@@ -1,0 +1,1301 @@
+{
+  "Xaxis": {
+    "curLocation": {
+      "valueType": "float",
+      "addr": "DM000",
+      "name": "X轴当前位置",
+      "describe": "当前位置，单位毫米"
+    },
+    "curSpeed": {
+      "valueType": "float",
+      "addr": "DM002",
+      "name": "X轴当前速度",
+      "describe": "当前速度，单位毫米每秒"
+    },
+    "curStatus": {
+      "valueType": "int16",
+      "addr": "DM004",
+      "name": "X轴当前状态",
+      "describe": "x轴当前状态, =1  axis1_ready"
+    },
+    "curMotion": {
+      "valueType": "int16",
+      "addr": "DM005",
+      "name": "X轴当前电机状态",
+      "describe": "x轴当前电机状态，=1 busy，=2 done"
+    },
+    "runType": {
+      "valueType": "bool",
+      "addr": "MR005",
+      "name": "X轴运行类型",
+      "describe": "x轴运动类型（=0点动，=1相对运动）"
+    },
+    "initLocation": {
+      "valueType": "bool",
+      "addr": "MR004",
+      "name": "X回原点启动",
+      "describe": "x回原点启动"
+    },
+    "jogStart": {
+      "valueType": "bool",
+      "addr": "MR006",
+      "name": "X轴正转开始",
+      "describe": "x轴正转开始"
+    },
+    "axisParamsConfirm": {
+      "valueType": "bool",
+      "addr": "MR010",
+      "name": "X轴参数设置确认",
+      "describe": "x轴参数设置确认"
+    },
+    "jogAntiStart": {
+      "valueType": "bool",
+      "addr": "MR007",
+      "name": "X轴反转开始",
+      "describe": "x轴反转开始"
+    },
+    "jogRelativeSpeed": {
+      "valueType": "float",
+      "addr": "DM044",
+      "name": "X点动和相对运动速度",
+      "describe": "x点动和相对运动速度",
+      "upperValue": "20",
+      "lowerValue": "0",
+      "alarmPriority": 1
+    },
+    "jogRelativeHighSpeed": {
+      "valueType": "float",
+      "addr": "DM046",
+      "name": "X点动和相对运动速度高速",
+      "describe": "x点动和相对运动速度高速",
+      "upperValue": "150",
+      "lowerValue": "0"
+    },
+    "relativeDistance": {
+      "valueType": "float",
+      "addr": "DM014",
+      "name": "X轴相对运动距离",
+      "describe": "x轴相对运动距离"
+    },
+    "absoluteStart": {
+      "valueType": "bool",
+      "addr": "MR002",
+      "name": "X轴绝对运动开始",
+      "describe": "x轴绝对运动开始"
+    },
+    "absoluteSpeed": {
+      "valueType": "float",
+      "addr": "DM042",
+      "name": "X轴绝对运动速度",
+      "describe": "x轴绝对运动速度",
+      "upperValue": "150",
+      "lowerValue": "0"
+    },
+    "absoluteLocation": {
+      "valueType": "float",
+      "addr": "DM012",
+      "name": "X轴绝对运动目标位置",
+      "describe": "x轴绝对运动目标位置",
+      "maxValue": "295",
+      "minValue": "-45"
+    },
+    "highSpeed": {
+      "valueType": "bool",
+      "addr": "MR008",
+      "name": "X轴高速运动",
+      "describe": "x轴高速运动0低速1高速"
+    },
+    "upperLimit": {
+      "valueType": "uint16",
+      "addr": "DM1000",
+      "name": "X轴正限位",
+      "describe": "X轴正限位标志，到正限位后锁定驱动器，需要手动解除锁定",
+      "invalidValue": [ "2" ],
+      "alarmPriority": 1
+    },
+    "lowerLimit": {
+      "valueType": "uint16",
+      "addr": "DM1000",
+      "name": "X轴负限位",
+      "describe": "X轴负限位标志，到负限位后锁定驱动器，需要手动解除锁定",
+      "invalidValue": [ "3" ],
+      "alarmPriority": 1
+    },
+    "softUpperLimit": {
+      "defaultValue": "295",
+      "valueType": "float",
+      "addr": "DM20",
+      "name": "X轴软正限位",
+      "describe": "X轴软正限位标志，到软正限位后无法继续正向移动"
+    },
+    "softLowerLimit": {
+      "defaultValue": "-42",
+      "valueType": "float",
+      "addr": "DM22",
+      "name": "X轴软负限位",
+      "describe": "X轴软负限位，到软负限位后无法继续负向运动"
+    },
+    "panelRelativeDistance": {
+      "valueType": "float",
+      "addr": "DM016",
+      "name": "X按钮模式相对移动距离",
+      "describe": "x按钮模式相对移动距离"
+    }
+  },
+  "Yaxis": {
+    "curLocation": {
+      "valueType": "float",
+      "addr": "DM100",
+      "name": "Y轴当前位置",
+      "describe": "Y当前位置，单位毫米"
+    },
+    "gratingRulerCurLocation": {
+      "valueType": "float",
+      "addr": "DM106",
+      "name": "Y轴光栅尺当前位置",
+      "describe": "Y轴光栅尺当前位置"
+    },
+    "curSpeed": {
+      "valueType": "float",
+      "addr": "DM102",
+      "name": "Y轴当前速度",
+      "describe": "Y轴当前速度，单位毫米每秒"
+    },
+    "curStatus": {
+      "valueType": "int16",
+      "addr": "DM104",
+      "name": "Y轴当前状态",
+      "describe": "Y轴当前状态"
+    },
+    "curMotion": {
+      "valueType": "int16",
+      "addr": "DM105",
+      "name": "Y轴当前电机状态",
+      "describe": "Y轴当前电机状态，=1 busy，=2 done"
+    },
+    "runType": {
+      "valueType": "bool",
+      "addr": "MR105",
+      "name": "Y轴运行类型",
+      "describe": "Y轴运动类型（=0点动，=1相对运动）"
+    },
+    "initLocation": {
+      "valueType": "bool",
+      "addr": "MR104",
+      "name": "Y回原点启动",
+      "describe": "y回原点启动"
+    },
+    "jogStart": {
+      "valueType": "bool",
+      "addr": "MR106",
+      "name": "Y轴正转开始",
+      "describe": "Y轴正转开始"
+    },
+    "axisParamsConfirm": {
+      "valueType": "bool",
+      "addr": "MR010",
+      "name": "Y轴参数设置确认",
+      "describe": "y轴参数设置确认"
+    },
+    "jogAntiStart": {
+      "valueType": "bool",
+      "addr": "MR107",
+      "name": "Y轴反转开始",
+      "describe": "Y轴反转开始"
+    },
+    "jogRelativeSpeed": {
+      "valueType": "float",
+      "addr": "DM144",
+      "name": "Y点动和相对运动速度",
+      "describe": "Y点动和相对运动速度",
+      "upperValue": "40",
+      "lowerValue": "0"
+    },
+    "jogRelativeHighSpeed": {
+      "valueType": "float",
+      "addr": "DM146",
+      "name": "Y点动和相对运动速度高速",
+      "describe": "y点动和相对运动速度高速",
+      "upperValue": "50",
+      "lowerValue": "0"
+    },
+    "relativeDistance": {
+      "valueType": "float",
+      "addr": "DM114",
+      "name": "Y轴相对运动距离",
+      "describe": "Y轴相对运动距离"
+    },
+    "absoluteStart": {
+      "valueType": "bool",
+      "addr": "MR102",
+      "name": "Y轴绝对运动开始",
+      "describe": "Y轴绝对运动开始"
+    },
+    "absoluteSpeed": {
+      "valueType": "float",
+      "addr": "DM142",
+      "name": "Y轴绝对运动速度",
+      "describe": "Y轴绝对运动速度",
+      "upperValue": "50",
+      "lowerValue": "0"
+    },
+    "absoluteLocation": {
+      "valueType": "float",
+      "addr": "DM112",
+      "name": "Y轴绝对运动目标位置",
+      "describe": "Y轴绝对运动目标位置",
+      "maxValue": "129",
+      "minValue": "-12"
+    },
+    "highSpeed": {
+      "valueType": "bool",
+      "addr": "MR108",
+      "name": "Y轴高速运动",
+      "describe": "y轴高速运动0低速1高速"
+    },
+    "upperLimit": {
+      "valueType": "uint16",
+      "addr": "DM1000",
+      "name": "Y轴正限位",
+      "describe": "Y轴正限位标志，到正限位后锁定驱动器，需要手动解除锁定",
+      "invalidValue": [ "5" ],
+      "alarmPriority": 1
+    },
+    "lowerLimit": {
+      "valueType": "uint16",
+      "addr": "DM1000",
+      "name": "Y轴负限位",
+      "describe": "Y轴负限位标志，到负限位后锁定驱动器，需要手动解除锁定",
+      "invalidValue": [ "6" ],
+      "alarmPriority": 1
+    },
+    "softUpperLimit": {
+      "defaultValue": "129",
+      "valueType": "float",
+      "addr": "DM120",
+      "name": "Y轴软正限位",
+      "describe": "Y轴软正限位标志，到软正限位后无法继续正向移动"
+    },
+    "softLowerLimit": {
+      "defaultValue": "-15",
+      "valueType": "float",
+      "addr": "DM122",
+      "name": "Y轴软负限位",
+      "describe": "Y轴软负限位，到软负限位后无法继续负向运动"
+    },
+    "panelRelativeDistance": {
+      "valueType": "float",
+      "addr": "DM116",
+      "name": "Y按钮模式相对移动距离",
+      "describe": "Y按钮模式相对移动距离"
+    }
+  },
+  "Z1axis": {
+    "curLocation": {
+      "valueType": "float",
+      "addr": "DM200",
+      "name": "Z1轴当前位置",
+      "describe": "Z1当前位置，单位毫米"
+    },
+    "gratingRulerCurLocation": {
+      "valueType": "float",
+      "addr": "DM206",
+      "name": "Z1轴光栅尺当前位置",
+      "describe": "Z1轴光栅尺当前位置"
+    },
+    "curSpeed": {
+      "valueType": "float",
+      "addr": "DM202",
+      "name": "Z1轴当前速度",
+      "describe": "当前速度，单位毫米每秒"
+    },
+    "curStatus": {
+      "valueType": "int16",
+      "addr": "DM204",
+      "name": "Z1轴当前状态",
+      "describe": "Z1轴当前状态"
+    },
+    "curMotion": {
+      "valueType": "int16",
+      "addr": "DM205",
+      "name": "Z1轴当前电机状态",
+      "describe": "Z1轴当前电机状态，=1 busy，=2 done"
+    },
+    "runType": {
+      "valueType": "bool",
+      "addr": "MR205",
+      "name": "Z1轴运行类型",
+      "describe": "Z1轴运动类型（=0点动，=1相对运动）"
+    },
+    "initLocation": {
+      "valueType": "bool",
+      "addr": "MR204",
+      "name": "Z1回原点启动",
+      "describe": "Z1回原点启动"
+    },
+    "jogStart": {
+      "valueType": "bool",
+      "addr": "MR206",
+      "name": "Z1轴正转开始",
+      "describe": "Z1轴正转开始"
+    },
+    "jogAntiStart": {
+      "valueType": "bool",
+      "addr": "MR207",
+      "name": "Z1轴反转开始",
+      "describe": "Z1轴反转开始"
+    },
+    "axisParamsConfirm": {
+      "valueType": "bool",
+      "addr": "MR010",
+      "name": "Z1轴参数设置确认",
+      "describe": "z1轴参数设置确认"
+    },
+    "jogRelativeSpeed": {
+      "valueType": "float",
+      "addr": "DM244",
+      "name": "Z1点动和相对运动速度",
+      "describe": "Z1点动和相对运动速度",
+      "upperValue": "40",
+      "lowerValue": "0"
+    },
+    "jogRelativeHighSpeed": {
+      "valueType": "float",
+      "addr": "DM246",
+      "name": "Z1点动和相对运动速度高速",
+      "describe": "z1点动和相对运动速度高速",
+      "upperValue": "40",
+      "lowerValue": "0"
+    },
+    "relativeDistance": {
+      "valueType": "float",
+      "addr": "DM214",
+      "name": "Z1轴相对运动距离",
+      "describe": "Z1轴相对运动距离"
+    },
+    "absoluteStart": {
+      "valueType": "bool",
+      "addr": "MR202",
+      "name": "Z1轴绝对运动开始",
+      "describe": "Z1轴绝对运动开始"
+    },
+    "absoluteSpeed": {
+      "valueType": "float",
+      "addr": "DM242",
+      "name": "Z1轴绝对运动速度",
+      "describe": "Z1轴绝对运动速度",
+      "upperValue": "40",
+      "lowerValue": "0"
+    },
+    "absoluteLocation": {
+      "valueType": "float",
+      "addr": "DM212",
+      "name": "Z1轴绝对运动目标位置",
+      "describe": "Z1轴绝对运动目标位置",
+      "maxValue": "50",
+      "minValue": "-5"
+    },
+    "highSpeed": {
+      "valueType": "bool",
+      "addr": "MR208",
+      "name": "Z1轴高速运动",
+      "describe": "z1轴高速运动0低速1高速"
+    },
+    "upperLimit": {
+      "valueType": "uint16",
+      "addr": "DM1000",
+      "name": "Z1轴正限位",
+      "describe": "Y轴正限位标志，到正限位后锁定驱动器，需要手动解除锁定",
+      "invalidValue": [ "8" ],
+      "alarmPriority": 1
+    },
+    "lowerLimit": {
+      "valueType": "uint16",
+      "addr": "DM1000",
+      "name": "Z1轴负限位",
+      "describe": "Z1轴负限位标志，到负限位后锁定驱动器，需要手动解除锁定",
+      "invalidValue": [ "9" ],
+      "alarmPriority": 1
+    },
+    "softUpperLimit": {
+      "defaultValue": "50",
+      "valueType": "float",
+      "addr": "DM220",
+      "name": "Z1轴软正限位",
+      "describe": "Z1轴软正限位标志，到软正限位后无法继续正向移动"
+    },
+    "softLowerLimit": {
+      "defaultValue": "-5",
+      "valueType": "float",
+      "addr": "DM222",
+      "name": "Z1轴软负限位",
+      "describe": "Z1轴软负限位，到软负限位后无法继续负向运动"
+    },
+    "panelRelativeDistance": {
+      "valueType": "float",
+      "addr": "DM216",
+      "name": "Z1按钮模式相对移动距离",
+      "describe": "Z1按钮模式相对移动距离"
+    }
+  },
+  "Z2axis": {
+    "curLocation": {
+      "valueType": "float",
+      "addr": "DM300",
+      "name": "Z2轴当前位置",
+      "describe": "Z2当前位置，单位毫米"
+    },
+    "curSpeed": {
+      "valueType": "float",
+      "addr": "DM302",
+      "name": "Z2轴当前速度",
+      "describe": "当前速度，单位毫米每秒"
+    },
+    "curStatus": {
+      "valueType": "int16",
+      "addr": "DM304",
+      "name": "Z2轴当前状态",
+      "describe": "Z2轴当前状态"
+    },
+    "curMotion": {
+      "valueType": "int16",
+      "addr": "DM305",
+      "name": "Z2轴当前电机状态",
+      "describe": "Z2轴当前电机状态，=1 busy，=2 done"
+    },
+    "runType": {
+      "valueType": "bool",
+      "addr": "MR305",
+      "name": "Z2轴运行类型",
+      "describe": "Z2轴运动类型（=0点动，=1相对运动）"
+    },
+    "initLocation": {
+      "valueType": "bool",
+      "addr": "MR304",
+      "name": "Z2回原点启动",
+      "describe": "Z2回原点启动"
+    },
+    "jogStart": {
+      "valueType": "bool",
+      "addr": "MR306",
+      "name": "Z2轴正转开始",
+      "describe": "Z2轴正转开始"
+    },
+    "axisParamsConfirm": {
+      "valueType": "bool",
+      "addr": "MR010",
+      "name": "Z2轴参数设置确认",
+      "describe": "z2轴参数设置确认"
+    },
+    "jogAntiStart": {
+      "valueType": "bool",
+      "addr": "MR307",
+      "name": "Z2轴反转开始",
+      "describe": "Z2轴反转开始"
+    },
+    "jogRelativeSpeed": {
+      "valueType": "float",
+      "addr": "DM344",
+      "name": "Z2点动和相对运动速度",
+      "describe": "Z2点动和相对运动速度",
+      "upperValue": "20",
+      "lowerValue": "0"
+    },
+    "jogRelativeHighSpeed": {
+      "valueType": "float",
+      "addr": "DM346",
+      "name": "Z2点动和相对运动速度高速",
+      "describe": "Z2点动和相对运动速度高速",
+      "upperValue": "20",
+      "lowerValue": "0"
+    },
+    "relativeDistance": {
+      "valueType": "float",
+      "addr": "DM314",
+      "name": "Z2轴相对运动距离",
+      "describe": "Z2轴相对运动距离"
+    },
+    "absoluteStart": {
+      "valueType": "bool",
+      "addr": "MR302",
+      "name": "Z2轴绝对运动开始",
+      "describe": "Z2轴绝对运动开始"
+    },
+    "absoluteSpeed": {
+      "valueType": "float",
+      "addr": "DM342",
+      "name": "Z2轴绝对运动速度",
+      "describe": "Z2轴绝对运动速度",
+      "upperValue": "30",
+      "lowerValue": "0"
+    },
+    "absoluteLocation": {
+      "valueType": "float",
+      "addr": "DM312",
+      "name": "Z2轴绝对运动目标位置",
+      "describe": "Z2轴绝对运动目标位置",
+      "maxValue": "40",
+      "minValue": "-5"
+    },
+    "highSpeed": {
+      "valueType": "bool",
+      "addr": "MR308",
+      "name": "Z2轴高速运动",
+      "describe": "Z2轴高速运动0低速1高速"
+    },
+    "upperLimit": {
+      "valueType": "uint16",
+      "addr": "DM1000",
+      "name": "Z2轴正限位",
+      "describe": "Y轴正限位标志，到正限位后锁定驱动器，需要手动解除锁定",
+      "invalidValue": [ "11" ],
+      "alarmPriority": 1
+    },
+    "lowerLimit": {
+      "valueType": "uint16",
+      "addr": "DM1000",
+      "name": "Z2轴负限位",
+      "describe": "Z1轴负限位标志，到负限位后锁定驱动器，需要手动解除锁定",
+      "invalidValue": [ "12" ],
+      "alarmPriority": 1
+    },
+    "softUpperLimit": {
+      "defaultValue": "50",
+      "valueType": "float",
+      "addr": "DM320",
+      "name": "Z2轴软正限位",
+      "describe": "Z2轴软正限位标志，到软正限位后无法继续正向移动"
+    },
+    "softLowerLimit": {
+      "defaultValue": "-5",
+      "valueType": "float",
+      "addr": "DM322",
+      "name": "Z2轴软负限位",
+      "describe": "Z2轴软负限位，到软负限位后无法继续负向运动"
+    }
+  },
+  "ThetaAxis": {
+    "curLocation": {
+      "valueType": "float",
+      "addr": "DM400",
+      "name": "Theta轴当前位置",
+      "describe": "Theta当前位置，单位毫米"
+    },
+    "curSpeed": {
+      "valueType": "float",
+      "addr": "DM402",
+      "name": "Theta轴当前速度",
+      "describe": "当前速度，单位毫米每秒"
+    },
+    "curStatus": {
+      "valueType": "int16",
+      "addr": "DM404",
+      "name": "Theta轴当前状态",
+      "describe": "Theta轴当前状态"
+    },
+    "curMotion": {
+      "valueType": "int16",
+      "addr": "DM405",
+      "name": "Theta轴当前电机状态",
+      "describe": "Theta轴当前电机状态，=1 busy，=2 done"
+    },
+    "runType": {
+      "valueType": "bool",
+      "addr": "MR405",
+      "name": "Theta轴运行类型",
+      "describe": "Theta轴运动类型（=0点动，=1相对运动）"
+    },
+    "initLocation": {
+      "valueType": "bool",
+      "addr": "MR404",
+      "name": "Theta回原点启动",
+      "describe": "Theta回原点启动"
+    },
+    "jogStart": {
+      "valueType": "bool",
+      "addr": "MR406",
+      "name": "Theta轴正转开始",
+      "describe": "Theta轴正转开始"
+    },
+    "axisParamsConfirm": {
+      "valueType": "bool",
+      "addr": "MR010",
+      "name": "Theta轴参数设置确认",
+      "describe": "theta轴参数设置确认"
+    },
+    "jogAntiStart": {
+      "valueType": "bool",
+      "addr": "MR407",
+      "name": "Theta轴反转开始",
+      "describe": "Theta轴反转开始"
+    },
+    "jogRelativeSpeed": {
+      "valueType": "float",
+      "addr": "DM444",
+      "name": "Theta点动和相对运动速度",
+      "describe": "Theta点动和相对运动速度",
+      "upperValue": "50",
+      "lowerValue": "0"
+    },
+    "jogRelativeHighSpeed": {
+      "valueType": "float",
+      "addr": "DM446",
+      "name": "Theta点动和相对运动速度高速",
+      "describe": "Theta点动和相对运动速度高速",
+      "upperValue": "50",
+      "lowerValue": "0"
+    },
+    "relativeDistance": {
+      "valueType": "float",
+      "addr": "DM414",
+      "name": "Theta轴相对运动距离",
+      "describe": "Theta轴相对运动距离"
+    },
+    "absoluteStart": {
+      "valueType": "bool",
+      "addr": "MR402",
+      "name": "Theta轴绝对运动开始",
+      "describe": "Theta轴绝对运动开始"
+    },
+    "absoluteSpeed": {
+      "valueType": "float",
+      "addr": "DM442",
+      "name": "Theta轴绝对运动速度",
+      "describe": "Theta轴绝对运动速度",
+      "upperValue": "50",
+      "lowerValue": "0"
+    },
+    "absoluteLocation": {
+      "valueType": "float",
+      "addr": "DM412",
+      "name": "Theta轴绝对运动目标位置",
+      "describe": "Theta轴绝对运动目标位置"
+    },
+    "highSpeed": {
+      "valueType": "bool",
+      "addr": "MR408",
+      "name": "Theta轴高速运动",
+      "describe": "Theta轴高速运动0低速1高速"
+    }
+  },
+  "bladeMantance": {
+    "initReplaceLocation": {
+      "valueType": "bool",
+      "addr": "MR600",
+      "name": "进入换刀画面",
+      "describe": "进入换刀画面"
+    },
+    "xReplaceLocation": {
+      "valueType": "float",
+      "addr": "DM518",
+      "name": "x轴刀片换刀位置",
+      "describe": "x轴刀片换刀位置"
+    },
+    "yReplaceLocation": {
+      "valueType": "float",
+      "addr": "DM520",
+      "name": "Y轴刀片换刀位置",
+      "describe": "Y轴刀片换刀位置"
+    },
+    "z1ReplaceLocation": {
+      "valueType": "float",
+      "addr": "DM522",
+      "name": "Z1轴刀片换刀位置",
+      "describe": "z1轴刀片换刀位置"
+    },
+    "z2ReplaceLocation": {
+      "valueType": "float",
+      "addr": "DM524",
+      "name": "Z2轴刀片换刀位置",
+      "describe": "z2轴刀片换刀位置"
+    },
+    "bladeSetup": {
+      "valueType": "bool",
+      "addr": "MR601",
+      "name": "进入测高画面",
+      "describe": "进入测高画面"
+    },
+    "bladeMantanceStatus": {
+      "valueType": "bool",
+      "addr": "MR607",
+      "name": "刀片维护准备OK",
+      "describe": "刀片维护准备OK"
+    },
+    "confirmParams": {
+      "valueType": "bool",
+      "addr": "MR609",
+      "name": "刀片维护参数设置确认",
+      "describe": "刀片维护参数设置确认"
+    },
+    "xHeightSet": {
+      "valueType": "float",
+      "addr": "DM526",
+      "name": "x轴测高位置设置",
+      "describe": "x轴测高位置设置"
+    },
+    "yHeightSet": {
+      "valueType": "float",
+      "addr": "DM528",
+      "name": "Y轴测高位置设置",
+      "describe": "Y轴测高位置设置"
+    },
+    "z1HeightSet": {
+      "valueType": "float",
+      "addr": "DM530",
+      "name": "Z1轴测高位置设置",
+      "describe": "z1轴测高位置设置"
+    },
+    "z2HeightSet": {
+      "valueType": "float",
+      "addr": "DM532",
+      "name": "Z2轴测高位置设置",
+      "describe": "z2轴测高位置设置"
+    },
+    "xBaseMeasurePos": {
+      "valueType": "float",
+      "addr": "DM534",
+      "name": "x轴基准线测量位置设置",
+      "describe": "x轴基准线测量位置设置"
+    },
+    "yBaseMeasurePos": {
+      "valueType": "float",
+      "addr": "DM536",
+      "name": "Y轴基准线测量位置设置",
+      "describe": "Y轴基准线测量位置设置"
+    },
+    "z1BaseMeasurePos": {
+      "valueType": "float",
+      "addr": "DM534",
+      "name": "Z1轴基准线测量位置设置",
+      "describe": "z1轴基准线测量位置设置"
+    },
+    "z2BaseMeasurePos": {
+      "valueType": "float",
+      "addr": "DM536",
+      "name": "Z2轴基准线测量位置设置",
+      "describe": "z2轴基准线测量位置设置"
+    }
+  },
+  "wholeDevice": {
+    "systemInit": {
+      "valueType": "bool",
+      "addr": "MR500",
+      "name": "整机零点标定",
+      "describe": "整机零点标定"
+    },
+    "systemReset": {
+      "valueType": "bool",
+      "addr": "MR501",
+      "name": "整机复位",
+      "describe": "整机复位"
+    },
+    "systemErrorReset": {
+      "valueType": "bool",
+      "addr": "MR1000",
+      "name": "轴错误报警已解除",
+      "describe": "轴错误报警已解除"
+    },
+    "systemStop": {
+      "valueType": "bool",
+      "addr": "MR502",
+      "name": "停止",
+      "describe": "停止"
+    },
+    "axisAlarm": {
+      "valueType": "int16",
+      "addr": "DM1000",
+      "name": "轴错误报警",
+      "describe": "轴错误报警",
+      "validValue": [ "0" ],
+      "alarmPriority": 0
+    },
+    "clearAxisAlarm": {
+      "valueType": "bool",
+      "addr": "MR503",
+      "name": "轴错误清除",
+      "describe": "轴错误清除"
+    },
+    "vacuumState": {
+      "valueType": "bool",
+      "addr": "MR504",
+      "name": "真空状态",
+      "describe": "真空状态"
+    },
+    "vacuumSwitch": {
+      "valueType": "bool",
+      "addr": "MR603",
+      "name": "真空on/off",
+      "describe": "真空on/off"
+    },
+    "spindleAir": {
+      "valueType": "bool",
+      "addr": "MR505",
+      "name": "主轴气源",
+      "describe": "主轴气源"
+    },
+    "spindleCuttingWater": {
+      "valueType": "bool",
+      "addr": "MR506",
+      "name": "主轴切割水",
+      "describe": "主轴切割水"
+    },
+    "spindleCoolingWater": {
+      "valueType": "bool",
+      "addr": "MR507",
+      "name": "主轴冷却水",
+      "describe": "主轴冷却水"
+    },
+    "workpieceBlowingStatus": {
+      "valueType": "bool",
+      "addr": "MR509",
+      "name": "相机吹气状态",
+      "describe": "相机吹气状态"
+    },
+    "systemInitStatus": {
+      "valueType": "bool",
+      "addr": "MR510",
+      "name": "整机零点标定完成",
+      "describe": "整机零点标定完成"
+    },
+    "spindleManuallyRun": {
+      "valueType": "bool",
+      "addr": "MR511",
+      "name": "主轴手动运行",
+      "describe": "主轴手动运行"
+    },
+    "spindleManuallyRunStatus": {
+      "valueType": "bool",
+      "addr": "MR513",
+      "name": "主轴运行",
+      "describe": "主轴运行"
+    },
+    "vacuumSwitchStatus": {
+      "valueType": "bool",
+      "addr": "MR512",
+      "name": "真空打开状态",
+      "describe": "真空打开状态"
+    },
+    "screwOil": {
+      "valueType": "bool",
+      "addr": "MR508",
+      "name": "丝杆润源油",
+      "describe": "丝杆润源油"
+    },
+    "systemAlarm": {
+      "valueType": "int16",
+      "addr": "DM1010",
+      "name": "硬件报警",
+      "describe": "设备硬件报警",
+      "validValue": [ "0" ],
+      "alarmPriority": 10
+    },
+    "clearSystemAlarm": {
+      "valueType": "bool",
+      "addr": "MR1001",
+      "name": "确认硬件报警",
+      "describe": "确认设备硬件报警"
+    },
+    "securityDoor1": {
+      "valueType": "bool",
+      "addr": "MR604",
+      "name": "翻转安全门",
+      "describe": "翻转安全门"
+    },
+    "securityDoor2Close": {
+      "valueType": "bool",
+      "addr": "MR605",
+      "name": "关闭推拉安全门",
+      "describe": "关闭推拉安全门"
+    },
+    "securityDoor2Open": {
+      "valueType": "bool",
+      "addr": "MR606",
+      "name": "打开推拉安全门",
+      "describe": "打开推拉安全门"
+    },
+    "securityDoor1Status": {
+      "valueType": "int16",
+      "addr": "DM006",
+      "name": "安全门1状态",
+      "describe": "安全门1状态"
+    },
+    "securityDoor2Status": {
+      "valueType": "int16",
+      "addr": "DM007",
+      "name": "安全门2状态",
+      "describe": "安全门2状态"
+    },
+    "spindleSpeedStatus": {
+      "valueType": "int16",
+      "addr": "DM008",
+      "name": "主轴转速显示",
+      "describe": "主轴转速显示"
+    },
+    "cuttingWater": {
+      "valueType": "bool",
+      "addr": "MR911",
+      "name": "切割水ON/OFF",
+      "describe": "切割水ON/OFF"
+    },
+    "workpieceBlowing": {
+      "valueType": "bool",
+      "addr": "MR912",
+      "name": "工件吹气ON/OFF",
+      "describe": "工件吹气ON/OFF"
+    },
+    "panelButtons": {
+      "valueType": "bool",
+      "addr": "MR515",
+      "name": "面板按钮有效",
+      "describe": "面板按钮有效"
+    }
+  },
+  "calibration": {
+    "alignInit": {
+      "valueType": "bool",
+      "addr": "MR800",
+      "name": "进入影像校准画面",
+      "describe": "进入影像校准画面"
+    },
+    "alignStatus": {
+      "valueType": "bool",
+      "addr": "MR805",
+      "name": "校准准备OK",
+      "describe": "校准准备OK"
+    },
+    "confirmParams": {
+      "valueType": "bool",
+      "addr": "MR804",
+      "name": "校准参数设置确认",
+      "describe": "校准参数设置确认"
+    },
+    "alignInitX": {
+      "valueType": "float",
+      "addr": "dm580",
+      "name": "x轴校准初始设置",
+      "describe": "x轴校准初始设置"
+    },
+    "alignInitY": {
+      "valueType": "float",
+      "addr": "dm584",
+      "name": "y轴校准初始设置",
+      "describe": "y轴校准初始设置"
+    },
+    "alignInitZ1": {
+      "valueType": "float",
+      "addr": "dm588",
+      "name": "z1轴校准初始设置",
+      "describe": "z1轴校准初始设置"
+    },
+    "alignInitZ2": {
+      "valueType": "float",
+      "addr": "dm560",
+      "name": "z2轴校准初始设置",
+      "describe": "z2轴校准初始设置"
+    },
+    "alignRunMotion": {
+      "valueType": "bool",
+      "addr": "MR806",
+      "name": "XY校准运行开始",
+      "describe": "XY校准运行开始"
+    },
+    "xRunMotion": {
+      "valueType": "float",
+      "addr": "DM562",
+      "name": "X轴校准位置",
+      "describe": "X轴校准位置"
+    },
+    "yRunMotion": {
+      "valueType": "float",
+      "addr": "DM564",
+      "name": "Y轴校准位置",
+      "describe": "Y轴校准位置"
+    }
+  },
+  "cutting": {
+    "fullAutoInit": {
+      "valueType": "bool",
+      "addr": "MR900",
+      "name": "自动切割画面进入",
+      "describe": "自动切割画面进入"
+    },
+    "semiAutoInit": {
+      "valueType": "bool",
+      "addr": "MR901",
+      "name": "半自动切割画面进入",
+      "describe": "半自动切割画面进入"
+    },
+    "confirmParams": {
+      "valueType": "bool",
+      "addr": "MR902",
+      "name": "切割设置参数确认",
+      "describe": "切割设置参数确认"
+    },
+    "cutStatus": {
+      "valueType": "bool",
+      "addr": "MR903",
+      "name": "切割准备完成",
+      "describe": "切割准备完成"
+    },
+    "cutDirectionAgo": {
+      "valueType": "bool",
+      "addr": "MR904",
+      "name": "切割方向-前切",
+      "describe": "切割方向-前切"
+    },
+    "cutMethod": {
+      "valueType": "int16",
+      "addr": "DM622",
+      "name": "切割模式",
+      "describe": "切割模式"
+    },
+    "cutDirectionAfter": {
+      "valueType": "bool",
+      "addr": "MR905",
+      "name": "切割方向-后切",
+      "describe": "切割方向-后切"
+    },
+    "cutStart": {
+      "valueType": "bool",
+      "addr": "MR906",
+      "name": "切割开始",
+      "describe": "切割开始"
+    },
+    "cutStop": {
+      "valueType": "bool",
+      "addr": "MR907",
+      "name": "切割停止",
+      "describe": "切割停止"
+    },
+    "fullAutoCutEnd": {
+      "valueType": "bool",
+      "addr": "MR908",
+      "name": "自动切割结束",
+      "describe": "自动所有切割面完成后，=1"
+    },
+    "alignmentStatus": {
+      "valueType": "bool",
+      "addr": "MR909",
+      "name": "自动校准开始",
+      "describe": "第一刀切割后，停止等待校准OK"
+    },
+    "shutdownCheck": {
+      "valueType": "bool",
+      "addr": "MR910",
+      "name": "停机检查",
+      "describe": "停机检查"
+    },
+    "xStartPosition": {
+      "valueType": "float",
+      "addr": "DM590",
+      "name": "X轴切割开始位置",
+      "describe": "X轴切割开始位置"
+    },
+    "xLength": {
+      "valueType": "float",
+      "addr": "DM602",
+      "name": "X轴切割结束位置",
+      "describe": "X轴切割结束位置"
+    },
+    "xInitPosition": {
+      "valueType": "float",
+      "addr": "DM592",
+      "name": "进入切割模式X轴初始位置",
+      "describe": "进入切割模式X轴初始位置"
+    },
+    "yInitPosition": {
+      "valueType": "float",
+      "addr": "DM596",
+      "name": "进入切割模式Y轴初始位置",
+      "describe": "进入切割模式Y轴初始位置"
+    },
+    "z1InitPosition": {
+      "valueType": "float",
+      "addr": "DM600",
+      "name": "进入切割模式z1轴初始位置",
+      "describe": "进入切割模式z1轴初始位置"
+    },
+    "yStartPosition": {
+      "valueType": "float",
+      "addr": "DM594",
+      "name": "Y轴切割开始位置",
+      "describe": "Y轴切割开始位置"
+    },
+    "z1StartPosition": {
+      "valueType": "float",
+      "addr": "DM598",
+      "name": "z1轴切割开始位置",
+      "describe": "z1轴切割开始位置"
+    },
+    "z1EndPosition": {
+      "valueType": "float",
+      "addr": "DM610",
+      "name": "z1轴切割结束位置",
+      "describe": "z1轴切割结束位置"
+    },
+    "spindleRev": {
+      "valueType": "int16",
+      "addr": "DM608",
+      "name": "主轴速度",
+      "describe": "主轴速度"
+    },
+    "confirmParamsStatus": {
+      "valueType": "int16",
+      "addr": "DM605",
+      "name": "返回数据写入状态",
+      "describe": "返回数据写入状态"
+    },
+    "cutNum": {
+      "valueType": "int16",
+      "addr": "DM604",
+      "name": "切割次数",
+      "describe": "切割次数"
+    },
+    "cutFaceAngle": {
+      "valueType": "float",
+      "addr": "DM606",
+      "name": "当前切割面角度",
+      "describe": "当前切割面角度"
+    },
+    "feedSpeed": {
+      "valueType": "float",
+      "addr": "DM612",
+      "name": "X切割速度",
+      "describe": "X切割速度"
+    },
+    "xStopLocation": {
+      "valueType": "float",
+      "addr": "DM614",
+      "name": "x轴停机检查位置",
+      "describe": "x轴停机检查位置"
+    },
+    "yStopLocation": {
+      "valueType": "float",
+      "addr": "DM616",
+      "name": "y停机检查位置",
+      "describe": "y停机检查位置"
+    },
+    "z2StopLocation": {
+      "valueType": "float",
+      "addr": "DM618",
+      "name": "z2停机检查位置",
+      "describe": "z2停机检查位置"
+    },
+    "returnSpeed": {
+      "valueType": "float",
+      "addr": "DM620",
+      "name": "切割返回速度",
+      "describe": "切割返回速度"
+    }
+  },
+  "sparkRepairKnife": {
+    "enterElectrical": {
+      "valueType": "bool",
+      "addr": "MR700",
+      "name": "进入修刀画面",
+      "describe": "进入修刀画面"
+    },
+    "confirmParams": {
+      "valueType": "bool",
+      "addr": "MR701",
+      "name": "修刀参数设置确认",
+      "describe": "修刀参数设置确认"
+    },
+    "sharpenStart": {
+      "valueType": "bool",
+      "addr": "MR702",
+      "name": "修刀开始",
+      "describe": "修刀开始"
+    },
+    "sharpenEnd": {
+      "valueType": "bool",
+      "addr": "MR707",
+      "name": "修刀结束",
+      "describe": "修刀结束"
+    },
+    "sharpenStop": {
+      "valueType": "bool",
+      "addr": "MR703",
+      "name": "修刀停止",
+      "describe": "修刀停止"
+    },
+    "sharpenStatus": {
+      "valueType": "bool",
+      "addr": "MR705",
+      "name": "电火花修刀准备OK",
+      "describe": "电火花修刀准备OK"
+    },
+    "z1StartPos": {
+      "valueType": "float",
+      "addr": "dm640",
+      "name": "z1轴修刀开始位置",
+      "describe": "z1轴修刀开始位置"
+    },
+    "yFrontStartPos": {
+      "valueType": "float",
+      "addr": "dm644",
+      "name": "Y轴正面修刀开始位置",
+      "describe": "Y轴正面修刀开始位置"
+    },
+    "yBackStartPos": {
+      "valueType": "float",
+      "addr": "dm648",
+      "name": "Y轴反面修刀开始位置",
+      "describe": "Y轴反面修刀开始位置"
+    },
+    "z1EndPos": {
+      "valueType": "float",
+      "addr": "dm652",
+      "name": "z1轴修刀结束位置",
+      "describe": "z1轴修刀结束位置"
+    },
+    "xStartPos": {
+      "valueType": "float",
+      "addr": "DM664",
+      "name": "x轴修刀开始位置",
+      "describe": "x轴修刀开始位置"
+    },
+    "zStepAmount": {
+      "valueType": "float",
+      "addr": "DM668",
+      "name": "z轴每次修刀下降距离",
+      "describe": "z轴每次修刀下降距离"
+    },
+    "repeatCount": {
+      "valueType": "int16",
+      "addr": "DM670",
+      "name": "重复次数",
+      "describe": "重复次数"
+    },
+    "sharpenSpeed": {
+      "valueType": "float",
+      "addr": "DM672",
+      "name": "修刀速度",
+      "describe": "修刀速度"
+    },
+    "spindleSpeed": {
+      "valueType": "float",
+      "addr": "DM674",
+      "name": "修刀主轴速度",
+      "describe": "修刀主轴速度"
+    },
+    "zLimitPos": {
+      "valueType": "float",
+      "addr": "DM676",
+      "name": "Z轴极限位置",
+      "describe": "Z轴极限位置"
+    },
+    "currentCount": {
+      "valueType": "int16",
+      "addr": "DM660",
+      "name": "当前修刀次数",
+      "describe": "当前修刀次数"
+    },
+    "electricalStatus": {
+      "valueType": "bool",
+      "addr": "MR704",
+      "name": "修刀工作中",
+      "describe": "修刀工作中"
+    }
+  }
+}

@@ -1,0 +1,34 @@
+﻿<Page x:Class="精密切割系统.View.Pages.F4_BladeMaintenance.FADressDataDelConf"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
+      xmlns:local="clr-namespace:精密切割系统.View.Pages.F4_BladeMaintenance"
+      mc:Ignorable="d" 
+      d:DesignHeight="676" d:DesignWidth="1448"
+      Title="FADressDataDelConf" Loaded="Page_Loaded">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
+        <!--磨刀参数拷贝 -->
+        <Label x:Name="labParameterCopy" Content="磨刀参数删除" Margin="30,30,0,0" Grid.Row="0"  Grid.Column="0" Grid.ColumnSpan="2" FontSize="30" FontWeight="Bold"/>
+        <StackPanel Grid.Row="1" Grid.Column="0" x:Name="sp1" HorizontalAlignment="Center">
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left"  Margin="0,50,0,0">
+                <Label Width="140" Height="35"  x:Name="labDelParameterNo" Content="删除参数号" FontWeight="Bold" FontSize="16"/>
+                <Controls:InputTextBox x:Name="tbDelParameterNo" Width="160" TextWrapping="Wrap" Height="35" InputType="Numeral" XMin="0" XAllowNull="False" IsEnabled="False"/>
+            </StackPanel>
+            <Label  Height="35"  x:Name="labParameterEnter" Content="按确定键将删除参数号" Margin="0,50,0,0" FontWeight="Bold" FontSize="16" HorizontalContentAlignment="Center"/>
+
+        </StackPanel>
+    </Grid>
+</Page>

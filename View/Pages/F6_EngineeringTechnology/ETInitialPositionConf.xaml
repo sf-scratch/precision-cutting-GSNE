@@ -1,0 +1,92 @@
+﻿<Page x:Class="精密切割系统.View.F6_EngineeringTechnology.ETInitialPositionConf"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
+      xmlns:local="clr-namespace:精密切割系统.View.F6_EngineeringTechnology"
+      mc:Ignorable="d" 
+      d:DesignHeight="676" d:DesignWidth="1448"
+      Title="ETInitialPositionConf" Loaded="Page_Loaded">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="350"/>
+            <ColumnDefinition Width="350"/>
+            <ColumnDefinition Width="350"/>
+        </Grid.ColumnDefinitions>
+        <!--原6.6 -->
+        <Label x:Name="labInitialPosition" Content="各模式初始位置 (4.3)" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="30,30,0,0" FontSize="30" FontWeight="Bold"/>
+        <StackPanel Grid.Row="1" Grid.Column="0" x:Name="sp1" Margin="30,0,10,0" >
+            <Label  Height="35"  x:Name="labHeightPosition" Content="测高模式" Margin="0,20,0,5" FontWeight="Bold" FontSize="22"/>
+            <Label  Height="35"  x:Name="zhweizhi" Content="" Margin="0,10,0,5" FontWeight="Bold" FontSize="18"/>
+            <Label Height="35"  x:Name="labBladeSetupInitX" Content="x轴初始位置" Margin="0,10,0,5" FontWeight="Bold" FontSize="16"/>
+            <Controls:InputTextBox x:Name="inputBladeSetupInitX" TextWrapping="Wrap" Height="35" InputType="Decimal" XMin="-45" XMax="295"  XPrecision="3"/>
+
+            <Label Height="35"  x:Name="labBladeSetupInitY" Content="y轴初始位置" Margin="0,10,0,0" FontWeight="Bold" FontSize="16"/>
+            <Controls:InputTextBox x:Name="inputBladeSetupInitY" TextWrapping="Wrap" Height="35" InputType="Decimal" XMin="-15" XMax="135" XPrecision="3"/>
+
+            <Label Height="35"  x:Name="labBladeSetupInitZ1" Content="z1轴初始位置" Margin="0,10,0,0" FontWeight="Bold" FontSize="16"/>
+            <Controls:InputTextBox x:Name="inputBladeSetupInitZ1" TextWrapping="Wrap" Height="35" InputType="Decimal" XMin="-5" XMax="50"  XPrecision="3"/>
+
+            <Label Height="35"  x:Name="labBladeSetupInitZ2" Content="z2轴初始位置" Margin="0,10,0,0" FontWeight="Bold" FontSize="16"/>
+            <Controls:InputTextBox x:Name="inputBladeSetupInitZ2" TextWrapping="Wrap" Height="35" InputType="Decimal" XMin="-5" XMax="50"  XPrecision="3"/>
+            
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="1" x:Name="sp2" Margin="50,0,10,0" >
+            <Label  Height="35"  x:Name="labPositionOfElectricSpark" Content="校准模式" Margin="0,20,0,5" FontWeight="Bold" FontSize="22"/>
+            <Label  Height="35"  x:Name="labCalibratedPosition" Content="" Margin="0,10,0,5" FontWeight="Bold" FontSize="18"/>
+            <Label  Height="35"  x:Name="labAlignInitX" Content="x轴初始位置" Margin="0,10,0,5" FontWeight="Bold" FontSize="16"/>
+            <Controls:InputTextBox x:Name="inputAlignInitX" TextWrapping="Wrap" Height="35" InputType="Decimal" XMin="-45" XMax="295"  XPrecision="3"/>
+
+            <Label   Height="35"  x:Name="labAlignInitY" Content="y轴初始位置" Margin="0,10,0,0" FontWeight="Bold" FontSize="16"/>
+            <Controls:InputTextBox x:Name="inputAlignInitY" TextWrapping="Wrap" Height="35" InputType="Decimal" XMin="-15" XMax="135" XPrecision="3"/>
+
+            <Label  Height="35"  x:Name="labAlignInitZ1" Content="z1轴初始位置" Margin="0,10,0,0" FontWeight="Bold" FontSize="16"/>
+            <Controls:InputTextBox x:Name="inputAlignInitZ1" TextWrapping="Wrap" Height="35" InputType="Decimal" XMin="-5" XMax="50"  XPrecision="3"/>
+
+            <Label  Height="35"  x:Name="labAlignInitZ2" Content="z2轴初始位置" Margin="0,10,0,0" FontWeight="Bold" FontSize="16"/>
+            <Controls:InputTextBox x:Name="inputAlignInitZ2" TextWrapping="Wrap" Height="35"  InputType="Decimal" XMin="-5" XMax="50"  XPrecision="3"/>
+            
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="2" x:Name="sp3" Margin="50,0,10,0" >
+            <Label  Height="35"  x:Name="zhweizhi2" Content="切割模式" Margin="0,20,0,5" FontWeight="Bold" FontSize="22"/>
+            <Label  Height="35"  x:Name="labCuttingPosition" Content="" Margin="0,10,0,5" FontWeight="Bold" FontSize="18"/>
+            <Label  Height="35"  x:Name="labCutInitX" Content="x轴初始位置" Margin="0,10,0,5" FontWeight="Bold" FontSize="16"/>
+            <Controls:InputTextBox x:Name="inputCutInitX" TextWrapping="Wrap" Height="35" InputType="Decimal" XMin="-45" XMax="295"  XPrecision="3"/>
+
+            <Label   Height="35"  x:Name="labCutInitY" Content="y轴初始位置" Margin="0,10,0,0" FontWeight="Bold" FontSize="16"/>
+            <Controls:InputTextBox x:Name="inputCutInitY" TextWrapping="Wrap" Height="35" InputType="Decimal" XMin="-15" XMax="135" XPrecision="3"/>
+
+            <Label  Height="35"  x:Name="labCutInitZ1" Content="z1轴初始位置" Margin="0,10,0,0" FontWeight="Bold" FontSize="16"/>
+            <Controls:InputTextBox x:Name="inputCutInitZ1" TextWrapping="Wrap" Height="35" InputType="Decimal" XMin="-5" XMax="50"  XPrecision="3"/>
+
+            <Label  Height="35"  x:Name="labCutInitZ2" Content="z2轴初始位置" Margin="0,10,0,0" FontWeight="Bold" FontSize="16"/>
+            <Controls:InputTextBox x:Name="inputCutInitZ2" TextWrapping="Wrap" Height="35"  InputType="Decimal" XMin="-5" XMax="50"  XPrecision="3"/>
+
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="3" x:Name="sp4" Margin="50,0,10,0" >
+            <Label  Height="35"  x:Name="labBladeReplacementPosition" Content="刀片更换模式" Margin="0,20,0,5" FontWeight="Bold" FontSize="22"/>
+            <Label  Height="35"  x:Name="zhweizhi3" Content="" Margin="0,10,0,5" FontWeight="Bold" FontSize="18"/>
+            <Label  Height="35"  x:Name="labCutReplaceInitX" Content="x轴初始位置" Margin="0,10,0,5" FontWeight="Bold" FontSize="16"/>
+            <Controls:InputTextBox x:Name="inputCutReplaceInitX" TextWrapping="Wrap" Height="35" InputType="Decimal" XMin="-45" XMax="295"  XPrecision="3"/>
+
+            <Label   Height="35"  x:Name="labCutReplaceInitY" Content="y轴初始位置" Margin="0,10,0,0" FontWeight="Bold" FontSize="16"/>
+            <Controls:InputTextBox x:Name="inputCutReplaceInitY" TextWrapping="Wrap" Height="35" InputType="Decimal" XMin="-15" XMax="135"  XPrecision="3"/>
+
+            <Label  Height="35"  x:Name="labCutReplaceInitZ1" Content="z1轴初始位置" Margin="0,10,0,0" FontWeight="Bold" FontSize="16"/>
+            <Controls:InputTextBox x:Name="inputCutReplaceInitZ1" TextWrapping="Wrap" Height="35" InputType="Decimal" XMin="-5" XMax="50"  XPrecision="3"/>
+
+            <Label  Height="35"  x:Name="labCutReplaceInitZ2" Content="z2轴初始位置" Margin="0,10,0,0" FontWeight="Bold" FontSize="16"/>
+            <Controls:InputTextBox x:Name="inputCutReplaceInitZ2" TextWrapping="Wrap" Height="35"  InputType="Decimal" XMin="-5" XMax="50"  XPrecision="3"/>
+
+        </StackPanel>
+
+
+    </Grid>
+</Page>

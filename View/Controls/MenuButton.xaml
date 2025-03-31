@@ -1,0 +1,75 @@
+﻿<UserControl x:Class="精密切割系统.View.Controls.MenuButton"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:精密切割系统.View.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="224" d:DesignWidth="302">
+    <Grid>
+        <Border x:Name="menuBorder" CornerRadius="10">
+            <Button x:Name="menuBtn"  Grid.Column="2"  HorizontalAlignment="Center" VerticalAlignment="Center" Background="Transparent" BorderThickness="0,0,0,0" Padding="0,0,0,3" IsHitTestVisible="False">
+                <StackPanel Orientation="Vertical">
+                    <Image x:Name="menuIcon" HorizontalAlignment="Center" VerticalAlignment="Top" Source="/Assets/picture/main_btn_sd.png" Width="80" Height="80" Margin="0,0,0,0"/>
+                    <TextBlock x:Name="menuText" HorizontalAlignment="Center" Text="相机操作" VerticalAlignment="Bottom" Margin="0,30,0,0" FontSize="24" FontWeight="Bold"/>
+                </StackPanel>
+            </Button>
+            <Border.Effect>
+                <DropShadowEffect 
+                ShadowDepth="5" 
+                BlurRadius="20" 
+                Color="#4DC9EBF7" 
+                Direction="315" />
+            </Border.Effect>
+            <!-- 设置按钮内容的偏移效果 -->
+            <Border.RenderTransform>
+                <TranslateTransform x:Name="ContentTransform" X="0" Y="0" />
+            </Border.RenderTransform>
+            <!-- 响应事件 -->
+            <Border.Triggers>
+                <!-- 按下时内容向阴影方向偏移 -->
+                <EventTrigger RoutedEvent="Border.TouchDown">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)"
+                                             To="2" Duration="0:0:0.1" />
+                            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)"
+                                             To="2" Duration="0:0:0.1" />
+                            <!-- 发光减弱 -->
+                            <DoubleAnimation Storyboard.TargetProperty="(Effect).(DropShadowEffect.Opacity)"
+                                             To="0.16" Duration="0:0:0.1" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+                <!-- 松开时恢复原位 -->
+                <EventTrigger RoutedEvent="Border.TouchUp">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)"
+                                             To="0" Duration="0:0:0.1" />
+                            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)"
+                                             To="0" Duration="0:0:0.1" />
+                            <!-- 发光恢复 -->
+                            <DoubleAnimation Storyboard.TargetProperty="(Effect).(DropShadowEffect.Opacity)"
+                                             To="0.8" Duration="0:0:0.1" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+                <!-- 松开时恢复原位 -->
+                <EventTrigger RoutedEvent="Border.TouchLeave">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)"
+                                             To="0" Duration="0:0:0.1" />
+                            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)"
+                                             To="0" Duration="0:0:0.1" />
+                            <!-- 发光恢复 -->
+                            <DoubleAnimation Storyboard.TargetProperty="(Effect).(DropShadowEffect.Opacity)"
+                                             To="0.8" Duration="0:0:0.1" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Border.Triggers>
+        </Border>
+    </Grid>
+</UserControl>

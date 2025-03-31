@@ -1,0 +1,16 @@
+bin
+obj
+.idea
+.vs
+.csproj.user
+.csproj
+.cache
+.lref
+/obj
+/bin
+/精密切割系统.csproj
+/精密切割系统.csproj.user
+/精密切割系统.sln.DotSettings.user
+/Program.cs
+/DrvLog
+Program.cs

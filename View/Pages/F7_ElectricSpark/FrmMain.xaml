@@ -1,0 +1,138 @@
+﻿<Page x:Class="精密切割系统.View.Pages.FrmMain"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:Controls="clr-namespace:精密切割系统.View.Controls" 
+      xmlns:local="clr-namespace:精密切割系统.View.Pages"
+      mc:Ignorable="d" 
+      d:DesignHeight="676" d:DesignWidth="1448"
+      Title="FrmMain" Loaded="Page_Loaded" Unloaded="Page_Unloaded">
+
+    <Grid>
+        <StackPanel Margin="30,10,0,0" >
+            <Label x:Name="lbTitles" Margin="0,30,0,0" Content="精度测量(7.5)" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"  FontWeight="Bold" FontSize="22"/>
+            <StackPanel Width="1200" Margin="0,20,0,0" Orientation="Horizontal" HorizontalAlignment="Left" >
+                <Label Width="120"  Height="35" Content="测量轴" FontWeight="Bold" FontSize="16" />
+                <ComboBox x:Name="testAxisInput" Width="140" Height="35" VerticalContentAlignment="Center">
+                    <ComboBoxItem Content="X轴" Tag="X轴" Height="30"/>
+                    <ComboBoxItem Content="Y轴" Tag="Y轴" Height="30"/>
+                    <ComboBoxItem Content="Z1轴" Tag="Z1轴" Height="30"/>                    
+                </ComboBox>
+                <Label Width="50"></Label>
+                <Label Width="120" Height="35" Content="当前状态" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox x:Name="testStatus" Width="140" Text="准备中..." TextWrapping="Wrap"  Height="35" IsEnabled="False"/>
+                <Label Width="120" Margin="20 0 0 0"  Height="35" Content="暂停时间(毫秒)" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox x:Name="stopTime" Width="140"  TextWrapping="Wrap"  Height="35" InputType="Numeral" XMin="0" XMax="999999"/>
+            </StackPanel>
+            <StackPanel Width="1400" Margin="0,10,0,0" Orientation="Horizontal" HorizontalAlignment="Left" >
+                <Label Width="120"  Height="35" Content="开始位置" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox x:Name="testStartPositionInput" Width="140"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="-400" XMax="400" XPrecision="4"  IsEnabled="True"/>
+                <Label Width="50"></Label>
+                <Label Width="120"   Height="35" Content="目标位置" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox x:Name="targetPositionInput" Width="140"  TextWrapping="Wrap"  Height="35" InputType="Numeral" XMin="-400" XMax="400" />
+                <Button Content="消除回程误" x:Name="confirmPositionBtn" Width="120" Margin="20,0,0,0" Height="30" Click="confirmPositionBtn_Click" />
+
+                <Label Width="120" Margin="30 0 0 0" Height="35" Content="绝对位置" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox x:Name="customTargetPositionInput" Width="140"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="-400" XMax="400" XPrecision="6"/>
+                <Button Content="绝对位置开始" x:Name="customConfirmPositionBtn" Width="120" Margin="20,0,0,0" Height="30" Click="customConfirmPositionBtn_Click" />
+                <Button Content="光栅尺绝对位置开始" x:Name="rulerPositionBtn" Width="120" Margin="20,0,0,0" Height="30" Click="rulerPositionBtn_Click" />
+            </StackPanel>
+            <StackPanel Width="1200" Margin="0,10,0,0" Orientation="Horizontal" HorizontalAlignment="Left" >
+                <Label Width="120"  Height="35" Content="测量次数" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox x:Name="testNumInput" Width="140"  TextWrapping="Wrap"  Height="35" InputType="Numeral" XMin="0" XMax="2000"/>
+                <Label Width="50"></Label>
+                <Label Width="120"   Height="35" Content="当前次数" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox x:Name="currentNumInput" Width="140"  TextWrapping="Wrap"  Height="35" InputType="Numeral" XMin="0" XMax="400"/>
+            </StackPanel>
+            <StackPanel Width="1000" Margin="0,10,0,0" Orientation="Horizontal" HorizontalAlignment="Left" >
+                <Label Width="120"  Height="35" Content="步进(毫米)" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox x:Name="testIndexNumInput" Width="140"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="-400" XMax="400" XPrecision="6"/>
+                <Label Width="50"></Label>
+                <Label Width="120"   Height="35" Content="当前位置" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox x:Name="currentPositionInput" Width="140"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="-400" XMax="400" XPrecision="10"/>
+                <Label Width="50"></Label>
+                <Label Width="150"   Height="35" Content="光栅尺当前位置" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox x:Name="gratingCurrentPositionInput" Width="140"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="-400" XMax="400" XPrecision="10"/>
+            </StackPanel>
+            <StackPanel Width="1200" Margin="0,20,0,0" Orientation="Horizontal" HorizontalAlignment="Left" >
+                <Label Width="120"   Height="35" Content="方向" FontWeight="Bold" FontSize="16" />
+                <ComboBox x:Name="directionInput" Width="140" Height="35" VerticalContentAlignment="Center">
+                    <ComboBoxItem Content="正向" Tag="1" Height="30"/>
+                    <ComboBoxItem Content="反向" Tag="2" Height="30"/>
+                    <ComboBoxItem Content="双向" Tag="3" Height="30"/>
+                </ComboBox>
+                <Label Width="100"></Label>
+                <CheckBox Content="是否补偿" FontSize="16" x:Name="compCheckbox" Height="35" Width="105" VerticalContentAlignment="Center" IsChecked="False" Click="compCheckbox_Click" >
+                    <CheckBox.LayoutTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </CheckBox.LayoutTransform>
+                </CheckBox>
+                <CheckBox Content="单步步进" FontSize="16" x:Name="stepCheckbox" Height="35" Width="100" VerticalContentAlignment="Center" IsChecked="False" Click="repeatedCheckbox_Click" >
+                    <CheckBox.LayoutTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </CheckBox.LayoutTransform>
+                </CheckBox>
+                <CheckBox Content="循环" FontSize="16" x:Name="repeatedCheckbox" Height="35" Width="80" VerticalContentAlignment="Center" IsChecked="False" Click="repeatedCheckbox_Click" >
+                    <CheckBox.LayoutTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </CheckBox.LayoutTransform>
+                </CheckBox>
+                <CheckBox Content="Y轴光栅尺补偿" x:Name="yCompCheckbox" Height="35" Width="130" VerticalContentAlignment="Center" 
+         Margin="20 0 0 0" FontSize="16" IsChecked="False" Checked="yCompCheckbox_Checked" Unchecked="yCompCheckbox_Unchecked" >
+                    <CheckBox.LayoutTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </CheckBox.LayoutTransform>
+                </CheckBox>
+                <CheckBox Content="Z轴光栅尺补偿" x:Name="z1CompCheckbox" Height="35" Width="130" VerticalContentAlignment="Center" 
+         Margin="20 0 0 0" FontSize="16" IsChecked="False" Checked="z1CompCheckbox_Checked" Unchecked="z1CompCheckbox_Unchecked" >
+                    <CheckBox.LayoutTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </CheckBox.LayoutTransform>
+                </CheckBox>
+                
+            </StackPanel>
+            <StackPanel Width="800" Margin="0,20,0,0" Orientation="Horizontal" HorizontalAlignment="Left" >
+                <Label Width="50"></Label>
+                <Button Content="启动测量" x:Name="startTestBtn" Width="120" Margin="20,0,0,0" Height="30" Click="startTestBtn_Click" />
+                <Button Content="暂停测量" x:Name="pauseTestBtn" Width="120" Margin="20,0,0,0" Height="30" Click="pauseTestBtn_Click" />
+                <Button Content="结束测量" x:Name="endTestBtn" Width="120" Margin="20,0,0,0" Height="30" Click="endTestBtn_Click" />
+                <Button Content="单步步进" x:Name="stepTestBtn" Width="120" Margin="20 0 0 0" Height="30" Click="stepTestBtn_Click" />
+                <Button Content="补偿测试" x:Name="compTestBtn" Width="120" Margin="20 0 0 0" Height="30" Click="compTestBtn_Click" />
+            </StackPanel>
+            <StackPanel Width="1200" HorizontalAlignment="Left" Margin="0,10,0,0">
+                <Label Content="光栅尺位置：" FontSize="16" FontWeight="Bold"></Label>
+                <Controls:InputTextBox x:Name="actualPositions" Width="1200" TextWrapping="Wrap"  Height="100" />
+            </StackPanel>
+            <StackPanel Width="1200" HorizontalAlignment="Left" Margin="0,10,0,0">
+                <Label Content="电机位置：" FontSize="16" FontWeight="Bold"></Label>
+                <Controls:InputTextBox x:Name="motorPositions" Width="1200" TextWrapping="Wrap"  Height="100" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Page>

@@ -1,0 +1,338 @@
+﻿<UserControl x:Class="精密切割系统.View.Controls.DirectOperate"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:精密切割系统.View.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="250" d:DesignWidth="1500" IsVisibleChanged="UserControl_IsVisibleChanged" Unloaded="UserControl_Unloaded">
+    <UserControl.Resources>
+        <Style TargetType="Button">
+            <Setter Property="BorderBrush" Value="{x:Null}"></Setter>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+BorderBrush="{TemplateBinding BorderBrush}" 
+BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1.0" ScaleY="1.0"/>
+                </Setter.Value>
+            </Setter>
+
+            <!-- 按下效果触发器 -->
+            <Style.Triggers>
+                <!-- 鼠标按下时效果 -->
+                <Trigger Property="IsPressed" Value="True">
+
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <ScaleTransform ScaleX="0.95" ScaleY="0.95"/>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="BorderBrush" Value="DarkGray"/>
+                </Trigger>
+
+                <!-- 动态恢复效果：动画从按下状态回到正常状态 -->
+                <Trigger Property="IsPressed" Value="False">
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleX)"
+                                                 To="1.0" Duration="0:0:0.1"/>
+                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleY)"
+                                                 To="1.0" Duration="0:0:0.1"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+                    <!-- 松开时移除边框 -->
+                    <Setter Property="BorderBrush" Value="Transparent"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Border CornerRadius="10" Background="#E9FDFF"  Margin="20,0,0,0">
+                <Border.Effect>
+                    <DropShadowEffect 
+                    ShadowDepth="4" 
+                    BlurRadius="20" 
+                    Color="#4DC9EBF7" 
+                    Direction="315" />
+                </Border.Effect>
+                <Grid Grid.Column="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="20*"></ColumnDefinition>
+                        <ColumnDefinition Width="80*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0" >
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Button Background="Transparent"  Width="100" Height="100" Click="Button_Click" IsTabStop="False">
+                                <Button.Content>
+                                    <StackPanel Orientation="Vertical">
+                                        <Border x:Name="scanBorder" CornerRadius="33,33,33,33" Background="#177CFA" Width="66" Height="66">
+                                            <Image x:Name="scanIcon" Source="/Assets/picture/IDX_icon.png" Width="52" Height="52"></Image>
+                                        </Border>
+                                        <TextBlock Margin="0 10 0 0" Text="IDX" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"></TextBlock>
+                                    </StackPanel>
+                                </Button.Content>
+                                
+                            </Button>
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <Button Background="Transparent"  Width="100" Height="100" IsTabStop="False" Click="Button_Click_1">
+                                <Button.Content>
+                                    <StackPanel Orientation="Vertical">
+                                        <Border x:Name="scrBorder" CornerRadius="33,33,33,33" Background="#FFFFFF" Width="66" Height="66">
+                                            <Image x:Name="scrIcon" Source="/Assets/picture/SCR_icon.png" Width="52" Height="52"></Image>
+                                        </Border>
+                                        <TextBlock Margin="0 10 0 0" Text="SCR" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"></TextBlock>
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
+                        </Grid>
+
+                    </Grid>
+                    <Grid Grid.Column="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="20*"></ColumnDefinition>
+                            <ColumnDefinition Width="60*"></ColumnDefinition>
+                            <ColumnDefinition Width="20*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="0" Margin="0,20,0,0">
+                            <Button x:Name="idxLeftBottom" VerticalAlignment="Top" 
+                    Background="Transparent" BorderBrush="{x:Null}" 
+                                    TouchDown="idxLeftBottom_TouchDown" 
+                                    TouchLeave="idxLeftBottom_TouchLeave"
+                                    TouchUp="idxLeftBottom_TouchUp" 
+                                    Foreground="{x:Null}" PreviewMouseDown="idxLeftBottom_PreviewMouseDown">
+                                <Button.Content>
+                                    <Image Width="58" Height="72"  x:Name="idxLeftBottomIcon" Source="/Assets/picture/idx_left_bottom.png"></Image>
+                                </Button.Content>
+                            </Button>
+                        </Grid>
+                        <Grid Grid.Column="1" >
+                            <Grid.RowDefinitions>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Button VerticalAlignment="Top" 
+                                        x:Name="idxTop"
+                                        TouchDown="idxTop_TouchDown"
+                                        TouchUp="idxTop_TouchUp"
+                                        TouchLeave="idxTop_TouchLeave"
+                                        Height="75"
+                                         Background="Transparent">
+                                    <Button.Content>
+                                        <Image Width="89" Height="52" x:Name="idxTopIcon" Source="/Assets/picture/idx_top.png"></Image>
+                                    </Button.Content>
+                                </Button>
+                            </Grid>
+                            <Grid Grid.Row="1" >
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Grid Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Button x:Name="idxLeftBtn" TouchDown="idxLeftBtn_TouchDown" TouchUp="idxLeftBtn_TouchUp" TouchLeave="idxLeftBtn_TouchLeave"
+                        VerticalAlignment="Top" Width="99" Height="75" Background="Transparent">
+                                        <Button.Content>
+                                            <Image Width="89" Height="52" x:Name="idxLeftIcon" Source="/Assets/picture/idx_left.png"></Image>
+                                        </Button.Content>
+                                    </Button>
+                                </Grid>
+                                <Grid Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Button  x:Name="idxRight" TouchDown="idxRight_TouchDown" TouchUp="idxRight_TouchUp" TouchLeave="idxRight_TouchLeave"
+                        VerticalAlignment="Top" Width="99" Height="75" Background="Transparent">
+                                        <Button.Content>
+                                            <Image Width="89" Height="52"  x:Name="idxRightIcon" Source="/Assets/picture/idx_right.png"></Image>
+                                        </Button.Content>
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                            <Grid Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Button x:Name="idxBottomBtn" TouchDown="idxBottomBtn_TouchDown" TouchUp="idxBottomBtn_TouchUp" TouchLeave="idxBottomBtn_TouchLeave"
+                    VerticalAlignment="Top" Height="75" Background="Transparent">
+                                    <Button.Content>
+                                        <Image Width="89" Height="52" x:Name="idxBottomIcon" Source="/Assets/picture/idx_bottom.png"></Image>
+                                    </Button.Content>
+                                </Button>
+                            </Grid>
+                        </Grid>
+                        <Grid Grid.Column="2" Margin="0,20,0,0">
+                            <Button x:Name="idxRightBottomBtn" Width="82" 
+                                    TouchLeave="idxRightBottomBtn_TouchLeave"
+                                    TouchDown="idxRightBottomBtn_TouchDown" TouchUp="idxRightBottomBtn_TouchUp"
+                VerticalAlignment="Top"  Background="Transparent" PreviewMouseDown="idxRightBottomBtn_PreviewMouseDown">
+                                <Button.Content>
+                                    <Image Width="58" Height="72" x:Name="idxRightBottomIcon" Source="/Assets/picture/idx_right_bottom.png"></Image>
+                                </Button.Content>
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Border>
+            <Border Grid.Column="1" CornerRadius="10" Background="#E9FDFF"  Margin="10,0,5,0">
+                <Border.Effect>
+                    <DropShadowEffect 
+                    ShadowDepth="5" 
+                    BlurRadius="20" 
+                    Color="#4DC9EBF7" 
+                    Direction="315" />
+                </Border.Effect>
+                <Grid Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="20*"></ColumnDefinition>
+                        <ColumnDefinition Width="80*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0" >
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid Width="100" Height="100">
+                                <StackPanel Orientation="Vertical">
+                                    <Border CornerRadius="33,33,33,33" Width="66" Height="66">
+                                        <Image Source="/Assets/picture/SCAN_icon.png" Width="52" Height="52"></Image>
+                                    </Border>
+                                    <TextBlock  Text="Scan" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"></TextBlock>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                        <Grid Grid.Row="1" Loaded="UserControl_Loaded">
+                            <Button x:Name="scrHighSpeedBtn" TouchDown="scrHighSpeedBtn_TouchDown"
+                    Background="Transparent" Width="100" Height="100">
+                                <Button.Content>
+                                    <StackPanel Orientation="Vertical">
+                                        <Border x:Name="highSpeedBorder" CornerRadius="33,33,33,33" Background="#FFFFFF" Width="66" Height="66">
+                                            <Image x:Name="highSpeedIcon" Source="/Assets/picture/scan_hi_speed_icon.png" Width="52" Height="52"></Image>
+                                        </Border>
+                                        <TextBlock  Text="高速" FontSize="18" Margin="0 10 0 0" FontWeight="Bold" HorizontalAlignment="Center"></TextBlock>
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
+                        </Grid>
+
+                    </Grid>
+                    <Grid Grid.Column="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="20*"></ColumnDefinition>
+                            <ColumnDefinition Width="60*"></ColumnDefinition>
+                            <ColumnDefinition Width="20*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="0" Margin="0,20,0,0">
+                            <Button VerticalAlignment="Top" 
+                                    x:Name="scanLeftBottomBtn"
+                                    TouchDown="scanLeftBottomBtn_TouchDown"
+                                    TouchLeave="scanLeftBottomBtn_TouchLeave"
+                                    TouchUp="scanLeftBottomBtn_TouchUp" Width="82"
+                                    Background="Transparent" PreviewMouseUp="scanLeftBottomBtn_PreviewMouseUp" PreviewMouseDown="scanLeftBottomBtn_PreviewMouseDown">
+                                <Button.Content>
+                                    <Image Width="58" Height="72" x:Name="scanLeftBottomIcon" Source="/Assets/picture/scan_left_bottom.png"></Image>
+                                </Button.Content>
+                            </Button>
+                        </Grid>
+                        <Grid Grid.Column="1" >
+                            <Grid.RowDefinitions>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Button VerticalAlignment="Top" 
+                                    x:Name="scanTopBtn"
+                                    TouchDown="scanTopBtn_TouchDown"
+                                    TouchLeave="scanTopBtn_TouchLeave"
+                                    TouchUp="scanTopBtn_TouchUp" Height="75"
+                                    Background="Transparent" PreviewMouseDown="scanTopBtn_PreviewMouseDown" PreviewMouseUp="scanTopBtn_PreviewMouseUp">
+                                    <Button.Content>
+                                        <Image Width="89" Height="52"  x:Name="scanTopIcon" Source="/Assets/picture/scan_top.png"></Image>
+                                    </Button.Content>
+                                </Button>
+                            </Grid>
+                            <Grid Grid.Row="1" >
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Grid Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Button VerticalAlignment="Top"
+                                        x:Name="scanLeftBtn"
+                                        TouchDown="scanLeftBtn_TouchDown"
+                                        TouchUp="scanLeftBtn_TouchUp"
+                                            TouchLeave="scanLeftBtn_TouchLeave"
+                                        Height="75" Background="Transparent" PreviewMouseDown="scanLeftBtn_PreviewMouseDown" PreviewMouseUp="scanLeftBtn_PreviewMouseUp">
+                                        <Button.Content>
+                                            <Image Width="89" Height="52"  x:Name="scanLeftIcon" Source="/Assets/picture/scan_left.png"></Image>
+                                        </Button.Content>
+                                    </Button>
+                                </Grid>
+                                <Grid Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Button VerticalAlignment="Top" 
+                                        x:Name="scanRightBtn"
+                                        TouchDown="scanRightBtn_TouchDown"
+                                        TouchLeave="scanRightBtn_TouchLeave"
+                                        TouchUp="scanRightBtn_TouchUp"
+                                        Height="75"
+                                         Background="Transparent" PreviewMouseDown="scanRightBtn_MouseDown" PreviewMouseUp="scanRightBtn_MouseUp">
+                                        <Button.Content>
+                                            <Image Width="89" Height="52" x:Name="scanRightIcon" Source="/Assets/picture/scan_right.png"></Image>
+                                        </Button.Content>
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                            <Grid Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Button VerticalAlignment="Top" 
+                                    x:Name="scanBottomBtn"
+                                    TouchDown="scanBottomBtn_TouchDown"
+                                        TouchLeave="scanBottomBtn_TouchLeave"
+                                    TouchUp="scanBottomBtn_TouchUp" Height="75"
+                                     Background="Transparent" PreviewMouseDown="scanBottomBtn_PreviewMouseDown" PreviewMouseUp="scanBottomBtn_PreviewMouseUp">
+                                    <Button.Content>
+                                        <Image Width="89" Height="55" x:Name="scanBottomIcon" Source="/Assets/picture/scan_bottom.png"></Image>
+                                    </Button.Content>
+                                </Button>
+                            </Grid>
+                        </Grid>
+                        <Grid Grid.Column="2" Margin="0,20,0,0">
+                            <Button VerticalAlignment="Top" 
+                    x:Name="scanRightBottomBtn"
+                    TouchDown="scanRightBottomBtn_TouchDown"
+                                    TouchLeave="scanRightBottomBtn_TouchLeave"
+                    TouchUp="scanRightBottomBtn_TouchUp" Width="82"
+                     Background="Transparent" PreviewMouseDown="scanRightBottomBtn_PreviewMouseDown" PreviewMouseUp="scanRightBottomBtn_PreviewMouseUp">
+                                <Button.Content>
+                                    <Image Width="58" Height="72" x:Name="scanRightBottomIcon" Source="/Assets/picture/scan_right_bottom.png"></Image>
+                                </Button.Content>
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Border>
+            
+
+            
+        </Grid>
+    </Grid>
+</UserControl>

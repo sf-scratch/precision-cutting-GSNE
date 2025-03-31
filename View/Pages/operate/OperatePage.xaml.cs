@@ -1,0 +1,906 @@
+﻿using NPOI.SS.Formula.Functions;
+using SixLabors.ImageSharp.Metadata.Profiles.Exif;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using 精密切割系统.Assets.config.buttom;
+using 精密切割系统.Assets.config.menu;
+using 精密切割系统.Driver;
+using 精密切割系统.FrmWindow.common;
+using 精密切割系统.Helpers;
+using 精密切割系统.Model.plc;
+using 精密切割系统.Utils;
+using 精密切割系统.View.Controls;
+using 精密切割系统.View.Pages.common;
+using 精密切割系统.View.Pages.F4_BladeMaintenance;
+using 精密切割系统.ViewModel;
+using static 精密切割系统.Helpers.MaterialSnackUtils;
+
+namespace 精密切割系统.View.Pages.operate
+{
+    /// <summary>
+    /// OperatePage.xaml 的交互逻辑
+    /// </summary>
+    public partial class OperatePage : Page
+    {
+        static CtViewModel ctViewModel = new CtViewModel();
+        public OperatePage()
+        {
+            InitializeComponent();
+            this.DataContext = ctViewModel;
+        }
+
+        MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
+        bool btnRunFlag = false;
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            List<KeyboardBtn> list = Tools.GetChildrenOfType<KeyboardBtn>(this);
+            Debug.WriteLine("进入了哦！");
+            list.ForEach(btn => {
+                btn.KeyPressed -= btnClick;
+                btn.KeyPressed += btnClick;
+            });
+            ctViewModel.UpdateImage(false, 3);
+            ctViewModel.UpdateImage(false, 4);
+            ctViewModel.UpdateImage(false, 5);
+            ctViewModel.UpdateImage(false, 6);
+            ctViewModel.UpdateImage(false, 7);
+            ctViewModel.UpdateImage(false, 8);
+            ctViewModel.UpdateImage(false, 9);
+            ctViewModel.UpdateImage(false, 8004);
+
+            isSwitchOpen(false, 7);
+            isSwitchOpen(false, 8);
+            if (GlobalParams.onlineFlag)
+            {
+                Thread _thread = new Thread(ShowOperateBtn);
+                _thread.IsBackground = true;
+                _thread.Start();
+            }
+            SetLettersCase(upperFlag);
+        }
+
+        public void ShowOperateBtn()
+        {
+            bool door1Status = false;
+            bool door2Status = false;
+            bool vacuumState = false;
+            bool spindleCuttingWater = false;
+            bool workpieceBlowingStatus = false;
+            bool systemInitFlagStatus = false;
+            bool panelStatus = false;
+            bool firstJoin = true;
+            bool spindleManuallyRunStatus = true;
+            while (true)
+            {
+                bool tempDoor1Status = CommonCheck.GetDoorStatus(DeviceKey.securityDoor1StatusKey);
+                bool tempDoor2Status = CommonCheck.GetDoorStatus(DeviceKey.securityDoor2StatusKey);
+                bool tempVacuumState = CommonCheck.GetParamsStatus(DeviceKey.vacuumSwitchStatusKey);
+                bool tempSpindleCuttingWater = CommonCheck.GetParamsStatus(DeviceKey.spindleCuttingWaterKey);
+                bool tempWorkpieceBlowingStatus = CommonCheck.GetParamsStatus(DeviceKey.workpieceBlowingStatusKey);
+                bool tempSystemInitFlagStatus = CommonCheck.GetParamsStatus(DeviceKey.systemInitStatusKey);
+                bool tempPanelStatus = CommonCheck.GetParamsStatus(DeviceKey.panelStatusKey);
+                bool tempSpindleManuallyRunStatus = CommonCheck.GetParamsStatus(DeviceKey.spindleManuallyRunStatusKey);
+                Application.Current.Dispatcher.Invoke(() => {
+                    if (tempVacuumState != vacuumState || firstJoin)
+                    {
+                        vacuumState = tempVacuumState;
+                        isSwitchOpen(tempVacuumState, 3);
+                    }
+                    if (spindleManuallyRunStatus != tempSpindleManuallyRunStatus || firstJoin)
+                    {
+                        spindleManuallyRunStatus = tempSpindleManuallyRunStatus;
+                        isSwitchOpen(spindleManuallyRunStatus, 4);
+                    }
+                    if (tempSpindleCuttingWater != spindleCuttingWater || firstJoin)
+                    {
+                        spindleCuttingWater = tempSpindleCuttingWater;
+                        isSwitchOpen(tempSpindleCuttingWater, 5);
+                    }
+                    if (tempSystemInitFlagStatus != systemInitFlagStatus || firstJoin)
+                    {
+                        systemInitFlagStatus = tempSystemInitFlagStatus;
+                        GlobalParams.systemInitFlag = systemInitFlagStatus;
+                        isSwitchOpen(tempSystemInitFlagStatus, 6);
+                    }
+                    if (tempDoor1Status != door1Status || firstJoin)
+                    {
+                        door1Status = tempDoor1Status;
+                        isSwitchOpen(!tempDoor1Status, 7);
+                    }
+                    if (tempDoor2Status != door2Status || firstJoin)
+                    {
+                        door2Status = tempDoor2Status;
+                        isSwitchOpen(!tempDoor2Status, 8);
+                    }
+                    if (tempWorkpieceBlowingStatus != workpieceBlowingStatus || firstJoin)
+                    {
+                        workpieceBlowingStatus = tempWorkpieceBlowingStatus;
+                        isSwitchOpen(tempWorkpieceBlowingStatus, 9);
+                    }
+                    if (tempPanelStatus != panelStatus || firstJoin)
+                    {
+                        panelStatus = tempPanelStatus;
+                        isSwitchOpen(tempPanelStatus, 8004);
+                    }
+                    if (firstJoin)
+                    {
+                        firstJoin = false;
+                    }
+                });
+                Thread.Sleep(500);
+            }
+        }
+
+        private bool upperFlag = true;
+
+        public void btnClick(object sender, string key)
+        {
+            /*if (CommonCheck.CheckGlobalRunStatus())
+            {
+                return;
+            }*/
+            // 处理按下事件
+            KeyboardBtn btn = (KeyboardBtn)sender;
+            //  0 是字母  null 或者是1，则是数字或者字母
+            if (btn.BtnType == null)
+            {
+                CustomKeyPress(btn.BtnValue);
+            }
+            else if (btn.BtnType.Equals("0"))
+            {
+                // 0 
+                CustomKeyPress(btn.BtnValue);
+            }
+            else if (btn.BtnType.Equals("2"))
+            {
+                string sendKey = "";
+                if (btn.BtnValue == "Shift")
+                {
+                    upperFlag = upperFlag ? false : true;
+                    SetLettersCase(upperFlag);
+                    sendKey = "capslock";
+                }
+                else if (btn.BtnValue == "Backtab")
+                {
+                    sendKey = "shift+tab";
+                }
+                else if (btn.BtnValue == "Home")
+                {
+                    sendKey = "ctrl+a";
+                }
+                else if (btn.BtnValue == "Tab")
+                {
+                    sendKey = "tab";
+                }
+                else if (btn.BtnValue == ".")
+                {
+                    sendKey = "dot";
+                }
+                else if (btn.BtnValue == "Del")
+                {
+                    sendKey = "del";
+                }
+                else if (btn.BtnValue == "+")
+                {
+                    sendKey = "plus";
+                }
+                else if (btn.BtnValue == "-")
+                {
+                    sendKey = "minus";
+                }
+                else if (btn.BtnValue == "Down")
+                {
+                    mainWindow.ShowKeyboardPage(0);
+                }
+                if (!string.IsNullOrEmpty(sendKey))
+                {
+                    CustomKeyPress(sendKey);
+                }
+            }
+            else if (btn.BtnType.Equals("3"))
+            {
+                string sendKey = "";
+                if ("↑".Equals(btn.BtnValue))
+                {
+                    sendKey = "up";
+                }
+                else if ("↓".Equals(btn.BtnValue))
+                {
+                    sendKey = "down";
+                }
+                else if ("←".Equals(btn.BtnValue))
+                {
+                    sendKey = "left";
+                }
+                else if ("→".Equals(btn.BtnValue))
+                {
+                    sendKey = "right";
+                }
+                if (btn.BtnValue != "")
+                {
+                    CustomKeyPress(sendKey);
+                }
+            }
+        }
+
+        private void CustomKeyPress(string key)
+        {
+            Task.Run(() =>  KeyboardSimulator.SimulateKeyPress(key) );
+        }
+
+        // caseType 大小写类型 0 大写 1 小写
+        public void SetLettersCase(bool upperFlagValue)
+        {
+            List<KeyboardBtn> list = Tools.GetChildrenOfType<KeyboardBtn>(this);
+            list.ForEach(btn =>
+            {
+                if ("0".Equals(btn.BtnType))
+                {
+                    string btnText = btn.BtnValue;
+                    if (btnText != null && btnText.Length > 0)
+                    {
+                        btn.BtnValue = upperFlagValue ? btnText.ToUpper() : btnText.ToLower();
+                    }
+                }
+
+            });
+        }
+
+        public static bool IsBetweenAandZ(char c)
+        {
+            return c >= 'a' && c <= 'z';
+        }
+
+        /***
+         * 开关状态显示
+         * type true：开；false：关
+         * code 当前按钮的编码
+         * */
+        public static void isSwitchOpen(bool type,int code)
+        {
+            ctViewModel.UpdateImage(type, code);
+        }
+
+        /// <summary>
+        /// 设置显示类型
+        /// </summary>
+        /// <param name="type">0 操作菜单 1 方向操作菜单 2 自定义键盘</param>
+        public void SetOperateShowType(int type)
+        {
+            // 设置可见性
+            OperateGrid.Visibility = type == 0 ? Visibility.Visible : Visibility.Collapsed;
+            costomKeyboardGrid.Visibility = type == 2 ? Visibility.Visible : Visibility.Collapsed;
+            commonDirection.Visibility = type == 1 ? Visibility.Visible : Visibility.Collapsed;
+
+            Task.Run(() => {
+                Thread.Sleep(500);
+                // 延时释放触控设备
+                Dispatcher.InvokeAsync(() =>
+                {
+                    // 设置触控响应
+                    OperateGrid.IsHitTestVisible = type == 0;
+                    costomKeyboardGrid.IsHitTestVisible = type == 2;
+                    commonDirection.IsHitTestVisible = type == 1;
+
+                    // 设置 ZIndex
+                    Panel.SetZIndex(OperateGrid, type == 0 ? 1 : 0);
+                    Panel.SetZIndex(costomKeyboardGrid, type == 2 ? 1 : 0);
+                    Panel.SetZIndex(commonDirection, type == 1 ? 1 : 0);
+                }, System.Windows.Threading.DispatcherPriority.Background);
+                
+            });
+        }
+
+        //动态创建多个菜单
+        public void UpdateOperate(List<OperateBean> list)
+        {
+            var tempList = list.Where(bean => bean.Code == 6).ToList();
+            if (tempList.Count == 0)
+            {
+                // 记录当前页面菜单
+                GlobalParams.currentOperateBeanList = list;
+                // 改变下面选中样式
+                mainWindow.SetShortcutBtnStatus(false, false);
+            }
+
+            OperateGrid.Children.Clear();
+            if (list.Count==0)
+            {
+                return;
+            }
+            if (list.Count > 5) //两行
+            {
+                for (int row = 0; row < 2; row++)
+                {
+                    OperateBean bean;
+                    if (row == 0)
+                    {
+                        for (int col = 0; col < 5; col++)
+                        {
+                            bean = list[col];
+                            addOperateButton(row, col, bean);
+                        }
+                    }
+                    else
+                    {
+                        for (int col = 0; col < list.Count - 5; col++)
+                        {
+                            bean = list[col + row + 4];
+                            addOperateButton(row, col, bean);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                for (int col = 0; col < list.Count; col++)
+                {
+                    addOperateButton(0, col, list[col]);
+                }
+            }
+        }
+
+        private void addOperateButton(int row, int col, OperateBean bean)
+        {
+            //-1为占位空
+            if (bean.Code==-1)
+            {
+                Label lbl = new Label();
+                lbl.SetValue(Grid.RowProperty, row);
+                lbl.SetValue(Grid.ColumnProperty, col);
+                OperateGrid.Children.Add(lbl);
+            }
+            else
+            {
+                OperateButton operateButton = new OperateButton(bean);
+                operateButton.Width = 268;
+                operateButton.Height = 100;
+                operateButton.SetValue(Grid.RowProperty, row);
+                operateButton.SetValue(Grid.ColumnProperty, col);
+                operateButton.OperateClicked += null;
+                operateButton.OperateClicked += OperateButton_OperateClicked;
+                
+                operateButton.OperateonLeave += null;
+                operateButton.OperateonLeave += OperateButton_OperateonLeave;
+                operateButton.OperateonDown += null;
+                operateButton.OperateonDown += OperateButton_OperateonDown;
+                OperateGrid.Children.Add(operateButton);
+            }
+            
+        }
+
+        private void OperateButton_OperateonDown(object? sender, OperateBean e)
+        {
+            onDown?.Invoke(sender, e.Code);
+        }
+
+        private void OperateButton_OperateonLeave(object? sender, OperateBean e)
+        {
+            onLeave?.Invoke(sender, e.Code);
+        }
+        CameraCommon cameraCommon;
+        bool spindRunStatus = false;
+        private void OperateButton_OperateClicked(object? sender, OperateBean e)
+        {
+            if (!string.IsNullOrEmpty(e.PageUrl))
+            {
+                mainWindow.NavigateToPage(e.PageUrl);
+                return;
+            }
+
+            //按钮点击事件
+            switch (e.Code)
+            {
+                case 1:
+                    if (CommonCheck.ModeCheck())
+                    {
+                        return;
+                    }
+                    // 测高
+                    ToBladeHeight(sender as OperateButton);
+                    break;
+                case 2:
+                    if (CommonCheck.ModeCheck())
+                    {
+                        return;
+                    }
+                    mainWindow.NavigateToPage("Pages/F3_ModelCatalog/MCDeviceDataListConf");
+                    break;
+                case 3:
+                    // CT 真空
+                    // 如果是切割中，则单独处理
+                    if (CommonCheck.CutModeCheck())
+                    {
+                        // 真空状态 false 关闭 true 打开
+                        bool tempVacuumState = CommonCheck.GetParamsStatus(DeviceKey.vacuumSwitchStatusKey);
+                        if (tempVacuumState)
+                        {
+                            // 如果是打开状态，则执行工件更换后关闭真空
+                            ReplaceWorkpiece(true);
+                        } else
+                        {
+                            // 打开真空
+                            VacuumOperate();
+                        }
+                    } else
+                    {
+                        VacuumOperate();
+                    }
+                    break;
+                case 2433:
+                    // CT 真空
+                    ReplaceWorkpiece(true);
+                    break;
+                case 4:
+                    SpindleManuallyRun();
+                    break;
+                case 5:
+                    if (!GlobalParams.onlineFlag)
+                    {
+                        return;
+                    }
+                    // 切割水
+                    CutWaterOperate();
+                    break;
+                case 6:
+                    if (!GlobalParams.onlineFlag && !CommonCheck.CheckDoor1())
+                    {
+                        return;
+                    }
+                    // 系统初始化
+                    SystemInitOperate();
+                    break;
+                case 7:
+                    if (!GlobalParams.onlineFlag)
+                    {
+                        return;
+                    }
+                    // 翻盖门操作
+                    Door1Operate();
+                    break;
+                case 8:
+                    if (!GlobalParams.onlineFlag)
+                    {
+                        return;
+                    }
+                    // 推拉门操作
+                    Door2Operate();
+                    break;
+                case 9:
+                    if (!GlobalParams.onlineFlag)
+                    {
+                        return;
+                    }
+                    // 相机吹气
+                    CameraBlowingOperate();
+                    break;
+                case 10:
+                    if (!GlobalParams.onlineFlag)
+                    {
+                        return;
+                    }
+                    // 工件更换
+                    ReplaceWorkpiece();
+                    break;
+                case 2406:
+                    // 切割停止
+                    StopCut();
+                    break;
+                case 5302:
+                        // 弹出确认对话框
+                        MessageBoxResult result = MessageBox.Show("确定要关机吗？", "关机确认", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                        if (result == MessageBoxResult.Yes)
+                        {
+                            ProcessStartInfo psi = new ProcessStartInfo("shutdown", "/s /t 0")
+                            {
+                                UseShellExecute = true,
+                                Verb = "runas" // 以管理员权限运行
+                            };
+                            Process.Start(psi);
+                        }
+                    break;
+                default:
+                    onClicked?.Invoke(this, e.Code);
+                    break;
+            }
+        }
+        bool SpindleManuallyRunFlag = false;
+        /// <summary>
+        /// 主轴电机
+        /// </summary>
+        private void SpindleManuallyRun()
+        {
+            if (!GlobalParams.onlineFlag)
+            {
+                return;
+            }
+            if (SpindleManuallyRunFlag)
+            {
+                return;
+            }
+            if (CommonCheck.ModeCheck())
+            {
+                return;
+            }
+            if (!CommonCheck.CheckDoor() || !CommonCheck.SpindleAirCheck() || !CommonCheck.SpindleStatusCheck())
+            {
+                return;
+            }
+            GlobalParams.globalRunFlag = true;
+            SpindleManuallyRunFlag = true;
+            int status = spindRunStatus ? 0 : 1;
+            // 主轴电机
+            PlcControl.tagControl.wholeDevice.SetSpindleManuallyRunStatus(status);
+            MaterialSnackUtils.MaterialSnack($"主轴{(status == 1 ? "启动" : "关闭")}中！", SnackType.WARNING, 0);
+            Task.Run(() => {
+                bool flag = Tools.WaitForValue(DeviceKey.spindleManuallyRunStatusKey, status);
+                if (flag)
+                {
+                    spindRunStatus = !spindRunStatus;
+                    MaterialSnackUtils.MaterialSnack($"主轴已{(status == 1 ? "启动" : "关闭")}！", SnackType.SUCCESS);
+                }
+                else
+                {
+                    MaterialSnackUtils.MaterialSnack("主轴操作异常！", SnackType.WARNING);
+                }
+            });
+            GlobalParams.globalRunFlag = false;
+            SpindleManuallyRunFlag = false;
+        }
+
+        private void ToBladeHeight(OperateButton operateBtn)
+        {
+            if (!GlobalParams.onlineFlag)
+            {
+                mainWindow.NavigateToPage("Pages/F4_BladeMaintenance/BmContactSetupConf");
+                return;
+            }
+            // 测高
+            if (CommonCheck.MlignStatusCheck())
+            {
+                // 新发送PLC进入模式，当模式进入成功后，跳转页面
+                // 进入测高模式
+                MaterialSnackUtils.MaterialSnack("进入测高模式中...", SnackType.WARNING, 0);
+                PlcControl.tagControl.bladeMantance.RunBladeSetup(1);
+                PlcControl.tagControl.wholeDevice.SetPanelButtonsStauts(1);
+                GlobalParams.globalRunFlag = true;
+                operateBtn.resetState = false;
+                // 监听状态，如果模式准备完成，则跳转页面
+                Task.Run(() =>
+                {
+                    bool flag = Tools.WaitForValue(DeviceKey.bladeMantanceStatusKey, 1);
+                    GlobalParams.globalRunFlag = false;
+                    if (flag)
+                    {
+                        mainWindow.NavigateToPage("Pages/F4_BladeMaintenance/BmContactSetupConf");
+                    }
+                    else
+                    {
+                        operateBtn.resetState = true;
+                        MaterialSnackUtils.MaterialSnack("进入刀片测高失败！", SnackType.WARNING);
+                    }
+                });
+            }
+        }
+        // 设置事件处理器的方法
+        public void SetOnClickedHandler(EventHandler<int> handler, EventHandler<int> leaveHandler, EventHandler<int> downHandler = null)
+        {
+            // 添加新的处理器
+            onClicked = null;
+            onClicked += handler;
+            onLeave = null;
+            onLeave += leaveHandler;
+            onDown = null;
+            onDown += downHandler;
+        }
+        //操作代理
+        public event EventHandler<int> onClicked;
+        public event EventHandler<int> onDown;
+        public event EventHandler<int> onLeave;
+
+        // CT 真空
+        private void VacuumOperate()
+        {
+            PlcControl.tagControl.wholeDevice.VacuumSwitch(1);
+        }
+
+        /// <summary>
+        /// 切割水
+        /// </summary>
+        private void CutWaterOperate()
+        {
+            PlcControl.tagControl.wholeDevice.SetCuttingWater();
+        }
+        // 系统初始化状态 0 未操作 1 确认操作 2 操作中
+        int systemInitStatus = 0;
+        /// <summary>
+        /// 系统初始化
+        /// </summary>
+        private void SystemInitOperate()
+        {
+            if (!CommonCheck.AxisReady() || !CommonCheck.CheckDoor1())
+            {
+                return;
+            }
+            if (systemInitStatus == 2)
+            {
+                MaterialSnackUtils.MaterialSnack("初始化中，请稍后再试！", MaterialSnackUtils.SnackType.WARNING);
+                return;
+            }
+            if (systemInitStatus == 0 && PlcControl.allAlarm.Count > 0)
+            {
+                systemInitStatus = 1;
+                MaterialSnackUtils.MaterialSnack("请再次点击确认初始化！", MaterialSnackUtils.SnackType.WARNING);
+                return;
+            }
+            systemInitStatus = 2;
+
+            PlcControl.plc.exitAllModel();
+            PlcControl.tagControl.wholeDevice.SystemInit();
+            MaterialSnackUtils.MaterialSnack("系统初始化中...", MaterialSnackUtils.SnackType.SUCCESS, 0);
+            GlobalParams.globalRunFlag = true;
+            Thread _thread = new Thread(AlarmDispose);
+            _thread.IsBackground = true;
+            _thread.Start();
+            // 监听各轴运动速度，是否为0
+            Task.Run(() => {
+
+                Thread.Sleep(2500);
+                // 开始计时
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                Tools.WaitForValue(DeviceKey.systemInitStatusKey, 1);
+                // 检查是否超过40秒
+                if (stopwatch.Elapsed.TotalSeconds > 90)
+                {
+                    MaterialSnackUtils.MaterialSnack("初始化过程超时，请检查系统状态!", MaterialSnackUtils.SnackType.ERROR, 0);
+                } else
+                {
+                    GlobalParams.systemInitFlag = true;
+                    PlcControl.allAlarm.Clear();
+                    Application.Current.Dispatcher.Invoke(new Action(() =>
+                    {
+                        List<MainMenu> mainMenuList = Tools.GetChildrenOfType<MainMenu>(mainWindow);
+                        if (mainMenuList.Count == 0)
+                        {
+                            mainWindow.NavigateToPage("MainMenu");
+                        }
+                    }));
+                    // 退出所有模式
+                    PlcControl.plc.exitAllModel();
+                    MaterialSnackUtils.MaterialSnack("系统初始化完成！", MaterialSnackUtils.SnackType.SUCCESS);
+                }
+                systemInitStatus = 0;
+                GlobalParams.globalRunFlag = false;
+                stopwatch.Stop(); // 停止计时
+            });
+        }
+
+        public void AlarmDispose()
+        {
+            while (systemInitStatus != 0)
+            {
+                if (PlcControl.allAlarm.Count > 0)
+                {
+                    systemInitStatus = 0;
+                    GlobalParams.globalRunFlag = false;
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// 翻盖门1操作
+        /// </summary>
+        private void Door1Operate()
+        {
+            if (CommonCheck.CheckSpindleRunStatus())
+            {
+                return;
+            }
+            String door1StatusStr = PlcControl.plc.GetPlcValueString(DeviceKey.securityDoor1StatusKey);
+            if ("1".Equals(door1StatusStr))
+            {
+                door1Status = 1;
+            }
+            else
+            {
+                door1Status = 0;
+            }
+            // 打开安全门1
+            PlcControl.tagControl.wholeDevice.OperateSecurityDoor1(1);
+        }
+
+        // 安全门1 状态
+        static int door1Status = 0;
+        // 安全门2 状态
+        static int door2Status = 0;
+
+        /// <summary>
+        /// 推拉门操作
+        /// </summary>
+        private void Door2Operate()
+        {
+            if (CommonCheck.CheckSpindleRunStatus())
+            {
+                return;
+            }
+            String door2StatusStr = PlcControl.plc.GetPlcValueString(DeviceKey.securityDoor2StatusKey);
+            if ("1".Equals(door2StatusStr))
+            {
+                door2Status = 1;
+            }
+            else
+            {
+                door2Status = 0;
+            }
+            // 打开安全门2
+            PlcControl.tagControl.wholeDevice.OperateSecurityDoor2(door2Status);
+        }
+
+        /// <summary>
+        /// 相机吹气
+        /// </summary>
+        private void CameraBlowingOperate()
+        {
+            PlcControl.tagControl.wholeDevice.SetWorkpieceBlowing();
+        }
+
+
+        /// <summary>
+        /// 更换工件
+        /// </summary>
+        private void ReplaceWorkpiece(bool vacuumFlag = false)
+        {
+            if (btnRunFlag)
+            {
+                return;
+            }
+            if (!CommonCheck.AxisReady(false) || CommonCheck.ModelRunCheck())
+            {
+                return;
+            }
+            string replacePositionX = "-63";
+            string replacePositionY = "-85";
+            string replacePositionZ1 = "0";
+            string replacePositionZ2 = "0";
+            float z1SafePosition = 5;
+            float z2SafePosition = 5;
+            int timeoutMilliseconds = 30000; // 超时时间为30秒
+            Task.Run(() =>
+            {
+                btnRunFlag = true;
+                GlobalParams.globalRunFlag = true;
+                var stopwatch = new Stopwatch();
+                // 开始计时
+                stopwatch.Start();
+                // 移动Z1和Z2到位置
+                PlcControl.tagControl.Z1axis.StartAbsolute("10", replacePositionZ1);
+                PlcControl.tagControl.Z2axis.StartAbsolute("10", replacePositionZ2);
+
+                // 等待z1和z2轴状态为done
+                while (true)
+                {
+                    Thread.Sleep(2000);
+                    bool z1ReadyFlag = Tools.TrueFlag(PlcControl.plc.GetPlcValueString(DeviceKey.z1CurMotionStatusKey));
+                    bool z2ReadyFlag = Tools.TrueFlag(PlcControl.plc.GetPlcValueString(DeviceKey.z2CurMotionStatusKey));
+
+                    if (!z1ReadyFlag && !z2ReadyFlag) break;
+                    if (stopwatch.ElapsedMilliseconds > timeoutMilliseconds)
+                    {
+                        MaterialSnackUtils.MaterialSnack("Z1或Z2轴移动超时！", SnackType.ERROR);
+                        GlobalParams.globalRunFlag = false;
+                        return;
+                    }
+                }
+
+                // 检查Z1和Z2位置是否安全
+                float z1CurrentPosition = Tools.GetFloatStringValue(PlcControl.plc.GetPlcValueString(DeviceKey.z1CurLocationKey));
+                float z2CurrentPosition = Tools.GetFloatStringValue(PlcControl.plc.GetPlcValueString(DeviceKey.z2CurLocationKey));
+                if (z1CurrentPosition > z1SafePosition || z2CurrentPosition > z2SafePosition)
+                {
+                    MaterialSnackUtils.MaterialSnack("Z1或Z2不在安全位置，请重试！", SnackType.WARNING);
+                    GlobalParams.globalRunFlag = false;
+                    return;
+                }
+
+
+                // 移动X和Y轴、theta轴
+                PlcControl.tagControl.Xaxis.StartAbsolute("150", replacePositionX);
+                PlcControl.tagControl.Yaxis.StartAbsolute("30", replacePositionY);
+                CurrentUtils.InitCutCh();
+                // 等待X和Y轴状态为done
+                while (true)
+                {
+                    bool xReadyFlag = Tools.TrueFlag(PlcControl.plc.GetPlcValueString(DeviceKey.curMotionStatusKey));
+                    bool yReadyFlag = Tools.TrueFlag(PlcControl.plc.GetPlcValueString(DeviceKey.yCurMotionStatusKey));
+
+                    if (!xReadyFlag && !yReadyFlag) break;
+
+                    if (stopwatch.ElapsedMilliseconds > timeoutMilliseconds)
+                    {
+                        MaterialSnackUtils.MaterialSnack("X或Y轴移动超时！", SnackType.ERROR);
+                        GlobalParams.globalRunFlag = false;
+                        return;
+                    }
+                    Thread.Sleep(100);
+                }
+                // 打开推拉门
+                // PlcControl.tagControl.wholeDevice.OperateSecurityDoor2(1);
+                if (vacuumFlag)
+                {
+                    VacuumOperate();
+                }
+                // 停止计时
+                stopwatch.Stop();
+                GlobalParams.globalRunFlag = false;
+                btnRunFlag = false;
+            });
+        }
+
+        // 手动校准页面
+        public void ManualAlignment()
+        {
+            // 切割相关业务 需要检查状态
+            if (CommonCheck.CutStatusCheck())
+            {
+                mainWindow.NavigateToPage("Pages/F2_ManualOperation/MQManualAlignmentConf", "type=1");
+            }
+        }
+        bool stopCutRunFlag = false;
+        /// <summary>
+        /// 切割停止
+        /// </summary>
+        private void StopCut()
+        {
+            if (stopCutRunFlag)
+            {
+                return;
+            }
+            stopCutRunFlag = true;
+            GlobalParams.globalRunFlag = true;
+            CutOperateUtils.buzzerTipFlag = false;
+            CutOperateUtils.exitCut();
+            Task.Run(() => {
+                CutOperateUtils.MonitorCutStatusFalse();
+                stopCutRunFlag = false;
+            });
+        }
+        /// <summary>
+        /// 自动对焦
+        /// </summary>
+        private void AutoFocus()
+        {
+            CommonOperate.GetInstance().AutoFocus(1, mainWindow);
+        }
+
+        //private OperateButton getOperateButton(string code)
+        //{
+        //    for (int i=0;i< OperateGrid.Children.Count;i++)
+        //    {
+        //        OperateButton bt = OperateGrid.Children[i] as OperateButton;
+        //        if (bt.Name.EndsWith("code"))
+
+        //        {
+        //            return bt;
+        //        }
+        //    }
+        //    return null;
+        //}
+    }
+}

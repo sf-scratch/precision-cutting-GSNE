@@ -1,0 +1,190 @@
+﻿<Page
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:精密切割系统.ViewModel"
+      xmlns:Controls="clr-namespace:精密切割系统.View.Controls" x:Class="精密切割系统.View.Pages.F5_3_1_FunctionData"
+      mc:Ignorable="d"
+      d:DesignHeight="676" d:DesignWidth="1448"
+      Title="F5_3_1_FunctionData" Loaded="Page_Loaded">
+    <Page.DataContext>
+        <local:F5_3_1_OperationDataViewModel />
+    </Page.DataContext>
+    <Grid>
+        <Grid.RowDefinitions >
+            <RowDefinition Height="80"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <!--原5.3.1-->
+        <Label x:Name="lbParamForm" Margin="30,30,0,0" Content="功能参数维护 (4.1)" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"  FontWeight="Bold" FontSize="22"/>
+        <StackPanel Grid.Row="1" Grid.Column="0" x:Name="sp1" HorizontalAlignment="Left" Margin="30,5,0,0" >
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                <Label x:Name="lbSmSuDu" Width="180" Height="35" Content="扫描速度" FontWeight="Bold" FontSize="16" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                <Label   Width="100"  Height="35" Content="X轴" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox Text="{Binding Path=XScanSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged }" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XAllowNull="False" XPrecision="3" />
+                <Label  Width="160"  Height="35" Content="mm/s" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox Text="{Binding Path=XSscanDistance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XAllowNull="False" XPrecision="4" />
+                <Label  Width="60"  Height="35" Content="mm" FontWeight="Bold" FontSize="16" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                <Label   Width="100"  Height="35" Content="Y轴" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox Text="{Binding Path=YScanSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XAllowNull="False" XPrecision="3"/>
+                <Label  Width="160"  Height="35" Content="mm/s" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox Text="{Binding Path=YSscanDistance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XAllowNull="False" XPrecision="4" />
+                <Label  Width="60"  Height="35" Content="mm" FontWeight="Bold" FontSize="16" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                <Label   Width="100"  Height="35" Content="Z轴" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox Text="{Binding Path=ZScanSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XAllowNull="False" XPrecision="3"/>
+                <Label  Width="160"  Height="35" Content="mm/s" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox Text="{Binding Path=ZSscanDistance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XAllowNull="False" XPrecision="4" />
+                <Label  Width="60"  Height="35" Content="mm" FontWeight="Bold" FontSize="16" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                <Label   Width="100"  Height="35" Content="θ轴" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox Text="{Binding Path=RScanSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XAllowNull="False" XPrecision="3"/>
+                <Label  Width="160"  Height="35" Content="度/s" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox Text="{Binding Path=RSscanDistance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XAllowNull="False" XPrecision="4" />
+                <Label  Width="60"  Height="35" Content="度" FontWeight="Bold" FontSize="16" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                <Label x:Name="lbSmTime" Width="180" Height="35" Content="扫描速度" FontWeight="Bold" FontSize="16" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                <Label  Width="100"  Height="35" Content="低速" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox Text="{Binding Path=MoveLowTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XAllowNull="False" XPrecision="3"/>
+                <Label  Width="100"  Height="35" Content="mm/s" FontWeight="Bold" FontSize="16" />
+                <Label  Width="60"  Height="35" Content="中速" FontWeight="Bold" FontSize="16" Visibility="Collapsed"/>
+                <Controls:InputTextBox Text="{Binding Path=MoveHighTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Visibility="Collapsed" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Numeral" XMin="0" XAllowNull="False" XPrecision="0"/>
+                <Label  Width="60"  Height="35" Content="mm/s" FontWeight="Bold" FontSize="16" Visibility="Collapsed"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                <Label x:Name="lbPmMove" Width="180" Height="35" Content="屏幕移动量" FontWeight="Bold" FontSize="16" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                <Label   Width="100"  Height="35" Content="X轴" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox Text="{Binding Path=XScreenIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XAllowNull="False" XPrecision="4"/>
+                <Label  Width="100"  Height="35" Content="mm" FontWeight="Bold" FontSize="16" />
+                <Label  Width="60"  Height="35" Content="Y轴" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox Text="{Binding Path=YScreenIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XAllowNull="False" XPrecision="4"/>
+                <Label  Width="60"  Height="35" Content="mm" FontWeight="Bold" FontSize="16" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                <Label x:Name="zAxisCompLabel" Width="180" Height="35" Content="Z轴补偿" FontWeight="Bold" FontSize="16" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                <Label   Width="100"  Height="35" Content="前几刀" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox Text="{Binding Path=zAxisCompNum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Numeral" XMin="0" XAllowNull="False"/>
+                <Label  Width="100"  Height="35" Content="刀" FontWeight="Bold" FontSize="16" />
+                <Label  Width="60"  Height="35" Content="补偿量" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox Text="{Binding Path=zAxisCompValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XAllowNull="False" XPrecision="4"/>
+                <Label  Width="60"  Height="35" Content="mm" FontWeight="Bold" FontSize="16" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                <Label x:Name="cutBakInfoLabel" Width="180" Height="35" Content="切割回程速度" FontWeight="Bold" FontSize="16" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                <Label  Width="100"  Height="35" Content="X轴" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox Text="{Binding Path=cutXAxisBackSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150" XMax="300" TextWrapping="Wrap"  Height="35" InputType="Numeral" XAllowNull="False"/>
+                <Label  Width="60"  Height="35" Content="mm/s" FontWeight="Bold" FontSize="16" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,0" Visibility="Collapsed">
+                <Label   Width="100"  Height="35" Content="容许余量" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox Text="{Binding Path=EscapeRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XAllowNull="False" XMax="1" XPrecision="3"/>
+                <Label  Width="80" Height="35" Content="mm" FontWeight="Bold" FontSize="16" />
+                <Label  Width="80" Height="35" Content="额外余量" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox Text="{Binding Path=ExtraEscapeRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XAllowNull="False" XMax="1" XPrecision="3"/>
+                <Label  Width="60"  Height="35" Content="mm" FontWeight="Bold" FontSize="16" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,0" Visibility="Collapsed">
+                <Label x:Name="lbZhuzdl" Width="556" Height="35" Content="主轴负载电流" FontWeight="Bold" FontSize="16" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,0" Visibility="Collapsed">
+                <Label   Width="100"  Height="35" Content="停止操作" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox Text="{Binding Path=MStopElectrical, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XAllowNull="False" XMax="1" XPrecision="3"/>
+                <Label  Width="160"  Height="35" Content="A" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox Text="{Binding Path=MStopTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XAllowNull="False" XMax="1" XPrecision="1"/>
+                <Label  Width="60"  Height="35" Content="s" FontWeight="Bold" FontSize="16" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,0" Visibility="Collapsed">
+                <Label   Width="100"  Height="35" Content="Z-EM操作" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox Text="{Binding Path=ZStopElectrical, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XAllowNull="False" XMax="1" XPrecision="3"/>
+                <Label  Width="160"  Height="35" Content="A" FontWeight="Bold" FontSize="16" />
+                <Controls:InputTextBox Text="{Binding Path=ZStopTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XAllowNull="False" XMax="1" XPrecision="1"/>
+                <Label  Width="60"  Height="35" Content="s" FontWeight="Bold" FontSize="16" />
+            </StackPanel>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Margin="30,5,0,0" Visibility="Collapsed">
+            <StackPanel Orientation="Horizontal" >
+                <Label Width="220"  Height="35" Content="ZEM完成后切割开始位置" FontWeight="Bold" FontSize="16" />
+                <ComboBox Name="cbxZStopAfterSeq" Width="130" Height="35" VerticalContentAlignment="Center">
+                    <ComboBoxItem Content="下一刀" Tag="下一刀" Height="30"/>
+                    <ComboBoxItem Content="同一刀" Tag="同一刀" Height="30"/>
+                </ComboBox>
+            </StackPanel>
+            <StackPanel Margin="50,0,0,0">
+                <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                    <Label x:Name="lbZhuzsdl" Width="220" Height="35" Content="切割余量" FontWeight="Bold" FontSize="16" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                    <Label   Width="150"  Height="35" Content="X轴开始方向" FontWeight="Bold" FontSize="16" />
+                    <Controls:InputTextBox Text="{Binding Path=XStartClearance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XAllowNull="False" XPrecision="3"/>
+                    <Label  Width="100"  Height="35" Content="mm" FontWeight="Bold" FontSize="16" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                    <Label   Width="150"  Height="35" Content="X轴停止方向" FontWeight="Bold" FontSize="16" />
+                    <Controls:InputTextBox Text="{Binding Path=XEndClearance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XAllowNull="False" XPrecision="3"/>
+                    <Label  Width="100"  Height="35" Content="mm" FontWeight="Bold" FontSize="16" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                    <Label   Width="150"  Height="35" Content="Y轴" FontWeight="Bold" FontSize="16" />
+                    <Controls:InputTextBox Text="{Binding Path=YClearance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XAllowNull="False" XPrecision="3"/>
+                    <Label  Width="100"  Height="35" Content="mm" FontWeight="Bold" FontSize="16" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                    <Label   Width="150"  Height="35" Content="强制检查厚度" FontWeight="Bold" FontSize="16" />
+                    <Controls:InputTextBox Text="{Binding Path=AutoFocusCheckLimit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XAllowNull="False" XPrecision="3"/>
+                    <Label  Width="100"  Height="35" Content="mm" FontWeight="Bold" FontSize="16" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                    <Label   Width="150"  Height="35" Content="吹气动作" FontWeight="Bold" FontSize="16" />
+                    <Controls:InputTextBox Text="{Binding Path=AirCurtainStroke, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XAllowNull="False" XPrecision="3"/>
+                    <Label  Width="100"  Height="35" Content="mm" FontWeight="Bold" FontSize="16" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                    <Label   Width="150"  Height="35" Content="工作真空下限" FontWeight="Bold" FontSize="16" />
+                    <Controls:InputTextBox Text="{Binding Path=VaccumWorkLowerLimit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="-200" XAllowNull="False" XMax="1" XPrecision="1"/>
+                    <Label  Width="100"  Height="35" Content="Kpa" FontWeight="Bold" FontSize="16" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                    <Label   Width="150"  Height="35" Content="夹具真空下限" FontWeight="Bold" FontSize="16" />
+                    <Controls:InputTextBox Text="{Binding Path=VaccumPumpLowerLimitOther, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="-200" XAllowNull="False" XMax="1" XPrecision="1"/>
+                    <Label  Width="100"  Height="35" Content="Kpa" FontWeight="Bold" FontSize="16" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                    <Label   Width="150"  Height="35" Content="切割过程" FontWeight="Bold" FontSize="16" />
+                    <Controls:InputTextBox Text="{Binding Path=LimitDuringCutting, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="-200" XAllowNull="False" XMax="1" XPrecision="1"/>
+                    <Label  Width="100"  Height="35" Content="Kpa" FontWeight="Bold" FontSize="16" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                    <Label   Width="150"  Height="35" Content="真空泵下限" FontWeight="Bold" FontSize="16" />
+                    <Controls:InputTextBox Text="{Binding Path=VaccumPumpLowerLimit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="-200" XAllowNull="False" XMax="1" XPrecision="1"/>
+                    <Label  Width="100"  Height="35" Content="Kpa" FontWeight="Bold" FontSize="16" />
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left" Width="120" >
+
+
+        </StackPanel>
+    </Grid>
+</Page>

@@ -1,0 +1,35 @@
+﻿<Page
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:精密切割系统.View.Pages.F5_GeneralEfficiency"
+      xmlns:Controls="clr-namespace:精密切割系统.View.Controls" x:Class="精密切割系统.View.Pages.F5_GeneralEfficiency.F5_1_PrecutDataCopy"
+      mc:Ignorable="d" 
+      d:DesignHeight="676" d:DesignWidth="1448"
+      Title="F5_1_PrecutDataCopy" Loaded="Page_Loaded">
+
+    <Grid Margin="30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Label Grid.Row="0" Content="预切割参数目录拷贝" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="30" FontWeight="Bold" Padding="0,0,0,0" Margin="0,0,0,20"/>
+        <StackPanel Grid.Row="1"  VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Grid >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Orientation="Horizontal">
+                    <Label Content="预切割过程No" Width="150"  FontSize="16" Margin="0,0,15,0" HorizontalContentAlignment="Right"/>
+                    <Controls:InputTextBox  x:Name="tbxSrc"  TextWrapping="Wrap" Text=""  Width="300" FontSize="16" IsEnabled="False"/>
+                </StackPanel>
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,15,0,0">
+                    <Label Content="新预切割过程No" Width="150"  FontSize="16" Margin="0,0,15,0" HorizontalContentAlignment="Right"/>
+                    <Controls:InputTextBox  x:Name="tbxDst" Width="300" FontSize="16" InputType="Numeral" XPrecision="0" XMax="20" XMin="0"/>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+    </Grid>
+</Page>

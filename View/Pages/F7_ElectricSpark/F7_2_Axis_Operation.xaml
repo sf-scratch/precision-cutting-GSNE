@@ -1,0 +1,71 @@
+﻿<Page
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:精密切割系统.ViewModel"
+      xmlns:Controls="clr-namespace:精密切割系统.View.Controls" x:Class="精密切割系统.View.Pages.F7_ElectricSpark.F7_2_Axis_Operation"
+      mc:Ignorable="d" 
+      Background="#FFDFFCFF"
+      d:DesignHeight="676" d:DesignWidth="1448"
+      Title="F7_2_Axis_Operation" Loaded="Page_Loaded">
+    <Page.DataContext>
+        <local:F7_2_AxisOperationViewModel />
+    </Page.DataContext>
+    <Page.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#FFDFFCFF"/>
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="Background" Value="#FFDFFCFF"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Page.Resources>
+    <Grid Margin="30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Label Grid.Row="0" Content="轴运动（5.4）" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="30" FontWeight="Bold" Padding="0,0,0,0" Margin="0,0,0,20"/>
+        <Controls:InputTextBox HorizontalAlignment="Left" Margin="86,49,0,0" Grid.Row="1" TextWrapping="Wrap" Text="轴名称" TextAlignment="Center" VerticalAlignment="Top" Width="152" IsReadOnly="True" Height="38"/>
+        <Controls:InputTextBox HorizontalAlignment="Left" Margin="270,49,0,0" Grid.Row="1" TextWrapping="Wrap" Text="轴慢速度(mm/s)" TextAlignment="Center" VerticalAlignment="Top" Width="172" IsReadOnly="True" Height="38"/>
+        <Controls:InputTextBox HorizontalAlignment="Left" Margin="701,49,0,0" Grid.Row="1" TextWrapping="Wrap" Text="相对运动长度(mm)" TextAlignment="Center" VerticalAlignment="Top" Width="182" IsReadOnly="True" Height="38"/>
+        <Controls:InputTextBox HorizontalAlignment="Left" Margin="910,49,0,0" Grid.Row="1" TextWrapping="Wrap" Text="当前位置(mm)" TextAlignment="Center" VerticalAlignment="Top" Width="152" IsReadOnly="True" Height="38"/>
+        <Button HorizontalAlignment="Left" x:Name="btnXAxis" Background="#FFDFFCFF" Content="X轴" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Margin="86,133,0,0" Grid.Row="1" VerticalAlignment="Top" Width="152" Height="52" FontSize="16" BorderThickness="2" BorderBrush="LightBlue" Click="btnXAxis_Click"/>
+        <Controls:InputTextBox HorizontalAlignment="Left" Margin="1085,49,0,0" Grid.Row="1" TextWrapping="Wrap" Text="当前状态" TextAlignment="Center" VerticalAlignment="Top" Width="152" IsReadOnly="True" Height="38"/>
+        <Button HorizontalAlignment="Left" x:Name="btnYAxis" Content="Y轴" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Margin="86,229,0,0" Grid.Row="1" VerticalAlignment="Top" Width="152" Height="51" FontSize="16" BorderThickness="2" BorderBrush="LightBlue" Click="btnYAxis_Click" Background="#FFDFFCFF"/>
+        <Button HorizontalAlignment="Left" x:Name="btnZAxis" Background="#FFDFFCFF" Content="Z轴" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Margin="86,326,0,0" Grid.Row="1" VerticalAlignment="Top" Width="152" Height="51" FontSize="16" BorderThickness="2" BorderBrush="LightBlue" Click="btnZAxis_Click"/>
+        <Button HorizontalAlignment="Left" x:Name="btnThetaAxis" Background="#FFDFFCFF" Content="Theta轴" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Margin="86,423,0,0" Grid.Row="1" VerticalAlignment="Top" Width="152" Height="51" FontSize="16" BorderThickness="2" BorderBrush="LightBlue" Click="btnThetaAxis_Click"/>
+        <Controls:InputTextBox x:Name="tbxXSpeed" HorizontalAlignment="Left" Margin="280,133,0,0" Grid.Row="1" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="152" Height="52"/>
+        <Controls:InputTextBox x:Name="tbxYSpeed" HorizontalAlignment="Left" Margin="280,229,0,0" Grid.Row="1" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="152" Height="51"/>
+        <Controls:InputTextBox x:Name="tbxZSpeed" HorizontalAlignment="Left" Margin="280,326,0,0" Grid.Row="1" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="152" Height="51"/>
+        <Controls:InputTextBox x:Name="tbxThetaSpeed" HorizontalAlignment="Left" Margin="280,423,0,0" Grid.Row="1" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="152" Height="51"/>
+        <Controls:InputTextBox x:Name="tbxXLenght" HorizontalAlignment="Left" Margin="716,133,0,0" Grid.Row="1" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="151" Height="52"/>
+        <Controls:InputTextBox x:Name="tbxYLenght" HorizontalAlignment="Left" Margin="716,229,0,0" Grid.Row="1" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="153" Height="51"/>
+        <Controls:InputTextBox x:Name="tbxZLenght" HorizontalAlignment="Left" Margin="715,326,0,0" Grid.Row="1" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="152" Height="51"/>
+        <Controls:InputTextBox x:Name="tbxThetaLenght" HorizontalAlignment="Left" Margin="716,423,0,0" Grid.Row="1" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="153" Height="51"/>
+        <Controls:InputTextBox x:Name="tbxXPosition" Text="{Binding xCurPosition, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="910,133,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="152" Height="52" IsReadOnly="True" Background="#FFB4D8DC"/>
+        <Controls:InputTextBox x:Name="tbxYPosition" Text="{Binding yCurPosition, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="910,229,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="152" Height="51" IsReadOnly="True" Background="#FFB4D8DC"/>
+        <Controls:InputTextBox x:Name="tbxZPosition" Text="{Binding zCurPosition, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="910,326,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="152" Height="51" IsReadOnly="True" Background="#FFB4D8DC"/>
+        <Controls:InputTextBox x:Name="tbxThetaPosition" Text="{Binding thetaCurPosition, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="910,423,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="152" Height="51" IsReadOnly="True" Background="#FFB4D8DC"/>
+
+
+        <Rectangle x:Name="rectXStatus" HorizontalAlignment="Left" Height="52" Margin="1128,133,0,0" Grid.Row="1" Stroke="Black" VerticalAlignment="Top" Width="66">
+            <!--Rectangle.Fill>
+                <SolidColorBrush Color="{Binding xStatus, Converter={StaticResource BoolToColorConverter}}" />
+            </Rectangle.Fill-->
+        </Rectangle>
+        <Rectangle x:Name="rectYStatus" HorizontalAlignment="Left" Height="51" Margin="1128,229,0,0" Grid.Row="1" Stroke="Black" VerticalAlignment="Top" Width="66">
+        </Rectangle>
+        <Rectangle x:Name="rectZStatus" HorizontalAlignment="Left" Height="51" Margin="1128,326,0,0" Grid.Row="1" Stroke="Black" VerticalAlignment="Top" Width="66">
+        </Rectangle>
+        <Rectangle x:Name="rectThetaStatus" HorizontalAlignment="Left" Height="51" Margin="1128,423,0,0" Grid.Row="1" Stroke="Black" VerticalAlignment="Top" Width="66">
+        </Rectangle>
+        <Controls:InputTextBox HorizontalAlignment="Left" Margin="503,49,0,0" Grid.Row="1" TextWrapping="Wrap" Text="轴速度(mm/s)" TextAlignment="Center" VerticalAlignment="Top" Width="152" IsReadOnly="True" Height="38"/>
+        <Controls:InputTextBox x:Name="tbxXFastSpeed" HorizontalAlignment="Left" Margin="503,133,0,0" Grid.Row="1" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="152" Height="52"/>
+        <Controls:InputTextBox x:Name="tbxYFastSpeed" HorizontalAlignment="Left" Margin="503,229,0,0" Grid.Row="1" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="152" Height="51"/>
+        <Controls:InputTextBox x:Name="tbxZFastSpeed" HorizontalAlignment="Left" Margin="503,326,0,0" Grid.Row="1" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="152" Height="51"/>
+        <Controls:InputTextBox x:Name="tbxThetaFastSpeed" HorizontalAlignment="Left" Margin="503,423,0,0" Grid.Row="1" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="152" Height="51"/>
+    </Grid>
+</Page>

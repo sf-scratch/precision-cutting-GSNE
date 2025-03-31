@@ -1,0 +1,208 @@
+﻿using NPOI.SS.Formula.Functions;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using System.Xml.Linq;
+using 精密切割系统.Assets.config.buttom;
+using 精密切割系统.Driver;
+using 精密切割系统.FrmWindow.common;
+using 精密切割系统.Helpers;
+using 精密切割系统.Utils;
+using 精密切割系统.View.Pages.common;
+using 精密切割系统.View.Pages.operate;
+using 精密切割系统.ViewModel;
+
+namespace 精密切割系统.View.Controls
+{
+    /// <summary>
+    /// RightButton.xaml 的交互逻辑
+    /// </summary>
+    public partial class RightButton : UserControl
+    {
+        private MainWindow? mainWindow;
+        //文字
+        public static readonly DependencyProperty ContentTextProperty =
+        DependencyProperty.Register("ContentText", typeof(string), typeof(RightButton), new PropertyMetadata(null));
+
+        public string ContentText
+        {
+            get { return (string)GetValue(ContentTextProperty); }
+            set { SetValue(ContentTextProperty, value); }
+        }
+        // 是否返回 false不返回 true 返回上一级
+        public static readonly DependencyProperty BackFlagProperty =
+        DependencyProperty.Register("BackFlag", typeof(bool), typeof(RightButton), new PropertyMetadata(null));
+
+        public bool BackFlag
+        {
+            get { return (bool)GetValue(BackFlagProperty); }
+            set { SetValue(BackFlagProperty, value); }
+        }
+        // 全局有操作时，是否可以点击
+        public static readonly DependencyProperty GlobalRunOperateFlagProperty =
+        DependencyProperty.Register("GlobalRunOperateFlag", typeof(bool), typeof(RightButton), new PropertyMetadata(null));
+
+        public bool GlobalRunOperateFlag
+        {
+            get { return (bool)GetValue(GlobalRunOperateFlagProperty); }
+            set { SetValue(GlobalRunOperateFlagProperty, value); }
+        }
+        //图片ICON
+        public static readonly DependencyProperty ImagePathProperty =
+       DependencyProperty.Register("ImagePath", typeof(string), typeof(RightButton), new PropertyMetadata(null));
+
+        public string ImagePath
+        {
+            get { return (string)GetValue(ImagePathProperty); }
+            set { SetValue(ImagePathProperty, value); }
+        }
+
+        //按钮背景色
+       public static readonly DependencyProperty BackgroundDefColorProperty =
+       DependencyProperty.Register("BackgroundDefColor", typeof(Brush), typeof(RightButton), new PropertyMetadata(Brushes.Silver));
+
+
+        public Brush BackgroundDefColor
+        {
+            get { return (Brush)GetValue(BackgroundDefColorProperty); }
+            set { SetValue(BackgroundDefColorProperty, value); }
+        }
+
+        //按钮按下背景色
+        public static readonly DependencyProperty BackgroundDownColorProperty =
+        DependencyProperty.Register("BackgroundDownColor", typeof(Brush), typeof(RightButton), new PropertyMetadata(Brushes.Silver));
+
+        public Brush BackgroundDownColor
+        {
+            get { return (Brush)GetValue(BackgroundDownColorProperty); }
+            set { SetValue(BackgroundDownColorProperty, value); }
+        }
+
+        public RightButton()
+        {
+            InitializeComponent();
+            mainWindow = Application.Current.MainWindow as MainWindow;
+            if (DevicesUtis.IsTouchSupported()) {
+                btnBorder.TouchDown += BtnBorder_TouchDown;
+                btnBorder.TouchLeave += BtnBorder_TouchLeave;
+                btnBorder.TouchUp += BtnBorder_TouchUp;
+            }
+            else
+            {
+                btnBorder.MouseDown += BtnBorder_MouseDown;
+                btnBorder.MouseUp += BtnBorder_MouseUp;
+            }
+        }
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            btnBorder.Background = BackgroundDefColor;
+        }
+
+        private void BtnBorder_TouchUp(object? sender, TouchEventArgs e)
+        {
+            onClick(true);
+        }
+
+        private void BtnBorder_TouchLeave(object? sender, TouchEventArgs e)
+        {
+            if (resetState)
+            {
+                btnBorder.Background = BackgroundDefColor;
+            }
+        }
+
+        private void BtnBorder_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+
+            btnBorder.Background = BackgroundDownColor;
+        }
+
+        private void BtnBorder_TouchDown(object? sender, TouchEventArgs e)
+        {
+            btnBorder.Background = BackgroundDownColor;
+            
+        }
+
+        private void BtnBorder_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            onClick(true);
+        }
+
+        private void onClick(Boolean isOK)
+        {
+            if (!CommonCheck.CheckAlarmStatus() && !GlobalRunOperateFlag)
+            {
+                MaterialSnackUtils.MaterialSnack("请先解除报警！", MaterialSnackUtils.SnackType.WARNING, 5);
+                return;
+            }
+            if (!GlobalParams.systemInitFlag && !GlobalRunOperateFlag)
+            {
+                MaterialSnackUtils.MaterialSnack("请先进行初始化！", MaterialSnackUtils.SnackType.WARNING, 5);
+                return;
+            }
+            bool ignoreFlag = false;
+            // 判断是否有在进行中的操作，如果有，则不执行点击事件
+            if (GlobalParams.globalRunFlag && !GlobalRunOperateFlag)
+            {
+                // MaterialSnackUtils.MaterialSnack("操作进行中！", MaterialSnackUtils.SnackType.WARNING, 5);
+                return;
+            }
+
+            //保证下面的按钮控件页面回去的时候不在软键盘上
+            OperatePage operatePage = mainWindow.operateFrame.Content as OperatePage;
+            if (operatePage==null)
+            {
+                operatePage.SetOperateShowType(0);
+            }
+            if (PlcControl.allAlarm.Count > 0 && !GlobalRunOperateFlag)
+            {
+                return;
+            }
+            Uri currentPageUri = mainWindow.mainFrame.CurrentSource;
+            if (currentPageUri!=null&&BackFlag && mainWindow.mainFrame.CanGoBack 
+                && !currentPageUri.ToString().Contains("MainMenu.xaml"))
+            {
+                mainWindow.mainFrame.GoBack();
+                if (RightClicked != null)
+                {
+                    RightClicked?.Invoke(this, isOK);
+                }
+            }
+            else
+            {
+                RightClicked?.Invoke(this, isOK);
+            }
+        }
+        // 设置事件处理器的方法
+        public void SetRightClickedHandler(EventHandler<Boolean> handler)
+        {
+            // 移除所有现有的处理器
+            RightClicked -= RightClicked;
+            // 添加新的处理器
+            RightClicked += handler;
+        }
+        public event EventHandler<Boolean> RightClicked;
+
+        public bool resetState { get; set; } = true;
+
+        public void resetBg()
+        {
+            btnBorder.Background = BackgroundDefColor;
+        }
+
+       
+    }
+}

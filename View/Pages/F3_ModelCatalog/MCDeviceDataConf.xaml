@@ -1,0 +1,545 @@
+﻿<Page
+    x:Class="精密切割系统.View.Pages.F3_ModelCatalog.MCDeviceDataConf"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:精密切割系统.View.Pages.F3_ModelCatalog"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="MCDeviceDataConf"
+    d:DesignHeight="676"
+    d:DesignWidth="1448"
+    mc:Ignorable="d">
+
+    <Grid Margin="30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Label
+            Grid.Row="0"
+            Margin="0,0,0,30"
+            Padding="0,0,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            Content="型号参数 (2.1.1)"
+            FontSize="30"
+            FontWeight="Bold"
+            Loaded="Label_Loaded" />
+        <Grid Grid.Row="1" Margin="10,0,10,10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <!--  第一节  -->
+            <Grid Grid.Row="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel
+                    Grid.Column="0"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal">
+                    <WrapPanel>
+                        <Label
+                            Margin="0,0,10,0"
+                            Content="型号参数号"
+                            FontSize="14" />
+                        <Controls:InputTextBox
+                            x:Name="labDirectoryName"
+                            Width="120"
+                            IsEnabled="False" />
+                        <Label
+                            Margin="10,0,10,0"
+                            Content="/"
+                            FontSize="14" />
+                        <Controls:InputTextBox
+                            x:Name="labDeviceDataNo"
+                            Width="120"
+                            IsEnabled="False" />
+                    </WrapPanel>
+                    <WrapPanel Margin="30,0,0,0">
+                        <Label
+                            Margin="0,0,10,0"
+                            Content="ID"
+                            FontSize="14" />
+                        <Controls:InputTextBox
+                            x:Name="inputDeviceDataId"
+                            Width="200"
+                            XMax="30"
+                            XMin="0" />
+                    </WrapPanel>
+                </StackPanel>
+                <StackPanel
+                    Grid.Column="1"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal">
+                    <Label
+                        Margin="0,0,10,0"
+                        Content="旋转轴转数"
+                        FontSize="14" />
+                    <Controls:InputTextBox
+                        x:Name="inputSpindleRev"
+                        Width="120"
+                        InputType="Numeral"
+                        XMax="100000"
+                        XMin="0"
+                        XPrecision="0" />
+                    <Label
+                        Margin="10,0,10,0"
+                        Content="min"
+                        FontSize="14" />
+                    <Label
+                        Margin="10,0,10,0"
+                        Content="预切割过程No."
+                        FontSize="14" />
+                    <Controls:InputTextBox
+                        x:Name="inputPrecutProcessNo"
+                        Width="120"
+                        InputType="Numeral"
+                        XMax="100"
+                        XMin="0" />
+                    <Label
+                        Margin="10,0,10,0"
+                        Content="切割顺序（切割面）"
+                        FontSize="14" />
+                    <Controls:InputTextBox
+                        x:Name="inputCuttingChSeq"
+                        Width="120"
+                        InputType="English" />
+                </StackPanel>
+            </Grid>
+            <!--  第二节  -->
+            <StackPanel Grid.Row="1">
+                <Label Content="切割片形状和尺寸" FontSize="14" />
+            </StackPanel>
+            <!--  第三节  -->
+            <StackPanel Grid.Row="2" Margin="0,0,0,5">
+                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                    <RadioButton
+                        x:Name="rabRound"
+                        Margin="0,0,10,0"
+                        VerticalContentAlignment="Center"
+                        Checked="RabRound_Checked"
+                        Content="圆形切割尺寸"
+                        FontSize="14"
+                        GroupName="size" />
+                    <Controls:InputTextBox
+                        x:Name="inputRound"
+                        Width="120"
+                        InputType="Decimal" />
+                    <Label Content="mm" FontSize="14" />
+                    <RadioButton
+                        x:Name="rabSquare"
+                        Margin="10,0,10,0"
+                        VerticalContentAlignment="Center"
+                        Checked="RabSquare_Checked"
+                        Content="长方形切割尺寸"
+                        FontSize="14"
+                        GroupName="size" />
+                    <Label
+                        Margin="10,0,0,0"
+                        Content="Ch1"
+                        FontSize="14" />
+                    <Controls:InputTextBox
+                        x:Name="inputSquareCh1"
+                        Width="120"
+                        InputType="Decimal" />
+                    <Label Content="mm" FontSize="14" />
+                    <Label
+                        Margin="20,0,0,0"
+                        Content="Ch2"
+                        FontSize="14" />
+                    <Controls:InputTextBox
+                        x:Name="inputSquareCh2"
+                        Width="120"
+                        InputType="Decimal" />
+                    <Label Content="mm" FontSize="14" />
+                    <Label
+                        Margin="30,0,0,0"
+                        Content="晶片厚度"
+                        FontSize="14" />
+                    <Controls:InputTextBox
+                        x:Name="inputWorkThickness"
+                        Width="120"
+                        InputType="Decimal"
+                        XMax="1000"
+                        XMin="-1000" />
+                    <Label Content="mm" FontSize="14" />
+                    <Label Content="胶片厚度" FontSize="14" />
+                    <Controls:InputTextBox
+                        x:Name="inputTapeThickness"
+                        Width="120"
+                        InputType="Decimal"
+                        XMax="1000"
+                        XMin="-1000" />
+                    <Label Content="mm" FontSize="14" />
+                </StackPanel>
+            </StackPanel>
+            <!--  第四节  -->
+            <Grid Grid.Row="3" Margin="0,5,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="300" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Row="0" Grid.Column="0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="60" />
+                        </Grid.ColumnDefinitions>
+                        <Label
+                            x:Name="labChName"
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Margin="0,0,0,10"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Background="#CAEAFE"
+                            Content="Ch1"
+                            FontSize="16"
+                            FontWeight="Bold" />
+                        <!--  列数据  -->
+                        <Label
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Margin="0,0,0,10"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Content="θ Deg."
+                            FontSize="16" />
+                        <Controls:InputTextBox
+                            x:Name="inputThetaDeg"
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Margin="0,0,0,10"
+                            InputType="Decimal" />
+                        <Label
+                            Grid.Row="1"
+                            Grid.Column="2"
+                            Margin="0,0,0,10"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Content="°"
+                            FontSize="16" />
+                        <!--  列数据  -->
+                        <Label
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            Margin="0,0,0,10"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Content="切割方式"
+                            FontSize="16" />
+                        <ComboBox
+                            x:Name="ComBoxCutMode"
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            Margin="0,0,0,10"
+                            VerticalContentAlignment="Center">
+                            <ComboBoxItem Height="35" Content="A" />
+                            <ComboBoxItem Height="35" Content="B_ZKEEP" />
+                        </ComboBox>
+                        <!--  列数据  -->
+                        <Label
+                            Grid.Row="3"
+                            Grid.Column="0"
+                            Margin="0,0,0,10"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Content="切割方向"
+                            FontSize="16" />
+                        <ComboBox
+                            x:Name="ComBoxCutDir"
+                            Grid.Row="3"
+                            Grid.Column="1"
+                            Margin="0,0,0,10"
+                            VerticalContentAlignment="Center">
+                            <ComboBoxItem Height="35" Content="FRONT" />
+                            <ComboBoxItem Height="35" Content="REAR" />
+                        </ComboBox>
+                        <!--  列数据  -->
+                        <Label
+                            Grid.Row="4"
+                            Grid.Column="0"
+                            Margin="0,0,0,8"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Content="切割刀数"
+                            FontSize="16" />
+                        <Controls:InputTextBox
+                            x:Name="inputCutLine"
+                            Grid.Row="4"
+                            Grid.Column="1"
+                            Margin="0,0,0,8"
+                            InputType="Numeral"
+                            XMax="10000"
+                            XMin="0"
+                            XPrecision="0" />
+                        <Label
+                            Grid.Row="4"
+                            Grid.Column="3"
+                            Margin="0,0,0,8"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Content="刀"
+                            FontSize="16" />
+                        <!--  列数据  -->
+                        <Label
+                            Grid.Row="5"
+                            Grid.Column="0"
+                            Margin="0,0,0,8"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Content="绝对切割位置"
+                            FontSize="16" />
+                        <Controls:InputTextBox
+                            x:Name="absoluteCutPosition"
+                            Grid.Row="5"
+                            Grid.Column="1"
+                            Margin="0,0,0,8"
+                            XAllowNull="true"
+                            InputType="Decimal" />
+                        <Label
+                            Grid.Row="5"
+                            Grid.Column="3"
+                            Margin="0,0,0,8"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Content="mm"
+                            FontSize="16" />
+                        <!--  列数据  -->
+                        <Label
+                            Grid.Row="6"
+                            Grid.Column="0"
+                            Margin="0,0,0,8"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Content="刀片角度"
+                            FontSize="16" />
+                        <Controls:InputTextBox
+                            x:Name="inputBladeAngle"
+                            Grid.Row="6"
+                            Grid.Column="1"
+                            Margin="0,0,0,8"
+                            InputType="Decimal" />
+                        <Label
+                            Grid.Row="6"
+                            Grid.Column="3"
+                            Margin="0,0,0,8"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Content="°"
+                            FontSize="16" />
+                        <!--列数据
+                        <Label Grid.Row="7" Grid.Column="0" Margin="0,0,0,10" FontSize="16" Content="切割禁止R"  VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                        <Controls:InputTextBox x:Name="inputMoncutR" Grid.Row="7" Margin="0,0,0,8" Grid.Column="1" InputType="Decimal"/>
+                        <Label Grid.Row="7" Grid.Column="3" Margin="0,0,0,8" FontSize="16" Content="mm"  VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                        -->
+                        <!--  列数据  -->
+                        <Label
+                            Grid.Row="7"
+                            Grid.Column="0"
+                            Margin="0,0,0,8"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Content="X偏移"
+                            FontSize="16" />
+                        <Controls:InputTextBox
+                            x:Name="inputOffsetX"
+                            Grid.Row="7"
+                            Grid.Column="1"
+                            Margin="0,0,0,8"
+                            InputType="Decimal" />
+                        <Label
+                            Grid.Row="7"
+                            Grid.Column="3"
+                            Margin="0,0,0,8"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Content="mm"
+                            FontSize="16" />
+                        <!--  列数据  -->
+                        <Label
+                            Grid.Row="8"
+                            Grid.Column="0"
+                            Margin="0,0,0,8"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Content="θ偏移"
+                            FontSize="16"
+                            Visibility="Collapsed" />
+                        <Controls:InputTextBox
+                            x:Name="inputOffsetTheta"
+                            Grid.Row="8"
+                            Grid.Column="1"
+                            Margin="0,0,0,8"
+                            InputType="Decimal"
+                            Visibility="Collapsed" />
+                        <Label
+                            Grid.Row="8"
+                            Grid.Column="3"
+                            Margin="0,0,0,8"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Content="°"
+                            FontSize="16"
+                            Visibility="Collapsed" />
+                    </Grid>
+                </StackPanel>
+                <StackPanel Grid.Row="0" Grid.Column="1">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Margin="0,0,0,8"
+                            VerticalAlignment="Bottom">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="45" />
+                                    <RowDefinition Height="45" />
+                                    <RowDefinition Height="45" />
+                                    <RowDefinition Height="45" />
+                                    <RowDefinition Height="45" />
+                                    <RowDefinition Height="45" />
+                                    <RowDefinition Height="45" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="150" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Label
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    Margin="0,0,10,10"
+                                    HorizontalContentAlignment="Right"
+                                    VerticalContentAlignment="Center"
+                                    Content="刀片高度"
+                                    FontSize="16" />
+                                <Label
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Margin="0,0,10,10"
+                                    HorizontalContentAlignment="Right"
+                                    VerticalContentAlignment="Center"
+                                    Content="进刀速度"
+                                    FontSize="16" />
+                                <Label
+                                    Grid.Row="2"
+                                    Grid.Column="0"
+                                    Margin="0,0,10,10"
+                                    HorizontalContentAlignment="Right"
+                                    VerticalContentAlignment="Center"
+                                    Content="Y轴移动量"
+                                    FontSize="16" />
+                                <Label
+                                    Grid.Row="3"
+                                    Grid.Column="0"
+                                    Margin="0,0,10,10"
+                                    HorizontalContentAlignment="Right"
+                                    VerticalContentAlignment="Center"
+                                    Content="刀数"
+                                    FontSize="16" />
+                                <Label
+                                    x:Name="deptSetLabel"
+                                    Grid.Row="4"
+                                    Grid.Column="0"
+                                    Margin="0,0,10,10"
+                                    HorizontalContentAlignment="Right"
+                                    VerticalContentAlignment="Center"
+                                    Content="刀片深度"
+                                    FontSize="16" />
+                                <Label
+                                    x:Name="loopLabel"
+                                    Grid.Row="5"
+                                    Grid.Column="0"
+                                    Margin="0,0,10,10"
+                                    HorizontalContentAlignment="Right"
+                                    VerticalContentAlignment="Center"
+                                    Content="循环"
+                                    FontSize="16" />
+                                <Label
+                                    Grid.Row="6"
+                                    Grid.Column="0"
+                                    Margin="0,0,10,10"
+                                    HorizontalContentAlignment="Right"
+                                    VerticalContentAlignment="Center"
+                                    Content="Z轴下降速度"
+                                    FontSize="16"
+                                    Visibility="Collapsed" />
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="0" Grid.Column="1">
+                            <Grid x:Name="dataGrid">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Label
+                                    x:Name="labListName"
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    Background="#CAEAFE"
+                                    Content="Ch1"
+                                    FontSize="16"
+                                    FontWeight="Bold" />
+                                <StackPanel
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Height="362.88">
+                                    <ListView
+                                        Name="lvDataView"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        ItemsSource="{Binding ColList}"
+                                        Loaded="lvDataView_Loaded">
+                                        <ListView.View>
+                                            <GridView x:Name="dataGridView" />
+                                        </ListView.View>
+                                    </ListView>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>

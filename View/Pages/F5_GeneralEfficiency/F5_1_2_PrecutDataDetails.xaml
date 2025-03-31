@@ -1,0 +1,142 @@
+﻿<Page x:Class="精密切割系统.View.Pages.F5_GeneralEfficiency.F5_1_2_PrecutDataDetails"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:精密切割系统.ViewModel"
+      xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
+      mc:Ignorable="d" 
+      d:DesignHeight="655" d:DesignWidth="1570"
+      Title="F5_1_2_PrecutDataDetails"  Loaded="Page_Loaded">
+    <Page.DataContext>
+        <local:F5_1_1_PrecutDataViewModel />
+    </Page.DataContext>
+    <Grid Margin="30,30,30,30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <!--预切割过程 长度 -->
+        <Label Grid.Row="0" Content="预切割过程（3.5.2）" Padding="0" HorizontalAlignment="Left" Height="40" Width="324" FontSize="30" VerticalContentAlignment="Center" FontWeight="SemiBold" />
+        <StackPanel Grid.Row="1"  Grid.Column="0">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,30,0,0">
+                <Label Content="预切割过程No." FontSize="16" FontWeight="SemiBold" />
+                <Controls:InputTextBox HorizontalAlignment="Left"   Text="{ Binding Path=PrecutNo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged }"  Width="150" FontSize="16"  IsEnabled="False"/>
+            </StackPanel>
+            <StackPanel Margin="0,20,0,0" HorizontalAlignment="Left">
+                <Label Content="预切割名称"  FontSize="16" FontWeight="SemiBold"/>
+                <Controls:InputTextBox  Margin="0,5,0,0"  TextWrapping="Wrap" Text="{Binding PrecutID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Width="234" FontSize="16"/>
+            </StackPanel>
+            <StackPanel Margin="0,20,0,0" HorizontalAlignment="Left" Visibility="Collapsed">
+                <Label Content="旧刀预切割的开始速度序号"  FontSize="16" FontWeight="SemiBold"/>
+                <Controls:InputTextBox  TextWrapping="Wrap" Margin="0,5,0,0" Text="{Binding UsedBladeNo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Width="234" FontSize="16" InputType="Numeral" XMax="20" XMin="0"/>
+            </StackPanel>
+            <StackPanel Margin="0,20,0,0" HorizontalAlignment="Left">
+                <Label Content="新刀预切割的开始速度序号"  FontSize="16" FontWeight="SemiBold"/>
+                <Controls:InputTextBox  TextWrapping="Wrap"  Margin="0,5,0,0" Text="{Binding NewBladeNo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Width="234" FontSize="16" InputType="Numeral" XMax="20" XMin="1"/>
+            </StackPanel>
+            <StackPanel Margin="0,20,0,0" HorizontalAlignment="Left" Visibility="Collapsed">
+                <Label Content="预切割中再度减速切割的还原量"   FontSize="16" FontWeight="SemiBold"/>
+                <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                    <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding PrecutDecrease, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Width="234" FontSize="16" InputType="Numeral" XMax="30" XMin="0"/>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+
+        <Grid Grid.Row="0" Grid.Column="1" Grid.RowSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="520" />
+                    <ColumnDefinition Width="520" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" >
+                    <Label Content="序号" Width="60"  HorizontalContentAlignment="Center"  VerticalAlignment="Top" FontSize="16"/>
+                    <Label Content="进刀速度" Width="150" HorizontalContentAlignment="Center"  VerticalAlignment="Top" FontSize="16"/>
+                    <Label Content="" Width="80" HorizontalContentAlignment="Center"  VerticalAlignment="Top" FontSize="16"/>
+                    <Label Content="长度" Width="150" HorizontalContentAlignment="Center" VerticalAlignment="Top" FontSize="16"/>
+                    <Label Content="" Width="80" HorizontalContentAlignment="Center"  VerticalAlignment="Top" FontSize="16"/>
+
+                </StackPanel>
+                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Margin="70,0,0,0">
+                    <Label Content="序号" Width="60" HorizontalContentAlignment="Center"  VerticalAlignment="Top" FontSize="16"/>
+                    <Label Content="进刀速度" Width="150" HorizontalContentAlignment="Center"  VerticalAlignment="Top" FontSize="16"/>
+                    <Label Content="" Width="80" HorizontalContentAlignment="Center"  VerticalAlignment="Top" FontSize="16"/>
+                    <Label Content="长度" Width="150" HorizontalContentAlignment="Center"  VerticalAlignment="Top" FontSize="16"/>
+                    <Label Content="" Width="80" HorizontalContentAlignment="Center"  VerticalAlignment="Top" FontSize="16"/>
+                </StackPanel>
+            </Grid>
+
+            <ListView  Grid.Row="1" x:Name="lvwPrecut2"  BorderThickness="0" ItemsSource="{Binding PrecutTable, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"   Background="#FFDFFCFF" ScrollViewer.VerticalScrollBarVisibility="Disabled" FontSize="16" Margin="0 10 0 0">
+                <ListView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Vertical" ItemHeight="45" IsItemsHost="True"/>
+                    </ItemsPanelTemplate>
+                </ListView.ItemsPanel>
+                <ListView.View>
+                    <GridView>
+                        <GridView.ColumnHeaderContainerStyle>
+                            <Style TargetType="GridViewColumnHeader">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </Style>
+                        </GridView.ColumnHeaderContainerStyle>
+                        <!-- 其他列 -->
+                        <GridViewColumn Header="序号" Width="60">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Label Width="60" Height="35" Content="{Binding Index, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <!-- 添加一个TextBox列 -->
+                        <GridViewColumn Header="进刀速度" Width="150">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Controls:InputTextBox Width="130" Height="35" Text="{Binding Speed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center" Background="#FFDFFCFF" InputType="Decimal" XMax="1000" XMin="-1000" XPrecision="3"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="" Width="80">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Label Width="Auto"  Content="mm/s" Height="35" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Left"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="长度" Width="150">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Controls:InputTextBox Width="130" Height="35" Text="{Binding Path=Len, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center" Background="#FFDFFCFF" InputType="Decimal" XMax="1000" XMin="-1000" XPrecision="3"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="" Width="40">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Label Width="Auto"  Content="m" Height="35" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Left"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
+                        <GridViewColumn Header="" Width="100">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Label Width="100"  Content="" Height="35" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <!--"GridViewColumn Header="进刀速度" Width="200" DisplayMemberBinding="{Binding Speed}"/>
+        <GridViewColumn Header="切割刀数" Width="400" DisplayMemberBinding="{Binding Number}"/-->
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Grid>
+    </Grid>
+</Page>

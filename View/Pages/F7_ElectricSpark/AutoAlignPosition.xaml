@@ -1,0 +1,103 @@
+﻿<Page x:Class="精密切割系统.View.Pages.F7_ElectricSpark.AutoAlignPosition"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:精密切割系统.View.Pages.F7_ElectricSpark" xmlns:controls="clr-namespace:精密切割系统.View.Controls"
+      mc:Ignorable="d" 
+      d:DesignHeight="655" d:DesignWidth="1570"
+      Title="AutoAlignPosition" Loaded="Page_Loaded">
+    <Page.Resources>
+        <Style TargetType="controls:InputTextBox" x:Key="customInputTextBoxCss">
+            <Setter Property="Width" Value="150"></Setter>
+        </Style>
+        <Style TargetType="Label">
+            <Setter Property="FontSize" Value="16"></Setter>
+        </Style>
+    </Page.Resources>
+    <StackPanel Width="1570" HorizontalAlignment="Left">
+        <TextBlock Text="自动位置补偿" Margin="30 30 0 0" FontSize="22" FontWeight="Bold"></TextBlock>
+        <StackPanel Orientation="Horizontal">
+            <StackPanel Margin="30 10 0 0" Height="565" HorizontalAlignment="Left" Width="400">
+                <StackPanel Orientation="Horizontal" Width="300" HorizontalAlignment="Left">
+                    <Label Content="序号" Width="100"></Label>
+                    <Label Content="测量值" Width="100"></Label>
+                </StackPanel>
+                <ScrollViewer Height="520"  VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding Rows}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Width="300" HorizontalAlignment="Left" Margin="0 10 0 0">
+                                    <Label Content="{Binding RowIndex}" Width="50" ></Label>
+                                    <controls:InputTextBox Text="{Binding ActualValue, UpdateSourceTrigger=PropertyChanged}" Width="150"></controls:InputTextBox>
+                                    <Label Content="μm" Width="100"></Label>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </StackPanel>
+            <StackPanel Margin="30">
+                <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
+                    <Label Content="当前状态" Width="90"></Label>
+                    <controls:InputTextBox x:Name="testStatus" Text="准备中..." Width="150" Margin="5 0 0 0" IsEnabled="False"></controls:InputTextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
+                    <Label Content="测量进度" Width="90"></Label>
+                    <controls:InputTextBox Width="67" Text="0" x:Name="currentIndex" Margin="5 0 0 0" IsEnabled="False"></controls:InputTextBox>
+                    <Label Content="-"></Label>
+                    <controls:InputTextBox Width="67" Text="{Binding Path=TestCount,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" x:Name="totalLabel" IsEnabled="False"></controls:InputTextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
+                    <Label Content="切割方向" Width="90"></Label>
+                    <controls:InputTextBox x:Name="cutDirectionInput" Text="-" Width="150" Margin="5 0 0 0"></controls:InputTextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
+                    <Label Content="测量次数" Width="90"></Label>
+                    <controls:InputTextBox x:Name="testCount" Text="{Binding Path=TestCount,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Width="150" Margin="5 0 0 0" InputType="Numeral"></controls:InputTextBox>
+                    <Label Content="次"></Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
+                    <Label Content="步进距离" Width="90"></Label>
+                    <controls:InputTextBox Width="150" x:Name="testYIndex" InputType="Decimal" XPrecision="4" Margin="5 0 0 0" 
+                                           Text="{Binding Path=YIndex,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></controls:InputTextBox>
+                    <Label Content="um"></Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
+                    <Label Content="进刀速度" Width="90"></Label>
+                    <controls:InputTextBox Width="150" x:Name="feedSpeed" InputType="Decimal" 
+                                           XPrecision="4" Margin="5 0 0 0" 
+                                           Text="{Binding Path=FeedSpeed,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></controls:InputTextBox>
+                    <Label Content="mm/s"></Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
+                    <Label Content="刀片高度" Width="90"></Label>
+                    <controls:InputTextBox Width="150" x:Name="BladeHeight" InputType="Decimal" XPrecision="4" Margin="5 0 0 0" 
+                                           Text="{Binding Path=BladeHeight,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></controls:InputTextBox>
+                    <Label Content="mm"></Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
+                    <Label Content="切割深度" Width="90"></Label>
+                    <controls:InputTextBox Width="150" x:Name="cutDeep" InputType="Decimal" XPrecision="4" Margin="5 0 0 0" 
+                                           Text="{Binding Path=DepthSteps,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></controls:InputTextBox>
+                    <Label Content="mm"></Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
+                    <Label Content="工作盘大小"  Width="90"></Label>
+                    <controls:InputTextBox Width="150" x:Name="SquareCh1" InputType="Decimal" XPrecision="4" Margin="5 0 0 0" 
+                                           Text="{Binding Path=SquareCh1,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></controls:InputTextBox>
+                    <Label Content="mm"></Label>
+                    <controls:InputTextBox Width="150" x:Name="SquareCh2" InputType="Decimal" XPrecision="4" Margin="5 0 0 0" 
+                                           Text="{Binding Path=SquareCh2,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></controls:InputTextBox>
+                    <Label Content="mm"></Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
+                    <Label Content="主轴转速" Width="90"></Label>
+                    <controls:InputTextBox Width="150" x:Name="SpindleRev" InputType="Numeral" Margin="5 0 0 0" 
+                                           Text="{Binding Path=SpindleRev,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></controls:InputTextBox>
+                    <Label Content="/min"></Label>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+    </StackPanel>
+</Page>

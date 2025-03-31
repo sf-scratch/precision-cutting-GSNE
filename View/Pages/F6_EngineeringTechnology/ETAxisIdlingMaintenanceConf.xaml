@@ -1,0 +1,55 @@
+﻿<Page
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:精密切割系统.View.F6_EngineeringTechnology"
+      xmlns:Controls="clr-namespace:精密切割系统.View.Controls" x:Class="精密切割系统.View.F6_EngineeringTechnology.ETAxisIdlingMaintenanceConf"
+      mc:Ignorable="d" 
+      d:DesignHeight="676" d:DesignWidth="1448"
+      Title="ETAxisIdlingMaintenanceConf" Loaded="Page_Loaded">
+    <Grid Width="900" Height="600">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="300"/>
+        </Grid.ColumnDefinitions>
+        <Label x:Name="lbF6_5" Content="Axis Idling Maintenance (6.1)" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4"  FontWeight="Bold" FontSize="22"/>
+        <StackPanel Grid.Row="1" Grid.Column="0" x:Name="sp1" HorizontalAlignment="Right">
+            <StackPanel Width="120" Height="35"/>
+            <CheckBox x:Name="checkBox1"  Width="120" Height="30" Content="X-Axis" Margin="0,15,0,0" FontWeight="Bold" />
+            <CheckBox x:Name="checkBox2"  Width="120" Height="30" Content="Y-Axis" Margin="0,15,0,0" FontWeight="Bold" />
+            <CheckBox x:Name="checkBox3"  Width="120" Height="30" Content="Z-Axis" Margin="0,15,0,0" FontWeight="Bold" />
+            <CheckBox x:Name="checkBox4"  Width="120" Height="30" Content="θ-Axis" Margin="0,15,0,0" FontWeight="Bold" />
+            <CheckBox x:Name="checkBox5"  Width="120" Height="30" Content="Spindle" Margin="0,15,0,0" FontWeight="Bold" />
+            <CheckBox x:Name="checkBox6"  Width="120" Height="30" Content="Cut water" Margin="0,15,0,0" FontWeight="Bold" />
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="1" x:Name="sp2">
+            <Label Width="120" Height="35" Content="Speed" FontWeight="Bold" FontSize="16"/>
+            <Controls:InputTextBox TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" Margin="0,5,0,5" />
+            <Controls:InputTextBox TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" Margin="0,5,0,5" />
+            <Controls:InputTextBox TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" Margin="0,5,0,5" />
+            <Controls:InputTextBox TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" Margin="0,5,0,5" />
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="2" x:Name="sp3" HorizontalAlignment="Left">
+            <Label Width="120" Height="35" Content=""/>
+            <Label Width="120" Height="35" Content="mm/s" Margin="0,10,0,0" FontWeight="Bold" />
+            <Label Width="120" Height="35" Content="mm/s" Margin="0,10,0,0" FontWeight="Bold" />
+            <Label Width="120" Height="35" Content="mm/s" Margin="0,10,0,0" FontWeight="Bold" />
+            <Label Width="120" Height="35" Content="°/s" Margin="0,10,0,0" FontWeight="Bold" />
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="3" x:Name="sp4">
+            <Label Width="120" Height="35" Content="Speed" FontWeight="Bold" FontSize="16"/>
+            <Controls:InputTextBox TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" Margin="0,5,0,5" />
+            <Controls:InputTextBox TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" Margin="0,5,0,5" />
+            <Controls:InputTextBox TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" Margin="0,5,0,5" />
+            <Controls:InputTextBox TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" Margin="0,5,0,5" />
+
+        </StackPanel>
+    </Grid>
+</Page>

@@ -1,0 +1,373 @@
+﻿using 精密切割系统.database.db.modle;
+using 精密切割系统.FrmWindow.common;
+using 精密切割系统.Model.bunkering;
+using 精密切割系统.Model.plc;
+using 精密切割系统.ViewModel;
+using ElectricalDischargeTruingModel = 精密切割系统.database.db.modle.ElectricalDischargeTruingModel;
+
+namespace 精密切割系统.Utils
+{
+    internal class CurrentUtils
+    {
+        // 刀片测高参数
+        public static BladeHeightModel bladeHeightModel;
+        // 型号参数
+        public static FileTableItemModel fileTableItemModel;
+        // 型号参数-当前切割面
+        public static FileTableItemChModel fileTableItemChModel;
+        // 型号参数-面列表
+        public static List<FileTableItemChModel> fileTableItemChModels;
+        // 电火花修刀
+        public static ElectricalDischargeTruingModel electricalDischargeTruingModel;
+        // 位置补偿
+        public static List<PositionCompensationModel> positionCompensationModels;
+        // 预切割
+        public static PreCutModel preCutModel;
+        // 各轴初始位置
+        public static InitialPositionModel initialPositionModel;
+        public static SpeedSettingModel speedSettingModel;
+        public static OperationParametersModel operationParametersModel;
+        public static PositionAlignmentModel positionAlignmentModel;
+
+        public static void UpdateParams()
+        {
+            // 加载测高参数
+            bladeHeightModel = GetBladeHeightModel();
+            // 加载型号参数配置
+            fileTableItemModel = GetFileTableItemModel();
+            // 加载当前切割面
+            fileTableItemChModel = GetFileTableItemChModel();
+            // 加载所有切割面
+            fileTableItemChModels = GetFileTableItemChModels();
+            // 加载电火花信息
+            electricalDischargeTruingModel = GetElectricalDischargeTruingModel();
+            // 加载位置补偿信息
+            positionCompensationModels = GetPositionCompensationModels();
+            // 加载预切割配置
+            preCutModel = GetPreCutModel();
+            initialPositionModel = GetInitialPositionModel();
+            speedSettingModel = GetSpeedSettingModel();
+            operationParametersModel = GetOperationParametersModel();
+            positionAlignmentModel = GetPositionAlignmentModel();
+        }
+
+        public static void initPlcPosition()
+        {
+            // 各轴运动速度 点动高速/低速速度  绝对运动速度 
+            InitAxisSpeedIndex(operationParametersModel);
+            // 设置位置校准
+            InitPositionAlignment(positionAlignmentModel);
+            InitInitialPositionModel(initialPositionModel);
+            // 初始化测高数据
+            InitSetupDate();
+        }
+
+        public static void InitSetupDate()
+        {
+            PlcControl.tagControl.bladeMantance.SetSetupParams(bladeHeightModel);
+        }
+
+        public static void InitInitialPositionModel(InitialPositionModel _model)
+        {
+            // 测高初始位置
+            PlcControl.tagControl.bladeMantance.SetBladeSetuInitPosition(_model.BladeSetupInitX, _model.BladeSetupInitY, _model.BladeSetupInitZ1, _model.BladeSetupInitZ2);
+            // 校准初始位置
+            PlcControl.tagControl.calibration.SetAlignInitPosition(_model.AlignInitX, _model.AlignInitY, _model.AlignInitZ1, _model.AlignInitZ2);
+            // 刀片更换位置
+            PlcControl.tagControl.bladeMantance.SetCutReplaceInitPosition(_model.CutReplaceInitX, _model.CutReplaceInitY, _model.CutReplaceInitZ1, _model.CutReplaceInitZ2);
+            // 切割位置
+            PlcControl.tagControl.cutting.SetCutInitPosition(_model.CutInitX, _model.CutInitY, _model.CutInitZ1);
+        }
+
+        public static void InitPositionAlignment(PositionAlignmentModel _model)
+        {
+            //赋值全局变量 
+            float result = 0;
+            //theta轴切割中心点位置 X轴
+            bool tryRe = float.TryParse(_model.ThetaCenterLocationX, out result);
+            if (tryRe)
+            {
+                GlobalParams.thetaCenterLocationX = result;
+            }
+            //theta轴切割中心点位置 Y轴
+            tryRe = float.TryParse(_model.ThetaCenterLocationY, out result);
+            if (tryRe)
+            {
+                GlobalParams.thetaCenterLocationY = result;
+            }
+            //theta轴相机中心点位置 X轴
+            tryRe = float.TryParse(_model.ThetaCameraLocationX, out result);
+            if (tryRe)
+            {
+                GlobalParams.thetaCameraLocationX = result;
+            }
+            //theta轴相机中心点位置 Y轴
+            tryRe = float.TryParse(_model.ThetaCameraLocationY, out result);
+            if (tryRe)
+            {
+                GlobalParams.thetaCameraLocationY = result;
+            }
+            //相机 聚焦初始位置
+            double result_d = 0;
+            tryRe = double.TryParse(_model.InitPosition, out result_d);
+            if (tryRe)
+            {
+                GlobalParams.initPosition = result_d;
+            }
+            //相机 高速的倍率
+            tryRe = double.TryParse(_model.MultipleNum, out result_d);
+            if (tryRe)
+            {
+                GlobalParams.multipleNum = result_d;
+            }
+            //X轴切割位置和相机位置的偏移量
+            tryRe = float.TryParse(_model.CameraToCutXOffset, out result);
+            if (tryRe)
+            {
+                GlobalParams.cameraToCutXOffset = result;
+            }
+            //相机焦点和切割位置的偏移量
+            tryRe = float.TryParse(_model.CameraToCutYOffset, out result);
+            if (tryRe)
+            {
+                GlobalParams.cameraToCutYOffset = result;
+            }
+            //切割Z1轴最大安全距离
+            tryRe = float.TryParse(_model.CutZ1MaxLocation, out result);
+            if (tryRe)
+            {
+                GlobalParams.cutZ1MaxLocation = result;
+            }
+            //相机和切割点的X轴的偏移量
+            tryRe = float.TryParse(_model.CameraOffsetX, out result);
+            if (tryRe)
+            {
+                GlobalParams.cameraOffsetX = result;
+            }
+            //相机和切割点的Y轴的偏移量
+            tryRe = float.TryParse(_model.CameraOffsetY, out result);
+            if (tryRe)
+            {
+                GlobalParams.cameraOffsetY = result;
+            }
+            GlobalParams.LightIntensityChannel = _model.LightIntensityChannel;
+            GlobalParams.LowLightIntensityChannel = _model.LowLightIntensityChannel;
+            GlobalParams.RingLightIntensityChannel = _model.RingLightIntensityChannel;
+            GlobalParams.workDiscFocusPosition = _model.WorkDiscFocusPosition;
+        }
+
+        /// <summary>
+        /// 设置各轴的速度和距离数据
+        /// </summary>
+        public static void InitAxisSpeedIndex(OperationParametersModel operationParametersModel)
+        {
+            // 设置X轴相关速度、位置设置
+            PlcControl.tagControl.Xaxis.SetAxisSpeed(operationParametersModel.MoveLowTime
+                , operationParametersModel.XScanSpeed, operationParametersModel.XSscanDistance
+                , operationParametersModel.XScanSpeed, operationParametersModel.xPanelJogDistance);
+            // 设置Y轴相关速度、位置设置
+            PlcControl.tagControl.Yaxis.SetAxisSpeed(operationParametersModel.MoveLowTime, operationParametersModel.YScanSpeed
+                , operationParametersModel.YSscanDistance
+                , operationParametersModel.YScanSpeed, operationParametersModel.yPanelJogDistance);
+            // 设置Z1轴相关速度、位置设置
+            PlcControl.tagControl.Z1axis.SetAxisSpeed(operationParametersModel.MoveLowTime, operationParametersModel.ZScanSpeed
+                , operationParametersModel.ZSscanDistance
+                , operationParametersModel.ZScanSpeed, operationParametersModel.zPanelJogDistance);
+
+
+            // 设置屏幕移动量 θ轴的屏幕移动量根据选择的型号参数来动
+            GlobalParams.xScreenIndex = operationParametersModel.XScreenIndex;
+            GlobalParams.yScreenIndex = operationParametersModel.YScreenIndex;
+            // 设置扫描移动距离
+            GlobalParams.xScanDistance = operationParametersModel.XSscanDistance;
+            GlobalParams.yScanDistance = operationParametersModel.YSscanDistance;
+            GlobalParams.z1ScanDistance = operationParametersModel.ZSscanDistance;
+            // 设置屏幕移动速度
+            GlobalParams.xScreenSpeed = operationParametersModel.XScanSpeed;
+            GlobalParams.yScreenSpeed = operationParametersModel.YScanSpeed;
+
+            // 设置扫描速度
+            GlobalParams.xScanSpeed = operationParametersModel.XScanSpeed;
+            GlobalParams.yScanSpeed = operationParametersModel.YScanSpeed;
+
+            // Z轴补偿
+            // 设置Z轴补偿量
+            GlobalParams.zAxisCompNum = operationParametersModel.zAxisCompNum;
+            GlobalParams.zAxisCompValue = Tools.GetFloatStringValue(operationParametersModel.zAxisCompValue);
+
+            // 设置切割回程速度
+            PlcControl.tagControl.cutting.SetReturnSpeed(operationParametersModel.cutXAxisBackSpeed);
+        }
+
+        //获取当前配置集合
+        public static CurrentConfigurationModel GetCurrentConfiguration()
+        {
+            var list = SqlHelper.Table<CurrentConfigurationModel>()
+                       .Where(t => t.Id == 1).ToList();
+            CurrentConfigurationModel current = new CurrentConfigurationModel();
+            //数据不存在，则初始化数据
+            if (list.Count() > 0)
+            {
+                return list[0];
+            }
+            else
+            {
+                SqlHelper.Add(current);
+            }
+            return current;
+        }
+        /// <summary>
+        /// 修改当前切割面
+        /// </summary>
+        /// <param name="currentChNo"></param>
+        public static async void UpdateCurrentCh(string currentChNo)
+        {
+            // 设置当前切割面
+            CurrentConfigurationModel currentModel = CurrentUtils.GetCurrentConfiguration();
+            currentModel.ChannelNum = currentChNo;
+            GlobalParams.currentCH = currentChNo;
+            await SqlHelper.UpdateAsync(currentModel);
+        }
+
+        /// <summary>
+        /// 初始化切割面，切换到Ch 1
+        /// </summary>
+        public static void InitCutCh()
+        {
+            Tools.LogInfo($"InitCutCh() 初始化GlobalParams.calibrationAngle");
+            // 修改切割面
+            UpdateCurrentCh(GlobalParams.CH1);
+            GlobalParams.calibrationAngle = 0;
+            // 旋转切割面
+            PlcControl.tagControl.ThetaAxis.StartAbsolute("90", "0");
+        }
+
+
+        //刷新当前配置集合
+        public static async Task UpdateCurrentConfiguration(CurrentConfigurationModel model)
+        {
+            await SqlHelper.UpdateAsync(model);
+        }
+
+        public static BladeHeightModel GetBladeHeightModel()
+        {
+            long id = GetCurrentConfiguration().BladeHeightDataId;
+            var listConf = SqlHelper.Table<BladeHeightModel>().Where(t => t.Id == id).ToList();
+            BladeHeightModel _model = new BladeHeightModel();
+            if (listConf.Count() > 0) {
+                _model = listConf[0];
+            }
+            return _model;
+        }
+
+        /// <summary>
+        /// 获取当前切割面
+        /// </summary>
+        /// <returns></returns>
+        public static string GetCurrentChNo()
+        {
+            CurrentConfigurationModel _model = GetCurrentConfiguration();
+            return _model.ChannelNum;
+        }
+
+        public static FileTableItemChModel GetFileTableItemChModel()
+        {
+            var currentConfig = GetCurrentConfiguration();
+            long deviceDataId = currentConfig.DeviceDataId;
+            string channelNum = currentConfig.ChannelNum;
+
+            var query = SqlHelper.Table<FileTableItemChModel>().Where(t => t.ItemId == deviceDataId);
+
+            if (!string.IsNullOrEmpty(channelNum))
+            {
+                query = query.Where(t => t.ChName == channelNum);
+            }
+            return query.FirstOrDefault() ?? new FileTableItemChModel();
+        }
+        public static List<FileTableItemChModel> GetFileTableItemChModels()
+        {
+            var currentConfig = GetCurrentConfiguration();
+            long deviceDataId = currentConfig.DeviceDataId;
+
+            return SqlHelper.Table<FileTableItemChModel>().Where(t => t.ItemId == deviceDataId).ToList();
+        }
+        public static FileTableItemModel GetFileTableItemModel()
+        {
+            long id = GetCurrentConfiguration().DeviceDataId;
+            var listConf = SqlHelper.Table<FileTableItemModel>().Where(t => t.Id == id).ToList();
+            FileTableItemModel _model = new FileTableItemModel();
+            if (listConf.Count() > 0) {
+                _model = listConf[0];
+            }
+            return _model;
+        }
+        public static PreCutModel GetPreCutModel()
+        {
+            string id = GetFileTableItemModel().PrecutProcessNo;
+            var listConf = SqlHelper.Table<PreCutModel>().Where(t => t.PrecutNo == id).ToList();
+            PreCutModel _model = new PreCutModel();
+            if (listConf.Count() > 0) {
+                _model = listConf[0];
+            }
+            return _model;
+        }
+        public static InitialPositionModel GetInitialPositionModel()
+        {
+            long id = 1;
+            var listConf = SqlHelper.Table<InitialPositionModel>().Where(t => t.Id == id).ToList();
+            InitialPositionModel _model = null;
+            if (listConf.Count() > 0) {
+                _model = listConf[0];
+            }
+            return _model;
+        }
+        public static SpeedSettingModel GetSpeedSettingModel()
+        {
+            long id = 1;
+            var listConf = SqlHelper.Table<SpeedSettingModel>().Where(t => t.Id == id).ToList();
+            SpeedSettingModel _model = null;
+            if (listConf.Count() > 0) {
+                _model = listConf[0];
+            }
+            return _model;
+        }
+        public static OperationParametersModel GetOperationParametersModel()
+        {
+            long id = 1;
+            var listConf = SqlHelper.Table<OperationParametersModel>().Where(t => t.Id == id).ToList();
+            OperationParametersModel _model = null;
+            if (listConf.Count() > 0) {
+                _model = listConf[0];
+            }
+            return _model;
+        }
+
+        public static PositionAlignmentModel GetPositionAlignmentModel()
+        {
+            PositionAlignmentModel positionAlignmentMode = new PositionAlignmentModel();
+            var list = SqlHelper.Table<PositionAlignmentModel>().Where(t => t.Id == 1).ToList();
+            if (list.Count > 0)
+            {
+                positionAlignmentMode = list[0];
+            }
+            return positionAlignmentMode;
+        }
+
+        public static ElectricalDischargeTruingModel GetElectricalDischargeTruingModel()
+        {
+            var listConf = SqlHelper.Table<ElectricalDischargeTruingModel>().ToList();
+            return listConf.Count > 0 ? listConf[0] : new ElectricalDischargeTruingModel();
+        }
+        public static List<PositionCompensationModel> GetPositionCompensationModels()
+        {
+            return SqlHelper.Table<PositionCompensationModel>().ToList();
+        }
+
+        //获取7.0用户默认设置
+        public static UserDefineDataModel getUserDefineDataModel()
+        {
+            var listConf = SqlHelper.Table<UserDefineDataModel>().ToList();
+            return listConf.Count > 0 ? listConf[0] : new UserDefineDataModel();
+        }
+    }
+}

@@ -1,0 +1,41 @@
+﻿<Page xmlns:Controls="clr-namespace:精密切割系统.View.Controls"  x:Class="精密切割系统.View.Pages.F3_ModelCatalog.MCCopyDeviceDirectoryConf"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:精密切割系统.View.Pages.F3_ModelCatalog"
+      mc:Ignorable="d" 
+      d:DesignHeight="676" d:DesignWidth="1448"
+      Title="MCCopyDeviceDirectoryConf" Loaded="Page_Loaded">
+
+    <Grid Margin="30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Label Grid.Row="0" Content="拷贝配置" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="30" FontWeight="Bold" Padding="0,0,0,0" Margin="0,0,0,30"/>
+        <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <StackPanel  Orientation="Horizontal">
+                <Label Content="" FontSize="16" Width="150"  Padding="0,0,0,0" VerticalAlignment="Center" HorizontalContentAlignment="Right" />
+                <Label Content="目录名" FontSize="16" Width="300"  Padding="0,0,0,0" VerticalAlignment="Center" HorizontalContentAlignment="Center" />
+                <Label Content="型号参数序号" FontSize="16" Width="300"  Padding="0,0,0,0" VerticalAlignment="Center" HorizontalContentAlignment="Center" />
+            </StackPanel>
+            <StackPanel  Orientation="Horizontal" Margin="0,20,0,0">
+                <Label Content="被拷贝型号参数号" FontSize="16" Width="150"  Margin="0,0,10,0" VerticalAlignment="Center" HorizontalContentAlignment="Right" />
+                <Controls:InputTextBox x:Name="labRootFile"  Width="300" Height="35" IsEnabled="False" />
+                <Controls:InputTextBox x:Name="labDeviceDataNo"  Width="300" Height="35" IsEnabled="False" Margin="15,0,0,0"/>
+            </StackPanel>
+            <StackPanel  Orientation="Horizontal" Margin="0,20,0,0">
+                <Label Content="拷贝成参数号" FontSize="16" Width="150"  Margin="0,0,10,0" VerticalAlignment="Center" HorizontalContentAlignment="Right"/>
+                <ComboBox x:Name="comboDirectory" Width="300" VerticalContentAlignment="Center" FontSize="16" >
+                    <ComboBox.ItemContainerStyle>
+                        <Style TargetType="ComboBoxItem">
+                            <Setter Property="Height" Value="50"/>
+                        </Style>
+                    </ComboBox.ItemContainerStyle>
+                </ComboBox>
+                <Controls:InputTextBox x:Name="inputDeviceDataNo"  Width="300" Height="35" Margin="15,0,0,0" XMin="0" XMax="8" MaxLength="8"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Page>

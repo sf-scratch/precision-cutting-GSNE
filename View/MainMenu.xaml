@@ -1,0 +1,32 @@
+﻿<Page
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:精密切割系统.View"
+      x:Class="精密切割系统.View.MainMenu"
+      mc:Ignorable="d"   Background="#FFDFFCFF"
+      Title="MainMenu" Loaded="Page_Loaded">
+
+    <Grid >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="70"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <TextBlock x:Name="menuTitle" FontSize="30" Grid.Row="0" Height="Auto" Width="Auto" Text="Menu"  Padding="30,20,0,0" UseLayoutRounding="True" FontWeight="Bold" />
+        <Grid x:Name="MenuGrid" Grid.Row="1" Width="1560" Height="565"  HorizontalAlignment="Left" VerticalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+        </Grid>
+    </Grid>
+    
+
+</Page>
