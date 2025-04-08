@@ -107,10 +107,10 @@ namespace 精密切割系统.View.Pages.common
         }
         private void StartGrabbing()
         {
-            /*if (!GlobalParams.onlineFlag)
+            if (!GlobalParams.onlineFlag)
             {
                 return;
-            }*/
+            }
             m_bThreadState = true;
             m_hGrabThread = new Thread(GrabThreadProcess);
             m_hGrabThread.IsBackground = true;
@@ -128,10 +128,10 @@ namespace 精密切割系统.View.Pages.common
 
         public void StopGrabbing()
         {
-            /*if (!GlobalParams.onlineFlag)
+            if (!GlobalParams.onlineFlag)
             {
                 return;
-            }*/
+            }
             m_bThreadState = false;
             uint nReVal = m_currentDev.StopGrabbing();
             if (nReVal != SciCam.SCI_CAMERA_OK)
@@ -143,10 +143,10 @@ namespace 精密切割系统.View.Pages.common
         }
         private void GrabThreadProcess()
         {
-            /*if (!GlobalParams.onlineFlag)
+            if (!GlobalParams.onlineFlag)
             {
                 return;
-            }*/
+            }
             uint nReVal = SciCam.SCI_CAMERA_OK;
             nint payload = nint.Zero;
 

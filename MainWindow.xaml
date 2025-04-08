@@ -6,8 +6,8 @@
         xmlns:local="clr-namespace:精密切割系统"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
-        Title="MainWindow" Height="1080" Width="1920" WindowStyle="None" 
-        Background="#FFDFFCFF" WindowState="Maximized" Loaded="Window_Loaded">
+        Title="MainWindow" Height="1080" Width="1920"
+        Background="#FFDFFCFF" Loaded="Window_Loaded">
     <!-- WindowState="Maximized" -->
     <Window.Resources>
         <Style TargetType="Button" x:Key="MyButtonStyle">

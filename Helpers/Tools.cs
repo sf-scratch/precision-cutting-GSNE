@@ -24,6 +24,7 @@ namespace 精密切割系统.Utils
     internal class Tools
     {
         public static ILog log = LogManager.GetLogger(typeof(Tools));
+        public static ILog debugLog = LogManager.GetLogger("SpecialDebug");
         //public static string curPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         public static string curPath = AppDomain.CurrentDomain.BaseDirectory;
 
@@ -40,6 +41,11 @@ namespace 精密切割系统.Utils
         public static void LogWarning(string msg)
         {
             log.Warn(msg);
+        }
+
+        public static void LogDebug(string msg)
+        {
+            debugLog.Debug(msg);
         }
         // 把路径转换为BitmapImage
         public static BitmapImage BitmapImageToBitmap(string path)
@@ -108,6 +114,36 @@ namespace 精密切割系统.Utils
             }
 
             return floatArray;
+        }
+
+        public static bool TryParseStringToFloatArray(string str, out float[] array)
+        {
+            // 将字符串按逗号分割成字符串数组
+            string[] stringArray = str.Split(',');
+            // 创建一个float数组，长度与分割后的字符串数组相同
+            float[] floatArray = new float[stringArray.Length];
+            // 将每个字符串元素转换为float
+            for (int i = 0; i < stringArray.Length; i++)
+            {
+                if (!string.IsNullOrEmpty(stringArray[i].Trim()))
+                {
+                    if (float.TryParse(stringArray[i], out float value))
+                    {
+                        floatArray[i] = value;
+                    }
+                    else
+                    {
+                        array = new float[stringArray.Length];
+                        return false;
+                    }
+                }
+                else
+                {
+                    floatArray[i] = 0.0f;
+                }
+            }
+            array = floatArray;
+            return true;
         }
 
         // 宽和高的像素

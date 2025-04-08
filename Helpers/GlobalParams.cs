@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using 精密切割系统.Assets.config.buttom;
+using 精密切割系统.Model.cut;
 
 namespace 精密切割系统.FrmWindow.common
 {
@@ -90,21 +91,59 @@ namespace 精密切割系统.FrmWindow.common
         // Theta轴 拉直角度
         public static float calibrationAngle = 0;
 
-        public static string CH1 = "Ch 1";
-        public static string CH2 = "Ch 2";
-        public static string CH3 = "Ch 3";
-        public static string CH4 = "Ch 4";
+        public const string CH1 = "Ch 1";
+        public const string CH2 = "Ch 2";
+        public const string CH3 = "Ch 3";
+        public const string CH4 = "Ch 4";
 
         // 修刀位置 Y轴前端：129.985  Y轴后端：128.24  Z轴设定位置：39.005    127.98224  129.30324
 
         //==========================位置校准相关=======================  
         // theta轴切割中心点位置 X轴  184.289 177  第一台  184.289f  第二台 210
-        public static float thetaCenterLocationX = 125f;
+        public static float thetaCenterLocationX = 0f;
         // 第二台 
         // public static float thetaCenterLocationX = 220f;
 
         // theta轴中心点位置 - Y轴 49.707   53.73523   62.386
-        public static float thetaCenterLocationY = 62.386f;
+        public static float thetaCenterLocationY = 0f;
+
+
+
+
+
+
+        /// <summary>
+        /// 工件半径
+        /// </summary>
+        public static readonly float WorkpieceRadius  = 30;
+
+        /// <summary>
+        /// 工件中心点到theta轴中心点距离
+        /// <summary>
+        public static readonly float CenterDistance = 10;
+
+        /// <summary>
+        /// 磨刀板尺寸
+        /// </summary>
+        public static DataRectangleF SharpenRect = new DataRectangleF(-20, -20, 40, 15);
+
+        /// <summary>
+        /// theta轴中心点位置
+        /// </summary>
+        public static DataPoint<float> ThetaCenterPoint = new DataPoint<float>(thetaCenterLocationX, thetaCenterLocationY);
+
+        /// <summary>
+        /// 切割多少刀后开始磨刀
+        /// </summary>
+        public static readonly int CutThenSharpenStepNum = 10;
+
+        /// <summary>
+        /// 磨刀步数
+        /// </summary>
+        public static readonly int SharpenStepNum = 5;
+
+
+
 
         // theta轴相机中心点位置 X轴 28.89837  17.8
         public static float thetaCameraLocationX = 17.8f;
