@@ -6,16 +6,26 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:精密切割系统.View.page.right"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
+    xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
     Title="RightPage"
     d:DesignHeight="905"
     d:DesignWidth="290"
+    d:DataContext="{d:DesignInstance viewModel:RightPageViewModel, IsDesignTimeCreatable=True}"
     Loaded="Page_Loaded"
     mc:Ignorable="d">
     <Page.Resources>
         <Style TargetType="Controls:RightButton">
             <Setter Property="Margin" Value="0,20,0,0" />
         </Style>
+        <Style TargetType="ListBoxItem">
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
     </Page.Resources>
+    <Page.DataContext>
+        <viewModel:RightPageViewModel></viewModel:RightPageViewModel>
+    </Page.DataContext>
     <Grid>
         <StackPanel>
             <!-- 转速、状态显示 -->
@@ -126,6 +136,53 @@ Height="22.86"
             </StackPanel>
         </StackPanel>
 
+        <ListBox Margin="0,0,0,125"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Bottom"
+                 Visibility="Visible"
+                 Background="Transparent"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 ScrollViewer.CanContentScroll="True"
+                 VirtualizingPanel.ScrollUnit="Pixel"
+                 SelectionMode="Extended"
+                 BorderThickness="0"
+                 BorderBrush="Transparent"
+                 ItemsSource="{Binding RightButtonParams}" d:ItemsSource="{d:SampleData}">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <ContentPresenter />
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="Transparent"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Controls:RightButton
+                        BackFlag="{Binding BackFlag}"
+                        BackgroundDefColor="{Binding BackgroundDefColor}"
+                        BackgroundDownColor="{Binding BackgroundDownColor}"
+                        ContentText="{Binding ContentText}"
+                        ImagePath="{Binding ImagePath}"
+                        Visibility="{Binding Visibility}">
+                        <behaviors:Interaction.Triggers>
+                            <behaviors:EventTrigger EventName="RightButtonClicked">
+                                <behaviors:InvokeCommandAction Command="{Binding RightClickCommand}"/>
+                            </behaviors:EventTrigger>
+                        </behaviors:Interaction.Triggers>
+                    </Controls:RightButton>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
         <!--  -底部按钮项项  -->
         <StackPanel
             x:Name="PanelAction"

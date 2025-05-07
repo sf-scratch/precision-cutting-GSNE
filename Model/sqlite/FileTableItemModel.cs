@@ -36,10 +36,10 @@ namespace 精密切割系统.database.db.modle
         public string CuttingChSeq { get; set; } = "0";
 
         [Column("workbench_ch1")]// 工作台长
-        public float WorkbenchCh1 { get; set; } = 155;
+        public float WorkbenchCh1 { get; set; } = 50;
 
         [Column("workbench_ch2")]// 工作台宽
-        public float WorkbenchCh2 { get; set; } = 155;
+        public float WorkbenchCh2 { get; set; } = 50;
 
         [Column("workShape")]//切割片形状(圆形/长方形)
         public int WorkShape { get; set; } = 1;

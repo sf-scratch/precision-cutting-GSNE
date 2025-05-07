@@ -97,7 +97,7 @@
       "name": "X轴绝对运动目标位置",
       "describe": "x轴绝对运动目标位置",
       "maxValue": "205",
-      "minValue": "-65"
+      "minValue": "0"
     },
     "highSpeed": {
       "valueType": "bool",
@@ -129,7 +129,7 @@
       "describe": "X轴软正限位标志，到软正限位后无法继续正向移动"
     },
     "softLowerLimit": {
-      "defaultValue": "-65",
+      "defaultValue": "0",
       "valueType": "float",
       "addr": "DM22",
       "name": "X轴软负限位",
@@ -244,8 +244,8 @@
       "addr": "DM112",
       "name": "Y轴绝对运动目标位置",
       "describe": "Y轴绝对运动目标位置",
-      "maxValue": "55",
-      "minValue": "-88"
+      "maxValue": "145",
+      "minValue": "0"
     },
     "highSpeed": {
       "valueType": "bool",
@@ -270,14 +270,14 @@
       "alarmPriority": 1
     },
     "softUpperLimit": {
-      "defaultValue": "55",
+      "defaultValue": "145",
       "valueType": "float",
       "addr": "DM120",
       "name": "Y轴软正限位",
       "describe": "Y轴软正限位标志，到软正限位后无法继续正向移动"
     },
     "softLowerLimit": {
-      "defaultValue": "-88",
+      "defaultValue": "0",
       "valueType": "float",
       "addr": "DM122",
       "name": "Y轴软负限位",
@@ -392,7 +392,7 @@
       "addr": "DM212",
       "name": "Z1轴绝对运动目标位置",
       "describe": "Z1轴绝对运动目标位置",
-      "maxValue": "40",
+      "maxValue": "45.1",
       "minValue": "0"
     },
     "highSpeed": {
@@ -418,14 +418,14 @@
       "alarmPriority": 1
     },
     "softUpperLimit": {
-      "defaultValue": "40",
+      "defaultValue": "45.1",
       "valueType": "float",
       "addr": "DM220",
       "name": "Z1轴软正限位",
       "describe": "Z1轴软正限位标志，到软正限位后无法继续正向移动"
     },
     "softLowerLimit": {
-      "defaultValue": "-0",
+      "defaultValue": "0",
       "valueType": "float",
       "addr": "DM222",
       "name": "Z1轴软负限位",
@@ -534,8 +534,8 @@
       "addr": "DM312",
       "name": "Z2轴绝对运动目标位置",
       "describe": "Z2轴绝对运动目标位置",
-      "maxValue": "9",
-      "minValue": "-9"
+      "maxValue": "18",
+      "minValue": "0"
     },
     "highSpeed": {
       "valueType": "bool",
@@ -560,14 +560,14 @@
       "alarmPriority": 1
     },
     "softUpperLimit": {
-      "defaultValue": "9",
+      "defaultValue": "18",
       "valueType": "float",
       "addr": "DM320",
       "name": "Z2轴软正限位",
       "describe": "Z2轴软正限位标志，到软正限位后无法继续正向移动"
     },
     "softLowerLimit": {
-      "defaultValue": "-9",
+      "defaultValue": "0",
       "valueType": "float",
       "addr": "DM322",
       "name": "Z2轴软负限位",
@@ -684,6 +684,18 @@
       "addr": "MR600",
       "name": "进入换刀画面",
       "describe": "进入换刀画面"
+    },
+    "NoContactHeightMeasurement": {
+      "valueType": "bool",
+      "addr": "MR612",
+      "name": "是否开启非接触测高",
+      "describe": "是否开启非接触测高"
+    },
+    "HeightMeasurementCompleted": {
+      "valueType": "bool",
+      "addr": "MR613",
+      "name": "测高完成",
+      "describe": "测高完成"
     },
     "xReplaceLocation": {
       "valueType": "float",
@@ -1151,6 +1163,12 @@
       "addr": "MR907",
       "name": "切割停止",
       "describe": "切割停止"
+    },
+    "CutStopCompleted": {
+      "valueType": "bool",
+      "addr": "MR2000",
+      "name": "切割停止完成",
+      "describe": "切割停止完成"
     },
     "fullAutoCutEnd": {
       "valueType": "bool",

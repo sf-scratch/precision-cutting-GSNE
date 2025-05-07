@@ -1,8 +1,13 @@
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Numerics;
 using HslCommunication;
 using HslCommunication.Profinet.Keyence;
+using Newtonsoft.Json.Linq;
+using NPOI.SS.Formula.Functions;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.FrmWindow.common;
+using 精密切割系统.Helpers;
 using 精密切割系统.Model.cut;
 using 精密切割系统.Model.sqlite;
 using 精密切割系统.Utils;
@@ -28,10 +33,10 @@ namespace 精密切割系统.Driver
         }
 
         public static string plcIP = "192.168.10.10";
-
         private static KeyencePlc? plc = null;
         private static readonly object _Object = new object();
-        private static KeyenceMcNet keyence_net = new KeyenceMcNet(plcIP, 5000);
+        private volatile static KeyenceMcNet keyence_net = new KeyenceMcNet(plcIP, 5000);
+        private static KeyenceMcNet _keyence_async_net = new KeyenceMcNet(plcIP, 5000);
         public static OperateResult connect;
         public Dictionary<string, PlcDataType> typeMap = new Dictionary<string, PlcDataType>();
 
@@ -99,15 +104,15 @@ namespace 精密切割系统.Driver
         {
             if (IP != null)
             {
-                keyence_net = new KeyenceMcNet(IP, 5000);
+                _keyence_async_net = new KeyenceMcNet(IP, 5000);
                 plcIP = IP;
             }
             else
             {
-                keyence_net = new KeyenceMcNet(plcIP, 5000);
+                _keyence_async_net = new KeyenceMcNet(plcIP, 5000);
             }
 
-            connect = await keyence_net.ConnectServerAsync();
+            connect = await _keyence_async_net.ConnectServerAsync();
             if (!connect.IsSuccess)
             {
                 Tools.LogError("PLC连接失败！");
@@ -130,13 +135,17 @@ namespace 精密切割系统.Driver
         /// <returns>是否通信成功</returns>
         private bool TestPlcCommunication()
         {
+            if (keyence_net == null)
+            {
+                return false;
+            }
             // 进行读写测试组合验证 257110103562
             var testRead = keyence_net.ReadBool("MR1010", 1);
             if (!testRead.IsSuccess) return false;
 
             // 写入测试
-            var testWrite = keyence_net.Write("MR1010", testRead.Content[0]);
-            if (!testWrite.IsSuccess) return false;
+            //var testWrite = keyence_net.Write("MR1010", testRead.Content[0]);
+            //if (!testWrite.IsSuccess) return false;
 
             // 再次读取验证
             var verifyRead = keyence_net.ReadBool("MR1010", 1);
@@ -149,17 +158,29 @@ namespace 精密切割系统.Driver
         /// <returns>是否通信成功</returns>
         private async Task<bool> TestPlcCommunicationAsync()
         {
+            if (keyence_net == null)
+            {
+                return false;
+            }
             // 进行读写测试组合验证 257110103562
-            var testRead = await keyence_net.ReadBoolAsync("MR1010", 1);
-            if (!testRead.IsSuccess) return false;
+            var testRead = await _keyence_async_net.ReadBoolAsync("MR1010", 1);
+            if (!testRead.IsSuccess)
+            {
+                return false;
+            }
 
             // 写入测试
-            var testWrite = await keyence_net.WriteAsync("MR1010", testRead.Content[0]);
-            if (!testWrite.IsSuccess) return false;
+            //var testWrite = await keyence_net.WriteAsync("MR1010", testRead.Content[0]);
+            //if (!testWrite.IsSuccess) return false;
 
             // 再次读取验证
-            var verifyRead = await keyence_net.ReadBoolAsync("MR1010", 1);
-            return verifyRead.IsSuccess && verifyRead.Content[0] == testRead.Content[0];
+            var verifyRead = await _keyence_async_net.ReadBoolAsync("MR1010", 1);
+            bool result = verifyRead.IsSuccess && verifyRead.Content[0] == testRead.Content[0];
+            if (!result)
+            {
+
+            }
+            return result;
         }
 
         public bool CloseConnect()
@@ -177,10 +198,10 @@ namespace 精密切割系统.Driver
 
         public async Task<bool> CloseConnectAsync()
         {
-            if (keyence_net != null)
+            if (_keyence_async_net != null)
             {
-                OperateResult result = await keyence_net.ConnectCloseAsync();
-                keyence_net = null; // 释放对象，防止旧连接影响新连接
+                OperateResult result = await _keyence_async_net.ConnectCloseAsync();
+                _keyence_async_net = null; // 释放对象，防止旧连接影响新连接
                 plc = plc = new KeyencePlc(plcIP);
                 connect = null;
                 return result.IsSuccess;
@@ -340,7 +361,7 @@ namespace 精密切割系统.Driver
             return null;
         }
 
-        public async Task<string> ReadDataAsync(string plcAddr, PlcDataType dataType = PlcDataType.Int32, ushort dataNumber = 1)
+        public async Task<string> ReadDataAsync(string plcAddr, PlcDataType dataType, ushort dataNumber = 1)
         {
             if (!GlobalParams.onlineFlag) return string.Empty;
             const int maxRetries = 3;
@@ -358,13 +379,13 @@ namespace 精密切割系统.Driver
                     switch (dataType)
                     {
                         case PlcDataType.Bool:
-                            var boolResult = await keyence_net.ReadBoolAsync(plcAddr, dataNumber);
+                            var boolResult = await _keyence_async_net.ReadBoolAsync(plcAddr, dataNumber);
                             read = boolResult.IsSuccess ?
                                 OperateResult.CreateSuccessResult(boolResult.Content.Cast<object>().ToArray()) :
                                 OperateResult.CreateFailedResult<object[]>(boolResult);
                             break;
                         case PlcDataType.Int16:
-                            var int16Result = await keyence_net.ReadInt16Async(plcAddr, dataNumber);
+                            var int16Result = await _keyence_async_net.ReadInt16Async(plcAddr, dataNumber);
                             if (int16Result.IsSuccess)
                             {
                                 var convertedContent = int16Result.Content.Select(x => (object)((int)x)).ToArray();
@@ -376,7 +397,7 @@ namespace 精密切割系统.Driver
                             }
                             break;
                         case PlcDataType.UInt16:
-                            var uint16Result = await keyence_net.ReadUInt16Async(plcAddr, dataNumber);
+                            var uint16Result = await _keyence_async_net.ReadUInt16Async(plcAddr, dataNumber);
                             if (uint16Result.IsSuccess)
                             {
                                 var convertedContent = uint16Result.Content.Select(x => (object)((uint)x)).ToArray();
@@ -388,7 +409,7 @@ namespace 精密切割系统.Driver
                             }
                             break;
                         case PlcDataType.Int32:
-                            var int32Result = await keyence_net.ReadInt32Async(plcAddr, dataNumber);
+                            var int32Result = await _keyence_async_net.ReadInt32Async(plcAddr, dataNumber);
                             if (int32Result.IsSuccess)
                             {
                                 var convertedContent = int32Result.Content.Select(x => (object)((int)x)).ToArray();
@@ -400,7 +421,7 @@ namespace 精密切割系统.Driver
                             }
                             break;
                         case PlcDataType.UInt32:
-                            var uint32Result = await keyence_net.ReadUInt32Async(plcAddr, dataNumber);
+                            var uint32Result = await _keyence_async_net.ReadUInt32Async(plcAddr, dataNumber);
                             if (uint32Result.IsSuccess)
                             {
                                 var convertedContent = uint32Result.Content.Select(x => (object)((uint)x)).ToArray();
@@ -412,7 +433,7 @@ namespace 精密切割系统.Driver
                             }
                             break;
                         case PlcDataType.Int64:
-                            var int64Result = await keyence_net.ReadInt64Async(plcAddr, dataNumber);
+                            var int64Result = await _keyence_async_net.ReadInt64Async(plcAddr, dataNumber);
                             if (int64Result.IsSuccess)
                             {
                                 var convertedContent = int64Result.Content.Select(x => (object)((long)x)).ToArray();
@@ -424,7 +445,7 @@ namespace 精密切割系统.Driver
                             }
                             break;
                         case PlcDataType.UInt64:
-                            var uint64Result = await keyence_net.ReadUInt64Async(plcAddr, dataNumber);
+                            var uint64Result = await _keyence_async_net.ReadUInt64Async(plcAddr, dataNumber);
                             if (uint64Result.IsSuccess)
                             {
                                 var convertedContent = uint64Result.Content.Select(x => (object)((ulong)x)).ToArray();
@@ -436,7 +457,7 @@ namespace 精密切割系统.Driver
                             }
                             break;
                         case PlcDataType.Float:
-                            var floatResult = await keyence_net.ReadFloatAsync(plcAddr, dataNumber);
+                            var floatResult = await _keyence_async_net.ReadFloatAsync(plcAddr, dataNumber);
                             if (floatResult.IsSuccess)
                             {
                                 var convertedContent = floatResult.Content.Select(x => (object)((float)x)).ToArray();
@@ -448,7 +469,7 @@ namespace 精密切割系统.Driver
                             }
                             break;
                         case PlcDataType.Double:
-                            var doubleResult = await keyence_net.ReadDoubleAsync(plcAddr, dataNumber);
+                            var doubleResult = await _keyence_async_net.ReadDoubleAsync(plcAddr, dataNumber);
                             if (doubleResult.IsSuccess)
                             {
                                 var convertedContent = doubleResult.Content.Select(x => (object)((double)x)).ToArray();
@@ -484,6 +505,167 @@ namespace 精密切割系统.Driver
 
             Tools.LogError($"读取PLC失败：地址 {plcAddr}，类型 {dataType}，所有尝试均失败");
             return string.Empty;
+        }
+
+        public async Task<bool?> ReadDataAsync(string plcAddr)
+        {
+            bool[]? bools = await ReadDataAsync(plcAddr, 1);
+            if (bools != null && bools.Length == 1)
+            {
+                return bools[0];
+            }
+            return null;
+        }
+
+        public async Task<bool[]?> ReadDataAsync(string plcAddr, ushort dataNumber)
+        {
+            if (!GlobalParams.onlineFlag) return null;
+            const int maxRetries = 3;
+            const int retryDelayMs = 100;
+            for (int attempt = 1; attempt <= maxRetries; attempt++)
+            {
+                try
+                {
+                    if (!await EnsurePlcConnectedAsync())
+                    {
+                        Tools.LogError($"读取PLC失败：PLC未连接（尝试 {attempt}/{maxRetries}）");
+                        continue;
+                    }
+                    var int16Result = await _keyence_async_net.ReadBoolAsync(plcAddr, dataNumber);
+                    if (int16Result.IsSuccess)
+                    {
+                        return int16Result.Content;
+                    }
+                    if (attempt < maxRetries)
+                    {
+                        Tools.LogWarning($"读取PLC数据失败，地址：{plcAddr}，类型：{typeof(bool)}，尝试第{attempt}次重试");
+                        await Task.Delay(retryDelayMs);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Tools.LogError($"读取PLC异常：地址 {plcAddr}，类型 {typeof(bool)}，尝试 {attempt}/{maxRetries}，异常：{ex.Message}");
+                    if (attempt < maxRetries)
+                    {
+                        await Task.Delay(retryDelayMs);
+                    }
+                }
+            }
+            Tools.LogError($"读取PLC失败：地址 {plcAddr}，类型 {typeof(bool)}，所有尝试均失败");
+            return null;
+        }
+
+        public async Task<T?> ReadDataAsync<T>(string plcAddr) where T : struct, INumber<T>
+        {
+            T[]? datas = await ReadDataAsync<T>(plcAddr, 1);
+            if (datas != null && datas.Length == 1)
+            {
+                return datas[0];
+            }
+            return null;
+        }
+
+        public async Task<T[]?> ReadDataAsync<T>(string plcAddr, ushort dataNumber) where T : INumber<T>
+        {
+            Type type = typeof(T);
+            if (!type.IsPrimitive) return null;
+            const int maxRetries = 3;
+            const int retryDelayMs = 100;
+            for (int attempt = 1; attempt <= maxRetries; attempt++)
+            {
+                try
+                {
+                    if (!await EnsurePlcConnectedAsync())
+                    {
+                        Tools.LogError($"读取PLC失败：PLC未连接（尝试 {attempt}/{maxRetries}）");
+                        continue;
+                    }
+                    if (type == typeof(short))
+                    {
+                        var int16Result = await _keyence_async_net.ReadInt16Async(plcAddr, dataNumber);
+                        if (int16Result.IsSuccess)
+                        {
+                            return int16Result.Content.Select(p => T.CreateChecked(p)).ToArray();
+                        }
+                    }
+                    else if (type == typeof(ushort))
+                    {
+                        var uint16Result = await _keyence_async_net.ReadUInt16Async(plcAddr, dataNumber);
+                        if (uint16Result.IsSuccess)
+                        {
+                            return uint16Result.Content.Select(p => T.CreateChecked(p)).ToArray();
+                        }
+                    }
+                    else if (type == typeof(int))
+                    {
+                        var int32Result = await _keyence_async_net.ReadInt32Async(plcAddr, dataNumber);
+                        if (int32Result.IsSuccess)
+                        {
+                            return int32Result.Content.Select(p => T.CreateChecked(p)).ToArray();
+                        }
+                    }
+                    else if (type == typeof(uint))
+                    {
+                        var uint32Result = await _keyence_async_net.ReadUInt32Async(plcAddr, dataNumber);
+                        if (uint32Result.IsSuccess)
+                        {
+                            return uint32Result.Content.Select(p => T.CreateChecked(p)).ToArray();
+                        }
+                    }
+                    else if (type == typeof(long))
+                    {
+                        var int64Result = await _keyence_async_net.ReadInt64Async(plcAddr, dataNumber);
+                        if (int64Result.IsSuccess)
+                        {
+                            return int64Result.Content.Select(p => T.CreateChecked(p)).ToArray();
+                        }
+                    }
+                    else if (type == typeof(ulong))
+                    {
+                        var uint64Result = await _keyence_async_net.ReadUInt64Async(plcAddr, dataNumber);
+                        if (uint64Result.IsSuccess)
+                        {
+                            return uint64Result.Content.Select(p => T.CreateChecked(p)).ToArray();
+                        }
+                    }
+                    else if (type == typeof(float))
+                    {
+
+                        var floatResult = await _keyence_async_net.ReadFloatAsync(plcAddr, dataNumber);
+                        if (floatResult.IsSuccess)
+                        {
+                            return floatResult.Content.Select(p => T.CreateChecked(p)).ToArray();
+                        }
+                    }
+                    else if (type == typeof(double))
+                    {
+                        var doubleResult = await _keyence_async_net.ReadDoubleAsync(plcAddr, dataNumber);
+                        if (doubleResult.IsSuccess)
+                        {
+                            return doubleResult.Content.Select(p => T.CreateChecked(p)).ToArray();
+                        }
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"不支持的数据类型：{type}");
+                    }
+                    if (attempt < maxRetries)
+                    {
+                        Tools.LogWarning($"读取PLC数据失败，地址：{plcAddr}，类型：{type}，尝试第{attempt}次重试");
+                        await Task.Delay(retryDelayMs);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Tools.LogError($"读取PLC异常：地址 {plcAddr}，类型 {type}，尝试 {attempt}/{maxRetries}，异常：{ex.Message}");
+                    if (attempt < maxRetries)
+                    {
+                        await Task.Delay(retryDelayMs);
+                    }
+                }
+            }
+            Tools.LogError($"读取PLC失败：地址 {plcAddr}，类型 {type}，所有尝试均失败");
+            return null;
         }
 
         public List<string> readMultiData(List<string> plcAddrList, PlcDataType dataType = PlcDataType.Int32)
@@ -647,61 +829,61 @@ namespace 精密切割系统.Driver
                 {
                     case PlcDataType.Bool:
                         bool boolRes = pData.ToString().Equals("1") || pData.ToString().Equals("true", StringComparison.OrdinalIgnoreCase);
-                        write = await keyence_net.WriteAsync(plcAddr, boolRes);
+                        write = await _keyence_async_net.WriteAsync(plcAddr, boolRes);
                         break;
 
                     case PlcDataType.Int16:
                         if (short.TryParse(pData.ToString(), out short int16Res))
-                            write = await keyence_net.WriteAsync(plcAddr, int16Res);
+                            write = await _keyence_async_net.WriteAsync(plcAddr, int16Res);
                         else
                             throw new ArgumentException("Invalid Int16 value.");
                         break;
 
                     case PlcDataType.UInt16:
                         if (ushort.TryParse(pData.ToString(), out ushort uint16Res))
-                            write = await keyence_net.WriteAsync(plcAddr, uint16Res);
+                            write = await _keyence_async_net.WriteAsync(plcAddr, uint16Res);
                         else
                             throw new ArgumentException("Invalid UInt16 value.");
                         break;
 
                     case PlcDataType.Int32:
                         if (int.TryParse(pData.ToString(), out int int32Res))
-                            write = await keyence_net.WriteAsync(plcAddr, int32Res);
+                            write = await _keyence_async_net.WriteAsync(plcAddr, int32Res);
                         else
                             throw new ArgumentException("Invalid Int32 value.");
                         break;
 
                     case PlcDataType.UInt32:
                         if (uint.TryParse(pData.ToString(), out uint uint32Res))
-                            write = await keyence_net.WriteAsync(plcAddr, uint32Res);
+                            write = await _keyence_async_net.WriteAsync(plcAddr, uint32Res);
                         else
                             throw new ArgumentException("Invalid UInt32 value.");
                         break;
 
                     case PlcDataType.Int64:
                         if (long.TryParse(pData.ToString(), out long int64Res))
-                            write = await keyence_net.WriteAsync(plcAddr, int64Res);
+                            write = await _keyence_async_net.WriteAsync(plcAddr, int64Res);
                         else
                             throw new ArgumentException("Invalid Int64 value.");
                         break;
 
                     case PlcDataType.UInt64:
                         if (ulong.TryParse(pData.ToString(), out ulong uint64Res))
-                            write = await keyence_net.WriteAsync(plcAddr, uint64Res);
+                            write = await _keyence_async_net.WriteAsync(plcAddr, uint64Res);
                         else
                             throw new ArgumentException("Invalid UInt64 value.");
                         break;
 
                     case PlcDataType.Float:
                         if (float.TryParse(pData.ToString(), out float floatRes))
-                            write = await keyence_net.WriteAsync(plcAddr, floatRes);
+                            write = await _keyence_async_net.WriteAsync(plcAddr, floatRes);
                         else
                             throw new ArgumentException("Invalid Float value.");
                         break;
 
                     case PlcDataType.Double:
                         if (double.TryParse(pData.ToString(), out double doubleRes))
-                            write = await keyence_net.WriteAsync(plcAddr, doubleRes);
+                            write = await _keyence_async_net.WriteAsync(plcAddr, doubleRes);
                         else
                             throw new ArgumentException("Invalid Double value.");
                         break;
@@ -901,11 +1083,11 @@ namespace 精密切割系统.Driver
                 return true;
             }
             // 检查PLC连接状态
-            if (!await EnsurePlcConnectedAsync())
-            {
-                Tools.LogError("写入PLC失败：PLC未连接");
-                return false;
-            }
+            //if (!await EnsurePlcConnectedAsync())
+            //{
+            //    Tools.LogError("写入PLC失败：PLC未连接");
+            //    return false;
+            //}
 
             // 检查输入参数有效性
             if (tag == null || (string.IsNullOrEmpty(tag.Value) && string.IsNullOrEmpty(tag.writeValue)))
@@ -992,10 +1174,10 @@ namespace 精密切割系统.Driver
                 for (int attempt = 1; attempt <= maxReconnectAttempts; attempt++)
                 {
                     Tools.LogInfo($"开始第{attempt}次PLC重连尝试");
-                    await CloseConnectAsync();
+                    //await CloseConnectAsync();
                     await Task.Delay(reconnectDelayMs);
 
-                    if (await ConnectPlcAsync())
+                    //if (await ConnectPlcAsync())
                     {
                         // 进行通信测试
                         if (await TestPlcCommunicationAsync())
@@ -1028,8 +1210,11 @@ namespace 精密切割系统.Driver
             if (connect == null) return false;
 
             // 进行基本连接检查
-            OperateResult<bool[]> read = await keyence_net.ReadBoolAsync("MR510", 1);
-            if (!read.IsSuccess) return false;
+            OperateResult<bool[]> read = await _keyence_async_net.ReadBoolAsync("MR510", 1);
+            if (!read.IsSuccess)
+            {
+                return false;
+            }
 
             // 检查通信质量
             return await TestPlcCommunicationAsync();
@@ -1188,6 +1373,33 @@ namespace 精密切割系统.Driver
             return false;
         }
 
+        public async Task<bool> IsSpeedZeroAsync()
+        {
+            float? speepd = await PlcControl.plc.ReadDataAsync<float>(curSpeed.addr);
+            return speepd != null && speepd.Value.NearlyEquals(0, 0.1f);
+        }
+
+        private async Task<bool> IsNearlyPosition(float targetPosition)
+        {
+            float? curLoacation = await GetCurrentLocationAsync();
+            return curLoacation != null && curLoacation.Value.NearlyEquals(targetPosition, 0.1f);
+        }
+
+        public async Task WatiNearlyPositionAsync(float targetPosition, CancellationToken token)
+        {
+            await TaskUtils.WaitExpectedResultAsync(IsNearlyPosition, targetPosition, token);
+        }
+
+        public async Task WatiSpeedZeroAsync(CancellationToken token)
+        {
+            await TaskUtils.WaitExpectedResultAsync(IsSpeedZeroAsync, token);
+        }
+
+        public async Task<float?> GetCurrentLocationAsync()
+        {
+            return await keyencePlc.ReadDataAsync<float>(curLocation.addr);
+        }
+
         /// <summary>
         /// 回零点
         /// </summary>
@@ -1249,6 +1461,27 @@ namespace 精密切割系统.Driver
             // 执行电动或者相对运动
             RunJog(jogDirection);
         }
+
+        public async Task StartRelativeAsync(float speed, float distance, int jogDirection, CancellationToken token)
+        {
+            // 设置相对运动
+            runType.writeValue = "1";
+            await keyencePlc.WriteTagAsync(runType);
+            // 设置相对运动距离
+            relativeDistance.writeValue = distance.ToString();
+            await keyencePlc.WriteTagAsync(relativeDistance);
+            // 设置相对运动速度
+            jogRelativeSpeed.writeValue = speed.ToString();
+            await keyencePlc.WriteTagAsync(jogRelativeSpeed);
+            // 轴参数确认
+            axisParamsConfirm.writeValue = "1";
+            await keyencePlc.WriteTagAsync(axisParamsConfirm);
+            // 执行电动或者相对运动
+            await RunJogAsync(jogDirection);
+            // 等待相对运动完成
+            await WatiSpeedZeroAsync(token);
+        }
+
         /// <summary>
         /// 设置点动和寸动的移动速度
         /// </summary>
@@ -1261,6 +1494,7 @@ namespace 精密切割系统.Driver
             axisParamsConfirm.writeValue= "1";
             keyencePlc.writeTag(axisParamsConfirm);
         }
+
         public void SetAbsoluteSpeed(string speed)
         {
             absoluteSpeed.writeValue= speed;
@@ -1269,7 +1503,15 @@ namespace 精密切割系统.Driver
             axisParamsConfirm.writeValue= "1";
             keyencePlc.writeTag(axisParamsConfirm);
         }
-        
+
+        public async Task SetAbsoluteSpeedAsync(float speed)
+        {
+            absoluteSpeed.writeValue = speed.ToString();
+            await keyencePlc.WriteTagAsync(absoluteSpeed);
+            axisParamsConfirm.writeValue = "1";
+            await keyencePlc.WriteTagAsync(axisParamsConfirm);
+        }
+
         public string StartAbsolute(string speed, string location, bool compFlag = false)
         {
             if (!IsReady()) return null;
@@ -1294,6 +1536,33 @@ namespace 精密切割系统.Driver
             return location;
         }
 
+        public async Task StartAbsoluteAsync(float speed, float location, CancellationToken token)
+        {
+            axisParamsConfirm.writeValue = "1";
+            await keyencePlc.WriteTagAsync(axisParamsConfirm);
+            // 设置绝对运动位置
+            absoluteLocation.writeValue = location.ToString();
+            await keyencePlc.WriteTagAsync(absoluteLocation);
+            // 设置绝对运动速度
+            await SetAbsoluteSpeedAsync(speed);
+            // 设置绝对运功开始
+            absoluteStart.writeValue = "1";
+            await keyencePlc.WriteTagAsync(absoluteStart);
+            // 等待绝对运动完成
+            await WatiNearlyPositionAsync(location, token);
+            // 等待速度为0
+            await WatiSpeedZeroAsync(token);
+        }
+
+        public async Task WaitAxisMotionDone()
+        {
+            await TaskUtils.WaitExpectedResultAsync<ushort>(async () =>
+            {
+                ushort? curStatusData = await keyencePlc.ReadDataAsync<ushort>(curStatus.addr);
+                Tools.LogDebug($"curStatusData: {curStatusData}");
+                return curStatusData ?? 0;
+            }, 2);
+        }
 
         public void RunJog(int jogDirection)
         {
@@ -1321,6 +1590,31 @@ namespace 精密切割系统.Driver
                 keyencePlc.writeTag(jogAntiStart);
             }
         }
+
+        public async Task RunJogAsync(int jogDirection)
+        {
+            axisParamsConfirm.writeValue = "1";
+            await keyencePlc.WriteTagAsync(axisParamsConfirm);
+            // 关闭正转
+            jogStart.writeValue = "0";
+            await keyencePlc.WriteTagAsync(jogStart);
+            // 关闭反转
+            jogAntiStart.writeValue = "0";
+            await keyencePlc.WriteTagAsync(jogAntiStart);
+            if (jogDirection == 0)
+            {
+                // 开启正转
+                jogStart.writeValue = "1";
+                await keyencePlc.WriteTagAsync(jogStart);
+            }
+            else
+            {
+                // 开启反转
+                jogAntiStart.writeValue = "1";
+                await keyencePlc.WriteTagAsync(jogAntiStart);
+            }
+        }
+
         /// <summary>
         /// 设置是否高速 0 低速 1 高速
         /// </summary>
@@ -1378,6 +1672,8 @@ namespace 精密切割系统.Driver
         private KeyencePlc keyencePlc = KeyencePlc.GetInstance();
         // ============刀片维护相关
         public Tag initReplaceLocation { get; set; }
+        public Tag NoContactHeightMeasurement { get; set; }
+        public Tag HeightMeasurementCompleted { get; set; }
         public Tag xReplaceLocation { get; set; }
         public Tag yReplaceLocation { get; set; }
         public Tag z1ReplaceLocation { get; set; }
@@ -1449,6 +1745,12 @@ namespace 精密切割系统.Driver
             await keyencePlc.WriteTagAsync(setupStart);
         }
 
+        public async Task SetNoContactHeightMeasurement(int status)
+        {
+            NoContactHeightMeasurement.writeValue = status.ToString();
+            await keyencePlc.WriteTagAsync(NoContactHeightMeasurement);
+        }
+
         /// <summary>
         /// 执行换刀
         /// </summary>
@@ -1457,6 +1759,16 @@ namespace 精密切割系统.Driver
             initReplaceLocation.writeValue = status + "";
             keyencePlc.writeTag(initReplaceLocation);
         }
+
+        /// <summary>
+        /// 执行换刀
+        /// </summary>
+        public async Task RunBladeReplaceAsync(int status)
+        {
+            initReplaceLocation.writeValue = status + "";
+            await keyencePlc.WriteTagAsync(initReplaceLocation);
+        }
+
         /// <summary>
         /// 执行测高
         /// </summary>
@@ -1465,6 +1777,16 @@ namespace 精密切割系统.Driver
             bladeSetup.writeValue = status + "";
             keyencePlc.writeTag(bladeSetup);
         }
+
+        /// <summary>
+        /// 执行测高
+        /// </summary>
+        public async Task RunBladeSetupAsync(int status)
+        {
+            bladeSetup.writeValue = status + "";
+            await keyencePlc.WriteTagAsync(bladeSetup);
+        }
+
         /// <summary>
         /// 设置测高初始位置
         /// </summary>
@@ -1488,8 +1810,22 @@ namespace 精密切割系统.Driver
             Thread.Sleep(10);
             // 确认设置参数
             ConfirmParams();
-
         }
+
+        public async Task SetBladeSetuInitPositionAsync(string initX, string initY, string initZ1, string initZ2)
+        {
+            xHeightSet.writeValue = initX.ToString();
+            yHeightSet.writeValue = initY.ToString();
+            z1HeightSet.writeValue = initZ1.ToString();
+            z2HeightSet.writeValue = initZ2.ToString();
+            await keyencePlc.WriteTagAsync(xHeightSet);
+            await keyencePlc.WriteTagAsync(yHeightSet);
+            await keyencePlc.WriteTagAsync(z1HeightSet);
+            await keyencePlc.WriteTagAsync(z2HeightSet);
+            confirmParams.writeValue = "1";
+            await keyencePlc.WriteTagAsync(confirmParams);
+        }
+
         /// <summary>
         /// 设置基准线校准初始位置
         /// </summary>
@@ -1657,6 +1993,13 @@ namespace 精密切割系统.Driver
             spindleManuallyRun.writeValue = status + "";
             keyencePlc.writeTag(spindleManuallyRun);
         }
+
+        public async Task<bool> IsSpindleStopAsync()
+        {
+            bool? isRun = await PlcControl.plc.ReadDataAsync(spindleManuallyRunStatus.addr);
+            return isRun == false;
+        }
+
         /// <summary>
         /// 设置面板按钮状态
         /// </summary>
@@ -1683,6 +2026,7 @@ namespace 精密切割系统.Driver
             initLocation.writeValue = "1";
             keyencePlc.writeTag(initLocation);
         }
+
         /// <summary>
         /// 打开或关闭切割水
         /// </summary>
@@ -1691,6 +2035,25 @@ namespace 精密切割系统.Driver
             cuttingWater.writeValue = "1";
             keyencePlc.writeTag(cuttingWater);
         }
+
+        /// <summary>
+        /// 打开切割水
+        /// </summary>
+        public async Task OpenCuttingWaterAsync()
+        {
+            cuttingWater.writeValue = "1";
+            await keyencePlc.WriteTagAsync(cuttingWater);
+        }
+
+        /// <summary>
+        /// 关闭切割水
+        /// </summary>
+        public async Task CloseCuttingWaterAsync()
+        {
+            cuttingWater.writeValue = "0";
+            await keyencePlc.WriteTagAsync(cuttingWater);
+        }
+
         /// <summary>
         /// 打开或关闭工作盘真空
         /// </summary>
@@ -1883,7 +2246,19 @@ namespace 精密切割系统.Driver
             alignRunMotion.writeValue = "1";
             keyencePlc.writeTag(alignRunMotion);
         }
-        
+
+        public async Task RunMotionAsync(float xRunMotionValue, float yRunMotionValue)
+        {
+            xRunMotion.writeValue = xRunMotionValue.ToString();
+            yRunMotion.writeValue = yRunMotionValue.ToString();
+            await keyencePlc.WriteTagAsync(xRunMotion);
+            await keyencePlc.WriteTagAsync(yRunMotion);
+            alignRunMotion.writeValue = "0";
+            await keyencePlc.WriteTagAsync(alignRunMotion);
+            alignRunMotion.writeValue = "1";
+            await keyencePlc.WriteTagAsync(alignRunMotion);
+        }
+
     }
 
     public class Cutting
@@ -1914,6 +2289,8 @@ namespace 精密切割系统.Driver
         public Tag cutStart { get; set; }
         // 切割停止
         public Tag cutStop { get; set; }
+        // 切割停止完成
+        public Tag CutStopCompleted { get; set; }
         // X轴切割开始位置
         public Tag xStartPosition { get; set; }
         // Y轴切割开始位置
@@ -1974,7 +2351,40 @@ namespace 精密切割系统.Driver
             fullAutoInit.writeValue = status.ToString();
             keyencePlc.writeTag(fullAutoInit);
         }
-        
+
+        /// <summary>
+        /// 进入全自动切割异步
+        /// </summary>
+        public async Task EnterFullAutoInitAsync(int status)
+        {
+            fullAutoInit.writeValue = status.ToString();
+            await keyencePlc.WriteTagAsync(fullAutoInit);
+        }
+
+        // 等待准备好切割
+        public async Task WaitReadyToCutAsync(CancellationToken token)
+        {
+            await TaskUtils.WaitExpectedResultAsync(IsReadyToCutAsync, true, token);
+        }
+
+        // 判断是否已准备好切割
+        public async Task<bool> IsReadyToCutAsync()
+        {
+            return await keyencePlc.ReadDataAsync(cutStatus.addr) ?? false;
+        }
+
+        // 等待准备好切割
+        public async Task WaitCutStopAsync(CancellationToken token)
+        {
+            await TaskUtils.WaitExpectedResultAsync(IsCompletedCutStopAsync, true, token);
+        }
+
+        // 判断切割是否停止完成
+        public async Task<bool> IsCompletedCutStopAsync()
+        {
+            return await keyencePlc.ReadDataAsync(CutStopCompleted.addr) ?? false;
+        }
+
         /// <summary>
         /// 开始切割
         /// </summary>
@@ -1988,10 +2398,9 @@ namespace 精密切割系统.Driver
         /// <summary>
         /// 开始切割
         /// </summary>
-        /// <param name="status">0 停止 1 开始</param>
-        public async Task StartCutAsync(int status)
+        public async Task StartCutAsync()
         {
-            cutStart.writeValue = status.ToString();
+            cutStart.writeValue = "1";
             await keyencePlc.WriteTagAsync(cutStart);
         }
 
@@ -2033,6 +2442,11 @@ namespace 精密切割系统.Driver
             keyencePlc.writeTag(cutStop);
         }
 
+        public async Task<int?> GetCutNum()
+        {
+            return await keyencePlc.ReadDataAsync<int>(cutNum.addr);
+        }
+
         /// <summary>
         /// 停止切割
         /// </summary>
@@ -2051,6 +2465,17 @@ namespace 精密切割系统.Driver
             fullAutoCutEnd.writeValue = "1";
             keyencePlc.writeTag(fullAutoCutEnd);
         }
+
+        /// <summary>
+        /// 切割结束
+        /// </summary>
+        public async Task EndFullAutoCutAsync()
+        {
+            fullAutoCutEnd.writeValue = "1";
+            await keyencePlc.WriteTagAsync(fullAutoCutEnd);
+        }
+
+
         /// <summary>
         /// 设置Y轴开始位置
         /// </summary>
@@ -2169,7 +2594,14 @@ namespace 精密切割系统.Driver
         public async Task SetCutParamsAsync(float feedSpeedValue, float zEndLocation, float zStartLocation, float xStartLoaction
             , float xEndLocation, float yCutLocation, string checkStatus, float thetaDeg, int spindleRevValue, CutDirection cutDirection)
         {
+            float xSoftUpperLimit = float.Parse(PlcControl.tagControl.Xaxis.softUpperLimit.defaultValue);
+            if (xEndLocation > xSoftUpperLimit) xEndLocation = xSoftUpperLimit;
 
+            float ySoftUpperLimit = float.Parse(PlcControl.tagControl.Yaxis.softUpperLimit.defaultValue);
+            if (yCutLocation > ySoftUpperLimit) yCutLocation = ySoftUpperLimit;
+            //float temp = xStartLoaction;
+            //xStartLoaction = -xEndLocation;
+            //xEndLocation = -temp;
             Tools.LogDebug(
                 $"\r\n切割速度: {feedSpeedValue}\r\n" +
                 $"Z轴开始位置: {zStartLocation}\r\n" +
@@ -2250,6 +2682,32 @@ namespace 精密切割系统.Driver
             // 确认切割参数
             ConfirmParams();
         }
+
+        /// <summary>
+        /// 设置切割停止位置
+        /// </summary>
+        /// <param name="xLocation"></param>
+        /// <param name="yLocation"></param>
+        /// <param name="z2Location"></param>
+        public async Task SetStopLocationAsync(float xLocation, float yLocation, float z2Location)
+        {
+            float xSoftUpperLimit = float.Parse(PlcControl.tagControl.Xaxis.softUpperLimit.defaultValue);
+            if (xLocation > xSoftUpperLimit) xLocation = xSoftUpperLimit;
+
+            float ySoftUpperLimit = float.Parse(PlcControl.tagControl.Yaxis.softUpperLimit.defaultValue);
+            if (yLocation > ySoftUpperLimit) yLocation = ySoftUpperLimit;
+
+            xStopLocation.writeValue = xLocation.ToString();
+            await keyencePlc.WriteTagAsync(xStopLocation);
+            yStopLocation.writeValue = yLocation.ToString();
+            await keyencePlc.WriteTagAsync(yStopLocation);
+            z2StopLocation.writeValue = z2Location.ToString();
+            await keyencePlc.WriteTagAsync(z2StopLocation);
+            // 确认切割参数
+            confirmParams.writeValue = "1";
+            await keyencePlc.WriteTagAsync(confirmParams);
+        }
+
         /// <summary>
         /// 设置返回速度
         /// </summary>

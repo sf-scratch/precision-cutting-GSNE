@@ -126,10 +126,11 @@ namespace 精密切割系统.Model.cut
         /// <summary>
         /// 移动矩形位置
         /// </summary>
-        public void Translate(float offsetX, float offsetY)
+        public DataRectangleF Translate(float offsetX, float offsetY)
         {
             X += offsetX;
             Y += offsetY;
+            return this;
         }
 
         /// <summary>
@@ -153,6 +154,11 @@ namespace 精密切割系统.Model.cut
         public override string ToString()
         {
             return $"Rectangle(Left={Left}, Top={Top}, Right={Right}, Bottom={Bottom}, Width={Width}, Height={Height})";
+        }
+
+        public DataRectangleF Clone()
+        {
+            return new DataRectangleF(X, Y, Width, Height);
         }
     }
 }

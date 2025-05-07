@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ namespace 精密切割系统.FrmWindow.common
     internal class GlobalParams
     {
         // true 在线版本 false 离线版本
-        public static bool onlineFlag = false;
+        public static bool onlineFlag = true;
         // 当前页面是否是首页
         public static bool currentPageIsHome = false;
         // 全局运行参数 如果有参数在运行，则其它按钮不能操作
@@ -108,29 +109,92 @@ namespace 精密切割系统.FrmWindow.common
         public static float thetaCenterLocationY = 0f;
 
 
+        /// <summary>
+        /// 正常步进距离
+        /// </summary>
+        public static readonly float NormalStepDistance = 0.15f;
 
+        /// <summary>
+        /// 跳跃步进距离
+        /// </summary>
+        public static readonly float JumpStepDistance = 0.3f;
 
+        /// <summary>
+        /// 在磨刀几次后检测
+        /// </summary>
+        public static readonly int CheckMarksSharpenTimes = 10;
 
+        /// <summary>
+        /// 单刀磨损量
+        /// </summary>
+        public static readonly float SingleBladeWear = 0.01f;
+
+        /// <summary>
+        /// 刀片抬起高度
+        /// </summary>
+        public static readonly float BladeLiftingHeight = 2f;
+
+        /// <summary>
+        /// 胶片厚度
+        /// </summary>
+        public static readonly float FilmThickness = 0.07f;
+
+        /// <summary>
+        /// 硅片厚度
+        /// </summary>
+        public static readonly float WaferThickness = 0.63f;
+
+        /// <summary>
+        /// 磨刀板厚度
+        /// </summary>
+        public static readonly float SharpeningBoardThickness = 1.029f;
 
         /// <summary>
         /// 工件半径
         /// </summary>
-        public static readonly float WorkpieceRadius  = 30;
+        public static readonly float WorkpieceRadius  = 70;
 
         /// <summary>
         /// 工件中心点到theta轴中心点距离
         /// <summary>
-        public static readonly float CenterDistance = 10;
-
-        /// <summary>
-        /// 磨刀板尺寸
-        /// </summary>
-        public static DataRectangleF SharpenRect = new DataRectangleF(-20, -20, 40, 15);
+        public static readonly float CenterDistance = 0.5f;
 
         /// <summary>
         /// theta轴中心点位置
         /// </summary>
-        public static DataPoint<float> ThetaCenterPoint = new DataPoint<float>(thetaCenterLocationX, thetaCenterLocationY);
+        public static DataPoint<float> ThetaCenterPoint = new DataPoint<float>(144.832f, 74.6f);
+
+        /// <summary>
+        /// 相机相对刀片中心点位置
+        /// </summary>
+        public static DataPoint<float> CameraRelativeBladePosition = new DataPoint<float>(-67.056f, -5.357f);
+
+        /// <summary>
+        /// 相机中心点位置
+        /// </summary>
+        public static DataPoint<float> CameraCenterPoint = new DataPoint<float>(ThetaCenterPoint.X + CameraRelativeBladePosition.X, ThetaCenterPoint.Y + CameraRelativeBladePosition.Y);
+        //public static DataPoint<float> CameraCenterPoint = new DataPoint<float>(78.647f, 71.2f);
+
+        ///// <summary>
+        ///// 相机相对theta轴中心点位置
+        ///// </summary>
+        //public static DataPoint<float> CameraRelativeThetaPosition = new DataPoint<float>(-67.056f, -5.467f);
+        //public static DataPoint<float> CameraRelativeThetaPosition = new DataPoint<float>(-66.185f, -3.4f);
+
+        /// <summary>
+        /// 自动聚焦位置
+        /// </summary>
+        public static DataPoint<float> AutoFocusPoint = new DataPoint<float>(CameraCenterPoint.X, CameraCenterPoint.Y + 30);
+
+        /// <summary>
+        /// 自动聚焦位置Z1
+        /// </summary>
+        public static float AutoFocusStartPositionZ2 = 11.9f;
+
+        /// <summary>
+        /// 磨刀板尺寸
+        /// </summary>
+        public static DataRectangleF SharpenRect = new DataRectangleF(ThetaCenterPoint.X - 35f, ThetaCenterPoint.Y - 72f, 70, 70);
 
         /// <summary>
         /// 切割多少刀后开始磨刀
@@ -141,6 +205,13 @@ namespace 精密切割系统.FrmWindow.common
         /// 磨刀步数
         /// </summary>
         public static readonly int SharpenStepNum = 5;
+
+        /// <summary>
+        /// 非接触测高位置到工作台的z1轴高度
+        /// </summary>
+        //public static readonly float NonContactHeightMeasurementToWorkbenchZ1 = 18.829453f;
+        public static readonly float NonContactHeightMeasurementToWorkbenchZ1 = 19.029453f;
+        //public static readonly float NonContactHeightMeasurementToWorkbenchZ1 = 19.029453f;
 
 
 

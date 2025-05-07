@@ -82,70 +82,80 @@ namespace 精密切割系统.Model.cut
         }
 
         /// <summary>
-        /// 计算水平直线与旋转半圆的交点（线段的起始点在结束点的左侧）
+        /// 计算水平直线与旋转半圆的交点
         /// </summary>
-        /// <param name="center">圆心坐标</param>
-        /// <param name="radius">半径</param>
-        /// <param name="rotationAngle">旋转角度（度）</param>
-        /// <param name="horizontalLineY">水平直线y坐标</param>
-        /// <returns>两个交点，如果没有交点或不相交则返回null</returns>
-        public static LineSegment? CalculateSemicircleIntersectionLine(DataPoint<float> center, float radius, float rotationAngle, float horizontalLineY)
+        /// <param name="pivot">旋转中心点</param>
+        /// <param name="centerOffset">圆心相对于旋转中心的偏移</param>
+        /// <param name="radius">半圆半径</param>
+        /// <param name="rotationAngle">顺时针旋转角度（弧度）</param>
+        /// <param name="y">水平直线的Y坐标</param>
+        /// <returns>交点列表（可能包含0-3个点）</returns>
+        public static LineSegment? CalculateSemicircleIntersectionLine(DataPoint<float> pivot, DataPoint<float> centerOffset, float radius, float rotationAngle, float y)
         {
-            // 转换为弧度
-            float theta = rotationAngle * MathF.PI / 180f;
-            var points = new List<DataPoint<float>>();
-            float cTranslated = horizontalLineY - center.Y; // 平移后的水平直线 y' = c - y0
+            // 1. 计算旋转后的圆心位置
+            DataPoint<float> center = RotatePoint(
+                new DataPoint<float>(pivot.X + centerOffset.X, pivot.Y + centerOffset.Y),
+                pivot,
+                rotationAngle);
 
-            // 预计算三角函数
-            float sinTheta = MathF.Sin(theta);
-            float cosTheta = MathF.Cos(theta);
+            // 2. 计算不考虑旋转时的交点（完整圆）
+            List<DataPoint<float>> intersections = new List<DataPoint<float>>();
+            float dy = y - center.Y;
 
-            // (1) 计算旋转后的半圆部分交点
-            float term1 = 4 * cTranslated * cTranslated * sinTheta * sinTheta;
-            float term2 = 4 * (cTranslated * cTranslated - radius * radius * cosTheta * cosTheta);
-            float delta = term1 - term2;
-
-            if (delta >= 0)
+            if (Math.Abs(dy) <= radius)
             {
-                float sqrtDelta = MathF.Sqrt(delta);
-                float x1 = (2 * cTranslated * sinTheta + sqrtDelta) / 2;
-                float x2 = (2 * cTranslated * sinTheta - sqrtDelta) / 2;
+                // 计算x坐标偏移量
+                float dx = (float)Math.Sqrt(radius * radius - dy * dy);
 
-                foreach (float x in new[] { x1, x2 })
+                // 不考虑旋转时的两个交点（圆上的点）
+                DataPoint<float> p1 = new DataPoint<float>(center.X - dx, y);
+                DataPoint<float> p2 = new DataPoint<float>(center.X + dx, y);
+
+                // 3. 检查这些点是否在半圆内（考虑旋转）
+                foreach (DataPoint<float> p in new[] { p1, p2 })
                 {
-                    if (MathF.Abs(x) <= radius)
+                    if (IsPointInRotatedSemicircle(p, center, pivot, centerOffset, radius, rotationAngle))
                     {
-                        float y = MathF.Sqrt(radius * radius - x * x); // 下半圆 y ≥ 0
-                                                                       // 反向旋转并平移回原坐标系
-                        float xRotated = center.X + x * cosTheta - y * sinTheta;
-                        float yRotated = center.Y + x * sinTheta + y * cosTheta;
-                        points.Add(new DataPoint<float>(xRotated, yRotated));
+                        intersections.Add(p);
                     }
                 }
             }
 
-            // (2) 计算旋转后的直径部分交点
-            if (MathF.Abs(sinTheta) > 1e-6f)
+            // 4. 检查直线与直径的交点
+            // 直径的初始位置是从(center.X - radius, center.Y)到(center.X + radius, center.Y)
+            DataPoint<float> diameterStart = new DataPoint<float>(center.X - radius, center.Y);
+            DataPoint<float> diameterEnd = new DataPoint<float>(center.X + radius, center.Y);
+
+            // 旋转直径端点（圆心已经旋转，直径需要相对于圆心旋转）
+            DataPoint<float> rotatedStart = RotatePointAroundCenter(diameterStart, center, rotationAngle);
+            DataPoint<float> rotatedEnd = RotatePointAroundCenter(diameterEnd, center, rotationAngle);
+
+            // 计算直线与直径的交点
+            if (Math.Abs(rotatedStart.Y - rotatedEnd.Y) > float.Epsilon)
             {
-                float xDiameter = cTranslated / sinTheta;
-                if (MathF.Abs(xDiameter) <= radius)
+                // 直径不再水平，计算交点
+                float t = (y - rotatedStart.Y) / (rotatedEnd.Y - rotatedStart.Y);
+                if (t >= 0 && t <= 1)
                 {
-                    float xRotated = center.X + xDiameter * cosTheta;
-                    float yRotated = center.Y + xDiameter * sinTheta;
-                    points.Add(new DataPoint<float>(xRotated, yRotated));
+                    float x = rotatedStart.X + t * (rotatedEnd.X - rotatedStart.X);
+                    DataPoint<float> diameterIntersection = new DataPoint<float>(x, y);
+
+                    // 检查交点是否在直径线段上
+                    if (IsPointOnDiameter(diameterIntersection, rotatedStart, rotatedEnd))
+                    {
+                        intersections.Add(diameterIntersection);
+                    }
                 }
             }
-            else if (MathF.Abs(cTranslated) < 1e-6f) // 水平直线与直径重合
+            else if (Math.Abs(rotatedStart.Y - y) < float.Epsilon)
             {
-                points.Add(new DataPoint<float>(
-                    center.X + radius * cosTheta,
-                    center.Y + radius * sinTheta
-                ));
-                points.Add(new DataPoint<float>(
-                    center.X - radius * cosTheta,
-                    center.Y - radius * sinTheta
-                ));
+                // 直径与直线重合，添加两个端点
+                intersections.Add(rotatedStart);
+                intersections.Add(rotatedEnd);
             }
+
+            // 5. 去重（考虑浮点误差）
+            List<DataPoint<float>> points = RemoveDuplicatePoints(intersections, 0.0001f);
 
             if (points.Count == 0)
             {
@@ -182,6 +192,88 @@ namespace 精密切割系统.Model.cut
                 }
                 return new LineSegment(p2, p1);
             }
+        }
+
+        /// <summary>
+        /// 点绕圆心旋转（顺时针）
+        /// </summary>
+        private static DataPoint<float> RotatePointAroundCenter(DataPoint<float> point, DataPoint<float> center, float angle)
+        {
+            // 转换为弧度
+            float theta = angle * MathF.PI / 180f;
+            float x = point.X - center.X;
+            float y = point.Y - center.Y;
+
+            // 顺时针旋转矩阵
+            float newX = x * (float)Math.Cos(theta) + y * (float)Math.Sin(theta);
+            float newY = -x * (float)Math.Sin(theta) + y * (float)Math.Cos(theta);
+
+            return new DataPoint<float>(newX + center.X, newY + center.Y);
+        }
+
+        /// <summary>
+        /// 检查点是否在旋转后的半圆内
+        /// </summary>
+        private static bool IsPointInRotatedSemicircle(
+            DataPoint<float> point, DataPoint<float> center, DataPoint<float> pivot,
+            DataPoint<float> centerOffset, float radius, float rotationAngle)
+        {
+            // 转换为弧度
+            float theta = rotationAngle * MathF.PI / 180f;
+            // 将点转换到以圆心为原点的坐标系
+            float localX = point.X - center.X;
+            float localY = point.Y - center.Y;
+
+            // 应用逆时针旋转（相当于将半圆转回初始位置）
+            float unrotatedX = localX * (float)Math.Cos(theta) + localY * (float)Math.Sin(theta);
+            float unrotatedY = -localX * (float)Math.Sin(theta) + localY * (float)Math.Cos(theta);
+
+            // 在半圆的局部坐标系中，初始半圆是下半圆，所以需要 unrotatedY >= 0
+            return unrotatedY >= 0;
+        }
+
+        /// <summary>
+        /// 检查点是否在直径线段上
+        /// </summary>
+        private static bool IsPointOnDiameter(DataPoint<float> point, DataPoint<float> start, DataPoint<float> end)
+        {
+            // 检查点是否在线段的包围盒内
+            float minX = Math.Min(start.X, end.X);
+            float maxX = Math.Max(start.X, end.X);
+            float minY = Math.Min(start.Y, end.Y);
+            float maxY = Math.Max(start.Y, end.Y);
+
+            return point.X >= minX && point.X <= maxX &&
+                   point.Y >= minY && point.Y <= maxY;
+        }
+
+        /// <summary>
+        /// 去除重复点（考虑浮点误差）
+        /// </summary>
+        private static List<DataPoint<float>> RemoveDuplicatePoints(List<DataPoint<float>> points, float epsilon)
+        {
+            List<DataPoint<float>> result = new List<DataPoint<float>>();
+
+            foreach (DataPoint<float> p in points)
+            {
+                bool isDuplicate = false;
+                foreach (DataPoint<float> existing in result)
+                {
+                    if (Math.Abs(p.X - existing.X) < epsilon &&
+                        Math.Abs(p.Y - existing.Y) < epsilon)
+                    {
+                        isDuplicate = true;
+                        break;
+                    }
+                }
+
+                if (!isDuplicate)
+                {
+                    result.Add(p);
+                }
+            }
+
+            return result;
         }
 
         public static Tuple<DataPoint<float>, DataPoint<float>> GetSameHorizontalLine(DataPoint<float> point1, DataPoint<float> point2, DataPoint<float> point3)

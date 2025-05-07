@@ -39,6 +39,8 @@ using 精密切割系统.Model.logs;
 using static SQLite.SQLite3;
 using NPOI.OpenXmlFormats.Dml.Diagram;
 using 精密切割系统.Model.plc;
+using 精密切割系统.View.Pages.Auto;
+using 精密切割系统.Model.cut;
 
 namespace 精密切割系统
 {
@@ -62,6 +64,14 @@ namespace 精密切割系统
             Application.Current.Dispatcher.Invoke(() =>
             {
                 mainFrame.Navigate(new Uri($"View/{pageName}.xaml" + (string.IsNullOrEmpty(paramsStr) ? "" : "?" + paramsStr), UriKind.Relative));
+            });
+        }
+
+        public void NavigateToPage(string pageName, object paramsStr)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                mainFrame.Navigate(new Uri($"View/{pageName}.xaml", UriKind.Relative), paramsStr);
             });
         }
 
@@ -127,8 +137,6 @@ namespace 精密切割系统
                     new RunLogsViewModel("结果", "初始化成功！")
                 });
         }
-
-        
 
         private void ShortcutDirectBtn_TouchUp(object? sender, TouchEventArgs e)
         {
@@ -204,8 +212,8 @@ namespace 精密切割系统
                             Thread.Sleep(2000);
                         }
                     }
-                    if (PlcControl.connectionStatus && CameraUtils.m_bDeviceOpened && CameraUtils.l_lightConnectStatus)
-                    // if (PlcControl.connectionStatus)
+                    // if (PlcControl.connectionStatus && CameraUtils.m_bDeviceOpened && CameraUtils.l_lightConnectStatus)
+                    if (PlcControl.connectionStatus)
                     {
                         MaterialSnackUtils.MaterialSnack("设备加载完成！", MaterialSnackUtils.SnackType.SUCCESS, 0);
                         break;

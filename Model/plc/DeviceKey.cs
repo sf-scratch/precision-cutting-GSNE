@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using 精密切割系统.Driver;
+using 精密切割系统.FrmWindow.common;
+using 精密切割系统.ViewModel;
 
 namespace 精密切割系统.Model.plc
 {
-    internal class DeviceKey
+    internal static class DeviceKey
     {
 
         // θ轴名称
@@ -114,6 +117,8 @@ namespace 精密切割系统.Model.plc
         public static string thetaHighSpeedKey = "Theta轴高速运动";
 
         public static string initReplaceLocationKey = "进入换刀画面";
+        public static string NoContactHeightMeasurementKey = "是否开启非接触测高";
+        public static string HeightMeasurementCompletedKey = "测高完成";
         public static string xReplaceLocationKey = "x轴刀片换刀位置";
         public static string bladeMantanceStatusKey = "刀片维护准备OK";
         public static string yReplaceLocationKey = "Y轴刀片换刀位置";
@@ -175,6 +180,7 @@ namespace 精密切割系统.Model.plc
         public static string cutDirectionAfterKey = "切割方向-后切";
         public static string cutStartKey = "切割开始";
         public static string cutStopKey = "切割停止";
+        public static string CutStopCompletedKey = "切割停止完成";
         public static string fullAutoCutEndKey = "自动切割结束";
         public static string alignmentStatusKey = "自动校准开始";
         public static string xStartPositionKey = "X轴切割开始位置";

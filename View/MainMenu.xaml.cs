@@ -35,6 +35,9 @@ using 精密切割系统.Model.plc;
 using 精密切割系统.ViewModel;
 using 精密切割系统.database.db.modle;
 using System.Reflection.PortableExecutable;
+using 精密切割系统.Model.cut;
+using 精密切割系统.View.Pages.Auto;
+using 精密切割系统.View.Pages.F4_BladeMaintenance;
 
 namespace 精密切割系统.View
 {
@@ -86,8 +89,8 @@ namespace 精密切割系统.View
             }
 
             _ = initUserDefine();
-
         }
+
         //初始化右侧按键等
         private void InitRightPage(MenuItem item)
         {
@@ -373,30 +376,8 @@ namespace 精密切割系统.View
                     // 刀片更换
                     if (CommonCheck.MlignStatusCheck())
                     {
-                        // 新发送PLC进入模式，当模式进入成功后，跳转页面
-                        // 进入刀片更换模式
                         MaterialSnackUtils.MaterialSnack("进入刀片更换模式中...", SnackType.WARNING, 0);
-                        MenuButton menu = sender as MenuButton;
-                        menu.resetState = false;
-                        // 进入换刀模式
-                        PlcControl.tagControl.bladeMantance.RunBladeReplace(1);
-                        GlobalParams.globalRunFlag = true;
-                        // 监听状态，如果模式准备完成，则跳转页面
-                        Task.Run(() =>
-                        {
-                            bool flag = Tools.WaitForValue(DeviceKey.bladeMantanceStatusKey, 1);
-                            GlobalParams.globalRunFlag = false;
-                            if (flag)
-                            {
-                                mainWindow.NavigateToPage(bean.PageUrl);
-                            }
-                            else
-                            {
-                                menu.resetState = true;
-                                PlcControl.tagControl.bladeMantance.RunBladeReplace(0);
-                                MaterialSnackUtils.MaterialSnack("进入刀片更换失败！", SnackType.WARNING, 0);
-                            }
-                        });
+                        mainWindow.NavigateToPage(bean.PageUrl);
                     }
                     break;
                 case 402:

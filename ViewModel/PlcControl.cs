@@ -333,8 +333,8 @@ namespace 精密切割系统.ViewModel
                 string dm1010 = PlcControl.plc.GetPlcValueStringByAddr("DM1010", PlcDataType.Int16);
                 if (!"0".Equals(dm1010) && (currentDeviceAlarmItem == null || !dm1000.Equals(currentDeviceAlarmItem.code)))
                 {
-                    currentDeviceAlarmItem.code = dm1010;
                     currentDeviceAlarmItem = new AlarmItem();
+                    currentDeviceAlarmItem.code = dm1010;
                     currentDeviceAlarmItem.title = currentDeviceAlarmItem.axisAlarm[dm1010];
                     currentDeviceAlarmItem.startTime = DateTime.Now.ToString(formatStr);
                     Debug.WriteLine($"dm1010:{dm1010}");

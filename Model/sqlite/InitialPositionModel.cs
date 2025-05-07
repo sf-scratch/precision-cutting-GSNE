@@ -28,6 +28,20 @@ namespace 精密切割系统.database.db.modle
         [Column("bladeSetupInitZ2")]//z2轴初始位置
         public string BladeSetupInitZ2 { get; set; } = "20.000";
 
+
+        // 非接触测高位置
+        [Column("noContactBladeSetupInitX")]//x轴初始位置
+        public string NoContactBladeSetupInitX { get; set; } = "153.000";
+
+        [Column("noContactBladeSetupInitY")]//x轴初始位置
+        public string NoContactBladeSetupInitY { get; set; } = "120.000";
+
+        [Column("noContactBladeSetupInitZ1")]//z1轴初始位置
+        public string NoContactBladeSetupInitZ1 { get; set; } = "30.000";
+
+        [Column("noContactBladeSetupInitZ2")]//z2轴初始位置
+        public string NoContactBladeSetupInitZ2 { get; set; } = "20.000";
+
         // 电火花修刀位置
 
         // 校准位置

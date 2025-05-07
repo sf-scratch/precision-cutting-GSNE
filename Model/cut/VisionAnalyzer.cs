@@ -72,6 +72,30 @@ namespace 精密切割系统.Model.cut
                 image?.Dispose();
             }
         }
+
+        public static (double bladeWidthMm, double collapseWidthMm) ProcessImage(Mat image, double pixelToMmRatio = 1.0)
+        {
+            try
+            {
+                if (image.Empty())
+                    throw new Exception($"无法读取图像文件");
+
+                int imageWidth = image.Cols;
+                var result = VisualizeResults(image, GetContourData(image), imageWidth, pixelToMmRatio);
+                Debug.WriteLine($"图像处理完成 - 刀痕宽度: {result.Item1}mm, 崩边宽度: {result.Item2}mm");
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"图像处理失败: {ex.Message}");
+                throw;
+            }
+            finally
+            {
+                //image?.Dispose();
+            }
+        }
+
         /// <summary>
         /// 获取图片有效轮廓
         /// </summary>

@@ -143,6 +143,7 @@ namespace 精密切割系统.View.Controls
 
         private void onClick(Boolean isOK)
         {
+            RaiseRightClickedEvent();
             if (!CommonCheck.CheckAlarmStatus() && !GlobalRunOperateFlag)
             {
                 MaterialSnackUtils.MaterialSnack("请先解除报警！", MaterialSnackUtils.SnackType.WARNING, 5);
@@ -153,14 +154,12 @@ namespace 精密切割系统.View.Controls
                 MaterialSnackUtils.MaterialSnack("请先进行初始化！", MaterialSnackUtils.SnackType.WARNING, 5);
                 return;
             }
-            bool ignoreFlag = false;
             // 判断是否有在进行中的操作，如果有，则不执行点击事件
             if (GlobalParams.globalRunFlag && !GlobalRunOperateFlag)
             {
                 // MaterialSnackUtils.MaterialSnack("操作进行中！", MaterialSnackUtils.SnackType.WARNING, 5);
                 return;
             }
-
             //保证下面的按钮控件页面回去的时候不在软键盘上
             OperatePage operatePage = mainWindow.operateFrame.Content as OperatePage;
             if (operatePage==null)
@@ -203,6 +202,26 @@ namespace 精密切割系统.View.Controls
             btnBorder.Background = BackgroundDefColor;
         }
 
-       
+        // 在自定义控件（RightButton）中定义路由事件
+        public static readonly RoutedEvent RightClickedEvent =
+            EventManager.RegisterRoutedEvent(
+                "RightClicked",
+                RoutingStrategy.Bubble,  // 使用冒泡路由
+                typeof(RoutedEventHandler),
+                typeof(RightButton));
+
+        // 提供CLR事件包装器
+        public event RoutedEventHandler RightButtonClicked
+        {
+            add { AddHandler(RightClickedEvent, value); }
+            remove { RemoveHandler(RightClickedEvent, value); }
+        }
+
+        // 触发事件的方法
+        private void RaiseRightClickedEvent()
+        {
+            RoutedEventArgs args = new RoutedEventArgs(RightClickedEvent);
+            RaiseEvent(args);
+        }
     }
 }

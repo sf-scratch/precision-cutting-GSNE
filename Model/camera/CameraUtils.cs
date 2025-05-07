@@ -59,6 +59,7 @@ namespace 精密切割系统.Driver
         static bool matImgFlag = false;
         static Mutex mutex = new Mutex();
 
+
         public static void connectDevice()
         {
             // 查找相机
@@ -655,6 +656,11 @@ namespace 精密切割系统.Driver
                 errorMessage = "Set Gain failed";
             }
 
+        }
+
+        public static string GetLunguId()
+        {
+            return "T24111102B0006";
         }
     }
 }

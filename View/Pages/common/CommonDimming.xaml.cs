@@ -97,12 +97,12 @@ namespace 精密切割系统.View.Pages.common
 
         private void SubOne_OnClick(object sender, RoutedEventArgs e)
         {
-            AdjustIntensity(-0.01m, CameraUtils.currentCameraIndex);
+            AdjustIntensity(-0.0025m, CameraUtils.currentCameraIndex);
         }
 
         private void AddOne_OnClick(object sender, RoutedEventArgs e)
         {
-            AdjustIntensity(0.01m, CameraUtils.currentCameraIndex);
+            AdjustIntensity(0.0025m, CameraUtils.currentCameraIndex);
         }
 
         private void AddFive_OnClick(object sender, RoutedEventArgs e)

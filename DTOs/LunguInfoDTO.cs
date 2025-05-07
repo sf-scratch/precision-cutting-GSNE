@@ -7,18 +7,12 @@ using System.Threading.Tasks;
 
 namespace 精密切割系统.DTOs
 {
-    internal class LunguInfoDTO
+    public class LunguInfoDTO
     {
         /// <summary>
-        /// AB平均厚度
+        /// 刀片类型
         /// </summary>
-        [JsonProperty("abhdpj")]
-        public double ABAverageThickness { get; set; }
-
-        /// <summary>
-        /// 最长刀刃
-        /// </summary>
-        [JsonProperty("zcskdrcd")]
-        public double LongestBlade { get; set; }
+        [JsonProperty("finishType")]
+        public string BladeType { get; set; }
     }
 }

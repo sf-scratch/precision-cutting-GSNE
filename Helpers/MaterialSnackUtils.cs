@@ -68,6 +68,7 @@ namespace 精密切割系统.Helpers
                         headerPage.messgesBorder.Background = new SolidColorBrush(Color.FromArgb(8, 255, 69, 69));
                         headerPage.messgesBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(255, 69, 69));
                         headerPage.messgeLabel.Foreground = new SolidColorBrush(Color.FromRgb(255, 69, 69));
+                        Tools.LogWarning(msg);
                         break;
                     case SnackType.INFO:
                         headerPage.messgesBorder.Background = new SolidColorBrush(Color.FromArgb(8, 163, 163, 163));

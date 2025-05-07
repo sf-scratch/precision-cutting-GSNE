@@ -1,10 +1,13 @@
-﻿using System.Diagnostics;
+﻿using OpenCvSharp;
+using OpenCvSharp.WpfExtensions;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using 精密切割系统.Assets.config.buttom;
 using 精密切割系统.Driver;
 using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
+using 精密切割系统.Model.cut;
 using 精密切割系统.Model.plc;
 using 精密切割系统.Utils;
 using 精密切割系统.View.page.right;
@@ -462,6 +465,20 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             // 关闭插补
             PlcControl.tagControl.wholeDevice.SetInterpositionStatus(0);
             axisRealTimeFlag = false;
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Mat mat = cameraCommon.localBitmap.ToMat();
+            // 保存Mat到本地文件
+            bool success = Cv2.ImWrite($"C:\\Users\\17632\\Desktop\\image\\{DateTime.Now.Ticks}_mat.jpg", mat);
+            Mat cropMat = AutoCutUtils.CropHorizontalCenter(mat, (int)(mat.Height * 0.05));
+            // 保存Mat到本地文件
+            bool success2 = Cv2.ImWrite($"C:\\Users\\17632\\Desktop\\image\\{DateTime.Now.Ticks}_cropMat.jpg", cropMat);
+            Mat cropMatJpg = AutoCutUtils.JpegStreamToMat(AutoCutUtils.MatToJpegStream(cropMat));
+            // 保存Mat到本地文件
+            bool success3 = Cv2.ImWrite($"C:\\Users\\17632\\Desktop\\image\\{DateTime.Now.Ticks}_cropMatJpg.jpg", cropMatJpg);
+            var (bladeWidthMm, collapseWidthMm) = VisionAnalyzer.ProcessImage(cropMatJpg);
         }
     }
 }

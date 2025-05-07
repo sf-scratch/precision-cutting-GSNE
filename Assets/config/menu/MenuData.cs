@@ -73,7 +73,7 @@ namespace 精密切割系统.Assets.config.menu
         public static List<MenuBean> GetF4MenuList()
         {
             var list = new List<MenuBean>();
-            list.Add(new MenuBean(401, "刀片更换", "/Assets/icon/menu_4/menu_4_1.png", "/Assets/icon/menu_4/menu_4_1_white.png",3, "Pages/F4_BladeMaintenance/BMBladeReplacementConf"));
+            list.Add(new MenuBean(401, "刀片更换", "/Assets/icon/menu_4/menu_4_1.png", "/Assets/icon/menu_4/menu_4_1_white.png",3, "Pages/F4_BladeMaintenance/BladeReplacementConfiguration"));
             list.Add(new MenuBean(402, "刀片测高", "/Assets/icon/menu_4/menu_4_2.png", "/Assets/icon/menu_4/menu_4_2_white.png",3, "Pages/F4_BladeMaintenance/BmContactSetupConf"));
             // list.Add(new MenuBean(403, "刀片配置参数", "/Assets/icon/menu_4/menu_4_3.png", "/Assets/icon/menu_4/menu_4_3_white.png"));
             // list.Add(new MenuBean(404, "刀片对齐", "/Assets/icon/menu_4/menu_4_4.png", "/Assets/icon/menu_4/menu_4_4_white.png"));

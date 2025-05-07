@@ -568,7 +568,7 @@ namespace 精密切割系统.Driver
                     return false;
                 }
                 // 设置/计算切割相关参数
-                float xOffset = 25f;
+                float xOffset = 10f;
                 float avgWorkbenchCh1 = workbenchCh1 / 2;
 
                 // Z轴开始位置 = Z轴下降位置 - 2
@@ -1086,6 +1086,7 @@ namespace 精密切割系统.Driver
             string runValue = PlcControl.plc.GetPlcValueString(DeviceKey.cutStatusKey);
             return "True".Equals(runValue);
         }
+
         // 监听切割状态
         public static bool MonitorCutStatus()
         {
