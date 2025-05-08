@@ -13,6 +13,7 @@ namespace 精密切割系统.FrmWindow.common
     {
         // true 在线版本 false 离线版本
         public static bool onlineFlag = true;
+        public static readonly bool OnlineMES = false;
         // 当前页面是否是首页
         public static bool currentPageIsHome = false;
         // 全局运行参数 如果有参数在运行，则其它按钮不能操作
@@ -213,6 +214,16 @@ namespace 精密切割系统.FrmWindow.common
         public static readonly float NonContactHeightMeasurementToWorkbenchZ1 = 19.029453f;
         //public static readonly float NonContactHeightMeasurementToWorkbenchZ1 = 19.029453f;
 
+        // x轴默认速度
+        public const float XDefaultSpeed = 10;
+        // y轴默认速度
+        public const float YDefaultSpeed = 10;
+        // z1轴默认速度
+        public const float Z1DefaultSpeed = 10;
+        // z2相机轴默认速度
+        public const float Z2DefaultSpeed = 2;
+        // thetaθ轴默认速度
+        public const float ThetaDefaultSpeed = 20;
 
 
 

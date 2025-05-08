@@ -11,15 +11,15 @@ using 精密切割系统.View.common;
 
 namespace 精密切割系统.ViewModel
 {
-    public class RightPageViewModel : INotifyPropertyChanged
+    public class OperatePageViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public ObservableCollection<RightButtonParams> RightButtonParams { get; set; }
 
-        public RightPageViewModel()
+        public OperatePageViewModel()
         {
-            RightButtonParams = WindowLayout.RightPageButtons;
+            RightButtonParams = WindowLayout.OperatePageButtons;
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)

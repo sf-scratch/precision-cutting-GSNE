@@ -53,10 +53,9 @@ namespace 精密切割系统.View.Controls
                 operateBorder.PreviewMouseDown += OperateBorder_MouseDown;
                 operateBorder.PreviewMouseUp += OperateBorder_MouseUp;
             }
-
         }
 
-     
+
 
 
 

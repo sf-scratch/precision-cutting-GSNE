@@ -114,7 +114,7 @@ namespace 精密切割系统.Model.cut
         {
             if (_thetaDegQueue.Count == 0)
             {
-                InitThetaDegQueue(cutCalibratTheta);
+                InitThetaDegQueue();
             }
             try
             {
@@ -137,19 +137,17 @@ namespace 精密切割系统.Model.cut
                             //计算工件圆心坐标
                             DataPoint<float> workpieceCenterPoint = new DataPoint<float>(_thetaCenterPoint.X, _thetaCenterPoint.Y + _centerDistance);
                             // 该theta角度第一次切割，切割半圆最下边切为起始位置
-                            _recordCutY = GeometryUtils.FindBottomTangentY(_thetaCenterPoint, workpieceCenterPoint, _workpieceRadius, _thetaDegQueue.Peek()) - 15;
+                            _recordCutY = GeometryUtils.FindBottomTangentY(_thetaCenterPoint, workpieceCenterPoint, _workpieceRadius, _thetaDegQueue.Peek() + cutCalibratTheta) - 40;
                             _isRotateTheta = false;
                         }
                         float cutSize = GetCutSize();
                         if (!CheckCutDistance(_workpieceRadius, cutSize))
                         {
-                            //临时使用，90度时防止切到磨刀板
-                            margin = 0;
                             _thetaDegQueue.Dequeue();
                             if (_thetaDegQueue.Count == 0)
                             {
                                 ChangeWorkpiece();
-                                InitThetaDegQueue(cutCalibratTheta);
+                                InitThetaDegQueue();
                             }
                             _isRotateTheta = true;
                             _isNewestCut = true;
@@ -157,7 +155,7 @@ namespace 精密切割系统.Model.cut
                             continue;
                         }
                         _recordCutY = AutoCutUtils.CalculateCutY(_recordCutY, cutSize, _cutDirection);
-                        LineSegment? line = AutoCutUtils.CalculateSemicircleCuttingLine(_thetaCenterPoint, _thetaDegQueue.Peek(), _workpieceRadius, _centerDistance, _recordCutY);
+                        LineSegment? line = AutoCutUtils.CalculateSemicircleCuttingLine(_thetaCenterPoint, _thetaDegQueue.Peek() + cutCalibratTheta, _workpieceRadius, _centerDistance, _recordCutY);
                         if (line == null)
                         {
                             Tools.LogDebug("获取切割线失败！");
@@ -185,10 +183,9 @@ namespace 精密切割系统.Model.cut
                         CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, needCutTimes, _totalCutTimes));
 
                         //加上边距
-                        float startX = line.StartPoint.X - margin;
-                        float endX = line.EndPoint.X + margin;
+                        var (startX, endX) = CalculateCuttingX(line, _thetaDegQueue.Peek(), margin);
                         //设置切割参数
-                        await PlcControl.tagControl.cutting.SetCutParamsAsync(cutSpeed, endZ, startZ, startX, endX, line.StartPoint.Y, "0", _thetaDegQueue.Peek(), spindleRev, _cutDirection);
+                        await PlcControl.tagControl.cutting.SetCutParamsAsync(cutSpeed, endZ, startZ, startX, endX, line.StartPoint.Y, "0", _thetaDegQueue.Peek() + cutCalibratTheta, spindleRev, _cutDirection);
                         //设置停止位置
                         await PlcControl.tagControl.cutting.SetStopLocationAsync(line.EndPoint.X + _cameraRelativeBladePosition.X, line.StartPoint.Y + _cameraRelativeBladePosition.Y, focusClearZ2);
                         //开始切割信号
@@ -204,9 +201,6 @@ namespace 精密切割系统.Model.cut
                         //判断是否开始检查刀痕
                         if (_totalCutTimes % GlobalParams.CheckMarksSharpenTimes == 0)
                         {
-                            //await HttpUtils.SendSharpenDataToMES();
-                            //MaterialSnackUtils.MaterialSnack("上传MES中...", MaterialSnackUtils.SnackType.WARNING, 0);
-                            //await Task.Delay(1000);
                             MaterialSnackUtils.MaterialSnack("检查刀痕中...", MaterialSnackUtils.SnackType.WARNING, 0);
                             try
                             {
@@ -277,11 +271,11 @@ namespace 精密切割系统.Model.cut
             Init();
         }
 
-        private void InitThetaDegQueue(float cutCalibratTheta)
+        private void InitThetaDegQueue()
         {
             _thetaDegQueue.Clear();
-            //_thetaDegQueue.Enqueue(cutCalibratTheta);
-            _thetaDegQueue.Enqueue(cutCalibratTheta + 90);
+            _thetaDegQueue.Enqueue(0);
+            _thetaDegQueue.Enqueue(90);
         }
 
         private bool CheckCutDistance(float workpieceRadius, float cutSize)
@@ -335,6 +329,18 @@ namespace 精密切割系统.Model.cut
         {
             //换磨刀板
             Tools.LogDebug("提示换工件");
+        }
+
+        private (float startX, float endX) CalculateCuttingX(LineSegment line, float theta, float margin)
+        {
+            float startX = line.StartPoint.X - margin;
+            float endX = line.EndPoint.X + margin;
+            //90度切割时，X轴结束位置不加上边距，防止切到磨刀板
+            if (theta == 90)
+            {
+                endX = line.EndPoint.X;
+            }
+            return (startX, endX);
         }
     }
 

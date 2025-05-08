@@ -27,7 +27,7 @@ namespace 精密切割系统.Model.cut
     {
         // 常量定义
         /// <summary>轮廓面积阈值，用于过滤小面积噪点</summary>
-        const int THRESHOLD_AREA = 1000;
+        const int THRESHOLD_AREA = 5000;
         /// <summary>边界偏移量，用于去除边缘干扰</summary>
         const int BORDER_OFFSET = 10;
 
@@ -41,7 +41,7 @@ namespace 精密切割系统.Model.cut
         /// <exception cref="ArgumentException">当像素比例小于等于0时抛出</exception>
         /// <exception cref="FileNotFoundException">当图像文件不存在时抛出</exception>
         /// <exception cref="Exception">当图像无法读取时抛出</exception>
-        public static (double bladeWidthMm, double collapseWidthMm) ProcessImage(string imagePath, double pixelToMmRatio = 1.0)
+        public static (double bladeWidthMm, double collapseWidthMm) ProcessImage(string imagePath, double pixelToMmRatio = 0.00074)
         {
             if (string.IsNullOrEmpty(imagePath))
                 throw new ArgumentNullException(nameof(imagePath), "图像路径不能为空");
@@ -73,13 +73,12 @@ namespace 精密切割系统.Model.cut
             }
         }
 
-        public static (double bladeWidthMm, double collapseWidthMm) ProcessImage(Mat image, double pixelToMmRatio = 1.0)
+        public static (double bladeWidthMm, double collapseWidthMm) ProcessImage(Mat image, double pixelToMmRatio = 0.00074)
         {
             try
             {
                 if (image.Empty())
                     throw new Exception($"无法读取图像文件");
-
                 int imageWidth = image.Cols;
                 var result = VisualizeResults(image, GetContourData(image), imageWidth, pixelToMmRatio);
                 Debug.WriteLine($"图像处理完成 - 刀痕宽度: {result.Item1}mm, 崩边宽度: {result.Item2}mm");

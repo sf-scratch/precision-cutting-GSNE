@@ -19,6 +19,7 @@ using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.plc;
 using 精密切割系统.Utils;
+using 精密切割系统.View.common;
 using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.common;
 using 精密切割系统.View.Pages.F4_BladeMaintenance;
@@ -58,7 +59,7 @@ namespace 精密切割系统.View.Pages.Auto
             }
             mainWindow = Application.Current.MainWindow as MainWindow;
             NavigateUtils.ClearRightPage(); 
-            updateDefineDataModel();
+            //updateDefineDataModel();
         }
 
         private void AutoCutPausing_Navigated(object sender, NavigationEventArgs e)
@@ -71,6 +72,7 @@ namespace 精密切割系统.View.Pages.Auto
             {
                 autoCutRuning.DataContext = autoCutRuningViewModel;
             }
+            WindowLayout.OperatePageButtons.Clear();
         }
 
         //根据默认配置控制对应显示和隐藏

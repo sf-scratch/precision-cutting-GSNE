@@ -45,10 +45,10 @@
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Frame x:Name="headerFrame" Source="View/Pages/Header/HeaderPage.xaml" NavigationUIVisibility="Hidden"/>
-            <!--
+            <!-- 
             <Grid>
                 <TextBox Width="120" Height="30" GotFocus="TextBox_GotFocus" HorizontalAlignment="Left"></TextBox>
-                <TextBox Width="120" Height="30" GotFocus="TextBox_GotFocus" VerticalContentAlignment="Stretch"></TextBox>
+                <TextBox Width="120" Height="30" GotFocus="TextBox_GotFocus" VerticalContentAlignment="Stretch"></TextBox> 
             </Grid>
             -->
         </Grid>

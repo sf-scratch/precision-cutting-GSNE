@@ -6,9 +6,12 @@
       xmlns:local="clr-namespace:精密切割系统.View.Pages.operate" 
       xmlns:controls="clr-namespace:精密切割系统.View.Controls" 
       xmlns:common="clr-namespace:精密切割系统.View.Pages.common"
+      xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
       xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
+      xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
       mc:Ignorable="d" 
       d:DesignHeight="250" d:DesignWidth="1450"
+      d:DataContext="{d:DesignInstance viewModel:OperatePageViewModel, IsDesignTimeCreatable=True}"
       Loaded="Page_Loaded" 
       Title="OperatePage">
     <Page.Resources>
@@ -17,9 +20,19 @@
             <Setter Property="Height" Value="62"></Setter>
             <Setter Property="Margin" Value="5"></Setter>
         </Style>
+        <Style TargetType="Controls:RightButton">
+            <Setter Property="Margin" Value="10,20,0,0" />
+        </Style>
+        <Style TargetType="ListBoxItem">
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
     </Page.Resources>
+    <Page.DataContext>
+        <viewModel:OperatePageViewModel/>
+    </Page.DataContext>
     <Grid>
-        
+
         <Grid x:Name="OperateGrid" Width="1450" Height="250" Margin="15,0,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
@@ -33,7 +46,8 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
         </Grid>
-        <controls:DirectOperate x:Name="commonDirection"  Visibility="Collapsed"></controls:DirectOperate>
+
+        <controls:DirectOperate x:Name="commonDirection"  Visibility="Collapsed"/>
         <!-- <common:CustomKeyboard x:Name="costomKeyboardGrid" Visibility="Collapsed" ></common:CustomKeyboard> -->
         <Grid x:Name="costomKeyboardGrid">
             <Border BorderThickness="1" CornerRadius="10" Background="#DFFCFF" Margin="20,5,0,10">
@@ -158,6 +172,61 @@
                 </Grid>
             </Border>
         </Grid>
+
+        <ListBox Margin="15,0,0,0" Width="1450" Height="250"
+         HorizontalAlignment="Stretch"
+         VerticalAlignment="Stretch"
+         Visibility="Visible"
+         Background="Transparent"
+         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+         ScrollViewer.CanContentScroll="True"
+         VirtualizingPanel.ScrollUnit="Pixel"
+         SelectionMode="Extended"
+         BorderThickness="0"
+         BorderBrush="Transparent"
+         ItemsSource="{Binding RightButtonParams}" d:ItemsSource="{d:SampleData ItemCount=10}">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <ContentPresenter />
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="Transparent"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Controls:RightButton
+                        Width="268"
+                        Height="100"
+                BackFlag="{Binding BackFlag}"
+                BackgroundDefColor="{Binding BackgroundDefColor}"
+                BackgroundDownColor="{Binding BackgroundDownColor}"
+                ContentText="{Binding ContentText}"
+                ImagePath="{Binding ImagePath}"
+                Visibility="{Binding Visibility}">
+                        <behaviors:Interaction.Triggers>
+                            <behaviors:EventTrigger EventName="RightButtonClicked">
+                                <behaviors:InvokeCommandAction Command="{Binding RightClickCommand}"/>
+                            </behaviors:EventTrigger>
+                        </behaviors:Interaction.Triggers>
+                    </Controls:RightButton>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
     </Grid>
-    
+
 </Page>

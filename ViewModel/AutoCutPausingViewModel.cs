@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using 精密切割系统.Assets.config.buttom;
+using 精密切割系统.Driver;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.common;
+using 精密切割系统.View.common;
 
 namespace 精密切割系统.ViewModel
 {
@@ -17,6 +21,11 @@ namespace 精密切割系统.ViewModel
         public RelayCommand ContinueCommand { get; set; }
         public RelayCommand StopCommand { get; set; }
         private AutoCutRuningViewModel _autoCutRuningViewModel;
+
+        // 控制右侧按钮
+        public ObservableCollection<RightButtonParams> RightPageButtonCollection;
+        // 控制底部侧按钮
+        public ObservableCollection<RightButtonParams> OperatePageButtonCollection;
 
         private static int _afterReplaceBladeCutTimes;
         /// <summary>
@@ -131,6 +140,8 @@ namespace 精密切割系统.ViewModel
         public AutoCutPausingViewModel(AutoCutRuningViewModel autoCutRuningViewModel)
         {
             _autoCutRuningViewModel = autoCutRuningViewModel;
+            RightPageButtonCollection = WindowLayout.RightPageButtons;
+            OperatePageButtonCollection = WindowLayout.OperatePageButtons;
             InitRightButton();
             _afterHeightMeasurementZ = autoCutRuningViewModel.AfterHeightMeasurementZ;
             _sharpenBladeHeight = autoCutRuningViewModel.SharpenBladeHeight;
@@ -151,9 +162,29 @@ namespace 精密切割系统.ViewModel
 
         private void InitRightButton()
         {
-            _autoCutRuningViewModel.RightButtonParamsCollection.Clear();
-            _autoCutRuningViewModel.RightButtonParamsCollection.Add(RightButtonParams.GreenRightButton("继续", "/Assets/icon/right/enter.png", ContinueCommandExecute));
-            _autoCutRuningViewModel.RightButtonParamsCollection.Add(RightButtonParams.RedRightButton("停止", "/Assets/icon/right/stop.png", StopCommandExecute));
+            RightPageButtonCollection.Clear();
+            RightPageButtonCollection.Add(RightButtonParams.GreenRightButton("继续", "/Assets/icon/right/enter.png", ContinueCommandExecute));
+            RightPageButtonCollection.Add(RightButtonParams.RedRightButton("停止", "/Assets/icon/right/stop.png", StopCommandExecute));
+        }
+
+        private void InitBottonButton()
+        {
+            OperatePageButtonCollection.Clear();
+            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调窄", "/Assets/icon/tab_1/03/tab_02.png", BaselineNarrowing));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线校准", "/Assets/icon/tab_1/03/tab_08.png", BaselineCalibration));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调宽", "/Assets/icon/tab_1/03/tab_05.png", BaselineWidthAdjustment));
+        }
+
+        private void BaselineWidthAdjustment()
+        {
+        }
+
+        private void BaselineCalibration()
+        {
+        }
+
+        private void BaselineNarrowing()
+        {
         }
 
         private void ContinueCommandExecute()

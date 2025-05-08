@@ -79,6 +79,11 @@ namespace 精密切割系统.Model.common
             return new RightButtonParams(new SolidColorBrush(Color.FromRgb(0xFF, 0xAD, 0x00)), new SolidColorBrush(Color.FromRgb(0xC8, 0xAD, 0x00)), contentText, imagePath, action);
         }
 
+        public static RightButtonParams BlueRightButton(string contentText, string imagePath, Action action)
+        {
+            return new RightButtonParams(new SolidColorBrush(Color.FromRgb(0x50, 0x87, 0xcb)), new SolidColorBrush(Color.FromRgb(0x50, 0x87, 0xcb)), contentText, imagePath, action);
+        }
+
         public static RightButtonParams RedRightButton(string contentText, string imagePath, Action action)
         {
             return new RightButtonParams(Brushes.Red, Brushes.DarkRed, contentText, imagePath, action);

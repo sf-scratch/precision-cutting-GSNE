@@ -119,22 +119,22 @@
                     </Controls:InputTextBox>
                     <TextBlock HorizontalAlignment="Left" Text=""/>
                     <TextBlock Text="订单规格"/>
-                    <Controls:InputTextBox Text="{Binding OrderType}"/>
+                    <Controls:InputTextBox Text="{Binding LunguSks.OrderType}"/>
                     <TextBlock HorizontalAlignment="Left" Text=""/>
                     <TextBlock Text="刀片类型"/>
-                    <Controls:InputTextBox Text="{Binding BladeType}"/>
+                    <Controls:InputTextBox Text="{Binding LunguSks.BladeType}"/>
                     <TextBlock HorizontalAlignment="Left" Text=""/>
                     <TextBlock Text="刀刃规格"/>
-                    <Controls:InputTextBox Text="{Binding BladeEdgeType}"/>
+                    <Controls:InputTextBox Text="{Binding LunguSks.BladeEdgeType}"/>
                     <TextBlock HorizontalAlignment="Left" Text=""/>
                     <TextBlock Text="最长刀刃长度"/>
-                    <Controls:InputTextBox Text="{Binding LongestBlade}"/>
+                    <Controls:InputTextBox Text="{Binding LunguSks.LongestBlade}"/>
                     <TextBlock HorizontalAlignment="Left" Text="um"/>
                     <TextBlock Text="刀刃平均厚度"/>
-                    <Controls:InputTextBox Text="{Binding ABAverageThickness}"/>
+                    <Controls:InputTextBox Text="{Binding LunguSks.ABAverageThickness}"/>
                     <TextBlock HorizontalAlignment="Left" Text="um"/>
                     <TextBlock Text="刀片外径"/>
-                    <Controls:InputTextBox Text="{Binding BladeOuterDiameter}"/>
+                    <Controls:InputTextBox Text="{Binding LunguSks.BladeOuterDiameter}"/>
                     <TextBlock HorizontalAlignment="Left" Text="um"/>
                 </auto:AutoGrid>
             </GroupBox>

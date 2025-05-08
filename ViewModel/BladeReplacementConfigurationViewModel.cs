@@ -20,6 +20,7 @@ using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut;
 using 精密切割系统.Model.sqlite;
 using 精密切割系统.Utils;
+using 精密切割系统.View.common;
 
 namespace 精密切割系统.ViewModel
 {
@@ -32,7 +33,6 @@ namespace 精密切割系统.ViewModel
         // 控制右侧按钮
         private ObservableCollection<RightButtonParams> _rightButtonParams;
 
-        #region 轮毂信息
         private string _lunguId;
         public string LunguId
         {
@@ -40,60 +40,13 @@ namespace 精密切割系统.ViewModel
             set { _lunguId = value; OnPropertyChanged(); }
         }
 
-        private float _abAverageThickness;
-        public float ABAverageThickness
-        {
-            get { return _abAverageThickness; }
-            set { _abAverageThickness = value; OnPropertyChanged(); }
-        }
+        private LunguSksjModel _lunguSks;
 
-        private float _longestBlade;
-        public float LongestBlade
+        public LunguSksjModel LunguSks
         {
-            get { return _longestBlade; }
-            set { _longestBlade = value; OnPropertyChanged(); }
+            get { return _lunguSks; }
+            set { _lunguSks = value; OnPropertyChanged(); }
         }
-
-        private string _bladeType;
-        /// <summary>
-        /// 刀片类型
-        /// </summary>
-        public string BladeType
-        {
-            get { return _bladeType; }
-            set { _bladeType = value; OnPropertyChanged(); }
-        }
-
-        private string _orderType;
-        /// <summary>
-        /// 订单类型
-        /// </summary>
-        public string OrderType
-        {
-            get { return _orderType; }
-            set { _orderType = value; OnPropertyChanged(); }
-        }
-
-        private string _bladeEdgeType;
-        /// <summary>
-        /// 刀刃规格
-        /// </summary>
-        public string BladeEdgeType
-        {
-            get { return _bladeEdgeType; }
-            set { _bladeEdgeType = value; OnPropertyChanged(); }
-        }
-
-        private string _bladeOuterDiameter;
-        /// <summary>
-        /// 刀片外径
-        /// </summary>
-        public string BladeOuterDiameter
-        {
-            get { return _bladeOuterDiameter; }
-            set { _bladeOuterDiameter = value; OnPropertyChanged(); }
-        }
-        #endregion
 
         private SharpenParamsModel _sharpenParams;
         /// <summary>
@@ -118,7 +71,7 @@ namespace 精密切割系统.ViewModel
         public BladeReplacementConfigurationViewModel()
         {
             LunguId = CameraUtils.GetLunguId();
-            _rightButtonParams = RightPageViewModel.RightButtonParams;
+            _rightButtonParams = WindowLayout.RightPageButtons;
             AutoRunCommand = new RelayCommand(AutoRun);
             InitCommand = new RelayCommand<string>(Init);
             InitRightButtonOnlyBack();
@@ -148,20 +101,14 @@ namespace 精密切割系统.ViewModel
             {
                 InitRightButtonOnlyBack();
                 //轮毂信息
-                LunguSksjDTO? lunguSksj = await HttpUtils.GetLunguSksjAsync(lunguId);
-                if (lunguSksj == null)
+                LunguSksjDTO? lunguSksjDTO = await HttpUtils.GetLunguSksjAsync(lunguId);
+                if (lunguSksjDTO == null)
                 {
                     Tools.LogError("轮毂信息获取失败！");
                     MaterialSnackUtils.MaterialSnack("轮毂信息获取失败！", MaterialSnackUtils.SnackType.WARNING);
-                    LunguId = string.Empty;
                     return;
                 }
-                ABAverageThickness = lunguSksj.ABAverageThickness;
-                LongestBlade = lunguSksj.LongestBlade;
-                BladeType = lunguSksj.BladeType;
-                OrderType = lunguSksj.OrderType;
-                BladeEdgeType = lunguSksj.BladeEdgeType;
-                BladeOuterDiameter = lunguSksj.BladeOuterDiameter;
+                LunguSks = MapperConfig.Mapper.Map<LunguSksjModel>(lunguSksjDTO);
 
                 //磨刀参数
                 int bmSharpParamId = 1;
@@ -179,10 +126,10 @@ namespace 精密切割系统.ViewModel
                     RotateSpeed = sharpenParam.RotateSpeed.ToInt(),
                     CutThickness = sharpenParam.CutThickness,
                     CoJiaoHeight = sharpenParam.CoJiaoHeight,
-                    CutHeight = AutoCutUtils.GetSharpenDeep(lunguSksj.BladeType),
+                    CutHeight = AutoCutUtils.GetSharpenDeep(LunguSks.BladeType),
                     CoOffsetX = sharpenParam.CoOffsetX,
                     CutSize = 0.3f,
-                    CutNum = AutoCutUtils.GetNeedSharpenTimes(lunguSksj.LongestBlade / 1000, AutoCutUtils.GetBladeExposedMax(lunguSksj.ABAverageThickness), GlobalParams.SingleBladeWear),
+                    CutNum = AutoCutUtils.GetNeedSharpenTimes(LunguSks.LongestBlade / 1000, AutoCutUtils.GetBladeExposedMax(LunguSks.ABAverageThickness), GlobalParams.SingleBladeWear),
                     CutSpeed1 = 0,
                     CutNum1 = 0,
                     CutSpeed2 = 0,
@@ -210,7 +157,7 @@ namespace 精密切割系统.ViewModel
                 FileTableItemChModel fileTableCh = chModels[0];
                 CutParams = new CutParamsModel
                 {
-                    CutHeight = AutoCutUtils.GetCuttingZ(lunguSksj.BladeType),
+                    CutHeight = AutoCutUtils.GetCuttingZ(LunguSks.BladeType),
                     TapeThickness = fileTable.TapeThickness,
                     SpindleRev = fileTable.SpindleRev,
                     PrecutProcessNo = fileTable.PrecutProcessNo,
@@ -231,7 +178,7 @@ namespace 精密切割系统.ViewModel
 
         private void AutoRun()
         {
-            NavigateUtils.NavigateToPage("Pages/Auto/AutoCutRuning", new Tuple<SharpenParamsModel, CutParamsModel>(SharpenParams, CutParams));
+            NavigateUtils.NavigateToPage("Pages/Auto/AutoCutRuning", new Tuple<SharpenParamsModel, CutParamsModel, string>(SharpenParams, CutParams, LunguId));
         }
 
         private void Back()

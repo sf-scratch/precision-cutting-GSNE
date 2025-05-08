@@ -89,6 +89,8 @@ namespace 精密切割系统
         OperatePage operatePage;
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            var result = VisionAnalyzer.ProcessImage("C:\\Users\\17632\\Desktop\\image\\638821406301167160_cropMatJpgText.jpg");
+            Debug.WriteLine(result);
             string logDirectory = "logs";
             int daysThreshold = 30; // 清理超过 30 天的日志
             TimeSpan interval = TimeSpan.FromDays(1); // 每天触发一次

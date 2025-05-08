@@ -1273,11 +1273,11 @@ namespace 精密切割系统.Driver
     {
         public PlcTags() { }
 
-        public Axis Xaxis { get; set; } = new Axis("X轴");
-        public Axis Yaxis { get; set; } = new Axis("Y轴");
-        public Axis Z1axis { get; set; } = new Axis("Z1轴");
-        public Axis Z2axis { get; set; } = new Axis("Z2轴");
-        public Axis ThetaAxis { get; set; } = new Axis("Theta轴");
+        public Axis Xaxis { get; set; } = new Axis(AxisName.X);
+        public Axis Yaxis { get; set; } = new Axis(AxisName.Y);
+        public Axis Z1axis { get; set; } = new Axis(AxisName.Z1);
+        public Axis Z2axis { get; set; } = new Axis(AxisName.Z2);
+        public Axis ThetaAxis { get; set; } = new Axis(AxisName.Theta);
 
         public BladeMantance bladeMantance { get; set; }
 
@@ -1536,15 +1536,31 @@ namespace 精密切割系统.Driver
             return location;
         }
 
-        public async Task StartAbsoluteAsync(float speed, float location, CancellationToken token)
+        public async Task StartAbsoluteAsync(float location, CancellationToken token = default, float? speed = null)
         {
             axisParamsConfirm.writeValue = "1";
             await keyencePlc.WriteTagAsync(axisParamsConfirm);
             // 设置绝对运动位置
             absoluteLocation.writeValue = location.ToString();
             await keyencePlc.WriteTagAsync(absoluteLocation);
-            // 设置绝对运动速度
-            await SetAbsoluteSpeedAsync(speed);
+            if (speed != null)
+            {
+                // 设置绝对运动速度
+                await SetAbsoluteSpeedAsync(speed.Value);
+            }
+            else
+            {
+                float defaultSpeed = axisName switch
+                {
+                    AxisName.X => GlobalParams.XDefaultSpeed,
+                    AxisName.Y => GlobalParams.YDefaultSpeed,
+                    AxisName.Z1 => GlobalParams.Z1DefaultSpeed,
+                    AxisName.Z2 => GlobalParams.Z2DefaultSpeed,
+                    AxisName.Theta => GlobalParams.ThetaDefaultSpeed,
+                    _ => 1f // 默认值
+                };
+                await SetAbsoluteSpeedAsync(defaultSpeed);
+            }
             // 设置绝对运功开始
             absoluteStart.writeValue = "1";
             await keyencePlc.WriteTagAsync(absoluteStart);
@@ -1664,6 +1680,14 @@ namespace 精密切割系统.Driver
         
     }
 
+    public class AxisName
+    {
+        public const string X = "X轴";
+        public const string Y = "Y轴";
+        public const string Z1 = "Z1轴";
+        public const string Z2 = "Z2轴";
+        public const string Theta = "Theta轴";
+    }
     public class BladeMantance
     {
         public BladeMantance()

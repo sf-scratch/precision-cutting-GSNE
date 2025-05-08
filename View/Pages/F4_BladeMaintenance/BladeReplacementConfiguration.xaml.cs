@@ -18,6 +18,7 @@ using 精密切割系统.Helpers;
 using 精密切割系统.Model.cut;
 using 精密切割系统.Model.plc;
 using 精密切割系统.Utils;
+using 精密切割系统.View.common;
 using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.Auto;
 using 精密切割系统.View.Pages.operate;
@@ -53,9 +54,13 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             {
                 _navService.Navigated -= BladeReplacementConfiguration_Navigated;
             }
-            if (e.TryParse(out AutoCutRuning autoCutRuning, out Tuple<SharpenParamsModel, CutParamsModel> tuple))
+            if (e.TryParse(out AutoCutRuning autoCutRuning, out Tuple<SharpenParamsModel, CutParamsModel, string> tuple))
             {
-                autoCutRuning.DataContext = new AutoCutRuningViewModel(tuple.Item1, tuple.Item2);
+                autoCutRuning.DataContext = new AutoCutRuningViewModel(tuple.Item1, tuple.Item2, tuple.Item3);
+            }
+            else if (e.Content is not AutoCutPausing)
+            {
+                WindowLayout.RightPageButtons.Clear();
             }
         }
     }

@@ -38,11 +38,6 @@ namespace 精密切割系统.Model.cut
             set { _message = value; }
         }
 
-        /// <summary>
-        /// 磨刀数
-        /// </summary>
-        public List<int>? SharpenTimesList { get; set; }
-
         public RunResult(bool isSuccess, RunExceptionType type, string message)
         {
             _isSuccess = isSuccess;
@@ -55,9 +50,9 @@ namespace 精密切割系统.Model.cut
             return new RunResult(false, type, message);
         }
 
-        public static RunResult Success(List<int>? sharpenTimesList = null)
+        public static RunResult Success()
         {
-            return new RunResult(true, RunExceptionType.None, string.Empty) { SharpenTimesList = sharpenTimesList };
+            return new RunResult(true, RunExceptionType.None, string.Empty);
         }
     }
 

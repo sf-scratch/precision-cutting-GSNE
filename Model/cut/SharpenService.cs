@@ -112,7 +112,7 @@ namespace 精密切割系统.Model.cut
             _curSharpenDistance = 0;
         }
 
-        public async Task<RunResult> Run(LunguSksjDTO lunguSksj, float bladeContactWorkingDiscZ1, float bladeLiftingHeight, int spindleRev, float margin, float sharpenCalibratTheta, CancellationToken pauseToken)
+        public async Task<RunResult> Run(LunguSksjDTO lunguSksj, float bladeContactWorkingDiscZ1, float bladeLiftingHeight, int spindleRev, float margin, float sharpenCalibratTheta, int sharpenTimes, CancellationToken pauseToken)
         {
             InitFromAppsettings();
             if (_thetaDegQueue.Count == 0)
@@ -121,7 +121,6 @@ namespace 精密切割系统.Model.cut
                 //保存磨刀参数
                 Appsettings.UpdateAppSettings(Appsettings.ThetaDegQueue, _thetaDegQueue.ToList());
             }
-            List<int> sharpenTimesList = new List<int>();
             try
             {
                 //打开切割水
@@ -134,128 +133,117 @@ namespace 精密切割系统.Model.cut
                 float abAverageThickness = lunguSksj.ABAverageThickness / 1000;
                 float longestBlade = lunguSksj.LongestBlade / 1000;
                 float bladeExposedMax = AutoCutUtils.GetBladeExposedMax(abAverageThickness);
-                bool hasBladeWear = false;
-                do
+                float cutDeep = AutoCutUtils.GetSharpenDeep(lunguSksj.BladeType);
+                int curSharpenTimes = 0;
+                //开始磨刀，磨指定刀数
+                while (curSharpenTimes < sharpenTimes)
                 {
-                    //int needSharpenTimes = AutoCutUtils.GetNeedSharpenTimes(hasBladeWear ? AutoCutUtils.GetCurrentBladeLength() : longestBlade, bladeExposedMax, _singleBladeWear);
-                    int needSharpenTimes = 1;
-                    sharpenTimesList.Add(needSharpenTimes);
-                    float cutDeep = AutoCutUtils.GetSharpenDeep(lunguSksj.BladeType);
-                    int sharpenTime = 0;
-                    //开始磨刀，磨指定刀数
-                    while (sharpenTime < needSharpenTimes)
+                    try
                     {
-                        try
+                        if (_isRotateTheta)
                         {
-                            if (_isRotateTheta)
+                            // 该theta角度第一次切割，切割矩形最下边切为起始位置
+                            _recordSharpenY = GeometryUtils.FindBottomTangentY(_thetaCenterPoint, _sharpenRect, _thetaDegQueue.Peek());
+                            _isRotateTheta = false;
+                        }
+                        float cutSize = GetCutSize();
+                        if (!CheckSharpenDistance(_sharpenRect, cutSize))
+                        {
+                            _thetaDegQueue.Dequeue();
+                            if (_thetaDegQueue.Count == 0)
                             {
-                                // 该theta角度第一次切割，切割矩形最下边切为起始位置
-                                _recordSharpenY = GeometryUtils.FindBottomTangentY(_thetaCenterPoint, _sharpenRect, _thetaDegQueue.Peek());
-                                _isRotateTheta = false;
-                            }
-                            float cutSize = GetCutSize();
-                            if (!CheckSharpenDistance(_sharpenRect, cutSize))
-                            {
-                                _thetaDegQueue.Dequeue();
-                                if (_thetaDegQueue.Count == 0)
-                                {
-                                    RemindReplaceSharpenBoard?.Invoke();
-                                    //清空记录
-                                    Appsettings.UpdateAppSettingsToNull(Appsettings.RecordSharpenY);
-                                    Appsettings.UpdateAppSettingsToNull(Appsettings.ThetaDegQueue);
-                                    InitThetaDegQueue(sharpenCalibratTheta);
-                                }
-                                //保存磨刀参数
-                                Appsettings.UpdateAppSettings(Appsettings.ThetaDegQueue, _thetaDegQueue.ToList());
-                                _isRotateTheta = true;
-                                _isNewestSharpen = true;
-                                _curSharpenDistance = 0;
-                                continue;
+                                RemindReplaceSharpenBoard?.Invoke();
+                                //清空记录
+                                Appsettings.UpdateAppSettingsToNull(Appsettings.RecordSharpenY);
+                                Appsettings.UpdateAppSettingsToNull(Appsettings.ThetaDegQueue);
+                                InitThetaDegQueue(sharpenCalibratTheta);
                             }
                             //保存磨刀参数
-                            Appsettings.UpdateAppSettings(Appsettings.RecordSharpenY, _recordSharpenY);
-                            _recordSharpenY = AutoCutUtils.CalculateCutY(_recordSharpenY, cutSize, _cutDirection);
-                            LineSegment? line = AutoCutUtils.CalculateRectangleCuttingLine(_thetaCenterPoint, _sharpenRect, _thetaDegQueue.Peek(), _recordSharpenY, margin);
-                            if (line == null)
-                            {
-                                Tools.LogDebug("获取磨刀线失败！");
-                                return RunResult.Fail(RunExceptionType.Other, "获取磨刀线失败！");
-                            }
-                            //当前磨刀次数
-                            int? curCutNum = await PlcControl.tagControl.cutting.GetCutNum();
-                            if (curCutNum == null)
-                            {
-                                return RunResult.Fail(RunExceptionType.None, "读取磨刀次数失败！");
-                            }
-                            float endZ = bladeContactWorkingDiscZ1 - GlobalParams.SharpeningBoardThickness - GlobalParams.FilmThickness + cutDeep;
-                            float startZ = endZ - bladeLiftingHeight;
-                            float sharpenSpeed = GetCutSpeed(abAverageThickness, _isNewestSharpen);
-                            //检查是否暂停
-                            if (usingPauseToken.IsCancellationRequested)
-                            {
-                                _continueTcs = new TaskCompletionSource<CancellationToken?>();
-                                CancellationToken? token = await _continueTcs.Task;
-                                if (token == null)
-                                {
-                                    return RunResult.Fail(RunExceptionType.Stop, "停止磨刀");
-                                }
-                                usingPauseToken = token.Value;
-                            }
-                            //var invocationCount = SharpenServiceProcessChanged?.GetInvocationList().Length ?? 0;
-                            //触发磨刀进度更新事件
-                            SharpenServiceProcessChanged?.Invoke(new SharpenServiceProcess(endZ, sharpenSpeed, sharpenTimesList.Sum(), _totalSharpenTimes));
-                            //设置磨刀参数
-                            await PlcControl.tagControl.cutting.SetCutParamsAsync(sharpenSpeed, endZ, startZ, line.StartPoint.X, line.EndPoint.X, line.StartPoint.Y, "0", _thetaDegQueue.Peek(), spindleRev, _cutDirection);
-                            //设置停止位置
-                            await PlcControl.tagControl.cutting.SetStopLocationAsync(line.EndPoint.X, line.StartPoint.Y - GlobalParams.cameraOffsetY, startZ);
-                            //开始磨刀
-                            await PlcControl.tagControl.cutting.StartCutAsync();
-                            //等待磨刀次数变化，表示开始磨刀
-                            await TaskUtils.WaitExpectedResultAsync(async () => 
-                            {
-                                int? cutNum = await PlcControl.tagControl.cutting.GetCutNum();
-                                return cutNum != null && cutNum > curCutNum;
-                            }, usingPauseToken);
-                            //监听Z轴是否上升，等待磨刀完成
-                            await PlcControl.tagControl.Z1axis.WatiNearlyPositionAsync(startZ, usingPauseToken);
-                            _totalSharpenTimes++;
-                            sharpenTime++;
-                            //触发磨刀进度更新事件
-                            SharpenServiceProcessChanged?.Invoke(new SharpenServiceProcess(endZ, sharpenSpeed, sharpenTimesList.Sum(), _totalSharpenTimes, true));
-                            //判断是否开始检查刀痕
-                            //if (_totalSharpenTimes % GlobalParams.CheckMarksSharpenTimes == 0)
-                            //{
-                            //    await HttpUtils.SendSharpenDataToMES();
-                            //    if (!AutoCutUtils.CheckKnifeMarksStatus())
-                            //    {
-                            //        Tools.LogDebug("刀痕不合格！");
-                            //        return RunResult.Fail(RunExceptionType.BladeScrap, "刀痕不合格！");
-                            //    }
-                            //}
+                            Appsettings.UpdateAppSettings(Appsettings.ThetaDegQueue, _thetaDegQueue.ToList());
+                            _isRotateTheta = true;
+                            _isNewestSharpen = true;
+                            _curSharpenDistance = 0;
+                            continue;
                         }
-                        catch (OperationCanceledException)
+                        //保存磨刀参数
+                        Appsettings.UpdateAppSettings(Appsettings.RecordSharpenY, _recordSharpenY);
+                        _recordSharpenY = AutoCutUtils.CalculateCutY(_recordSharpenY, cutSize, _cutDirection);
+                        LineSegment? line = AutoCutUtils.CalculateRectangleCuttingLine(_thetaCenterPoint, _sharpenRect, _thetaDegQueue.Peek(), _recordSharpenY, margin);
+                        if (line == null)
+                        {
+                            Tools.LogDebug("获取磨刀线失败！");
+                            return RunResult.Fail(RunExceptionType.Other, "获取磨刀线失败！");
+                        }
+                        //当前磨刀次数
+                        int? curCutNum = await PlcControl.tagControl.cutting.GetCutNum();
+                        if (curCutNum == null)
+                        {
+                            return RunResult.Fail(RunExceptionType.None, "读取磨刀次数失败！");
+                        }
+                        float endZ = bladeContactWorkingDiscZ1 - GlobalParams.SharpeningBoardThickness - GlobalParams.FilmThickness + cutDeep;
+                        float startZ = endZ - bladeLiftingHeight;
+                        float sharpenSpeed = GetCutSpeed(abAverageThickness, _isNewestSharpen);
+                        //检查是否暂停
+                        if (usingPauseToken.IsCancellationRequested)
                         {
                             _continueTcs = new TaskCompletionSource<CancellationToken?>();
                             CancellationToken? token = await _continueTcs.Task;
-                            // 如果token为null，表示停止磨刀
                             if (token == null)
                             {
                                 return RunResult.Fail(RunExceptionType.Stop, "停止磨刀");
                             }
                             usingPauseToken = token.Value;
                         }
-                        catch (Exception ex)
+                        //var invocationCount = SharpenServiceProcessChanged?.GetInvocationList().Length ?? 0;
+                        //触发磨刀进度更新事件
+                        SharpenServiceProcessChanged?.Invoke(new SharpenServiceProcess(endZ, sharpenSpeed, sharpenTimes, _totalSharpenTimes));
+                        //设置磨刀参数
+                        await PlcControl.tagControl.cutting.SetCutParamsAsync(sharpenSpeed, endZ, startZ, line.StartPoint.X, line.EndPoint.X, line.StartPoint.Y, "0", _thetaDegQueue.Peek(), spindleRev, _cutDirection);
+                        //设置停止位置
+                        await PlcControl.tagControl.cutting.SetStopLocationAsync(line.EndPoint.X, line.StartPoint.Y - GlobalParams.cameraOffsetY, startZ);
+                        //开始磨刀
+                        await PlcControl.tagControl.cutting.StartCutAsync();
+                        //等待磨刀次数变化，表示开始磨刀
+                        await TaskUtils.WaitExpectedResultAsync(async () =>
                         {
-                            Tools.LogDebug($"执行磨刀失败！{ex.Message}");
-                            return RunResult.Fail(RunExceptionType.Other, $"执行磨刀失败！{ex.Message}");
-                        }
-                        _isNewestSharpen = false;
+                            int? cutNum = await PlcControl.tagControl.cutting.GetCutNum();
+                            return cutNum != null && cutNum > curCutNum;
+                        }, usingPauseToken);
+                        //监听Z轴是否上升，等待磨刀完成
+                        await PlcControl.tagControl.Z1axis.WatiNearlyPositionAsync(startZ, usingPauseToken);
+                        _totalSharpenTimes++;
+                        curSharpenTimes++;
+                        //触发磨刀进度更新事件
+                        SharpenServiceProcessChanged?.Invoke(new SharpenServiceProcess(endZ, sharpenSpeed, sharpenTimes, _totalSharpenTimes, true));
+                        //判断是否开始检查刀痕
+                        //if (_totalSharpenTimes % GlobalParams.CheckMarksSharpenTimes == 0)
+                        //{
+                        //    await HttpUtils.SendSharpenDataToMES();
+                        //    if (!AutoCutUtils.CheckKnifeMarksStatus())
+                        //    {
+                        //        Tools.LogDebug("刀痕不合格！");
+                        //        return RunResult.Fail(RunExceptionType.BladeScrap, "刀痕不合格！");
+                        //    }
+                        //}
                     }
-                    //指定刀数已磨完
-                    hasBladeWear = true;
+                    catch (OperationCanceledException)
+                    {
+                        _continueTcs = new TaskCompletionSource<CancellationToken?>();
+                        CancellationToken? token = await _continueTcs.Task;
+                        // 如果token为null，表示停止磨刀
+                        if (token == null)
+                        {
+                            return RunResult.Fail(RunExceptionType.Stop, "停止磨刀");
+                        }
+                        usingPauseToken = token.Value;
+                    }
+                    catch (Exception ex)
+                    {
+                        Tools.LogDebug($"执行磨刀失败！{ex.Message}");
+                        return RunResult.Fail(RunExceptionType.Other, $"执行磨刀失败！{ex.Message}");
+                    }
+                    _isNewestSharpen = false;
                 }
-                //判断是否达到切割条件
-                while (!AutoCutUtils.CheckHasMeetCuttingCondition());
                 //总磨刀数置零
                 _totalSharpenTimes = 0;
             }
@@ -266,7 +254,7 @@ namespace 精密切割系统.Model.cut
                 //关闭切割水
                 await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
             }
-            return RunResult.Success(sharpenTimesList);
+            return RunResult.Success();
         }
 
         public void Continue(CancellationToken token)
