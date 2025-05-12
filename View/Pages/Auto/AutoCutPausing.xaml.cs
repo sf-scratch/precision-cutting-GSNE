@@ -31,9 +31,8 @@ namespace 精密切割系统.View.Pages.Auto
     /// <summary>
     /// AutoCutPausing.xaml 的交互逻辑
     /// </summary>
-    public partial class AutoCutPausing : Page
+    public partial class AutoCutPausing : UserControl
     {
-        private NavigationService _navService;
         MainWindow mainWindow;
         bool runFlag = false;
         bool stopCheckFlag = false;
@@ -52,27 +51,9 @@ namespace 精密切割系统.View.Pages.Auto
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            _navService = NavigationService;
-            if (_navService != null)
-            {
-                _navService.Navigated += AutoCutPausing_Navigated;
-            }
             mainWindow = Application.Current.MainWindow as MainWindow;
             NavigateUtils.ClearRightPage(); 
             //updateDefineDataModel();
-        }
-
-        private void AutoCutPausing_Navigated(object sender, NavigationEventArgs e)
-        {
-            if (_navService != null)
-            {
-                _navService.Navigated -= AutoCutPausing_Navigated;
-            }
-            if (e.TryParse(out AutoCutRuning autoCutRuning, out AutoCutRuningViewModel autoCutRuningViewModel))
-            {
-                autoCutRuning.DataContext = autoCutRuningViewModel;
-            }
-            WindowLayout.OperatePageButtons.Clear();
         }
 
         //根据默认配置控制对应显示和隐藏

@@ -212,12 +212,12 @@
                     <Controls:RightButton
                         Width="268"
                         Height="100"
-                BackFlag="{Binding BackFlag}"
-                BackgroundDefColor="{Binding BackgroundDefColor}"
-                BackgroundDownColor="{Binding BackgroundDownColor}"
-                ContentText="{Binding ContentText}"
-                ImagePath="{Binding ImagePath}"
-                Visibility="{Binding Visibility}">
+                        BackFlag="{Binding BackFlag}"
+                        BackgroundDefColor="{Binding BackgroundDefColor}"
+                        BackgroundDownColor="{Binding BackgroundDownColor}"
+                        ContentText="{Binding ContentText}"
+                        ImagePath="{Binding ImagePath}"
+                        Visibility="{Binding Visibility}">
                         <behaviors:Interaction.Triggers>
                             <behaviors:EventTrigger EventName="RightButtonClicked">
                                 <behaviors:InvokeCommandAction Command="{Binding RightClickCommand}"/>

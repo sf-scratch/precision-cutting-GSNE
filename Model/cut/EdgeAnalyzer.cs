@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace 精密切割系统.Model.cut
 {
-    internal class EdgeAnalyzer
+    public class EdgeAnalyzer
     {
         // === 参数配置 ===
         private const double PIXEL_TO_UM = 0.74;          // 每像素对应微米

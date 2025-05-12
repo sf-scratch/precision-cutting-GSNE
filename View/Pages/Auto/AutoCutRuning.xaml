@@ -1,4 +1,4 @@
-﻿<Page x:Class="精密切割系统.View.Pages.Auto.AutoCutRuning"
+﻿<UserControl x:Class="精密切割系统.View.Pages.Auto.AutoCutRuning"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -11,9 +11,7 @@
       xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
       mc:Ignorable="d" 
       d:DesignHeight="676" d:DesignWidth="1448"
-      d:DataContext="{d:DesignInstance viewModel:AutoCutRuningViewModel, IsDesignTimeCreatable=True}"
-      Loaded="Page_Loaded"
-      Title="AutoCutRuning">
+      d:DataContext="{d:DesignInstance viewModel:AutoCutRuningViewModel, IsDesignTimeCreatable=True}">
     <behaviors:Interaction.Triggers>
         <behaviors:EventTrigger EventName="Loaded">
             <behaviors:InvokeCommandAction 
@@ -21,7 +19,7 @@
                 CommandParameter="可选参数"/>
         </behaviors:EventTrigger>
     </behaviors:Interaction.Triggers>
-    <Page.Resources>
+    <UserControl.Resources>
         <Style TargetType="TextBlock">
             <Setter Property="FontSize" Value="18"/>
             <Setter Property="FontWeight" Value="Bold"/>
@@ -150,7 +148,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
-    </Page.Resources>
+    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="50*" />
@@ -200,4 +198,4 @@
             </StackPanel>
         </Grid>
     </Grid>
-</Page>
+</UserControl>

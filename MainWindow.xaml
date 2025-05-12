@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:精密切割系统"
+        xmlns:prism="http://prismlibrary.com/"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Title="MainWindow" Height="1080" Width="1920"
@@ -72,6 +73,7 @@
                     </Border.Effect>
                     <Grid Grid.Row="0">
                         <Frame x:Name="mainFrame" Grid.Row="1" Grid.Column="0" Source="View/MainMenu.xaml" NavigationUIVisibility="Hidden"/>
+                        <ContentControl prism:RegionManager.RegionName="MainRegion" />
                     </Grid>
                 </Border>
 

@@ -17,6 +17,7 @@ using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.cut;
 using 精密切割系统.Model.plc;
+using 精密切割系统.PubSubEvent;
 using 精密切割系统.Utils;
 using 精密切割系统.View.common;
 using 精密切割系统.View.page.right;
@@ -29,39 +30,16 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
     /// <summary>
     /// BladeReplacementConfiguration.xaml 的交互逻辑
     /// </summary>
-    public partial class BladeReplacementConfiguration : Page
+    public partial class BladeReplacementConfiguration : UserControl
     {
-        private NavigationService _navService;
-
-        public BladeReplacementConfiguration()
+        public BladeReplacementConfiguration(IEventAggregator eventAggregator)
         {
             InitializeComponent();
-        }
-
-        private void Page_Loaded(object sender, RoutedEventArgs e)
-        {
-            _navService = NavigationService;
-            if (_navService != null)
+            eventAggregator.GetEvent<SetFocusEvent>().Subscribe(target =>
             {
-                _navService.Navigated += BladeReplacementConfiguration_Navigated;
-            }
-            NavigateUtils.ClearRightPage();
-        }
-
-        private void BladeReplacementConfiguration_Navigated(object sender, NavigationEventArgs e)
-        {
-            if (_navService != null)
-            {
-                _navService.Navigated -= BladeReplacementConfiguration_Navigated;
-            }
-            if (e.TryParse(out AutoCutRuning autoCutRuning, out Tuple<SharpenParamsModel, CutParamsModel, string> tuple))
-            {
-                autoCutRuning.DataContext = new AutoCutRuningViewModel(tuple.Item1, tuple.Item2, tuple.Item3);
-            }
-            else if (e.Content is not AutoCutPausing)
-            {
-                WindowLayout.RightPageButtons.Clear();
-            }
+                if (target == "lunguTextBox")
+                    lunguTextBox.Focus();
+            });
         }
     }
 }

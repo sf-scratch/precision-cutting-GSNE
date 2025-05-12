@@ -38,6 +38,7 @@ using System.Reflection.PortableExecutable;
 using 精密切割系统.Model.cut;
 using 精密切割系统.View.Pages.Auto;
 using 精密切割系统.View.Pages.F4_BladeMaintenance;
+using Prism.Navigation.Regions;
 
 namespace 精密切割系统.View
 {
@@ -370,14 +371,14 @@ namespace 精密切割系统.View
                 case 401:
                     if (!GlobalParams.onlineFlag)
                     {
-                        mainWindow.NavigateToPage(bean.PageUrl);
+                        ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(BladeReplacementConfiguration));
                         break;
                     }
                     // 刀片更换
                     if (CommonCheck.MlignStatusCheck())
                     {
                         MaterialSnackUtils.MaterialSnack("进入刀片更换模式中...", SnackType.WARNING, 0);
-                        mainWindow.NavigateToPage(bean.PageUrl);
+                        ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(BladeReplacementConfiguration));
                     }
                     break;
                 case 402:

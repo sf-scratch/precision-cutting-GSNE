@@ -41,7 +41,8 @@ namespace 精密切割系统.Model.cut
         /// <exception cref="ArgumentException">当像素比例小于等于0时抛出</exception>
         /// <exception cref="FileNotFoundException">当图像文件不存在时抛出</exception>
         /// <exception cref="Exception">当图像无法读取时抛出</exception>
-        public static (double bladeWidthMm, double collapseWidthMm) ProcessImage(string imagePath, double pixelToMmRatio = 0.00074)
+        //public static (double bladeWidthMm, double collapseWidthMm) ProcessImage(string imagePath, double pixelToMmRatio = 0.000439)
+        public static (double bladeWidthMm, double collapseWidthMm) ProcessImage(string imagePath, double pixelToMmRatio = 0.0004575)
         {
             if (string.IsNullOrEmpty(imagePath))
                 throw new ArgumentNullException(nameof(imagePath), "图像路径不能为空");
@@ -56,7 +57,7 @@ namespace 精密切割系统.Model.cut
                 image = Cv2.ImRead(imagePath);
                 if (image.Empty())
                     throw new Exception($"无法读取图像文件: {imagePath}");
-                
+
                 int imageWidth = image.Cols;
                 var result = VisualizeResults(image, GetContourData(image), imageWidth, pixelToMmRatio);
                 Debug.WriteLine($"图像处理完成 - 刀痕宽度: {result.Item1}mm, 崩边宽度: {result.Item2}mm");
@@ -73,7 +74,8 @@ namespace 精密切割系统.Model.cut
             }
         }
 
-        public static (double bladeWidthMm, double collapseWidthMm) ProcessImage(Mat image, double pixelToMmRatio = 0.00074)
+        //public static (double bladeWidthMm, double collapseWidthMm) ProcessImage(Mat image, double pixelToMmRatio = 0.00074)
+        public static (double bladeWidthMm, double collapseWidthMm) ProcessImage(Mat image, double pixelToMmRatio = 0.0004575)
         {
             try
             {
@@ -139,14 +141,14 @@ namespace 精密切割系统.Model.cut
                 // 开运算去噪
                 kernel = Cv2.GetStructuringElement(MorphShapes.Rect, new Size(3, 3));
                 Cv2.MorphologyEx(binary, binary, MorphTypes.Open, kernel);
-                
+
                 Debug.WriteLine("图像预处理完成：灰度转换、高斯模糊、二值化、开运算");
 
                 // 查找轮廓
                 Point[][] contours;
                 HierarchyIndex[] hierarchy;
                 Cv2.FindContours(binary, out contours, out hierarchy, RetrievalModes.External, ContourApproximationModes.ApproxSimple);
-                
+
                 if (contours == null || contours.Length == 0)
                 {
                     Debug.WriteLine("未检测到有效轮廓");
@@ -224,7 +226,7 @@ namespace 精密切割系统.Model.cut
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
         /// <exception cref="ArgumentException"></exception>
-        private static AnalysisResult SnakeCase(string imagePath)
+        public static AnalysisResult SnakeCase(string imagePath)
         {
             Mat image = Cv2.ImRead(imagePath);
             if (image.Empty())
@@ -475,6 +477,6 @@ namespace 精密切割系统.Model.cut
             return Tuple.Create<Point?, double>(center, maxVal);
         }
 
-        
+
     }
 }

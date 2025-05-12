@@ -12,7 +12,7 @@ namespace 精密切割系统.FrmWindow.common
     internal class GlobalParams
     {
         // true 在线版本 false 离线版本
-        public static bool onlineFlag = true;
+        public static bool onlineFlag = false;
         public static readonly bool OnlineMES = false;
         // 当前页面是否是首页
         public static bool currentPageIsHome = false;
@@ -123,7 +123,7 @@ namespace 精密切割系统.FrmWindow.common
         /// <summary>
         /// 在磨刀几次后检测
         /// </summary>
-        public static readonly int CheckMarksSharpenTimes = 10;
+        public static readonly int CheckMarksSharpenTimes = 1;
 
         /// <summary>
         /// 单刀磨损量
@@ -190,7 +190,7 @@ namespace 精密切割系统.FrmWindow.common
         /// <summary>
         /// 自动聚焦位置Z1
         /// </summary>
-        public static float AutoFocusStartPositionZ2 = 11.9f;
+        public static float AutoFocusStartPositionZ2 = 11.8f;
 
         /// <summary>
         /// 磨刀板尺寸

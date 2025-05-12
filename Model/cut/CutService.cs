@@ -137,7 +137,7 @@ namespace 精密切割系统.Model.cut
                             //计算工件圆心坐标
                             DataPoint<float> workpieceCenterPoint = new DataPoint<float>(_thetaCenterPoint.X, _thetaCenterPoint.Y + _centerDistance);
                             // 该theta角度第一次切割，切割半圆最下边切为起始位置
-                            _recordCutY = GeometryUtils.FindBottomTangentY(_thetaCenterPoint, workpieceCenterPoint, _workpieceRadius, _thetaDegQueue.Peek() + cutCalibratTheta) - 40;
+                            _recordCutY = GeometryUtils.FindBottomTangentY(_thetaCenterPoint, workpieceCenterPoint, _workpieceRadius, _thetaDegQueue.Peek() + cutCalibratTheta) - 42f;
                             _isRotateTheta = false;
                         }
                         float cutSize = GetCutSize();
@@ -187,7 +187,7 @@ namespace 精密切割系统.Model.cut
                         //设置切割参数
                         await PlcControl.tagControl.cutting.SetCutParamsAsync(cutSpeed, endZ, startZ, startX, endX, line.StartPoint.Y, "0", _thetaDegQueue.Peek() + cutCalibratTheta, spindleRev, _cutDirection);
                         //设置停止位置
-                        await PlcControl.tagControl.cutting.SetStopLocationAsync(line.EndPoint.X + _cameraRelativeBladePosition.X, line.StartPoint.Y + _cameraRelativeBladePosition.Y, focusClearZ2);
+                        await PlcControl.tagControl.cutting.SetStopLocationAsync((line.StartPoint.X + line.EndPoint.X) / 2 + _cameraRelativeBladePosition.X, line.StartPoint.Y + _cameraRelativeBladePosition.Y, focusClearZ2);
                         //开始切割信号
                         await PlcControl.tagControl.cutting.StartCutAsync();
                         //等待磨刀次数变化，表示开始磨刀

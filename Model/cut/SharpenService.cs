@@ -54,6 +54,11 @@ namespace 精密切割系统.Model.cut
         private readonly int _checkMarksSharpenTimes = GlobalParams.CheckMarksSharpenTimes;
 
         /// <summary>
+        /// 相机相对刀片中心点位置
+        /// </summary>
+        public static DataPoint<float> _cameraRelativeBladePosition = GlobalParams.CameraRelativeBladePosition;
+
+        /// <summary>
         /// 单刀磨损量
         /// </summary>
         private readonly float _singleBladeWear = GlobalParams.SingleBladeWear;
@@ -131,8 +136,6 @@ namespace 精密切割系统.Model.cut
                 await PlcControl.tagControl.cutting.WaitReadyToCutAsync(pauseToken);
                 CancellationToken usingPauseToken = pauseToken;
                 float abAverageThickness = lunguSksj.ABAverageThickness / 1000;
-                float longestBlade = lunguSksj.LongestBlade / 1000;
-                float bladeExposedMax = AutoCutUtils.GetBladeExposedMax(abAverageThickness);
                 float cutDeep = AutoCutUtils.GetSharpenDeep(lunguSksj.BladeType);
                 int curSharpenTimes = 0;
                 //开始磨刀，磨指定刀数
@@ -200,7 +203,7 @@ namespace 精密切割系统.Model.cut
                         //设置磨刀参数
                         await PlcControl.tagControl.cutting.SetCutParamsAsync(sharpenSpeed, endZ, startZ, line.StartPoint.X, line.EndPoint.X, line.StartPoint.Y, "0", _thetaDegQueue.Peek(), spindleRev, _cutDirection);
                         //设置停止位置
-                        await PlcControl.tagControl.cutting.SetStopLocationAsync(line.EndPoint.X, line.StartPoint.Y - GlobalParams.cameraOffsetY, startZ);
+                        await PlcControl.tagControl.cutting.SetStopLocationAsync((line.StartPoint.X + line.EndPoint.X) / 2 + _cameraRelativeBladePosition.X, line.StartPoint.Y + _cameraRelativeBladePosition.Y, startZ);
                         //开始磨刀
                         await PlcControl.tagControl.cutting.StartCutAsync();
                         //等待磨刀次数变化，表示开始磨刀

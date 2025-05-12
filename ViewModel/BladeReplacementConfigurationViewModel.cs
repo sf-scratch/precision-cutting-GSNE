@@ -10,6 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
 using 精密切割系统.DTOs;
@@ -19,17 +20,20 @@ using 精密切割系统.HttpClients;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut;
 using 精密切割系统.Model.sqlite;
+using 精密切割系统.PubSubEvent;
 using 精密切割系统.Utils;
 using 精密切割系统.View.common;
+using 精密切割系统.View.Pages.Auto;
 
 namespace 精密切割系统.ViewModel
 {
-    public class BladeReplacementConfigurationViewModel : INotifyPropertyChanged
+    public class BladeReplacementConfigurationViewModel : CustomBindableBase
     {
         private static readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
-        public event PropertyChangedEventHandler? PropertyChanged;
         public RelayCommand AutoRunCommand { get; set; }
         public RelayCommand<string> InitCommand { get; set; }
+        private readonly IRegionManager _regionManager;
+        private readonly IEventAggregator _eventAggregator;
         // 控制右侧按钮
         private ObservableCollection<RightButtonParams> _rightButtonParams;
 
@@ -37,7 +41,7 @@ namespace 精密切割系统.ViewModel
         public string LunguId
         {
             get { return _lunguId; }
-            set { _lunguId = value; OnPropertyChanged(); }
+            set { _lunguId = value; RaisePropertyChanged(); }
         }
 
         private LunguSksjModel _lunguSks;
@@ -45,7 +49,7 @@ namespace 精密切割系统.ViewModel
         public LunguSksjModel LunguSks
         {
             get { return _lunguSks; }
-            set { _lunguSks = value; OnPropertyChanged(); }
+            set { _lunguSks = value; RaisePropertyChanged(); }
         }
 
         private SharpenParamsModel _sharpenParams;
@@ -55,7 +59,7 @@ namespace 精密切割系统.ViewModel
         public SharpenParamsModel SharpenParams
         {
             get { return _sharpenParams; }
-            set { _sharpenParams = value; OnPropertyChanged(); }
+            set { _sharpenParams = value; RaisePropertyChanged(); }
         }
 
         private CutParamsModel _cutParams;
@@ -65,21 +69,25 @@ namespace 精密切割系统.ViewModel
         public CutParamsModel CutParams
         {
             get { return _cutParams; }
-            set { _cutParams = value; OnPropertyChanged(); }
+            set { _cutParams = value; RaisePropertyChanged(); }
         }
 
-        public BladeReplacementConfigurationViewModel()
+        public BladeReplacementConfigurationViewModel(IRegionManager regionManager, IEventAggregator eventAggregator)
         {
+            _regionManager = regionManager;
+            _eventAggregator = eventAggregator;
             LunguId = CameraUtils.GetLunguId();
             _rightButtonParams = WindowLayout.RightPageButtons;
             AutoRunCommand = new RelayCommand(AutoRun);
             InitCommand = new RelayCommand<string>(Init);
-            InitRightButtonOnlyBack();
+        }
+
+        public BladeReplacementConfigurationViewModel()
+        {
         }
 
         private void InitRightButtonOnlyBack()
         {
-            _rightButtonParams.Clear();
             _rightButtonParams.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }
 
@@ -99,7 +107,6 @@ namespace 精密切割系统.ViewModel
             }
             try
             {
-                InitRightButtonOnlyBack();
                 //轮毂信息
                 LunguSksjDTO? lunguSksjDTO = await HttpUtils.GetLunguSksjAsync(lunguId);
                 if (lunguSksjDTO == null)
@@ -178,7 +185,13 @@ namespace 精密切割系统.ViewModel
 
         private void AutoRun()
         {
-            NavigateUtils.NavigateToPage("Pages/Auto/AutoCutRuning", new Tuple<SharpenParamsModel, CutParamsModel, string>(SharpenParams, CutParams, LunguId));
+            NavigationParameters parameters = new NavigationParameters
+            {
+                { "SharpenParams", SharpenParams },
+                { "CutParams", CutParams },
+                { "LunguId", LunguId }
+            };
+            _regionManager.RequestNavigate(RegionName.MainRegion, nameof(AutoCutRuning), parameters);
         }
 
         private void Back()
@@ -186,9 +199,18 @@ namespace 精密切割系统.ViewModel
             NavigateUtils.NavigateToPage("MainMenu");
         }
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        public override void OnNavigatedTo(NavigationContext navigationContext)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            base.OnNavigatedTo(navigationContext);
+            LunguSks = new LunguSksjModel();
+            SharpenParams = new SharpenParamsModel();
+            CutParams = new CutParamsModel();
+            InitRightButton();
+            //InitRightButtonOnlyBack();
+            Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                _eventAggregator.GetEvent<SetFocusEvent>().Publish("lunguTextBox");
+            }), DispatcherPriority.Loaded);
         }
     }
 }

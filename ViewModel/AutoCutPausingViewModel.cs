@@ -11,15 +11,17 @@ using 精密切割系统.Assets.config.buttom;
 using 精密切割系统.Driver;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.common;
+using 精密切割系统.Model.cut;
 using 精密切割系统.View.common;
+using 精密切割系统.View.Pages.Auto;
 
 namespace 精密切割系统.ViewModel
 {
-    public class AutoCutPausingViewModel : INotifyPropertyChanged
+    public class AutoCutPausingViewModel : CustomBindableBase
     {
-        public event PropertyChangedEventHandler? PropertyChanged;
         public RelayCommand ContinueCommand { get; set; }
         public RelayCommand StopCommand { get; set; }
+        private IRegionManager _regionManager;
         private AutoCutRuningViewModel _autoCutRuningViewModel;
 
         // 控制右侧按钮
@@ -34,7 +36,7 @@ namespace 精密切割系统.ViewModel
         public int AfterReplaceBladeCutTimes
         {
             get { return _afterReplaceBladeCutTimes; }
-            set { _afterReplaceBladeCutTimes = value; OnPropertyChanged(); }
+            set { _afterReplaceBladeCutTimes = value; RaisePropertyChanged(); }
         }
 
         private float _afterHeightMeasurementZ;
@@ -44,7 +46,7 @@ namespace 精密切割系统.ViewModel
         public float AfterHeightMeasurementZ
         {
             get { return _afterHeightMeasurementZ; }
-            set { _afterHeightMeasurementZ = value; OnPropertyChanged(); }
+            set { _afterHeightMeasurementZ = value; RaisePropertyChanged(); }
         }
 
         private float _sharpenBladeHeight;
@@ -54,7 +56,7 @@ namespace 精密切割系统.ViewModel
         public float SharpenBladeHeight
         {
             get { return _sharpenBladeHeight; }
-            set { _sharpenBladeHeight = value; OnPropertyChanged(); }
+            set { _sharpenBladeHeight = value; RaisePropertyChanged(); }
         }
 
         private float _sharpenSpeed;
@@ -64,7 +66,7 @@ namespace 精密切割系统.ViewModel
         public float SharpenSpeed
         {
             get { return _sharpenSpeed; }
-            set { _sharpenSpeed = value; OnPropertyChanged(); }
+            set { _sharpenSpeed = value; RaisePropertyChanged(); }
         }
 
         private string _sharpenProgress;
@@ -74,7 +76,7 @@ namespace 精密切割系统.ViewModel
         public string SharpenProgress
         {
             get { return _sharpenProgress; }
-            set { _sharpenProgress = value; OnPropertyChanged(); }
+            set { _sharpenProgress = value; RaisePropertyChanged(); }
         }
 
         private string _deviceDataNo;
@@ -84,7 +86,7 @@ namespace 精密切割系统.ViewModel
         public string DeviceDataNo
         {
             get { return _deviceDataNo; }
-            set { _deviceDataNo = value; OnPropertyChanged(); }
+            set { _deviceDataNo = value; RaisePropertyChanged(); }
         }
 
         private float _cutBladeHeight;
@@ -94,7 +96,7 @@ namespace 精密切割系统.ViewModel
         public float CutBladeHeight
         {
             get { return _cutBladeHeight; }
-            set { _cutBladeHeight = value; OnPropertyChanged(); }
+            set { _cutBladeHeight = value; RaisePropertyChanged(); }
         }
 
         private float _cutSpeed;
@@ -104,7 +106,7 @@ namespace 精密切割系统.ViewModel
         public float CutSpeed
         {
             get { return _cutSpeed; }
-            set { _cutSpeed = value; OnPropertyChanged(); }
+            set { _cutSpeed = value; RaisePropertyChanged(); }
         }
 
         private string _cutProgress;
@@ -114,7 +116,7 @@ namespace 精密切割系统.ViewModel
         public string CutProgress
         {
             get { return _cutProgress; }
-            set { _cutProgress = value; OnPropertyChanged(); }
+            set { _cutProgress = value; RaisePropertyChanged(); }
         }
 
         private float _baselineWidth;
@@ -124,7 +126,7 @@ namespace 精密切割系统.ViewModel
         public float BaselineWidth
         {
             get { return _baselineWidth; }
-            set { _baselineWidth = value; OnPropertyChanged(); }
+            set { _baselineWidth = value; RaisePropertyChanged(); }
         }
 
         private float _brokenEdgeWidth;
@@ -134,24 +136,14 @@ namespace 精密切割系统.ViewModel
         public float BrokenEdgeWidth
         {
             get { return _brokenEdgeWidth; }
-            set { _brokenEdgeWidth = value; OnPropertyChanged(); }
+            set { _brokenEdgeWidth = value; RaisePropertyChanged(); }
         }
 
-        public AutoCutPausingViewModel(AutoCutRuningViewModel autoCutRuningViewModel)
+        public AutoCutPausingViewModel(IRegionManager regionManager)
         {
-            _autoCutRuningViewModel = autoCutRuningViewModel;
+            _regionManager = regionManager;
             RightPageButtonCollection = WindowLayout.RightPageButtons;
             OperatePageButtonCollection = WindowLayout.OperatePageButtons;
-            InitRightButton();
-            _afterHeightMeasurementZ = autoCutRuningViewModel.AfterHeightMeasurementZ;
-            _sharpenBladeHeight = autoCutRuningViewModel.SharpenBladeHeight;
-            _sharpenSpeed = autoCutRuningViewModel.SharpenSpeed;
-            _sharpenProgress = autoCutRuningViewModel.SharpenProgress;
-            _deviceDataNo = autoCutRuningViewModel.DeviceDataNo;
-            _cutBladeHeight = autoCutRuningViewModel.CutBladeHeight;
-            _cutSpeed = autoCutRuningViewModel.CutSpeed;
-            _cutProgress = autoCutRuningViewModel.CutProgress;
-            _afterReplaceBladeCutTimes = autoCutRuningViewModel.AfterReplaceBladeCutTimes;
             ContinueCommand = new RelayCommand(ContinueCommandExecute);
             StopCommand = new RelayCommand(StopCommandExecute);
         }
@@ -162,14 +154,12 @@ namespace 精密切割系统.ViewModel
 
         private void InitRightButton()
         {
-            RightPageButtonCollection.Clear();
             RightPageButtonCollection.Add(RightButtonParams.GreenRightButton("继续", "/Assets/icon/right/enter.png", ContinueCommandExecute));
             RightPageButtonCollection.Add(RightButtonParams.RedRightButton("停止", "/Assets/icon/right/stop.png", StopCommandExecute));
         }
 
         private void InitBottonButton()
         {
-            OperatePageButtonCollection.Clear();
             OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调窄", "/Assets/icon/tab_1/03/tab_02.png", BaselineNarrowing));
             OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线校准", "/Assets/icon/tab_1/03/tab_08.png", BaselineCalibration));
             OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调宽", "/Assets/icon/tab_1/03/tab_05.png", BaselineWidthAdjustment));
@@ -189,7 +179,13 @@ namespace 精密切割系统.ViewModel
 
         private void ContinueCommandExecute()
         {
-            NavigateUtils.NavigateToPage("Pages/Auto/AutoCutRuning", _autoCutRuningViewModel);
+            NavigationParameters parameters = new NavigationParameters
+            {
+                { "SharpenParams", _autoCutRuningViewModel.SharpenParams },
+                { "CutParams", _autoCutRuningViewModel.CutParams },
+                { "LunguId", _autoCutRuningViewModel.LunguId }
+            };
+            _regionManager.RequestNavigate(RegionName.MainRegion, nameof(AutoCutRuning), parameters);
         }
 
         private void StopCommandExecute()
@@ -197,9 +193,21 @@ namespace 精密切割系统.ViewModel
             _autoCutRuningViewModel.StopAsync();
         }
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        public override void OnNavigatedTo(NavigationContext navigationContext)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            base.OnNavigatedTo(navigationContext);
+            InitRightButton();
+            InitBottonButton();
+            _autoCutRuningViewModel = navigationContext.Parameters.GetValue<AutoCutRuningViewModel>("AutoCutRuningViewModel");
+            _afterHeightMeasurementZ = _autoCutRuningViewModel.AfterHeightMeasurementZ;
+            _sharpenBladeHeight = _autoCutRuningViewModel.SharpenBladeHeight;
+            _sharpenSpeed = _autoCutRuningViewModel.SharpenSpeed;
+            _sharpenProgress = _autoCutRuningViewModel.SharpenProgress;
+            _deviceDataNo = _autoCutRuningViewModel.DeviceDataNo;
+            _cutBladeHeight = _autoCutRuningViewModel.CutBladeHeight;
+            _cutSpeed = _autoCutRuningViewModel.CutSpeed;
+            _cutProgress = _autoCutRuningViewModel.CutProgress;
+            _afterReplaceBladeCutTimes = _autoCutRuningViewModel.AfterReplaceBladeCutTimes;
         }
     }
 }

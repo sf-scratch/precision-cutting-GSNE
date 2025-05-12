@@ -12,22 +12,15 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using 精密切割系统.FrmWindow.common;
-using 精密切割系统.Helpers;
-using 精密切割系统.Model.cut;
-using 精密切割系统.View.page.right;
-using 精密切割系统.View.Pages.operate;
-using 精密切割系统.ViewModel;
 
-namespace 精密切割系统.View.Pages.Auto
+namespace 精密切割系统.View.Pages.common
 {
     /// <summary>
-    /// AutoCutRuning.xaml 的交互逻辑
+    /// EmptyView.xaml 的交互逻辑
     /// </summary>
-    public partial class AutoCutRuning : UserControl
+    public partial class EmptyView : UserControl
     {
-        private NavigationService _navService;
-        public AutoCutRuning()
+        public EmptyView()
         {
             InitializeComponent();
         }

@@ -362,7 +362,7 @@ namespace 精密切割系统.Model.cut
             await Task.WhenAll(taskWhole, taskX, taskY, taskZ1, taskZ2);
         }
 
-        public static async Task<float?> AutoFocusAsync(CancellationToken token)
+        public static CameraCommon? GetCameraCommon()
         {
             MainWindow? mainWindow = Application.Current.MainWindow as MainWindow;
             if (mainWindow == null || !CommonCheck.AxisReady(false))
@@ -370,13 +370,22 @@ namespace 精密切割系统.Model.cut
                 return null;
             }
             // 获取相机页面
-            List<CameraCommon> cameraCommons = Tools.GetChildrenOfType<CameraCommon>(mainWindow.mainFrame);
+            List<CameraCommon> cameraCommons = Tools.GetChildrenOfType<CameraCommon>(mainWindow);
             if (cameraCommons.Count == 0)
-            { 
+            {
+                return null;
+            }
+            return cameraCommons.FirstOrDefault();
+        }
+
+        public static async Task<float?> AutoFocusAsync(CancellationToken token)
+        {
+            CameraCommon? cameraCommon = GetCameraCommon();
+            if (cameraCommon is null)
+            {
                 MaterialSnackUtils.MaterialSnack("相机获取失败！", MaterialSnackUtils.SnackType.WARNING);
                 return null;
             }
-            CameraCommon cameraCommon = cameraCommons[0];
             // 获取当前配置的工作盘和膜的厚度
             FileTableItemModel fileTableItemModel = CurrentUtils.GetFileTableItemModel();
             // 获取工件的厚度和膜的厚度

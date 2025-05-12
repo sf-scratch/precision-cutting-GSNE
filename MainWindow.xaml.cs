@@ -41,6 +41,7 @@ using NPOI.OpenXmlFormats.Dml.Diagram;
 using 精密切割系统.Model.plc;
 using 精密切割系统.View.Pages.Auto;
 using 精密切割系统.Model.cut;
+using System.Windows.Threading;
 
 namespace 精密切割系统
 {
@@ -89,55 +90,60 @@ namespace 精密切割系统
         OperatePage operatePage;
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            var result = VisionAnalyzer.ProcessImage("C:\\Users\\17632\\Desktop\\image\\638821406301167160_cropMatJpgText.jpg");
-            Debug.WriteLine(result);
-            string logDirectory = "logs";
-            int daysThreshold = 30; // 清理超过 30 天的日志
-            TimeSpan interval = TimeSpan.FromDays(1); // 每天触发一次
-            LogCleaner.StartLogCleanup(logDirectory, daysThreshold, interval);
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                var result = VisionAnalyzer.ProcessImage("C:\\MySpace\\Dev\\OPT Camera Viewer_v4.0.0.1\\Pictures\\PIC_2025-05-09 15-35-09.807(1).bmp");
+                var result1 = VisionAnalyzer.SnakeCase("C:\\MySpace\\Dev\\OPT Camera Viewer_v4.0.0.1\\Pictures\\PIC_2025-05-09 15-35-09.807(1).bmp");
+                Debug.WriteLine(result);
+                string logDirectory = "logs";
+                int daysThreshold = 30; // 清理超过 30 天的日志
+                TimeSpan interval = TimeSpan.FromDays(1); // 每天触发一次
+                LogCleaner.StartLogCleanup(logDirectory, daysThreshold, interval);
 
-            operatePage = operateFrame.Content as OperatePage;
-            operatePage.SetOperateShowType(0);
-            operatePage.UpdateOperate(OperateData.GetTab01Operate());
-            InitializeData.initSystemData();
-            if (!GlobalParams.onlineFlag)
-            {
-                GlobalParams.systemInitFlag = true;
-            }
-            // 初始化设备
-            initThread = new Thread(InitDevice);
-            initThread.IsBackground = true;
-            initThread.Start();
-            operateFrame.Navigated += OperateFrame_Navigated;
-            if (DevicesUtis.IsTouchSupported())
-            {
-                shortcutDirectBtn.TouchDown += shortcutDirectBtn_TouchDown;
-                shortcutTopBtn.TouchDown += shortcutTopBtn_TouchDown;
-            }
-            else
-            {
-                shortcutDirectBtn.MouseDown += shortcutDirectBtn_MouseDown;
-                shortcutTopBtn.MouseDown += shortcutTopBtn_MouseDown;
-            }
-            GlobalParams.ValueChanged += (sender, args) =>
-            {
-                List<CommonDirection> commonDirectionList = Tools.GetChildrenOfType<CommonDirection>(mainFrame);
-                if (commonDirectionList != null && commonDirectionList.Count > 0)
+                operatePage = operateFrame.Content as OperatePage;
+                operatePage.SetOperateShowType(0);
+                operatePage.UpdateOperate(OperateData.GetTab01Operate());
+                InitializeData.initSystemData();
+                if (!GlobalParams.onlineFlag)
                 {
-                    commonDirectionList[0].SetHighBtnStatus(GlobalParams.heightSpeedStatus);
+                    GlobalParams.systemInitFlag = true;
                 }
-                List<DirectOperate> directOperateList = Tools.GetChildrenOfType<DirectOperate>(operateFrame);
-                if (directOperateList != null && directOperateList.Count > 0)
+                // 初始化设备
+                initThread = new Thread(InitDevice);
+                initThread.IsBackground = true;
+                initThread.Start();
+                operateFrame.Navigated += OperateFrame_Navigated;
+                if (DevicesUtis.IsTouchSupported())
                 {
-                    directOperateList[0].SetHighBtnStatus(GlobalParams.heightSpeedStatus);
+                    shortcutDirectBtn.TouchDown += shortcutDirectBtn_TouchDown;
+                    shortcutTopBtn.TouchDown += shortcutTopBtn_TouchDown;
                 }
-            };
+                else
+                {
+                    shortcutDirectBtn.MouseDown += shortcutDirectBtn_MouseDown;
+                    shortcutTopBtn.MouseDown += shortcutTopBtn_MouseDown;
+                }
+                GlobalParams.ValueChanged += (sender, args) =>
+                {
+                    List<CommonDirection> commonDirectionList = Tools.GetChildrenOfType<CommonDirection>(mainFrame);
+                    if (commonDirectionList != null && commonDirectionList.Count > 0)
+                    {
+                        commonDirectionList[0].SetHighBtnStatus(GlobalParams.heightSpeedStatus);
+                    }
+                    List<DirectOperate> directOperateList = Tools.GetChildrenOfType<DirectOperate>(operateFrame);
+                    if (directOperateList != null && directOperateList.Count > 0)
+                    {
+                        directOperateList[0].SetHighBtnStatus(GlobalParams.heightSpeedStatus);
+                    }
+                };
 
-            RunLogsCommon.LogEvent(LogType.INIT, new List<RunLogsViewModel>
+                RunLogsCommon.LogEvent(LogType.INIT, new List<RunLogsViewModel>
                 {
                     new RunLogsViewModel(LogType.INIT, "初始化"),
                     new RunLogsViewModel("结果", "初始化成功！")
                 });
+            }), DispatcherPriority.ContextIdle);
+            
         }
 
         private void ShortcutDirectBtn_TouchUp(object? sender, TouchEventArgs e)
