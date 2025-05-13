@@ -992,22 +992,22 @@ namespace 精密切割系统.Driver
                 });
             }
             // CloseCutWater();
-            Task.Run(() => {
-                Thread.Sleep(1000);
-                PlcControl.tagControl.wholeDevice.SetCuttingWater();
+            Task.Run(async () => {
+                await Task.Delay(1000);
+                await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
             });
         }
 
         /// <summary>
         /// 关闭切割水
         /// </summary>
-        public static void CloseCutWater()
+        public static async void CloseCutWater()
         {
             bool tempSpindleCuttingWater = CommonCheck.GetParamsStatus(DeviceKey.spindleCuttingWaterKey);
             if (tempSpindleCuttingWater)
             {
                 // 关水
-                PlcControl.tagControl.wholeDevice.SetCuttingWater();
+                await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
             }
         }
 

@@ -134,6 +134,26 @@ Height="22.86"
                     </StackPanel>
                 </StackPanel>
             </StackPanel>
+            <DataGrid ItemsSource="{Binding ActiveAlarms}" AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="报警地址" Binding="{Binding Address}"/>
+                    <DataGridTextColumn Header="级别" Binding="{Binding Level}">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="{Binding LevelBrush}"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="消息" Binding="{Binding Message}"/>
+                    <!--<DataGridTemplateColumn Header="操作">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="确认" Command="{Binding AckCommand}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>-->
+                </DataGrid.Columns>
+            </DataGrid>
         </StackPanel>
 
         <ListBox Margin="0,0,0,125"

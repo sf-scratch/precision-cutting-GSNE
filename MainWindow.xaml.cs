@@ -93,6 +93,7 @@ namespace 精密切割系统
         OperatePage operatePage;
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            AlarmConfig alarmConfig = AlarmConfig.Instance;
             Dispatcher.BeginInvoke(new Action(() =>
             {
                 //var result = VisionAnalyzer.ProcessImage("C:\\MySpace\\Dev\\OPT Camera Viewer_v4.0.0.1\\Pictures\\PIC_2025-05-09 15-35-09.807(1).bmp");
@@ -182,7 +183,6 @@ namespace 精密切割系统
             mainPlc = PlcControl.GetInstance();
             // 加载配置参数
             CurrentUtils.UpdateParams();
-            mainPlc.readConfig();
             if (!GlobalParams.onlineFlag)
             {
                 GlobalParams.globalRunFlag = false;
@@ -472,6 +472,7 @@ namespace 精密切割系统
 
         private void shortcutTopBtn_MouseDown(object sender, MouseButtonEventArgs e)
         {
+            AlarmConfig alarmConfig = AlarmConfig.Instance;
             shortcutTopBtnSel = !shortcutTopBtnSel;
             shortcutBottomBtnSel = false;
             ShortcutBtnClick();

@@ -980,6 +980,12 @@
       "name": "翻转安全门",
       "describe": "翻转安全门"
     },
+    "alarmReset": {
+      "valueType": "bool",
+      "addr": "MR3002",
+      "name": "报警复位",
+      "describe": "报警复位"
+    },
     "securityDoor2Close": {
       "valueType": "bool",
       "addr": "MR605",
@@ -993,8 +999,8 @@
       "describe": "打开推拉安全门"
     },
     "securityDoor1Status": {
-      "valueType": "int16",
-      "addr": "DM006",
+      "valueType": "bool",
+      "addr": "MR614",
       "name": "安全门1状态",
       "describe": "安全门1状态"
     },
@@ -1535,5 +1541,4 @@
       "describe": "当前研磨次数"
     }
   }
-
 }

@@ -1,0 +1,1603 @@
+﻿[
+  {
+    "Address": "MR60000",
+    "Level": "Warning",
+    "Message": "PLC电池电量不足"
+  },
+  {
+    "Address": "MR60001",
+    "Level": "Warning",
+    "Message": "急停中"
+  },
+  {
+    "Address": "MR60002",
+    "Level": "Warning",
+    "Message": "气压不足"
+  },
+  {
+    "Address": "MR60003",
+    "Level": "Warning",
+    "Message": "已达生产目标"
+  },
+  {
+    "Address": "MR60004",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60005",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60006",
+    "Level": "Warning",
+    "Message": "总复位中"
+  },
+  {
+    "Address": "MR60007",
+    "Level": "Warning",
+    "Message": "总复位未完成"
+  },
+  {
+    "Address": "MR60008",
+    "Level": "Warning",
+    "Message": "模块重启中"
+  },
+  {
+    "Address": "MR60009",
+    "Level": "Warning",
+    "Message": "待机中"
+  },
+  {
+    "Address": "MR60010",
+    "Level": "Warning",
+    "Message": "安全门急停"
+  },
+  {
+    "Address": "MR60011",
+    "Level": "Warning",
+    "Message": "关气急停中"
+  },
+  {
+    "Address": "MR60012",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60013",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60014",
+    "Level": "Warning",
+    "Message": "设备超过5分钟未启动皮带停止"
+  },
+  {
+    "Address": "MR60015",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60100",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60101",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60102",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60103",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60104",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60105",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60106",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60107",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60108",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60109",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60110",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60111",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60112",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60113",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60114",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60115",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60200",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60201",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60202",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60203",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60204",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60205",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60206",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60207",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60208",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60209",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60210",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60211",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60212",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60213",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60214",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60215",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60300",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60301",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60302",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60303",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60304",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60305",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60306",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60307",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60308",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60309",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60310",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60311",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60312",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60313",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60314",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60315",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60400",
+    "Level": "Error",
+    "Message": "主轴冷却水报警"
+  },
+  {
+    "Address": "MR60401",
+    "Level": "Error",
+    "Message": "主轴切割水报警"
+  },
+  {
+    "Address": "MR60402",
+    "Level": "Error",
+    "Message": "主轴变频器报警"
+  },
+  {
+    "Address": "MR60403",
+    "Level": "Error",
+    "Message": "工作台真空报警"
+  },
+  {
+    "Address": "MR60404",
+    "Level": "Error",
+    "Message": "工件真空度报警"
+  },
+  {
+    "Address": "MR60405",
+    "Level": "Error",
+    "Message": "主轴气压报警"
+  },
+  {
+    "Address": "MR60406",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60407",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60408",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60409",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60410",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60411",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60412",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60413",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60414",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60415",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60500",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60501",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60502",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60503",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60504",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60505",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60506",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60507",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60508",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60509",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60510",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60511",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60512",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60513",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60514",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60515",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60600",
+    "Level": "Error",
+    "Message": "安全门1打开中#"
+  },
+  {
+    "Address": "MR60601",
+    "Level": "Error",
+    "Message": "安全门2打开中#"
+  },
+  {
+    "Address": "MR60602",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60603",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60604",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60605",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60606",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60607",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60608",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60609",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60610",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60611",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60612",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60613",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60614",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60615",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60700",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60701",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60702",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60703",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60704",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60705",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60706",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60707",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60708",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60709",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60710",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60711",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60712",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60713",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60714",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60715",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60800",
+    "Level": "Error",
+    "Message": "急停1报警中"
+  },
+  {
+    "Address": "MR60801",
+    "Level": "Error",
+    "Message": "急停2报警中"
+  },
+  {
+    "Address": "MR60802",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60803",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60804",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60805",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60806",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60807",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60808",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60809",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60810",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60811",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60812",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60813",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60814",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60815",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60900",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60901",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60902",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60903",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60904",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60905",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60906",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60907",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60908",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60909",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60910",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60911",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60912",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60913",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60914",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR60915",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61000",
+    "Level": "Error",
+    "Message": "A1-X轴伺服需搜寻原点"
+  },
+  {
+    "Address": "MR61001",
+    "Level": "Error",
+    "Message": "A1-X轴伺服到达+极限"
+  },
+  {
+    "Address": "MR61002",
+    "Level": "Error",
+    "Message": "A1-X轴伺服到达-极限"
+  },
+  {
+    "Address": "MR61003",
+    "Level": "Error",
+    "Message": "A1-X轴伺服放松中"
+  },
+  {
+    "Address": "MR61004",
+    "Level": "Error",
+    "Message": "A1-X轴伺服驱动器"
+  },
+  {
+    "Address": "MR61005",
+    "Level": "Error",
+    "Message": "A1-X轴伺服错误中"
+  },
+  {
+    "Address": "MR61006",
+    "Level": "Error",
+    "Message": "A1-X轴伺服准备好"
+  },
+  {
+    "Address": "MR61007",
+    "Level": "Error",
+    "Message": "A1-X轴伺服动作未到位"
+  },
+  {
+    "Address": "MR61008",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61009",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61010",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61011",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61012",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61013",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61014",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61015",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61100",
+    "Level": "Error",
+    "Message": "A2-Y轴伺服需搜寻原点"
+  },
+  {
+    "Address": "MR61101",
+    "Level": "Error",
+    "Level": "Error",
+    "Message": "A2-Y轴伺服到达+极限"
+  },
+  {
+    "Address": "MR61102",
+    "Level": "Error",
+    "Message": "A2-Y轴伺服到达-极限"
+  },
+  {
+    "Address": "MR61103",
+    "Level": "Error",
+    "Message": "A2-Y轴伺服放松中"
+  },
+  {
+    "Address": "MR61104",
+    "Level": "Error",
+    "Message": "A2-Y轴伺服驱动器"
+  },
+  {
+    "Address": "MR61105",
+    "Level": "Error",
+    "Message": "A2-Y轴伺服错误中"
+  },
+  {
+    "Address": "MR61106",
+    "Level": "Error",
+    "Message": "A2-Y轴伺服准备好"
+  },
+  {
+    "Address": "MR61107",
+    "Level": "Error",
+    "Message": "A2-Y轴伺服动作未到位"
+  },
+  {
+    "Address": "MR61108",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61109",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61110",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61111",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61112",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61113",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61114",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61115",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61200",
+    "Level": "Error",
+    "Message": "A3-Z1轴伺服需搜寻原点"
+  },
+  {
+    "Address": "MR61201",
+    "Level": "Error",
+    "Message": "A3-Z1轴伺服到达+极限"
+  },
+  {
+    "Address": "MR61202",
+    "Level": "Error",
+    "Message": "A3-Z1轴伺服到达-极限"
+  },
+  {
+    "Address": "MR61203",
+    "Level": "Error",
+    "Message": "A3-Z1轴伺服放松中"
+  },
+  {
+    "Address": "MR61204",
+    "Level": "Error",
+    "Message": "A3-Z1轴伺服驱动器"
+  },
+  {
+    "Address": "MR61205",
+    "Level": "Error",
+    "Message": "A3-Z1轴伺服错误中"
+  },
+  {
+    "Address": "MR61206",
+    "Level": "Error",
+    "Message": "A3-Z1轴伺服准备好"
+  },
+  {
+    "Address": "MR61207",
+    "Level": "Error",
+    "Message": "A3-Z1轴伺服动作未到位"
+  },
+  {
+    "Address": "MR61208",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61209",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61210",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61211",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61212",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61213",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61214",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61215",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61300",
+    "Level": "Error",
+    "Message": "A4-Z2轴伺服需搜寻原点"
+  },
+  {
+    "Address": "MR61301",
+    "Level": "Error",
+    "Message": "A4-Z2轴伺服到达+极限"
+  },
+  {
+    "Address": "MR61302",
+    "Level": "Error",
+    "Message": "A4-Z2轴伺服到达-极限"
+  },
+  {
+    "Address": "MR61303",
+    "Level": "Error",
+    "Message": "A4-Z2轴伺服放松中"
+  },
+  {
+    "Address": "MR61304",
+    "Level": "Error",
+    "Message": "A4-Z2轴伺服驱动器"
+  },
+  {
+    "Address": "MR61305",
+    "Level": "Error",
+    "Message": "A4-Z2轴伺服错误中"
+  },
+  {
+    "Address": "MR61306",
+    "Level": "Error",
+    "Message": "A4-Z2轴伺服准备好"
+  },
+  {
+    "Address": "MR61307",
+    "Level": "Error",
+    "Message": "A4-Z2轴伺服动作未到位"
+  },
+  {
+    "Address": "MR61308",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61309",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61310",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61311",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61312",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61313",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61314",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61315",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61400",
+    "Level": "Error",
+    "Message": "A5-U轴伺服需搜寻原点"
+  },
+  {
+    "Address": "MR61401",
+    "Level": "Error",
+    "Message": "A5-U轴伺服到达+极限"
+  },
+  {
+    "Address": "MR61402",
+    "Level": "Error",
+    "Message": "A5-U轴伺服到达-极限"
+  },
+  {
+    "Address": "MR61403",
+    "Level": "Error",
+    "Message": "A5-U轴伺服放松中"
+  },
+  {
+    "Address": "MR61404",
+    "Level": "Error",
+    "Message": "A5-U轴伺服驱动器"
+  },
+  {
+    "Address": "MR61405",
+    "Level": "Error",
+    "Message": "A5-U轴伺服错误中"
+  },
+  {
+    "Address": "MR61406",
+    "Level": "Error",
+    "Message": "A5-U轴伺服准备好"
+  },
+  {
+    "Address": "MR61407",
+    "Level": "Error",
+    "Message": "A5-U轴伺服动作未到位"
+  },
+  {
+    "Address": "MR61408",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61409",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61410",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61411",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61412",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61413",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61414",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61415",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61500",
+    "Level": "Error",
+    "Message": "A6-V轴伺服需搜寻原点"
+  },
+  {
+    "Address": "MR61501",
+    "Level": "Error",
+    "Message": "A6-V轴伺服到达+极限"
+  },
+  {
+    "Address": "MR61502",
+    "Level": "Error",
+    "Message": "A6-V轴伺服到达-极限"
+  },
+  {
+    "Address": "MR61503",
+    "Level": "Error",
+    "Message": "A6-V轴伺服放松中"
+  },
+  {
+    "Address": "MR61504",
+    "Level": "Error",
+    "Message": "A6-V轴伺服驱动器"
+  },
+  {
+    "Address": "MR61505",
+    "Level": "Error",
+    "Message": "A6-V轴伺服错误中"
+  },
+  {
+    "Address": "MR61506",
+    "Level": "Error",
+    "Message": "A6-V轴伺服准备好"
+  },
+  {
+    "Address": "MR61507",
+    "Level": "Error",
+    "Message": "A6-V轴伺服动作未到位"
+  },
+  {
+    "Address": "MR61508",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61509",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61510",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61511",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61512",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61513",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61514",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61515",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61600",
+    "Level": "Error",
+    "Message": "A7-W轴伺服需搜寻原点"
+  },
+  {
+    "Address": "MR61601",
+    "Level": "Error",
+    "Message": "A7-W轴伺服到达+极限"
+  },
+  {
+    "Address": "MR61602",
+    "Level": "Error",
+    "Message": "A7-W轴伺服到达-极限"
+  },
+  {
+    "Address": "MR61603",
+    "Level": "Error",
+    "Message": "A7-W轴伺服放松中"
+  },
+  {
+    "Address": "MR61604",
+    "Level": "Error",
+    "Message": "A7-W轴伺服驱动器"
+  },
+  {
+    "Address": "MR61605",
+    "Level": "Error",
+    "Message": "A7-W轴伺服错误中"
+  },
+  {
+    "Address": "MR61606",
+    "Level": "Error",
+    "Message": "A7-W轴伺服准备好"
+  },
+  {
+    "Address": "MR61607",
+    "Level": "Error",
+    "Message": "A7-W轴伺服动作未到位"
+  },
+  {
+    "Address": "MR61608",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61609",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61610",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61611",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61612",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61613",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61614",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61615",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61700",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61701",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61702",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61703",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61704",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61705",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61706",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61707",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61708",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61709",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61710",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61711",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61712",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61713",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61714",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61715",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61800",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61801",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61802",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61803",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61804",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61805",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61806",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61807",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61808",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61809",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61810",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61811",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61812",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61813",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61814",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61815",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61900",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61901",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61902",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61903",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61904",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61905",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61906",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61907",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61908",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61909",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61910",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61911",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61912",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61913",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61914",
+    "Level": "None",
+    "Message": ""
+  },
+  {
+    "Address": "MR61915",
+    "Level": "None",
+    "Message": ""
+  }
+]

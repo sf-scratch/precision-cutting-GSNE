@@ -18,13 +18,17 @@ namespace 精密切割系统.ViewModel
     {
         private PlcControl()
         {
-            readConfig();
             if (GlobalParams.onlineFlag)
             {
                 readTags = new Thread(updateAllTags);
                 readTags.IsBackground = true;
                 readTags.Start();
             }
+        }
+
+        static PlcControl()
+        {
+            ReadConfig();
         }
 
         private static readonly object _Object = new object();
@@ -62,7 +66,7 @@ namespace 精密切割系统.ViewModel
 
         // PLC IO信息
 
-        public void readConfig()
+        public static void ReadConfig()
         {
             // 获取相对于当前目录的配置文件路径
             // example PlcControl.tagControl.Xaxis.StartJog();

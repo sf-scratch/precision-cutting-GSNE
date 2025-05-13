@@ -200,7 +200,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
             rightPage.btnBack.Visibility = Visibility.Collapsed;
             rightPage.btnCutStart.Visibility = Visibility.Collapsed;
             // 设置状态
-            Task.Run(() => {
+            Task.Run(async () => {
                 GlobalParams.globalRunFlag = true;
                 CheckError();
                 // 开始测量 切割完一刀，就增加测量行
@@ -324,7 +324,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
                 if (CommonCheck.GetParamsStatus(DeviceKey.workpieceBlowingStatusKey))
                 {
                     Thread.Sleep(3000);
-                    PlcControl.tagControl.wholeDevice.SetWorkpieceBlowing();
+                    await PlcControl.tagControl.wholeDevice.CloseWorkpieceBlowingAsync();
                 }
             });
         }

@@ -126,24 +126,13 @@ namespace 精密切割系统.View.Pages.Hader
             ClearAlarmInfo();
         }
 
-        private void ClearAlarmInfo()
+        private async void ClearAlarmInfo()
         {
             if (PlcControl.allAlarm.Count > 0)
             {
                 PlcControl.allAlarm[0].ClearAlarm();
             }
-            GlobalParams.globalRunFlag = false;
-            Task.Run(() =>
-            {
-                Thread.Sleep(300);
-                if (Tools.TrueFlag(PlcControl.plc.GetPlcValueString(DeviceKey.buzzerKey)) 
-                    || Tools.TrueFlag(PlcControl.plc.GetPlcValueString(DeviceKey.yellowLightFlashKey)))
-                {
-                    PlcControl.tagControl.wholeDevice.SetYellowLightFlash(0);
-                    PlcControl.tagControl.wholeDevice.SetBuzzerStatus(0);
-                }
-            });
-            
+            await PlcControl.tagControl.wholeDevice.AlarmResetAsync();
         }
 
         //退出系统；连续10下退出系统或最小化窗口

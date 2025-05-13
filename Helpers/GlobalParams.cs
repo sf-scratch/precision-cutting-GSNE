@@ -12,7 +12,7 @@ namespace 精密切割系统.FrmWindow.common
     internal class GlobalParams
     {
         // true 在线版本 false 离线版本
-        public static bool onlineFlag = false;
+        public static bool onlineFlag = true;
         public static readonly bool OnlineMES = false;
         // 当前页面是否是首页
         public static bool currentPageIsHome = false;

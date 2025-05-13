@@ -262,12 +262,12 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                     GlobalParams.globalRunFlag = false;
                     return;
                 }
-                Task.Run(() =>
+                Task.Run(async () =>
                 {
                     if (CommonCheck.GetParamsStatus(DeviceKey.workpieceBlowingStatusKey))
                     {
-                        Thread.Sleep(3000);
-                        PlcControl.tagControl.wholeDevice.SetWorkpieceBlowing();
+                        await Task.Delay(3000);
+                        await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
                     }
                 });
             }
@@ -358,7 +358,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 
         }
 
-        private void cut()
+        private async void cut()
         {
             Thread.Sleep(1000);
             // 等待切割模式准备好
@@ -503,7 +503,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                             {
                                 // 吹气4秒
                                 Thread.Sleep(4000);
-                                PlcControl.tagControl.wholeDevice.SetWorkpieceBlowing();
+                                await PlcControl.tagControl.wholeDevice.OpenWorkpieceBlowingAsync();
                             }
                             while (stopFlag)
                             {

@@ -1041,7 +1041,7 @@ namespace 精密切割系统.Driver
             }
 
             // 检查输入参数有效性
-            if (tag == null || (string.IsNullOrEmpty(tag.Value) && string.IsNullOrEmpty(tag.writeValue)))
+            if (tag == null || string.IsNullOrEmpty(tag.Value) || string.IsNullOrEmpty(tag.writeValue))
             {
                 Tools.LogError("写入PLC失败：tag或tag.writeValue为空");
                 return false;
@@ -1926,6 +1926,7 @@ namespace 精密切割系统.Driver
         public Tag axisAlarm { get; set; }
         public Tag clearAxisAlarm { get; set; }
         public Tag securityDoor1 { get; set; }
+        public Tag alarmReset { get; set; }
         public Tag securityDoor2Close { get; set; }
         public Tag securityDoor2Open { get; set; }
         public Tag securityDoor1Status { get; set; }
@@ -1990,6 +1991,8 @@ namespace 精密切割系统.Driver
         /// </summary>
         public async Task SystemInitAsync()
         {
+            systemInit.writeValue = "0";
+            await keyencePlc.WriteTagAsync(systemInit);
             systemInit.writeValue = "1";
             await keyencePlc.WriteTagAsync(systemInit);
         }
@@ -2018,6 +2021,14 @@ namespace 精密切割系统.Driver
         public async Task WaitSystemInitCompletedAsync(CancellationToken token)
         {
             await TaskUtils.WaitExpectedResultAsync(IsCompletedSystemInitAsync, true, token);
+        }
+
+        public async Task AlarmResetAsync()
+        {
+            alarmReset.writeValue = "0";
+            await keyencePlc.WriteTagAsync(alarmReset);
+            alarmReset.writeValue = "1";
+            await keyencePlc.WriteTagAsync(alarmReset);
         }
 
         /// <summary>
@@ -2089,12 +2100,12 @@ namespace 精密切割系统.Driver
         }
 
         /// <summary>
-        /// 打开或关闭切割水
+        /// 是否开启切割水
         /// </summary>
-        public void SetCuttingWater()
+        /// <returns></returns>
+        public async Task<bool> IsOpenSpindleCuttingWaterAsync()
         {
-            cuttingWater.writeValue = "1";
-            keyencePlc.writeTag(cuttingWater);
+            return await keyencePlc.ReadDataAsync(spindleCuttingWater.addr) == true;
         }
 
         /// <summary>
@@ -2123,14 +2134,34 @@ namespace 精密切割系统.Driver
             workVacuumSwitch.writeValue = "1";
             keyencePlc.writeTag(workVacuumSwitch);
         }
+
         /// <summary>
-        /// 设置工件吹气
+        /// 设置工件吹气打开
         /// </summary>
-        public void SetWorkpieceBlowing()
+        public async Task OpenWorkpieceBlowingAsync()
         {
             workpieceBlowing.writeValue = "1";
-            keyencePlc.writeTag (workpieceBlowing);
+            await keyencePlc.WriteTagAsync(workpieceBlowing);
         }
+
+        /// <summary>
+        /// 设置工件吹气关闭
+        /// </summary>
+        public async Task CloseWorkpieceBlowingAsync()
+        {
+            workpieceBlowing.writeValue = "0";
+            await keyencePlc.WriteTagAsync(workpieceBlowing);
+        }
+
+        /// <summary>
+        /// 是否打开工件吹气
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> IsOpenWorkpieceBlowingAsync()
+        {
+            return await keyencePlc.ReadDataAsync(workpieceBlowingStatus.addr) == true;
+        }
+
         /// <summary>
         /// 设置工件吹气
         /// </summary>
@@ -2139,15 +2170,25 @@ namespace 精密切割系统.Driver
             workpieceBlowing.writeValue = "1";
             await keyencePlc.WriteTagAsync(workpieceBlowing);
         }
-        /// <summary>
-        /// 操作安全门1
-        /// </summary>
-        /// <param name="status">0关闭 1 打开</param>
-        public void OperateSecurityDoor1(int status)
+
+        public async Task<bool> IsOpenSecurityDoor1Async()
         {
-            securityDoor1.writeValue = status + "";
-            keyencePlc.writeTag (securityDoor1);
-        }/// <summary>
+            return await keyencePlc.ReadDataAsync(securityDoor1.addr) == false;
+        }
+
+        public async Task OpenSecurityDoor1Async()
+        {
+            securityDoor1.writeValue = "0";
+            await keyencePlc.WriteTagAsync(securityDoor1);
+        }
+
+        public async Task CloseSecurityDoor1Async()
+        {
+            securityDoor1.writeValue = "1";
+            await keyencePlc.WriteTagAsync(securityDoor1);
+        }
+
+        /// <summary>
         /// 操作安全门2
         /// </summary>
         /// <param name="status">0关闭 1 打开</param>
@@ -2170,15 +2211,24 @@ namespace 精密切割系统.Driver
                 keyencePlc.writeTag(securityDoor2Open);
             }
         }
-        /// <summary>
-        /// 设置真空状态
-        /// </summary>
-        /// <param name="status">0 关 1 开</param>
-        public void VacuumSwitch(int status)
+
+        public async Task<bool> IsOpenVacuumSwitchAsync()
         {
-            vacuumSwitch.writeValue = status + "";
-            keyencePlc.writeTag (vacuumSwitch);
+            return await keyencePlc.ReadDataAsync(vacuumState.addr) == true;
         }
+
+        public async Task OpenVacuumSwitchAsync()
+        {
+            vacuumSwitch.writeValue = "1";
+            await keyencePlc.WriteTagAsync(vacuumSwitch);
+        }
+
+        public async Task CloseVacuumSwitchAsync()
+        {
+            vacuumSwitch.writeValue = "0";
+            await keyencePlc.WriteTagAsync(vacuumSwitch);
+        }
+
         /// <summary>
         /// 设置油泵计数清零
         /// </summary>
