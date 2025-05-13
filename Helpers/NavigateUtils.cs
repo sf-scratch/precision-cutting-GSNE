@@ -26,7 +26,6 @@ namespace 精密切割系统.Helpers
                 MaterialSnackUtils.MaterialSnack("跳转界面失败", MaterialSnackUtils.SnackType.WARNING, 0);
                 return;
             }
-            ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(EmptyView));
             mainWindow.NavigateToPage(pageName);
         }
 
@@ -39,7 +38,6 @@ namespace 精密切割系统.Helpers
                 MaterialSnackUtils.MaterialSnack("跳转界面失败", MaterialSnackUtils.SnackType.WARNING, 0);
                 return;
             }
-            ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(EmptyView));
             if (paramObj != null)
             {
                 mainWindow.NavigateToPage(pageName, paramObj);
@@ -74,11 +72,22 @@ namespace 精密切割系统.Helpers
             {
                 return;
             }
+            operatePage.SetOperateShowType(3);
             operatePage.UpdateOperate([]);
             rightPage.PanelAction.Visibility = Visibility.Visible;
         }
 
         public static void ClearMainFrame()
+        {
+            MainWindow? mainWindow = Application.Current.MainWindow as MainWindow;
+            if (mainWindow == null)
+            {
+                return;
+            }
+            mainWindow.mainFrame.Content = null;
+        }
+
+        public static void Clear()
         {
             MainWindow? mainWindow = Application.Current.MainWindow as MainWindow;
             if (mainWindow == null)

@@ -41,6 +41,17 @@ namespace 精密切割系统.View.Controls
             get { return (string)GetValue(ContentTextProperty); }
             set { SetValue(ContentTextProperty, value); }
         }
+
+        public double ContentTextFontSize
+        {
+            get { return (double)GetValue(ContentTextFontSizeProperty); }
+            set { SetValue(ContentTextFontSizeProperty, value); }
+        }
+
+        // 文字大小
+        public static readonly DependencyProperty ContentTextFontSizeProperty =
+            DependencyProperty.Register("ContentTextFontSize", typeof(double), typeof(RightButton), new PropertyMetadata(0d));
+
         // 是否返回 false不返回 true 返回上一级
         public static readonly DependencyProperty BackFlagProperty =
         DependencyProperty.Register("BackFlag", typeof(bool), typeof(RightButton), new PropertyMetadata(null));
@@ -103,7 +114,13 @@ namespace 精密切割系统.View.Controls
             {
                 btnBorder.MouseDown += BtnBorder_MouseDown;
                 btnBorder.MouseUp += BtnBorder_MouseUp;
+                btnBorder.MouseLeave += BtnBorder_MouseLeave;
             }
+        }
+
+        private void BtnBorder_MouseLeave(object sender, MouseEventArgs e)
+        {
+            btnBorder.Background = BackgroundDefColor;
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -113,6 +130,8 @@ namespace 精密切割系统.View.Controls
 
         private void BtnBorder_TouchUp(object? sender, TouchEventArgs e)
         {
+            btnBorder.Background = BackgroundDefColor;
+            RaiseRightClickedEvent();
             onClick(true);
         }
 
@@ -126,8 +145,9 @@ namespace 精密切割系统.View.Controls
 
         private void BtnBorder_MouseUp(object sender, MouseButtonEventArgs e)
         {
-
-            btnBorder.Background = BackgroundDownColor;
+            btnBorder.Background = BackgroundDefColor;
+            RaiseRightClickedEvent();
+            onClick(true);
         }
 
         private void BtnBorder_TouchDown(object? sender, TouchEventArgs e)
@@ -138,12 +158,11 @@ namespace 精密切割系统.View.Controls
 
         private void BtnBorder_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            onClick(true);
+            btnBorder.Background = BackgroundDownColor;
         }
 
         private void onClick(Boolean isOK)
         {
-            RaiseRightClickedEvent();
             if (!CommonCheck.CheckAlarmStatus() && !GlobalRunOperateFlag)
             {
                 MaterialSnackUtils.MaterialSnack("请先解除报警！", MaterialSnackUtils.SnackType.WARNING, 5);
@@ -202,7 +221,6 @@ namespace 精密切割系统.View.Controls
             btnBorder.Background = BackgroundDefColor;
         }
 
-        // 在自定义控件（RightButton）中定义路由事件
         public static readonly RoutedEvent RightClickedEvent =
             EventManager.RegisterRoutedEvent(
                 "RightClicked",
@@ -210,14 +228,12 @@ namespace 精密切割系统.View.Controls
                 typeof(RoutedEventHandler),
                 typeof(RightButton));
 
-        // 提供CLR事件包装器
         public event RoutedEventHandler RightButtonClicked
         {
             add { AddHandler(RightClickedEvent, value); }
             remove { RemoveHandler(RightClickedEvent, value); }
         }
 
-        // 触发事件的方法
         private void RaiseRightClickedEvent()
         {
             RoutedEventArgs args = new RoutedEventArgs(RightClickedEvent);

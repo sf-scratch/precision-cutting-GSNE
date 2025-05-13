@@ -11,7 +11,7 @@
       xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
       mc:Ignorable="d" 
       d:DesignHeight="250" d:DesignWidth="1450"
-      d:DataContext="{d:DesignInstance viewModel:OperatePageViewModel, IsDesignTimeCreatable=True}"
+      d:DataContext="{d:DesignInstance viewModel:CtViewModel, IsDesignTimeCreatable=True}"
       Loaded="Page_Loaded" 
       Title="OperatePage">
     <Page.Resources>
@@ -28,11 +28,7 @@
             <Setter Property="Padding" Value="0"/>
         </Style>
     </Page.Resources>
-    <Page.DataContext>
-        <viewModel:OperatePageViewModel/>
-    </Page.DataContext>
     <Grid>
-
         <Grid x:Name="OperateGrid" Width="1450" Height="250" Margin="15,0,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
@@ -173,7 +169,83 @@
             </Border>
         </Grid>
 
-        <ListBox Margin="15,0,0,0" Width="1450" Height="250"
+        <ListBox Margin="15,0,0,0" Width="1450" Height="250" x:Name="OperateButtonListBox"
+                 HorizontalAlignment="Stretch"
+                 VerticalAlignment="Stretch"
+                 Visibility="Visible"
+                 Background="Transparent"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 ScrollViewer.CanContentScroll="True"
+                 VirtualizingPanel.ScrollUnit="Pixel"
+                 SelectionMode="Extended"
+                 BorderThickness="0"
+                 BorderBrush="Transparent"
+                 ItemsSource="{Binding RightButtonParams}" d:ItemsSource="{d:SampleData}">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <ContentPresenter />
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="Transparent"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Controls:RightButton
+                        BackFlag="{Binding BackFlag}"
+                        BackgroundDefColor="{Binding BackgroundDefColor}"
+                        BackgroundDownColor="{Binding BackgroundDownColor}"
+                        ContentText="{Binding ContentText}"
+                        ContentTextFontSize="{Binding ContentTextFontSize}"
+                        ImagePath="{Binding ImagePath}"
+                        Visibility="{Binding Visibility}">
+                        <behaviors:Interaction.Triggers>
+                            <behaviors:EventTrigger EventName="RightButtonClicked">
+                                <behaviors:InvokeCommandAction Command="{Binding RightClickCommand}"/>
+                            </behaviors:EventTrigger>
+                            <!-- 按下时开始触发 -->
+                            <behaviors:EventTrigger EventName="PreviewMouseDown">
+                                <behaviors:InvokeCommandAction Command="{Binding StartCommand}"/>
+                            </behaviors:EventTrigger>
+                            <!-- 松开时停止 -->
+                            <behaviors:EventTrigger EventName="PreviewMouseUp">
+                                <behaviors:InvokeCommandAction Command="{Binding StopCommand}"/>
+                            </behaviors:EventTrigger>
+                            <!-- 鼠标移开时停止 -->
+                            <behaviors:EventTrigger EventName="MouseLeave">
+                                <behaviors:InvokeCommandAction Command="{Binding StopCommand}"/>
+                            </behaviors:EventTrigger>
+                            <!-- 支持触摸屏 -->
+                            <behaviors:EventTrigger EventName="PreviewTouchDown">
+                                <behaviors:InvokeCommandAction Command="{Binding StartCommand}"/>
+                            </behaviors:EventTrigger>
+                            <behaviors:EventTrigger EventName="PreviewTouchUp">
+                                <behaviors:InvokeCommandAction Command="{Binding StopCommand}"/>
+                            </behaviors:EventTrigger>
+                            <behaviors:EventTrigger EventName="TouchLeave">
+                                <behaviors:InvokeCommandAction Command="{Binding StopCommand}"/>
+                            </behaviors:EventTrigger>
+                        </behaviors:Interaction.Triggers>
+                    </Controls:RightButton>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <!--<ListBox Margin="15,0,0,0" Width="1450" Height="250" x:Name="OperateuttonListBox"
          HorizontalAlignment="Stretch"
          VerticalAlignment="Stretch"
          Visibility="Visible"
@@ -200,6 +272,7 @@
                         </Setter.Value>
                     </Setter>
                     <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="IsHitTestVisible" Value="True"/>
                     <Style.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Background" Value="Transparent"/>
@@ -212,10 +285,12 @@
                     <Controls:RightButton
                         Width="268"
                         Height="100"
+                        IsHitTestVisible="True"
                         BackFlag="{Binding BackFlag}"
                         BackgroundDefColor="{Binding BackgroundDefColor}"
                         BackgroundDownColor="{Binding BackgroundDownColor}"
                         ContentText="{Binding ContentText}"
+                        ContentTextFontSize="{Binding ContentTextFontSize}"
                         ImagePath="{Binding ImagePath}"
                         Visibility="{Binding Visibility}">
                         <behaviors:Interaction.Triggers>
@@ -226,7 +301,7 @@
                     </Controls:RightButton>
                 </DataTemplate>
             </ListBox.ItemTemplate>
-        </ListBox>
+        </ListBox>-->
     </Grid>
 
 </Page>

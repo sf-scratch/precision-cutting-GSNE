@@ -445,6 +445,15 @@ namespace 精密切割系统.Model.cut
             return null;
         }
 
+        public static async Task WorkpieceBlowingAsync(CancellationToken token)
+        {
+            await PlcControl.tagControl.wholeDevice.SetWorkpieceBlowingAsync();
+            await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(190, token);
+            await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(70, token);
+            await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(2, token);
+            await PlcControl.tagControl.wholeDevice.SetWorkpieceBlowingAsync();
+        }
+
         private static async Task<Queue<CutStep>?> GetAllCutSequenceAsync(long id, float afterHeightMeasurementZ)
         {
             // 判断是否确认配置信息
@@ -1004,12 +1013,15 @@ namespace 精密切割系统.Model.cut
         /// <returns></returns>
         public static async Task<bool> CheckKnifeMarksStatus(LineSegment line, float focusClearZ2, CancellationToken token)
         {
+            
             //return true;
             DataPoint<float> relativePos = GlobalParams.CameraRelativeBladePosition;
             await WaitAllAxisStopAsync(token);
             await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, token);
             await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(line.StartPoint.Y + relativePos.Y, token);
             await PlcControl.tagControl.Xaxis.StartAbsoluteAsync((line.StartPoint.X + line.EndPoint.X) / 2 + relativePos.X, token);
+            //工件吹气
+            await WorkpieceBlowingAsync(token);
             await AutoFocusAsync(token);
             CancellationTokenSource cts = new CancellationTokenSource();
             CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(token, cts.Token);
@@ -1043,16 +1055,16 @@ namespace 精密切割系统.Model.cut
             cts.Cancel();
             List<Mat> mats = await grabTimerTask;
             ImagesAnalysisResult imagesAnalysisRes = await ProcessImagesAnalysisAsync(mats, token);
-            // 处理图像数据，取中间的图像
+            // 处理图像数据
             if (imagesAnalysisRes.ImageDatas.Count != 0)
             {
-                ImageData imageData = imagesAnalysisRes.ImageDatas.First();
+                ImageData imageData = imagesAnalysisRes.BladeWidthMaxImage;
                 PdaUtils.AddToolMarkWidth(imageData.BladeWidth.ToString());
                 PdaUtils.AddToolMarkActualWidth(imageData.BladeWidth.ToString());
                 PdaUtils.AddFirstToolMarkWidth(imageData.BladeWidth.ToString());
                 PdaUtils.AddFirstToolMarkImage(imageData.Mat);
                 PdaUtils.AddSecondToolMarkImage(imagesAnalysisRes.ImageDatas[1].Mat);
-                PdaUtils.AddMaximumCollapseAngle(imagesAnalysisRes.CollapseWidthMax.ToString());
+                PdaUtils.AddMaximumCollapseAngle(imagesAnalysisRes.CollapseWidthMaxImage.CollapseWidth.ToString());
             }
             return true;
         }
@@ -1076,17 +1088,16 @@ namespace 精密切割系统.Model.cut
                     //tasks.Add(SaveImageDataAsync($"C:\\Users\\17632\\Desktop\\image\\{DateTime.Now.Ticks}_cropMatJpg.jpg", cropMatJpg, semaphore, token));
                     var (bladeWidthMm, collapseWidthMm) = VisionAnalyzer.ProcessImage(cropMatJpg);
                     Cv2.PutText(cropMatJpg, $"bladeWidthMm: {bladeWidthMm} collapseWidthMm:{collapseWidthMm}", new OpenCvSharp.Point(10, 40), HersheyFonts.HersheySimplex, 1.5f, new Scalar(0, 0, 255));
-                    result.ImageDatas.Add(new ImageData() { BladeWidth = bladeWidthMm, CollapseWidth = collapseWidthMm, Mat = cropMat});
+                    ImageData imageData = new ImageData() { BladeWidth = bladeWidthMm, CollapseWidth = collapseWidthMm, Mat = cropMat };
+                    result.ImageDatas.Add(imageData);
                     tasks.Add(SaveImageDataAsync($"C:\\Users\\17632\\Desktop\\image\\{DateTime.Now.Ticks}_cropMatJpgText.jpg", cropMatJpg, semaphore, token));
-                    if (result.BladeWidthMax < bladeWidthMm)
+                    if (result.BladeWidthMaxImage.BladeWidth < bladeWidthMm)
                     {
-                        result.BladeWidthMax = bladeWidthMm;
-                        result.BladeWidthMaxMat = cropMatJpg;
+                        result.BladeWidthMaxImage = imageData;
                     }
-                    if (result.CollapseWidthMax < collapseWidthMm)
+                    if (result.CollapseWidthMaxImage.CollapseWidth < collapseWidthMm)
                     {
-                        result.CollapseWidthMax = collapseWidthMm;
-                        result.CollapseWidthMaxMat = cropMatJpg;
+                        result.CollapseWidthMaxImage = imageData;
                     }
                 }
                 await Task.WhenAll(tasks);

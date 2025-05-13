@@ -9,10 +9,8 @@ namespace 精密切割系统.Model.cut
 {
     public class ImagesAnalysisResult
     {
-        public double BladeWidthMax { get; set; } = double.MinValue;
-        public Mat BladeWidthMaxMat { get; set; }
-        public double CollapseWidthMax { get; set; } = double.MinValue;
-        public Mat CollapseWidthMaxMat { get; set; }
+        public ImageData BladeWidthMaxImage { get; set; } = new ImageData() { BladeWidth = double.MinValue};
+        public ImageData CollapseWidthMaxImage { get; set; } = new ImageData() { CollapseWidth = double.MinValue };
         public List<ImageData> ImageDatas{ get; set; } = new List<ImageData>();
     }
 

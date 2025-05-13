@@ -23,7 +23,7 @@ namespace 精密切割系统.Helpers
                 return false;
             }
             Dictionary<string, FlowsValuesDTO> flowsDic = allFieldValues.Select(x => x.ToFlowsValuesDTO()).ToDictionary(x => x.FieldLabel);
-            FieldValuesDTO fieldValues = GetFieldValuesDTO(flowsDic, "QG-01", lunguId);
+            FieldValuesDTO fieldValues = GetFieldValuesDTO(flowsDic, "QG-03", lunguId);
             string? groupOperateId = await HttpUtils.InsertFlowValuesAsync(fieldValues);
             if (groupOperateId == null)
             {

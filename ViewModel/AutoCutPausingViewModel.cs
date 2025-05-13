@@ -12,8 +12,10 @@ using 精密切割系统.Driver;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut;
+using 精密切割系统.Utils;
 using 精密切割系统.View.common;
 using 精密切割系统.View.Pages.Auto;
+using 精密切割系统.View.Pages.common;
 
 namespace 精密切割系统.ViewModel
 {
@@ -23,6 +25,7 @@ namespace 精密切割系统.ViewModel
         public RelayCommand StopCommand { get; set; }
         private IRegionManager _regionManager;
         private AutoCutRuningViewModel _autoCutRuningViewModel;
+        private CameraCommon? _cameraCommon;
 
         // 控制右侧按钮
         public ObservableCollection<RightButtonParams> RightPageButtonCollection;
@@ -146,6 +149,11 @@ namespace 精密切割系统.ViewModel
             OperatePageButtonCollection = WindowLayout.OperatePageButtons;
             ContinueCommand = new RelayCommand(ContinueCommandExecute);
             StopCommand = new RelayCommand(StopCommandExecute);
+            _cameraCommon = AutoCutUtils.GetCameraCommon();
+            if (_cameraCommon is null)
+            {
+                MaterialSnackUtils.MaterialSnack("相机获取失败！", MaterialSnackUtils.SnackType.WARNING);
+            }
         }
 
         public AutoCutPausingViewModel()
@@ -155,18 +163,19 @@ namespace 精密切割系统.ViewModel
         private void InitRightButton()
         {
             RightPageButtonCollection.Add(RightButtonParams.GreenRightButton("继续", "/Assets/icon/right/enter.png", ContinueCommandExecute));
-            RightPageButtonCollection.Add(RightButtonParams.RedRightButton("停止", "/Assets/icon/right/stop.png", StopCommandExecute));
+            RightPageButtonCollection.Add(RightButtonParams.RedRightButton("停止", "/Assets/icon/right/stop.png", null, StopCommandExecute));
         }
 
         private void InitBottonButton()
         {
-            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调窄", "/Assets/icon/tab_1/03/tab_02.png", BaselineNarrowing));
-            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线校准", "/Assets/icon/tab_1/03/tab_08.png", BaselineCalibration));
-            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调宽", "/Assets/icon/tab_1/03/tab_05.png", BaselineWidthAdjustment));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调窄", "/Assets/icon/tab_1/03/tab_02.png", null, BaselineNarrowing, 8));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调宽", "/Assets/icon/tab_1/03/tab_05.png", null, BaselineWidthAdjustment, 8));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线校准", "/Assets/icon/tab_1/03/tab_08.png", null, BaselineCalibration, 8));
         }
 
         private void BaselineWidthAdjustment()
         {
+            _cameraCommon?.SetCutMarkWidth(1, 2);
         }
 
         private void BaselineCalibration()
@@ -175,6 +184,7 @@ namespace 精密切割系统.ViewModel
 
         private void BaselineNarrowing()
         {
+            _cameraCommon?.SetCutMarkWidth(-1, 2);
         }
 
         private void ContinueCommandExecute()

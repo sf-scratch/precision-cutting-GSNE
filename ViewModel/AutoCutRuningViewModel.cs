@@ -93,6 +93,16 @@ namespace 精密切割系统.ViewModel
             set { _sharpenProgress = value; RaisePropertyChanged(); }
         }
 
+        private float _totalWearAmount;
+        /// <summary>
+        /// 总磨损量
+        /// </summary>
+        public float TotalWearAmount
+        {
+            get { return _totalWearAmount; }
+            set { _totalWearAmount = value; RaisePropertyChanged(); }
+        }
+
         private string _deviceDataNo;
         /// <summary>
         /// 型号参数No
@@ -182,16 +192,9 @@ namespace 精密切割系统.ViewModel
                 return;
             }
             //暂停页面跳转回来会触发InitCommand，调继续切割
-            if (_pauseCts.IsCancellationRequested)
+            if (_pauseCts.IsCancellationRequested && !_monitoringAlarmCts.IsCancellationRequested)
             {
                 await ContinueAsync();
-                return;
-            }
-            //PDA上机操作
-            bool isSuccess = await PdaUtils.ComputerPracticeAsync(LunguId);
-            if (!isSuccess)
-            {
-                MaterialSnackUtils.MaterialSnack("上机失败！", MaterialSnackUtils.SnackType.WARNING, 0);
                 return;
             }
             //theta轴中心点位置
@@ -216,6 +219,13 @@ namespace 精密切割系统.ViewModel
             Task monitorTask = StartMonitoringAlarmAsync(_monitoringAlarmCts.Token);
             try
             {
+                //PDA上机操作
+                bool isSuccess = await PdaUtils.ComputerPracticeAsync(LunguId);
+                if (!isSuccess)
+                {
+                    MaterialSnackUtils.MaterialSnack("上机失败！", MaterialSnackUtils.SnackType.WARNING, 0);
+                    return;
+                }
                 HeightMeasurementMode heightMeasurementMode = HeightMeasurementMode.NoContact;
                 string lunguId = CameraUtils.GetLunguId();
                 LunguSksjDTO? lunguSksj = await HttpUtils.GetLunguSksjAsync(lunguId);
@@ -234,12 +244,12 @@ namespace 精密切割系统.ViewModel
                 }
                 AfterHeightMeasurementZ = firstHeightMeasurementZ.Value;
                 RunStatus = AutoRunStatus.AutoFocus;
+                await AutoCutUtils.WorkpieceBlowingAsync(_pauseCts.Token);
                 //对焦
                 await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(cameraCenterPoint.X, _pauseCts.Token);
                 await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(cameraCenterPoint.Y + 20, _pauseCts.Token);
                 await AutoCutUtils.AutoFocusAsync(_pauseCts.Token);
                 float? focusClearZ = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync();
-                //float? focusClearZ = 20;
 
                 RunStatus = AutoRunStatus.SharpenCalibrat;
                 // 磨刀校准
@@ -283,17 +293,18 @@ namespace 精密切割系统.ViewModel
                         MaterialSnackUtils.MaterialSnack("测高失败，没有测高数据！", MaterialSnackUtils.SnackType.WARNING, 0);
                         return;
                     }
+                    TotalWearAmount = curHeightZ.Value - firstHeightMeasurementZ.Value;
                     //上传磨刀数据到MES
                     PdaUtils.AddSharpen(curHeightZ.Value - AfterHeightMeasurementZ, sharpenTimes);
                     AfterHeightMeasurementZ = curHeightZ.Value;
                     if (AutoCutUtils.CheckIsMeetsCuttingConditions(lunguSksj, firstHeightMeasurementZ.Value, curHeightZ.Value))
                     {
+                        MaterialSnackUtils.MaterialSnack("刀片满足进入切割的条件！", MaterialSnackUtils.SnackType.SUCCESS, 0);
+                        await Task.Delay(1000);
                         break;
                     }
                     sharpenTimes = CalculateSharpenTimes(lunguSksj, singleBladeWear, firstHeightMeasurementZ.Value, curHeightZ.Value);
                 }
-                MaterialSnackUtils.MaterialSnack("刀片满足进入切割的条件！", MaterialSnackUtils.SnackType.SUCCESS, 0);
-                await Task.Delay(1000);
 
                 RunStatus = AutoRunStatus.CutingInProgress;
                 _cutService.CutServiceProcessChanged += CutService_CutServiceProcessChanged;
@@ -556,6 +567,11 @@ namespace 精密切割系统.ViewModel
             SharpenParams = navigationContext.Parameters.GetValue<SharpenParamsModel>("SharpenParams");
             CutParams = navigationContext.Parameters.GetValue<CutParamsModel>("CutParams");
             _deviceDataNo = CutParams.DeviceDataNo;
+        }
+
+        public override bool IsNavigationTarget(NavigationContext navigationContext)
+        {
+            return !_pauseCts.IsCancellationRequested || !_monitoringAlarmCts.IsCancellationRequested;
         }
     }
 }

@@ -24,6 +24,7 @@ using 精密切割系统.Helpers;
 using 精密切割系统.Model.plc;
 using 精密切割系统.Utils;
 using 精密切割系统.View.Controls;
+using 精密切割系统.View.Pages.Auto;
 using 精密切割系统.View.Pages.common;
 using 精密切割系统.View.Pages.F4_BladeMaintenance;
 using 精密切割系统.ViewModel;
@@ -284,8 +285,9 @@ namespace 精密切割系统.View.Pages.operate
         {
             // 设置可见性
             OperateGrid.Visibility = type == 0 ? Visibility.Visible : Visibility.Collapsed;
-            costomKeyboardGrid.Visibility = type == 2 ? Visibility.Visible : Visibility.Collapsed;
             commonDirection.Visibility = type == 1 ? Visibility.Visible : Visibility.Collapsed;
+            costomKeyboardGrid.Visibility = type == 2 ? Visibility.Visible : Visibility.Collapsed;
+            OperateButtonListBox.Visibility = type == 3 ? Visibility.Visible : Visibility.Collapsed;
 
             Task.Run(() => {
                 Thread.Sleep(500);
@@ -294,13 +296,15 @@ namespace 精密切割系统.View.Pages.operate
                 {
                     // 设置触控响应
                     OperateGrid.IsHitTestVisible = type == 0;
-                    costomKeyboardGrid.IsHitTestVisible = type == 2;
                     commonDirection.IsHitTestVisible = type == 1;
+                    costomKeyboardGrid.IsHitTestVisible = type == 2;
+                    OperateButtonListBox.IsHitTestVisible = type == 3;
 
                     // 设置 ZIndex
                     Panel.SetZIndex(OperateGrid, type == 0 ? 1 : 0);
-                    Panel.SetZIndex(costomKeyboardGrid, type == 2 ? 1 : 0);
                     Panel.SetZIndex(commonDirection, type == 1 ? 1 : 0);
+                    Panel.SetZIndex(costomKeyboardGrid, type == 2 ? 1 : 0);
+                    Panel.SetZIndex(OperateButtonListBox, type == 3 ? 1 : 0);
                 }, System.Windows.Threading.DispatcherPriority.Background);
                 
             });
@@ -395,7 +399,7 @@ namespace 精密切割系统.View.Pages.operate
         }
         CameraCommon cameraCommon;
         bool spindRunStatus = false;
-        private void OperateButton_OperateClicked(object? sender, OperateBean e)
+        private async void OperateButton_OperateClicked(object? sender, OperateBean e)
         {
             if (!string.IsNullOrEmpty(e.PageUrl))
             {
@@ -463,7 +467,7 @@ namespace 精密切割系统.View.Pages.operate
                         return;
                     }
                     // 系统初始化
-                    SystemInitOperate();
+                    await SystemInitOperateAsync();
                     break;
                 case 7:
                     if (!GlobalParams.onlineFlag)
@@ -627,79 +631,40 @@ namespace 精密切割系统.View.Pages.operate
         {
             PlcControl.tagControl.wholeDevice.SetCuttingWater();
         }
-        // 系统初始化状态 0 未操作 1 确认操作 2 操作中
-        int systemInitStatus = 0;
         /// <summary>
         /// 系统初始化
         /// </summary>
-        private void SystemInitOperate()
+        private async Task SystemInitOperateAsync()
         {
-            if (!CommonCheck.AxisReady() || !CommonCheck.CheckDoor1())
-            {
-                return;
-            }
-            if (systemInitStatus == 2)
+            if (await PlcControl.tagControl.wholeDevice.IsSystemInitingAsync())
             {
                 MaterialSnackUtils.MaterialSnack("初始化中，请稍后再试！", MaterialSnackUtils.SnackType.WARNING);
                 return;
             }
-            if (systemInitStatus == 0 && PlcControl.allAlarm.Count > 0)
+            if (await PlcControl.tagControl.wholeDevice.CanSystemInitAsync())
             {
-                systemInitStatus = 1;
-                MaterialSnackUtils.MaterialSnack("请再次点击确认初始化！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnackUtils.MaterialSnack("初始化未准备好！", MaterialSnackUtils.SnackType.WARNING);
                 return;
             }
-            systemInitStatus = 2;
-
+            // 退出所有模式
             PlcControl.plc.exitAllModel();
-            PlcControl.tagControl.wholeDevice.SystemInit();
+            await PlcControl.tagControl.wholeDevice.SystemInitAsync();
             MaterialSnackUtils.MaterialSnack("系统初始化中...", MaterialSnackUtils.SnackType.SUCCESS, 0);
-            GlobalParams.globalRunFlag = true;
-            Thread _thread = new Thread(AlarmDispose);
-            _thread.IsBackground = true;
-            _thread.Start();
-            // 监听各轴运动速度，是否为0
-            Task.Run(() => {
-
-                Thread.Sleep(2500);
-                // 开始计时
-                Stopwatch stopwatch = Stopwatch.StartNew();
-                Tools.WaitForValue(DeviceKey.systemInitStatusKey, 1);
-                // 检查是否超过40秒
-                if (stopwatch.Elapsed.TotalSeconds > 90)
-                {
-                    MaterialSnackUtils.MaterialSnack("初始化过程超时，请检查系统状态!", MaterialSnackUtils.SnackType.ERROR, 0);
-                } else
-                {
-                    GlobalParams.systemInitFlag = true;
-                    PlcControl.allAlarm.Clear();
-                    Application.Current.Dispatcher.Invoke(new Action(() =>
-                    {
-                        List<MainMenu> mainMenuList = Tools.GetChildrenOfType<MainMenu>(mainWindow);
-                        if (mainMenuList.Count == 0)
-                        {
-                            mainWindow.NavigateToPage("MainMenu");
-                        }
-                    }));
-                    // 退出所有模式
-                    PlcControl.plc.exitAllModel();
-                    MaterialSnackUtils.MaterialSnack("系统初始化完成！", MaterialSnackUtils.SnackType.SUCCESS);
-                }
-                systemInitStatus = 0;
-                GlobalParams.globalRunFlag = false;
-                stopwatch.Stop(); // 停止计时
-            });
-        }
-
-        public void AlarmDispose()
-        {
-            while (systemInitStatus != 0)
+            try
             {
-                if (PlcControl.allAlarm.Count > 0)
-                {
-                    systemInitStatus = 0;
-                    GlobalParams.globalRunFlag = false;
-                }
+                using var cts = new CancellationTokenSource();
+                cts.CancelAfter(TimeSpan.FromSeconds(90));
+                await PlcControl.tagControl.wholeDevice.WaitSystemInitCompletedAsync(cts.Token);
+                GlobalParams.systemInitFlag = true;
+                MaterialSnackUtils.MaterialSnack("系统初始化完成！", MaterialSnackUtils.SnackType.SUCCESS);
+            }
+            catch (OperationCanceledException)
+            {
+                MaterialSnackUtils.MaterialSnack("系统初始化过程超时，请检查系统状态!", MaterialSnackUtils.SnackType.WARNING, 0);
+            }
+            catch (Exception ex)
+            {
+                MaterialSnackUtils.MaterialSnack($"系统初始化时遇到其他错误: {ex.Message}", MaterialSnackUtils.SnackType.WARNING, 0);
             }
         }
 

@@ -42,6 +42,7 @@ using 精密切割系统.Model.plc;
 using 精密切割系统.View.Pages.Auto;
 using 精密切割系统.Model.cut;
 using System.Windows.Threading;
+using 精密切割系统.View.common;
 
 namespace 精密切割系统
 {
@@ -64,6 +65,7 @@ namespace 精密切割系统
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
+                ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(EmptyView));
                 mainFrame.Navigate(new Uri($"View/{pageName}.xaml" + (string.IsNullOrEmpty(paramsStr) ? "" : "?" + paramsStr), UriKind.Relative));
             });
         }
@@ -72,6 +74,7 @@ namespace 精密切割系统
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
+                ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(EmptyView));
                 mainFrame.Navigate(new Uri($"View/{pageName}.xaml", UriKind.Relative), paramsStr);
             });
         }
@@ -92,9 +95,9 @@ namespace 精密切割系统
         {
             Dispatcher.BeginInvoke(new Action(() =>
             {
-                var result = VisionAnalyzer.ProcessImage("C:\\MySpace\\Dev\\OPT Camera Viewer_v4.0.0.1\\Pictures\\PIC_2025-05-09 15-35-09.807(1).bmp");
-                var result1 = VisionAnalyzer.SnakeCase("C:\\MySpace\\Dev\\OPT Camera Viewer_v4.0.0.1\\Pictures\\PIC_2025-05-09 15-35-09.807(1).bmp");
-                Debug.WriteLine(result);
+                //var result = VisionAnalyzer.ProcessImage("C:\\MySpace\\Dev\\OPT Camera Viewer_v4.0.0.1\\Pictures\\PIC_2025-05-09 15-35-09.807(1).bmp");
+                //var result1 = VisionAnalyzer.SnakeCase("C:\\MySpace\\Dev\\OPT Camera Viewer_v4.0.0.1\\Pictures\\PIC_2025-05-09 15-35-09.807(1).bmp");
+                //Debug.WriteLine(result);
                 string logDirectory = "logs";
                 int daysThreshold = 30; // 清理超过 30 天的日志
                 TimeSpan interval = TimeSpan.FromDays(1); // 每天触发一次
@@ -319,8 +322,14 @@ namespace 精密切割系统
                 operatePage.SetOperateShowType(1);
             } else
             {
-                // isNavigating = true;
-                operatePage.SetOperateShowType(0);
+                if (WindowLayout.OperatePageButtons.Count != 0)
+                {
+                    operatePage.SetOperateShowType(3);
+                }
+                else
+                {
+                    operatePage.SetOperateShowType(0);
+                }
             }
             CommonEvent.BtnScaleDown(sender, 1);
             CommonEvent.BtnScaleDown(shortcutDirectBtn, 0);
@@ -381,17 +390,26 @@ namespace 精密切割系统
             shortcutBottomBtnSel = !shortcutBottomBtnSel;
             shortcutTopBtnSel = false;
             ShortcutBtnClick();
+            CommonEvent.BtnScaleDown(sender, 1);
+            CommonEvent.BtnScaleDown(shortcutTopBtn, 0);
             if (shortcutBottomBtnSel)
             {
                 operatePage.UpdateOperate(OperateData.GetTab01Operate());
             }
             else
             {
-
-                SetOperateBtn(operatePage);
+                if (GlobalParams.currentOperateBeanList.Count != 0)
+                {
+                    operatePage.UpdateOperate(GlobalParams.currentOperateBeanList);
+                    return;
+                }
+                if (WindowLayout.OperatePageButtons.Count != 0)
+                {
+                    operatePage.SetOperateShowType(3);
+                    return;
+                }
+                operatePage.UpdateOperate(GlobalParams.currentOperateBeanList);
             }
-            CommonEvent.BtnScaleDown(sender, 1);
-            CommonEvent.BtnScaleDown(shortcutTopBtn, 0);
         }
 
 
@@ -465,9 +483,14 @@ namespace 精密切割系统
             }
             else
             {
-                // isNavigating = true;
-                operatePage.SetOperateShowType(0);
-                // operateFrame.Navigate(new Uri("View/Pages/operate/OperatePage.xaml", UriKind.Relative));
+                if (WindowLayout.OperatePageButtons.Count != 0)
+                {
+                    operatePage.SetOperateShowType(3);
+                }
+                else
+                {
+                    operatePage.SetOperateShowType(0);
+                }
             }
         }
 
@@ -483,8 +506,17 @@ namespace 精密切割系统
             }
             else
             {
-
-                SetOperateBtn(operatePage);
+                if (GlobalParams.currentOperateBeanList.Count != 0)
+                {
+                    operatePage.UpdateOperate(GlobalParams.currentOperateBeanList);
+                    return;
+                }
+                if (WindowLayout.OperatePageButtons.Count != 0)
+                {
+                    operatePage.SetOperateShowType(3);
+                    return;
+                }
+                operatePage.UpdateOperate(GlobalParams.currentOperateBeanList);
             }
         }
     }

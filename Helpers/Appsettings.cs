@@ -51,7 +51,12 @@ namespace 精密切割系统.Helpers
 
         public static void UpdateAppSettingsToNull(string key)
         {
-            Configuration.GetSection(key).Value = null;
+            var section = Configuration.GetSection(key);
+            section.Value = null;
+            foreach (var child in section.GetChildren())
+            {
+                section.GetSection(child.Key).Value = null; // 清空子键值
+            }
             string jsonView = Configuration.ToJson();
             File.WriteAllText(_configPath, jsonView);
         }

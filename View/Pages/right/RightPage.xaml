@@ -172,11 +172,34 @@ Height="22.86"
                         BackgroundDefColor="{Binding BackgroundDefColor}"
                         BackgroundDownColor="{Binding BackgroundDownColor}"
                         ContentText="{Binding ContentText}"
+                        ContentTextFontSize="{Binding ContentTextFontSize}"
                         ImagePath="{Binding ImagePath}"
                         Visibility="{Binding Visibility}">
                         <behaviors:Interaction.Triggers>
                             <behaviors:EventTrigger EventName="RightButtonClicked">
                                 <behaviors:InvokeCommandAction Command="{Binding RightClickCommand}"/>
+                            </behaviors:EventTrigger>
+                            <!-- 按下时开始触发 -->
+                            <behaviors:EventTrigger EventName="PreviewMouseDown">
+                                <behaviors:InvokeCommandAction Command="{Binding StartCommand}"/>
+                            </behaviors:EventTrigger>
+                            <!-- 松开时停止 -->
+                            <behaviors:EventTrigger EventName="PreviewMouseUp">
+                                <behaviors:InvokeCommandAction Command="{Binding StopCommand}"/>
+                            </behaviors:EventTrigger>
+                            <!-- 鼠标移开时停止 -->
+                            <behaviors:EventTrigger EventName="MouseLeave">
+                                <behaviors:InvokeCommandAction Command="{Binding StopCommand}"/>
+                            </behaviors:EventTrigger>
+                            <!-- 支持触摸屏 -->
+                            <behaviors:EventTrigger EventName="PreviewTouchDown">
+                                <behaviors:InvokeCommandAction Command="{Binding StartCommand}"/>
+                            </behaviors:EventTrigger>
+                            <behaviors:EventTrigger EventName="PreviewTouchUp">
+                                <behaviors:InvokeCommandAction Command="{Binding StopCommand}"/>
+                            </behaviors:EventTrigger>
+                            <behaviors:EventTrigger EventName="TouchLeave">
+                                <behaviors:InvokeCommandAction Command="{Binding StopCommand}"/>
                             </behaviors:EventTrigger>
                         </behaviors:Interaction.Triggers>
                     </Controls:RightButton>

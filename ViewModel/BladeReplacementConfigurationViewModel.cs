@@ -88,6 +88,7 @@ namespace 精密切割系统.ViewModel
 
         private void InitRightButtonOnlyBack()
         {
+            _rightButtonParams.Clear();
             _rightButtonParams.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }
 
@@ -95,7 +96,7 @@ namespace 精密切割系统.ViewModel
         {
             _rightButtonParams.Clear();
             _rightButtonParams.Add(RightButtonParams.GreenRightButton("自动执行", "/Assets/icon/right/enter.png", AutoRun));
-            _rightButtonParams.Add(RightButtonParams.GreenRightButton("重置磨刀", "/Assets/icon/right/enter.png", SharpenService.Instance.Reset));
+            _rightButtonParams.Add(RightButtonParams.GreenRightButton("重置磨刀", "/Assets/icon/menu_6/menu_6_1_white.png", SharpenService.Instance.Reset));
             _rightButtonParams.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }
 
@@ -111,6 +112,7 @@ namespace 精密切割系统.ViewModel
                 LunguSksjDTO? lunguSksjDTO = await HttpUtils.GetLunguSksjAsync(lunguId);
                 if (lunguSksjDTO == null)
                 {
+                    InitRightButtonOnlyBack();
                     Tools.LogError("轮毂信息获取失败！");
                     MaterialSnackUtils.MaterialSnack("轮毂信息获取失败！", MaterialSnackUtils.SnackType.WARNING);
                     return;
@@ -205,8 +207,7 @@ namespace 精密切割系统.ViewModel
             LunguSks = new LunguSksjModel();
             SharpenParams = new SharpenParamsModel();
             CutParams = new CutParamsModel();
-            InitRightButton();
-            //InitRightButtonOnlyBack();
+            InitRightButtonOnlyBack();
             Application.Current.Dispatcher.BeginInvoke(new Action(() =>
             {
                 _eventAggregator.GetEvent<SetFocusEvent>().Publish("lunguTextBox");

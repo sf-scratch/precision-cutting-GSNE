@@ -137,7 +137,7 @@ namespace 精密切割系统.Model.cut
                             //计算工件圆心坐标
                             DataPoint<float> workpieceCenterPoint = new DataPoint<float>(_thetaCenterPoint.X, _thetaCenterPoint.Y + _centerDistance);
                             // 该theta角度第一次切割，切割半圆最下边切为起始位置
-                            _recordCutY = GeometryUtils.FindBottomTangentY(_thetaCenterPoint, workpieceCenterPoint, _workpieceRadius, _thetaDegQueue.Peek() + cutCalibratTheta) - 42f;
+                            _recordCutY = GeometryUtils.FindBottomTangentY(_thetaCenterPoint, workpieceCenterPoint, _workpieceRadius, _thetaDegQueue.Peek() + cutCalibratTheta) - 45.45f;
                             _isRotateTheta = false;
                         }
                         float cutSize = GetCutSize();
@@ -181,7 +181,6 @@ namespace 精密切割系统.Model.cut
                         }
                         //触发切割进度更新事件
                         CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, needCutTimes, _totalCutTimes));
-
                         //加上边距
                         var (startX, endX) = CalculateCuttingX(line, _thetaDegQueue.Peek(), margin);
                         //设置切割参数

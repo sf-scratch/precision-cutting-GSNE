@@ -1916,7 +1916,9 @@ namespace 精密切割系统.Driver
         }
         private KeyencePlc keyencePlc = KeyencePlc.GetInstance();
         // ============整机相关==========
+        public Tag canSystemInit { get; set; }
         public Tag systemInit { get; set; }
+        public Tag isSystemIniting { get; set; }
         public Tag systemReset { get; set; }
         public Tag systemInitStatus { get; set; }
         public Tag systemStop { get; set; }
@@ -1976,13 +1978,48 @@ namespace 精密切割系统.Driver
         // ============整机相关 END==========
 
         /// <summary>
+        /// 能否执行系统初始化
+        /// </summary>
+        public async Task<bool> CanSystemInitAsync()
+        {
+            return await PlcControl.plc.ReadDataAsync(canSystemInit.addr) == true;
+        }
+
+        /// <summary>
         /// 执行系统初始化
         /// </summary>
-        public void SystemInit()
+        public async Task SystemInitAsync()
         {
             systemInit.writeValue = "1";
-            keyencePlc.writeTag(systemInit);
+            await keyencePlc.WriteTagAsync(systemInit);
         }
+
+        /// <summary>
+        /// 是否系统初始化中
+        /// </summary>
+        public async Task<bool> IsSystemInitingAsync()
+        {
+            return await PlcControl.plc.ReadDataAsync(isSystemIniting.addr) == true;
+        }
+
+        /// <summary>
+        /// 系统初始化是否完成
+        /// </summary>
+        public async Task<bool> IsCompletedSystemInitAsync()
+        {
+            return await PlcControl.plc.ReadDataAsync(systemInitStatus.addr) == true;
+        }
+
+        /// <summary>
+        /// 等待系统初始化完成
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public async Task WaitSystemInitCompletedAsync(CancellationToken token)
+        {
+            await TaskUtils.WaitExpectedResultAsync(IsCompletedSystemInitAsync, true, token);
+        }
+
         /// <summary>
         /// IO模式设置
         /// </summary>
@@ -2093,6 +2130,14 @@ namespace 精密切割系统.Driver
         {
             workpieceBlowing.writeValue = "1";
             keyencePlc.writeTag (workpieceBlowing);
+        }
+        /// <summary>
+        /// 设置工件吹气
+        /// </summary>
+        public async Task SetWorkpieceBlowingAsync()
+        {
+            workpieceBlowing.writeValue = "1";
+            await keyencePlc.WriteTagAsync(workpieceBlowing);
         }
         /// <summary>
         /// 操作安全门1

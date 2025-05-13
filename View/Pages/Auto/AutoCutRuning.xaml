@@ -175,6 +175,9 @@
                     <TextBlock Text="磨刀进度"/>
                     <Controls:InputTextBox Text="{Binding SharpenProgress}"/>
                     <TextBlock HorizontalAlignment="Left" Text=""/>
+                    <TextBlock Text="总磨损量"/>
+                    <Controls:InputTextBox Text="{Binding TotalWearAmount}"/>
+                    <TextBlock HorizontalAlignment="Left" Text="mm"/>
                     <TextBlock Text="型号参数No"/>
                     <Controls:InputTextBox Text="{Binding DeviceDataNo}"/>
                     <TextBlock HorizontalAlignment="Left" Text="ID"/>

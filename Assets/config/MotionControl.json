@@ -838,11 +838,23 @@
 
   },
   "wholeDevice": {
+    "canSystemInit": {
+      "valueType": "bool",
+      "addr": "MR38000",
+      "name": "能否回零点",
+      "describe": "能否回零点"
+    },
     "systemInit": {
       "valueType": "bool",
-      "addr": "MR500",
+      "addr": "MR48000",
       "name": "整机零点标定",
       "describe": "整机零点标定"
+    },
+    "isSystemIniting": {
+      "valueType": "bool",
+      "addr": "MR58000",
+      "name": "是否初始化中",
+      "describe": "是否初始化中"
     },
     "systemReset": {
       "valueType": "bool",

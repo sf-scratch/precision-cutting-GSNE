@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
@@ -7,11 +8,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using 精密切割系统.Model.common;
+using 精密切割系统.View.common;
 
 namespace 精密切割系统.ViewModel
 {
     internal class CtViewModel : INotifyPropertyChanged
     {
+        public ObservableCollection<RightButtonParams> RightButtonParams { get; set; } = WindowLayout.OperatePageButtons;
+
         private BitmapImage _imageSource01;
         public BitmapImage ImageSource01
         {
