@@ -20,7 +20,6 @@ using 精密切割系统.Utils;
 using 精密切割系统.View;
 using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.Hader;
-using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.operate;
 using 精密切割系统.ViewModel;
 using System.Data;

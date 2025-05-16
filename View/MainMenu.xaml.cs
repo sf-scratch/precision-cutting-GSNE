@@ -205,7 +205,7 @@ namespace 精密切割系统.View
 
         private void MenuButton_MenuClicked(object? sender, MenuBean bean)
         {
-            if (!CommonCheck.CheckAlarmStatus())
+            if (AlarmConfig.Instance.HasActiveAlarm())
             {
                 MaterialSnackUtils.MaterialSnack("请先解除报警！", MaterialSnackUtils.SnackType.WARNING, 5);
                 return;
@@ -233,7 +233,7 @@ namespace 精密切割系统.View
                 // MaterialSnackUtils.MaterialSnack("操作进行中！", MaterialSnackUtils.SnackType.WARNING, 5);
                 //return;
             }
-            if (PlcControl.allAlarm.Count > 0)
+            if (AlarmConfig.Instance.HasActiveAlarm())
             {
                 return;
             }

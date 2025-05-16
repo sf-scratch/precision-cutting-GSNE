@@ -147,10 +147,6 @@ namespace 精密切割系统.ViewModel
             {
                 if (connectionStatus)
                 {
-                    if (allAlarm.Contains(connectPlc))
-                    {
-                        allAlarm.Remove(connectPlc);
-                    }
                     try
                     {
                         // plc变量默认值初始化写入一次
@@ -172,11 +168,7 @@ namespace 精密切割系统.ViewModel
                             plc.readTag(allTags[tKey]);
                         }
                         // 报警信息更新
-                        UpdateAlarm();
-                        if (allAlarm.Count > 0)
-                        {
-                            Helpers.MaterialSnackUtils.MaterialSnack(allAlarm[0].desc, Helpers.MaterialSnackUtils.SnackType.ERROR);
-                        }
+                        //UpdateAlarm();
                     }
                     catch (Exception ex)
                     {
@@ -186,10 +178,6 @@ namespace 精密切割系统.ViewModel
                 else
                 {
                     connectPlc.startTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                    if (!allAlarm.Contains(connectPlc))
-                    {
-                        allAlarm.Add(connectPlc);
-                    }
                 }
                 Thread.Sleep(500);
             }

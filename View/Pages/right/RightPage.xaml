@@ -8,6 +8,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
     xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:auto="clr-namespace:WpfAutoGrid;assembly=WpfAutoGrid.Core"
     Title="RightPage"
     d:DesignHeight="905"
     d:DesignWidth="290"
@@ -22,6 +24,12 @@
             <Setter Property="Margin" Value="0"/>
             <Setter Property="Padding" Value="0"/>
         </Style>
+        <Style TargetType="Label">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
     </Page.Resources>
     <Page.DataContext>
         <viewModel:RightPageViewModel></viewModel:RightPageViewModel>
@@ -29,112 +37,32 @@
     <Grid>
         <StackPanel>
             <!-- 转速、状态显示 -->
-            <StackPanel x:Name="ShowTemplate">
-                <!-- 头部按钮 -->
-                <!--<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
-                    <Border Grid.Row="0" Grid.Column="0" x:Name="btnPres" Width="120" CornerRadius="10" Background="#177CFA"  Height="40" Margin="0,0,5,0">
-                        <Label Content="PRES" Foreground="White" FontSize="18" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" x:Name="btnSpdl" Width="120" CornerRadius="10" Background="#08DEFE" Height="40" Margin="5,0,0,0">
-                        <Label Content="SPDL" Foreground="White" FontSize="18" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    </Border>
-                </StackPanel>
-                -->
-                <StackPanel Grid.Row="1" Grid.ColumnSpan="2">
-                    <StackPanel Margin="20,20,20,0" Orientation="Horizontal">
-                        <Label
-                            Width="120"
-                            VerticalAlignment="Center"
-                            HorizontalContentAlignment="Right"
-                            Content="主轴转速"
-                            FontSize="20" FontWeight="Bold" />
-                        <Label
-                            x:Name="spindleSpeedValue"
-                            Margin="2,0,0,0"
-                            VerticalAlignment="Center"
-                            Content="0"
-                            FontSize="20" FontWeight="Bold" />
-                    </StackPanel>
-                </StackPanel>
-                <StackPanel Margin="0,20,0,0">
-                    <StackPanel Margin="20 10 0 0" HorizontalAlignment="Left">
-                        <StackPanel
-                            Grid.Row="2"
-                            Grid.Column="0"
-                            Width="145"
-                            Orientation="Horizontal">
-                            <Label
-                                Margin="0,0,0,0"
-                                Width="120"
-                                Content="工作盘真空"
-                                FontSize="20" FontWeight="Bold" HorizontalContentAlignment="Right" />
-                            <Image
-                                x:Name="vacuumStateStatusIcon"
-                                Width="20"
-                                Height="22.86"
-                                Margin="5,0,0,0"
-                                Source="/Assets/picture/lamp_normal.png" />
-                        </StackPanel>
-                        <StackPanel
-                            Grid.Row="2"
-                            Grid.Column="1"
-                            Width="145"
-                            Margin="0 10 0 10"
-                            Orientation="Horizontal">
-                            <Label
-                                Margin="0,0,0,0"
-                                Width="120"
-                                Content="主轴气源"
-                                FontSize="20" FontWeight="Bold" HorizontalContentAlignment="Right" />
-                            <Image
-                                x:Name="spindleAirStatusIcon"
-                                Width="20"
-Height="22.86"
-                                Margin="5,0,0,0"
-                                Source="/Assets/picture/lamp_error.png" />
-                        </StackPanel>
-                        <StackPanel
-                            Grid.Row="3"
-                            Grid.Column="0"
-                            Width="145"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Orientation="Horizontal">
-                                                    <Label
-                                Width="120"
-        
-                                Content="主轴冷却水"
-                                FontSize="20" FontWeight="Bold" HorizontalContentAlignment="Right" />
-                                                    <Image
-                                x:Name="spindleCoolingWaterStatusIcon"
-                                Width="20"
-Height="22.86"
-                                Margin="5,0,0,0"
-                                Source="/Assets/picture/lamp_normal.png" />
-                                                </StackPanel>
-                                   <StackPanel
-                                        Grid.Row="3"
-                                        Grid.Column="1"
-                                        Width="145"
-                                       Margin="0 10 0 0"
-                                        Orientation="Horizontal">
-                                                    <Label
-                                Margin="0,0,0,0"
-                                                        
-                                Width="120"
-                                Content="切割水"
-                                FontSize="20" FontWeight="Bold" HorizontalContentAlignment="Right" MouseDown="Label_MouseDown" />
-                                                    <Image
-                                x:Name="spindleCuttingWaterStatusIcon"
-                                Width="20"
-Height="22.86"
-                                Margin="5,0,0,0"
-                                Source="/Assets/picture/lamp_normal.png" />
-                                                </StackPanel>
-                    </StackPanel>
-                </StackPanel>
-            </StackPanel>
-            <DataGrid ItemsSource="{Binding ActiveAlarms}" AutoGenerateColumns="False">
+            <auto:AutoGrid Margin="10" Columns="3*,*,3*,*" RowCount="10" ChildMargin="5" x:Name="ShowTemplate">
+                <Label Content="工作盘真空"/>
+                <Image x:Name="vacuumStateStatusIcon" Source="/Assets/picture/lamp_normal.png" />
+                <Label Content="主轴气源"/>
+                <Image x:Name="spindleAirStatusIcon" Source="/Assets/picture/lamp_error.png" />
+                <Label Content="主轴冷却水"/>
+                <Image x:Name="spindleCoolingWaterStatusIcon" Source="/Assets/picture/lamp_normal.png" />
+                <Label Content="切割水" MouseDown="Label_MouseDown" />
+                <Image x:Name="spindleCuttingWaterStatusIcon" Source="/Assets/picture/lamp_normal.png" />
+                <Label Content="主轴转速"/>
+                <Label/>
+                <Label x:Name="spindleSpeedValue" Content="0"/>
+            </auto:AutoGrid>
+            <DataGrid materialDesign:DataGridAssist.CellPadding="4 2 2 2" materialDesign:DataGridAssist.ColumnHeaderPadding="4 2 2 2" Visibility="{Binding AlarmVisibility}"
+                      CanUserAddRows="False" AutoGenerateColumns="False" ItemsSource="{Binding ActiveAlarms}" Background="Transparent" FontWeight="Bold">
+                <DataGrid.Resources>
+                    <ResourceDictionary>
+                        <ResourceDictionary.MergedDictionaries>
+                            <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml"/>
+                        </ResourceDictionary.MergedDictionaries>
+                        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}">
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="FontSize" Value="16"/>
+                        </Style>
+                    </ResourceDictionary>
+                </DataGrid.Resources>
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="报警地址" Binding="{Binding Address}"/>
                     <DataGridTextColumn Header="级别" Binding="{Binding Level}">
@@ -145,13 +73,6 @@ Height="22.86"
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
                     <DataGridTextColumn Header="消息" Binding="{Binding Message}"/>
-                    <!--<DataGridTemplateColumn Header="操作">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Button Content="确认" Command="{Binding AckCommand}"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>-->
                 </DataGrid.Columns>
             </DataGrid>
         </StackPanel>

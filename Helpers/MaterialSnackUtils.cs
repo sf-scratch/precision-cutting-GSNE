@@ -9,6 +9,8 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
+using 精密切割系统.Model.common;
+using 精密切割系统.PubSubEvent;
 using 精密切割系统.Utils;
 using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.Hader;
@@ -43,8 +45,9 @@ namespace 精密切割系统.Helpers
         /// <param name="msg"></param>
         /// <param name="type"></param>
         /// <param name="hideTime">隐藏时间 毫秒</param>
-        public static void MaterialSnack(string msg, SnackType type, int hideMilliseconds = 10)
+        public static void MaterialSnack(string msg, SnackType type, int hideMilliseconds = 10, IEventAggregator? eventAggregator = null)
         {
+            eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create(msg));
             Application.Current.Dispatcher.Invoke(new Action(() => {
                 // 更新UI控件的代码
                 initPage();

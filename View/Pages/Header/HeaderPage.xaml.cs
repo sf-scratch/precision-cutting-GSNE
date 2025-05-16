@@ -128,11 +128,10 @@ namespace 精密切割系统.View.Pages.Hader
 
         private async void ClearAlarmInfo()
         {
-            if (PlcControl.allAlarm.Count > 0)
+            if (AlarmConfig.Instance.HasActiveAlarm())
             {
-                PlcControl.allAlarm[0].ClearAlarm();
+                await PlcControl.tagControl.wholeDevice.AlarmResetAsync();
             }
-            await PlcControl.tagControl.wholeDevice.AlarmResetAsync();
         }
 
         //退出系统；连续10下退出系统或最小化窗口

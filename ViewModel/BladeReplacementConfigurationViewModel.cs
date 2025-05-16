@@ -108,15 +108,16 @@ namespace 精密切割系统.ViewModel
             }
             try
             {
+                LunguSksjDTO lunguSksjDTO = new LunguSksjDTO();
                 //轮毂信息
-                LunguSksjDTO? lunguSksjDTO = await HttpUtils.GetLunguSksjAsync(lunguId);
-                if (lunguSksjDTO == null)
-                {
-                    InitRightButtonOnlyBack();
-                    Tools.LogError("轮毂信息获取失败！");
-                    MaterialSnackUtils.MaterialSnack("轮毂信息获取失败！", MaterialSnackUtils.SnackType.WARNING);
-                    return;
-                }
+                //LunguSksjDTO? lunguSksjDTO = await HttpUtils.GetLunguSksjAsync(lunguId);
+                //if (lunguSksjDTO == null)
+                //{
+                //    InitRightButtonOnlyBack();
+                //    Tools.LogError("轮毂信息获取失败！");
+                //    MaterialSnackUtils.MaterialSnack("轮毂信息获取失败！", MaterialSnackUtils.SnackType.WARNING);
+                //    return;
+                //}
                 LunguSks = MapperConfig.Mapper.Map<LunguSksjModel>(lunguSksjDTO);
 
                 //磨刀参数

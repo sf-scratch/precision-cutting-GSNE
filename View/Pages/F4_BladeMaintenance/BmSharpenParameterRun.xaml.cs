@@ -664,8 +664,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             {
                 while (runFlag)
                 {
-                    ObservableCollection<AlarmItem> list = PlcControl.allAlarm;
-                    if (list.Count > 0)
+                    if (AlarmConfig.Instance.HasActiveAlarm())
                     {
                         errorFlag = true;
                         runFlag = false;

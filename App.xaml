@@ -3,12 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:精密切割系统"
              xmlns:prism="http://prismlibrary.com/"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              >
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="View/Controls/InputTextBoxDictionary.xaml"></ResourceDictionary>
-                <!-- <ResourceDictionary Source="View/common/CustomBotton.xaml"/> -->
+                <!--<materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="BlueGrey"  SecondaryColor="Lime" />-->
+                <!--<ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml"/>-->
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
         

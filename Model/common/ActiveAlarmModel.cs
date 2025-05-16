@@ -37,7 +37,7 @@ namespace 精密切割系统.Model.common
             {
                 return _level switch
                 {
-                    AlarmLevel.Warning => Brushes.YellowGreen,
+                    AlarmLevel.Warn => Brushes.YellowGreen,
                     AlarmLevel.Error => Brushes.Red,
                     AlarmLevel.None => Brushes.Blue,
                     _ => Brushes.Transparent

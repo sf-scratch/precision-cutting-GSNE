@@ -495,8 +495,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
             {
                 while (runFlag)
                 {
-                    ObservableCollection<AlarmItem> list = PlcControl.allAlarm;
-                    if (list.Count > 0)
+                    if (AlarmConfig.Instance.HasActiveAlarm())
                     {
                         exitFlag = true;
                         runFlag = false;

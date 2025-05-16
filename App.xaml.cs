@@ -3,6 +3,7 @@ using System.Data;
 using System.Windows;
 using System.Windows.Input;
 using 精密切割系统.Utils;
+using 精密切割系统.View.Controls;
 using 精密切割系统.View.Pages.Auto;
 using 精密切割系统.View.Pages.common;
 using 精密切割系统.View.Pages.F4_BladeMaintenance;

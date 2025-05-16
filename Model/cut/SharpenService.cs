@@ -131,9 +131,7 @@ namespace 精密切割系统.Model.cut
                 //打开切割水
                 await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
                 //进入全自动切割模式
-                await PlcControl.tagControl.cutting.EnterFullAutoInitAsync(1);
-                //等待切割准备完成信号
-                await PlcControl.tagControl.cutting.WaitReadyToCutAsync(pauseToken);
+                await PlcControl.tagControl.cutting.EnterCuttingModeAsync(pauseToken);
                 CancellationToken usingPauseToken = pauseToken;
                 float abAverageThickness = lunguSksj.ABAverageThickness / 1000;
                 float cutDeep = AutoCutUtils.GetSharpenDeep(lunguSksj.BladeType);
@@ -174,11 +172,10 @@ namespace 精密切割系统.Model.cut
                         LineSegment? line = AutoCutUtils.CalculateRectangleCuttingLine(_thetaCenterPoint, _sharpenRect, _thetaDegQueue.Peek(), _recordSharpenY, margin);
                         if (line == null)
                         {
-                            Tools.LogDebug("获取磨刀线失败！");
                             return RunResult.Fail(RunExceptionType.Other, "获取磨刀线失败！");
                         }
                         //当前磨刀次数
-                        int? curCutNum = await PlcControl.tagControl.cutting.GetCutNum();
+                        int? curCutNum = await PlcControl.tagControl.cutting.GetCutNumAsync();
                         if (curCutNum == null)
                         {
                             return RunResult.Fail(RunExceptionType.None, "读取磨刀次数失败！");
@@ -206,14 +203,8 @@ namespace 精密切割系统.Model.cut
                         await PlcControl.tagControl.cutting.SetStopLocationAsync((line.StartPoint.X + line.EndPoint.X) / 2 + _cameraRelativeBladePosition.X, line.StartPoint.Y + _cameraRelativeBladePosition.Y, startZ);
                         //开始磨刀
                         await PlcControl.tagControl.cutting.StartCutAsync();
-                        //等待磨刀次数变化，表示开始磨刀
-                        await TaskUtils.WaitExpectedResultAsync(async () =>
-                        {
-                            int? cutNum = await PlcControl.tagControl.cutting.GetCutNum();
-                            return cutNum != null && cutNum > curCutNum;
-                        }, usingPauseToken);
-                        //监听Z轴是否上升，等待磨刀完成
-                        await PlcControl.tagControl.Z1axis.WatiNearlyPositionAsync(startZ, usingPauseToken);
+                        //等待磨刀次数变化
+                        await PlcControl.tagControl.cutting.WaitCutNumUdatedAsync(curCutNum.Value, usingPauseToken);
                         _totalSharpenTimes++;
                         curSharpenTimes++;
                         //触发磨刀进度更新事件
@@ -242,7 +233,6 @@ namespace 精密切割系统.Model.cut
                     }
                     catch (Exception ex)
                     {
-                        Tools.LogDebug($"执行磨刀失败！{ex.Message}");
                         return RunResult.Fail(RunExceptionType.Other, $"执行磨刀失败！{ex.Message}");
                     }
                     _isNewestSharpen = false;
@@ -253,7 +243,7 @@ namespace 精密切割系统.Model.cut
             finally
             {
                 //退出全自动切割模式
-                await PlcControl.tagControl.cutting.EnterFullAutoInitAsync(0);
+                await PlcControl.tagControl.cutting.ExitCuttingModeAsync(pauseToken);
                 //关闭切割水
                 await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
             }

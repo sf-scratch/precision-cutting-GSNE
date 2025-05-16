@@ -9,7 +9,7 @@ namespace 精密切割系统.Model.plc
     public enum AlarmLevel
     {
         None,
-        Warning,
+        Warn,
         Error
     }
 }

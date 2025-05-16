@@ -18,6 +18,7 @@ using 精密切割系统.Assets.config.menu;
 using 精密切割系统.Driver;
 using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
+using 精密切割系统.Model.plc;
 using 精密切割系统.Utils;
 using 精密切割系统.ViewModel;
 
@@ -163,7 +164,12 @@ namespace 精密切割系统.View.Controls
 
         private void onClick(OperateBean bean)
         {
-            if (!CommonCheck.CheckAlarmStatus())
+            if (bean.Code == 6)
+            {
+                OperateClicked?.Invoke(this, bean);
+                return;
+            }
+            if (AlarmConfig.Instance.HasActiveAlarm())
             {
                 MaterialSnackUtils.MaterialSnack("请先解除报警！", MaterialSnackUtils.SnackType.WARNING, 5);
                 return;
@@ -190,7 +196,7 @@ namespace 精密切割系统.View.Controls
                 return;
             }
             // 如果有报警，且没有在运行中的，则可以点击
-            if (PlcControl.allAlarm.Count > 0 && !GlobalParams.globalRunFlag && bean.Code != 6)
+            if (AlarmConfig.Instance.HasActiveAlarm() && !GlobalParams.globalRunFlag && bean.Code != 6)
             {
                 return;
             }

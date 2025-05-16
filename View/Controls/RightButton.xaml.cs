@@ -19,6 +19,7 @@ using 精密切割系统.Assets.config.buttom;
 using 精密切割系统.Driver;
 using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
+using 精密切割系统.Model.plc;
 using 精密切割系统.Utils;
 using 精密切割系统.View.Pages.common;
 using 精密切割系统.View.Pages.operate;
@@ -163,7 +164,7 @@ namespace 精密切割系统.View.Controls
 
         private void onClick(Boolean isOK)
         {
-            if (!CommonCheck.CheckAlarmStatus() && !GlobalRunOperateFlag)
+            if (AlarmConfig.Instance.HasActiveAlarm() && !GlobalRunOperateFlag)
             {
                 MaterialSnackUtils.MaterialSnack("请先解除报警！", MaterialSnackUtils.SnackType.WARNING, 5);
                 return;
@@ -185,7 +186,7 @@ namespace 精密切割系统.View.Controls
             {
                 operatePage.SetOperateShowType(0);
             }
-            if (PlcControl.allAlarm.Count > 0 && !GlobalRunOperateFlag)
+            if (AlarmConfig.Instance.HasActiveAlarm() && !GlobalRunOperateFlag)
             {
                 return;
             }

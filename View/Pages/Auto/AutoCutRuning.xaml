@@ -5,10 +5,12 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:精密切割系统.View.Pages.Auto"
       xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
+      xmlns:custom="clr-namespace:精密切割系统.CustomControls"
       xmlns:auto="clr-namespace:WpfAutoGrid;assembly=WpfAutoGrid.Core" 
       xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
       xmlns:common="clr-namespace:精密切割系统.View.Pages.common"
       xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
       mc:Ignorable="d" 
       d:DesignHeight="676" d:DesignWidth="1448"
       d:DataContext="{d:DesignInstance viewModel:AutoCutRuningViewModel, IsDesignTimeCreatable=True}">
@@ -158,47 +160,88 @@
             <common:CameraCommon Width="765" Height="640" />
         </Grid>
         <Grid Grid.Column="1">
-            <StackPanel>
-                <Grid>
-                    <Label Margin="30,30,0,0" Content="自动执行状态" FontSize="25" FontWeight="Bold" />
-                </Grid>
-                <auto:AutoGrid Margin="10" Columns="4*,4*,*" RowCount="9" ChildMargin="5">
-                    <TextBlock Text="测高位置"/>
-                    <Controls:InputTextBox Text="{Binding AfterHeightMeasurementZ}"/>
-                    <TextBlock HorizontalAlignment="Left" Text="mm"/>
-                    <TextBlock Text="磨刀片高度"/>
-                    <Controls:InputTextBox Text="{Binding SharpenBladeHeight}"/>
-                    <TextBlock HorizontalAlignment="Left" Text="mm"/>
-                    <TextBlock Text="磨刀速度"/>
-                    <Controls:InputTextBox Text="{Binding SharpenSpeed}"/>
-                    <TextBlock HorizontalAlignment="Left" Text="mm/s"/>
-                    <TextBlock Text="磨刀进度"/>
-                    <Controls:InputTextBox Text="{Binding SharpenProgress}"/>
-                    <TextBlock HorizontalAlignment="Left" Text=""/>
-                    <TextBlock Text="总磨损量"/>
-                    <Controls:InputTextBox Text="{Binding TotalWearAmount}"/>
-                    <TextBlock HorizontalAlignment="Left" Text="mm"/>
-                    <TextBlock Text="型号参数No"/>
-                    <Controls:InputTextBox Text="{Binding DeviceDataNo}"/>
-                    <TextBlock HorizontalAlignment="Left" Text="ID"/>
-                    <TextBlock Text="切割刀片高度"/>
-                    <Controls:InputTextBox Text="{Binding CutBladeHeight}"/>
-                    <TextBlock HorizontalAlignment="Left" Text="mm"/>
-                    <TextBlock Text="切割速度"/>
-                    <Controls:InputTextBox Text="{Binding CutSpeed}"/>
-                    <TextBlock HorizontalAlignment="Left" Text="mm/s"/>
-                    <TextBlock Text="切割进度"/>
-                    <Controls:InputTextBox Text="{Binding CutProgress}"/>
-                    <TextBlock HorizontalAlignment="Left" Text=""/>
-                    <TextBlock Text="自更换刀片起"/>
-                    <Controls:InputTextBox Text="{Binding AfterReplaceBladeCutTimes}"/>
-                    <TextBlock HorizontalAlignment="Left" Text="刀"/>
-                </auto:AutoGrid>
-
-                <!--<StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Style="{StaticResource redButton}" Content="暂停" FontSize="30" Width="200" Margin="20" HorizontalAlignment="Right" Command="{Binding PauseCommand}"/>
-                </StackPanel>-->
-            </StackPanel>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.ColumnSpan="2" Margin="30,30,0,0" Content="自动执行状态" FontSize="25" FontWeight="Bold" />
+            <auto:AutoGrid Grid.Row="1" Margin="10" Columns="4*,4*,2*" RowCount="10" ChildMargin="5">
+                <TextBlock Text="测高位置"/>
+                <Controls:InputTextBox Text="{Binding AfterHeightMeasurementZ}"/>
+                <TextBlock HorizontalAlignment="Left" Text="mm"/>
+                <TextBlock Text="磨刀片高度"/>
+                <Controls:InputTextBox Text="{Binding SharpenBladeHeight}"/>
+                <TextBlock HorizontalAlignment="Left" Text="mm"/>
+                <TextBlock Text="磨刀速度"/>
+                <Controls:InputTextBox Text="{Binding SharpenSpeed}"/>
+                <TextBlock HorizontalAlignment="Left" Text="mm/s"/>
+                <TextBlock Text="磨刀进度"/>
+                <Controls:InputTextBox Text="{Binding SharpenProgress}"/>
+                <TextBlock HorizontalAlignment="Left" Text=""/>
+                <TextBlock Text="总磨损量"/>
+                <Controls:InputTextBox Text="{Binding TotalWearAmount}"/>
+                <TextBlock HorizontalAlignment="Left" Text="mm"/>
+                <TextBlock Text="型号参数No"/>
+                <Controls:InputTextBox Text="{Binding DeviceDataNo}"/>
+                <TextBlock HorizontalAlignment="Left" Text="ID"/>
+                <TextBlock Text="切割刀片高度"/>
+                <Controls:InputTextBox Text="{Binding CutBladeHeight}"/>
+                <TextBlock HorizontalAlignment="Left" Text="mm"/>
+                <TextBlock Text="切割速度"/>
+                <Controls:InputTextBox Text="{Binding CutSpeed}"/>
+                <TextBlock HorizontalAlignment="Left" Text="mm/s"/>
+                <TextBlock Text="切割进度"/>
+                <Controls:InputTextBox Text="{Binding CutProgress}"/>
+                <TextBlock HorizontalAlignment="Left" Text=""/>
+                <TextBlock Text="自更换刀片起"/>
+                <Controls:InputTextBox Text="{Binding AfterReplaceBladeCutTimes}"/>
+                <TextBlock HorizontalAlignment="Left" Text="刀"/>
+            </auto:AutoGrid>
+            <GroupBox Grid.Row="1" Grid.Column="1" materialDesign:ColorZoneAssist.Mode="SecondaryMid">
+                <GroupBox.Resources>
+                    <ResourceDictionary>
+                        <ResourceDictionary.MergedDictionaries>
+                            <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml"/>
+                        </ResourceDictionary.MergedDictionaries>
+                    </ResourceDictionary>
+                </GroupBox.Resources>
+                <GroupBox.HeaderTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Width="32" Height="32" VerticalAlignment="Center" Kind="InformationSlabBox" />
+                            <TextBlock Margin="8,0,0,0" VerticalAlignment="Center" Style="{StaticResource MaterialDesignSubtitle1TextBlock}" FontSize="18" Text="实时信息" FontWeight="Bold"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </GroupBox.HeaderTemplate>
+                <custom:ShowLastListBox ItemsSource="{Binding MessageList}" d:ItemsSource="{d:SampleData ItemCount=20}" Style="{StaticResource MaterialDesignListBox}" Height="300">
+                    <custom:ShowLastListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem" BasedOn="{StaticResource MaterialDesignListBoxItem}">
+                            <Setter Property="Margin" Value="0,0,0,1"/>
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="materialDesign:ListBoxItemAssist.ShowSelection" Value="False"/>
+                        </Style>
+                    </custom:ShowLastListBox.ItemContainerStyle>
+                    <custom:ShowLastListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock FontSize="10" Text="{Binding Time}" />
+                                        <TextBlock FontSize="12" TextWrapping="Wrap" FontWeight="Bold" Text="{Binding Message}" d:Text="999999999999999999999999999999999999999999999"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </custom:ShowLastListBox.ItemTemplate>
+                </custom:ShowLastListBox>
+            </GroupBox>
         </Grid>
     </Grid>
 </UserControl>

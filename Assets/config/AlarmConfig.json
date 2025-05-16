@@ -1,22 +1,22 @@
 ﻿[
   {
     "Address": "MR60000",
-    "Level": "Warning",
+    "Level": "Warn",
     "Message": "PLC电池电量不足"
   },
   {
     "Address": "MR60001",
-    "Level": "Warning",
+    "Level": "Warn",
     "Message": "急停中"
   },
   {
     "Address": "MR60002",
-    "Level": "Warning",
+    "Level": "Warn",
     "Message": "气压不足"
   },
   {
     "Address": "MR60003",
-    "Level": "Warning",
+    "Level": "Warn",
     "Message": "已达生产目标"
   },
   {
@@ -31,32 +31,32 @@
   },
   {
     "Address": "MR60006",
-    "Level": "Warning",
+    "Level": "Warn",
     "Message": "总复位中"
   },
   {
     "Address": "MR60007",
-    "Level": "Warning",
+    "Level": "Warn",
     "Message": "总复位未完成"
   },
   {
     "Address": "MR60008",
-    "Level": "Warning",
+    "Level": "Warn",
     "Message": "模块重启中"
   },
   {
     "Address": "MR60009",
-    "Level": "Warning",
+    "Level": "Warn",
     "Message": "待机中"
   },
   {
     "Address": "MR60010",
-    "Level": "Warning",
+    "Level": "Warn",
     "Message": "安全门急停"
   },
   {
     "Address": "MR60011",
-    "Level": "Warning",
+    "Level": "Warn",
     "Message": "关气急停中"
   },
   {
@@ -71,7 +71,7 @@
   },
   {
     "Address": "MR60014",
-    "Level": "Warning",
+    "Level": "Warn",
     "Message": "设备超过5分钟未启动皮带停止"
   },
   {

@@ -9,6 +9,7 @@ using 精密切割系统.database.db.modle;
 using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.cut;
+using 精密切割系统.Model.plc;
 using 精密切割系统.Model.sqlite;
 using 精密切割系统.Utils;
 using 精密切割系统.ViewModel;
@@ -1344,33 +1345,36 @@ namespace 精密切割系统.Driver
         public Tag panelRelativeDistance { get; set; }
         // 高速运动 0 低速 1 高速
         public Tag highSpeed { get; set; }
-        // 轴正限位
-        public Tag upperLimit { get; set; }
-        // 轴负限位
-        public Tag lowerLimit { get; set; }
+        public Tag isReady { get; set; }
+        public Tag isCompleteAbsoluteMotion { get; set; }
 
         // 轴软正限位
         public Tag softUpperLimit { get; set; }
         // 轴软负限位F
         public Tag softLowerLimit { get; set; }
-        public Tag axisParamsConfirm { get; set; }
 
         public bool IsReady()
         {
-            if (PlcControl.allAlarm.Count > 0)
+            if (AlarmConfig.Instance.HasActiveAlarm())
             {
-                return true;
+                return false;
             }
-            string status = this.axisName + "当前状态";
-            string mcStatus = this.axisName + "当前电机状态";
-            if (PlcControl.allTags.ContainsKey(status) && PlcControl.allTags.ContainsKey(mcStatus))
-            {
-                if (PlcControl.plc.GetPlcValueString(status) == "1" && PlcControl.plc.GetPlcValueString(mcStatus) == "2")
-                {
-                    return true;
-                }
-            }
-            return false;
+            return IsReadyAsync().Result;
+        }
+
+        public async Task<bool> IsReadyAsync()
+        {
+            return await PlcControl.plc.ReadDataAsync(isReady.addr) == true;
+        }
+
+        public async Task<bool> IsStopedAxisAsync()
+        {
+            return await PlcControl.plc.ReadDataAsync(isReady.addr) == true;
+        }
+
+        public async Task<bool> IsCompleteAbsoluteMotionAsync()
+        {
+            return await PlcControl.plc.ReadDataAsync(isCompleteAbsoluteMotion.addr) == true;
         }
 
         public async Task<bool> IsSpeedZeroAsync()
@@ -1390,9 +1394,14 @@ namespace 精密切割系统.Driver
             await TaskUtils.WaitExpectedResultAsync(IsNearlyPosition, targetPosition, token);
         }
 
-        public async Task WatiSpeedZeroAsync(CancellationToken token)
+        /// <summary>
+        /// 等待轴停止
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public async Task WatiAxisStopAsync(CancellationToken token)
         {
-            await TaskUtils.WaitExpectedResultAsync(IsSpeedZeroAsync, token);
+            await TaskUtils.WaitExpectedResultAsync(IsStopedAxisAsync, token);
         }
 
         public async Task<float?> GetCurrentLocationAsync()
@@ -1408,17 +1417,6 @@ namespace 精密切割系统.Driver
             if (!IsReady()) return;
             initLocation.writeValue = "1";
             keyencePlc.writeTag(initLocation);
-        }
-        /// <summary>
-        /// 点动结束
-        /// </summary>
-        /// <param name="jogDirection">方向 0 正 1 负</param>
-        public void StopMove()
-        {
-            jogStart.writeValue = "0";
-            keyencePlc.writeTag(jogStart);
-            jogAntiStart.writeValue = "0";
-            keyencePlc.writeTag(jogAntiStart);
         }
 
         /// <summary>
@@ -1437,13 +1435,67 @@ namespace 精密切割系统.Driver
             runType.writeValue = "0";
             keyencePlc.writeTag(runType);
             Thread.Sleep(5);
-            axisParamsConfirm.writeValue = "1";
-            keyencePlc.writeTag(axisParamsConfirm);
             // SetRelativeSpeed("10");
             Thread.Sleep(5);
             // 执行电动或者相对运动
             RunJog(jogDirection);
         }
+
+        /// <summary>
+        /// 点动开始
+        /// </summary>
+        /// <param name="speed">速度</param>
+        /// <param name="jogDirection">方向 0 正 1 负</param>
+        public async Task StartJogAsync(int jogDirection)
+        {
+            if (!await IsReadyAsync()) return;
+            // 设置运动类型为点动
+            runType.writeValue = "0";
+            keyencePlc.writeTag(runType);
+            // 关闭正转
+            jogStart.writeValue = "0";
+            keyencePlc.writeTag(jogStart);
+            // 关闭反转
+            jogAntiStart.writeValue = "0";
+            keyencePlc.writeTag(jogAntiStart);
+            if (jogDirection == 0)
+            {
+                // 开启正转
+                jogStart.writeValue = "1";
+                keyencePlc.writeTag(jogStart);
+            }
+            else
+            {
+                // 开启反转
+                jogAntiStart.writeValue = "1";
+                keyencePlc.writeTag(jogAntiStart);
+            }
+        }
+
+        /// <summary>
+        /// 点动结束
+        /// </summary>
+        /// <param name="jogDirection">方向 0 正 1 负</param>
+        public void StopMove()
+        {
+            jogStart.writeValue = "0";
+            keyencePlc.writeTag(jogStart);
+            jogAntiStart.writeValue = "0";
+            keyencePlc.writeTag(jogAntiStart);
+        }
+
+        /// <summary>
+        /// 点动结束
+        /// </summary>
+        /// <param name="jogDirection">方向 0 正 1 负</param>
+        public async Task StopJogAsync()
+        {
+            jogStart.writeValue = "0";
+            await keyencePlc.WriteTagAsync(jogStart);
+            jogAntiStart.writeValue = "0";
+            await keyencePlc.WriteTagAsync(jogAntiStart);
+        }
+
         public void StartRelative(string speed, string distance, int jogDirection)
         {
             if (!IsReady()) return;
@@ -1454,32 +1506,36 @@ namespace 精密切割系统.Driver
             // 设置相对运动距离
             relativeDistance.writeValue = distance;
             keyencePlc.writeTag(relativeDistance);
-            // 设置相对运动速度
-            axisParamsConfirm.writeValue = "1";
-            keyencePlc.writeTag(axisParamsConfirm);
             Thread.Sleep(5);
             // 执行电动或者相对运动
             RunJog(jogDirection);
         }
 
-        public async Task StartRelativeAsync(float speed, float distance, int jogDirection, CancellationToken token)
+        /// <summary>
+        /// 开始相对运动
+        /// </summary>
+        /// <param name="distance"></param>
+        /// <param name="jogDirection"></param>
+        /// <param name="token"></param>
+        /// <param name="highSpeed"></param>
+        /// <returns></returns>
+        public async Task StartRelativeAsync(float distance, int jogDirection, CancellationToken token, float? highSpeed = null)
         {
+            if (!await IsReadyAsync()) return;
             // 设置相对运动
             runType.writeValue = "1";
             await keyencePlc.WriteTagAsync(runType);
             // 设置相对运动距离
             relativeDistance.writeValue = distance.ToString();
             await keyencePlc.WriteTagAsync(relativeDistance);
-            // 设置相对运动速度
-            jogRelativeSpeed.writeValue = speed.ToString();
-            await keyencePlc.WriteTagAsync(jogRelativeSpeed);
-            // 轴参数确认
-            axisParamsConfirm.writeValue = "1";
-            await keyencePlc.WriteTagAsync(axisParamsConfirm);
-            // 执行电动或者相对运动
-            await RunJogAsync(jogDirection);
+            if (highSpeed is not null)
+            {
+                // 设置相对运动速度
+                jogRelativeSpeed.writeValue = highSpeed.Value.ToString();
+                await keyencePlc.WriteTagAsync(jogRelativeSpeed);
+            }
             // 等待相对运动完成
-            await WatiSpeedZeroAsync(token);
+            await WatiAxisStopAsync(token);
         }
 
         /// <summary>
@@ -1488,28 +1544,30 @@ namespace 精密切割系统.Driver
         /// <param name="speed"></param>
         public void SetRelativeSpeed(string speed)
         {
-            jogRelativeSpeed.writeValue= speed;
+            jogRelativeSpeed.writeValue = speed;
             keyencePlc.writeTag(jogRelativeSpeed);
-            Thread.Sleep(5);
-            axisParamsConfirm.writeValue= "1";
-            keyencePlc.writeTag(axisParamsConfirm);
+        }
+
+        /// <summary>
+        /// 设置点动和寸动的移动速度
+        /// </summary>
+        /// <param name="speed"></param>
+        public async Task SetRelativeSpeedAsync(float speed)
+        {
+            jogRelativeSpeed.writeValue = speed.ToString();
+            await keyencePlc.WriteTagAsync(jogRelativeSpeed);
         }
 
         public void SetAbsoluteSpeed(string speed)
         {
             absoluteSpeed.writeValue= speed;
             keyencePlc.writeTag(absoluteSpeed);
-            Thread.Sleep(5);
-            axisParamsConfirm.writeValue= "1";
-            keyencePlc.writeTag(axisParamsConfirm);
         }
 
         public async Task SetAbsoluteSpeedAsync(float speed)
         {
             absoluteSpeed.writeValue = speed.ToString();
             await keyencePlc.WriteTagAsync(absoluteSpeed);
-            axisParamsConfirm.writeValue = "1";
-            await keyencePlc.WriteTagAsync(axisParamsConfirm);
         }
 
         public string StartAbsolute(string speed, string location, bool compFlag = false)
@@ -1536,10 +1594,15 @@ namespace 精密切割系统.Driver
             return location;
         }
 
+        /// <summary>
+        /// 开始绝对运动
+        /// </summary>
+        /// <param name="location"></param>
+        /// <param name="token"></param>
+        /// <param name="speed"></param>
+        /// <returns></returns>
         public async Task StartAbsoluteAsync(float location, CancellationToken token = default, float? speed = null)
         {
-            axisParamsConfirm.writeValue = "1";
-            await keyencePlc.WriteTagAsync(axisParamsConfirm);
             // 设置绝对运动位置
             absoluteLocation.writeValue = location.ToString();
             await keyencePlc.WriteTagAsync(absoluteLocation);
@@ -1561,13 +1624,13 @@ namespace 精密切割系统.Driver
                 };
                 await SetAbsoluteSpeedAsync(defaultSpeed);
             }
+            absoluteStart.writeValue = "0";
+            await keyencePlc.WriteTagAsync(absoluteStart);
             // 设置绝对运功开始
             absoluteStart.writeValue = "1";
             await keyencePlc.WriteTagAsync(absoluteStart);
             // 等待绝对运动完成
-            await WatiNearlyPositionAsync(location, token);
-            // 等待速度为0
-            await WatiSpeedZeroAsync(token);
+            await WatiAxisStopAsync(token);
         }
 
         public async Task WaitAxisMotionDone()
@@ -1583,8 +1646,6 @@ namespace 精密切割系统.Driver
         public void RunJog(int jogDirection)
         {
             if (!IsReady()) return;
-            axisParamsConfirm.writeValue = "1";
-            keyencePlc.writeTag(axisParamsConfirm);
             Thread.Sleep(10);
             // 关闭正转
             jogStart.writeValue = "0";
@@ -1607,30 +1668,6 @@ namespace 精密切割系统.Driver
             }
         }
 
-        public async Task RunJogAsync(int jogDirection)
-        {
-            axisParamsConfirm.writeValue = "1";
-            await keyencePlc.WriteTagAsync(axisParamsConfirm);
-            // 关闭正转
-            jogStart.writeValue = "0";
-            await keyencePlc.WriteTagAsync(jogStart);
-            // 关闭反转
-            jogAntiStart.writeValue = "0";
-            await keyencePlc.WriteTagAsync(jogAntiStart);
-            if (jogDirection == 0)
-            {
-                // 开启正转
-                jogStart.writeValue = "1";
-                await keyencePlc.WriteTagAsync(jogStart);
-            }
-            else
-            {
-                // 开启反转
-                jogAntiStart.writeValue = "1";
-                await keyencePlc.WriteTagAsync(jogAntiStart);
-            }
-        }
-
         /// <summary>
         /// 设置是否高速 0 低速 1 高速
         /// </summary>
@@ -1640,7 +1677,17 @@ namespace 精密切割系统.Driver
             highSpeed.writeValue = highFlag;
             keyencePlc.writeTag(highSpeed);
         }
-        
+
+        /// <summary>
+        /// 设置是否高速 0 低速 1 高速
+        /// </summary>
+        /// <param name="highFlag"></param>
+        public async Task SetHighSpeedAsync(int highFlag)
+        {
+            highSpeed.writeValue = highFlag.ToString();
+            await keyencePlc.WriteTagAsync(highSpeed);
+        }
+
         /// <summary>
         /// 设置各轴运动速度和距离
         /// </summary>
@@ -1673,8 +1720,6 @@ namespace 精密切割系统.Driver
             panelRelativeDistance.writeValue = panelRelativeDistanceValue;
             keyencePlc.writeTag(panelRelativeDistance);
             Thread.Sleep(5);
-            axisParamsConfirm.writeValue = "1";
-            keyencePlc.writeTag(axisParamsConfirm);
         }
         
         
@@ -1696,6 +1741,7 @@ namespace 精密切割系统.Driver
         private KeyencePlc keyencePlc = KeyencePlc.GetInstance();
         // ============刀片维护相关
         public Tag initReplaceLocation { get; set; }
+        public Tag heightMeasurementEarlyEnd { get; set; }
         public Tag NoContactHeightMeasurement { get; set; }
         public Tag HeightMeasurementCompleted { get; set; }
         public Tag xReplaceLocation { get; set; }
@@ -1751,6 +1797,7 @@ namespace 精密切割系统.Driver
             keyencePlc.writeTag(setupSetNumber);
             ConfirmParams();
         }
+
         /// <summary>
         /// 开始测高
         /// </summary>
@@ -1758,6 +1805,15 @@ namespace 精密切割系统.Driver
         {
             setupStart.writeValue = "1";
             keyencePlc.writeTag(setupStart);
+        }
+
+        /// <summary>
+        /// 测高提前结束
+        /// </summary>
+        public async Task HeightMeasurementEarlyEndAsync()
+        {
+            heightMeasurementEarlyEnd.writeValue = "1";
+            await keyencePlc.WriteTagAsync(heightMeasurementEarlyEnd);
         }
 
         /// <summary>
@@ -1922,8 +1978,6 @@ namespace 精密切割系统.Driver
         public Tag systemReset { get; set; }
         public Tag systemInitStatus { get; set; }
         public Tag systemStop { get; set; }
-
-        public Tag axisAlarm { get; set; }
         public Tag clearAxisAlarm { get; set; }
         public Tag securityDoor1 { get; set; }
         public Tag alarmReset { get; set; }
@@ -1948,8 +2002,6 @@ namespace 精密切割系统.Driver
         public Tag workpieceBlowing { get; set; }
         // 工件吹气状态
         public Tag workpieceBlowingStatus { get; set; }
-        // 系统报警
-        public Tag systemAlarm { get; set; }
         // 确认系统报警
         public Tag clearSystemAlarm { get; set; }
         public Tag systemErrorClear { get; set; }
@@ -2162,15 +2214,6 @@ namespace 精密切割系统.Driver
             return await keyencePlc.ReadDataAsync(workpieceBlowingStatus.addr) == true;
         }
 
-        /// <summary>
-        /// 设置工件吹气
-        /// </summary>
-        public async Task SetWorkpieceBlowingAsync()
-        {
-            workpieceBlowing.writeValue = "1";
-            await keyencePlc.WriteTagAsync(workpieceBlowing);
-        }
-
         public async Task<bool> IsOpenSecurityDoor1Async()
         {
             return await keyencePlc.ReadDataAsync(securityDoor1.addr) == false;
@@ -2230,6 +2273,15 @@ namespace 精密切割系统.Driver
         }
 
         /// <summary>
+        /// 读取所有报警状态
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool[]?> ReadTotalAlarmsAsync()
+        {
+            return await PlcControl.plc.ReadDataAsync(AlarmConfig.Instance.StartAddress, (ushort)AlarmConfig.Instance.TotalAlarmCount);
+        }
+
+        /// <summary>
         /// 设置油泵计数清零
         /// </summary>
         /// <param name="status">0 关 1 开</param>
@@ -2280,11 +2332,11 @@ namespace 精密切割系统.Driver
         // z2轴校准初始设置
         public Tag alignInitZ2 { get; set; }
         // 差步运动开始
-        public Tag alignRunMotion { get; set; }
+        public Tag startInterpolationMotion { get; set; }
         // 差步X运动位置
-        public Tag xRunMotion { get; set; }
+        public Tag xInterpolationMotion { get; set; }
         // 差步Y轴运动位置
-        public Tag yRunMotion { get; set; }
+        public Tag yInterpolationMotion { get; set; }
         // 设置参数确认
         public Tag confirmParams { get; set; }
         // ============校准结束===========
@@ -2333,9 +2385,9 @@ namespace 精密切割系统.Driver
         /// <summary>
         /// 执行差步运动
         /// </summary>
-        /// <param name="xRunMotionValue"></param>
-        /// <param name="yRunMotionValue"></param>
-        public void RunMotion(float xRunMotionValue, float yRunMotionValue)
+        /// <param name="xInterpolationMotionValue"></param>
+        /// <param name="yInterpolationMotionValue"></param>
+        public void RunMotion(float xInterpolationMotionValue, float yInterpolationMotionValue)
         {
             // 判断X轴和Y轴状态  =1 ready
             if (!PlcControl.tagControl.Xaxis.IsReady() || !PlcControl.tagControl.Yaxis.IsReady())
@@ -2353,29 +2405,29 @@ namespace 精密切割系统.Driver
             }
 
             keyencePlc.readTag(xStatus);
-            xRunMotion.writeValue = xRunMotionValue + "";
-            yRunMotion.writeValue = yRunMotionValue + "";
-            keyencePlc.writeTag (xRunMotion);
+            xInterpolationMotion.writeValue = xInterpolationMotionValue + "";
+            yInterpolationMotion.writeValue = yInterpolationMotionValue + "";
+            keyencePlc.writeTag (xInterpolationMotion);
             Thread.Sleep(1);
-            keyencePlc.writeTag (yRunMotion);
+            keyencePlc.writeTag (yInterpolationMotion);
             Thread.Sleep(1);
-            alignRunMotion.writeValue = "0";
-            keyencePlc.writeTag(alignRunMotion);
+            startInterpolationMotion.writeValue = "0";
+            keyencePlc.writeTag(startInterpolationMotion);
             Thread.Sleep(1);
-            alignRunMotion.writeValue = "1";
-            keyencePlc.writeTag(alignRunMotion);
+            startInterpolationMotion.writeValue = "1";
+            keyencePlc.writeTag(startInterpolationMotion);
         }
 
-        public async Task RunMotionAsync(float xRunMotionValue, float yRunMotionValue)
+        public async Task RunMotionAsync(float xInterpolationMotionValue, float yInterpolationMotionValue)
         {
-            xRunMotion.writeValue = xRunMotionValue.ToString();
-            yRunMotion.writeValue = yRunMotionValue.ToString();
-            await keyencePlc.WriteTagAsync(xRunMotion);
-            await keyencePlc.WriteTagAsync(yRunMotion);
-            alignRunMotion.writeValue = "0";
-            await keyencePlc.WriteTagAsync(alignRunMotion);
-            alignRunMotion.writeValue = "1";
-            await keyencePlc.WriteTagAsync(alignRunMotion);
+            xInterpolationMotion.writeValue = xInterpolationMotionValue.ToString();
+            yInterpolationMotion.writeValue = yInterpolationMotionValue.ToString();
+            await keyencePlc.WriteTagAsync(xInterpolationMotion);
+            await keyencePlc.WriteTagAsync(yInterpolationMotion);
+            startInterpolationMotion.writeValue = "0";
+            await keyencePlc.WriteTagAsync(startInterpolationMotion);
+            startInterpolationMotion.writeValue = "1";
+            await keyencePlc.WriteTagAsync(startInterpolationMotion);
         }
 
     }
@@ -2388,8 +2440,8 @@ namespace 精密切割系统.Driver
         // ================切割相关
         // 自动切割画面进入
         public Tag fullAutoInit { get; set; }
-        // 半自动切割画面进入
-        public Tag semiAutoInit { get; set; }
+        // 是否已准备好进入切割模式
+        public Tag isReadyToCutting { get; set; }
         // 切割设置参数确认
         public Tag confirmParams { get; set; }
         // 切割设置参数确认状态
@@ -2408,8 +2460,6 @@ namespace 精密切割系统.Driver
         public Tag cutStart { get; set; }
         // 切割停止
         public Tag cutStop { get; set; }
-        // 切割停止完成
-        public Tag CutStopCompleted { get; set; }
         // X轴切割开始位置
         public Tag xStartPosition { get; set; }
         // Y轴切割开始位置
@@ -2422,18 +2472,16 @@ namespace 精密切割系统.Driver
         public Tag cutNum { get; set; }
         // 自动切割结束
         public Tag fullAutoCutEnd { get; set; }
-        // 自动校准开始
-        public Tag alignmentStatus { get; set; }
+        // 是否退出切割模式
+        public Tag isExitCuttingMode { get; set; }
         // 停机检查
         public Tag shutdownCheck { get; set; }
         // Z1轴结束位置（切割位置）
         public Tag z1EndPosition { get; set; }
         // 自动当前切割面角度
         public Tag cutFaceAngle { get; set; }
-        // 切割准备完成
-        public Tag cutStatus { get; set; }
-        // X切割速度
-        public Tag feedSpeed { get; set; }
+        // 是否进入切割模式
+        public Tag isEnterCuttingMode { get; set; }
         // X轴切割结束位置
         public Tag xLength { get; set; }
         // X轴初始位置
@@ -2452,16 +2500,20 @@ namespace 精密切割系统.Driver
         public Tag returnSpeed { get; set; }
         // 切割停止延时检查
         public Tag cutStopDelayTime { get; set; }
-        
+
         /// <summary>
-        /// 进入半自动切割
+        /// 是否已准备好进入切割模式
         /// </summary>
-        public void EnterSemiAutoInit(int status)
+        public async Task<bool> IsReadyToCuttingAsync()
         {
-            semiAutoInit.writeValue = status.ToString();
-            keyencePlc.writeTag(semiAutoInit);
+            return await keyencePlc.ReadDataAsync(isReadyToCutting.addr) == true;
         }
-        
+
+        public async Task WaitReadyToCuttingAsync(CancellationToken token)
+        {
+            await TaskUtils.WaitExpectedResultAsync(IsReadyToCuttingAsync, true, token);
+        }
+
         /// <summary>
         /// 进入全自动切割
         /// </summary>
@@ -2474,34 +2526,60 @@ namespace 精密切割系统.Driver
         /// <summary>
         /// 进入全自动切割异步
         /// </summary>
-        public async Task EnterFullAutoInitAsync(int status)
+        public async Task EnterCuttingModeAsync(CancellationToken token)
         {
-            fullAutoInit.writeValue = status.ToString();
+            await WaitReadyToCuttingAsync(token);
+            fullAutoInit.writeValue = "1";
             await keyencePlc.WriteTagAsync(fullAutoInit);
+            await WaitEnterCuttingModeAsync(token);
         }
 
-        // 等待准备好切割
-        public async Task WaitReadyToCutAsync(CancellationToken token)
+        /// <summary>
+        /// 退出全自动切割异步
+        /// </summary>
+        public async Task ExitCuttingModeAsync(CancellationToken token)
         {
-            await TaskUtils.WaitExpectedResultAsync(IsReadyToCutAsync, true, token);
+            fullAutoInit.writeValue = "0";
+            await keyencePlc.WriteTagAsync(fullAutoInit);
+            await WaitExitCuttingModeAsync(token);
         }
 
-        // 判断是否已准备好切割
-        public async Task<bool> IsReadyToCutAsync()
+        /// <summary>
+        /// 是否退出切割模式
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> IsExitCuttingModeAsync()
         {
-            return await keyencePlc.ReadDataAsync(cutStatus.addr) ?? false;
+            return await keyencePlc.ReadDataAsync(isExitCuttingMode.addr) ?? false;
         }
 
-        // 等待准备好切割
-        public async Task WaitCutStopAsync(CancellationToken token)
+        /// <summary>
+        /// 等待退出切割模式
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public async Task WaitExitCuttingModeAsync(CancellationToken token)
         {
-            await TaskUtils.WaitExpectedResultAsync(IsCompletedCutStopAsync, true, token);
+            await TaskUtils.WaitExpectedResultAsync(IsExitCuttingModeAsync, true, token);
         }
 
-        // 判断切割是否停止完成
-        public async Task<bool> IsCompletedCutStopAsync()
+        /// <summary>
+        /// 是否进入切割模式
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> IsEnterCuttingModeAsync()
         {
-            return await keyencePlc.ReadDataAsync(CutStopCompleted.addr) ?? false;
+            return await keyencePlc.ReadDataAsync(isEnterCuttingMode.addr) ?? false;
+        }
+
+        /// <summary>
+        /// 等待进入切割模式
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public async Task WaitEnterCuttingModeAsync(CancellationToken token)
+        {
+            await TaskUtils.WaitExpectedResultAsync(IsEnterCuttingModeAsync, true, token);
         }
 
         /// <summary>
@@ -2523,6 +2601,29 @@ namespace 精密切割系统.Driver
             await keyencePlc.WriteTagAsync(cutStart);
         }
 
+        /// <summary>
+        /// 获取切割次数
+        /// </summary>
+        /// <returns></returns>
+        public async Task<int?> GetCutNumAsync()
+        {
+           return await keyencePlc.ReadDataAsync<int>(cutNum.addr);
+        }
+
+        /// <summary>
+        /// 等待切割次数更新
+        /// </summary>
+        /// <param name="curCutNum"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public async Task WaitCutNumUdatedAsync(int preCutNum, CancellationToken token)
+        {
+            await TaskUtils.WaitExpectedResultAsync(async () =>
+            {
+                int? curCutNum = await GetCutNumAsync();
+                return curCutNum != null && curCutNum != preCutNum;
+            }, token);
+        }
 
         /// <summary>
         /// 切割方法
@@ -2533,6 +2634,7 @@ namespace 精密切割系统.Driver
             cutMethod.writeValue = cutMethodValue.ToString();
             keyencePlc.writeTag(cutMethod);
         }
+
         /// <summary>
         /// Y轴光栅尺补偿
         /// </summary>
@@ -2559,11 +2661,6 @@ namespace 精密切割系统.Driver
         {
             cutStop.writeValue = status + "";
             keyencePlc.writeTag(cutStop);
-        }
-
-        public async Task<int?> GetCutNum()
-        {
-            return await keyencePlc.ReadDataAsync<int>(cutNum.addr);
         }
 
         /// <summary>
@@ -2655,8 +2752,7 @@ namespace 精密切割系统.Driver
             , string xEndLocation, string yCutLocation, string checkStatus, string thetaDeg, string spindleRevValue, int cutDirection)
         {
             // 切割速度
-            feedSpeed.writeValue = feedSpeedValue.ToString();
-            keyencePlc.writeTag (feedSpeed);
+            PlcControl.tagControl.Xaxis.SetAbsoluteSpeed(feedSpeedValue.ToString());
             // x轴开始位置
             xStartPosition.writeValue = xStartLoaction.ToString();
             keyencePlc.writeTag(xStartPosition);
@@ -2735,8 +2831,7 @@ namespace 精密切割系统.Driver
                 $""
                 );
             // 切割速度
-            feedSpeed.writeValue = feedSpeedValue.ToString();
-            await keyencePlc.WriteTagAsync(feedSpeed);
+            await PlcControl.tagControl.Xaxis.SetAbsoluteSpeedAsync(feedSpeedValue);
             // x轴开始位置
             xStartPosition.writeValue = xStartLoaction.ToString();
             await keyencePlc.WriteTagAsync(xStartPosition);

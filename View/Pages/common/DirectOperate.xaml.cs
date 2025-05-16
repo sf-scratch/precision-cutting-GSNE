@@ -46,21 +46,7 @@ namespace 精密切割系统.View.Controls
             AutoReset = false // 每次触发后需要手动重新启动
         };
         private string relativeDistance = "0.005";
-        // 轴按下运动状态
-        private bool downRunStatus;
 
-        // idx
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            directStatus = 0;
-            SetDirectImage();
-        }
-        // scr
-        private void Button_Click_1(object sender, RoutedEventArgs e)
-        {
-            directStatus = 1;
-            SetDirectImage();
-        }
 
         private void DisposeTimer()
         {
@@ -71,60 +57,6 @@ namespace 精密切割系统.View.Controls
                 AutoReset = false // 每次触发后需要手动重新启动
             };
             timer.Elapsed += null;
-        }
-
-        public void SetDirectImage()
-        {
-            if (directStatus == 0)
-            {
-                scanBorder.Background = new SolidColorBrush(Color.FromRgb(23, 124, 250));
-                scrBorder.Background = new SolidColorBrush(Color.FromRgb(255, 255, 255));
-                scanIcon.Source = Tools.BitmapImageToBitmap("/Assets/picture/IDX_icon.png");
-                scrIcon.Source = Tools.BitmapImageToBitmap("/Assets/picture/SCR_icon.png");
-                // 设置方向图片按钮
-                idxLeftIcon.Source = Tools.BitmapImageToBitmap("/Assets/picture/idx_left.png");
-                idxTopIcon.Source = Tools.BitmapImageToBitmap("/Assets/picture/idx_top.png");
-                idxRightIcon.Source = Tools.BitmapImageToBitmap("/Assets/picture/idx_right.png");
-                idxBottomIcon.Source = Tools.BitmapImageToBitmap("/Assets/picture/idx_bottom.png");
-                idxRightBottomIcon.Source = Tools.BitmapImageToBitmap("/Assets/picture/idx_right_bottom.png");
-                idxLeftBottomIcon.Source = Tools.BitmapImageToBitmap("/Assets/picture/idx_left_bottom.png");
-            }
-            else 
-            {
-
-                scanBorder.Background = new SolidColorBrush(Color.FromRgb(255, 255, 255));
-                scrBorder.Background = new SolidColorBrush(Color.FromRgb(23, 124, 250));
-                scanIcon.Source = Tools.BitmapImageToBitmap("/Assets/picture/IDX_icon_sel.png");
-                scrIcon.Source = Tools.BitmapImageToBitmap("/Assets/picture/SCR_icon_sel.png");
-
-                idxLeftIcon.Source = Tools.BitmapImageToBitmap("/Assets/picture/scr_left.png");
-                idxTopIcon.Source = Tools.BitmapImageToBitmap("/Assets/picture/scr_top.png");
-                idxRightIcon.Source = Tools.BitmapImageToBitmap("/Assets/picture/scr_right.png");
-                idxBottomIcon.Source = Tools.BitmapImageToBitmap("/Assets/picture/scr_bottom.png");
-                idxRightBottomIcon.Source = Tools.BitmapImageToBitmap("/Assets/picture/scr_right_bottom.png");
-                idxLeftBottomIcon.Source = Tools.BitmapImageToBitmap("/Assets/picture/scr_left_bottom.png");
-            }
-        }
-
-        private void idxLeftBottom_TouchDown(object sender, TouchEventArgs e)
-        {
-            if (CommonCheck.AxisRunStatusCheck())
-            {
-                return;
-            }
-            // 相对运动90°
-            // PlcControl.tagControl.ThetaAxis.StartRelative(GlobalParams.thetaScreenSpeed, GlobalParams.thetaScreenIndex, 0);
-            RotationAngle(0);
-            SetBtnImage(idxLeftBottomIcon, "left_bottom", true, 1);
-        }
-
-        private void idxLeftBottom_TouchUp(object sender, TouchEventArgs e)
-        {
-            if (CommonCheck.AxisRunStatusCheck())
-            {
-                return;
-            }
-            SetBtnImage(idxLeftBottomIcon, "left_bottom", false, 1);
         }
 
         public void SetBtnImage(Image image, string direction, bool isSelected, int type)
@@ -144,101 +76,6 @@ namespace 精密切割系统.View.Controls
             image.Source = Tools.BitmapImageToBitmap("/Assets/picture/" + resourceName + ".png");
         }
 
-        private void idxTop_TouchDown(object sender, TouchEventArgs e)
-        {
-            if (CommonCheck.AxisRunStatusCheck())
-            {
-                return;
-            }
-            if (downRunStatus)
-            {
-                return;
-            }
-            // Y轴向上运动 directStatus 如果为0 则是步进 如果为1 则scr 距离为步进的2倍
-            downRunStatus = true;
-            // 创建并启动新任务
-            Task.Run(() => ScrOrIndexScreen(1, 1));
-            SetBtnImage(idxTopIcon, "top", true, 1);
-        }
-
-        private void idxTop_TouchUp(object sender, TouchEventArgs e)
-        {
-            SetBtnImage(idxTopIcon, "top", false, 1);
-        }
-
-        private void idxLeftBtn_TouchDown(object sender, TouchEventArgs e)
-        {
-            if (CommonCheck.AxisRunStatusCheck())
-            {
-                return;
-            }
-            downRunStatus = true;
-            // 创建并启动新任务
-            Task.Run(() => ScrOrIndexScreen(1, 0));
-
-            downRunStatus = false;
-            SetBtnImage(idxLeftIcon, "left", true, 1);
-        }
-
-        private void idxLeftBtn_TouchUp(object sender, TouchEventArgs e)
-        {
-            SetBtnImage(idxLeftIcon, "left", false, 1);
-        }
-
-        private void idxRight_TouchDown(object sender, TouchEventArgs e)
-        {
-            if (CommonCheck.AxisRunStatusCheck())
-            {
-                return;
-            }
-            downRunStatus = true;
-            // 创建并启动新任务
-            Task.Run(() => ScrOrIndexScreen(0, 0));
-            downRunStatus = false;
-            SetBtnImage(idxRightIcon, "right", true, 1);
-        }
-
-        private void idxRight_TouchUp(object sender, TouchEventArgs e)
-        {
-            SetBtnImage(idxRightIcon, "right", false, 1);
-        }
-
-        private void idxBottomBtn_TouchDown(object sender, TouchEventArgs e)
-        {
-            if (CommonCheck.AxisRunStatusCheck())
-            {
-                return;
-            }
-            downRunStatus = true;
-            // 创建并启动新任务
-            Task.Run(() => ScrOrIndexScreen(0, 1));
-
-            downRunStatus = false;
-            SetBtnImage(idxBottomIcon, "bottom", true, 1);
-        }
-
-        private void idxBottomBtn_TouchUp(object sender, TouchEventArgs e)
-        {
-            SetBtnImage(idxBottomIcon, "bottom", false, 1);
-        }
-
-        private void idxRightBottomBtn_TouchDown(object sender, TouchEventArgs e)
-        {
-            if (CommonCheck.AxisRunStatusCheck())
-            {
-                return;
-            }
-            // 相对运动-90° 这个角度可能是根据ch1 ch2 ch3 ch4来的
-            // PlcControl.tagControl.ThetaAxis.StartRelative(GlobalParams.thetaScreenSpeed, GlobalParams.thetaScreenIndex, 1);
-            SetBtnImage(idxRightBottomIcon, "right_bottom", true, 1);
-            RotationAngle(1);
-        }
-
-        private void idxRightBottomBtn_TouchUp(object sender, TouchEventArgs e)
-        {
-            SetBtnImage(idxRightBottomIcon, "right_bottom", false, 1);
-        }
-
         private void scanLeftBottomBtn_TouchDown(object sender, TouchEventArgs e)
         {
             scanLeftBottomBtnDown(0, 0);
@@ -255,6 +92,11 @@ namespace 精密切割系统.View.Controls
         }
 
         private void scanTopBtn_TouchUp(object sender, TouchEventArgs e)
+        {
+            scanLeftBottomBtnDown(2, 1);
+        }
+
+        private void scanTopBtn_TouchLeave(object sender, TouchEventArgs e)
         {
             scanLeftBottomBtnDown(2, 1);
         }
@@ -347,8 +189,6 @@ namespace 精密切割系统.View.Controls
                 // 是否运动完成 应该读取plc的值 true是运行中，false是已停止
                 Tools.WaitForValue(PlcControl.allTags[DeviceKey.yCurSpeedKey], "0");
             }
-            // Y轴向上运动结束
-            downRunStatus = false;
         }
 
 
@@ -366,7 +206,7 @@ namespace 精密切割系统.View.Controls
             GlobalParams.heightSpeedStatus = hiSpeedStatus;
         }
 
-        public void SetHighBtnStatus(int tempHiSpeedStatus)
+        public async void SetHighBtnStatus(int tempHiSpeedStatus)
         {
             if (tempHiSpeedStatus == 0)
             {
@@ -374,8 +214,11 @@ namespace 精密切割系统.View.Controls
                 highSpeedBorder.Background = new SolidColorBrush(Color.FromRgb(255, 255, 255));
                 GlobalParams.multipleNum = 0.1;
                 // 设置为低速
-                PlcControl.tagControl.Xaxis.SetHighSpeed("0");
-                PlcControl.tagControl.Yaxis.SetHighSpeed("0");
+                await PlcControl.tagControl.Xaxis.SetHighSpeedAsync(0);
+                await PlcControl.tagControl.Yaxis.SetHighSpeedAsync(0);
+                await PlcControl.tagControl.Z1axis.SetHighSpeedAsync(0);
+                await PlcControl.tagControl.Z2axis.SetHighSpeedAsync(0);
+                await PlcControl.tagControl.ThetaAxis.SetHighSpeedAsync(0);
             }
             else
             {
@@ -383,8 +226,16 @@ namespace 精密切割系统.View.Controls
                 highSpeedBorder.Background = new SolidColorBrush(Color.FromRgb(23, 124, 250));
                 GlobalParams.multipleNum = 1;
                 // 设置为高速
-                PlcControl.tagControl.Xaxis.SetHighSpeed("1");
-                PlcControl.tagControl.Yaxis.SetHighSpeed("1");
+                await PlcControl.tagControl.Xaxis.SetHighSpeedAsync(1);
+                await PlcControl.tagControl.Xaxis.SetRelativeSpeedAsync(100);
+                await PlcControl.tagControl.Yaxis.SetHighSpeedAsync(1);
+                await PlcControl.tagControl.Yaxis.SetRelativeSpeedAsync(100);
+                await PlcControl.tagControl.Z1axis.SetHighSpeedAsync(1);
+                await PlcControl.tagControl.Z1axis.SetRelativeSpeedAsync(10);
+                await PlcControl.tagControl.Z2axis.SetHighSpeedAsync(1);
+                await PlcControl.tagControl.Z2axis.SetRelativeSpeedAsync(2);
+                await PlcControl.tagControl.ThetaAxis.SetHighSpeedAsync(1);
+                await PlcControl.tagControl.ThetaAxis.SetRelativeSpeedAsync(2);
             }
         }
         bool rotationAngleFlag = false;
@@ -524,37 +375,6 @@ namespace 精密切割系统.View.Controls
             scanLeftBottomBtnDown(1, 1);
         }
 
-        private void idxLeftBtn_TouchLeave(object sender, TouchEventArgs e)
-        {
-            SetBtnImage(idxLeftIcon, "left", false, 1);
-        }
-
-        private void idxRight_TouchLeave(object sender, TouchEventArgs e)
-        {
-            SetBtnImage(idxRightIcon, "right", false, 1);
-        }
-
-        private void idxBottomBtn_TouchLeave(object sender, TouchEventArgs e)
-        {
-            SetBtnImage(idxBottomIcon, "bottom", false, 1);
-        }
-
-        private void idxTop_TouchLeave(object sender, TouchEventArgs e)
-        {
-            SetBtnImage(idxTopIcon, "top", false, 1);
-        }
-
-        private void idxLeftBottom_TouchLeave(object sender, TouchEventArgs e)
-        {
-            SetBtnImage(idxLeftBottomIcon, "left_bottom", false, 1);
-        }
-
-        private void idxRightBottomBtn_TouchLeave(object sender, TouchEventArgs e)
-        {
-
-            SetBtnImage(idxRightBottomIcon, "right_bottom", false, 1);
-        }
-
         private void scanLeftBottomBtn_TouchLeave(object sender, TouchEventArgs e)
         {
             scanLeftBottomBtnDown(0, 1);
@@ -573,18 +393,13 @@ namespace 精密切割系统.View.Controls
                 if (isVisible)
                 {
                     hiSpeedStatus = GlobalParams.heightSpeedStatus;
-                    SetHighBtnStatus(hiSpeedStatus);
+                    SetHighBtnStatus(0);
                 }
             }
         }
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
-        }
-
-        private void scanTopBtn_TouchLeave(object sender, TouchEventArgs e)
-        {
-            scanLeftBottomBtnDown(2, 1);
         }
 
         private void scanRightBtn_MouseDown(object sender, MouseButtonEventArgs e)
@@ -597,14 +412,9 @@ namespace 精密切割系统.View.Controls
             scanLeftBottomBtnDown(5, 1);
         }
 
-        private void idxLeftBottom_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        private void scanRightBtn_MouseLeave(object sender, MouseEventArgs e)
         {
-            RotationAngle(0);
-        }
-
-        private void idxRightBottomBtn_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            RotationAngle(1);
+            scanLeftBottomBtnDown(5, 1);
         }
 
         /// <summary>
@@ -612,7 +422,7 @@ namespace 精密切割系统.View.Controls
         /// </summary>
         /// <param name="type">0 左下 1 右下 2 上 3 下 4 左 5 右</param>
         /// <param name="operateType">操作类型 0 down 1 up</param>
-        private void scanLeftBottomBtnDown(int type, int operateType)
+        private async void scanLeftBottomBtnDown(int type, int operateType)
         {
             if (operateType == 0)
             {
@@ -623,56 +433,27 @@ namespace 精密切割系统.View.Controls
                 switch (type)
                 {
                     case 0:
-                        PlcControl.tagControl.ThetaAxis.StartJog(1);
+                        await PlcControl.tagControl.ThetaAxis.StartJogAsync(1);
                         SetBtnImage(scanLeftBottomIcon, "left_bottom", true, 2);
                         break;
                     case 1:
-                        PlcControl.tagControl.ThetaAxis.StartJog(0);
+                        await PlcControl.tagControl.ThetaAxis.StartJogAsync(0);
                         SetBtnImage(scanRightBottomIcon, "right_bottom", true, 2);
                         break;
                     case 2:
-                        // 先执行相对运动
-                        PlcControl.tagControl.Yaxis.StartRelative(GlobalParams.xScanSpeed, relativeDistance, 1);
-                        DisposeTimer();
-                        timer.Elapsed += (sender, e) =>
-                        {
-                            PlcControl.tagControl.Yaxis.StartJog(1);
-                        };
-                        timer.Start();
+                        await PlcControl.tagControl.Yaxis.StartJogAsync(1);
                         SetBtnImage(scanTopIcon, "top", true, 2);
                         break;
                     case 3:
-                        // 先执行相对运动
-                        PlcControl.tagControl.Yaxis.StartRelative(GlobalParams.xScanSpeed, relativeDistance, 0);
-                        DisposeTimer();
-                        timer.Elapsed += (sender, e) =>
-                        {
-                            PlcControl.tagControl.Yaxis.StartJog(0);
-                        };
-                        timer.Start();
+                        await PlcControl.tagControl.Yaxis.StartJogAsync(0);
                         SetBtnImage(scanBottomIcon, "bottom", true, 2);
                         break;
                     case 4:
-                        // 先执行相对运动
-                        PlcControl.tagControl.Xaxis.StartRelative(GlobalParams.xScanSpeed, relativeDistance, 0);
-                        DisposeTimer();
-                        timer.Elapsed += (sender, e) =>
-                        {
-                            PlcControl.tagControl.Xaxis.StartJog(0);
-                        };
-                        timer.Start();
+                        await PlcControl.tagControl.Xaxis.StartJogAsync(0);
                         SetBtnImage(scanLeftIcon, "left", true, 2);
                         break;
                     case 5:
-                        // 先执行相对运动
-                        PlcControl.tagControl.Xaxis.StartRelative(GlobalParams.xScanSpeed, relativeDistance, 1);
-                        DisposeTimer();
-                        timer.Elapsed += (sender, e) =>
-                        {
-                            PlcControl.tagControl.Xaxis.StartJog(1);
-                        };
-                        timer.Start();
-
+                        await PlcControl.tagControl.Xaxis.StartJogAsync(1);
                         SetBtnImage(scanRightIcon, "right", true, 2);
                         break;
                     default:
@@ -693,19 +474,19 @@ namespace 精密切割系统.View.Controls
                         SetBtnImage(scanRightBottomIcon, "right_bottom", false, 2);
                         break;
                     case 2:
-                        PlcControl.tagControl.Yaxis.StopMove();
+                        await PlcControl.tagControl.Yaxis.StopJogAsync();
                         SetBtnImage(scanTopIcon, "top", false, 2);
                         break;
                     case 3:
-                        PlcControl.tagControl.Yaxis.StopMove();
+                        await PlcControl.tagControl.Yaxis.StopJogAsync();
                         SetBtnImage(scanBottomIcon, "bottom", false, 2);
                         break;
                     case 4:
-                        PlcControl.tagControl.Xaxis.StopMove();
+                        await PlcControl.tagControl.Xaxis.StopJogAsync();
                         SetBtnImage(scanLeftIcon, "left", false, 2);
                         break;
                     case 5:
-                        PlcControl.tagControl.Xaxis.StopMove();
+                        await PlcControl.tagControl.Xaxis.StopJogAsync();
                         SetBtnImage(scanRightIcon, "right", false, 2);
                         break;
                     default:
@@ -724,12 +505,22 @@ namespace 精密切割系统.View.Controls
             scanLeftBottomBtnDown(0, 1);
         }
 
+        private void scanLeftBottomBtn_MouseLeave(object sender, MouseEventArgs e)
+        {
+            scanLeftBottomBtnDown(0, 1);
+        }
+
         private void scanRightBottomBtn_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             scanLeftBottomBtnDown(1, 0);
         }
 
         private void scanRightBottomBtn_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            scanLeftBottomBtnDown(1, 1);
+        }
+
+        private void scanRightBottomBtn_MouseLeave(object sender, MouseEventArgs e)
         {
             scanLeftBottomBtnDown(1, 1);
         }
@@ -744,12 +535,22 @@ namespace 精密切割系统.View.Controls
             scanLeftBottomBtnDown(2, 1);
         }
 
+        private void scanTopBtn_MouseLeave(object sender, MouseEventArgs e)
+        {
+            scanLeftBottomBtnDown(2, 1);
+        }
+
         private void scanBottomBtn_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             scanLeftBottomBtnDown(3, 0);
         }
 
         private void scanBottomBtn_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            scanLeftBottomBtnDown(3, 1);
+        }
+
+        private void scanBottomBtn_MouseLeave(object sender, MouseEventArgs e)
         {
             scanLeftBottomBtnDown(3, 1);
         }
@@ -762,6 +563,25 @@ namespace 精密切割系统.View.Controls
         private void scanLeftBtn_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
             scanLeftBottomBtnDown(4, 1);
+        }
+
+        private void scanLeftBtn_MouseLeave(object sender, MouseEventArgs e)
+        {
+            scanLeftBottomBtnDown(4, 1);
+        }
+
+        private void scrHighSpeedBtn_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (hiSpeedStatus == 1)
+            {
+                hiSpeedStatus = 0;
+            }
+            else
+            {
+                hiSpeedStatus = 1;
+            }
+            SetHighBtnStatus(hiSpeedStatus);
+            
         }
     }
 }

@@ -912,8 +912,7 @@ namespace 精密切割系统.Driver
             {
                 while (_disposed)
                 {
-                    ObservableCollection<AlarmItem> list = PlcControl.allAlarm;
-                    if (list.Count > 0)
+                    if (AlarmConfig.Instance.HasActiveAlarm())
                     {
                         Debug.WriteLine("异常报警！");
                         globalErrorFlag = true;

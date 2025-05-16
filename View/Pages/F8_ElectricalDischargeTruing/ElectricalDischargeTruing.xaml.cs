@@ -293,8 +293,7 @@ namespace 精密切割系统.View.Pages.F8_ElectricalDischargeTruing
             {
                 while (_runFlag == 0)
                 {
-                    ObservableCollection<AlarmItem> list = PlcControl.allAlarm;
-                    if (list.Count > 0)
+                    if (AlarmConfig.Instance.HasActiveAlarm())
                     {
                         Finish();
                     }
@@ -321,7 +320,7 @@ namespace 精密切割系统.View.Pages.F8_ElectricalDischargeTruing
         private void btnStart()
         {
             // 如果有异常，则不能进行操作
-            if (PlcControl.allAlarm.Count > 0)
+            if (AlarmConfig.Instance.HasActiveAlarm())
             {
                 GlobalParams.globalRunFlag = false;
                 startRunFlag = false;
@@ -466,7 +465,7 @@ namespace 精密切割系统.View.Pages.F8_ElectricalDischargeTruing
             String currentCountStr = PlcControl.plc.GetPlcValueString(DeviceKey.currentCountKey);
             while (!repeatCount.Equals(currentCountStr) && _runFlag != 0)
             {
-                if (PlcControl.allAlarm.Count > 0) 
+                if (AlarmConfig.Instance.HasActiveAlarm()) 
                 {
                     _runFlag = 0;
                     break;

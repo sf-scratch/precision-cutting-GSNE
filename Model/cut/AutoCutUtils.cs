@@ -29,6 +29,9 @@ using System.Drawing.Imaging;
 using System.Collections.Concurrent;
 using Newtonsoft.Json.Linq;
 using Emgu.CV.Reg;
+using 精密切割系统.PubSubEvent;
+using 精密切割系统.Model.common;
+using System.Windows.Interop;
 
 namespace 精密切割系统.Model.cut
 {
@@ -168,7 +171,7 @@ namespace 精密切割系统.Model.cut
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        public static async Task<float?> ProcessMeasureHeightAsync(HeightMeasurementMode mode, CancellationToken token)
+        public static async Task<float?> ProcessMeasureHeightAsync(HeightMeasurementMode mode, CancellationToken token, IEventAggregator? eventAggregator = null)
         {
             InitialPositionModel? initPos = await GetInitialPositionAsync();
             if (initPos is null) return null;
@@ -193,6 +196,7 @@ namespace 精密切割系统.Model.cut
             await PlcControl.tagControl.bladeMantance.RunBladeSetupAsync(1);
             //等待测高准备完成信号
             await TaskUtils.WaitExpectedResultAsync(IsReadyToMeasureHeightAsync, true, token);
+            eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始测高！"));
             BladeHeightModel bladeHeightModel;
             //测高参数的数据
             List<BladeHeightModel> list = await SqlHelper.TableAsync<BladeHeightModel>()
@@ -200,13 +204,13 @@ namespace 精密切割系统.Model.cut
             //数据不存在，则初始化数据
             if (list == null || list.Count == 0)
             {
-                MaterialSnackUtils.MaterialSnack("获取测高参数失败！", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnackUtils.MaterialSnack("获取测高参数失败！", MaterialSnackUtils.SnackType.ERROR, 0, eventAggregator);
                 return null;
             }
             bladeHeightModel = list[0];
             if (!int.TryParse(bladeHeightModel.Retry, out int retry))
             {
-                MaterialSnackUtils.MaterialSnack("测高参数异常！", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnackUtils.MaterialSnack("测高参数异常！", MaterialSnackUtils.SnackType.ERROR, 0, eventAggregator);
                 return null;
             }
             // 发送测高开始信号到PLC
@@ -220,8 +224,8 @@ namespace 精密切割系统.Model.cut
                 // 如果不相等，则记录值
                 if (curMeasureHeightTimes != measureHeightTimes)
                 {
-                    string setupValue = await PlcControl.plc.GetPlcValueStringAsync(DeviceKey.setupValueKey);
-                    Tools.LogDebug($"第{curMeasureHeightTimes}次测高：{setupValue}");
+                    string setupValue = await PlcControl.plc.GetPlcValueStringAsync(DeviceKey.setupValueKey); 
+                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"第{curMeasureHeightTimes}次测高：{setupValue}"));
                     setupValueList.Add(Tools.GetFloatStringValue(setupValue));
                     measureHeightTimes = curMeasureHeightTimes;
                 }
@@ -232,10 +236,7 @@ namespace 精密切割系统.Model.cut
             }
             //等待完成测高信号
             await TaskUtils.WaitExpectedResultAsync(IsCompletedMeasureHeightAsync, true, token);
-            Tools.LogDebug($"测高平均值：{setupValueList.Average()}");
-            await WaitAllAxisStopAsync(token);
-            //抬起Z1轴
-            await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(5, token);
+            eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高平均值：{setupValueList.Average()}"));
             // 计算3次的平均值，为测高值
             return setupValueList.Average();
         }
@@ -355,10 +356,10 @@ namespace 精密切割系统.Model.cut
         public static async Task WaitAllAxisStopAsync(CancellationToken token)
         {
             Task taskWhole = TaskUtils.WaitExpectedResultAsync(PlcControl.tagControl.wholeDevice.IsSpindleStopAsync, token);
-            Task taskX = PlcControl.tagControl.Xaxis.WatiSpeedZeroAsync(token);
-            Task taskY = PlcControl.tagControl.Yaxis.WatiSpeedZeroAsync(token);
-            Task taskZ1 = PlcControl.tagControl.Z1axis.WatiSpeedZeroAsync(token);
-            Task taskZ2 = PlcControl.tagControl.Z2axis.WatiSpeedZeroAsync(token);
+            Task taskX = PlcControl.tagControl.Xaxis.WatiAxisStopAsync(token);
+            Task taskY = PlcControl.tagControl.Yaxis.WatiAxisStopAsync(token);
+            Task taskZ1 = PlcControl.tagControl.Z1axis.WatiAxisStopAsync(token);
+            Task taskZ2 = PlcControl.tagControl.Z2axis.WatiAxisStopAsync(token);
             await Task.WhenAll(taskWhole, taskX, taskY, taskZ1, taskZ2);
         }
 
@@ -378,12 +379,12 @@ namespace 精密切割系统.Model.cut
             return cameraCommons.FirstOrDefault();
         }
 
-        public static async Task<float?> AutoFocusAsync(CancellationToken token)
+        public static async Task<float?> AutoFocusAsync(CancellationToken token, IEventAggregator? eventAggregator = null)
         {
             CameraCommon? cameraCommon = GetCameraCommon();
             if (cameraCommon is null)
             {
-                MaterialSnackUtils.MaterialSnack("相机获取失败！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnackUtils.MaterialSnack("相机获取失败！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
                 return null;
             }
             // 获取当前配置的工作盘和膜的厚度
@@ -396,62 +397,48 @@ namespace 精密切割系统.Model.cut
             float? z2CurLocation = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync();
             if (z2CurLocation != null)
             {
-                float start = 0.01f;
-                float end = 0.5f;
-                float increment = 0.01f;
-                HashSet<ImageData> dataSet = new HashSet<ImageData>();
+                float margin = 0.5f;
                 float lastBlurriness = 0;
                 float lastPosition = 0;
-                // 增加动态调整步进增量的逻辑
-                float dynamicIncrement = increment;  // 初始步进增量
-                for (float i = start; i < end; i += dynamicIncrement)
+                for (float newPosition = startPositionZ2 - margin; newPosition <= startPositionZ2 + margin; newPosition += 0.05f)
                 {
-                    // 执行你的操作
-                    float newPosition = startPositionZ2 + i;
                     await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(newPosition, token);
                     if (cameraCommon.localBitmap != null)
                     {
                         float tenengradBlurriness = (float)VisualUtils.CalculateTenengrad2(cameraCommon.localBitmap);
-                        Tools.LogInfo("当前位置：" + newPosition + " 当前模糊度：" + tenengradBlurriness);
+                        eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"当前位置：{newPosition} 当前模糊度：{tenengradBlurriness}"));
                         if (lastBlurriness > 0 && lastBlurriness - tenengradBlurriness > 0.5)
                         {
                             // 找到最清晰的位置，停止循环并移动到上一个位置
-                            Tools.LogInfo("最清晰的图片已找到，停止当前对焦并返回到上一个位置");
+                            eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"最清晰的图片已找到，Z2位置{lastPosition}"));
                             // 调用plc方法，走到上一个位置
                             await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(lastPosition, token);
                             return lastPosition;
-                        }
-                        if (tenengradBlurriness < 10)
-                        {
-                            dynamicIncrement = 0.05f;
-                        }
-                        else if (tenengradBlurriness < 20)
-                        {
-                            dynamicIncrement = 0.03f;
-                        }
-                        else
-                        {
-                            dynamicIncrement = increment;
                         }
                         lastBlurriness = tenengradBlurriness;
                         lastPosition = newPosition;
                     }
                     else
                     {
-                        Tools.LogInfo("聚焦获取当前帧失败！");
+                        eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("聚焦获取当前帧失败！"));
                     }
                 }
             }
             return null;
         }
 
+        /// <summary>
+        /// 工作盘吹气
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public static async Task WorkpieceBlowingAsync(CancellationToken token)
         {
-            await PlcControl.tagControl.wholeDevice.SetWorkpieceBlowingAsync();
+            await PlcControl.tagControl.wholeDevice.OpenWorkpieceBlowingAsync();
             await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(190, token);
             await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(70, token);
             await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(2, token);
-            await PlcControl.tagControl.wholeDevice.SetWorkpieceBlowingAsync();
+            await PlcControl.tagControl.wholeDevice.CloseWorkpieceBlowingAsync();
         }
 
         private static async Task<Queue<CutStep>?> GetAllCutSequenceAsync(long id, float afterHeightMeasurementZ)
@@ -1013,8 +1000,6 @@ namespace 精密切割系统.Model.cut
         /// <returns></returns>
         public static async Task<bool> CheckKnifeMarksStatus(LineSegment line, float focusClearZ2, CancellationToken token)
         {
-            
-            //return true;
             DataPoint<float> relativePos = GlobalParams.CameraRelativeBladePosition;
             await WaitAllAxisStopAsync(token);
             await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, token);
