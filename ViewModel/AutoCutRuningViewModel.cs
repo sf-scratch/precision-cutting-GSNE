@@ -238,7 +238,8 @@ namespace 精密切割系统.ViewModel
                     MaterialSnackUtils.MaterialSnack("上机失败！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
                     return;
                 }
-                LunguSksjDTO? lunguSksj = await HttpUtils.GetLunguSksjAsync(LunguId);
+                LunguSksjDTO? lunguSksj = new LunguSksjDTO();
+                //LunguSksjDTO? lunguSksj = await HttpUtils.GetLunguSksjAsync(LunguId);
                 //if (lunguSksj == null)
                 //{
                 //    MaterialSnackUtils.MaterialSnack("轮毂信息获取错误！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
@@ -255,11 +256,10 @@ namespace 精密切割系统.ViewModel
                 }
                 AfterHeightMeasurementZ = firstHeightMeasurementZ.Value;
                 RunStatus = AutoRunStatus.AutoFocus;
-                await AutoCutUtils.WorkpieceBlowingAsync(_pauseCts.Token);
+                await AutoCutUtils.WorkpieceBlowingAsync(_eventAggregator, _pauseCts.Token);
                 //对焦
-                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(cameraCenterPoint.X, _pauseCts.Token);
-                await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(cameraCenterPoint.Y + 20, _pauseCts.Token);
-                float? focusClearZ = await AutoCutUtils.AutoFocusAsync(_pauseCts.Token, _eventAggregator);
+                await PlcControl.tagControl.cutting.RunMotionAsync(cameraCenterPoint.X, cameraCenterPoint.Y + 20, _pauseCts.Token);
+                float? focusClearZ = await AutoCutUtils.AutoFocusAsync(_eventAggregator, _pauseCts.Token);
 
                 RunStatus = AutoRunStatus.SharpenCalibrat;
                 // 磨刀校准
@@ -296,7 +296,7 @@ namespace 精密切割系统.ViewModel
 
                     RunStatus = AutoRunStatus.HeightMeasurementInProgress;
                     // 开始测高
-                    curHeightZ = await AutoCutUtils.ProcessMeasureHeightAsync(heightMeasurementMode, _pauseCts.Token);
+                    curHeightZ = await AutoCutUtils.ProcessMeasureHeightAsync(heightMeasurementMode, _pauseCts.Token, _eventAggregator);
                     if (curHeightZ == null)
                     {
                         MaterialSnackUtils.MaterialSnack("测高失败，没有测高数据！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
@@ -383,7 +383,7 @@ namespace 精密切割系统.ViewModel
             {
                 try
                 {
-                    if (AlarmConfig.Instance.HasActiveAlarm())
+                    if (AlarmConfig.Instance.HasActiveErrorAlarm())
                     {
                         if (!_pauseCts.IsCancellationRequested)
                         {
@@ -446,7 +446,7 @@ namespace 精密切割系统.ViewModel
             }
             else
             {
-                MaterialSnackUtils.MaterialSnack("停止自动切割，当前状态不允许暂停！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                //MaterialSnackUtils.MaterialSnack("停止自动切割，当前状态不允许暂停！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
             }
             return false;
         }
@@ -476,6 +476,8 @@ namespace 精密切割系统.ViewModel
             {
                 //结束测高
                 await PlcControl.tagControl.bladeMantance.HeightMeasurementEarlyEndAsync();
+                //等待完成测高信号
+                await PlcControl.tagControl.bladeMantance.WaitHeightMeasurementCompletedAsync(default);
             }
             else if (RunStatus == AutoRunStatus.SharpeningInProgress || RunStatus == AutoRunStatus.CutingInProgress)
             {

@@ -912,7 +912,7 @@ namespace 精密切割系统.Driver
             {
                 while (_disposed)
                 {
-                    if (AlarmConfig.Instance.HasActiveAlarm())
+                    if (AlarmConfig.Instance.HasActiveErrorAlarm())
                     {
                         Debug.WriteLine("异常报警！");
                         globalErrorFlag = true;

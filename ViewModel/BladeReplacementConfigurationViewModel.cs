@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using OpenCvSharp;
+using Prism.Events;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -78,7 +79,7 @@ namespace 精密切割系统.ViewModel
             _eventAggregator = eventAggregator;
             LunguId = CameraUtils.GetLunguId();
             _rightButtonParams = WindowLayout.RightPageButtons;
-            AutoRunCommand = new RelayCommand(AutoRun);
+            AutoRunCommand = new RelayCommand(AutoRunAsync);
             InitCommand = new RelayCommand<string>(Init);
         }
 
@@ -95,7 +96,7 @@ namespace 精密切割系统.ViewModel
         private void InitRightButton()
         {
             _rightButtonParams.Clear();
-            _rightButtonParams.Add(RightButtonParams.GreenRightButton("自动执行", "/Assets/icon/right/enter.png", AutoRun));
+            _rightButtonParams.Add(RightButtonParams.GreenRightButton("自动执行", "/Assets/icon/right/enter.png", AutoRunAsync));
             _rightButtonParams.Add(RightButtonParams.GreenRightButton("重置磨刀", "/Assets/icon/menu_6/menu_6_1_white.png", SharpenService.Instance.Reset));
             _rightButtonParams.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }
@@ -108,14 +109,13 @@ namespace 精密切割系统.ViewModel
             }
             try
             {
-                LunguSksjDTO lunguSksjDTO = new LunguSksjDTO();
                 //轮毂信息
+                LunguSksjDTO lunguSksjDTO = new LunguSksjDTO();
                 //LunguSksjDTO? lunguSksjDTO = await HttpUtils.GetLunguSksjAsync(lunguId);
                 //if (lunguSksjDTO == null)
                 //{
                 //    InitRightButtonOnlyBack();
-                //    Tools.LogError("轮毂信息获取失败！");
-                //    MaterialSnackUtils.MaterialSnack("轮毂信息获取失败！", MaterialSnackUtils.SnackType.WARNING);
+                //    MaterialSnackUtils.MaterialSnack("轮毂信息获取失败！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
                 //    return;
                 //}
                 LunguSks = MapperConfig.Mapper.Map<LunguSksjModel>(lunguSksjDTO);
@@ -126,8 +126,7 @@ namespace 精密切割系统.ViewModel
                                     .Where(t => t.Id == bmSharpParamId).ToListAsync();
                 if (list.Count <= 0)
                 {
-                    Tools.LogError("磨刀参数获取错误！");
-                    MaterialSnackUtils.MaterialSnack("磨刀参数获取错误！", MaterialSnackUtils.SnackType.WARNING);
+                    MaterialSnackUtils.MaterialSnack("磨刀参数获取错误！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
                     return;
                 }
                 BmSharpenParameterModel sharpenParam = list[0];
@@ -152,7 +151,7 @@ namespace 精密切割系统.ViewModel
                 var listConf = await SqlHelper.TableAsync<FileTableItemModel>().Where(t => t.Id == fileTableId).ToListAsync();
                 if (listConf.Count == 0)
                 {
-                    MaterialSnackUtils.MaterialSnack("切割参数获取错误！", MaterialSnackUtils.SnackType.WARNING);
+                    MaterialSnackUtils.MaterialSnack("切割参数获取错误！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
                     return;
                 }
                 FileTableItemModel fileTable = listConf[0];
@@ -161,7 +160,7 @@ namespace 精密切割系统.ViewModel
                     .Where(t => t.ItemId == fileTable.Id).ToListAsync();
                 if (chModels.Count == 0)
                 {
-                    MaterialSnackUtils.MaterialSnack("切割通道参数获取错误！", MaterialSnackUtils.SnackType.WARNING);
+                    MaterialSnackUtils.MaterialSnack("切割通道参数获取错误！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
                     return;
                 }
                 FileTableItemChModel fileTableCh = chModels[0];
@@ -186,8 +185,13 @@ namespace 精密切割系统.ViewModel
 
         }
 
-        private void AutoRun()
+        private async void AutoRunAsync()
         {
+            if (!await PlcControl.tagControl.wholeDevice.IsOpenVacuumSwitchAsync())
+            {
+                MaterialSnackUtils.MaterialSnack("未打开工作盘真空！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                return;
+            }
             NavigationParameters parameters = new NavigationParameters
             {
                 { "SharpenParams", SharpenParams },

@@ -660,7 +660,7 @@ namespace 精密切割系统.Driver
 
         public static string GetLunguId()
         {
-            return "T24111102B0006";
+            return "YL24081330B077";
         }
     }
 }

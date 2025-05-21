@@ -19,8 +19,9 @@ namespace 精密切割系统.Helpers
     public static class Appsettings
     {
         private static readonly string _configPath = Path.Combine(AppContext.BaseDirectory, "appsettings.json");
-        public static readonly string RecordSharpenY = "SharpenRecord:RecordSharpenY";
-        public static readonly string ThetaDegQueue = "SharpenRecord:ThetaDegQueue";
+        public static readonly string SharpenY = "SharpenRecord:SharpenY";
+        public static readonly string SharpenThetaDegQueue = "SharpenRecord:ThetaDegQueue";
+        public static readonly string ContactHeightMeasurementThetaDeg = "ContactHeightMeasurementRecord:ThetaDeg";
 
         public static IConfigurationRoot Configuration { get; }
 

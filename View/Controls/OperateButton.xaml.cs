@@ -169,7 +169,7 @@ namespace 精密切割系统.View.Controls
                 OperateClicked?.Invoke(this, bean);
                 return;
             }
-            if (AlarmConfig.Instance.HasActiveAlarm())
+            if (AlarmConfig.Instance.HasActiveErrorAlarm())
             {
                 MaterialSnackUtils.MaterialSnack("请先解除报警！", MaterialSnackUtils.SnackType.WARNING, 5);
                 return;
@@ -196,7 +196,7 @@ namespace 精密切割系统.View.Controls
                 return;
             }
             // 如果有报警，且没有在运行中的，则可以点击
-            if (AlarmConfig.Instance.HasActiveAlarm() && !GlobalParams.globalRunFlag && bean.Code != 6)
+            if (AlarmConfig.Instance.HasActiveErrorAlarm() && !GlobalParams.globalRunFlag && bean.Code != 6)
             {
                 return;
             }

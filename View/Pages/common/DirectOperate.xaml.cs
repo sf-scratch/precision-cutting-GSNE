@@ -17,6 +17,7 @@ using System.Windows.Shapes;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
 using 精密切割系统.FrmWindow.common;
+using 精密切割系统.Helpers;
 using 精密切割系统.Model.plc;
 using 精密切割系统.Utils;
 using 精密切割系统.View.Pages.common;
@@ -76,74 +77,10 @@ namespace 精密切割系统.View.Controls
             image.Source = Tools.BitmapImageToBitmap("/Assets/picture/" + resourceName + ".png");
         }
 
-        private void scanLeftBottomBtn_TouchDown(object sender, TouchEventArgs e)
-        {
-            scanLeftBottomBtnDown(0, 0);
-        }
-
-        private void scanLeftBottomBtn_TouchUp(object sender, TouchEventArgs e)
-        {
-            scanLeftBottomBtnDown(0, 1);
-        }
-
-        private void scanTopBtn_TouchDown(object sender, TouchEventArgs e)
-        {
-            scanLeftBottomBtnDown(2, 0);
-        }
-
-        private void scanTopBtn_TouchUp(object sender, TouchEventArgs e)
-        {
-            scanLeftBottomBtnDown(2, 1);
-        }
-
-        private void scanTopBtn_TouchLeave(object sender, TouchEventArgs e)
-        {
-            scanLeftBottomBtnDown(2, 1);
-        }
-
-        private void scanLeftBtn_TouchDown(object sender, TouchEventArgs e)
-        {
-            scanLeftBottomBtnDown(4, 0);
-        }
-
-        private void scanLeftBtn_TouchUp(object sender, TouchEventArgs e)
-        {
-            scanLeftBottomBtnDown(4, 1);
-        }
-
-        private void scanRightBtn_TouchDown(object sender, TouchEventArgs e)
-        {
-            scanLeftBottomBtnDown(5, 0);
-        }
-
-        private void scanRightBtn_TouchUp(object sender, TouchEventArgs e)
-        {
-            scanLeftBottomBtnDown(5, 1);
-        }
-
         private void stopTimer()
         {
             timer.Stop();
             timer.Dispose();
-        }
-        private void scanBottomBtn_TouchDown(object sender, TouchEventArgs e)
-        {
-            scanLeftBottomBtnDown(3, 0);
-        }
-
-        private void scanBottomBtn_TouchUp(object sender, TouchEventArgs e)
-        {
-            scanLeftBottomBtnDown(3, 1);
-        }
-
-        private void scanRightBottomBtn_TouchDown(object sender, TouchEventArgs e)
-        {
-            scanLeftBottomBtnDown(1, 0);
-        }
-
-        private void scanRightBottomBtn_TouchUp(object sender, TouchEventArgs e)
-        {
-            scanLeftBottomBtnDown(1, 1);
         }
 
         // 运行方向 0 正 1 负
@@ -204,6 +141,7 @@ namespace 精密切割系统.View.Controls
             }
             SetHighBtnStatus(hiSpeedStatus);
             GlobalParams.heightSpeedStatus = hiSpeedStatus;
+            
         }
 
         public async void SetHighBtnStatus(int tempHiSpeedStatus)
@@ -227,15 +165,15 @@ namespace 精密切割系统.View.Controls
                 GlobalParams.multipleNum = 1;
                 // 设置为高速
                 await PlcControl.tagControl.Xaxis.SetHighSpeedAsync(1);
-                await PlcControl.tagControl.Xaxis.SetRelativeSpeedAsync(100);
+                await PlcControl.tagControl.Xaxis.SetJogRelativeSpeedAsync(GlobalParams.XDefaultSpeed);
                 await PlcControl.tagControl.Yaxis.SetHighSpeedAsync(1);
-                await PlcControl.tagControl.Yaxis.SetRelativeSpeedAsync(100);
+                await PlcControl.tagControl.Yaxis.SetJogRelativeSpeedAsync(GlobalParams.YDefaultSpeed);
                 await PlcControl.tagControl.Z1axis.SetHighSpeedAsync(1);
-                await PlcControl.tagControl.Z1axis.SetRelativeSpeedAsync(10);
+                await PlcControl.tagControl.Z1axis.SetJogRelativeSpeedAsync(GlobalParams.Z1DefaultSpeed);
                 await PlcControl.tagControl.Z2axis.SetHighSpeedAsync(1);
-                await PlcControl.tagControl.Z2axis.SetRelativeSpeedAsync(2);
+                await PlcControl.tagControl.Z2axis.SetJogRelativeSpeedAsync(GlobalParams.Z2DefaultSpeed);
                 await PlcControl.tagControl.ThetaAxis.SetHighSpeedAsync(1);
-                await PlcControl.tagControl.ThetaAxis.SetRelativeSpeedAsync(2);
+                await PlcControl.tagControl.ThetaAxis.SetJogRelativeSpeedAsync(GlobalParams.ThetaDefaultSpeed);
             }
         }
         bool rotationAngleFlag = false;
@@ -354,32 +292,6 @@ namespace 精密切割系统.View.Controls
                 semiAutomaticCuttingConfs[0].SetChannelNo(newChannelNum);
             }
         }
-
-        private void scanLeftBtn_TouchLeave(object sender, TouchEventArgs e)
-        {
-            scanLeftBottomBtnDown(4, 1);
-        }
-
-        private void scanBottomBtn_TouchLeave(object sender, TouchEventArgs e)
-        {
-            scanLeftBottomBtnDown(3, 1);
-        }
-
-        private void scanRightBtn_TouchLeave(object sender, TouchEventArgs e)
-        {
-            scanLeftBottomBtnDown(5, 1);
-        }
-
-        private void scanRightBottomBtn_TouchLeave(object sender, TouchEventArgs e)
-        {
-            scanLeftBottomBtnDown(1, 1);
-        }
-
-        private void scanLeftBottomBtn_TouchLeave(object sender, TouchEventArgs e)
-        {
-            scanLeftBottomBtnDown(0, 1);
-        }
-
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             
@@ -397,181 +309,9 @@ namespace 精密切割系统.View.Controls
                 }
             }
         }
-
-        private void UserControl_Unloaded(object sender, RoutedEventArgs e)
-        {
-        }
-
-        private void scanRightBtn_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            scanLeftBottomBtnDown(5, 0);
-        }
-
-        private void scanRightBtn_MouseUp(object sender, MouseButtonEventArgs e)
-        {
-            scanLeftBottomBtnDown(5, 1);
-        }
-
-        private void scanRightBtn_MouseLeave(object sender, MouseEventArgs e)
-        {
-            scanLeftBottomBtnDown(5, 1);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="type">0 左下 1 右下 2 上 3 下 4 左 5 右</param>
-        /// <param name="operateType">操作类型 0 down 1 up</param>
-        private async void scanLeftBottomBtnDown(int type, int operateType)
-        {
-            if (operateType == 0)
-            {
-                if (CommonCheck.AxisRunStatusCheck())
-                {
-                    return;
-                }
-                switch (type)
-                {
-                    case 0:
-                        await PlcControl.tagControl.ThetaAxis.StartJogAsync(1);
-                        SetBtnImage(scanLeftBottomIcon, "left_bottom", true, 2);
-                        break;
-                    case 1:
-                        await PlcControl.tagControl.ThetaAxis.StartJogAsync(0);
-                        SetBtnImage(scanRightBottomIcon, "right_bottom", true, 2);
-                        break;
-                    case 2:
-                        await PlcControl.tagControl.Yaxis.StartJogAsync(1);
-                        SetBtnImage(scanTopIcon, "top", true, 2);
-                        break;
-                    case 3:
-                        await PlcControl.tagControl.Yaxis.StartJogAsync(0);
-                        SetBtnImage(scanBottomIcon, "bottom", true, 2);
-                        break;
-                    case 4:
-                        await PlcControl.tagControl.Xaxis.StartJogAsync(0);
-                        SetBtnImage(scanLeftIcon, "left", true, 2);
-                        break;
-                    case 5:
-                        await PlcControl.tagControl.Xaxis.StartJogAsync(1);
-                        SetBtnImage(scanRightIcon, "right", true, 2);
-                        break;
-                    default:
-                        break;
-                }
-            } else if (operateType == 1)
-            {
-                stopTimer();
-                switch (type)
-                {
-                    case 0:
-
-                        PlcControl.tagControl.ThetaAxis.StopMove();
-                        SetBtnImage(scanLeftBottomIcon, "left_bottom", false, 2);
-                        break;
-                    case 1:
-                        PlcControl.tagControl.ThetaAxis.StopMove();
-                        SetBtnImage(scanRightBottomIcon, "right_bottom", false, 2);
-                        break;
-                    case 2:
-                        await PlcControl.tagControl.Yaxis.StopJogAsync();
-                        SetBtnImage(scanTopIcon, "top", false, 2);
-                        break;
-                    case 3:
-                        await PlcControl.tagControl.Yaxis.StopJogAsync();
-                        SetBtnImage(scanBottomIcon, "bottom", false, 2);
-                        break;
-                    case 4:
-                        await PlcControl.tagControl.Xaxis.StopJogAsync();
-                        SetBtnImage(scanLeftIcon, "left", false, 2);
-                        break;
-                    case 5:
-                        await PlcControl.tagControl.Xaxis.StopJogAsync();
-                        SetBtnImage(scanRightIcon, "right", false, 2);
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-
-        private void scanLeftBottomBtn_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            scanLeftBottomBtnDown(0, 0);
-        }
-
-        private void scanLeftBottomBtn_PreviewMouseUp(object sender, MouseButtonEventArgs e)
-        {
-            scanLeftBottomBtnDown(0, 1);
-        }
-
-        private void scanLeftBottomBtn_MouseLeave(object sender, MouseEventArgs e)
-        {
-            scanLeftBottomBtnDown(0, 1);
-        }
-
-        private void scanRightBottomBtn_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            scanLeftBottomBtnDown(1, 0);
-        }
-
-        private void scanRightBottomBtn_PreviewMouseUp(object sender, MouseButtonEventArgs e)
-        {
-            scanLeftBottomBtnDown(1, 1);
-        }
-
-        private void scanRightBottomBtn_MouseLeave(object sender, MouseEventArgs e)
-        {
-            scanLeftBottomBtnDown(1, 1);
-        }
-
-        private void scanTopBtn_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            scanLeftBottomBtnDown(2, 0);
-        }
-
-        private void scanTopBtn_PreviewMouseUp(object sender, MouseButtonEventArgs e)
-        {
-            scanLeftBottomBtnDown(2, 1);
-        }
-
-        private void scanTopBtn_MouseLeave(object sender, MouseEventArgs e)
-        {
-            scanLeftBottomBtnDown(2, 1);
-        }
-
-        private void scanBottomBtn_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            scanLeftBottomBtnDown(3, 0);
-        }
-
-        private void scanBottomBtn_PreviewMouseUp(object sender, MouseButtonEventArgs e)
-        {
-            scanLeftBottomBtnDown(3, 1);
-        }
-
-        private void scanBottomBtn_MouseLeave(object sender, MouseEventArgs e)
-        {
-            scanLeftBottomBtnDown(3, 1);
-        }
-
-        private void scanLeftBtn_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            scanLeftBottomBtnDown(4, 0);
-        }
-
-        private void scanLeftBtn_PreviewMouseUp(object sender, MouseButtonEventArgs e)
-        {
-            scanLeftBottomBtnDown(4, 1);
-        }
-
-        private void scanLeftBtn_MouseLeave(object sender, MouseEventArgs e)
-        {
-            scanLeftBottomBtnDown(4, 1);
-        }
-
         private void scrHighSpeedBtn_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
+            if (DevicesUtis.IsTouchSupported()) return;
             if (hiSpeedStatus == 1)
             {
                 hiSpeedStatus = 0;
@@ -582,6 +322,23 @@ namespace 精密切割系统.View.Controls
             }
             SetHighBtnStatus(hiSpeedStatus);
             
+        }
+
+        private void scrHighSpeedBtn_ManipulationStarting(object sender, ManipulationStartingEventArgs e)
+        {
+            // 这将抑制鼠标事件的生成
+            e.ManipulationContainer = this;
+            
+            if (hiSpeedStatus == 1)
+            {
+                hiSpeedStatus = 0;
+            }
+            else
+            {
+                hiSpeedStatus = 1;
+            }
+            SetHighBtnStatus(hiSpeedStatus);
+            GlobalParams.heightSpeedStatus = hiSpeedStatus;
         }
     }
 }

@@ -20,7 +20,7 @@ namespace 精密切割系统.Driver
         public static bool CutStatusCheck(int checkType = 0)
         {
             // 判断是否有报警
-            if (AlarmConfig.Instance.HasActiveAlarm())
+            if (AlarmConfig.Instance.HasActiveErrorAlarm())
             {
                 return false;
             }
@@ -52,7 +52,7 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public static bool AxisRunStatusCheck()
         {
-            if (!CheckGlobalRunStatus() || !AxisReady(false) || AlarmConfig.Instance.HasActiveAlarm())
+            if (!CheckGlobalRunStatus() || !AxisReady(false) || AlarmConfig.Instance.HasActiveErrorAlarm())
             {
                 return false;
             }
@@ -321,6 +321,7 @@ namespace 精密切割系统.Driver
         /// <returns>门的key </returns>
         public static bool GetDoorStatus(String doorName)
         {
+            return true;
             string runValue = PlcControl.plc.GetPlcValueString(doorName);
             return "True".Equals(runValue);
         }

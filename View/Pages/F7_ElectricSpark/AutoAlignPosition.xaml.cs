@@ -495,7 +495,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
             {
                 while (runFlag)
                 {
-                    if (AlarmConfig.Instance.HasActiveAlarm())
+                    if (AlarmConfig.Instance.HasActiveErrorAlarm())
                     {
                         exitFlag = true;
                         runFlag = false;

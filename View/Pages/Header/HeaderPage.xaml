@@ -16,6 +16,10 @@
             <Label x:Name="labelWeek" Content="星期一" FontSize="22" Margin="0,0,0,3" VerticalAlignment="Bottom" FontWeight="Bold" />
         </WrapPanel>
         <WrapPanel VerticalAlignment="Bottom" Width="Auto" HorizontalAlignment="Right" Margin="0,0,30,0" Grid.ColumnSpan="2">
+            <StackPanel  VerticalAlignment="Bottom" Width="Auto" HorizontalAlignment="Left" Margin="0 0 20 0" x:Name="urgentRaiseBtn" Orientation="Vertical" TouchDown="urgentRaiseBtn_TouchDown" MouseDown="urgentRaiseBtn_MouseDown">
+                <Image Width="58" Height="58" RenderTransformOrigin="0.964,1.2" Source="/Assets/icon/header/up_arrow2_icon.ico"/>
+                <Label  Content="紧急抬起" FontSize="20"  Foreground="#1D2123" HorizontalAlignment="Center" FontWeight="Bold" />
+            </StackPanel>
             <StackPanel x:Name="sensorBtn" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" Width="100" Margin="0 0 20 0">
                 <Image  Width="58" Height="58" RenderTransformOrigin="0.964,1.2" Source="/Assets/picture/icon_sensor.png"/>
                 <Label  Content="敏感器" FontSize="20"  Foreground="#1D2123" HorizontalAlignment="Center" FontWeight="Bold" />

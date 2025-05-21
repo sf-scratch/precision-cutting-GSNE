@@ -261,7 +261,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             {
                 while (runFlag)
                 {
-                    if (AlarmConfig.Instance.HasActiveAlarm())
+                    if (AlarmConfig.Instance.HasActiveErrorAlarm())
                     {
                         Tools.LogError("异常报警！");
                         runFlag = false;

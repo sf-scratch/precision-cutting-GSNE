@@ -163,7 +163,7 @@ namespace 精密切割系统.FrmWindow.common
         /// <summary>
         /// theta轴中心点位置
         /// </summary>
-        public static DataPoint<float> ThetaCenterPoint = new DataPoint<float>(144.832f, 74.6f);
+        public static DataPoint<float> ThetaCenterPoint = new DataPoint<float>(146.48f, 84f);
 
         /// <summary>
         /// 相机相对刀片中心点位置
@@ -210,20 +210,19 @@ namespace 精密切割系统.FrmWindow.common
         /// <summary>
         /// 非接触测高位置到工作台的z1轴高度
         /// </summary>
-        //public static readonly float NonContactHeightMeasurementToWorkbenchZ1 = 18.829453f;
-        public static readonly float NonContactHeightMeasurementToWorkbenchZ1 = 19.029453f;
         //public static readonly float NonContactHeightMeasurementToWorkbenchZ1 = 19.029453f;
+        public static readonly float NonContactHeightMeasurementToWorkbenchZ1 = 19f;
 
         // x轴默认速度
         public const float XDefaultSpeed = 10;
         // y轴默认速度
         public const float YDefaultSpeed = 10;
         // z1轴默认速度
-        public const float Z1DefaultSpeed = 10;
+        public const float Z1DefaultSpeed = 3;
         // z2相机轴默认速度
-        public const float Z2DefaultSpeed = 2;
+        public const float Z2DefaultSpeed = 0.2f;
         // thetaθ轴默认速度
-        public const float ThetaDefaultSpeed = 20;
+        public const float ThetaDefaultSpeed = 2;
 
 
 

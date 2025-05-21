@@ -199,6 +199,7 @@ namespace 精密切割系统.Model.cut
                         if (_totalCutTimes % GlobalParams.CheckMarksSharpenTimes == 0)
                         {
                             MaterialSnackUtils.MaterialSnack("检查刀痕中...", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+                            bool isOkKnifeMarksStatus;
                             try
                             {
                                 //退出全自动切割模式
@@ -206,11 +207,7 @@ namespace 精密切割系统.Model.cut
                                 //关闭切割水
                                 await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
                                 //刀痕检查
-                                if (!await AutoCutUtils.CheckKnifeMarksStatus(line, focusClearZ2, pauseToken))
-                                {
-                                    return RunResult.Fail(RunExceptionType.BladeScrap, "刀痕不合格！");
-                                }
-                                MaterialSnackUtils.MaterialSnack("刀痕合格！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+                                isOkKnifeMarksStatus = await AutoCutUtils.CheckKnifeMarksStatus(line, focusClearZ2, eventAggregator, pauseToken);
                             }
                             finally
                             {
@@ -219,6 +216,11 @@ namespace 精密切割系统.Model.cut
                                 //进入全自动切割模式
                                 await PlcControl.tagControl.cutting.EnterCuttingModeAsync(pauseToken);
                             }
+                            if (!isOkKnifeMarksStatus)
+                            {
+                                return RunResult.Fail(RunExceptionType.BladeScrap, "刀痕不合格！");
+                            }
+                            MaterialSnackUtils.MaterialSnack("刀痕合格！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
                         }
                     }
                     catch (OperationCanceledException)
@@ -299,6 +301,7 @@ namespace 精密切割系统.Model.cut
 
         private float GetCutSpeed(float abAverageThickness)
         {
+            return 100f;
             float cutSpeed;
             if (abAverageThickness <= 16)
             {

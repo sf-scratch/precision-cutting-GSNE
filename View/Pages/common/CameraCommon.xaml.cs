@@ -569,7 +569,7 @@ namespace 精密切割系统.View.Pages.common
             cameraPictureClick(x, y);
         }
 
-        private void cameraPictureClick(double x, double y)
+        private async void cameraPictureClick(double x, double y)
         {
             string xCurPosition = PlcControl.plc.GetPlcValueString(DeviceKey.curLocationKey);
             string yCurPosition = PlcControl.plc.GetPlcValueString(DeviceKey.yCurLocationKey);
@@ -635,7 +635,7 @@ namespace 精密切割系统.View.Pages.common
             {
                 yPosition = yLowerValue;
             }
-            PlcControl.tagControl.calibration.RunMotion((float)xPosition, (float)yPosition);
+            await PlcControl.tagControl.cutting.RunMotionAsync((float)xPosition, (float)yPosition, default);
         }
     }
     

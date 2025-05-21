@@ -92,6 +92,8 @@ namespace 精密切割系统
         OperatePage operatePage;
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            // 禁用触摸到鼠标事件的转换
+            Touch.FrameReported += (s, e) => { /* 防止触摸触发鼠标事件 */ };
             AlarmConfig alarmConfig = AlarmConfig.Instance;
             Dispatcher.BeginInvoke(new Action(() =>
             {

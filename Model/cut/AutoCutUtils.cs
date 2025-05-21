@@ -21,7 +21,6 @@ using 精密切割系统.ViewModel;
 using System.Runtime.InteropServices;
 using OpenCvSharp.WpfExtensions;
 using SciCamera.Net;
-using System.Drawing;
 using 精密切割系统.View.Pages.common;
 using System.IO;
 using System.Windows;
@@ -32,6 +31,7 @@ using Emgu.CV.Reg;
 using 精密切割系统.PubSubEvent;
 using 精密切割系统.Model.common;
 using System.Windows.Interop;
+using Prism.Events;
 
 namespace 精密切割系统.Model.cut
 {
@@ -179,13 +179,20 @@ namespace 精密切割系统.Model.cut
             {
                 //接触测高
                 case HeightMeasurementMode.Contact:
-                    await PlcControl.tagControl.bladeMantance.SetBladeSetuInitPositionAsync(initPos.BladeSetupInitX, initPos.BladeSetupInitY, initPos.BladeSetupInitZ1, initPos.BladeSetupInitZ2);
-                    await PlcControl.tagControl.bladeMantance.SetNoContactHeightMeasurement(1);
+                    int? thetaDeg = Appsettings.GetValue<int>(Appsettings.ContactHeightMeasurementThetaDeg);
+                    if (thetaDeg == null)
+                    {
+                        MaterialSnackUtils.MaterialSnack("接触测高配置文件异常！", MaterialSnackUtils.SnackType.ERROR, 0, eventAggregator);
+                        return null;
+                    }
+                    Appsettings.UpdateAppSettings(Appsettings.ContactHeightMeasurementThetaDeg, thetaDeg.Value + 1);
+                    await PlcControl.tagControl.bladeMantance.SetBladeSetuInitPositionAsync(initPos.BladeSetupInitX, initPos.BladeSetupInitY, thetaDeg.Value);
+                    await PlcControl.tagControl.bladeMantance.StartContactHeightMeasurement();
                     break;
                 //非接触测高
                 case HeightMeasurementMode.NoContact:
-                    await PlcControl.tagControl.bladeMantance.SetBladeSetuInitPositionAsync(initPos.NoContactBladeSetupInitX, initPos.NoContactBladeSetupInitY, initPos.NoContactBladeSetupInitZ1, initPos.NoContactBladeSetupInitZ2);
-                    await PlcControl.tagControl.bladeMantance.SetNoContactHeightMeasurement(0);
+                    await PlcControl.tagControl.bladeMantance.SetBladeSetuInitPositionAsync(initPos.NoContactBladeSetupInitX, initPos.NoContactBladeSetupInitY);
+                    await PlcControl.tagControl.bladeMantance.StartNoContactHeightMeasurement();
                     break;
                 default:
                     break;
@@ -193,7 +200,7 @@ namespace 精密切割系统.Model.cut
             //关闭切割水
             await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
             //进入测高模式
-            await PlcControl.tagControl.bladeMantance.RunBladeSetupAsync(1);
+            await PlcControl.tagControl.bladeMantance.StartBladeSetupAsync();
             //等待测高准备完成信号
             await TaskUtils.WaitExpectedResultAsync(IsReadyToMeasureHeightAsync, true, token);
             eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始测高！"));
@@ -235,7 +242,7 @@ namespace 精密切割系统.Model.cut
                 return null;
             }
             //等待完成测高信号
-            await TaskUtils.WaitExpectedResultAsync(IsCompletedMeasureHeightAsync, true, token);
+            await PlcControl.tagControl.bladeMantance.WaitHeightMeasurementCompletedAsync(token);
             eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高平均值：{setupValueList.Average()}"));
             // 计算3次的平均值，为测高值
             return setupValueList.Average();
@@ -253,12 +260,6 @@ namespace 精密切割系统.Model.cut
             return initialPosition;
         }
 
-        // 判断测高是否完成
-        public static async Task<bool> IsCompletedMeasureHeightAsync()
-        {
-            return await PlcControl.plc.ReadDataAsync(PlcControl.tagControl.bladeMantance.HeightMeasurementCompleted.addr) ?? false;
-        }
-
         // 判断是否已准备好测高
         public static async Task<bool> IsReadyToMeasureHeightAsync()
         {
@@ -273,12 +274,12 @@ namespace 精密切割系统.Model.cut
         {
             return 0;
             await WaitAllAxisStopAsync(token);
-            await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(workpieceCenterPoint.Y + 10, token);
-            await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(workpieceCenterPoint.X - workpieceRadius, token);
+            await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(workpieceCenterPoint.Y + 10, default, token);
+            await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(workpieceCenterPoint.X - workpieceRadius, default, token);
             CancellationTokenSource cts = new CancellationTokenSource();
             CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(token, cts.Token);
             CancellationToken linkedToken = linkedCts.Token;
-            Task slowSpeedMoveTask = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(workpieceCenterPoint.X + workpieceRadius, linkedToken, 7f);
+            Task slowSpeedMoveTask = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(workpieceCenterPoint.X + workpieceRadius, 7f, linkedToken);
             //Task slowSpeedMoveTask = PlcControl.tagControl.Xaxis.StartRelativeAsync(1f, workpieceRadius * 2, 0, linkedToken);
             Task grabTimerTask = Task.Run(async () =>
             {
@@ -323,12 +324,12 @@ namespace 精密切割系统.Model.cut
         {
             return 0;
             await WaitAllAxisStopAsync(token);
-            await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(sharpenRect.Bottom - 10, token);
-            await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(sharpenRect.X, token);
+            await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(sharpenRect.Bottom - 10, default, token);
+            await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(sharpenRect.X, default, token);
             CancellationTokenSource cts = new CancellationTokenSource();
             CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(token, cts.Token);
             CancellationToken linkedToken = linkedCts.Token;
-            Task slowSpeedMoveTask = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(sharpenRect.X + sharpenRect.Width, token, 7);
+            Task slowSpeedMoveTask = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(sharpenRect.X + sharpenRect.Width, 7, token);
             Task grabTimerTask = Task.Run(async () =>
             {
                 try
@@ -356,10 +357,10 @@ namespace 精密切割系统.Model.cut
         public static async Task WaitAllAxisStopAsync(CancellationToken token)
         {
             Task taskWhole = TaskUtils.WaitExpectedResultAsync(PlcControl.tagControl.wholeDevice.IsSpindleStopAsync, token);
-            Task taskX = PlcControl.tagControl.Xaxis.WatiAxisStopAsync(token);
-            Task taskY = PlcControl.tagControl.Yaxis.WatiAxisStopAsync(token);
-            Task taskZ1 = PlcControl.tagControl.Z1axis.WatiAxisStopAsync(token);
-            Task taskZ2 = PlcControl.tagControl.Z2axis.WatiAxisStopAsync(token);
+            Task taskX = PlcControl.tagControl.Xaxis.WaitAxisStopAsync(token);
+            Task taskY = PlcControl.tagControl.Yaxis.WaitAxisStopAsync(token);
+            Task taskZ1 = PlcControl.tagControl.Z1axis.WaitAxisStopAsync(token);
+            Task taskZ2 = PlcControl.tagControl.Z2axis.WaitAxisStopAsync(token);
             await Task.WhenAll(taskWhole, taskX, taskY, taskZ1, taskZ2);
         }
 
@@ -379,7 +380,7 @@ namespace 精密切割系统.Model.cut
             return cameraCommons.FirstOrDefault();
         }
 
-        public static async Task<float?> AutoFocusAsync(CancellationToken token, IEventAggregator? eventAggregator = null)
+        public static async Task<float?> AutoFocusAsync(IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
             CameraCommon? cameraCommon = GetCameraCommon();
             if (cameraCommon is null)
@@ -387,41 +388,42 @@ namespace 精密切割系统.Model.cut
                 MaterialSnackUtils.MaterialSnack("相机获取失败！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
                 return null;
             }
-            // 获取当前配置的工作盘和膜的厚度
-            FileTableItemModel fileTableItemModel = CurrentUtils.GetFileTableItemModel();
-            // 获取工件的厚度和膜的厚度
-            float workThickness = float.Parse(fileTableItemModel.WorkThickness);
-            float tapeThickness = float.Parse(fileTableItemModel.TapeThickness);
-            float startPositionZ2 = GlobalParams.AutoFocusStartPositionZ2;
-            await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(startPositionZ2, token);
-            float? z2CurLocation = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync();
-            if (z2CurLocation != null)
+            float? roughFocusPosition = await AutoFocusAsync(cameraCommon, GlobalParams.AutoFocusStartPositionZ2, 0.5f, 0.05f, token, eventAggregator);
+            if (roughFocusPosition == null)
             {
-                float margin = 0.5f;
-                float lastBlurriness = 0;
-                float lastPosition = 0;
-                for (float newPosition = startPositionZ2 - margin; newPosition <= startPositionZ2 + margin; newPosition += 0.05f)
+
+               MaterialSnackUtils.MaterialSnack("粗调聚焦失败！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+                return null;
+            }
+            // 进行精调聚焦
+            return await AutoFocusAsync(cameraCommon, roughFocusPosition.Value, 0.05f, 0.01f, token, eventAggregator);
+        }
+
+        private static async Task<float?> AutoFocusAsync(CameraCommon cameraCommon, float startPositionZ2, float margin, float singleMoveDistance, CancellationToken token, IEventAggregator? eventAggregator = null)
+        {
+            float lastBlurriness = 0;
+            float lastPosition = 0;
+            for (float newPosition = startPositionZ2 - margin; newPosition <= startPositionZ2 + margin; newPosition += singleMoveDistance)
+            {
+                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(newPosition, default, token);
+                if (cameraCommon.localBitmap != null)
                 {
-                    await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(newPosition, token);
-                    if (cameraCommon.localBitmap != null)
+                    float tenengradBlurriness = (float)VisualUtils.CalculateTenengrad2(cameraCommon.localBitmap);
+                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"当前位置：{newPosition} 当前模糊度：{tenengradBlurriness}"));
+                    if (lastBlurriness > 0 && lastBlurriness - tenengradBlurriness > 0.5)
                     {
-                        float tenengradBlurriness = (float)VisualUtils.CalculateTenengrad2(cameraCommon.localBitmap);
-                        eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"当前位置：{newPosition} 当前模糊度：{tenengradBlurriness}"));
-                        if (lastBlurriness > 0 && lastBlurriness - tenengradBlurriness > 0.5)
-                        {
-                            // 找到最清晰的位置，停止循环并移动到上一个位置
-                            eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"最清晰的图片已找到，Z2位置{lastPosition}"));
-                            // 调用plc方法，走到上一个位置
-                            await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(lastPosition, token);
-                            return lastPosition;
-                        }
-                        lastBlurriness = tenengradBlurriness;
-                        lastPosition = newPosition;
+                        // 找到最清晰的位置，停止循环并移动到上一个位置
+                        eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"最清晰的图片已找到，Z2位置{lastPosition}"));
+                        // 调用plc方法，走到上一个位置
+                        await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(lastPosition, default, token);
+                        return lastPosition;
                     }
-                    else
-                    {
-                        eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("聚焦获取当前帧失败！"));
-                    }
+                    lastBlurriness = tenengradBlurriness;
+                    lastPosition = newPosition;
+                }
+                else
+                {
+                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("聚焦获取当前帧失败！"));
                 }
             }
             return null;
@@ -432,13 +434,19 @@ namespace 精密切割系统.Model.cut
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        public static async Task WorkpieceBlowingAsync(CancellationToken token)
+        public static async Task WorkpieceBlowingAsync(IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
-            await PlcControl.tagControl.wholeDevice.OpenWorkpieceBlowingAsync();
-            await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(190, token);
-            await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(70, token);
-            await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(2, token);
-            await PlcControl.tagControl.wholeDevice.CloseWorkpieceBlowingAsync();
+            eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始工件吹气..."));
+            try
+            {
+                await PlcControl.tagControl.wholeDevice.OpenWorkpieceBlowingAsync();
+                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(190, 20, token);
+                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(2, 20, token);
+            }
+            finally
+            {
+                await PlcControl.tagControl.wholeDevice.CloseWorkpieceBlowingAsync();
+            }
         }
 
         private static async Task<Queue<CutStep>?> GetAllCutSequenceAsync(long id, float afterHeightMeasurementZ)
@@ -998,20 +1006,18 @@ namespace 精密切割系统.Model.cut
         /// 检查刀痕状态
         /// </summary>
         /// <returns></returns>
-        public static async Task<bool> CheckKnifeMarksStatus(LineSegment line, float focusClearZ2, CancellationToken token)
+        public static async Task<bool> CheckKnifeMarksStatus(LineSegment line, float focusClearZ2, IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
-            DataPoint<float> relativePos = GlobalParams.CameraRelativeBladePosition;
-            await WaitAllAxisStopAsync(token);
-            await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, token);
-            await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(line.StartPoint.Y + relativePos.Y, token);
-            await PlcControl.tagControl.Xaxis.StartAbsoluteAsync((line.StartPoint.X + line.EndPoint.X) / 2 + relativePos.X, token);
             //工件吹气
-            await WorkpieceBlowingAsync(token);
-            await AutoFocusAsync(token);
+            await WorkpieceBlowingAsync(eventAggregator, token);
+            DataPoint<float> relativePos = GlobalParams.CameraRelativeBladePosition;
+            await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, token);
+            await PlcControl.tagControl.cutting.RunMotionAsync(line.StartPoint.Y + relativePos.Y, (line.StartPoint.X + line.EndPoint.X) / 2 + relativePos.X, token);
+            await AutoFocusAsync(eventAggregator, token);
             CancellationTokenSource cts = new CancellationTokenSource();
             CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(token, cts.Token);
             CancellationToken linkedToken = linkedCts.Token;
-            Task slowSpeedMoveTask = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(line.StartPoint.X + relativePos.X, linkedToken, 7f);
+            Task slowSpeedMoveTask = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(line.StartPoint.X + relativePos.X, 7f, linkedToken);
             Task<List<Mat>> grabTimerTask = Task.Run(async () =>
             {
                 List<Mat> mats = new List<Mat>();
@@ -1050,47 +1056,106 @@ namespace 精密切割系统.Model.cut
                 PdaUtils.AddFirstToolMarkImage(imageData.Mat);
                 PdaUtils.AddSecondToolMarkImage(imagesAnalysisRes.ImageDatas[1].Mat);
                 PdaUtils.AddMaximumCollapseAngle(imagesAnalysisRes.CollapseWidthMaxImage.CollapseWidth.ToString());
+                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"最大刀痕宽度：{imagesAnalysisRes.BladeWidthMaxImage.BladeWidth} 最大崩边宽度：{imagesAnalysisRes.BladeWidthMaxImage.CollapseWidth}"));
             }
             return true;
         }
 
         public static async Task<ImagesAnalysisResult> ProcessImagesAnalysisAsync(List<Mat> mats, CancellationToken token)
         {
-            // 配置参数
-            const int ioMaxConcurrency = 4; // 机械硬盘建议 2，SSD 可提高到 4-8
-            Task<ImagesAnalysisResult> ioTask = Task.Run(async () =>
+            const int ioMaxConcurrency = 4;
+            var result = new ImagesAnalysisResult();
+            using var semaphore = new SemaphoreSlim(ioMaxConcurrency);
+
+            var tasks = mats.Select(async mat =>
             {
-                ImagesAnalysisResult result = new ImagesAnalysisResult();
-                using var semaphore = new SemaphoreSlim(ioMaxConcurrency);
-                var tasks = new List<Task>();
-                foreach (var mat in mats)
+                await semaphore.WaitAsync(token);
+                try
                 {
                     token.ThrowIfCancellationRequested();
-                    //tasks.Add(SaveImageDataAsync($"C:\\Users\\17632\\Desktop\\image\\{DateTime.Now.Ticks}_mat.jpg", mat, semaphore, token));
+
                     Mat cropMat = CropHorizontalCenter(mat, (int)(mat.Height * 0.13));
-                    //tasks.Add(SaveImageDataAsync($"C:\\Users\\17632\\Desktop\\image\\{DateTime.Now.Ticks}_cropMat.jpg", cropMat, semaphore, token));
                     Mat cropMatJpg = JpegStreamToMat(MatToJpegStream(cropMat));
-                    //tasks.Add(SaveImageDataAsync($"C:\\Users\\17632\\Desktop\\image\\{DateTime.Now.Ticks}_cropMatJpg.jpg", cropMatJpg, semaphore, token));
-                    var (bladeWidthMm, collapseWidthMm) = VisionAnalyzer.ProcessImage(cropMatJpg);
-                    Cv2.PutText(cropMatJpg, $"bladeWidthMm: {bladeWidthMm} collapseWidthMm:{collapseWidthMm}", new OpenCvSharp.Point(10, 40), HersheyFonts.HersheySimplex, 1.5f, new Scalar(0, 0, 255));
-                    ImageData imageData = new ImageData() { BladeWidth = bladeWidthMm, CollapseWidth = collapseWidthMm, Mat = cropMat };
+
+                    var (bladeWidthMm, collapseWidthMm) = await Task.Run(() =>
+                        VisionAnalyzer.ProcessImage(cropMatJpg), token);
+
+                    Cv2.PutText(cropMatJpg,
+                        $"bladeWidthMm: {bladeWidthMm} collapseWidthMm:{collapseWidthMm}",
+                        new OpenCvSharp.Point(10, 40),
+                        HersheyFonts.HersheySimplex,
+                        1.5f,
+                        new Scalar(0, 0, 255));
+
+                    var imageData = new ImageData
+                    {
+                        BladeWidth = bladeWidthMm,
+                        CollapseWidth = collapseWidthMm,
+                        Mat = cropMat
+                    };
+
                     result.ImageDatas.Add(imageData);
-                    tasks.Add(SaveImageDataAsync($"C:\\Users\\17632\\Desktop\\image\\{DateTime.Now.Ticks}_cropMatJpgText.jpg", cropMatJpg, semaphore, token));
-                    if (result.BladeWidthMaxImage.BladeWidth < bladeWidthMm)
+
+
+                    Cv2.ImWrite($"C:\\Users\\17632\\Desktop\\image\\{DateTime.Now.Ticks}_cropMatJpgText.jpg", cropMatJpg);
+
+                    // 更新最大值需要线程安全操作
+                    lock (result)
                     {
-                        result.BladeWidthMaxImage = imageData;
-                    }
-                    if (result.CollapseWidthMaxImage.CollapseWidth < collapseWidthMm)
-                    {
-                        result.CollapseWidthMaxImage = imageData;
+                        if (result.BladeWidthMaxImage.BladeWidth < bladeWidthMm)
+                            result.BladeWidthMaxImage = imageData;
+
+                        if (result.CollapseWidthMaxImage.CollapseWidth < collapseWidthMm)
+                            result.CollapseWidthMaxImage = imageData;
                     }
                 }
-                await Task.WhenAll(tasks);
-                return result;
-            }, token);
+                finally
+                {
+                    semaphore.Release();
+                }
+            });
 
-            return await ioTask;
+            await Task.WhenAll(tasks);
+            return result;
         }
+
+        //public static async Task<ImagesAnalysisResult> ProcessImagesAnalysisAsync(List<Mat> mats, CancellationToken token)
+        //{
+        //    // 配置参数
+        //    const int ioMaxConcurrency = 4; // 机械硬盘建议 2，SSD 可提高到 4-8
+        //    Task<ImagesAnalysisResult> ioTask = Task.Run(async () =>
+        //    {
+        //        ImagesAnalysisResult result = new ImagesAnalysisResult();
+        //        using var semaphore = new SemaphoreSlim(ioMaxConcurrency);
+        //        var tasks = new List<Task>();
+        //        foreach (var mat in mats)
+        //        {
+        //            token.ThrowIfCancellationRequested();
+        //            //tasks.Add(SaveImageDataAsync($"C:\\Users\\17632\\Desktop\\image\\{DateTime.Now.Ticks}_mat.jpg", mat, semaphore, token));
+        //            Mat cropMat = CropHorizontalCenter(mat, (int)(mat.Height * 0.13));
+        //            //tasks.Add(SaveImageDataAsync($"C:\\Users\\17632\\Desktop\\image\\{DateTime.Now.Ticks}_cropMat.jpg", cropMat, semaphore, token));
+        //            Mat cropMatJpg = JpegStreamToMat(MatToJpegStream(cropMat));
+        //            //tasks.Add(SaveImageDataAsync($"C:\\Users\\17632\\Desktop\\image\\{DateTime.Now.Ticks}_cropMatJpg.jpg", cropMatJpg, semaphore, token));
+        //            var (bladeWidthMm, collapseWidthMm) = VisionAnalyzer.ProcessImage(cropMatJpg);
+        //            Cv2.PutText(cropMatJpg, $"bladeWidthMm: {bladeWidthMm} collapseWidthMm:{collapseWidthMm}", new OpenCvSharp.Point(10, 40), HersheyFonts.HersheySimplex, 1.5f, new Scalar(0, 0, 255));
+        //            ImageData imageData = new ImageData() { BladeWidth = bladeWidthMm, CollapseWidth = collapseWidthMm, Mat = cropMat };
+        //            result.ImageDatas.Add(imageData);
+        //            tasks.Add(SaveImageDataAsync($"C:\\Users\\17632\\Desktop\\image\\{DateTime.Now.Ticks}_cropMatJpgText.jpg", cropMatJpg, semaphore, token));
+        //            if (result.BladeWidthMaxImage.BladeWidth < bladeWidthMm)
+        //            {
+        //                result.BladeWidthMaxImage = imageData;
+        //            }
+        //            if (result.CollapseWidthMaxImage.CollapseWidth < collapseWidthMm)
+        //            {
+        //                result.CollapseWidthMaxImage = imageData;
+        //            }
+        //        }
+        //        await Task.WhenAll(tasks);
+        //        return result;
+        //    }, token);
+
+        //    return await ioTask;
+        //}
 
         private static async Task SaveImageDataAsync(string filePath, Mat mat, SemaphoreSlim semaphore, CancellationToken token)
         {
@@ -1284,25 +1349,6 @@ namespace 精密切割系统.Model.cut
 
             // 解码字节数组为 Mat
             return Cv2.ImDecode(jpegBytes, ImreadModes.Color);
-        }
-
-        public static void AddTextToImage(string imagePath, string outputPath, string text)
-        {
-            // 1. 加载图片
-            using (var image = Image.FromFile(imagePath))
-            using (var graphics = Graphics.FromImage(image))
-            {
-                // 2. 配置文字样式
-                var font = new Font("Arial", 20, System.Drawing.FontStyle.Bold);
-                var brush = new SolidBrush(System.Drawing.Color.Red);
-                var point = new PointF(10, 10); // 文字位置
-
-                // 3. 绘制文字
-                graphics.DrawString(text, font, brush, point);
-
-                // 4. 保存图片
-                image.Save(outputPath, ImageFormat.Jpeg);
-            }
         }
 
         public void AddTextWithOpenCV(string imagePath, string outputPath, string text)

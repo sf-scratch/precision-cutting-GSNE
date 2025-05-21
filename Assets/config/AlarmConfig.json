@@ -61,13 +61,13 @@
   },
   {
     "Address": "MR60012",
-    "Level": "None",
-    "Message": ""
+    "Level": "Warn",
+    "Message": "测高动作中"
   },
   {
     "Address": "MR60013",
-    "Level": "None",
-    "Message": ""
+    "Level": "Warn",
+    "Message": "切割动作中"
   },
   {
     "Address": "MR60014",
@@ -81,28 +81,28 @@
   },
   {
     "Address": "MR60100",
-    "Level": "None",
-    "Message": ""
+    "Level": "Warn",
+    "Message": "工件工作盘真空中"
   },
   {
     "Address": "MR60101",
-    "Level": "None",
-    "Message": ""
+    "Level": "Warn",
+    "Message": "真空破中"
   },
   {
     "Address": "MR60102",
-    "Level": "None",
-    "Message": ""
+    "Level": "Warn",
+    "Message": "冷却水打开中"
   },
   {
     "Address": "MR60103",
-    "Level": "None",
-    "Message": ""
+    "Level": "Warn",
+    "Message": "切割水打开中"
   },
   {
     "Address": "MR60104",
-    "Level": "None",
-    "Message": ""
+    "Level": "Warn",
+    "Message": "相机吹气中"
   },
   {
     "Address": "MR60105",
@@ -351,13 +351,13 @@
   },
   {
     "Address": "MR60406",
-    "Level": "None",
-    "Message": ""
+    "Level": "Error",
+    "Message": "接触测高回路故障"
   },
   {
     "Address": "MR60407",
-    "Level": "None",
-    "Message": ""
+    "Level": "Error",
+    "Message": "Z轴紧急抬起中（功能键）"
   },
   {
     "Address": "MR60408",

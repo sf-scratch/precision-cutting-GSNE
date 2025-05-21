@@ -30,11 +30,17 @@
       "name": "X轴运行类型",
       "describe": "x轴运动类型（=0点动，=1相对运动）"
     },
-    "initLocation": {
+    "startHoming": {
       "valueType": "bool",
-      "addr": "MR004",
+      "addr": "MR003",
       "name": "X回原点启动",
       "describe": "x回原点启动"
+    },
+    "relaxAxis": {
+      "valueType": "bool",
+      "addr": "MR004",
+      "name": "X轴放松",
+      "describe": "X轴放松"
     },
     "jogStart": {
       "valueType": "bool",
@@ -167,11 +173,17 @@
       "name": "Y轴运行类型",
       "describe": "Y轴运动类型（=0点动，=1相对运动）"
     },
-    "initLocation": {
+    "startHoming": {
       "valueType": "bool",
-      "addr": "MR104",
+      "addr": "MR103",
       "name": "Y回原点启动",
       "describe": "y回原点启动"
+    },
+    "relaxAxis": {
+      "valueType": "bool",
+      "addr": "MR104",
+      "name": "Y轴放松",
+      "describe": "Y轴放松"
     },
     "jogStart": {
       "valueType": "bool",
@@ -303,11 +315,17 @@
       "name": "Z1轴运行类型",
       "describe": "Z1轴运动类型（=0点动，=1相对运动）"
     },
-    "initLocation": {
+    "startHoming": {
       "valueType": "bool",
-      "addr": "MR204",
+      "addr": "MR203",
       "name": "Z1回原点启动",
       "describe": "Z1回原点启动"
+    },
+    "relaxAxis": {
+      "valueType": "bool",
+      "addr": "MR204",
+      "name": "Z1轴放松",
+      "describe": "Z1轴放松"
     },
     "jogStart": {
       "valueType": "bool",
@@ -433,11 +451,17 @@
       "name": "Z2轴运行类型",
       "describe": "Z2轴运动类型（=0点动，=1相对运动）"
     },
-    "initLocation": {
+    "startHoming": {
       "valueType": "bool",
-      "addr": "MR304",
+      "addr": "MR303",
       "name": "Z2回原点启动",
       "describe": "Z2回原点启动"
+    },
+    "relaxAxis": {
+      "valueType": "bool",
+      "addr": "MR304",
+      "name": "Z2轴放松",
+      "describe": "Z2轴放松"
     },
     "jogStart": {
       "valueType": "bool",
@@ -557,11 +581,17 @@
       "name": "Theta轴运行类型",
       "describe": "Theta轴运动类型（=0点动，=1相对运动）"
     },
-    "initLocation": {
+    "startHoming": {
       "valueType": "bool",
-      "addr": "MR404",
+      "addr": "MR403",
       "name": "Theta回原点启动",
       "describe": "Theta回原点启动"
+    },
+    "relaxAxis": {
+      "valueType": "bool",
+      "addr": "MR404",
+      "name": "Theta轴放松",
+      "describe": "Theta轴放松"
     },
     "jogStart": {
       "valueType": "bool",
@@ -721,9 +751,15 @@
     },
     "z2HeightSet": {
       "valueType": "float",
-      "addr": "DM532",
+      "addr": "DM533",
       "name": "Z2轴测高位置设置",
       "describe": "z2轴测高位置设置"
+    },
+    "thetaSet": {
+      "valueType": "float",
+      "addr": "DM532",
+      "name": "theta轴测高位置设置",
+      "describe": "theta轴测高位置设置"
     },
     "xBaseMeasurePos": {
       "valueType": "float",
@@ -811,6 +847,12 @@
       "addr": "MR48000",
       "name": "整机零点标定",
       "describe": "整机零点标定"
+    },
+    "urgentRaise": {
+      "valueType": "bool",
+      "addr": "MR48300",
+      "name": "紧急抬起主轴",
+      "describe": "紧急抬起主轴"
     },
     "isSystemIniting": {
       "valueType": "bool",
@@ -1059,24 +1101,6 @@
       "addr": "dm560",
       "name": "z2轴校准初始设置",
       "describe": "z2轴校准初始设置"
-    },
-    "startInterpolationMotion": {
-      "valueType": "bool",
-      "addr": "MR806",
-      "name": "XY校准运行开始",
-      "describe": "XY校准运行开始"
-    },
-    "xInterpolationMotion": {
-      "valueType": "float",
-      "addr": "DM562",
-      "name": "X轴校准位置",
-      "describe": "X轴校准位置"
-    },
-    "yRunMotion": {
-      "valueType": "float",
-      "addr": "DM564",
-      "name": "Y轴校准位置",
-      "describe": "Y轴校准位置"
     }
   },
   "cutting": {
@@ -1265,6 +1289,30 @@
       "addr": "DM626",
       "name": "切割停止延时检查",
       "describe": "切割停止延时检查"
+    },
+    "startInterpolationMotion": {
+      "valueType": "bool",
+      "addr": "MR806",
+      "name": "XY轴插补开始",
+      "describe": "XY轴插补开始"
+    },
+    "isCompleteInterpolationMotion": {
+      "valueType": "bool",
+      "addr": "MR807",
+      "name": "XY轴插补是否完成",
+      "describe": "XY轴插补是否完成"
+    },
+    "xInterpolationMotion": {
+      "valueType": "float",
+      "addr": "DM562",
+      "name": "X轴插补位置",
+      "describe": "X轴插补位置"
+    },
+    "yInterpolationMotion": {
+      "valueType": "float",
+      "addr": "DM564",
+      "name": "Y轴插补位置",
+      "describe": "Y轴插补位置"
     }
   },
   "sparkRepairKnife": {

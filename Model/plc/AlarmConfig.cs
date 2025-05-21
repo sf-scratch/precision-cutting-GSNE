@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Model.cut;
 using 精密切割系统.Utils;
 using 精密切割系统.ViewModel;
@@ -100,6 +101,27 @@ namespace 精密切割系统.Model.plc
                 for (int i = 0; i < _newestAlarms.Length; i++)
                 {
                     if (_newestAlarms[i] && _alarmInfos[i].Level != AlarmLevel.None)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 是否有激活的错误报警
+        /// </summary>
+        /// <returns></returns>
+        public bool HasActiveErrorAlarm()
+        {
+            if (GlobalParams.onlineFlag == false) return false; // 如果不在线，则不检查报警
+            lock (_lock)
+            {
+                if (_newestAlarms is null || _newestAlarms.Length == 0 || _newestAlarms.Length != _alarmInfos.Length) return true;
+                for (int i = 0; i < _newestAlarms.Length; i++)
+                {
+                    if (_newestAlarms[i] && _alarmInfos[i].Level == AlarmLevel.Error)
                     {
                         return true;
                     }

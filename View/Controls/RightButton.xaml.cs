@@ -164,7 +164,7 @@ namespace 精密切割系统.View.Controls
 
         private void onClick(Boolean isOK)
         {
-            if (AlarmConfig.Instance.HasActiveAlarm() && !GlobalRunOperateFlag)
+            if (AlarmConfig.Instance.HasActiveErrorAlarm() && !GlobalRunOperateFlag)
             {
                 MaterialSnackUtils.MaterialSnack("请先解除报警！", MaterialSnackUtils.SnackType.WARNING, 5);
                 return;
@@ -186,7 +186,7 @@ namespace 精密切割系统.View.Controls
             {
                 operatePage.SetOperateShowType(0);
             }
-            if (AlarmConfig.Instance.HasActiveAlarm() && !GlobalRunOperateFlag)
+            if (AlarmConfig.Instance.HasActiveErrorAlarm() && !GlobalRunOperateFlag)
             {
                 return;
             }

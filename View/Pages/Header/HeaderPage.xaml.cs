@@ -128,10 +128,7 @@ namespace 精密切割系统.View.Pages.Hader
 
         private async void ClearAlarmInfo()
         {
-            if (AlarmConfig.Instance.HasActiveAlarm())
-            {
-                await PlcControl.tagControl.wholeDevice.AlarmResetAsync();
-            }
+            await PlcControl.tagControl.wholeDevice.AlarmResetAsync();
         }
 
         //退出系统；连续10下退出系统或最小化窗口
@@ -209,6 +206,16 @@ namespace 精密切割系统.View.Pages.Hader
                 return false;
             }
             return false;
+        }
+
+        private async void urgentRaiseBtn_TouchDown(object sender, TouchEventArgs e)
+        {
+            await PlcControl.tagControl.wholeDevice.UrgentRaise();
+        }
+
+        private async void urgentRaiseBtn_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            await PlcControl.tagControl.wholeDevice.UrgentRaise();
         }
     }
 }

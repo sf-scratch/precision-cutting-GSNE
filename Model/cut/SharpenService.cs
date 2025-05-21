@@ -124,7 +124,7 @@ namespace 精密切割系统.Model.cut
             {
                 InitThetaDegQueue(sharpenCalibratTheta);
                 //保存磨刀参数
-                Appsettings.UpdateAppSettings(Appsettings.ThetaDegQueue, _thetaDegQueue.ToList());
+                Appsettings.UpdateAppSettings(Appsettings.SharpenThetaDegQueue, _thetaDegQueue.ToList());
             }
             try
             {
@@ -155,19 +155,19 @@ namespace 精密切割系统.Model.cut
                             {
                                 RemindReplaceSharpenBoard?.Invoke();
                                 //清空记录
-                                Appsettings.UpdateAppSettingsToNull(Appsettings.RecordSharpenY);
-                                Appsettings.UpdateAppSettingsToNull(Appsettings.ThetaDegQueue);
+                                Appsettings.UpdateAppSettingsToNull(Appsettings.SharpenY);
+                                Appsettings.UpdateAppSettingsToNull(Appsettings.SharpenThetaDegQueue);
                                 InitThetaDegQueue(sharpenCalibratTheta);
                             }
                             //保存磨刀参数
-                            Appsettings.UpdateAppSettings(Appsettings.ThetaDegQueue, _thetaDegQueue.ToList());
+                            Appsettings.UpdateAppSettings(Appsettings.SharpenThetaDegQueue, _thetaDegQueue.ToList());
                             _isRotateTheta = true;
                             _isNewestSharpen = true;
                             _curSharpenDistance = 0;
                             continue;
                         }
                         //保存磨刀参数
-                        Appsettings.UpdateAppSettings(Appsettings.RecordSharpenY, _recordSharpenY);
+                        Appsettings.UpdateAppSettings(Appsettings.SharpenY, _recordSharpenY);
                         _recordSharpenY = AutoCutUtils.CalculateCutY(_recordSharpenY, cutSize, _cutDirection);
                         LineSegment? line = AutoCutUtils.CalculateRectangleCuttingLine(_thetaCenterPoint, _sharpenRect, _thetaDegQueue.Peek(), _recordSharpenY, margin);
                         if (line == null)
@@ -266,8 +266,8 @@ namespace 精密切割系统.Model.cut
         {
             Init();
             //清空记录
-            Appsettings.UpdateAppSettingsToNull(Appsettings.RecordSharpenY);
-            Appsettings.UpdateAppSettingsToNull(Appsettings.ThetaDegQueue);
+            Appsettings.UpdateAppSettingsToNull(Appsettings.SharpenY);
+            Appsettings.UpdateAppSettingsToNull(Appsettings.SharpenThetaDegQueue);
         }
 
         private void InitThetaDegQueue(float sharpenCalibratTheta)
@@ -278,8 +278,8 @@ namespace 精密切割系统.Model.cut
 
         private void InitFromAppsettings()
         {
-            float? recordSharpenY = Appsettings.GetValue<float>(Appsettings.RecordSharpenY);
-            List<float> thetaDegList = Appsettings.GetList<float>(Appsettings.ThetaDegQueue);
+            float? recordSharpenY = Appsettings.GetValue<float>(Appsettings.SharpenY);
+            List<float> thetaDegList = Appsettings.GetList<float>(Appsettings.SharpenThetaDegQueue);
             if (recordSharpenY != null && thetaDegList.Count != 0)
             {
                 _recordSharpenY = recordSharpenY.Value;
@@ -318,6 +318,7 @@ namespace 精密切割系统.Model.cut
 
         private float GetCutSpeed(float abAverageThickness, bool isNewestSharpen)
         {
+            return 100f;
             float cutSpeed;
             if (abAverageThickness <= 0.016)
             {
