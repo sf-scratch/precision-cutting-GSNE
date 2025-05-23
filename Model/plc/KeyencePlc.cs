@@ -1929,6 +1929,8 @@ namespace 精密切割系统.Driver
         /// </summary>
         public async Task StartBladeSetupAsync()
         {
+            //关闭切割水
+            await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
             bladeSetup.writeValue = "1";
             await keyencePlc.WriteTagAsync(bladeSetup);
         }
@@ -2588,6 +2590,8 @@ namespace 精密切割系统.Driver
         /// </summary>
         public async Task EnterCuttingModeAsync(CancellationToken token)
         {
+            //打开切割水
+            await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
             await WaitReadyToCuttingAsync(token);
             fullAutoInit.writeValue = "0";
             await keyencePlc.WriteTagAsync(fullAutoInit);
@@ -2606,6 +2610,8 @@ namespace 精密切割系统.Driver
             fullAutoCutEnd.writeValue = "1";
             await keyencePlc.WriteTagAsync(fullAutoCutEnd);
             await WaitExitCuttingModeAsync(token);
+            //关闭切割水
+            await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
         }
 
         /// <summary>

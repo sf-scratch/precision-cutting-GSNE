@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Utils;
 
 namespace 精密切割系统.ViewModel
@@ -591,6 +592,45 @@ namespace 精密切割系统.ViewModel
         async void ExecuteStopJogZ2Command()
         {
             await PlcControl.tagControl.Z2axis.StopJogAsync();
+        }
+
+        private bool _isHighSpeed;
+        public bool IsHighSpeed
+        {
+            get { return _isHighSpeed; }
+            set 
+            { 
+                SetProperty(ref _isHighSpeed, value);
+                if (_isHighSpeed)
+                {
+                    Task.Run(async () =>
+                    {
+                        // 设置为高速
+                        await PlcControl.tagControl.Xaxis.SetHighSpeedAsync(1);
+                        await PlcControl.tagControl.Xaxis.SetJogRelativeSpeedAsync(GlobalParams.XDefaultSpeed);
+                        await PlcControl.tagControl.Yaxis.SetHighSpeedAsync(1);
+                        await PlcControl.tagControl.Yaxis.SetJogRelativeSpeedAsync(GlobalParams.YDefaultSpeed);
+                        await PlcControl.tagControl.Z1axis.SetHighSpeedAsync(1);
+                        await PlcControl.tagControl.Z1axis.SetJogRelativeSpeedAsync(GlobalParams.Z1DefaultSpeed);
+                        await PlcControl.tagControl.Z2axis.SetHighSpeedAsync(1);
+                        await PlcControl.tagControl.Z2axis.SetJogRelativeSpeedAsync(GlobalParams.Z2DefaultSpeed);
+                        await PlcControl.tagControl.ThetaAxis.SetHighSpeedAsync(1);
+                        await PlcControl.tagControl.ThetaAxis.SetJogRelativeSpeedAsync(GlobalParams.ThetaDefaultSpeed);
+                    });
+                }
+                else
+                {
+                    Task.Run(async () =>
+                    {
+                        // 设置为低速
+                        await PlcControl.tagControl.Xaxis.SetHighSpeedAsync(0);
+                        await PlcControl.tagControl.Yaxis.SetHighSpeedAsync(0);
+                        await PlcControl.tagControl.Z1axis.SetHighSpeedAsync(0);
+                        await PlcControl.tagControl.Z2axis.SetHighSpeedAsync(0);
+                        await PlcControl.tagControl.ThetaAxis.SetHighSpeedAsync(0);
+                    });
+                }
+            }
         }
 
         public DirectOperateViewModel()

@@ -179,13 +179,13 @@ namespace 精密切割系统.Model.cut
             {
                 //接触测高
                 case HeightMeasurementMode.Contact:
-                    int? thetaDeg = Appsettings.GetValue<int>(Appsettings.ContactHeightMeasurementThetaDeg);
+                    int? thetaDeg = Appsettings.ContactHeightMeasurementThetaDeg;
                     if (thetaDeg == null)
                     {
                         MaterialSnackUtils.MaterialSnack("接触测高配置文件异常！", MaterialSnackUtils.SnackType.ERROR, 0, eventAggregator);
                         return null;
                     }
-                    Appsettings.UpdateAppSettings(Appsettings.ContactHeightMeasurementThetaDeg, thetaDeg.Value + 1);
+                    Appsettings.ContactHeightMeasurementThetaDeg = thetaDeg.Value + 1;
                     await PlcControl.tagControl.bladeMantance.SetBladeSetuInitPositionAsync(initPos.BladeSetupInitX, initPos.BladeSetupInitY, thetaDeg.Value);
                     await PlcControl.tagControl.bladeMantance.StartContactHeightMeasurement();
                     break;
@@ -197,8 +197,6 @@ namespace 精密切割系统.Model.cut
                 default:
                     break;
             }
-            //关闭切割水
-            await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
             //进入测高模式
             await PlcControl.tagControl.bladeMantance.StartBladeSetupAsync();
             //等待测高准备完成信号
@@ -382,17 +380,17 @@ namespace 精密切割系统.Model.cut
 
         public static async Task<float?> AutoFocusAsync(IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
+            eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始相机对焦..."));
             CameraCommon? cameraCommon = GetCameraCommon();
             if (cameraCommon is null)
             {
                 MaterialSnackUtils.MaterialSnack("相机获取失败！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
                 return null;
             }
-            float? roughFocusPosition = await AutoFocusAsync(cameraCommon, GlobalParams.AutoFocusStartPositionZ2, 0.5f, 0.05f, token, eventAggregator);
+            float? roughFocusPosition = await AutoFocusAsync(cameraCommon, Appsettings.FocusClearZ ?? 0, 0.5f, 0.05f, token, eventAggregator);
             if (roughFocusPosition == null)
             {
-
-               MaterialSnackUtils.MaterialSnack("粗调聚焦失败！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+                MaterialSnackUtils.MaterialSnack("粗调聚焦失败！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
                 return null;
             }
             // 进行精调聚焦
@@ -1006,12 +1004,11 @@ namespace 精密切割系统.Model.cut
         /// 检查刀痕状态
         /// </summary>
         /// <returns></returns>
-        public static async Task<bool> CheckKnifeMarksStatus(LineSegment line, float focusClearZ2, IEventAggregator? eventAggregator = null, CancellationToken token = default)
+        public static async Task<bool> CheckKnifeMarksStatus(LineSegment line, IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
             //工件吹气
             await WorkpieceBlowingAsync(eventAggregator, token);
-            DataPoint<float> relativePos = GlobalParams.CameraRelativeBladePosition;
-            await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, token);
+            DataPoint<float> relativePos = Appsettings.CameraRelativeBladePosition;
             await PlcControl.tagControl.cutting.RunMotionAsync(line.StartPoint.Y + relativePos.Y, (line.StartPoint.X + line.EndPoint.X) / 2 + relativePos.X, token);
             await AutoFocusAsync(eventAggregator, token);
             CancellationTokenSource cts = new CancellationTokenSource();

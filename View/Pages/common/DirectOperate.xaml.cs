@@ -144,36 +144,11 @@ namespace 精密切割系统.View.Controls
             
         }
 
-        public async void SetHighBtnStatus(int tempHiSpeedStatus)
+        public void SetHighBtnStatus(int tempHiSpeedStatus)
         {
-            if (tempHiSpeedStatus == 0)
+            if (DataContext is DirectOperateViewModel viewModel)
             {
-                highSpeedIcon.Source = Tools.BitmapImageToBitmap("/Assets/picture/scan_hi_speed_icon.png");
-                highSpeedBorder.Background = new SolidColorBrush(Color.FromRgb(255, 255, 255));
-                GlobalParams.multipleNum = 0.1;
-                // 设置为低速
-                await PlcControl.tagControl.Xaxis.SetHighSpeedAsync(0);
-                await PlcControl.tagControl.Yaxis.SetHighSpeedAsync(0);
-                await PlcControl.tagControl.Z1axis.SetHighSpeedAsync(0);
-                await PlcControl.tagControl.Z2axis.SetHighSpeedAsync(0);
-                await PlcControl.tagControl.ThetaAxis.SetHighSpeedAsync(0);
-            }
-            else
-            {
-                highSpeedIcon.Source = Tools.BitmapImageToBitmap("/Assets/picture/scan_hi_speed_icon_sel.png");
-                highSpeedBorder.Background = new SolidColorBrush(Color.FromRgb(23, 124, 250));
-                GlobalParams.multipleNum = 1;
-                // 设置为高速
-                await PlcControl.tagControl.Xaxis.SetHighSpeedAsync(1);
-                await PlcControl.tagControl.Xaxis.SetJogRelativeSpeedAsync(GlobalParams.XDefaultSpeed);
-                await PlcControl.tagControl.Yaxis.SetHighSpeedAsync(1);
-                await PlcControl.tagControl.Yaxis.SetJogRelativeSpeedAsync(GlobalParams.YDefaultSpeed);
-                await PlcControl.tagControl.Z1axis.SetHighSpeedAsync(1);
-                await PlcControl.tagControl.Z1axis.SetJogRelativeSpeedAsync(GlobalParams.Z1DefaultSpeed);
-                await PlcControl.tagControl.Z2axis.SetHighSpeedAsync(1);
-                await PlcControl.tagControl.Z2axis.SetJogRelativeSpeedAsync(GlobalParams.Z2DefaultSpeed);
-                await PlcControl.tagControl.ThetaAxis.SetHighSpeedAsync(1);
-                await PlcControl.tagControl.ThetaAxis.SetJogRelativeSpeedAsync(GlobalParams.ThetaDefaultSpeed);
+                viewModel.IsHighSpeed = tempHiSpeedStatus == 1;
             }
         }
         bool rotationAngleFlag = false;
@@ -305,8 +280,8 @@ namespace 精密切割系统.View.Controls
                 if (isVisible)
                 {
                     hiSpeedStatus = GlobalParams.heightSpeedStatus;
-                    SetHighBtnStatus(0);
                 }
+                SetHighBtnStatus(0);
             }
         }
         private void scrHighSpeedBtn_PreviewMouseDown(object sender, MouseButtonEventArgs e)

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using 精密切割系统.Assets.config.buttom;
 using 精密切割系统.Driver;
+using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut;
@@ -23,9 +24,10 @@ namespace 精密切割系统.ViewModel
     {
         public RelayCommand ContinueCommand { get; set; }
         public RelayCommand StopCommand { get; set; }
-        private IRegionManager _regionManager;
+        private readonly IRegionManager _regionManager;
+        private readonly CameraCommon? _cameraCommon;
         private AutoCutRuningViewModel _autoCutRuningViewModel;
-        private CameraCommon? _cameraCommon;
+        private DataPoint<float> _originPoint;
 
         // 控制右侧按钮
         public ObservableCollection<RightButtonParams> RightPageButtonCollection;
@@ -178,8 +180,17 @@ namespace 精密切割系统.ViewModel
             _cameraCommon?.SetCutMarkWidth(1, 2);
         }
 
-        private void BaselineCalibration()
+        private async void BaselineCalibration()
         {
+            DataPoint<float> relativePostion = Appsettings.CameraRelativeBladePosition;
+            DataPoint<float> curPoint = new DataPoint<float>
+            {
+                X = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0,
+                Y = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0
+            };
+            float offsetX = curPoint.X - _originPoint.X;
+            float offsetY = curPoint.Y - _originPoint.Y;
+            Appsettings.CameraRelativeBladePosition = new DataPoint<float>(relativePostion.X - offsetX, relativePostion.Y - offsetY);
         }
 
         private void BaselineNarrowing()
@@ -198,12 +209,12 @@ namespace 精密切割系统.ViewModel
             _regionManager.RequestNavigate(RegionName.MainRegion, nameof(AutoCutRuning), parameters);
         }
 
-        private void StopCommandExecute()
+        private async void StopCommandExecute()
         {
-            _autoCutRuningViewModel.StopAsync();
+            await _autoCutRuningViewModel.StopAsync();
         }
 
-        public override void OnNavigatedTo(NavigationContext navigationContext)
+        public override async void OnNavigatedTo(NavigationContext navigationContext)
         {
             base.OnNavigatedTo(navigationContext);
             InitRightButton();
@@ -218,6 +229,11 @@ namespace 精密切割系统.ViewModel
             _cutSpeed = _autoCutRuningViewModel.CutSpeed;
             _cutProgress = _autoCutRuningViewModel.CutProgress;
             _afterReplaceBladeCutTimes = _autoCutRuningViewModel.AfterReplaceBladeCutTimes;
+            _originPoint = new DataPoint<float>
+            {
+                X = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0,
+                Y = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0
+            };
         }
     }
 }

@@ -1,10 +1,12 @@
-﻿using System;
+﻿using NPOI.SS.Formula.Functions;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using 精密切割系统.Assets.config.buttom;
+using 精密切割系统.Helpers;
 using 精密切割系统.Model.cut;
 
 namespace 精密切割系统.FrmWindow.common
@@ -12,7 +14,7 @@ namespace 精密切割系统.FrmWindow.common
     internal class GlobalParams
     {
         // true 在线版本 false 离线版本
-        public static bool onlineFlag = true;
+        public static bool onlineFlag = false;
         public static readonly bool OnlineMES = false;
         // 当前页面是否是首页
         public static bool currentPageIsHome = false;
@@ -166,31 +168,15 @@ namespace 精密切割系统.FrmWindow.common
         public static DataPoint<float> ThetaCenterPoint = new DataPoint<float>(146.48f, 84f);
 
         /// <summary>
-        /// 相机相对刀片中心点位置
-        /// </summary>
-        public static DataPoint<float> CameraRelativeBladePosition = new DataPoint<float>(-67.056f, -5.357f);
-
-        /// <summary>
         /// 相机中心点位置
         /// </summary>
-        public static DataPoint<float> CameraCenterPoint = new DataPoint<float>(ThetaCenterPoint.X + CameraRelativeBladePosition.X, ThetaCenterPoint.Y + CameraRelativeBladePosition.Y);
-        //public static DataPoint<float> CameraCenterPoint = new DataPoint<float>(78.647f, 71.2f);
-
-        ///// <summary>
-        ///// 相机相对theta轴中心点位置
-        ///// </summary>
-        //public static DataPoint<float> CameraRelativeThetaPosition = new DataPoint<float>(-67.056f, -5.467f);
-        //public static DataPoint<float> CameraRelativeThetaPosition = new DataPoint<float>(-66.185f, -3.4f);
-
-        /// <summary>
-        /// 自动聚焦位置
-        /// </summary>
-        public static DataPoint<float> AutoFocusPoint = new DataPoint<float>(CameraCenterPoint.X, CameraCenterPoint.Y + 30);
-
-        /// <summary>
-        /// 自动聚焦位置Z1
-        /// </summary>
-        public static float AutoFocusStartPositionZ2 = 11.8f;
+        public static DataPoint<float> CameraCenterPoint
+        {
+            get
+            {
+                return new DataPoint<float>(ThetaCenterPoint.X + Appsettings.CameraRelativeBladePosition.X, ThetaCenterPoint.Y + Appsettings.CameraRelativeBladePosition.Y);
+            }
+        }
 
         /// <summary>
         /// 磨刀板尺寸

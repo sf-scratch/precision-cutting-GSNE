@@ -23,6 +23,7 @@ namespace 精密切割系统.Model.cut
         }
 
         public event Action<CutServiceProcess>? CutServiceProcessChanged;
+        public event Action<LineSegment?>? CutServicePaused;
         private TaskCompletionSource<CancellationToken?>? _continueTcs;
 
         /// <summary>
@@ -58,7 +59,7 @@ namespace 精密切割系统.Model.cut
         /// <summary>
         /// 相机相对刀片中心点位置
         /// </summary>
-        public static DataPoint<float> _cameraRelativeBladePosition = GlobalParams.CameraRelativeBladePosition;
+        public static DataPoint<float> _cameraRelativeBladePosition = Appsettings.CameraRelativeBladePosition;
 
         /// <summary>
         /// 切割方向
@@ -110,24 +111,23 @@ namespace 精密切割系统.Model.cut
             _recordCutY = 0;
         }
 
-        public async Task<RunResult> Run(LunguSksjDTO lunguSksj, float bladeContactWorkingDiscZ1, float focusClearZ2, float bladeLiftingHeight, int needCutTimes, int spindleRev, float margin, float cutCalibratTheta, IEventAggregator? eventAggregator, CancellationToken pauseToken = default)
+        public async Task<RunResult> Run(LunguSksjDTO lunguSksj, float bladeContactWorkingDiscZ1, float bladeLiftingHeight, int needCutTimes, int spindleRev, float margin, float cutCalibratTheta, IEventAggregator? eventAggregator, CancellationToken pauseToken = default)
         {
             if (_thetaDegQueue.Count == 0)
             {
                 InitThetaDegQueue();
             }
+            CancellationToken usingPauseToken = pauseToken;
             try
             {
-                //打开切割水
-                await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
                 //进入全自动切割模式
-                await PlcControl.tagControl.cutting.EnterCuttingModeAsync(pauseToken);
-                CancellationToken usingPauseToken = pauseToken;
+                await PlcControl.tagControl.cutting.EnterCuttingModeAsync(usingPauseToken);
                 float abAverageThickness = lunguSksj.ABAverageThickness;
                 float cutDeep = AutoCutUtils.GetCuttingZ(lunguSksj.BladeType);
                 int cutTime = 0;
                 while (cutTime < needCutTimes)
                 {
+                    LineSegment? line = null;
                     try
                     {
                         if (_isRotateTheta)
@@ -153,7 +153,7 @@ namespace 精密切割系统.Model.cut
                             continue;
                         }
                         _recordCutY = AutoCutUtils.CalculateCutY(_recordCutY, cutSize, _cutDirection);
-                        LineSegment? line = AutoCutUtils.CalculateSemicircleCuttingLine(_thetaCenterPoint, _thetaDegQueue.Peek() + cutCalibratTheta, _workpieceRadius, _centerDistance, _recordCutY);
+                        line = AutoCutUtils.CalculateSemicircleCuttingLine(_thetaCenterPoint, _thetaDegQueue.Peek() + cutCalibratTheta, _workpieceRadius, _centerDistance, _recordCutY);
                         if (line == null)
                         {
                             return RunResult.Fail(RunExceptionType.Other, "获取切割线失败！");
@@ -185,8 +185,6 @@ namespace 精密切割系统.Model.cut
                         var (startX, endX) = CalculateCuttingX(line, _thetaDegQueue.Peek(), margin);
                         //设置切割参数
                         await PlcControl.tagControl.cutting.SetCutParamsAsync(cutSpeed, endZ, startZ, startX, endX, line.StartPoint.Y, "0", _thetaDegQueue.Peek() + cutCalibratTheta, spindleRev, _cutDirection);
-                        //设置停止位置
-                        await PlcControl.tagControl.cutting.SetStopLocationAsync((line.StartPoint.X + line.EndPoint.X) / 2 + _cameraRelativeBladePosition.X, line.StartPoint.Y + _cameraRelativeBladePosition.Y, focusClearZ2);
                         //开始切割信号
                         await PlcControl.tagControl.cutting.StartCutAsync();
                         //等待磨刀次数变化
@@ -203,18 +201,14 @@ namespace 精密切割系统.Model.cut
                             try
                             {
                                 //退出全自动切割模式
-                                await PlcControl.tagControl.cutting.ExitCuttingModeAsync(pauseToken);
-                                //关闭切割水
-                                await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
+                                await PlcControl.tagControl.cutting.ExitCuttingModeAsync(usingPauseToken);
                                 //刀痕检查
-                                isOkKnifeMarksStatus = await AutoCutUtils.CheckKnifeMarksStatus(line, focusClearZ2, eventAggregator, pauseToken);
+                                isOkKnifeMarksStatus = await AutoCutUtils.CheckKnifeMarksStatus(line, eventAggregator, usingPauseToken);
                             }
                             finally
                             {
-                                //打开切割水
-                                await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
                                 //进入全自动切割模式
-                                await PlcControl.tagControl.cutting.EnterCuttingModeAsync(pauseToken);
+                                await PlcControl.tagControl.cutting.EnterCuttingModeAsync(usingPauseToken);
                             }
                             if (!isOkKnifeMarksStatus)
                             {
@@ -225,8 +219,13 @@ namespace 精密切割系统.Model.cut
                     }
                     catch (OperationCanceledException)
                     {
+                        //退出全自动切割模式
+                        await PlcControl.tagControl.cutting.ExitCuttingModeAsync(default);
+                        CutServicePaused?.Invoke(line);
                         _continueTcs = new TaskCompletionSource<CancellationToken?>();
                         CancellationToken? token = await _continueTcs.Task;
+                        //进入全自动切割模式
+                        await PlcControl.tagControl.cutting.EnterCuttingModeAsync(default);
                         if (token == null)
                         {
                             return RunResult.Fail(RunExceptionType.Stop, "停止切割");
@@ -244,9 +243,7 @@ namespace 精密切割系统.Model.cut
             finally
             {
                 //退出全自动切割模式
-                await PlcControl.tagControl.cutting.ExitCuttingModeAsync(pauseToken);
-                //关闭切割水
-                await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
+                await PlcControl.tagControl.cutting.ExitCuttingModeAsync(default);
             }
             return RunResult.Success();
         }
