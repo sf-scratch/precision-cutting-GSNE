@@ -154,9 +154,6 @@ namespace 精密切割系统.Model.cut
                             if (_thetaDegQueue.Count == 0)
                             {
                                 RemindReplaceSharpenBoard?.Invoke();
-                                //清空记录
-                                Appsettings.SharpenY = null;
-                                Appsettings.SharpenThetaDegQueue = null;
                                 InitThetaDegQueue(sharpenCalibratTheta);
                             }
                             //保存磨刀参数

@@ -105,10 +105,11 @@ namespace 精密切割系统.ViewModel
             _rightButtonParams.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }
 
-        private void InitBottonButton()
+        private void InitBottomButton()
         {
             _operatePageButtonCollection.Add(RightButtonParams.BlueRightButton("换刀片", "/Assets/icon/tab_1/03/tab_02.png", null, ReplaceBlade, 8));
             _operatePageButtonCollection.Add(RightButtonParams.BlueRightButton("换磨刀板", "/Assets/icon/tab_1/03/tab_05.png", null, ReplaceSharpeningBoard, 8));
+            _operatePageButtonCollection.Add(RightButtonParams.BlueRightButton("换硅片", "/Assets/icon/tab_1/03/tab_05.png", null, ReplaceWafer, 8));
         }
 
         private async void Init(string lunguId)
@@ -215,6 +216,11 @@ namespace 精密切割系统.ViewModel
             NavigateUtils.NavigateToPage("MainMenu");
         }
 
+        private async void ReplaceWafer()
+        {
+            await AutoCutUtils.ReplaceWaferAsync();
+        }
+
         private async void ReplaceSharpeningBoard()
         {
             await AutoCutUtils.ReplaceSharpeningBoardAsync();
@@ -232,6 +238,7 @@ namespace 精密切割系统.ViewModel
             SharpenParams = new SharpenParamsModel();
             CutParams = new CutParamsModel();
             InitRightButtonOnlyBack();
+            InitBottomButton();
             Application.Current.Dispatcher.BeginInvoke(new Action(() =>
             {
                 _eventAggregator.GetEvent<SetFocusEvent>().Publish("lunguTextBox");

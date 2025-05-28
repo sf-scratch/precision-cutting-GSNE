@@ -261,8 +261,8 @@ namespace 精密切割系统.ViewModel
                 }
                 AfterHeightMeasurementZ = firstHeightMeasurementZ.Value;
                 RunStatus = AutoRunStatus.AutoFocus;
-                await AutoCutUtils.WorkpieceBlowingAsync(_eventAggregator, _pauseCts.Token);
                 //对焦
+                await AutoCutUtils.WorkpieceBlowingAsync(_eventAggregator, _pauseCts.Token);
                 await PlcControl.tagControl.cutting.RunMotionAsync(cameraCenterPoint.X, cameraRelativeBladePosition.Y + Appsettings.CutY ?? cameraCenterPoint.Y + 30, _pauseCts.Token);
                 float? focusClearZ = await AutoCutUtils.AutoFocusAsync(_eventAggregator, _pauseCts.Token);
                 if (focusClearZ == null)
@@ -340,6 +340,7 @@ namespace 精密切割系统.ViewModel
                 RunStatus = AutoRunStatus.CutingInProgress;
                 _cutService.CutServiceProcessChanged += CutService_CutServiceProcessChanged;
                 _cutService.CutServicePaused += CutService_CutServicePaused;
+                _cutService.RemindReplaceWafer += CutService_RemindReplaceWafer;
                 float cutContactWorkingDiscZ1 = CalculateBladeContactWorkingDiscZ1(heightMeasurementMode, AfterHeightMeasurementZ, nonContactHeightMeasurementToWorkbenchZ1);
                 //开始切割
                 RunResult cutResult = await _cutService.Run(lunguSksj, cutContactWorkingDiscZ1, bladeLiftingHeight, CutParams.CutNum, CutParams.SpindleRev, CutParams.OffsetX, cutCalibratTheta, _eventAggregator, _pauseCts.Token);
@@ -362,12 +363,18 @@ namespace 精密切割系统.ViewModel
                 _sharpenService.RemindReplaceSharpenBoard -= SharpenService_RemindReplaceSharpenBoard;
                 _cutService.CutServiceProcessChanged -= CutService_CutServiceProcessChanged;
                 _cutService.CutServicePaused -= CutService_CutServicePaused;
+                _cutService.RemindReplaceWafer -= CutService_RemindReplaceWafer;
                 _pauseCts.Cancel();
                 _monitoringAlarmCts.Cancel();
                 await StopAsync();
                 await PdaUtils.UpdateFlowValuesAsync();
                 await PdaUtils.SetCompletedAsync();
             }
+        }
+
+        private async void CutService_RemindReplaceWafer()
+        {
+            await AutoCutUtils.ReplaceWaferAsync();
         }
 
         private async void SharpenService_SharpenServicePaused(LineSegment? line)

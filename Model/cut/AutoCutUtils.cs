@@ -185,7 +185,7 @@ namespace 精密切割系统.Model.cut
             Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0);
             Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0);
             await Task.WhenAll(taskX, taskY, taskZ1, taskZ2, taskTheta);
-            MaterialSnackUtils.MaterialSnack("请更换磨刀板！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+            MaterialSnackUtils.MaterialSnack("请更换刀片！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
         }
 
         /// <summary>
@@ -201,7 +201,29 @@ namespace 精密切割系统.Model.cut
             Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0);
             Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0);
             await Task.WhenAll(taskX, taskY, taskZ1, taskZ2, taskTheta);
+            //清空记录
+            Appsettings.SharpenY = null;
+            Appsettings.SharpenThetaDegQueue = null;
             MaterialSnackUtils.MaterialSnack("请更换磨刀板！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+        }
+
+        /// <summary>
+        /// 换硅片
+        /// </summary>
+        /// <returns></returns>
+        public static async Task ReplaceWaferAsync(IEventAggregator? eventAggregator = null)
+        {
+            MaterialSnackUtils.MaterialSnack("轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+            Task taskX = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(0);
+            Task taskY = PlcControl.tagControl.Yaxis.StartAbsoluteAsync(0);
+            Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0);
+            Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0);
+            Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0);
+            await Task.WhenAll(taskX, taskY, taskZ1, taskZ2, taskTheta);
+            //清空记录
+            Appsettings.CutY = null;
+            Appsettings.CutThetaDegQueue = null;
+            MaterialSnackUtils.MaterialSnack("请更换硅片！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
         }
 
         /// <summary>
@@ -253,8 +275,8 @@ namespace 精密切割系统.Model.cut
                         eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("主轴开始旋转"));
                         await PlcControl.tagControl.wholeDevice.TriggerSpindleManuallyRunAsync();
                     }
-                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹水"));
-                    await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingWaterAsync(2);
+                    //eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹水"));
+                    //await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingWaterAsync(2);
                     eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹气"));
                     await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingAsync(5);
                 }
@@ -1096,7 +1118,7 @@ namespace 精密切割系统.Model.cut
         /// 检查刀痕状态
         /// </summary>
         /// <returns></returns>
-        public static async Task<ImagesAnalysisResult> CheckKnifeMarksStatus(LineSegment line, IEventAggregator? eventAggregator = null, CancellationToken token = default)
+        public static async Task<ImagesAnalysisResult?> CheckKnifeMarksStatus(LineSegment line, IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
             //工件吹气
             await WorkpieceBlowingAsync(eventAggregator, token);
@@ -1134,7 +1156,16 @@ namespace 精密切割系统.Model.cut
             await Task.WhenAny(slowSpeedMoveTask, grabTimerTask);
             cts.Cancel();
             List<Mat> mats = await grabTimerTask;
-            ImagesAnalysisResult imagesAnalysisRes = await ProcessImagesAnalysisAsync(mats, token);
+            ImagesAnalysisResult? imagesAnalysisRes;
+            try
+            {
+                imagesAnalysisRes = await ProcessImagesAnalysisAsync(mats, token);
+            }
+            catch(ArgumentException ex)
+            {
+                Tools.LogError($"图像处理异常：{ex.Message}");
+                imagesAnalysisRes = null;
+            }
             return imagesAnalysisRes;
         }
 

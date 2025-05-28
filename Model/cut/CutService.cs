@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Shapes;
 using 精密切割系统.DTOs;
 using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
@@ -27,6 +28,7 @@ namespace 精密切割系统.Model.cut
 
         public event Action<CutServiceProcess>? CutServiceProcessChanged;
         public event Action<LineSegment?>? CutServicePaused;
+        public event Action? RemindReplaceWafer;
         private TaskCompletionSource<CancellationToken?>? _continueTcs;
 
         /// <summary>
@@ -152,10 +154,7 @@ namespace 精密切割系统.Model.cut
                             _thetaDegQueue.Dequeue();
                             if (_thetaDegQueue.Count == 0)
                             {
-                                ChangeWorkpiece();
-                                //清空记录
-                                Appsettings.CutY = null;
-                                Appsettings.CutThetaDegQueue = null;
+                                RemindReplaceWafer?.Invoke();
                                 InitThetaDegQueue(cutCalibratTheta);
                             }
                             //保存切割参数
@@ -185,9 +184,7 @@ namespace 精密切割系统.Model.cut
                         //检查是否暂停
                         if (usingPauseToken.IsCancellationRequested)
                         {
-                            _continueTcs = new TaskCompletionSource<CancellationToken?>();
-                            CancellationToken? token = await _continueTcs.Task;
-                            //如果token为null，表示停止切割
+                            CancellationToken? token = await WaitContinueAsync(line);
                             if (token == null)
                             {
                                 return RunResult.Fail(RunExceptionType.Stop, "停止切割");
@@ -219,7 +216,19 @@ namespace 精密切割系统.Model.cut
                                 //退出全自动切割模式
                                 await PlcControl.tagControl.cutting.ExitCuttingModeAsync(usingPauseToken);
                                 //刀痕检查
-                                ImagesAnalysisResult result = await AutoCutUtils.CheckKnifeMarksStatus(line, eventAggregator, usingPauseToken);
+                                ImagesAnalysisResult? result = await AutoCutUtils.CheckKnifeMarksStatus(line, eventAggregator, usingPauseToken);
+                                //刀痕检查结果为空，表示未检测到刀痕
+                                if (result == null)
+                                {
+                                    MaterialSnackUtils.MaterialSnack("图像识别刀痕异常，请人工检查刀痕状态！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+                                    CancellationToken? token = await WaitContinueAsync(line);
+                                    if (token == null)
+                                    {
+                                        return RunResult.Fail(RunExceptionType.Stop, "停止切割");
+                                    }
+                                    usingPauseToken = token.Value;
+                                    continue;
+                                }
                                 // 处理图像数据
                                 if (result.ImageDatas.Count != 0)
                                 {
@@ -269,9 +278,7 @@ namespace 精密切割系统.Model.cut
                     }
                     catch (OperationCanceledException)
                     {
-                        CutServicePaused?.Invoke(line);
-                        _continueTcs = new TaskCompletionSource<CancellationToken?>();
-                        CancellationToken? token = await _continueTcs.Task;
+                        CancellationToken? token = await WaitContinueAsync(line);
                         if (token == null)
                         {
                             return RunResult.Fail(RunExceptionType.Stop, "停止切割");
@@ -298,6 +305,13 @@ namespace 精密切割系统.Model.cut
         {
             _continueTcs?.TrySetResult(token); // 继续执行
             _continueTcs = null;
+        }
+
+        private async Task<CancellationToken?> WaitContinueAsync(LineSegment? line)
+        {
+            CutServicePaused?.Invoke(line);
+            _continueTcs = new TaskCompletionSource<CancellationToken?>();
+            return await _continueTcs.Task;
         }
 
         public void Stop()
@@ -357,12 +371,6 @@ namespace 精密切割系统.Model.cut
         public static float GetCutSpeed(float abAverageThickness)
         {
             return 40f;
-        }
-
-        private void ChangeWorkpiece()
-        {
-            //换磨刀板
-            Tools.LogDebug("提示换工件");
         }
 
         private (float startX, float endX) CalculateCuttingX(LineSegment line, float theta, float margin)

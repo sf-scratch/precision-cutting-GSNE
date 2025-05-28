@@ -178,7 +178,7 @@ namespace 精密切割系统.ViewModel
             RightPageButtonCollection.Add(RightButtonParams.RedRightButton("停止", "/Assets/icon/right/stop.png", null, StopCommandExecute));
         }
 
-        private void InitBottonButton()
+        private void InitBottomButton()
         {
             OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调窄", "/Assets/icon/tab_1/03/tab_02.png", null, BaselineNarrowing, 8));
             OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调宽", "/Assets/icon/tab_1/03/tab_05.png", null, BaselineWidthAdjustment, 8));
@@ -202,6 +202,7 @@ namespace 精密切割系统.ViewModel
             float offsetX = _originPoint.X - curPoint.X;
             float offsetY = _originPoint.Y - curPoint.Y;
             Appsettings.CameraRelativeBladePosition = new DataPoint<float>(relativePostion.X - offsetX, relativePostion.Y - offsetY);
+            _originPoint = curPoint;
             MaterialSnackUtils.MaterialSnack($"基准线校准完成", MaterialSnackUtils.SnackType.SUCCESS, 0);
         }
 
@@ -265,7 +266,6 @@ namespace 精密切割系统.ViewModel
         {
             base.OnNavigatedTo(navigationContext);
             InitRightButton();
-            InitBottonButton();
             _autoCutRuningViewModel = navigationContext.Parameters.GetValue<AutoCutRuningViewModel>("AutoCutRuningViewModel");
             _afterHeightMeasurementZ = _autoCutRuningViewModel.AfterHeightMeasurementZ;
             _sharpenBladeHeight = _autoCutRuningViewModel.SharpenBladeHeight;
@@ -276,11 +276,14 @@ namespace 精密切割系统.ViewModel
             _cutSpeed = _autoCutRuningViewModel.CutSpeed;
             _cutProgress = _autoCutRuningViewModel.CutProgress;
             _afterReplaceBladeCutTimes = _autoCutRuningViewModel.AfterReplaceBladeCutTimes;
-            _originPoint = new DataPoint<float>
+            float? xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync();
+            float? yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync();
+            // 初始化起始点位置
+            if (xLocation != null && yLocation != null)
             {
-                X = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0,
-                Y = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0
-            };
+                InitBottomButton();
+                _originPoint = new DataPoint<float>(xLocation.Value, yLocation.Value);
+            }
         }
     }
 }

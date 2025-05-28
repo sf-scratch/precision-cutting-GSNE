@@ -208,7 +208,7 @@ namespace 精密切割系统.FrmWindow.common
         // z1轴默认速度
         public const float Z1DefaultSpeed = 3;
         // z2相机轴默认速度
-        public const float Z2DefaultSpeed = 0.2f;
+        public const float Z2DefaultSpeed = 2f;
         // thetaθ轴默认速度
         public const float ThetaDefaultSpeed = 2;
 

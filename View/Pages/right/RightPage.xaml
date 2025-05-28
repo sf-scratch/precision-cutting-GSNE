@@ -8,6 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
     xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:behav="clr-namespace:精密切割系统.Behaviors"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:auto="clr-namespace:WpfAutoGrid;assembly=WpfAutoGrid.Core"
     Title="RightPage"
@@ -116,33 +117,9 @@
                         ContentTextFontSize="{Binding ContentTextFontSize}"
                         ImagePath="{Binding ImagePath}"
                         Visibility="{Binding Visibility}">
-                        <behaviors:Interaction.Triggers>
-                            <behaviors:EventTrigger EventName="RightButtonClicked">
-                                <behaviors:InvokeCommandAction Command="{Binding RightClickCommand}"/>
-                            </behaviors:EventTrigger>
-                            <!-- 按下时开始触发 -->
-                            <behaviors:EventTrigger EventName="PreviewMouseDown">
-                                <behaviors:InvokeCommandAction Command="{Binding StartCommand}"/>
-                            </behaviors:EventTrigger>
-                            <!-- 松开时停止 -->
-                            <behaviors:EventTrigger EventName="PreviewMouseUp">
-                                <behaviors:InvokeCommandAction Command="{Binding StopCommand}"/>
-                            </behaviors:EventTrigger>
-                            <!-- 鼠标移开时停止 -->
-                            <behaviors:EventTrigger EventName="MouseLeave">
-                                <behaviors:InvokeCommandAction Command="{Binding StopCommand}"/>
-                            </behaviors:EventTrigger>
-                            <!-- 支持触摸屏 -->
-                            <behaviors:EventTrigger EventName="PreviewTouchDown">
-                                <behaviors:InvokeCommandAction Command="{Binding StartCommand}"/>
-                            </behaviors:EventTrigger>
-                            <behaviors:EventTrigger EventName="PreviewTouchUp">
-                                <behaviors:InvokeCommandAction Command="{Binding StopCommand}"/>
-                            </behaviors:EventTrigger>
-                            <behaviors:EventTrigger EventName="TouchLeave">
-                                <behaviors:InvokeCommandAction Command="{Binding StopCommand}"/>
-                            </behaviors:EventTrigger>
-                        </behaviors:Interaction.Triggers>
+                        <behaviors:Interaction.Behaviors>
+                            <behav:DualInputBehavior StartCommand="{Binding RightClickCommand}"/>
+                        </behaviors:Interaction.Behaviors>
                     </Controls:RightButton>
                 </DataTemplate>
             </ListBox.ItemTemplate>
