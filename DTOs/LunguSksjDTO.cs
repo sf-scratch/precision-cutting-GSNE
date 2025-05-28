@@ -44,5 +44,11 @@ namespace 精密切割系统.DTOs
         /// </summary>
         [JsonProperty("dpwj")]
         public string BladeOuterDiameter { get; set; }
+
+        /// <summary>
+        /// 研磨后同心度
+        /// </summary>
+        [JsonProperty("ymhtxd")]
+        public float Ymhtxd { get; set; }
     }
 }

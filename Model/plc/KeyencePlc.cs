@@ -1784,6 +1784,8 @@ namespace 精密切割系统.Driver
         public Tag heightMeasurementEarlyEnd { get; set; }
         public Tag NoContactHeightMeasurement { get; set; }
         public Tag HeightMeasurementCompleted { get; set; }
+        public Tag opticalFiberSensorBlowing { get; set; }
+        public Tag opticalFiberSensorBlowingWater { get; set; }
         public Tag xReplaceLocation { get; set; }
         public Tag yReplaceLocation { get; set; }
         public Tag z1ReplaceLocation { get; set; }
@@ -1791,7 +1793,7 @@ namespace 精密切割系统.Driver
         public Tag bladeSetup { get; set; }
         // 设置参数确认
         public Tag confirmParams { get; set; }
-        // 刀片维护准备状态
+        // 是否已准备好测高
         public Tag bladeMantanceStatus { get; set; }
         // x轴测高位置设置
         public Tag xHeightSet { get; set; }
@@ -1877,6 +1879,40 @@ namespace 精密切割系统.Driver
             NoContactHeightMeasurement.writeValue = "1";
             await keyencePlc.WriteTagAsync(NoContactHeightMeasurement);
         }
+        
+        // 判断是否已准备好测高
+        public static async Task<bool> IsReadyToMeasureHeightAsync()
+        {
+            return await PlcControl.plc.ReadDataAsync(PlcControl.tagControl.bladeMantance.bladeMantanceStatus.addr) ?? false;
+        }
+
+        /// <summary>
+        /// 等待测高准备完成
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public async Task WaitReadyToMeasureHeightAsync(CancellationToken token)
+        {
+            await TaskUtils.WaitExpectedResultAsync(IsReadyToMeasureHeightAsync, token);
+        }
+
+        /// <summary>
+        /// 获取测高次数
+        /// </summary>
+        /// <returns></returns>
+        public async Task<int?> GetHeightMeasurementSetupNumber()
+        {
+           return await PlcControl.plc.ReadDataAsync<int>(setupNumber.addr);
+        }
+
+        /// <summary>
+        /// 获取测高值
+        /// </summary>
+        /// <returns></returns>
+        public async Task<float?> GetHeightMeasurementSetupValue()
+        {
+           return await PlcControl.plc.ReadDataAsync<float>(setupValue.addr);
+        }
 
         /// <summary>
         /// 测高是否完成
@@ -1895,6 +1931,68 @@ namespace 精密切割系统.Driver
         public async Task WaitHeightMeasurementCompletedAsync(CancellationToken token)
         {
             await TaskUtils.WaitExpectedResultAsync(IsCompletedHeightMeasurementAsync, token);
+        }
+
+        /// <summary>
+        /// 开启光纤传感器吹气
+        /// </summary>
+        /// <returns></returns>
+        public async Task OpenOpticalFiberSensorBlowingAsync(int blowingseconds)
+        {
+            await OpenOpticalFiberSensorBlowingAsync();
+            await Task.Delay(TimeSpan.FromSeconds(blowingseconds));
+            await CloseOpticalFiberSensorBlowingAsync();
+        }
+
+        /// <summary>
+        /// 开启光纤传感器吹气
+        /// </summary>
+        /// <returns></returns>
+        public async Task OpenOpticalFiberSensorBlowingAsync()
+        {
+            opticalFiberSensorBlowing.writeValue = "1";
+            await keyencePlc.WriteTagAsync(opticalFiberSensorBlowing);
+        }
+
+        /// <summary>
+        /// 关闭光纤传感器吹气
+        /// </summary>
+        /// <returns></returns>
+        public async Task CloseOpticalFiberSensorBlowingAsync()
+        {
+            opticalFiberSensorBlowing.writeValue = "0";
+            await keyencePlc.WriteTagAsync(opticalFiberSensorBlowing);
+        }
+
+        /// <summary>
+        /// 开启光纤传感器吹水
+        /// </summary>
+        /// <returns></returns>
+        public async Task OpenOpticalFiberSensorBlowingWaterAsync(int blowingWaterSeconds)
+        {
+            await OpenOpticalFiberSensorBlowingWaterAsync();
+            await Task.Delay(TimeSpan.FromSeconds(blowingWaterSeconds));
+            await CloseOpticalFiberSensorBlowingWaterAsync();
+        }
+
+        /// <summary>
+        /// 开启光纤传感器吹水
+        /// </summary>
+        /// <returns></returns>
+        public async Task OpenOpticalFiberSensorBlowingWaterAsync()
+        {
+            opticalFiberSensorBlowingWater.writeValue = "1";
+            await keyencePlc.WriteTagAsync(opticalFiberSensorBlowingWater);
+        }
+
+        /// <summary>
+        /// 关闭光纤传感器吹水
+        /// </summary>
+        /// <returns></returns>
+        public async Task CloseOpticalFiberSensorBlowingWaterAsync()
+        {
+            opticalFiberSensorBlowingWater.writeValue = "0";
+            await keyencePlc.WriteTagAsync(opticalFiberSensorBlowingWater);
         }
 
         /// <summary>
@@ -1931,6 +2029,8 @@ namespace 精密切割系统.Driver
         {
             //关闭切割水
             await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
+            bladeSetup.writeValue = "0";
+            await keyencePlc.WriteTagAsync(bladeSetup);
             bladeSetup.writeValue = "1";
             await keyencePlc.WriteTagAsync(bladeSetup);
         }
@@ -2161,6 +2261,25 @@ namespace 精密切割系统.Driver
         }
 
         /// <summary>
+        /// 获取主轴转速
+        /// </summary>
+        /// <returns></returns>
+        public async Task<int?> GetSpindleSpeedAsync()
+        {
+            return await keyencePlc.ReadDataAsync<int>(spindleSpeedStatus.addr);
+        }
+
+        /// <summary>
+        /// 等待主轴转速为0
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public async Task WaitSpindleSpeedToZeroAsync(CancellationToken token)
+        {
+            await TaskUtils.WaitExpectedResultAsync(GetSpindleSpeedAsync, 0, token);
+        }
+
+        /// <summary>
         /// IO模式设置
         /// </summary>
         public void IoModelSet(int status)
@@ -2186,6 +2305,7 @@ namespace 精密切割系统.Driver
             systemReset.writeValue = "1";
             keyencePlc.writeTag(systemReset);
         }
+
         /// <summary>
         /// 主轴运行状态修改
         /// </summary>
@@ -2193,6 +2313,17 @@ namespace 精密切割系统.Driver
         {
             spindleManuallyRun.writeValue = status + "";
             keyencePlc.writeTag(spindleManuallyRun);
+        }
+
+        /// <summary>
+        /// 主轴触发手动运行
+        /// </summary>
+        public async Task TriggerSpindleManuallyRunAsync()
+        {
+            spindleManuallyRun.writeValue = "0";
+            await keyencePlc.WriteTagAsync(spindleManuallyRun);
+            spindleManuallyRun.writeValue = "1";
+            await keyencePlc.WriteTagAsync(spindleManuallyRun);
         }
 
         public async Task<bool> IsSpindleStopAsync()
@@ -2367,6 +2498,38 @@ namespace 精密切割系统.Driver
             buzzer.writeValue = status + "";
             keyencePlc.writeTag (buzzer);
         }
+
+        /// <summary>
+        /// 打开蜂鸣器
+        /// </summary>
+        /// <returns></returns>
+        public async Task OpenBuzzerAsync(int seconds)
+        {
+            await OpenBuzzerAsync();
+            await Task.Delay(TimeSpan.FromSeconds(seconds));
+            await CloseBuzzerAsync();
+        }
+
+        /// <summary>
+        /// 打开蜂鸣器
+        /// </summary>
+        /// <returns></returns>
+        public async Task OpenBuzzerAsync()
+        {
+            buzzer.writeValue = "1";
+            await keyencePlc.WriteTagAsync(buzzer);
+        }
+
+        /// <summary>
+        /// 关闭蜂鸣器
+        /// </summary>
+        /// <returns></returns>
+        public async Task CloseBuzzerAsync()
+        {
+            buzzer.writeValue = "0";
+            await keyencePlc.WriteTagAsync(buzzer);
+        }
+
         /// <summary>
         /// 设置黄灯闪烁
         /// </summary>

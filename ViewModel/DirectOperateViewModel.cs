@@ -11,6 +11,8 @@ namespace 精密切割系统.ViewModel
 {
     public class DirectOperateViewModel : BindableBase
     {
+        private CancellationTokenSource _cancelGetAxisInfoCts;
+
         private DelegateCommand _startXCommand;
         public DelegateCommand StartXCommand =>
             _startXCommand ?? (_startXCommand = new DelegateCommand(ExecuteStartXCommand));
@@ -640,43 +642,52 @@ namespace 精密切割系统.ViewModel
             _speedZ1 = 3;
             _speedZ2 = 0.2f;
             _speedTheta = 2;
-            Task.Run(() => StartGetAxisInfoAsync(default));
             IsShowKeyboard = true;
         }
 
-        private async Task StartGetAxisInfoAsync(CancellationToken token)
+        public void StartGetAxisInfo()
         {
-            using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(500));
-            while (await timer.WaitForNextTickAsync(token))
+            _cancelGetAxisInfoCts = new CancellationTokenSource();
+            CancellationToken token = _cancelGetAxisInfoCts.Token;
+            Task.Run(async () =>
             {
-                try
+                using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(1000));
+                while (await timer.WaitForNextTickAsync(token))
                 {
-                    CurrentPositionX = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync()??float.NaN;
-                    CurrentPositionY = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync()??float.NaN;
-                    CurrentPositionZ1 = await PlcControl.tagControl.Z1axis.GetCurrentLocationAsync()??float.NaN;
-                    CurrentPositionZ2 = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync()??float.NaN;
-                    CurrentPositionTheta = await PlcControl.tagControl.ThetaAxis.GetCurrentLocationAsync()??float.NaN;
-                    CurrentSpeedX = await PlcControl.tagControl.Xaxis.GetAbsoluteSpeedAsync() ?? float.NaN;
-                    CurrentSpeedY = await PlcControl.tagControl.Yaxis.GetAbsoluteSpeedAsync() ?? float.NaN;
-                    CurrentSpeedZ1 = await PlcControl.tagControl.Z1axis.GetAbsoluteSpeedAsync() ?? float.NaN;
-                    CurrentSpeedZ2 = await PlcControl.tagControl.Z2axis.GetAbsoluteSpeedAsync() ?? float.NaN;
-                    CurrentSpeedTheta = await PlcControl.tagControl.ThetaAxis.GetAbsoluteSpeedAsync() ?? float.NaN;
-                    CurrentJogSpeedX = await PlcControl.tagControl.Xaxis.GetJogRelativeSpeedAsync() ?? float.NaN;
-                    CurrentJogSpeedY = await PlcControl.tagControl.Yaxis.GetJogRelativeSpeedAsync() ?? float.NaN;
-                    CurrentJogSpeedZ1 = await PlcControl.tagControl.Z1axis.GetJogRelativeSpeedAsync() ?? float.NaN;
-                    CurrentJogSpeedZ2 = await PlcControl.tagControl.Z2axis.GetJogRelativeSpeedAsync() ?? float.NaN;
-                    CurrentJogSpeedTheta = await PlcControl.tagControl.ThetaAxis.GetJogRelativeSpeedAsync() ?? float.NaN;
-                    IsReadyX = await PlcControl.tagControl.Xaxis.IsReadyAsync();
-                    IsReadyY = await PlcControl.tagControl.Yaxis.IsReadyAsync();
-                    IsReadyZ1 = await PlcControl.tagControl.Z1axis.IsReadyAsync();
-                    IsReadyZ2 = await PlcControl.tagControl.Z2axis.IsReadyAsync();
-                    IsReadyTheta = await PlcControl.tagControl.ThetaAxis.IsReadyAsync();
+                    try
+                    {
+                        CurrentPositionX = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? float.NaN;
+                        CurrentPositionY = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? float.NaN;
+                        CurrentPositionZ1 = await PlcControl.tagControl.Z1axis.GetCurrentLocationAsync() ?? float.NaN;
+                        CurrentPositionZ2 = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync() ?? float.NaN;
+                        CurrentPositionTheta = await PlcControl.tagControl.ThetaAxis.GetCurrentLocationAsync() ?? float.NaN;
+                        CurrentSpeedX = await PlcControl.tagControl.Xaxis.GetAbsoluteSpeedAsync() ?? float.NaN;
+                        CurrentSpeedY = await PlcControl.tagControl.Yaxis.GetAbsoluteSpeedAsync() ?? float.NaN;
+                        CurrentSpeedZ1 = await PlcControl.tagControl.Z1axis.GetAbsoluteSpeedAsync() ?? float.NaN;
+                        CurrentSpeedZ2 = await PlcControl.tagControl.Z2axis.GetAbsoluteSpeedAsync() ?? float.NaN;
+                        CurrentSpeedTheta = await PlcControl.tagControl.ThetaAxis.GetAbsoluteSpeedAsync() ?? float.NaN;
+                        CurrentJogSpeedX = await PlcControl.tagControl.Xaxis.GetJogRelativeSpeedAsync() ?? float.NaN;
+                        CurrentJogSpeedY = await PlcControl.tagControl.Yaxis.GetJogRelativeSpeedAsync() ?? float.NaN;
+                        CurrentJogSpeedZ1 = await PlcControl.tagControl.Z1axis.GetJogRelativeSpeedAsync() ?? float.NaN;
+                        CurrentJogSpeedZ2 = await PlcControl.tagControl.Z2axis.GetJogRelativeSpeedAsync() ?? float.NaN;
+                        CurrentJogSpeedTheta = await PlcControl.tagControl.ThetaAxis.GetJogRelativeSpeedAsync() ?? float.NaN;
+                        IsReadyX = await PlcControl.tagControl.Xaxis.IsReadyAsync();
+                        IsReadyY = await PlcControl.tagControl.Yaxis.IsReadyAsync();
+                        IsReadyZ1 = await PlcControl.tagControl.Z1axis.IsReadyAsync();
+                        IsReadyZ2 = await PlcControl.tagControl.Z2axis.IsReadyAsync();
+                        IsReadyTheta = await PlcControl.tagControl.ThetaAxis.IsReadyAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        Tools.LogError($"报警监控异常: {ex.Message}");
+                    }
                 }
-                catch (Exception ex)
-                {
-                    Tools.LogError($"报警监控异常: {ex.Message}");
-                }
-            }
+            });
+        }
+
+        public async Task StopGetAxisInfoAsync()
+        {
+            await _cancelGetAxisInfoCts.CancelAsync();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using NPOI.SS.Formula.Functions;
 using OpenCvSharp;
 using Prism.Events;
 using System;
@@ -37,6 +38,8 @@ namespace 精密切割系统.ViewModel
         private readonly IEventAggregator _eventAggregator;
         // 控制右侧按钮
         private ObservableCollection<RightButtonParams> _rightButtonParams;
+        // 控制底部侧按钮
+        public ObservableCollection<RightButtonParams> _operatePageButtonCollection;
 
         private string _lunguId;
         public string LunguId
@@ -79,6 +82,7 @@ namespace 精密切割系统.ViewModel
             _eventAggregator = eventAggregator;
             LunguId = CameraUtils.GetLunguId();
             _rightButtonParams = WindowLayout.RightPageButtons;
+            _operatePageButtonCollection = WindowLayout.OperatePageButtons;
             AutoRunCommand = new RelayCommand(AutoRunAsync);
             InitCommand = new RelayCommand<string>(Init);
         }
@@ -101,6 +105,12 @@ namespace 精密切割系统.ViewModel
             _rightButtonParams.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }
 
+        private void InitBottonButton()
+        {
+            _operatePageButtonCollection.Add(RightButtonParams.BlueRightButton("换刀片", "/Assets/icon/tab_1/03/tab_02.png", null, ReplaceBlade, 8));
+            _operatePageButtonCollection.Add(RightButtonParams.BlueRightButton("换磨刀板", "/Assets/icon/tab_1/03/tab_05.png", null, ReplaceSharpeningBoard, 8));
+        }
+
         private async void Init(string lunguId)
         {
             if (!_semaphore.Wait(0)) // 尝试获取锁（0 = 不等待）
@@ -110,14 +120,14 @@ namespace 精密切割系统.ViewModel
             try
             {
                 //轮毂信息
-                LunguSksjDTO lunguSksjDTO = new LunguSksjDTO();
-                //LunguSksjDTO? lunguSksjDTO = await HttpUtils.GetLunguSksjAsync(lunguId);
-                //if (lunguSksjDTO == null)
-                //{
-                //    InitRightButtonOnlyBack();
-                //    MaterialSnackUtils.MaterialSnack("轮毂信息获取失败！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
-                //    return;
-                //}
+                //LunguSksjDTO lunguSksjDTO = new LunguSksjDTO();
+                LunguSksjDTO? lunguSksjDTO = await HttpUtils.GetLunguSksjAsync(lunguId);
+                if (lunguSksjDTO == null)
+                {
+                    InitRightButtonOnlyBack();
+                    MaterialSnackUtils.MaterialSnack("轮毂信息获取失败！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                    return;
+                }
                 LunguSks = MapperConfig.Mapper.Map<LunguSksjModel>(lunguSksjDTO);
 
                 //磨刀参数
@@ -135,13 +145,12 @@ namespace 精密切割系统.ViewModel
                     RotateSpeed = sharpenParam.RotateSpeed.ToInt(),
                     CutThickness = sharpenParam.CutThickness,
                     CoJiaoHeight = sharpenParam.CoJiaoHeight,
-                    CutHeight = AutoCutUtils.GetSharpenDeep(LunguSks.BladeType),
+                    CutHeight = float.Parse(sharpenParam.CutThickness) + sharpenParam.CoJiaoHeight - AutoCutUtils.GetSharpenDeep(LunguSks.BladeType),
                     CoOffsetX = sharpenParam.CoOffsetX,
                     CutSize = 0.3f,
-                    CutNum = AutoCutUtils.GetNeedSharpenTimes(LunguSks.LongestBlade / 1000, AutoCutUtils.GetBladeExposedMax(LunguSks.ABAverageThickness), GlobalParams.SingleBladeWear),
-                    CutSpeed1 = 0,
+                    CutNum = 0,
+                    HightestCutSpeed = SharpenService.GetCutSpeed(lunguSksjDTO.ABAverageThickness, false),
                     CutNum1 = 0,
-                    CutSpeed2 = 0,
                     CutNum2 = 0
                 };
 
@@ -166,11 +175,11 @@ namespace 精密切割系统.ViewModel
                 FileTableItemChModel fileTableCh = chModels[0];
                 CutParams = new CutParamsModel
                 {
-                    CutHeight = AutoCutUtils.GetCuttingZ(LunguSks.BladeType),
+                    CutHeight = float.Parse(fileTable.TapeThickness) + float.Parse(fileTable.WorkThickness) - AutoCutUtils.GetCuttingDeep(LunguSks.BladeType),
                     TapeThickness = fileTable.TapeThickness,
                     SpindleRev = fileTable.SpindleRev,
                     PrecutProcessNo = fileTable.PrecutProcessNo,
-                    MaxCutSpeed = "0",
+                    MaxCutSpeed = CutService.GetCutSpeed(lunguSksjDTO.ABAverageThickness),
                     CutNum = fileTableCh.CutLine.ToInt(),
                     WorkThickness = fileTable.WorkThickness,
                     DeviceDataNo = fileTable.DeviceDataNo,
@@ -204,6 +213,16 @@ namespace 精密切割系统.ViewModel
         private void Back()
         {
             NavigateUtils.NavigateToPage("MainMenu");
+        }
+
+        private async void ReplaceSharpeningBoard()
+        {
+            await AutoCutUtils.ReplaceSharpeningBoardAsync();
+        }
+
+        private async void ReplaceBlade()
+        {
+            await AutoCutUtils.ReplaceBladeAsync();
         }
 
         public override void OnNavigatedTo(NavigationContext navigationContext)

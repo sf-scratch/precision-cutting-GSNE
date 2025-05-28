@@ -13,6 +13,8 @@ using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut;
+using 精密切割系统.Model.plc;
+using 精密切割系统.PubSubEvent;
 using 精密切割系统.Utils;
 using 精密切割系统.View.common;
 using 精密切割系统.View.Pages.Auto;
@@ -156,6 +158,7 @@ namespace 精密切割系统.ViewModel
             {
                 MaterialSnackUtils.MaterialSnack("相机获取失败！", MaterialSnackUtils.SnackType.WARNING);
             }
+            Task monitorTask = StartMonitoringAlarmAsync(default);
         }
 
         public AutoCutPausingViewModel()
@@ -164,7 +167,14 @@ namespace 精密切割系统.ViewModel
 
         private void InitRightButton()
         {
+            RightPageButtonCollection.Clear();
             RightPageButtonCollection.Add(RightButtonParams.GreenRightButton("继续", "/Assets/icon/right/enter.png", ContinueCommandExecute));
+            RightPageButtonCollection.Add(RightButtonParams.RedRightButton("停止", "/Assets/icon/right/stop.png", null, StopCommandExecute));
+        }
+
+        private void InitRightButtonOnlyStop()
+        {
+            RightPageButtonCollection.Clear();
             RightPageButtonCollection.Add(RightButtonParams.RedRightButton("停止", "/Assets/icon/right/stop.png", null, StopCommandExecute));
         }
 
@@ -182,20 +192,57 @@ namespace 精密切割系统.ViewModel
 
         private async void BaselineCalibration()
         {
+            MaterialSnackUtils.MaterialSnack($"基准线校准中", MaterialSnackUtils.SnackType.INFO, 0);
             DataPoint<float> relativePostion = Appsettings.CameraRelativeBladePosition;
             DataPoint<float> curPoint = new DataPoint<float>
             {
                 X = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0,
                 Y = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0
             };
-            float offsetX = curPoint.X - _originPoint.X;
-            float offsetY = curPoint.Y - _originPoint.Y;
+            float offsetX = _originPoint.X - curPoint.X;
+            float offsetY = _originPoint.Y - curPoint.Y;
             Appsettings.CameraRelativeBladePosition = new DataPoint<float>(relativePostion.X - offsetX, relativePostion.Y - offsetY);
+            MaterialSnackUtils.MaterialSnack($"基准线校准完成", MaterialSnackUtils.SnackType.SUCCESS, 0);
         }
 
         private void BaselineNarrowing()
         {
             _cameraCommon?.SetCutMarkWidth(-1, 2);
+        }
+
+        public async Task StartMonitoringAlarmAsync(CancellationToken token)
+        {
+            try
+            {
+                await MonitoringAlarmAsync(token);
+            }
+            catch (OperationCanceledException)
+            {
+                // 正常取消，无需处理
+            }
+            catch (Exception ex)
+            {
+                Tools.LogError(ex.Message);
+            }
+        }
+
+        private async Task MonitoringAlarmAsync(CancellationToken token)
+        {
+            using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
+            while (await timer.WaitForNextTickAsync(token))
+            {
+                try
+                {
+                    if (AlarmConfig.Instance.HasActiveErrorAlarm() && RightPageButtonCollection.Any(button => button.ContentText == "继续"))
+                    {
+                        InitRightButtonOnlyStop();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Tools.LogError(ex.Message);
+                }
+            }
         }
 
         private void ContinueCommandExecute()

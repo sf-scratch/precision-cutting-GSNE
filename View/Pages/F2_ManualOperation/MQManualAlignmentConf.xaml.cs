@@ -478,7 +478,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             Mat cropMatJpg = AutoCutUtils.JpegStreamToMat(AutoCutUtils.MatToJpegStream(cropMat));
             // 保存Mat到本地文件
             bool success3 = Cv2.ImWrite($"C:\\Users\\17632\\Desktop\\image\\{DateTime.Now.Ticks}_cropMatJpg.jpg", cropMatJpg);
-            var (bladeWidthMm, collapseWidthMm) = VisionAnalyzer.ProcessImage(cropMatJpg);
+            var (bladeWidthMm, collapseWidthMm, bladeTop, bladeBottom, collapseTop, collapseBottom) = VisionAnalyzer.ProcessImage(cropMatJpg);
         }
     }
 }

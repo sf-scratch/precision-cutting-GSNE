@@ -273,15 +273,28 @@ namespace 精密切割系统.View.Controls
             // scrHighSpeedBtn_TouchDown(null, null);
         }
 
-        private void UserControl_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private async void UserControl_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
+            
             if (e.NewValue is bool isVisible)
             {
                 if (isVisible)
                 {
-                    hiSpeedStatus = GlobalParams.heightSpeedStatus;
+                    hiSpeedStatus = GlobalParams.heightSpeedStatus; 
                 }
                 SetHighBtnStatus(0);
+            }
+            if (sender is DirectOperate directOperate && directOperate.DataContext is DirectOperateViewModel directOperateViewModel)
+            {
+                if (e.NewValue is bool isVisibleDirectOperate && isVisibleDirectOperate)
+                {
+                    directOperateViewModel.StartGetAxisInfo();
+                }
+                else
+                {
+                    // 如果不可见则停止获取DirectOperate的数据
+                    await directOperateViewModel.StopGetAxisInfoAsync();
+                }
             }
         }
         private void scrHighSpeedBtn_PreviewMouseDown(object sender, MouseButtonEventArgs e)

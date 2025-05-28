@@ -150,6 +150,22 @@ namespace 精密切割系统.Helpers
             fieldValues.List.Add(dhpz2);
         }
 
+        public static void AddMaximumCollapseAngleImage(Mat Mat)
+        {
+            if (!GlobalParams.OnlineMES || _tuple is null) return;
+            FieldValuesDTO fieldValues = _tuple.Item1;
+            Dictionary<string, FlowsValuesDTO> fieldDic = _tuple.Item2;
+            string? imageUrl = HttpUtils.UploadImage(Mat);
+            if (imageUrl == null)
+            {
+                return;
+            }
+            FlowsValuesDTO flows = fieldDic["崩角拍照"].Clone();
+            flows.GroupOperateId = fieldValues.GroupOperateId;
+            flows.FieldValue = imageUrl;
+            fieldValues.List.Add(flows);
+        }
+
         public static void AddMaximumCollapseAngle(string maximumCollapseAngle)
         {
             if (!GlobalParams.OnlineMES || _tuple is null) return;
@@ -174,10 +190,30 @@ namespace 精密切割系统.Helpers
             fieldValues.List.Add(dto);
         }
 
-        public static async Task UpdateFlowValues()
+        public static void AddSingleCollapseAngle(string singleCollapseAngle)
         {
             if (!GlobalParams.OnlineMES || _tuple is null) return;
             FieldValuesDTO fieldValues = _tuple.Item1;
+            Dictionary<string, FlowsValuesDTO> fieldDic = _tuple.Item2;
+            // 刀痕宽度(um)
+            FlowsValuesDTO dto = fieldDic["单边崩角大小"].Clone();
+            dto.GroupOperateId = fieldValues.GroupOperateId;
+            dto.FieldValue = singleCollapseAngle;
+            fieldValues.List.Add(dto);
+        }
+
+        public static async Task UpdateFlowValuesAsync()
+        {
+            if (!GlobalParams.OnlineMES || _tuple is null) return;
+            FieldValuesDTO fieldValues = _tuple.Item1;
+            await HttpUtils.InsertFlowValuesAsync(fieldValues);
+        }
+
+        public static async Task SetCompletedAsync()
+        {
+            if (!GlobalParams.OnlineMES || _tuple is null) return;
+            FieldValuesDTO fieldValues = _tuple.Item1;
+            fieldValues.Status = "3";
             await HttpUtils.InsertFlowValuesAsync(fieldValues);
         }
     }

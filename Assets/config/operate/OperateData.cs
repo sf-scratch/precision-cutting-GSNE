@@ -14,8 +14,8 @@ namespace 精密切割系统.Assets.config.buttom
         {
             var list = new List<OperateBean>();
             list.Add(new OperateBean(5302, "关机", "/Assets/icon/tab_5/tab_04.png"));
-            list.Add(new OperateBean(1, "刀片测高", "/Assets/icon/tab_0/tab_01.png"));
-            list.Add(new OperateBean(2, "型号参数", "/Assets/icon/tab_0/tab_02.png"));
+            list.Add(new OperateBean(1, "传感器吹气", "/Assets/icon/tab_0/tab_01.png"));
+            list.Add(new OperateBean(2, "传感器吹水", "/Assets/icon/tab_0/tab_02.png"));
             list.Add(new OperateBean(4, "主轴电机", "/Assets/icon/tab_0/tab_04.png"));
             list.Add(new OperateBean(5, "切割水", "/Assets/icon/tab_0/tab_05.png"));
             list.Add(new OperateBean(6, "系统初始化", "/Assets/icon/tab_0/tab_08.png"));

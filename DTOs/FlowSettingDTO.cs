@@ -58,7 +58,7 @@ namespace 精密切割系统.DTOs
         public string GroupCode { get; set; }
 
         [JsonProperty("coGroupCode")]
-        public string CoGroupCode { get; set; }
+        public string CoGroupCode { get; set; } = "GX-QG-001";
 
         [JsonProperty("nextFlag")]
         public string NextFlag { get; set; }

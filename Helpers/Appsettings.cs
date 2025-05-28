@@ -23,7 +23,45 @@ namespace 精密切割系统.Helpers
         }
 
         /// <summary>
-        /// 记录非接触测高theta角度
+        /// 记录切割硅片theta角度
+        /// </summary>
+        public static List<float>? CutThetaDegQueue
+        {
+            get { return GetList<float>(); }
+            set
+            {
+                if (value is not null)
+                {
+                    UpdateAppSettings(value);
+                }
+                else
+                {
+                    UpdateAppSettingsToNull();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 记录切割硅片Y轴位置
+        /// </summary>
+        public static float? CutY
+        {
+            get { return GetValue<float>(); }
+            set
+            {
+                if (value is not null)
+                {
+                    UpdateAppSettings(value.Value);
+                }
+                else
+                {
+                    UpdateAppSettingsToNull();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 记录磨刀板theta角度
         /// </summary>
         public static List<float>? SharpenThetaDegQueue
         {

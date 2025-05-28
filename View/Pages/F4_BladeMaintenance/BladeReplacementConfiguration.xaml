@@ -101,7 +101,7 @@
                 <GroupBox.Header>
                     <TextBlock Text="轮毂信息" FontWeight="Bold" FontSize="20"/>
                 </GroupBox.Header>
-                <auto:AutoGrid Margin="10" Columns="2*,3*,*,2*,3*,*" RowCount="7" ChildMargin="5">
+                <auto:AutoGrid Margin="10" Columns="2*,3*,*,2*,5*" RowCount="7" ChildMargin="5">
                     <TextBlock Text="轮毂号"/>
                     <Controls:InputTextBox x:Name="lunguTextBox" Text="{Binding LunguId}">
                         <!--<behaviors:Interaction.Triggers>
@@ -116,19 +116,16 @@
                     <TextBlock HorizontalAlignment="Left" Text=""/>
                     <TextBlock Text="订单规格"/>
                     <Controls:InputTextBox Text="{Binding LunguSks.OrderType}"/>
-                    <TextBlock HorizontalAlignment="Left" Text=""/>
-                    <TextBlock Text="刀片类型"/>
-                    <Controls:InputTextBox Text="{Binding LunguSks.BladeType}"/>
-                    <TextBlock HorizontalAlignment="Left" Text=""/>
-                    <TextBlock Text="刀刃规格"/>
-                    <Controls:InputTextBox Text="{Binding LunguSks.BladeEdgeType}"/>
-                    <TextBlock HorizontalAlignment="Left" Text=""/>
-                    <TextBlock Text="最长刀刃长度"/>
-                    <Controls:InputTextBox Text="{Binding LunguSks.LongestBlade}"/>
-                    <TextBlock HorizontalAlignment="Left" Text="um"/>
                     <TextBlock Text="刀刃平均厚度"/>
                     <Controls:InputTextBox Text="{Binding LunguSks.ABAverageThickness}"/>
                     <TextBlock HorizontalAlignment="Left" Text="um"/>
+                    <TextBlock Text="刀片类型"/>
+                    <Controls:InputTextBox Text="{Binding LunguSks.BladeType}"/>
+                    <TextBlock Text="最长刀刃长度"/>
+                    <Controls:InputTextBox Text="{Binding LunguSks.LongestBlade}"/>
+                    <TextBlock HorizontalAlignment="Left" Text="um"/>
+                    <TextBlock Text="刀刃规格"/>
+                    <Controls:InputTextBox Text="{Binding LunguSks.BladeEdgeType}"/>
                     <TextBlock Text="刀片外径"/>
                     <Controls:InputTextBox Text="{Binding LunguSks.BladeOuterDiameter}"/>
                     <TextBlock HorizontalAlignment="Left" Text="um"/>
@@ -201,28 +198,10 @@
                         <TextBlock Text="X轴偏移量"/>
                         <Controls:InputTextBox Text="{Binding SharpenParams.CoOffsetX}"/>
                         <TextBlock HorizontalAlignment="Left" Text="mm"/>
+                        <TextBlock Text="最高磨刀速率"/>
+                        <Controls:InputTextBox Text="{Binding SharpenParams.HightestCutSpeed}"/>
+                        <TextBlock HorizontalAlignment="Left" Text="mm/s"/>
                     </auto:AutoGrid>
-                    <StackPanel Width="620" Margin="80,0,0,20">
-                        <StackPanel Orientation="Horizontal">
-                            <Label x:Name="colHeadName1"  Width="60"  Height="35" Content="序号" FontWeight="Bold" FontSize="16" />
-                            <Label x:Name="colHeadName2"  Width="280"  Height="35" Content="进刀速度" FontWeight="Bold" FontSize="16" Margin="10,0,0,0"/>
-                            <Label x:Name="colHeadName3"  Width="120"  Height="35" Content="刀" FontWeight="Bold" FontSize="16" Margin="20,0,0,0" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
-                            <Label   Width="60"  Height="35" Content="1" FontWeight="Bold" FontSize="16" />
-                            <Controls:InputTextBox x:Name="jdMoCutOneSpeed" Width="200"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XPrecision="3" Text="{Binding SharpenParams.CutSpeed1}"/>
-                            <Label  Width="100"  Height="35" Content="mm/s" FontWeight="Bold" FontSize="16" />
-                            <Controls:InputTextBox x:Name="jdMoCutOneNo" Width="120"  TextWrapping="Wrap"  Height="35" InputType="Numeral" XMin="0" XPrecision="0" Text="{Binding SharpenParams.CutNum1}"/>
-                            <Label  Width="60"  Height="35" Content="刀" FontWeight="Bold" FontSize="16" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                            <Label   Width="60"  Height="35" Content="2" FontWeight="Bold" FontSize="16" />
-                            <Controls:InputTextBox x:Name="jdMoCutTwoSpeed" Width="200"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XPrecision="3" Text="{Binding SharpenParams.CutSpeed2}"/>
-                            <Label  Width="100"  Height="35" Content="mm/s" FontWeight="Bold" FontSize="16" />
-                            <Controls:InputTextBox x:Name="jdMoCutTwoNo" Width="120"  TextWrapping="Wrap"  Height="35" InputType="Numeral" XMin="0" XPrecision="0" Text="{Binding SharpenParams.CutSpeed2}"/>
-                            <Label  Width="60"  Height="35" Content="刀" FontWeight="Bold" FontSize="16" />
-                        </StackPanel>
-                    </StackPanel>
                 </StackPanel>
             </GroupBox>
             <!--<Controls:RightButton

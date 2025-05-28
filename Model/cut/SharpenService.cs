@@ -52,7 +52,7 @@ namespace 精密切割系统.Model.cut
         /// <summary>
         /// 在磨刀几次后检测
         /// </summary>
-        private readonly int _checkMarksSharpenTimes = GlobalParams.CheckMarksSharpenTimes;
+        private readonly int _checkMarksSharpenTimes = GlobalParams.CheckMarksCutTimes;
 
         /// <summary>
         /// 相机相对刀片中心点位置
@@ -85,9 +85,9 @@ namespace 精密切割系统.Model.cut
         private bool _isNewestSharpen;
 
         /// <summary>
-        /// 总磨刀次数
+        /// 已完成的磨刀次数
         /// </summary>
-        private int _totalSharpenTimes;
+        private int _finishedSharpenTimes;
 
         /// <summary>
         /// 当前Y轴磨刀距离
@@ -112,7 +112,6 @@ namespace 精密切割系统.Model.cut
             _isRotateTheta = true;
             _thetaDegQueue = new Queue<float>();
             _isNewestSharpen = true;
-            _totalSharpenTimes = 0;
             _curSharpenDistance = 0;
             _recordSharpenY = 0;
             _curSharpenDistance = 0;
@@ -128,6 +127,7 @@ namespace 精密切割系统.Model.cut
                 Appsettings.SharpenThetaDegQueue = _thetaDegQueue.ToList();
             }
             CancellationToken usingPauseToken = pauseToken;
+            int currentSharpenTimes = 0;
             try
             {
                 //进入全自动切割模式
@@ -166,9 +166,9 @@ namespace 精密切割系统.Model.cut
                             _curSharpenDistance = 0;
                             continue;
                         }
+                        _recordSharpenY = AutoCutUtils.CalculateCutY(_recordSharpenY, cutSize, _cutDirection);
                         //保存磨刀参数
                         Appsettings.SharpenY = _recordSharpenY;
-                        _recordSharpenY = AutoCutUtils.CalculateCutY(_recordSharpenY, cutSize, _cutDirection);
                         line = AutoCutUtils.CalculateRectangleCuttingLine(_thetaCenterPoint, _sharpenRect, _thetaDegQueue.Peek(), _recordSharpenY, margin);
                         if (line == null)
                         {
@@ -195,17 +195,17 @@ namespace 精密切割系统.Model.cut
                             usingPauseToken = token.Value;
                         }
                         //触发磨刀进度更新事件
-                        SharpenServiceProcessChanged?.Invoke(new SharpenServiceProcess(endZ, sharpenSpeed, sharpenTimes, _totalSharpenTimes));
+                        SharpenServiceProcessChanged?.Invoke(new SharpenServiceProcess(endZ, sharpenSpeed, sharpenTimes + _finishedSharpenTimes, currentSharpenTimes + _finishedSharpenTimes));
                         //设置磨刀参数
                         await PlcControl.tagControl.cutting.SetCutParamsAsync(sharpenSpeed, endZ, startZ, line.StartPoint.X, line.EndPoint.X, line.StartPoint.Y, "0", _thetaDegQueue.Peek(), spindleRev, _cutDirection);
                         //开始磨刀
                         await PlcControl.tagControl.cutting.StartCutAsync();
                         //等待磨刀次数变化
                         await PlcControl.tagControl.cutting.WaitCutNumUdatedAsync(curCutNum.Value, usingPauseToken);
-                        _totalSharpenTimes++;
+                        currentSharpenTimes++;
                         curSharpenTimes++;
                         //触发磨刀进度更新事件
-                        SharpenServiceProcessChanged?.Invoke(new SharpenServiceProcess(endZ, sharpenSpeed, sharpenTimes, _totalSharpenTimes, true));
+                        SharpenServiceProcessChanged?.Invoke(new SharpenServiceProcess(endZ, sharpenSpeed, sharpenTimes + _finishedSharpenTimes, currentSharpenTimes + _finishedSharpenTimes, true));
                         //判断是否开始检查刀痕
                         //if (_totalSharpenTimes % GlobalParams.CheckMarksSharpenTimes == 0)
                         //{
@@ -219,13 +219,9 @@ namespace 精密切割系统.Model.cut
                     }
                     catch (OperationCanceledException)
                     {
-                        //退出全自动切割模式
-                        await PlcControl.tagControl.cutting.ExitCuttingModeAsync(default);
                         SharpenServicePaused?.Invoke(line);
                         _continueTcs = new TaskCompletionSource<CancellationToken?>();
                         CancellationToken? token = await _continueTcs.Task;
-                        //进入全自动切割模式
-                        await PlcControl.tagControl.cutting.EnterCuttingModeAsync(default);
                         // 如果token为null，表示停止磨刀
                         if (token == null)
                         {
@@ -239,13 +235,13 @@ namespace 精密切割系统.Model.cut
                     }
                     _isNewestSharpen = false;
                 }
-                //总磨刀数置零
-                _totalSharpenTimes = 0;
             }
             finally
             {
                 //退出全自动切割模式
                 await PlcControl.tagControl.cutting.ExitCuttingModeAsync(default);
+                //记录本次磨刀完成的刀数
+                _finishedSharpenTimes += currentSharpenTimes;
             }
             return RunResult.Success();
         }
@@ -260,6 +256,7 @@ namespace 精密切割系统.Model.cut
         {
             _continueTcs?.TrySetResult(null); // 停止切割
             _continueTcs = null;
+            _finishedSharpenTimes = 0;
         }
 
         public void Reset()
@@ -316,9 +313,8 @@ namespace 精密切割系统.Model.cut
             return _isNewestSharpen ? _jumpStepDistance : _normalStepDistance;
         }
 
-        private float GetCutSpeed(float abAverageThickness, bool isNewestSharpen)
+        public static float GetCutSpeed(float abAverageThickness, bool isNewestSharpen)
         {
-            return 100f;
             float cutSpeed;
             if (abAverageThickness <= 0.016)
             {
@@ -330,7 +326,7 @@ namespace 精密切割系统.Model.cut
             }
             else
             {
-                cutSpeed = isNewestSharpen ? 10f : 30f;
+                cutSpeed = isNewestSharpen ? 10f : 60f;
             }
             return cutSpeed;
         }

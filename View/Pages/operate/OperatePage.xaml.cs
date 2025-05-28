@@ -92,6 +92,7 @@ namespace 精密切割系统.View.Pages.operate
                 bool tempDoor2Status = CommonCheck.GetDoorStatus(DeviceKey.securityDoor2StatusKey);
                 bool tempVacuumState = await PlcControl.tagControl.wholeDevice.IsOpenVacuumSwitchAsync();
                 bool tempSpindleCuttingWater = await PlcControl.tagControl.wholeDevice.IsOpenSpindleCuttingWaterAsync();
+                bool tempIsOpenOpticalFiberSensorBlowing = IsOpenOpticalFiberSensorBlowing;
                 bool tempWorkpieceBlowingStatus = await PlcControl.tagControl.wholeDevice.IsOpenWorkpieceBlowingAsync();
                 bool tempSystemInitFlagStatus = await PlcControl.tagControl.wholeDevice.IsCompletedSystemInitAsync();
                 bool tempPanelStatus = CommonCheck.GetParamsStatus(DeviceKey.panelStatusKey);
@@ -411,19 +412,21 @@ namespace 精密切割系统.View.Pages.operate
             switch (e.Code)
             {
                 case 1:
-                    if (CommonCheck.ModeCheck())
-                    {
-                        return;
-                    }
+                    //if (CommonCheck.ModeCheck())
+                    //{
+                    //    return;
+                    //}
                     // 测高
-                    ToBladeHeight(sender as OperateButton);
+                    //ToBladeHeight(sender as OperateButton);
+                    await OpticalFiberSensorBlowingAsync();
                     break;
                 case 2:
-                    if (CommonCheck.ModeCheck())
-                    {
-                        return;
-                    }
-                    mainWindow.NavigateToPage("Pages/F3_ModelCatalog/MCDeviceDataListConf");
+                    //if (CommonCheck.ModeCheck())
+                    //{
+                    //    return;
+                    //}
+                    //mainWindow.NavigateToPage("Pages/F3_ModelCatalog/MCDeviceDataListConf");
+                    await OpticalFiberSensorBlowingWaterAsync();
                     break;
                 case 3:
                     // CT 真空
@@ -644,6 +647,42 @@ namespace 精密切割系统.View.Pages.operate
             {
                 await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
             }
+        }
+
+        public static bool IsOpenOpticalFiberSensorBlowing { get; set; } = false;
+
+        /// <summary>
+        /// 光纤传感器吹气
+        /// </summary>
+        private async Task OpticalFiberSensorBlowingAsync()
+        {
+            if (IsOpenOpticalFiberSensorBlowing)
+            {
+                await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingAsync();
+            }
+            else
+            {
+                await PlcControl.tagControl.bladeMantance.CloseOpticalFiberSensorBlowingAsync();
+            }
+            IsOpenOpticalFiberSensorBlowing = !IsOpenOpticalFiberSensorBlowing;
+        }
+
+        public static bool IsOpenOpticalFiberSensorBlowingWater { get; set; } = false;
+
+        /// <summary>
+        /// 光纤传感器吹水
+        /// </summary>
+        private async Task OpticalFiberSensorBlowingWaterAsync()
+        {
+            if (IsOpenOpticalFiberSensorBlowingWater)
+            {
+                await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingWaterAsync();
+            }
+            else
+            {
+                await PlcControl.tagControl.bladeMantance.CloseOpticalFiberSensorBlowingWaterAsync();
+            }
+            IsOpenOpticalFiberSensorBlowingWater = !IsOpenOpticalFiberSensorBlowingWater;
         }
 
         /// <summary>

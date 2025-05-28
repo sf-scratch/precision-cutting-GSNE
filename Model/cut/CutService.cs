@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using OpenCvSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,9 @@ using 精密切割系统.DTOs;
 using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
 using 精密切割系统.HttpClients;
+using 精密切割系统.Model.common;
 using 精密切割系统.Model.plc;
+using 精密切割系统.PubSubEvent;
 using 精密切割系统.Utils;
 using 精密切割系统.ViewModel;
 
@@ -54,7 +57,7 @@ namespace 精密切割系统.Model.cut
         /// <summary>
         /// 在切割几次后检测
         /// </summary>
-        private readonly int _checkMarksCutTimes = GlobalParams.CheckMarksSharpenTimes;
+        private readonly int _checkMarksCutTimes = GlobalParams.CheckMarksCutTimes;
 
         /// <summary>
         /// 相机相对刀片中心点位置
@@ -82,9 +85,9 @@ namespace 精密切割系统.Model.cut
         private bool _isNewestCut;
 
         /// <summary>
-        /// 总磨刀次数
+        /// 已完成的磨刀次数
         /// </summary>
-        private int _totalCutTimes;
+        private int _finishedCutTimes;
 
         /// <summary>
         /// 当前Y轴磨刀距离
@@ -106,24 +109,28 @@ namespace 精密切割系统.Model.cut
             _isRotateTheta = true;
             _thetaDegQueue = new Queue<float>();
             _isNewestCut = true;
-            _totalCutTimes = 0;
+            _finishedCutTimes = 0;
             _curCutDistance = 0;
             _recordCutY = 0;
         }
 
         public async Task<RunResult> Run(LunguSksjDTO lunguSksj, float bladeContactWorkingDiscZ1, float bladeLiftingHeight, int needCutTimes, int spindleRev, float margin, float cutCalibratTheta, IEventAggregator? eventAggregator, CancellationToken pauseToken = default)
         {
+            InitFromAppsettings();
             if (_thetaDegQueue.Count == 0)
             {
-                InitThetaDegQueue();
+                InitThetaDegQueue(cutCalibratTheta);
+                //保存切割参数
+                Appsettings.CutThetaDegQueue = _thetaDegQueue.ToList();
             }
             CancellationToken usingPauseToken = pauseToken;
+            int currentSharpenTimes = 0;
             try
             {
                 //进入全自动切割模式
                 await PlcControl.tagControl.cutting.EnterCuttingModeAsync(usingPauseToken);
                 float abAverageThickness = lunguSksj.ABAverageThickness;
-                float cutDeep = AutoCutUtils.GetCuttingZ(lunguSksj.BladeType);
+                float cutDeep = AutoCutUtils.GetCuttingDeep(lunguSksj.BladeType);
                 int cutTime = 0;
                 while (cutTime < needCutTimes)
                 {
@@ -135,7 +142,8 @@ namespace 精密切割系统.Model.cut
                             //计算工件圆心坐标
                             DataPoint<float> workpieceCenterPoint = new DataPoint<float>(_thetaCenterPoint.X, _thetaCenterPoint.Y + _centerDistance);
                             // 该theta角度第一次切割，切割半圆最下边切为起始位置
-                            _recordCutY = GeometryUtils.FindBottomTangentY(_thetaCenterPoint, workpieceCenterPoint, _workpieceRadius, _thetaDegQueue.Peek() + cutCalibratTheta) - 45.45f;
+                            //_recordCutY = GeometryUtils.FindBottomTangentY(_thetaCenterPoint, workpieceCenterPoint, _workpieceRadius, _thetaDegQueue.Peek() + cutCalibratTheta);
+                            _recordCutY = 150;
                             _isRotateTheta = false;
                         }
                         float cutSize = GetCutSize();
@@ -145,14 +153,21 @@ namespace 精密切割系统.Model.cut
                             if (_thetaDegQueue.Count == 0)
                             {
                                 ChangeWorkpiece();
-                                InitThetaDegQueue();
+                                //清空记录
+                                Appsettings.CutY = null;
+                                Appsettings.CutThetaDegQueue = null;
+                                InitThetaDegQueue(cutCalibratTheta);
                             }
+                            //保存切割参数
+                            Appsettings.CutThetaDegQueue = _thetaDegQueue.ToList();
                             _isRotateTheta = true;
                             _isNewestCut = true;
                             _curCutDistance = 0;
                             continue;
                         }
                         _recordCutY = AutoCutUtils.CalculateCutY(_recordCutY, cutSize, _cutDirection);
+                        //保存切割参数
+                        Appsettings.CutY = _recordCutY;
                         line = AutoCutUtils.CalculateSemicircleCuttingLine(_thetaCenterPoint, _thetaDegQueue.Peek() + cutCalibratTheta, _workpieceRadius, _centerDistance, _recordCutY);
                         if (line == null)
                         {
@@ -180,7 +195,7 @@ namespace 精密切割系统.Model.cut
                             usingPauseToken = token.Value;
                         }
                         //触发切割进度更新事件
-                        CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, needCutTimes, _totalCutTimes));
+                        CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, needCutTimes + _finishedCutTimes, currentSharpenTimes + _finishedCutTimes));
                         //加上边距
                         var (startX, endX) = CalculateCuttingX(line, _thetaDegQueue.Peek(), margin);
                         //设置切割参数
@@ -189,21 +204,55 @@ namespace 精密切割系统.Model.cut
                         await PlcControl.tagControl.cutting.StartCutAsync();
                         //等待磨刀次数变化
                         await PlcControl.tagControl.cutting.WaitCutNumUdatedAsync(curCutNum.Value, usingPauseToken);
-                        _totalCutTimes++;
+                        currentSharpenTimes++;
                         cutTime++;
                         //触发切割进度更新事件
-                        CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, needCutTimes, _totalCutTimes, true));
+                        CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, needCutTimes + _finishedCutTimes, currentSharpenTimes + _finishedCutTimes, true));
                         //判断是否开始检查刀痕
-                        if (_totalCutTimes % GlobalParams.CheckMarksSharpenTimes == 0)
+                        if (currentSharpenTimes % _checkMarksCutTimes == 0 || currentSharpenTimes == needCutTimes)
                         {
+                            int chekcTimes = currentSharpenTimes / _checkMarksCutTimes;
                             MaterialSnackUtils.MaterialSnack("检查刀痕中...", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
-                            bool isOkKnifeMarksStatus;
+                            bool isOkKnifeMarksStatus = false;
                             try
                             {
                                 //退出全自动切割模式
                                 await PlcControl.tagControl.cutting.ExitCuttingModeAsync(usingPauseToken);
                                 //刀痕检查
-                                isOkKnifeMarksStatus = await AutoCutUtils.CheckKnifeMarksStatus(line, eventAggregator, usingPauseToken);
+                                ImagesAnalysisResult result = await AutoCutUtils.CheckKnifeMarksStatus(line, eventAggregator, usingPauseToken);
+                                // 处理图像数据
+                                if (result.ImageDatas.Count != 0)
+                                {
+                                    if (currentSharpenTimes == needCutTimes)
+                                    {
+                                        PdaUtils.AddSingleCollapseAngle(((result.CollapseWidthMaxImage.CollapseWidth - result.CollapseWidthMaxImage.BladeWidth) / 2).ToString());
+                                        PdaUtils.AddMaximumCollapseAngle(result.CollapseWidthMaxImage.CollapseWidth.ToString());
+                                        PdaUtils.AddMaximumCollapseAngleImage(result.CollapseWidthMaxImage.Mat);
+                                    }
+                                    else
+                                    {
+                                        ImageData bladeWidthMaxImage = result.BladeWidthMaxImage;
+                                        switch (chekcTimes)
+                                        {
+                                            case 1:
+                                                PdaUtils.AddFirstToolMarkWidth(bladeWidthMaxImage.BladeWidth.ToString());
+                                                PdaUtils.AddFirstToolMarkImage(bladeWidthMaxImage.Mat);
+                                                break;
+                                            case 2:
+                                                PdaUtils.AddToolMarkWidth(bladeWidthMaxImage.BladeWidth.ToString());
+                                                PdaUtils.AddToolMarkActualWidth(bladeWidthMaxImage.BladeWidth.ToString());
+                                                PdaUtils.AddSecondToolMarkImage(bladeWidthMaxImage.Mat);
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    }
+                                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create(
+                                        $"最大刀痕宽度：{result.BladeWidthMaxImage.BladeWidth} " +
+                                        $"最大崩边宽度：{result.BladeWidthMaxImage.CollapseWidth} " +
+                                        $"是否蛇形：{result.IsSnakelike}"));
+                                }
+                                isOkKnifeMarksStatus = true;
                             }
                             finally
                             {
@@ -215,17 +264,14 @@ namespace 精密切割系统.Model.cut
                                 return RunResult.Fail(RunExceptionType.BladeScrap, "刀痕不合格！");
                             }
                             MaterialSnackUtils.MaterialSnack("刀痕合格！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+                            MaterialSnackUtils.MaterialSnack("切割进行中...", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
                         }
                     }
                     catch (OperationCanceledException)
                     {
-                        //退出全自动切割模式
-                        await PlcControl.tagControl.cutting.ExitCuttingModeAsync(default);
                         CutServicePaused?.Invoke(line);
                         _continueTcs = new TaskCompletionSource<CancellationToken?>();
                         CancellationToken? token = await _continueTcs.Task;
-                        //进入全自动切割模式
-                        await PlcControl.tagControl.cutting.EnterCuttingModeAsync(default);
                         if (token == null)
                         {
                             return RunResult.Fail(RunExceptionType.Stop, "停止切割");
@@ -238,12 +284,12 @@ namespace 精密切割系统.Model.cut
                     }
                     _isNewestCut = false;
                 }
-                _totalCutTimes = 0;
             }
             finally
             {
                 //退出全自动切割模式
                 await PlcControl.tagControl.cutting.ExitCuttingModeAsync(default);
+                _finishedCutTimes = currentSharpenTimes;
             }
             return RunResult.Success();
         }
@@ -258,14 +304,26 @@ namespace 精密切割系统.Model.cut
         {
             _continueTcs?.TrySetResult(null); // 停止切割
             _continueTcs = null;
+            _finishedCutTimes = 0;
             Init();
         }
 
-        private void InitThetaDegQueue()
+        private void InitThetaDegQueue(float cutCalibratTheta)
         {
-            _thetaDegQueue.Clear();
-            _thetaDegQueue.Enqueue(0);
-            _thetaDegQueue.Enqueue(90);
+            _thetaDegQueue.Enqueue(cutCalibratTheta);
+            _thetaDegQueue.Enqueue(cutCalibratTheta + 90);
+        }
+
+        private void InitFromAppsettings()
+        {
+            float? recordCutY = Appsettings.CutY;
+            List<float>? thetaDegList = Appsettings.CutThetaDegQueue;
+            if (recordCutY != null && thetaDegList != null && thetaDegList.Count != 0)
+            {
+                _recordCutY = recordCutY.Value;
+                _thetaDegQueue = new Queue<float>(thetaDegList);
+                _isRotateTheta = false;
+            }
         }
 
         private bool CheckCutDistance(float workpieceRadius, float cutSize)
@@ -296,24 +354,9 @@ namespace 精密切割系统.Model.cut
             return _isNewestCut ? _jumpStepDistance : _normalStepDistance;
         }
 
-        private float GetCutSpeed(float abAverageThickness)
+        public static float GetCutSpeed(float abAverageThickness)
         {
-            return 100f;
-            float cutSpeed;
-            if (abAverageThickness <= 16)
-            {
-                cutSpeed = 40f;
-            }
-            else
-            {
-                cutSpeed = FindCutComparisonTable();
-            }
-            return cutSpeed;
-        }
-
-        private float FindCutComparisonTable()
-        {
-            return 20f;
+            return 40f;
         }
 
         private void ChangeWorkpiece()

@@ -63,18 +63,11 @@ namespace 精密切割系统.Model.cut
 
 
 
-        private float _cutSpeed1;
-        public float CutSpeed1
+        private float _hightestCutSpeed;
+        public float HightestCutSpeed
         {
-            get { return _cutSpeed1; }
-            set { _cutSpeed1 = value; OnPropertyChanged(); }
-        }
-
-        private float _cutSpeed2;
-        public float CutSpeed2
-        {
-            get { return _cutSpeed2; }
-            set { _cutSpeed2 = value; OnPropertyChanged(); }
+            get { return _hightestCutSpeed; }
+            set { _hightestCutSpeed = value; OnPropertyChanged(); }
         }
 
         private float _cutNum1;

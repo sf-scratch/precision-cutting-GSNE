@@ -4,10 +4,12 @@ using System.Windows;
 using System.Windows.Input;
 using 精密切割系统.Utils;
 using 精密切割系统.View.Controls;
+using 精密切割系统.View.Dialogs;
 using 精密切割系统.View.Pages.Auto;
 using 精密切割系统.View.Pages.common;
 using 精密切割系统.View.Pages.F4_BladeMaintenance;
 using 精密切割系统.ViewModel;
+using 精密切割系统.ViewModel.Dialogs;
 
 
 namespace 精密切割系统
@@ -28,6 +30,8 @@ namespace 精密切割系统
             containerRegistry.RegisterForNavigation<BladeReplacementConfiguration, BladeReplacementConfigurationViewModel>();
             containerRegistry.RegisterForNavigation<AutoCutRuning, AutoCutRuningViewModel>();
             containerRegistry.RegisterForNavigation<AutoCutPausing, AutoCutPausingViewModel>();
+            containerRegistry.RegisterDialog<ConfirmDialog, ConfirmDialogViewModel>();
+            containerRegistry.Register<IDialogWindow, ConfirmDialogWindow>(nameof(ConfirmDialogWindow));
         }
 
         //protected override void OnStartup(StartupEventArgs e)

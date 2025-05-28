@@ -47,8 +47,8 @@ namespace 精密切割系统.Model.cut
             set { _precutProcessNo = value; OnPropertyChanged(); }
         }
 
-        private string _maxCutSpeed;
-        public string MaxCutSpeed
+        private float _maxCutSpeed;
+        public float MaxCutSpeed
         {
             get { return _maxCutSpeed; }
             set { _maxCutSpeed = value; OnPropertyChanged(); }

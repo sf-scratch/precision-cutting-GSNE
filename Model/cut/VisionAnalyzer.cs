@@ -42,7 +42,7 @@ namespace 精密切割系统.Model.cut
         /// <exception cref="FileNotFoundException">当图像文件不存在时抛出</exception>
         /// <exception cref="Exception">当图像无法读取时抛出</exception>
         //public static (double bladeWidthMm, double collapseWidthMm) ProcessImage(string imagePath, double pixelToMmRatio = 0.000439)
-        public static (double bladeWidthMm, double collapseWidthMm) ProcessImage(string imagePath, double pixelToMmRatio = 0.0004575)
+        public static (double bladeWidthMm, double collapseWidthMm, double bladeTop, double bladeBottom, double collapseTop, double collapseBottom) ProcessImage(string imagePath, double pixelToMmRatio = 0.0004575)
         {
             if (string.IsNullOrEmpty(imagePath))
                 throw new ArgumentNullException(nameof(imagePath), "图像路径不能为空");
@@ -75,7 +75,7 @@ namespace 精密切割系统.Model.cut
         }
 
         //public static (double bladeWidthMm, double collapseWidthMm) ProcessImage(Mat image, double pixelToMmRatio = 0.00074)
-        public static (double bladeWidthMm, double collapseWidthMm) ProcessImage(Mat image, double pixelToMmRatio = 0.0004575)
+        public static (double bladeWidthMm, double collapseWidthMm, double bladeTop, double bladeBottom, double collapseTop, double collapseBottom) ProcessImage(Mat image, double pixelToMmRatio = 0.0004575)
         {
             try
             {
@@ -270,6 +270,46 @@ namespace 精密切割系统.Model.cut
             return result;
         }
 
+        public static AnalysisResult SnakeCase(Mat image)
+        {
+            Dictionary<string, List<Point>> contour_data = GetContourData(image);
+
+            if (!contour_data.TryGetValue("top", out var topPoints) || !contour_data.TryGetValue("bottom", out var bottomPoints))
+            {
+                throw new ArgumentException("contour_data 中缺少 top 或 bottom 数据");
+            }
+
+            if (topPoints.Count == 0 || bottomPoints.Count == 0)
+            {
+                throw new ArgumentException("未能检测到有效的上下边缘点");
+            }
+
+            var points = new List<(int x, int y)>();
+            foreach (var point in topPoints)
+            {
+                points.Add((point.X, point.Y));
+            }
+            var topEdgePoints = points.ToList();
+
+            points.Clear();
+            foreach (var point in bottomPoints)
+            {
+                points.Add((point.X, point.Y));
+            }
+            var bottomEdgePoints = points.ToList();
+
+            AnalysisResult result = EdgeAnalyzer.AnalyzeEdgeShape(topEdgePoints, bottomEdgePoints);
+
+            // 打印分析结果
+            Debug.WriteLine("\n边缘形状分析结果:");
+            Debug.WriteLine($"最大偏差: {result.MaxDevUm} μm");
+            Debug.WriteLine($"标准偏差: {result.StdDevUm} μm");
+            Debug.WriteLine($"角度: {result.AngleDeg}°");
+            Debug.WriteLine($"是否为蛇形: {result.Snake}");
+
+            return result;
+        }
+
         /// <summary>
         /// 获取刀痕和崩边宽度
         /// </summary>
@@ -287,7 +327,7 @@ namespace 精密切割系统.Model.cut
         /// 3. 计算崩边宽度：下边缘最大Y - 上边缘最小Y
         /// 4. 将像素单位转换为毫米
         /// </remarks>
-        private static (double, double) VisualizeResults(Mat image, Dictionary<string, List<Point>> data, int imageWidth, double ratio)
+        private static (double, double, double, double, double, double) VisualizeResults(Mat image, Dictionary<string, List<Point>> data, int imageWidth, double ratio)
         {
             if (image == null)
                 throw new ArgumentNullException(nameof(image), "输入图像不能为空");
@@ -330,13 +370,13 @@ namespace 精密切割系统.Model.cut
                     bladeWidth = yValues["bottom"].minY - yValues["top"].maxY;
                     collapseWidth = yValues["bottom"].maxY - yValues["top"].minY;
                     Debug.WriteLine($"计算结果 - 刀痕宽度: {bladeWidth * ratio}mm, 崩边宽度: {collapseWidth * ratio}mm");
+                    return (bladeWidth * ratio, collapseWidth * ratio, yValues["bottom"].minY, yValues["top"].maxY, yValues["bottom"].maxY, yValues["top"].minY);
                 }
                 else
                 {
                     Debug.WriteLine("未能获取完整的上下边缘数据，返回默认值0");
+                    return (0, 0, 0, 0, 0, 0);
                 }
-
-                return (bladeWidth * ratio, collapseWidth * ratio);
             }
             catch (Exception ex)
             {
@@ -438,6 +478,30 @@ namespace 精密切割系统.Model.cut
                 return null;
             }
         }
+
+        public static string? SpliceImages(List<Mat> mats)
+        {
+            try
+            {
+                // 拼接图片
+                Mat result = new Mat();
+                Cv2.HConcat(mats, result);
+                // 保存结果
+                string baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "file", "images", "spliced", DateTime.Now.ToString("yyyy-MM-dd"));
+                Directory.CreateDirectory(baseDir);
+                string fileName = $"spliced_{DateTime.Now.ToString("yyyyMMdd_HHmmss")}_{Guid.NewGuid().ToString().Substring(0, 8)}.jpg";
+                string outputPath = Path.Combine(baseDir, fileName);
+                Cv2.ImWrite(outputPath, result);
+                Console.WriteLine($"拼接完成，结果已保存到: {outputPath}");
+                return outputPath;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"错误：图片拼接过程中发生异常: {ex.Message}");
+                return null;
+            }
+        }
+
         /// <summary>
         /// 在大图中查找模板图片的位置
         /// </summary>

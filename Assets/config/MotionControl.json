@@ -116,7 +116,7 @@
       "describe": "X轴是否完成绝对运动"
     },
     "softUpperLimit": {
-      "defaultValue": "205",
+      "defaultValue": "222",
       "valueType": "float",
       "addr": "DM20",
       "name": "X轴软正限位",
@@ -258,7 +258,7 @@
       "describe": "Y轴是否完成绝对运动"
     },
     "softUpperLimit": {
-      "defaultValue": "145",
+      "defaultValue": "160",
       "valueType": "float",
       "addr": "DM120",
       "name": "Y轴软正限位",
@@ -689,6 +689,18 @@
       "name": "测高完成",
       "describe": "测高完成"
     },
+    "opticalFiberSensorBlowing": {
+      "valueType": "bool",
+      "addr": "MR48003",
+      "name": "光纤传感器吹气",
+      "describe": "光纤传感器吹气"
+    },
+    "opticalFiberSensorBlowingWater": {
+      "valueType": "bool",
+      "addr": "MR48002",
+      "name": "光纤传感器吹水",
+      "describe": "光纤传感器吹水"
+    },
     "xReplaceLocation": {
       "valueType": "float",
       "addr": "DM518",
@@ -722,8 +734,8 @@
     "bladeMantanceStatus": {
       "valueType": "bool",
       "addr": "MR607",
-      "name": "刀片维护准备OK",
-      "describe": "刀片维护准备OK"
+      "name": "测高已准备好",
+      "describe": "测高已准备好"
     },
     "confirmParams": {
       "valueType": "bool",
@@ -1042,7 +1054,7 @@
     },
     "buzzer": {
       "valueType": "bool",
-      "addr": "MR1006",
+      "addr": "MR48001",
       "name": "蜂鸣",
       "describe": "蜂鸣"
     },

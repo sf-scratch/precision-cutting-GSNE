@@ -14,8 +14,8 @@ namespace 精密切割系统.FrmWindow.common
     internal class GlobalParams
     {
         // true 在线版本 false 离线版本
-        public static bool onlineFlag = false;
-        public static readonly bool OnlineMES = false;
+        public static bool onlineFlag = true;
+        public static readonly bool OnlineMES = true;
         // 当前页面是否是首页
         public static bool currentPageIsHome = false;
         // 全局运行参数 如果有参数在运行，则其它按钮不能操作
@@ -123,9 +123,9 @@ namespace 精密切割系统.FrmWindow.common
         public static readonly float JumpStepDistance = 0.3f;
 
         /// <summary>
-        /// 在磨刀几次后检测
+        /// 在切割几次后检测
         /// </summary>
-        public static readonly int CheckMarksSharpenTimes = 1;
+        public static readonly int CheckMarksCutTimes = 4;
 
         /// <summary>
         /// 单刀磨损量
@@ -135,7 +135,7 @@ namespace 精密切割系统.FrmWindow.common
         /// <summary>
         /// 刀片抬起高度
         /// </summary>
-        public static readonly float BladeLiftingHeight = 2f;
+        public static readonly float BladeLiftingHeight = 1f;
 
         /// <summary>
         /// 胶片厚度
@@ -155,17 +155,17 @@ namespace 精密切割系统.FrmWindow.common
         /// <summary>
         /// 工件半径
         /// </summary>
-        public static readonly float WorkpieceRadius  = 70;
+        public static readonly float WorkpieceRadius  = 75;
 
         /// <summary>
         /// 工件中心点到theta轴中心点距离
         /// <summary>
-        public static readonly float CenterDistance = 0.5f;
+        public static readonly float CenterDistance = 2f;
 
         /// <summary>
         /// theta轴中心点位置
         /// </summary>
-        public static DataPoint<float> ThetaCenterPoint = new DataPoint<float>(146.48f, 84f);
+        public static DataPoint<float> ThetaCenterPoint = new DataPoint<float>(146.48f, 81.86f);
 
         /// <summary>
         /// 相机中心点位置
@@ -181,7 +181,7 @@ namespace 精密切割系统.FrmWindow.common
         /// <summary>
         /// 磨刀板尺寸
         /// </summary>
-        public static DataRectangleF SharpenRect = new DataRectangleF(ThetaCenterPoint.X - 35f, ThetaCenterPoint.Y - 72f, 70, 70);
+        public static DataRectangleF SharpenRect = new DataRectangleF(ThetaCenterPoint.X - 35f, ThetaCenterPoint.Y - 73f, 70, 70);
 
         /// <summary>
         /// 切割多少刀后开始磨刀
@@ -197,7 +197,9 @@ namespace 精密切割系统.FrmWindow.common
         /// 非接触测高位置到工作台的z1轴高度
         /// </summary>
         //public static readonly float NonContactHeightMeasurementToWorkbenchZ1 = 19.029453f;
-        public static readonly float NonContactHeightMeasurementToWorkbenchZ1 = 19f;
+        //public static readonly float NonContactHeightMeasurementToWorkbenchZ1 = 19f;
+        //public static readonly float NonContactHeightMeasurementToWorkbenchZ1 = 7.53f;
+        public static readonly float NonContactHeightMeasurementToWorkbenchZ1 = 7.5f;
 
         // x轴默认速度
         public const float XDefaultSpeed = 10;
