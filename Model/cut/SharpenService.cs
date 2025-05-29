@@ -111,10 +111,7 @@ namespace 精密切割系统.Model.cut
         {
             _isRotateTheta = true;
             _thetaDegQueue = new Queue<float>();
-            _isNewestSharpen = true;
-            _curSharpenDistance = 0;
             _recordSharpenY = 0;
-            _curSharpenDistance = 0;
         }
 
         public async Task<RunResult> Run(LunguSksjDTO lunguSksj, float bladeContactWorkingDiscZ1, float bladeLiftingHeight, int spindleRev, float margin, float sharpenCalibratTheta, int sharpenTimes, CancellationToken pauseToken)
@@ -158,6 +155,7 @@ namespace 精密切割系统.Model.cut
                             }
                             //保存磨刀参数
                             Appsettings.SharpenThetaDegQueue = _thetaDegQueue.ToList();
+                            Appsettings.SharpenDistance = 0;
                             _isRotateTheta = true;
                             _isNewestSharpen = true;
                             _curSharpenDistance = 0;
@@ -193,16 +191,23 @@ namespace 精密切割系统.Model.cut
                         }
                         //触发磨刀进度更新事件
                         SharpenServiceProcessChanged?.Invoke(new SharpenServiceProcess(endZ, sharpenSpeed, sharpenTimes + _finishedSharpenTimes, currentSharpenTimes + _finishedSharpenTimes));
+                        await PlcControl.tagControl.ThetaAxis.SetAbsoluteSpeedAsync(GlobalParams.ThetaDefaultSpeed);
                         //设置磨刀参数
                         await PlcControl.tagControl.cutting.SetCutParamsAsync(sharpenSpeed, endZ, startZ, line.StartPoint.X, line.EndPoint.X, line.StartPoint.Y, "0", _thetaDegQueue.Peek(), spindleRev, _cutDirection);
                         //开始磨刀
                         await PlcControl.tagControl.cutting.StartCutAsync();
-                        //等待磨刀次数变化
-                        await PlcControl.tagControl.cutting.WaitCutNumUdatedAsync(curCutNum.Value, usingPauseToken);
-                        currentSharpenTimes++;
-                        curSharpenTimes++;
-                        //触发磨刀进度更新事件
-                        SharpenServiceProcessChanged?.Invoke(new SharpenServiceProcess(endZ, sharpenSpeed, sharpenTimes + _finishedSharpenTimes, currentSharpenTimes + _finishedSharpenTimes, true));
+                        try
+                        {
+                            //等待磨刀次数变化
+                            await PlcControl.tagControl.cutting.WaitCutNumUdatedAsync(curCutNum.Value, usingPauseToken);
+                        }
+                        finally
+                        {
+                            currentSharpenTimes++;
+                            curSharpenTimes++;
+                            //触发磨刀进度更新事件
+                            SharpenServiceProcessChanged?.Invoke(new SharpenServiceProcess(endZ, sharpenSpeed, sharpenTimes + _finishedSharpenTimes, currentSharpenTimes + _finishedSharpenTimes, true));
+                        }
                         //判断是否开始检查刀痕
                         //if (_totalSharpenTimes % GlobalParams.CheckMarksSharpenTimes == 0)
                         //{
@@ -254,6 +259,7 @@ namespace 精密切割系统.Model.cut
             _continueTcs?.TrySetResult(null); // 停止切割
             _continueTcs = null;
             _finishedSharpenTimes = 0;
+            _isNewestSharpen = true;
         }
 
         public void Reset()
@@ -280,16 +286,18 @@ namespace 精密切割系统.Model.cut
                 _thetaDegQueue = new Queue<float>(thetaDegList);
                 _isRotateTheta = false;
             }
+            _curSharpenDistance = Appsettings.SharpenDistance ?? 0;
         }
 
         private bool CheckSharpenDistance(DataRectangleF sharpenRect, float cutSize)
         {
             bool res = true;
             _curSharpenDistance += cutSize;
+            Appsettings.SharpenDistance += cutSize;
             if (_thetaDegQueue.Count == 2)
             {
                 //磨刀距离达到最终位置
-                if (_curSharpenDistance >= sharpenRect.Height)
+                if (_curSharpenDistance >= sharpenRect.Height - 5)
                 {
                     res = false;
                 }
@@ -297,7 +305,7 @@ namespace 精密切割系统.Model.cut
             else
             {
                 //磨刀距离达到最终位置
-                if (_curSharpenDistance >= sharpenRect.Width)
+                if (_curSharpenDistance >= sharpenRect.Width - 5)
                 {
                     res = false;
                 }
@@ -313,7 +321,7 @@ namespace 精密切割系统.Model.cut
         public static float GetCutSpeed(float abAverageThickness, bool isNewestSharpen)
         {
             float cutSpeed;
-            if (abAverageThickness <= 0.016)
+            if (abAverageThickness <= 0.016f)
             {
                 cutSpeed = 10f;
             }

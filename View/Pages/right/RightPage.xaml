@@ -118,7 +118,7 @@
                         ImagePath="{Binding ImagePath}"
                         Visibility="{Binding Visibility}">
                         <behaviors:Interaction.Behaviors>
-                            <behav:DualInputBehavior StartCommand="{Binding RightClickCommand}"/>
+                            <behav:TouchAndClickBehavior TouchAndClickCommand="{Binding RightClickCommand}"/>
                         </behaviors:Interaction.Behaviors>
                     </Controls:RightButton>
                 </DataTemplate>

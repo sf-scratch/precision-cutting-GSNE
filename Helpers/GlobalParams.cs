@@ -125,7 +125,7 @@ namespace 精密切割系统.FrmWindow.common
         /// <summary>
         /// 在切割几次后检测
         /// </summary>
-        public static readonly int CheckMarksCutTimes = 4;
+        public static readonly int CheckMarksCutTimes = 10;
 
         /// <summary>
         /// 单刀磨损量
@@ -181,7 +181,7 @@ namespace 精密切割系统.FrmWindow.common
         /// <summary>
         /// 磨刀板尺寸
         /// </summary>
-        public static DataRectangleF SharpenRect = new DataRectangleF(ThetaCenterPoint.X - 35f, ThetaCenterPoint.Y - 73f, 70, 70);
+        public static DataRectangleF SharpenRect = new DataRectangleF(ThetaCenterPoint.X - 34, ThetaCenterPoint.Y - 70, 68, 68);
 
         /// <summary>
         /// 切割多少刀后开始磨刀
@@ -210,7 +210,7 @@ namespace 精密切割系统.FrmWindow.common
         // z2相机轴默认速度
         public const float Z2DefaultSpeed = 2f;
         // thetaθ轴默认速度
-        public const float ThetaDefaultSpeed = 2;
+        public const float ThetaDefaultSpeed = 20;
 
 
 

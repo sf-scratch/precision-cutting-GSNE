@@ -32,6 +32,7 @@ namespace 精密切割系统.Helpers
             {
                 if (value is not null)
                 {
+                    UpdateAppSettingsToNull();
                     UpdateAppSettings(value);
                 }
                 else
@@ -70,6 +71,7 @@ namespace 精密切割系统.Helpers
             {
                 if (value is not null)
                 {
+                    UpdateAppSettingsToNull();
                     UpdateAppSettings(value);
                 }
                 else
@@ -83,6 +85,44 @@ namespace 精密切割系统.Helpers
         /// 记录磨刀板Y轴位置
         /// </summary>
         public static float? SharpenY
+        {
+            get { return GetValue<float>(); }
+            set
+            {
+                if (value is not null)
+                {
+                    UpdateAppSettings(value.Value);
+                }
+                else
+                {
+                    UpdateAppSettingsToNull();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 记录磨刀板已磨损的距离
+        /// </summary>
+        public static float? SharpenDistance
+        {
+            get { return GetValue<float>(); }
+            set
+            {
+                if (value is not null)
+                {
+                    UpdateAppSettings(value.Value);
+                }
+                else
+                {
+                    UpdateAppSettingsToNull();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 记录硅片已切割的距离
+        /// </summary>
+        public static float? CutDistance
         {
             get { return GetValue<float>(); }
             set

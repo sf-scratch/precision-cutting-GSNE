@@ -169,20 +169,20 @@ namespace 精密切割系统.ViewModel
         {
             RightPageButtonCollection.Clear();
             RightPageButtonCollection.Add(RightButtonParams.GreenRightButton("继续", "/Assets/icon/right/enter.png", ContinueCommandExecute));
-            RightPageButtonCollection.Add(RightButtonParams.RedRightButton("停止", "/Assets/icon/right/stop.png", null, StopCommandExecute));
+            RightPageButtonCollection.Add(RightButtonParams.RedRightButton("停止", "/Assets/icon/right/stop.png", StopCommandExecute));
         }
 
         private void InitRightButtonOnlyStop()
         {
             RightPageButtonCollection.Clear();
-            RightPageButtonCollection.Add(RightButtonParams.RedRightButton("停止", "/Assets/icon/right/stop.png", null, StopCommandExecute));
+            RightPageButtonCollection.Add(RightButtonParams.RedRightButton("停止", "/Assets/icon/right/stop.png", StopCommandExecute));
         }
 
         private void InitBottomButton()
         {
-            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调窄", "/Assets/icon/tab_1/03/tab_02.png", null, BaselineNarrowing, 8));
-            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调宽", "/Assets/icon/tab_1/03/tab_05.png", null, BaselineWidthAdjustment, 8));
-            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线校准", "/Assets/icon/tab_1/03/tab_08.png", null, BaselineCalibration, 8));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调窄", "/Assets/icon/tab_1/03/tab_02.png", BaselineNarrowing, null, 8));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调宽", "/Assets/icon/tab_1/03/tab_05.png", BaselineWidthAdjustment, null, 8));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线校准", "/Assets/icon/tab_1/03/tab_08.png", BaselineCalibration, null, 8));
         }
 
         private void BaselineWidthAdjustment()
@@ -267,15 +267,15 @@ namespace 精密切割系统.ViewModel
             base.OnNavigatedTo(navigationContext);
             InitRightButton();
             _autoCutRuningViewModel = navigationContext.Parameters.GetValue<AutoCutRuningViewModel>("AutoCutRuningViewModel");
-            _afterHeightMeasurementZ = _autoCutRuningViewModel.AfterHeightMeasurementZ;
-            _sharpenBladeHeight = _autoCutRuningViewModel.SharpenBladeHeight;
-            _sharpenSpeed = _autoCutRuningViewModel.SharpenSpeed;
-            _sharpenProgress = _autoCutRuningViewModel.SharpenProgress;
-            _deviceDataNo = _autoCutRuningViewModel.DeviceDataNo;
-            _cutBladeHeight = _autoCutRuningViewModel.CutBladeHeight;
-            _cutSpeed = _autoCutRuningViewModel.CutSpeed;
-            _cutProgress = _autoCutRuningViewModel.CutProgress;
-            _afterReplaceBladeCutTimes = _autoCutRuningViewModel.AfterReplaceBladeCutTimes;
+            AfterHeightMeasurementZ = _autoCutRuningViewModel.AfterHeightMeasurementZ;
+            SharpenBladeHeight = _autoCutRuningViewModel.SharpenBladeHeight;
+            SharpenSpeed = _autoCutRuningViewModel.SharpenSpeed;
+            SharpenProgress = _autoCutRuningViewModel.SharpenProgress;
+            DeviceDataNo = _autoCutRuningViewModel.DeviceDataNo;
+            CutBladeHeight = _autoCutRuningViewModel.CutBladeHeight;
+            CutSpeed = _autoCutRuningViewModel.CutSpeed;
+            CutProgress = _autoCutRuningViewModel.CutProgress;
+            AfterReplaceBladeCutTimes = _autoCutRuningViewModel.AfterReplaceBladeCutTimes;
             float? xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync();
             float? yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync();
             // 初始化起始点位置

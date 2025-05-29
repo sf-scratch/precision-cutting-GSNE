@@ -286,15 +286,15 @@ namespace 精密切割系统.View.Controls
             }
             if (sender is DirectOperate directOperate && directOperate.DataContext is DirectOperateViewModel directOperateViewModel)
             {
-                if (e.NewValue is bool isVisibleDirectOperate && isVisibleDirectOperate)
-                {
-                    directOperateViewModel.StartGetAxisInfo();
-                }
-                else
-                {
-                    // 如果不可见则停止获取DirectOperate的数据
-                    await directOperateViewModel.StopGetAxisInfoAsync();
-                }
+                //if (e.NewValue is bool isVisibleDirectOperate && isVisibleDirectOperate)
+                //{
+                //    directOperateViewModel.StartGetAxisInfo();
+                //}
+                //else
+                //{
+                //    // 如果不可见则停止获取DirectOperate的数据
+                //    await directOperateViewModel.StopGetAxisInfoAsync();
+                //}
             }
         }
         private void scrHighSpeedBtn_PreviewMouseDown(object sender, MouseButtonEventArgs e)

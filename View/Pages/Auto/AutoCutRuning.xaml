@@ -187,7 +187,7 @@
                 <TextBlock HorizontalAlignment="Left" Text="mm"/>
                 <TextBlock Text="型号参数No"/>
                 <Controls:InputTextBox Text="{Binding DeviceDataNo}" IsEnabled="False"/>
-                <TextBlock HorizontalAlignment="Left" Text="ID"/>
+                <TextBlock HorizontalAlignment="Left" Text=""/>
                 <TextBlock Text="切割刀片高度"/>
                 <Controls:InputTextBox Text="{Binding CutBladeHeight}" IsEnabled="False"/>
                 <TextBlock HorizontalAlignment="Left" Text="mm"/>

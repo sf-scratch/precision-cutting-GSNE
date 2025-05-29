@@ -179,10 +179,10 @@ namespace 精密切割系统.Model.cut
         public static async Task ReplaceBladeAsync(IEventAggregator? eventAggregator = null)
         {
             MaterialSnackUtils.MaterialSnack("轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
-            Task taskX = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(0);
-            Task taskY = PlcControl.tagControl.Yaxis.StartAbsoluteAsync(0);
             Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0);
             Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0);
+            Task taskX = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(0);
+            Task taskY = PlcControl.tagControl.Yaxis.StartAbsoluteAsync(0);
             Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0);
             await Task.WhenAll(taskX, taskY, taskZ1, taskZ2, taskTheta);
             MaterialSnackUtils.MaterialSnack("请更换刀片！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
@@ -195,10 +195,10 @@ namespace 精密切割系统.Model.cut
         public static async Task ReplaceSharpeningBoardAsync(IEventAggregator? eventAggregator = null)
         {
             MaterialSnackUtils.MaterialSnack("轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
-            Task taskX = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(0);
-            Task taskY = PlcControl.tagControl.Yaxis.StartAbsoluteAsync(0);
             Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0);
             Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0);
+            Task taskX = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(0);
+            Task taskY = PlcControl.tagControl.Yaxis.StartAbsoluteAsync(0);
             Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0);
             await Task.WhenAll(taskX, taskY, taskZ1, taskZ2, taskTheta);
             //清空记录
@@ -214,10 +214,10 @@ namespace 精密切割系统.Model.cut
         public static async Task ReplaceWaferAsync(IEventAggregator? eventAggregator = null)
         {
             MaterialSnackUtils.MaterialSnack("轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
-            Task taskX = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(0);
-            Task taskY = PlcControl.tagControl.Yaxis.StartAbsoluteAsync(0);
             Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0);
             Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0);
+            Task taskX = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(0);
+            Task taskY = PlcControl.tagControl.Yaxis.StartAbsoluteAsync(0);
             Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0);
             await Task.WhenAll(taskX, taskY, taskZ1, taskZ2, taskTheta);
             //清空记录
@@ -268,7 +268,7 @@ namespace 精密切割系统.Model.cut
                 if (mode is HeightMeasurementMode.NoContact)
                 {
                     //测高前移动到初始位置，主轴旋转，开始吹水吹气
-                    await PlcControl.tagControl.cutting.RunMotionAsync(100, 100, token);
+                    await PlcControl.tagControl.cutting.RunMotionAsync(0, 50, token);
                     //主轴有旋转速度，则不需要手动触发
                     if (await PlcControl.tagControl.wholeDevice.GetSpindleSpeedAsync() == 0)
                     {
@@ -491,6 +491,7 @@ namespace 精密切割系统.Model.cut
                 return null;
             }
             float focusClearZ = Appsettings.FocusClearZ ?? 0;
+            await PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0, default, token);
             await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(focusClearZ, 2, token);
             // 模糊度大于200时，直接返回清晰位置
             if (cameraCommon.localBitmap != null)
@@ -529,7 +530,7 @@ namespace 精密切割系统.Model.cut
                         // 找到最清晰的位置，停止循环并移动到上一个位置
                         eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"最清晰的图片已找到，Z2位置{lastPosition}"));
                         // 调用plc方法，走到上一个位置
-                        await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(lastPosition, default, token);
+                        await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(lastPosition, 0.2f, token);
                         return lastPosition;
                     }
                     lastBlurriness = tenengradBlurriness;
@@ -1123,12 +1124,12 @@ namespace 精密切割系统.Model.cut
             //工件吹气
             await WorkpieceBlowingAsync(eventAggregator, token);
             DataPoint<float> relativePos = Appsettings.CameraRelativeBladePosition;
-            await PlcControl.tagControl.cutting.RunMotionAsync((line.StartPoint.X + line.EndPoint.X) / 2 + relativePos.X, line.StartPoint.Y + relativePos.Y, token);
+            await PlcControl.tagControl.cutting.RunMotionAsync(line.StartPoint.X + relativePos.X, line.StartPoint.Y + relativePos.Y, token);
             //await AutoFocusAsync(eventAggregator, token);
             CancellationTokenSource cts = new CancellationTokenSource();
             CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(token, cts.Token);
             CancellationToken linkedToken = linkedCts.Token;
-            Task slowSpeedMoveTask = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(line.StartPoint.X + relativePos.X, 7f, linkedToken);
+            Task slowSpeedMoveTask = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(line.EndPoint.X + relativePos.X, 7f, linkedToken);
             Task<List<Mat>> grabTimerTask = Task.Run(async () =>
             {
                 List<Mat> mats = new List<Mat>();
@@ -1198,7 +1199,7 @@ namespace 精密切割系统.Model.cut
                         pt1: new Point(0, bladeTop),  // 起点
                         pt2: new Point(cropConcatMatJpg.Width, bladeTop), // 终点
                         color: Scalar.Red,         // 颜色 (B,G,R)
-                        thickness: 2,             // 线宽
+                        thickness: 1,             // 线宽
                         lineType: LineTypes.AntiAlias // 抗锯齿
                         );
                     Cv2.Line(
@@ -1206,7 +1207,7 @@ namespace 精密切割系统.Model.cut
                         pt1: new Point(0, bladeBottom),  // 起点
                         pt2: new Point(cropConcatMatJpg.Width, bladeBottom), // 终点
                         color: Scalar.Red,         // 颜色 (B,G,R)
-                        thickness: 2,             // 线宽
+                        thickness: 1,             // 线宽
                         lineType: LineTypes.AntiAlias // 抗锯齿
                         );
                     Cv2.Line(
@@ -1214,7 +1215,7 @@ namespace 精密切割系统.Model.cut
                         pt1: new Point(0, collapseTop),  // 起点
                         pt2: new Point(cropConcatMatJpg.Width, collapseTop), // 终点
                         color: Scalar.Green,         // 颜色 (B,G,R)
-                        thickness: 2,             // 线宽
+                        thickness: 1,             // 线宽
                         lineType: LineTypes.AntiAlias // 抗锯齿
                         );
                     Cv2.Line(
@@ -1222,7 +1223,7 @@ namespace 精密切割系统.Model.cut
                         pt1: new Point(0, collapseBottom),  // 起点
                         pt2: new Point(cropConcatMatJpg.Width, collapseBottom), // 终点
                         color: Scalar.Green,         // 颜色 (B,G,R)
-                        thickness: 2,             // 线宽
+                        thickness: 1,             // 线宽
                         lineType: LineTypes.AntiAlias // 抗锯齿
                         );
                     string imagePath = System.IO.Path.Combine(AppContext.BaseDirectory, "image");
@@ -1268,7 +1269,7 @@ namespace 精密切割系统.Model.cut
                        pt1: new Point(0, bladeTop),  // 起点
                        pt2: new Point(cropMatJpg.Width, bladeTop), // 终点
                        color: Scalar.Red,         // 颜色 (B,G,R)
-                       thickness: 2,             // 线宽
+                       thickness: 1,             // 线宽
                        lineType: LineTypes.AntiAlias // 抗锯齿
                        );
                     Cv2.Line(
@@ -1276,7 +1277,7 @@ namespace 精密切割系统.Model.cut
                         pt1: new Point(0, bladeBottom),  // 起点
                         pt2: new Point(cropMatJpg.Width, bladeBottom), // 终点
                         color: Scalar.Red,         // 颜色 (B,G,R)
-                        thickness: 2,             // 线宽
+                        thickness: 1,             // 线宽
                         lineType: LineTypes.AntiAlias // 抗锯齿
                         );
                     Cv2.Line(
@@ -1284,7 +1285,7 @@ namespace 精密切割系统.Model.cut
                         pt1: new Point(0, collapseTop),  // 起点
                         pt2: new Point(cropMatJpg.Width, collapseTop), // 终点
                         color: Scalar.Green,         // 颜色 (B,G,R)
-                        thickness: 2,             // 线宽
+                        thickness: 1,             // 线宽
                         lineType: LineTypes.AntiAlias // 抗锯齿
                         );
                     Cv2.Line(
@@ -1292,7 +1293,7 @@ namespace 精密切割系统.Model.cut
                         pt1: new Point(0, collapseBottom),  // 起点
                         pt2: new Point(cropMatJpg.Width, collapseBottom), // 终点
                         color: Scalar.Green,         // 颜色 (B,G,R)
-                        thickness: 2,             // 线宽
+                        thickness: 1,             // 线宽
                         lineType: LineTypes.AntiAlias // 抗锯齿
                         );
 

@@ -107,9 +107,9 @@ namespace 精密切割系统.ViewModel
 
         private void InitBottomButton()
         {
-            _operatePageButtonCollection.Add(RightButtonParams.BlueRightButton("换刀片", "/Assets/icon/tab_1/03/tab_02.png", null, ReplaceBlade, 8));
-            _operatePageButtonCollection.Add(RightButtonParams.BlueRightButton("换磨刀板", "/Assets/icon/tab_1/03/tab_05.png", null, ReplaceSharpeningBoard, 8));
-            _operatePageButtonCollection.Add(RightButtonParams.BlueRightButton("换硅片", "/Assets/icon/tab_1/03/tab_05.png", null, ReplaceWafer, 8));
+            _operatePageButtonCollection.Add(RightButtonParams.BlueRightButton("换刀片", "/Assets/icon/tab_1/03/tab_02.png", ReplaceBlade, null, 8));
+            _operatePageButtonCollection.Add(RightButtonParams.BlueRightButton("换磨刀板", "/Assets/icon/tab_1/03/tab_05.png", ReplaceSharpeningBoard, null, 8));
+            _operatePageButtonCollection.Add(RightButtonParams.BlueRightButton("换硅片", "/Assets/icon/tab_1/03/tab_05.png", ReplaceSharpeningBoard, null, 8));
         }
 
         private async void Init(string lunguId)
@@ -150,7 +150,7 @@ namespace 精密切割系统.ViewModel
                     CoOffsetX = sharpenParam.CoOffsetX,
                     CutSize = 0.3f,
                     CutNum = 0,
-                    HightestCutSpeed = SharpenService.GetCutSpeed(lunguSksjDTO.ABAverageThickness, false),
+                    HightestCutSpeed = SharpenService.GetCutSpeed(lunguSksjDTO.ABAverageThickness / 1000, false),
                     CutNum1 = 0,
                     CutNum2 = 0
                 };
@@ -180,13 +180,14 @@ namespace 精密切割系统.ViewModel
                     TapeThickness = fileTable.TapeThickness,
                     SpindleRev = fileTable.SpindleRev,
                     PrecutProcessNo = fileTable.PrecutProcessNo,
-                    MaxCutSpeed = CutService.GetCutSpeed(lunguSksjDTO.ABAverageThickness),
+                    MaxCutSpeed = CutService.GetCutSpeed(lunguSksjDTO.ABAverageThickness / 1000),
                     CutNum = fileTableCh.CutLine.ToInt(),
                     WorkThickness = fileTable.WorkThickness,
                     DeviceDataNo = fileTable.DeviceDataNo,
                     OffsetX = fileTableCh.OffsetX.ToInt()
                 };
                 InitRightButton();
+                MaterialSnackUtils.MaterialSnack("", MaterialSnackUtils.SnackType.INFO, 0, _eventAggregator);
             }
             finally
             {

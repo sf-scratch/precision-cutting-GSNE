@@ -112,7 +112,6 @@ namespace 精密切割系统.Model.cut
             _thetaDegQueue = new Queue<float>();
             _isNewestCut = true;
             _finishedCutTimes = 0;
-            _curCutDistance = 0;
             _recordCutY = 0;
         }
 
@@ -145,7 +144,7 @@ namespace 精密切割系统.Model.cut
                             DataPoint<float> workpieceCenterPoint = new DataPoint<float>(_thetaCenterPoint.X, _thetaCenterPoint.Y + _centerDistance);
                             // 该theta角度第一次切割，切割半圆最下边切为起始位置
                             //_recordCutY = GeometryUtils.FindBottomTangentY(_thetaCenterPoint, workpieceCenterPoint, _workpieceRadius, _thetaDegQueue.Peek() + cutCalibratTheta);
-                            _recordCutY = 150;
+                            _recordCutY = 140;
                             _isRotateTheta = false;
                         }
                         float cutSize = GetCutSize();
@@ -159,6 +158,7 @@ namespace 精密切割系统.Model.cut
                             }
                             //保存切割参数
                             Appsettings.CutThetaDegQueue = _thetaDegQueue.ToList();
+                            Appsettings.CutDistance = 0;
                             _isRotateTheta = true;
                             _isNewestCut = true;
                             _curCutDistance = 0;
@@ -195,6 +195,7 @@ namespace 精密切割系统.Model.cut
                         CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, needCutTimes + _finishedCutTimes, currentSharpenTimes + _finishedCutTimes));
                         //加上边距
                         var (startX, endX) = CalculateCuttingX(line, _thetaDegQueue.Peek(), margin);
+                        await PlcControl.tagControl.ThetaAxis.SetAbsoluteSpeedAsync(GlobalParams.ThetaDefaultSpeed);
                         //设置切割参数
                         await PlcControl.tagControl.cutting.SetCutParamsAsync(cutSpeed, endZ, startZ, startX, endX, line.StartPoint.Y, "0", _thetaDegQueue.Peek() + cutCalibratTheta, spindleRev, _cutDirection);
                         //开始切割信号
@@ -338,15 +339,16 @@ namespace 精密切割系统.Model.cut
                 _thetaDegQueue = new Queue<float>(thetaDegList);
                 _isRotateTheta = false;
             }
+            _curCutDistance = Appsettings.CutDistance ?? 0;
         }
 
         private bool CheckCutDistance(float workpieceRadius, float cutSize)
         {
             bool res = true;
-            if (_thetaDegQueue.Count == 0)
+            if (_thetaDegQueue.Count == 2)
             {
                 //切割距离达到最终位置
-                if (_curCutDistance + cutSize * 2 >= workpieceRadius)
+                if (_curCutDistance + cutSize * 2 >= workpieceRadius - 5)
                 {
                     res = false;
                 }
@@ -354,12 +356,13 @@ namespace 精密切割系统.Model.cut
             else
             {
                 //切割距离达到最终位置
-                if (_curCutDistance + cutSize * 2 >= workpieceRadius * 2)
+                if (_curCutDistance + cutSize * 2 >= workpieceRadius * 2 - 5)
                 {
                     res = false;
                 }
             }
             _curCutDistance += cutSize;
+            Appsettings.CutDistance += cutSize;
             return res;
         }
 

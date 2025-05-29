@@ -32,6 +32,10 @@ namespace 精密切割系统.Model.cut
         /// <summary>
         /// 切割中
         /// </summary>
-        CutingInProgress
+        CutingInProgress,
+        /// <summary>
+        /// 结束
+        /// </summary>
+        End
     }
 }

@@ -210,7 +210,7 @@ namespace 精密切割系统.ViewModel
                 return;
             }
             //暂停页面跳转回来会触发InitCommand，调继续切割
-            if (_pauseCts.IsCancellationRequested && !_monitoringAlarmCts.IsCancellationRequested)
+            if (RunStatus == AutoRunStatus.SharpeningInProgress || RunStatus == AutoRunStatus.CutingInProgress)
             {
                 await ContinueAsync();
                 return;
@@ -319,11 +319,13 @@ namespace 精密切割系统.ViewModel
                             MaterialSnackUtils.MaterialSnack("测高失败，没有测高数据！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
                             return;
                         }
-                        float wearAmount = curHeightZ.Value - firstHeightMeasurementZ.Value;
+                        float wearAmount = curHeightZ.Value - AfterHeightMeasurementZ;
+                        _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"本次磨损量: {wearAmount}"));
+                        //float wearAmount = curHeightZ.Value - firstHeightMeasurementZ.Value;
                         // 如果磨损量小于0，说明测高数据有问题，继续测高
                         if (wearAmount > 0)
                         {
-                            TotalWearAmount = wearAmount;
+                            TotalWearAmount = curHeightZ.Value - firstHeightMeasurementZ.Value;
                             break;
                         }
                         _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("测高数据异常，重新测高"));
@@ -335,6 +337,7 @@ namespace 精密切割系统.ViewModel
                     {
                         isGetSingleBladeWear = false;
                         singleBladeWear = TotalWearAmount / defaultSharpenTimes;
+                        _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"单刀磨损量: {singleBladeWear}"));
                     }
                 } while (!isEndSharpen);
                 RunStatus = AutoRunStatus.CutingInProgress;
@@ -369,6 +372,7 @@ namespace 精密切割系统.ViewModel
                 await StopAsync();
                 await PdaUtils.UpdateFlowValuesAsync();
                 await PdaUtils.SetCompletedAsync();
+                RunStatus = AutoRunStatus.End;
             }
         }
 
@@ -472,8 +476,20 @@ namespace 精密切割系统.ViewModel
             }
         }
 
+        private bool _isForcedPause = false;
+
         private void Pause(Action? pauseThenAction = null)
         {
+            if (RunStatus != AutoRunStatus.CutingInProgress && RunStatus != AutoRunStatus.SharpeningInProgress)
+            {
+                if (!_isForcedPause)
+                {
+                    _isForcedPause = true;
+                    MaterialSnackUtils.MaterialSnack("当前状态不能暂停，再次点击暂停将退出自动执行！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                    return;
+                }
+            }
+            _isForcedPause = false;
             if (!GlobalParams.onlineFlag)
             {
                 NavigationParameters parameters = new NavigationParameters{{ "AutoCutRuningViewModel", this } };
@@ -489,10 +505,6 @@ namespace 精密切割系统.ViewModel
             // 暂停token
             _pauseCts.Cancel();
             _pauseThenAction = pauseThenAction;
-            if (RunStatus != AutoRunStatus.CutingInProgress && RunStatus != AutoRunStatus.SharpeningInProgress)
-            {
-                MaterialSnackUtils.MaterialSnack("当前状态不允许暂停！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
-            }
         }
 
         private async Task ContinueAsync()
