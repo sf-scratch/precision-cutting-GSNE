@@ -151,6 +151,12 @@ namespace 精密切割系统.Model.cut
                             if (_thetaDegQueue.Count == 0)
                             {
                                 RemindReplaceSharpenBoard?.Invoke();
+                                CancellationToken? token = await WaitContinueAsync(line);
+                                if (token == null)
+                                {
+                                    return RunResult.Fail(RunExceptionType.Stop, "停止切割");
+                                }
+                                usingPauseToken = token.Value;
                                 InitThetaDegQueue(sharpenCalibratTheta);
                             }
                             //保存磨刀参数
@@ -181,11 +187,10 @@ namespace 精密切割系统.Model.cut
                         //检查是否暂停
                         if (usingPauseToken.IsCancellationRequested)
                         {
-                            _continueTcs = new TaskCompletionSource<CancellationToken?>();
-                            CancellationToken? token = await _continueTcs.Task;
+                            CancellationToken? token = await WaitContinueAsync(line);
                             if (token == null)
                             {
-                                return RunResult.Fail(RunExceptionType.Stop, "停止磨刀");
+                                return RunResult.Fail(RunExceptionType.Stop, "停止切割");
                             }
                             usingPauseToken = token.Value;
                         }
@@ -221,13 +226,10 @@ namespace 精密切割系统.Model.cut
                     }
                     catch (OperationCanceledException)
                     {
-                        SharpenServicePaused?.Invoke(line);
-                        _continueTcs = new TaskCompletionSource<CancellationToken?>();
-                        CancellationToken? token = await _continueTcs.Task;
-                        // 如果token为null，表示停止磨刀
+                        CancellationToken? token = await WaitContinueAsync(line);
                         if (token == null)
                         {
-                            return RunResult.Fail(RunExceptionType.Stop, "停止磨刀");
+                            return RunResult.Fail(RunExceptionType.Stop, "停止切割");
                         }
                         usingPauseToken = token.Value;
                     }
@@ -252,6 +254,13 @@ namespace 精密切割系统.Model.cut
         {
             _continueTcs?.TrySetResult(token); // 继续执行
             _continueTcs = null;
+        }
+
+        private async Task<CancellationToken?> WaitContinueAsync(LineSegment? line)
+        {
+            SharpenServicePaused?.Invoke(line);
+            _continueTcs = new TaskCompletionSource<CancellationToken?>();
+            return await _continueTcs.Task;
         }
 
         public void Stop()

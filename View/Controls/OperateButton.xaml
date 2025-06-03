@@ -30,6 +30,8 @@ Margin="0,12,20,0" />
 Margin="0,12,20,0" />
         <Image x:Name="operate09" Visibility="Collapsed" Source="{Binding ImageSource09}"  Width="29" Height="16"   HorizontalAlignment="Right" VerticalAlignment="Top"
 Margin="0,12,20,0" />
+        <Image x:Name="operate010" Visibility="Collapsed" Source="{Binding ImageSource010}"  Width="29" Height="16"   HorizontalAlignment="Right" VerticalAlignment="Top"
+Margin="0,12,20,0" />
         <Image x:Name="operate8004" Visibility="Collapsed" Source="{Binding ImageSource8004}"  Width="29" Height="16"   HorizontalAlignment="Right" VerticalAlignment="Top"
 Margin="0,12,20,0" />
         <Grid.Effect>

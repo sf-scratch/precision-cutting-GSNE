@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using 精密切割系统.DTOs;
 using 精密切割系统.Utils;
 
 namespace 精密切割系统.HttpClients
@@ -39,11 +40,15 @@ namespace 精密切割系统.HttpClients
             {
                 request.AddHeader("Content-Type", apiRequest.ContentType);
                 string paramStr = string.Empty;
-                if (apiRequest.Parameters != null)
+                if (apiRequest.Parameters is string parameters)
+                {
+                    paramStr = parameters;
+                }
+                else if (apiRequest.Parameters != null)
                 {
                     paramStr = JsonConvert.SerializeObject(apiRequest.Parameters);
-                    Tools.LogDebug(paramStr);
                 }
+                Tools.LogDebug(paramStr);
                 request.AddJsonBody(paramStr);
                 //request.AddParameter("param", JsonConvert.SerializeObject(apiRequest.Parameters), ParameterType.RequestBody);
             }
@@ -52,11 +57,14 @@ namespace 精密切割系统.HttpClients
             ApiResponse? res;
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                if (response.Content == null)
+                try
                 {
-                    return null;
+                    return JsonConvert.DeserializeObject<ApiResponse?>(response.Content);
                 }
-                res = JsonConvert.DeserializeObject<ApiResponse?>(response.Content);
+                catch (Exception ex)
+                {
+                    return null; // 反序列化失败，返回null
+                }
             }
             else
             {
@@ -83,11 +91,14 @@ namespace 精密切割系统.HttpClients
             ApiResponse? res;
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                if (response.Content == null)
+                try
                 {
-                    return null;
+                    return JsonConvert.DeserializeObject<ApiResponse?>(response.Content);
                 }
-                res = JsonConvert.DeserializeObject<ApiResponse?>(response.Content);
+                catch (Exception)
+                {
+                    return null; // 反序列化失败，返回null
+                }
             }
             else
             {

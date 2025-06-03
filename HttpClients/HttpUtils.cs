@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using 精密切割系统.DTOs;
 using 精密切割系统.FrmWindow.common;
@@ -34,16 +35,22 @@ namespace 精密切割系统.HttpClients
                 Tools.LogDebug("获取轮毂信息失败！");
                 return null;
             }
-            LunguInfoDTO? lunguInfo = null;
             if (response.IsSuccess())
             {
-                lunguInfo = JsonConvert.DeserializeObject<LunguInfoDTO>(response.Data.ToString());
+                try
+                {
+                    return JsonConvert.DeserializeObject<LunguInfoDTO>(response.Data.ToString());
+                }
+                catch (Exception)
+                {
+                    return null; // 反序列化失败，返回null
+                }
             }
             else
             {
                 Tools.LogDebug(response.Msg);
             }
-            return lunguInfo;
+            return null;
         }
 
         /// <summary>
@@ -64,16 +71,22 @@ namespace 精密切割系统.HttpClients
                 Tools.LogDebug("获取轮毂蚀刻数据失败！");
                 return null;
             }
-            LunguSksjDTO? lunguInfo = null;
             if (response.IsSuccess())
             {
-                lunguInfo = JsonConvert.DeserializeObject<LunguSksjDTO>(response.Data.ToString());
+                try
+                {
+                    return JsonConvert.DeserializeObject<LunguSksjDTO>(response.Data.ToString());
+                }
+                catch (Exception)
+                {
+                    return null; // 反序列化失败，返回null
+                }
             }
             else
             {
                 Tools.LogDebug(response.Msg);
             }
-            return lunguInfo;
+            return null;
         }
 
         public static async Task<string?> InsertFlowValuesAsync(FieldValuesDTO fieldValues)
@@ -92,10 +105,13 @@ namespace 精密切割系统.HttpClients
             }
             if (response.IsSuccess())
             {
-                InsertFlowValuesResponseDTO? flowValuesResponseDTO = JsonConvert.DeserializeObject<InsertFlowValuesResponseDTO>(response.Data.ToString());
-                if (flowValuesResponseDTO != null)
+                try
                 {
-                    return flowValuesResponseDTO.GroupOperateId;
+                    return JsonConvert.DeserializeObject<InsertFlowValuesResponseDTO>(response.Data.ToString()).GroupOperateId;
+                }
+                catch (Exception)
+                {
+                    return null; // 反序列化失败，返回null
                 }
             }
             Tools.LogDebug(response.Msg);
@@ -124,10 +140,55 @@ namespace 精密切割系统.HttpClients
             }
             if (response.IsSuccess())
             {
-                List<FlowSettingDTO> fieldValues = JsonConvert.DeserializeObject<List<FlowSettingDTO>>(response.Data.ToString());
-                if (fieldValues != null)
+                try
                 {
-                    return fieldValues;
+                    return JsonConvert.DeserializeObject<List<FlowSettingDTO>>(response.Data.ToString());
+                }
+                catch (Exception)
+                {
+                    return null; // 反序列化失败，返回null
+                }
+            }
+            Tools.LogDebug(response.Msg);
+            return null;
+        }
+
+        /// <summary>
+        /// 获取QgParams
+        /// </summary>
+        /// <param name="hubNumber">轮毂号 </param>
+        /// <param name="sydrcd">剩余刀刃长度</param>
+        /// <param name="dbbjdx">单边崩角大小</param>
+        /// <returns></returns>
+        public static async Task<QgParamsDTO?> GetQgParamsByHub(string hubNumber, float? sydrcd = null, float? dbbjdx = null, float? zyhddmsl = null)
+        {
+            ApiRequest request = new ApiRequest
+            {
+                Method = RestSharp.Method.Post,
+                Route = $"n2baseDev-osb/http/interface/getQgParamsByHub",
+                Parameters = new JsonObject
+                {
+                    [nameof(hubNumber)] = hubNumber,
+                    [nameof(sydrcd)] = sydrcd,
+                    [nameof(dbbjdx)] = dbbjdx,
+                    [nameof(zyhddmsl)] = zyhddmsl,
+                }.ToString()
+            };
+            ApiResponse? response = await HttpRestClient.Instance.ExecuteAsync(request);
+            if (response == null)
+            {
+                Tools.LogDebug("InsertFlowValues失败！");
+                return null;
+            }
+            if (response.IsSuccess())
+            {
+                try
+                {
+                    return JsonConvert.DeserializeObject<QgParamsDTO>(response.Data.ToString());
+                }
+                catch (Exception ex)
+                {
+                    return null; // 反序列化失败，返回null
                 }
             }
             Tools.LogDebug(response.Msg);

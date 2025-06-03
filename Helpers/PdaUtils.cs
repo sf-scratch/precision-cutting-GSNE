@@ -1,4 +1,5 @@
-﻿using OpenCvSharp;
+﻿using NPOI.SS.Formula.Functions;
+using OpenCvSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,6 +52,91 @@ namespace 精密切割系统.Helpers
         private static FlowsValuesDTO? MslValues = null;
         private static int SharpenCount = 1;
 
+
+        public static void AddStandardBlade(string blade)
+        {
+            if (!GlobalParams.OnlineMES || _tuple is null) return;
+            FieldValuesDTO fieldValues = _tuple.Item1;
+            Dictionary<string, FlowsValuesDTO> fieldDic = _tuple.Item2;
+            if (fieldDic.TryGetValue("标准刃长", out FlowsValuesDTO? value))
+            {
+                FlowsValuesDTO dto = value.Clone();
+                dto.GroupOperateId = fieldValues.GroupOperateId;
+                dto.FieldValue = blade;
+                fieldValues.List.Add(dto);
+            }
+        }
+
+        public static void AddStandardAspectRatio(double aspectRatio)
+        {
+            if (!GlobalParams.OnlineMES || _tuple is null) return;
+            FieldValuesDTO fieldValues = _tuple.Item1;
+            Dictionary<string, FlowsValuesDTO> fieldDic = _tuple.Item2;
+            if (fieldDic.TryGetValue("标准刃长", out FlowsValuesDTO? value))
+            {
+                FlowsValuesDTO dto = value.Clone();
+                dto.GroupOperateId = fieldValues.GroupOperateId;
+                dto.FieldValue = aspectRatio.ToString();
+                fieldValues.List.Add(dto);
+            }
+        }
+
+        public static void AddStandardCutSpeed(float cutSpeed)
+        {
+            if (!GlobalParams.OnlineMES || _tuple is null) return;
+            FieldValuesDTO fieldValues = _tuple.Item1;
+            Dictionary<string, FlowsValuesDTO> fieldDic = _tuple.Item2;
+            if (fieldDic.TryGetValue("标准切割速率(mm/s)", out FlowsValuesDTO? value))
+            {
+                FlowsValuesDTO dto = value.Clone();
+                dto.GroupOperateId = fieldValues.GroupOperateId;
+                dto.FieldValue = cutSpeed.ToString();
+                fieldValues.List.Add(dto);
+            }
+        }
+
+        public static void AddStandardSharpenSpeed(string sharpenSpeed)
+        {
+            if (!GlobalParams.OnlineMES || _tuple is null) return;
+            FieldValuesDTO fieldValues = _tuple.Item1;
+            Dictionary<string, FlowsValuesDTO> fieldDic = _tuple.Item2;
+            if (fieldDic.TryGetValue("标准磨刀速率(mm/s)", out FlowsValuesDTO? value))
+            {
+                FlowsValuesDTO dto = value.Clone();
+                dto.GroupOperateId = fieldValues.GroupOperateId;
+                dto.FieldValue = sharpenSpeed;
+                fieldValues.List.Add(dto);
+            }
+        }
+
+        public static void AddResidueSharpenTimes(int residueSharpenTiems)
+        {
+            if (!GlobalParams.OnlineMES || _tuple is null) return;
+            FieldValuesDTO fieldValues = _tuple.Item1;
+            Dictionary<string, FlowsValuesDTO> fieldDic = _tuple.Item2;
+            if (fieldDic.TryGetValue("剩余磨刀数", out FlowsValuesDTO? value))
+            {
+                FlowsValuesDTO dto = value.Clone();
+                dto.GroupOperateId = fieldValues.GroupOperateId;
+                dto.FieldValue = residueSharpenTiems.ToString();
+                fieldValues.List.Add(dto);
+            }
+        }
+
+        public static void AddTotalSharpenTimes(int totalSharpenTiems)
+        {
+            if (!GlobalParams.OnlineMES || _tuple is null) return;
+            FieldValuesDTO fieldValues = _tuple.Item1;
+            Dictionary<string, FlowsValuesDTO> fieldDic = _tuple.Item2;
+            if (fieldDic.TryGetValue("总磨刀数", out FlowsValuesDTO? value))
+            {
+                FlowsValuesDTO dto = value.Clone();
+                dto.GroupOperateId = fieldValues.GroupOperateId;
+                dto.FieldValue = totalSharpenTiems.ToString();
+                fieldValues.List.Add(dto);
+            }
+        }
+
         public static void AddSharpen(float wearAmount, int count)
         {
             if (!GlobalParams.OnlineMES || _tuple is null) return;
@@ -78,7 +164,7 @@ namespace 精密切割系统.Helpers
             fieldValues.List.Add(mdsl);
         }
 
-        public static void AddToolMarkWidth(string toolMarkWidth)
+        public static void AddToolMarkWidth(double toolMarkWidth)
         {
             if (!GlobalParams.OnlineMES || _tuple is null) return;
             FieldValuesDTO fieldValues = _tuple.Item1;
@@ -86,11 +172,11 @@ namespace 精密切割系统.Helpers
             // 刀痕宽度(um)
             FlowsValuesDTO dto = fieldDic["刀痕宽度(um)"].Clone();
             dto.GroupOperateId = fieldValues.GroupOperateId;
-            dto.FieldValue = toolMarkWidth;
+            dto.FieldValue = Math.Round(toolMarkWidth * 1000).ToString();
             fieldValues.List.Add(dto);
         }
 
-        public static void AddToolMarkActualWidth(string toolMarkActualWidth)
+        public static void AddToolMarkActualWidth(double toolMarkActualWidth)
         {
             if (!GlobalParams.OnlineMES || _tuple is null) return;
             FieldValuesDTO fieldValues = _tuple.Item1;
@@ -98,11 +184,11 @@ namespace 精密切割系统.Helpers
             // 刀痕宽度(um)
             FlowsValuesDTO dto = fieldDic["刀痕实际宽度"].Clone();
             dto.GroupOperateId = fieldValues.GroupOperateId;
-            dto.FieldValue = toolMarkActualWidth;
+            dto.FieldValue = Math.Round(toolMarkActualWidth * 1000).ToString();
             fieldValues.List.Add(dto);
         }
 
-        public static void AddFirstToolMarkWidth(string firstToolMarkWidth)
+        public static void AddFirstToolMarkWidth(double firstToolMarkWidth)
         {
             if (!GlobalParams.OnlineMES || _tuple is null) return;
             FieldValuesDTO fieldValues = _tuple.Item1;
@@ -110,7 +196,7 @@ namespace 精密切割系统.Helpers
             // 刀痕宽度(um)
             FlowsValuesDTO dto = fieldDic["第一刀刀痕宽度"].Clone();
             dto.GroupOperateId = fieldValues.GroupOperateId;
-            dto.FieldValue = firstToolMarkWidth;
+            dto.FieldValue = Math.Round(firstToolMarkWidth * 1000).ToString();
             fieldValues.List.Add(dto);
         }
 
@@ -126,10 +212,13 @@ namespace 精密切割系统.Helpers
                 return;
             }
             // 第一刀图片
-            FlowsValuesDTO dhpz = fieldDic["第一刀（10mm/s）"].Clone();
-            dhpz.GroupOperateId = fieldValues.GroupOperateId;
-            dhpz.FieldValue = firstUrl;
-            fieldValues.List.Add(dhpz);
+            if (fieldDic.ContainsKey("第一刀（10mm/s）"))
+            {
+                FlowsValuesDTO dhpz = fieldDic["第一刀（10mm/s）"].Clone();
+                dhpz.GroupOperateId = fieldValues.GroupOperateId;
+                dhpz.FieldValue = firstUrl;
+                fieldValues.List.Add(dhpz);
+            }
         }
 
         public static void AddSecondToolMarkImage(Mat Mat)
@@ -144,10 +233,20 @@ namespace 精密切割系统.Helpers
                 return;
             }
             // 第二刀图片
-            FlowsValuesDTO dhpz2 = fieldDic["第二刀(20mm/s)"].Clone();
-            dhpz2.GroupOperateId = fieldValues.GroupOperateId;
-            dhpz2.FieldValue = secondUrl;
-            fieldValues.List.Add(dhpz2);
+            if (fieldDic.ContainsKey("第二刀(20mm/s)"))
+            {
+                FlowsValuesDTO dhpz2 = fieldDic["第二刀(20mm/s)"].Clone();
+                dhpz2.GroupOperateId = fieldValues.GroupOperateId;
+                dhpz2.FieldValue = secondUrl;
+                fieldValues.List.Add(dhpz2);
+            }
+            else if (fieldDic.ContainsKey("第二刀（60mm/s）"))
+            {
+                FlowsValuesDTO dhpz2 = fieldDic["第二刀（0mm/s）"].Clone();
+                dhpz2.GroupOperateId = fieldValues.GroupOperateId;
+                dhpz2.FieldValue = secondUrl;
+                fieldValues.List.Add(dhpz2);
+            }
         }
 
         public static void AddMaximumCollapseAngleImage(Mat Mat)
@@ -160,46 +259,127 @@ namespace 精密切割系统.Helpers
             {
                 return;
             }
-            FlowsValuesDTO flows = fieldDic["崩角拍照"].Clone();
-            flows.GroupOperateId = fieldValues.GroupOperateId;
-            flows.FieldValue = imageUrl;
-            fieldValues.List.Add(flows);
+            if (fieldDic.TryGetValue("崩角拍照", out FlowsValuesDTO? value))
+            {
+                FlowsValuesDTO dto = value.Clone();
+                dto.GroupOperateId = fieldValues.GroupOperateId;
+                dto.FieldValue = imageUrl;
+                fieldValues.List.Add(dto);
+            }
         }
 
-        public static void AddMaximumCollapseAngle(string maximumCollapseAngle)
+        public static void AddMaximumCollapseAngle(double maximumCollapseAngle)
         {
             if (!GlobalParams.OnlineMES || _tuple is null) return;
             FieldValuesDTO fieldValues = _tuple.Item1;
             Dictionary<string, FlowsValuesDTO> fieldDic = _tuple.Item2;
-            // 刀痕宽度(um)
-            FlowsValuesDTO dto = fieldDic["崩角最大值"].Clone();
-            dto.GroupOperateId = fieldValues.GroupOperateId;
-            dto.FieldValue = maximumCollapseAngle;
-            fieldValues.List.Add(dto);
+            if (fieldDic.TryGetValue("崩角最大值", out FlowsValuesDTO? value))
+            {
+                FlowsValuesDTO dto = value.Clone();
+                dto.GroupOperateId = fieldValues.GroupOperateId;
+                dto.FieldValue = Math.Round(maximumCollapseAngle * 1000).ToString();
+                fieldValues.List.Add(dto);
+            }
         }
 
-        public static void AddMaxCutSpeed(string maxCutSpeed)
+        public static void AddMaxCutSpeed(float maxCutSpeed)
         {
             if (!GlobalParams.OnlineMES || _tuple is null) return;
             FieldValuesDTO fieldValues = _tuple.Item1;
             Dictionary<string, FlowsValuesDTO> fieldDic = _tuple.Item2;
-            // 刀痕宽度(um)
-            FlowsValuesDTO dto = fieldDic["最高切割速度(mm/s)"].Clone();
-            dto.GroupOperateId = fieldValues.GroupOperateId;
-            dto.FieldValue = maxCutSpeed;
-            fieldValues.List.Add(dto);
+            if (fieldDic.TryGetValue("最高切割速度(mm/s)", out FlowsValuesDTO? value))
+            {
+                FlowsValuesDTO dto = value.Clone();
+                dto.GroupOperateId = fieldValues.GroupOperateId;
+                dto.FieldValue = maxCutSpeed.ToString();
+                fieldValues.List.Add(dto);
+            }
         }
 
-        public static void AddSingleCollapseAngle(string singleCollapseAngle)
+        public static void AddSingleCollapseAngle(double singleCollapseAngle)
         {
             if (!GlobalParams.OnlineMES || _tuple is null) return;
             FieldValuesDTO fieldValues = _tuple.Item1;
             Dictionary<string, FlowsValuesDTO> fieldDic = _tuple.Item2;
-            // 刀痕宽度(um)
-            FlowsValuesDTO dto = fieldDic["单边崩角大小"].Clone();
-            dto.GroupOperateId = fieldValues.GroupOperateId;
-            dto.FieldValue = singleCollapseAngle;
-            fieldValues.List.Add(dto);
+            if (fieldDic.TryGetValue("单边崩角大小", out FlowsValuesDTO? value))
+            {
+                FlowsValuesDTO dto = value.Clone();
+                dto.GroupOperateId = fieldValues.GroupOperateId;
+                dto.FieldValue = Math.Round(singleCollapseAngle * 1000, 1).ToString();
+                fieldValues.List.Add(dto);
+            }
+        }
+
+
+
+        public static void AddBladeEdgeBreakageGrade(string bladeEdgeBreakageGrade)
+        {
+            if (!GlobalParams.OnlineMES || _tuple is null) return;
+            FieldValuesDTO fieldValues = _tuple.Item1;
+            Dictionary<string, FlowsValuesDTO> fieldDic = _tuple.Item2;
+            if (fieldDic.TryGetValue("刀片崩边等级", out FlowsValuesDTO? value))
+            {
+                FlowsValuesDTO dto = value.Clone();
+                dto.GroupOperateId = fieldValues.GroupOperateId;
+                dto.FieldValue = bladeEdgeBreakageGrade;
+                fieldValues.List.Add(dto);
+            }
+        }
+
+        public static void AddWearAmountBeforeCircle(float wearAmountBeforeCircle)
+        {
+            if (!GlobalParams.OnlineMES || _tuple is null) return;
+            FieldValuesDTO fieldValues = _tuple.Item1;
+            Dictionary<string, FlowsValuesDTO> fieldDic = _tuple.Item2;
+            if (fieldDic.TryGetValue("真圆前磨损量", out FlowsValuesDTO? value))
+            {
+                FlowsValuesDTO dto = value.Clone();
+                dto.GroupOperateId = fieldValues.GroupOperateId;
+                dto.FieldValue = Math.Round(wearAmountBeforeCircle * 1000).ToString();
+                fieldValues.List.Add(dto);
+            }
+        }
+
+        public static void AddSingleWearAmount(float singleWearAmount)
+        {
+            if (!GlobalParams.OnlineMES || _tuple is null) return;
+            FieldValuesDTO fieldValues = _tuple.Item1;
+            Dictionary<string, FlowsValuesDTO> fieldDic = _tuple.Item2;
+            if (fieldDic.TryGetValue("单刀磨损量(修真圆后)", out FlowsValuesDTO? value))
+            {
+                FlowsValuesDTO dto = value.Clone();
+                dto.GroupOperateId = fieldValues.GroupOperateId;
+                dto.FieldValue = Math.Round(singleWearAmount * 1000).ToString();
+                fieldValues.List.Add(dto);
+            }
+        }
+
+        public static void AddWearAmountAfterCircle(float wearAmountAfterCircle)
+        {
+            if (!GlobalParams.OnlineMES || _tuple is null) return;
+            FieldValuesDTO fieldValues = _tuple.Item1;
+            Dictionary<string, FlowsValuesDTO> fieldDic = _tuple.Item2;
+            if (fieldDic.TryGetValue("真圆后磨损量", out FlowsValuesDTO? value))
+            {
+                FlowsValuesDTO dto = value.Clone();
+                dto.GroupOperateId = fieldValues.GroupOperateId;
+                dto.FieldValue = Math.Round(wearAmountAfterCircle * 1000).ToString();
+                fieldValues.List.Add(dto);
+            }
+        }
+
+        public static void AddBladeLifeGrade(string bladeLifeGrade)
+        {
+            if (!GlobalParams.OnlineMES || _tuple is null) return;
+            FieldValuesDTO fieldValues = _tuple.Item1;
+            Dictionary<string, FlowsValuesDTO> fieldDic = _tuple.Item2;
+            if (fieldDic.TryGetValue("刀片寿命等级", out FlowsValuesDTO? value))
+            {
+                FlowsValuesDTO dto = value.Clone();
+                dto.GroupOperateId = fieldValues.GroupOperateId;
+                dto.FieldValue = bladeLifeGrade;
+                fieldValues.List.Add(dto);
+            }
         }
 
         public static async Task UpdateFlowValuesAsync()

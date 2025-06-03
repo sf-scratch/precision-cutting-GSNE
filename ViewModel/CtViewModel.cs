@@ -116,6 +116,18 @@ namespace 精密切割系统.ViewModel
                 OnPropertyChanged(nameof(ImageSource09));
             }
         }
+
+        private BitmapImage _imageSource10;
+        public BitmapImage ImageSource10
+        {
+            get { return _imageSource10; }
+            set
+            {
+                _imageSource10 = value;
+                OnPropertyChanged(nameof(ImageSource09));
+            }
+        }
+
         private BitmapImage _imageSource8004;
         public BitmapImage ImageSource8004
         {
@@ -159,6 +171,9 @@ namespace 精密切割系统.ViewModel
                     break;
                 case 9:
                     ImageSource09 = new BitmapImage(new Uri(imagePath, UriKind.Relative));
+                    break;
+                case 10:
+                    ImageSource10 = new BitmapImage(new Uri(imagePath, UriKind.Relative));
                     break;
                 case 8004:
                     ImageSource8004 = new BitmapImage(new Uri(imagePath, UriKind.Relative));

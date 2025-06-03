@@ -165,7 +165,8 @@ namespace 精密切割系统.FrmWindow.common
         /// <summary>
         /// theta轴中心点位置
         /// </summary>
-        public static DataPoint<float> ThetaCenterPoint = new DataPoint<float>(146.48f, 81.86f);
+        //public static DataPoint<float> ThetaCenterPoint = new DataPoint<float>(146.48f, 81.86f);
+        public static DataPoint<float> ThetaCenterPoint = new DataPoint<float>(142.485f, 81.86f);
 
         /// <summary>
         /// 相机中心点位置
@@ -181,7 +182,7 @@ namespace 精密切割系统.FrmWindow.common
         /// <summary>
         /// 磨刀板尺寸
         /// </summary>
-        public static DataRectangleF SharpenRect = new DataRectangleF(ThetaCenterPoint.X - 34, ThetaCenterPoint.Y - 70, 68, 68);
+        public static DataRectangleF SharpenRect = new DataRectangleF(ThetaCenterPoint.X - 34, ThetaCenterPoint.Y - 71, 68, 68);
 
         /// <summary>
         /// 切割多少刀后开始磨刀

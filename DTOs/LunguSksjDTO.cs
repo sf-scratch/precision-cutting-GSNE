@@ -22,6 +22,12 @@ namespace 精密切割系统.DTOs
         public float LongestBlade { get; set; }
 
         /// <summary>
+        /// 现有刀刃长度
+        /// </summary>
+        [JsonProperty("xydrcd")]
+        public float ExistingBlade { get; set; }
+
+        /// <summary>
         /// 刀片类型
         /// </summary>
         [JsonProperty("finishType")]

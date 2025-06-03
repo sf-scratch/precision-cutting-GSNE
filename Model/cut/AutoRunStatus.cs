@@ -34,6 +34,14 @@ namespace 精密切割系统.Model.cut
         /// </summary>
         CutingInProgress,
         /// <summary>
+        /// 替换磨刀板
+        /// </summary>
+        ReplaceSharpenBoard,
+        /// <summary>
+        /// 替换硅片
+        /// </summary>
+        ReplaceWafer,
+        /// <summary>
         /// 结束
         /// </summary>
         End

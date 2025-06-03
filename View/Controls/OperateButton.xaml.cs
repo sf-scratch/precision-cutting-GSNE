@@ -95,6 +95,9 @@ namespace 精密切割系统.View.Controls
                 case 9:
                     operate09.Visibility = Visibility.Visible;
                     break;
+                case 10:
+                    operate010.Visibility = Visibility.Visible;
+                    break;
                 case 8004:
                     operate8004.Visibility = Visibility.Visible;
                     break;

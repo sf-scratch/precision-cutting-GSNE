@@ -62,6 +62,7 @@ namespace 精密切割系统.View.Pages.operate
             ctViewModel.UpdateImage(false, 7);
             ctViewModel.UpdateImage(false, 8);
             ctViewModel.UpdateImage(false, 9);
+            ctViewModel.UpdateImage(false, 10);
             ctViewModel.UpdateImage(false, 8004);
 
             isSwitchOpen(false, 7);
@@ -82,6 +83,7 @@ namespace 精密切割系统.View.Pages.operate
             bool vacuumState = false;
             bool spindleCuttingWater = false;
             bool workpieceBlowingStatus = false;
+            bool isOpenWorkVacuumSwitchStatus = false;
             bool systemInitFlagStatus = false;
             bool panelStatus = false;
             bool firstJoin = true;
@@ -95,6 +97,7 @@ namespace 精密切割系统.View.Pages.operate
                 bool tempIsOpenOpticalFiberSensorBlowing = IsOpenOpticalFiberSensorBlowing;
                 bool tempWorkpieceBlowingStatus = await PlcControl.tagControl.wholeDevice.IsOpenWorkpieceBlowingAsync();
                 bool tempSystemInitFlagStatus = await PlcControl.tagControl.wholeDevice.IsCompletedSystemInitAsync();
+                bool tempIsOpenWorkVacuumSwitchStatus = await PlcControl.tagControl.wholeDevice.IsOpenWorkVacuumSwitchStatusAsync();
                 bool tempPanelStatus = CommonCheck.GetParamsStatus(DeviceKey.panelStatusKey);
                 bool tempSpindleManuallyRunStatus = CommonCheck.GetParamsStatus(DeviceKey.spindleManuallyRunStatusKey);
                 Application.Current.Dispatcher.Invoke(() => {
@@ -133,6 +136,11 @@ namespace 精密切割系统.View.Pages.operate
                     {
                         workpieceBlowingStatus = tempWorkpieceBlowingStatus;
                         isSwitchOpen(tempWorkpieceBlowingStatus, 9);
+                    }
+                    if (tempIsOpenWorkVacuumSwitchStatus != isOpenWorkVacuumSwitchStatus || firstJoin)
+                    {
+                        isOpenWorkVacuumSwitchStatus = tempIsOpenWorkVacuumSwitchStatus;
+                        isSwitchOpen(isOpenWorkVacuumSwitchStatus, 10);
                     }
                     if (tempPanelStatus != panelStatus || firstJoin)
                     {
@@ -502,7 +510,15 @@ namespace 精密切割系统.View.Pages.operate
                         return;
                     }
                     // 工件更换
-                    ReplaceWorkpiece();
+                    //ReplaceWorkpiece();
+                    if (await PlcControl.tagControl.wholeDevice.IsOpenWorkVacuumSwitchStatusAsync())
+                    {
+                        await PlcControl.tagControl.wholeDevice.CloseWorkVacuumSwitchAsync();
+                    }
+                    else
+                    {
+                        await PlcControl.tagControl.wholeDevice.OpenWorkVacuumSwitchAsync();
+                    }
                     break;
                 case 2406:
                     // 切割停止

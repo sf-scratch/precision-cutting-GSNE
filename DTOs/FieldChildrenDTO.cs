@@ -34,7 +34,7 @@ namespace 精密切割系统.DTOs
                     FieldValueId = field.FieldValueId,
                     Children = field.Children == null ? new List<FieldChildrenDTO>() : field.Children.Select(child => child.Clone()).ToList(),
                     GroupCode = field.GroupCode,
-                    CoGroupCode = field.CoGroupCode
+                    CoGroupCode = "GX-QG-001"
                 }).ToList()
             };
         }

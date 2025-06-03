@@ -90,7 +90,7 @@ namespace 精密切割系统.DTOs
                 FieldType = FieldType,
                 FlowSetId = Id,
                 GroupCode = GroupCode,
-                CoGroupCode = CoGroupCode,
+                CoGroupCode = "GX-QG-001",
                 FlowId = FlowId,
                 BaseId = BaseId,
                 SopId = SopId,

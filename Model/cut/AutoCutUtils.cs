@@ -178,7 +178,7 @@ namespace 精密切割系统.Model.cut
         /// <returns></returns>
         public static async Task ReplaceBladeAsync(IEventAggregator? eventAggregator = null)
         {
-            MaterialSnackUtils.MaterialSnack("轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+            MaterialSnackUtils.MaterialSnack("请准备更换刀片,轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
             Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0);
             Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0);
             Task taskX = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(0);
@@ -194,7 +194,7 @@ namespace 精密切割系统.Model.cut
         /// <returns></returns>
         public static async Task ReplaceSharpeningBoardAsync(IEventAggregator? eventAggregator = null)
         {
-            MaterialSnackUtils.MaterialSnack("轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+            MaterialSnackUtils.MaterialSnack("请准备更换磨刀板,轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
             Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0);
             Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0);
             Task taskX = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(0);
@@ -204,6 +204,7 @@ namespace 精密切割系统.Model.cut
             //清空记录
             Appsettings.SharpenY = null;
             Appsettings.SharpenThetaDegQueue = null;
+            Appsettings.SharpenDistance = null;
             MaterialSnackUtils.MaterialSnack("请更换磨刀板！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
         }
 
@@ -213,7 +214,7 @@ namespace 精密切割系统.Model.cut
         /// <returns></returns>
         public static async Task ReplaceWaferAsync(IEventAggregator? eventAggregator = null)
         {
-            MaterialSnackUtils.MaterialSnack("轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+            MaterialSnackUtils.MaterialSnack("请准备更换硅片,轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
             Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0);
             Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0);
             Task taskX = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(0);
@@ -223,6 +224,7 @@ namespace 精密切割系统.Model.cut
             //清空记录
             Appsettings.CutY = null;
             Appsettings.CutThetaDegQueue = null;
+            Appsettings.CutDistance = null;
             MaterialSnackUtils.MaterialSnack("请更换硅片！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
         }
 
@@ -351,6 +353,73 @@ namespace 精密切割系统.Model.cut
                 // 计算3次的平均值，为测高值
                 return setupValueList.Average();
             }
+        }
+
+        /// <summary>
+        /// 预切割序列
+        /// </summary>
+        public static async Task<List<float>?> GetCutListAsync(string lunguId, float sydrcd)
+        {
+            // 查询当前配置获取预切割开始编号
+            FileTableItemModel fileTableItemModel = CurrentUtils.GetFileTableItemModel();
+            // 查询当前预切割流程信息
+            PreCutModel preCutModel = CurrentUtils.GetPreCutModel();
+            if (preCutModel.NewBladeNo == 0)
+            {
+                return null;
+            }
+            // 获取
+            float[] feedSpds = Tools.StringToFloatArray(preCutModel.FeedSpd); // 获取进刀速度
+            float[] ofLinesList = Tools.StringToFloatArray(preCutModel.OfLines); // 获取切割刀数
+            float cutSpeed = await CutService.GetCutSpeed(lunguId, sydrcd);
+            List<float> cutSpeedList = new List<float>();
+            // 从预切割开始编号开始
+            for (int i = preCutModel.NewBladeNo; i <= feedSpds.Length; i++)
+            {
+                // 获取进刀速度
+                float feedspeed = feedSpds[i - 1];
+                float cutLine = ofLinesList[i - 1];
+                if (feedspeed != 0 && cutLine != 0 && feedspeed <= cutSpeed)
+                {
+                    for (int j = 0; j < cutLine; j++)
+                    {
+                        cutSpeedList.Add(feedspeed);
+                    }
+                }
+            }
+            return cutSpeedList;
+        }
+
+        /// <summary>
+        /// 获取总切割刀数
+        /// </summary>
+        public static async Task<int?> GetTotalCutTimesAsync(string lunguId, float sydrcd)
+        {
+            // 查询当前配置获取预切割开始编号
+            FileTableItemModel fileTableItemModel = CurrentUtils.GetFileTableItemModel();
+            // 查询当前预切割流程信息
+            PreCutModel preCutModel = CurrentUtils.GetPreCutModel();
+            if (preCutModel.NewBladeNo == 0)
+            {
+                return null;
+            }
+            // 获取
+            float[] feedSpds = Tools.StringToFloatArray(preCutModel.FeedSpd); // 获取进刀速度
+            float[] ofLinesList = Tools.StringToFloatArray(preCutModel.OfLines); // 获取切割刀数
+            float cutSpeed = await CutService.GetCutSpeed(lunguId, sydrcd);
+            int totalCutTimes = 0;
+            // 从预切割开始编号开始
+            for (int i = preCutModel.NewBladeNo; i <= feedSpds.Length; i++)
+            {
+                // 获取进刀速度
+                float feedspeed = feedSpds[i - 1];
+                float cutLine = ofLinesList[i - 1];
+                if (feedspeed != 0 && cutLine != 0 && feedspeed <= cutSpeed)
+                {
+                    totalCutTimes += (int)cutLine;
+                }
+            }
+            return totalCutTimes;
         }
 
         private static async Task<InitialPositionModel?> GetInitialPositionAsync()

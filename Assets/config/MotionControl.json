@@ -910,7 +910,7 @@
     },
     "workVacuumSwitch": {
       "valueType": "bool",
-      "addr": "MR610",
+      "addr": "MR605",
       "name": "工作盘真空on/off",
       "describe": "工作盘真空on/off"
     },

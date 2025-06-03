@@ -2387,6 +2387,32 @@ namespace 精密切割系统.Driver
         }
 
         /// <summary>
+        /// 打开工作盘真空
+        /// </summary>
+        public async Task OpenWorkVacuumSwitchAsync()
+        {
+            workVacuumSwitch.writeValue = "1";
+            await keyencePlc.WriteTagAsync(workVacuumSwitch);
+        }
+
+        /// <summary>
+        /// 关闭工作盘真空
+        /// </summary>
+        public async Task CloseWorkVacuumSwitchAsync()
+        {
+            workVacuumSwitch.writeValue = "0";
+            await keyencePlc.WriteTagAsync(workVacuumSwitch);
+        }
+
+        /// <summary>
+        /// 工作盘是否打开真空
+        /// </summary>
+        public async Task<bool> IsOpenWorkVacuumSwitchStatusAsync()
+        {
+            return await keyencePlc.ReadDataAsync(workVacuumSwitch.addr) == true;
+        }
+
+        /// <summary>
         /// 设置工件吹气打开
         /// </summary>
         public async Task OpenWorkpieceBlowingAsync()
