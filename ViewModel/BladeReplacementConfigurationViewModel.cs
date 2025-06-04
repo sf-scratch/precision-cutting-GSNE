@@ -121,18 +121,19 @@ namespace 精密切割系统.ViewModel
             try
             {
                 //await PdaUtils.ComputerPracticeAsync(lunguId);
-                //PdaUtils.AddStandardCutSpeed("1");
-                //PdaUtils.AddStandardSharpenSpeed("2");
-                //PdaUtils.AddResidueSharpenTimes("3");
-                //PdaUtils.AddTotalSharpenTimes("4");
-                //PdaUtils.AddSharpen(0.5f, 10);
-                //PdaUtils.AddSharpen(0.2f, 11);
-                //PdaUtils.AddToolMarkWidth("5");
-                //PdaUtils.AddToolMarkActualWidth("6");
-                //PdaUtils.AddFirstToolMarkWidth("7");
-                //PdaUtils.AddMaximumCollapseAngle("8");
-                //PdaUtils.AddMaxCutSpeed("9");
-                //PdaUtils.AddSingleCollapseAngle("10");
+                //PdaUtils.AddWearAmountAfterCircle(0.035f, 10);
+                ////PdaUtils.AddStandardCutSpeed("1");
+                ////PdaUtils.AddStandardSharpenSpeed("2");
+                ////PdaUtils.AddResidueSharpenTimes("3");
+                ////PdaUtils.AddTotalSharpenTimes("4");
+                ////PdaUtils.AddSharpen(0.5f, 10);
+                ////PdaUtils.AddSharpen(0.2f, 11);
+                ////PdaUtils.AddToolMarkWidth("5");
+                ////PdaUtils.AddToolMarkActualWidth("6");
+                ////PdaUtils.AddFirstToolMarkWidth("7");
+                ////PdaUtils.AddMaximumCollapseAngle("8");
+                ////PdaUtils.AddMaxCutSpeed("9");
+                ////PdaUtils.AddSingleCollapseAngle("10");
                 //await PdaUtils.SetCompletedAsync();
                 //轮毂信息
                 //LunguSksjDTO lunguSksjDTO = new LunguSksjDTO();
@@ -193,8 +194,10 @@ namespace 精密切割系统.ViewModel
                     TapeThickness = fileTable.TapeThickness,
                     SpindleRev = fileTable.SpindleRev,
                     PrecutProcessNo = fileTable.PrecutProcessNo,
-                    MaxCutSpeed = await CutService.GetCutSpeed(LunguId, lunguSksjDTO.ExistingBlade),
-                    CutNum = await AutoCutUtils.GetTotalCutTimesAsync(LunguId, lunguSksjDTO.ExistingBlade) ?? 0,
+                    //MaxCutSpeed = await CutService.GetCutSpeed(LunguId, lunguSksjDTO.ExistingBlade),
+                    //CutNum = await AutoCutUtils.GetTotalCutTimesAsync(LunguId, lunguSksjDTO.ExistingBlade) ?? 0, 
+                    MaxCutSpeed = 0,
+                    CutNum = 0,
                     WorkThickness = fileTable.WorkThickness,
                     DeviceDataNo = fileTable.DeviceDataNo,
                     OffsetX = fileTableCh.OffsetX.ToInt()

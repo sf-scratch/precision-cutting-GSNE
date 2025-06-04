@@ -38,6 +38,7 @@ using static SQLite.SQLite3;
 using Point = OpenCvSharp.Point;
 using Emgu.CV.Bioinspired;
 using System.Windows.Shapes;
+using System.Diagnostics;
 
 namespace 精密切割系统.Model.cut
 {
@@ -265,7 +266,7 @@ namespace 精密切割系统.Model.cut
                 default:
                     break;
             }
-            while (true)
+            for (int times = 1; times <= 10; times++)
             {
                 if (mode is HeightMeasurementMode.NoContact)
                 {
@@ -348,11 +349,25 @@ namespace 精密切割系统.Model.cut
                 if (maxDeviation >= 0.01)
                 {
                     eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高偏差过大，重新测高"));
+                    if (times % 3 == 0)
+                    {
+                        await WaitManualBlowing(dialogService, token);
+                    }
                     continue;
                 }
                 // 计算3次的平均值，为测高值
                 return setupValueList.Average();
             }
+            return null;
+        }
+
+        public static async Task WaitManualBlowing(IDialogService dialogService, CancellationToken token)
+        {
+            await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, token);
+            await PlcControl.tagControl.cutting.RunMotionAsync(100, 0, token);
+            await PlcControl.tagControl.wholeDevice.OpenBuzzerAsync();
+            await dialogService.ShowDialogWindowAsync(nameof(ConfirmDialog), new DialogParameters() { { "ButtonContent", "测高多次失败，请手动吹水!" } }, r => { }, nameof(ConfirmDialogWindow));
+            await PlcControl.tagControl.wholeDevice.CloseBuzzerAsync();
         }
 
         /// <summary>
@@ -624,7 +639,7 @@ namespace 精密切割系统.Model.cut
             try
             {
                 await PlcControl.tagControl.wholeDevice.OpenWorkpieceBlowingAsync();
-                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(190, 20, token);
+                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(190, 80, token);
                 await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(2, 20, token);
             }
             finally
@@ -1190,46 +1205,58 @@ namespace 精密切割系统.Model.cut
         /// <returns></returns>
         public static async Task<ImagesAnalysisResult?> CheckKnifeMarksStatus(LineSegment line, IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
-            //工件吹气
-            await WorkpieceBlowingAsync(eventAggregator, token);
-            DataPoint<float> relativePos = Appsettings.CameraRelativeBladePosition;
-            await PlcControl.tagControl.cutting.RunMotionAsync(line.StartPoint.X + relativePos.X, line.StartPoint.Y + relativePos.Y, token);
-            //await AutoFocusAsync(eventAggregator, token);
-            CancellationTokenSource cts = new CancellationTokenSource();
-            CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(token, cts.Token);
-            CancellationToken linkedToken = linkedCts.Token;
-            Task slowSpeedMoveTask = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(line.EndPoint.X + relativePos.X, 7f, linkedToken);
-            Task<List<Mat>> grabTimerTask = Task.Run(async () =>
+            List<Mat> mats;
+            try
             {
-                List<Mat> mats = new List<Mat>();
-                try
+                DataPoint<float> relativePos = Appsettings.CameraRelativeBladePosition;
+                //工件吹气
+                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始工件吹气..."));
+                await PlcControl.tagControl.wholeDevice.OpenWorkpieceBlowingAsync();
+                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(190, 80, token);
+                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(line.EndPoint.X + relativePos.X, 10, token);
+                await PlcControl.tagControl.cutting.RunMotionAsync(line.EndPoint.X + relativePos.X, line.EndPoint.Y + relativePos.Y, token);
+                //await AutoFocusAsync(eventAggregator, token);
+                CancellationTokenSource cts = new CancellationTokenSource();
+                CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(token, cts.Token);
+                CancellationToken linkedToken = linkedCts.Token;
+                Task slowSpeedMoveTask = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(line.StartPoint.X + relativePos.X, 7f, linkedToken);
+                Task<List<Mat>> grabTimerTask = Task.Run(async () =>
                 {
-                    using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(150));
-                    while (await timer.WaitForNextTickAsync(linkedToken))
+                    List<Mat> mats = new List<Mat>();
+                    try
                     {
-                        await Application.Current.Dispatcher.InvokeAsync(() =>
+                        using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(150));
+                        while (await timer.WaitForNextTickAsync(linkedToken))
                         {
-                            WriteableBitmap? localBitmap = GrabWriteableBitmap();
-                            if (localBitmap != null)
+                            await Application.Current.Dispatcher.InvokeAsync(() =>
                             {
-                                mats.Add(localBitmap.ToMat());
-                            }
-                        });
+                                WriteableBitmap? localBitmap = GrabWriteableBitmap();
+                                if (localBitmap != null)
+                                {
+                                    mats.Add(localBitmap.ToMat());
+                                }
+                            });
+                        }
                     }
-                }
-                catch (OperationCanceledException)
-                {
-                    //正常取消任务
-                }
-                return mats;
-            }, linkedToken);
-            await Task.WhenAny(slowSpeedMoveTask, grabTimerTask);
-            cts.Cancel();
-            List<Mat> mats = await grabTimerTask;
+                    catch (OperationCanceledException)
+                    {
+                        //正常取消任务
+                    }
+                    return mats;
+                }, linkedToken);
+                await Task.WhenAny(slowSpeedMoveTask, grabTimerTask);
+                cts.Cancel();
+                mats = await grabTimerTask;
+            }
+            finally
+            {
+                //保证工作盘吹气关闭
+                await PlcControl.tagControl.wholeDevice.CloseWorkpieceBlowingAsync();
+            }
             ImagesAnalysisResult? imagesAnalysisRes;
             try
             {
-                imagesAnalysisRes = await ProcessImagesAnalysisAsync(mats, token);
+                imagesAnalysisRes = await ProcessImagesAnalysisAsync(mats, eventAggregator, token);
             }
             catch(ArgumentException ex)
             {
@@ -1239,13 +1266,17 @@ namespace 精密切割系统.Model.cut
             return imagesAnalysisRes;
         }
 
-        public static async Task<ImagesAnalysisResult> ProcessImagesAnalysisAsync(List<Mat> mats, CancellationToken token)
+        public static async Task<ImagesAnalysisResult> ProcessImagesAnalysisAsync(List<Mat> mats, IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
             var result = new ImagesAnalysisResult();
             result.IsSnakelike = await Task.Run(() =>
             {
+                var stopwatch = Stopwatch.StartNew();
                 //拼接所有图像
                 List<Mat> concatMats = ConcatMats(mats);
+                stopwatch.Stop();
+                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"拼接所有图像用时: {stopwatch.Elapsed.TotalSeconds} 秒"));
+                stopwatch = Stopwatch.StartNew();
                 foreach (Mat concatMat in concatMats)
                 {
                     Mat cropConcatMat = CropHorizontalCenter(concatMat, 80);
@@ -1255,14 +1286,16 @@ namespace 精密切割系统.Model.cut
                         $"bladeWidthMm: {bladeWidthMm}",
                         new Point(20, bladeTop),
                         HersheyFonts.HersheySimplex,
-                        1.5f,
-                        Scalar.Red);
+                        1.3f,
+                        Scalar.Red,
+                        2);
                     Cv2.PutText(cropConcatMatJpg,
                         $"collapseWidthMm:{collapseWidthMm}",
-                        new Point(800, collapseTop),
+                        new Point(900, collapseTop),
                         HersheyFonts.HersheySimplex,
-                        1.5f,
-                        Scalar.Green);
+                        1.3f,
+                        Scalar.Green,
+                        2);
                     Cv2.Line(
                         img: cropConcatMatJpg,
                         pt1: new Point(0, bladeTop),  // 起点
@@ -1306,9 +1339,13 @@ namespace 精密切割系统.Model.cut
                         Mat = cropConcatMatJpg
                     });
                 }
+                stopwatch.Stop();
+                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"识别拼接图像总用时: {stopwatch.Elapsed.TotalSeconds} 秒"));
+                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"识别拼接图像平均单张用时（{concatMats.Count}张）: {stopwatch.Elapsed.TotalSeconds / concatMats.Count} 秒"));
                 return result.ConcatImages.All(image => image.IsSnakelike);
             });
 
+            var stopwatch = Stopwatch.StartNew();
             // 配置参数
             const int ioMaxConcurrency = 2;
             using var semaphore = new SemaphoreSlim(ioMaxConcurrency);
@@ -1325,14 +1362,16 @@ namespace 精密切割系统.Model.cut
                         $"bladeWidthMm: {bladeWidthMm}",
                         new Point(20, bladeTop),
                         HersheyFonts.HersheySimplex,
-                        1.5f,
-                        new Scalar(0, 0, 255));
+                        1.3f,
+                        Scalar.Red,
+                        2);
                     Cv2.PutText(cropMatJpg,
                         $"collapseWidthMm:{collapseWidthMm}",
-                        new Point(20, collapseTop),
+                        new Point(900, collapseTop),
                         HersheyFonts.HersheySimplex,
-                        1.5f,
-                        new Scalar(0, 0, 255));
+                        1.3f,
+                        Scalar.Green,
+                        2);
                     Cv2.Line(
                        img: cropMatJpg,
                        pt1: new Point(0, bladeTop),  // 起点
@@ -1390,8 +1429,10 @@ namespace 精密切割系统.Model.cut
                     semaphore.Release();
                 }
             });
-
             await Task.WhenAll(tasks);
+            stopwatch.Stop();
+            eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"识别单个图像总用时: {stopwatch.Elapsed.TotalSeconds} 秒"));
+            eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"识别单个图像平均单张用时（{mats.Count}张）: {stopwatch.Elapsed.TotalSeconds / mats.Count} 秒"));
             return result;
         }
 

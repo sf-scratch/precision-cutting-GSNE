@@ -103,7 +103,7 @@
                 </GroupBox.Header>
                 <auto:AutoGrid Margin="10" Columns="2*,3*,*,2*,5*" RowCount="7" ChildMargin="5">
                     <TextBlock Text="轮毂号"/>
-                    <Controls:InputTextBox x:Name="lunguTextBox" Text="{Binding LunguId}">
+                    <Controls:InputTextBox x:Name="lunguTextBox" Text="{Binding LunguId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                         <!--<behaviors:Interaction.Triggers>
                             <behaviors:EventTrigger EventName="KeyUp">
                                 <behaviors:InvokeCommandAction Command="{Binding InitCommand}" CommandParameter="{Binding Text, ElementName=lunguTextBox}"/>

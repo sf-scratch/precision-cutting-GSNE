@@ -147,7 +147,7 @@ namespace 精密切割系统.Model.cut
                             DataPoint<float> workpieceCenterPoint = new DataPoint<float>(_thetaCenterPoint.X, _thetaCenterPoint.Y + _centerDistance);
                             // 该theta角度第一次切割，切割半圆最下边切为起始位置
                             //_recordCutY = GeometryUtils.FindBottomTangentY(_thetaCenterPoint, workpieceCenterPoint, _workpieceRadius, _thetaDegQueue.Peek() + cutCalibratTheta);
-                            _recordCutY = 140;
+                            _recordCutY = 150;
                             _isRotateTheta = false;
                         }
                         float cutSize = GetCutSize();
@@ -250,7 +250,7 @@ namespace 精密切割系统.Model.cut
                                         PdaUtils.AddMaximumCollapseAngleImage(result.CollapseWidthMaxImage.Mat);
                                         string bladeEdgeBreakageGrade = await GetDpbbdjAsync(lunguId, (float)singleCollapseAngle);
                                         PdaUtils.AddBladeEdgeBreakageGrade(bladeEdgeBreakageGrade);
-                                    }
+                                    } 
                                     else
                                     {
                                         ImageData bladeWidthMaxImage = result.BladeWidthMaxImage;
@@ -314,199 +314,199 @@ namespace 精密切割系统.Model.cut
             return RunResult.Success();
         }
 
-        public async Task<RunResult> Run(LunguSksjDTO lunguSksj, float cutSpeed, float bladeContactWorkingDiscZ1, float bladeLiftingHeight, int needCutTimes, int spindleRev, float margin, float cutCalibratTheta, IEventAggregator? eventAggregator, CancellationToken pauseToken = default)
-        {
-            InitFromAppsettings();
-            if (_thetaDegQueue.Count == 0)
-            {
-                InitThetaDegQueue(cutCalibratTheta);
-                //保存切割参数
-                Appsettings.CutThetaDegQueue = _thetaDegQueue.ToList();
-            }
-            CancellationToken usingPauseToken = pauseToken;
-            int currentCutTimes = 0;
-            try
-            {
-                //进入全自动切割模式
-                await PlcControl.tagControl.cutting.EnterCuttingModeAsync(usingPauseToken);
-                float abAverageThickness = lunguSksj.ABAverageThickness;
-                float cutDeep = AutoCutUtils.GetCuttingDeep(lunguSksj.BladeType);
-                int cutTime = 0;
-                while (cutTime < needCutTimes)
-                {
-                    LineSegment? line = null;
-                    try
-                    {
-                        if (_isRotateTheta)
-                        {
-                            //计算工件圆心坐标
-                            DataPoint<float> workpieceCenterPoint = new DataPoint<float>(_thetaCenterPoint.X, _thetaCenterPoint.Y + _centerDistance);
-                            // 该theta角度第一次切割，切割半圆最下边切为起始位置
-                            //_recordCutY = GeometryUtils.FindBottomTangentY(_thetaCenterPoint, workpieceCenterPoint, _workpieceRadius, _thetaDegQueue.Peek() + cutCalibratTheta);
-                            _recordCutY = 140;
-                            _isRotateTheta = false;
-                        }
-                        float cutSize = GetCutSize();
-                        if (!CheckCutDistance(_workpieceRadius, cutSize))
-                        {
-                            _thetaDegQueue.Dequeue();
-                            if (_thetaDegQueue.Count == 0)
-                            {
-                                RemindReplaceWafer?.Invoke();
-                                CancellationToken? token = await WaitContinueAsync(line);
-                                if (token == null)
-                                {
-                                    return RunResult.Fail(RunExceptionType.Stop, "停止切割");
-                                }
-                                usingPauseToken = token.Value;
-                                InitThetaDegQueue(cutCalibratTheta);
-                            }
-                            //保存切割参数
-                            Appsettings.CutThetaDegQueue = _thetaDegQueue.ToList();
-                            Appsettings.CutDistance = 0;
-                            _isRotateTheta = true;
-                            _isNewestCut = true;
-                            _curCutDistance = 0;
-                            continue;
-                        }
-                        _recordCutY = AutoCutUtils.CalculateCutY(_recordCutY, cutSize, _cutDirection);
-                        //保存切割参数
-                        Appsettings.CutY = _recordCutY;
-                        line = AutoCutUtils.CalculateSemicircleCuttingLine(_thetaCenterPoint, _thetaDegQueue.Peek() + cutCalibratTheta, _workpieceRadius, _centerDistance, _recordCutY);
-                        if (line == null)
-                        {
-                            return RunResult.Fail(RunExceptionType.Other, "获取切割线失败！");
-                        }
-                        //当前切割次数
-                        int? curCutNum = await PlcControl.tagControl.cutting.GetCutNumAsync();
-                        if (curCutNum == null)
-                        {
-                            return RunResult.Fail(RunExceptionType.Other, "获取当前切割次数失败！");
-                        }
-                        float endZ = bladeContactWorkingDiscZ1 - GlobalParams.WaferThickness - GlobalParams.FilmThickness + cutDeep;
-                        float startZ = endZ - bladeLiftingHeight;
-                        //检查是否暂停
-                        if (usingPauseToken.IsCancellationRequested)
-                        {
-                            CancellationToken? token = await WaitContinueAsync(line);
-                            if (token == null)
-                            {
-                                return RunResult.Fail(RunExceptionType.Stop, "停止切割");
-                            }
-                            usingPauseToken = token.Value;
-                        }
-                        //触发切割进度更新事件
-                        CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, needCutTimes + _finishedCutTimes, currentCutTimes + _finishedCutTimes));
-                        //加上边距
-                        var (startX, endX) = CalculateCuttingX(line, _thetaDegQueue.Peek(), margin);
-                        await PlcControl.tagControl.ThetaAxis.SetAbsoluteSpeedAsync(GlobalParams.ThetaDefaultSpeed);
-                        //设置切割参数
-                        await PlcControl.tagControl.cutting.SetCutParamsAsync(cutSpeed, endZ, startZ, startX, endX, line.StartPoint.Y, "0", _thetaDegQueue.Peek() + cutCalibratTheta, spindleRev, _cutDirection);
-                        //开始切割信号
-                        await PlcControl.tagControl.cutting.StartCutAsync();
-                        //等待磨刀次数变化
-                        await PlcControl.tagControl.cutting.WaitCutNumUdatedAsync(curCutNum.Value, usingPauseToken);
-                        currentCutTimes++;
-                        cutTime++;
-                        //触发切割进度更新事件
-                        CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, needCutTimes + _finishedCutTimes, currentCutTimes + _finishedCutTimes, true));
-                        //停止切割前
-                        int beforeStopCutTimes = currentCutTimes + _finishedCutTimes;
-                        //判断是否开始检查刀痕
-                        if (beforeStopCutTimes % _checkMarksCutTimes == 0 || beforeStopCutTimes == needCutTimes)
-                        {
-                            int chekcTimes = beforeStopCutTimes / _checkMarksCutTimes;
-                            MaterialSnackUtils.MaterialSnack("检查刀痕中...", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
-                            bool isOkKnifeMarksStatus = false;
-                            try
-                            {
-                                //退出全自动切割模式
-                                await PlcControl.tagControl.cutting.ExitCuttingModeAsync(usingPauseToken);
-                                //刀痕检查
-                                ImagesAnalysisResult? result = await AutoCutUtils.CheckKnifeMarksStatus(line, eventAggregator, usingPauseToken);
-                                //刀痕检查结果为空，表示未检测到刀痕
-                                if (result == null)
-                                {
-                                    MaterialSnackUtils.MaterialSnack("图像识别刀痕异常，请人工检查刀痕状态！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
-                                    CancellationToken? token = await WaitContinueAsync(line);
-                                    if (token == null)
-                                    {
-                                        return RunResult.Fail(RunExceptionType.Stop, "停止切割");
-                                    }
-                                    usingPauseToken = token.Value;
-                                    continue;
-                                }
-                                // 处理图像数据
-                                if (result.ImageDatas.Count != 0)
-                                {
-                                    if (beforeStopCutTimes == needCutTimes)
-                                    {
-                                        PdaUtils.AddSingleCollapseAngle((result.CollapseWidthMaxImage.CollapseWidth - result.CollapseWidthMaxImage.BladeWidth) / 2);
-                                        PdaUtils.AddMaximumCollapseAngle(result.CollapseWidthMaxImage.CollapseWidth);
-                                        PdaUtils.AddMaximumCollapseAngleImage(result.CollapseWidthMaxImage.Mat);
-                                    }
-                                    else
-                                    {
-                                        ImageData bladeWidthMaxImage = result.BladeWidthMaxImage;
-                                        switch (chekcTimes)
-                                        {
-                                            case 1:
-                                                PdaUtils.AddFirstToolMarkWidth(bladeWidthMaxImage.BladeWidth);
-                                                PdaUtils.AddFirstToolMarkImage(bladeWidthMaxImage.Mat);
-                                                break;
-                                            case 2:
-                                                PdaUtils.AddToolMarkWidth(bladeWidthMaxImage.BladeWidth);
-                                                PdaUtils.AddToolMarkActualWidth(bladeWidthMaxImage.BladeWidth);
-                                                PdaUtils.AddSecondToolMarkImage(bladeWidthMaxImage.Mat);
-                                                break;
-                                            default:
-                                                break;
-                                        }
-                                    }
-                                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create(
-                                        $"最大刀痕宽度：{result.BladeWidthMaxImage.BladeWidth} " +
-                                        $"最大崩边宽度：{result.BladeWidthMaxImage.CollapseWidth} " +
-                                        $"是否蛇形：{result.IsSnakelike}"));
-                                }
-                                isOkKnifeMarksStatus = true;
-                            }
-                            finally
-                            {
-                                //进入全自动切割模式
-                                await PlcControl.tagControl.cutting.EnterCuttingModeAsync(usingPauseToken);
-                            }
-                            if (!isOkKnifeMarksStatus)
-                            {
-                                return RunResult.Fail(RunExceptionType.BladeScrap, "刀痕不合格！");
-                            }
-                            MaterialSnackUtils.MaterialSnack("刀痕合格！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
-                            MaterialSnackUtils.MaterialSnack("切割进行中...", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
-                        }
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        CancellationToken? token = await WaitContinueAsync(line);
-                        if (token == null)
-                        {
-                            return RunResult.Fail(RunExceptionType.Stop, "停止切割");
-                        }
-                        usingPauseToken = token.Value;
-                    }
-                    catch (Exception ex)
-                    {
-                        return RunResult.Fail(RunExceptionType.Other, $"执行切割步骤失败！{ex.Message}");
-                    }
-                    _isNewestCut = false;
-                }
-            }
-            finally
-            {
-                //退出全自动切割模式
-                await PlcControl.tagControl.cutting.ExitCuttingModeAsync(default);
-                _finishedCutTimes = currentCutTimes;
-            }
-            return RunResult.Success();
-        }
+        //public async Task<RunResult> Run(LunguSksjDTO lunguSksj, float cutSpeed, float bladeContactWorkingDiscZ1, float bladeLiftingHeight, int needCutTimes, int spindleRev, float margin, float cutCalibratTheta, IEventAggregator? eventAggregator, CancellationToken pauseToken = default)
+        //{
+        //    InitFromAppsettings();
+        //    if (_thetaDegQueue.Count == 0)
+        //    {
+        //        InitThetaDegQueue(cutCalibratTheta);
+        //        //保存切割参数
+        //        Appsettings.CutThetaDegQueue = _thetaDegQueue.ToList();
+        //    }
+        //    CancellationToken usingPauseToken = pauseToken;
+        //    int currentCutTimes = 0;
+        //    try
+        //    {
+        //        //进入全自动切割模式
+        //        await PlcControl.tagControl.cutting.EnterCuttingModeAsync(usingPauseToken);
+        //        float abAverageThickness = lunguSksj.ABAverageThickness;
+        //        float cutDeep = AutoCutUtils.GetCuttingDeep(lunguSksj.BladeType);
+        //        int cutTime = 0;
+        //        while (cutTime < needCutTimes)
+        //        {
+        //            LineSegment? line = null;
+        //            try
+        //            {
+        //                if (_isRotateTheta)
+        //                {
+        //                    //计算工件圆心坐标
+        //                    DataPoint<float> workpieceCenterPoint = new DataPoint<float>(_thetaCenterPoint.X, _thetaCenterPoint.Y + _centerDistance);
+        //                    // 该theta角度第一次切割，切割半圆最下边切为起始位置
+        //                    //_recordCutY = GeometryUtils.FindBottomTangentY(_thetaCenterPoint, workpieceCenterPoint, _workpieceRadius, _thetaDegQueue.Peek() + cutCalibratTheta);
+        //                    _recordCutY = 140;
+        //                    _isRotateTheta = false;
+        //                }
+        //                float cutSize = GetCutSize();
+        //                if (!CheckCutDistance(_workpieceRadius, cutSize))
+        //                {
+        //                    _thetaDegQueue.Dequeue();
+        //                    if (_thetaDegQueue.Count == 0)
+        //                    {
+        //                        RemindReplaceWafer?.Invoke();
+        //                        CancellationToken? token = await WaitContinueAsync(line);
+        //                        if (token == null)
+        //                        {
+        //                            return RunResult.Fail(RunExceptionType.Stop, "停止切割");
+        //                        }
+        //                        usingPauseToken = token.Value;
+        //                        InitThetaDegQueue(cutCalibratTheta);
+        //                    }
+        //                    //保存切割参数
+        //                    Appsettings.CutThetaDegQueue = _thetaDegQueue.ToList();
+        //                    Appsettings.CutDistance = 0;
+        //                    _isRotateTheta = true;
+        //                    _isNewestCut = true;
+        //                    _curCutDistance = 0;
+        //                    continue;
+        //                }
+        //                _recordCutY = AutoCutUtils.CalculateCutY(_recordCutY, cutSize, _cutDirection);
+        //                //保存切割参数
+        //                Appsettings.CutY = _recordCutY;
+        //                line = AutoCutUtils.CalculateSemicircleCuttingLine(_thetaCenterPoint, _thetaDegQueue.Peek() + cutCalibratTheta, _workpieceRadius, _centerDistance, _recordCutY);
+        //                if (line == null)
+        //                {
+        //                    return RunResult.Fail(RunExceptionType.Other, "获取切割线失败！");
+        //                }
+        //                //当前切割次数
+        //                int? curCutNum = await PlcControl.tagControl.cutting.GetCutNumAsync();
+        //                if (curCutNum == null)
+        //                {
+        //                    return RunResult.Fail(RunExceptionType.Other, "获取当前切割次数失败！");
+        //                }
+        //                float endZ = bladeContactWorkingDiscZ1 - GlobalParams.WaferThickness - GlobalParams.FilmThickness + cutDeep;
+        //                float startZ = endZ - bladeLiftingHeight;
+        //                //检查是否暂停
+        //                if (usingPauseToken.IsCancellationRequested)
+        //                {
+        //                    CancellationToken? token = await WaitContinueAsync(line);
+        //                    if (token == null)
+        //                    {
+        //                        return RunResult.Fail(RunExceptionType.Stop, "停止切割");
+        //                    }
+        //                    usingPauseToken = token.Value;
+        //                }
+        //                //触发切割进度更新事件
+        //                CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, needCutTimes + _finishedCutTimes, currentCutTimes + _finishedCutTimes));
+        //                //加上边距
+        //                var (startX, endX) = CalculateCuttingX(line, _thetaDegQueue.Peek(), margin);
+        //                await PlcControl.tagControl.ThetaAxis.SetAbsoluteSpeedAsync(GlobalParams.ThetaDefaultSpeed);
+        //                //设置切割参数
+        //                await PlcControl.tagControl.cutting.SetCutParamsAsync(cutSpeed, endZ, startZ, startX, endX, line.StartPoint.Y, "0", _thetaDegQueue.Peek() + cutCalibratTheta, spindleRev, _cutDirection);
+        //                //开始切割信号
+        //                await PlcControl.tagControl.cutting.StartCutAsync();
+        //                //等待磨刀次数变化
+        //                await PlcControl.tagControl.cutting.WaitCutNumUdatedAsync(curCutNum.Value, usingPauseToken);
+        //                currentCutTimes++;
+        //                cutTime++;
+        //                //触发切割进度更新事件
+        //                CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, needCutTimes + _finishedCutTimes, currentCutTimes + _finishedCutTimes, true));
+        //                //停止切割前
+        //                int beforeStopCutTimes = currentCutTimes + _finishedCutTimes;
+        //                //判断是否开始检查刀痕
+        //                if (beforeStopCutTimes % _checkMarksCutTimes == 0 || beforeStopCutTimes == needCutTimes)
+        //                {
+        //                    int chekcTimes = beforeStopCutTimes / _checkMarksCutTimes;
+        //                    MaterialSnackUtils.MaterialSnack("检查刀痕中...", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+        //                    bool isOkKnifeMarksStatus = false;
+        //                    try
+        //                    {
+        //                        //退出全自动切割模式
+        //                        await PlcControl.tagControl.cutting.ExitCuttingModeAsync(usingPauseToken);
+        //                        //刀痕检查
+        //                        ImagesAnalysisResult? result = await AutoCutUtils.CheckKnifeMarksStatus(line, eventAggregator, usingPauseToken);
+        //                        //刀痕检查结果为空，表示未检测到刀痕
+        //                        if (result == null)
+        //                        {
+        //                            MaterialSnackUtils.MaterialSnack("图像识别刀痕异常，请人工检查刀痕状态！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+        //                            CancellationToken? token = await WaitContinueAsync(line);
+        //                            if (token == null)
+        //                            {
+        //                                return RunResult.Fail(RunExceptionType.Stop, "停止切割");
+        //                            }
+        //                            usingPauseToken = token.Value;
+        //                            continue;
+        //                        }
+        //                        // 处理图像数据
+        //                        if (result.ImageDatas.Count != 0)
+        //                        {
+        //                            if (beforeStopCutTimes == needCutTimes)
+        //                            {
+        //                                PdaUtils.AddSingleCollapseAngle((result.CollapseWidthMaxImage.CollapseWidth - result.CollapseWidthMaxImage.BladeWidth) / 2);
+        //                                PdaUtils.AddMaximumCollapseAngle(result.CollapseWidthMaxImage.CollapseWidth);
+        //                                PdaUtils.AddMaximumCollapseAngleImage(result.CollapseWidthMaxImage.Mat);
+        //                            }
+        //                            else
+        //                            {
+        //                                ImageData bladeWidthMaxImage = result.BladeWidthMaxImage;
+        //                                switch (chekcTimes)
+        //                                {
+        //                                    case 1:
+        //                                        PdaUtils.AddFirstToolMarkWidth(bladeWidthMaxImage.BladeWidth);
+        //                                        PdaUtils.AddFirstToolMarkImage(bladeWidthMaxImage.Mat);
+        //                                        break;
+        //                                    case 2:
+        //                                        PdaUtils.AddToolMarkWidth(bladeWidthMaxImage.BladeWidth);
+        //                                        PdaUtils.AddToolMarkActualWidth(bladeWidthMaxImage.BladeWidth);
+        //                                        PdaUtils.AddSecondToolMarkImage(bladeWidthMaxImage.Mat);
+        //                                        break;
+        //                                    default:
+        //                                        break;
+        //                                }
+        //                            }
+        //                            eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create(
+        //                                $"最大刀痕宽度：{result.BladeWidthMaxImage.BladeWidth} " +
+        //                                $"最大崩边宽度：{result.BladeWidthMaxImage.CollapseWidth} " +
+        //                                $"是否蛇形：{result.IsSnakelike}"));
+        //                        }
+        //                        isOkKnifeMarksStatus = true;
+        //                    }
+        //                    finally
+        //                    {
+        //                        //进入全自动切割模式
+        //                        await PlcControl.tagControl.cutting.EnterCuttingModeAsync(usingPauseToken);
+        //                    }
+        //                    if (!isOkKnifeMarksStatus)
+        //                    {
+        //                        return RunResult.Fail(RunExceptionType.BladeScrap, "刀痕不合格！");
+        //                    }
+        //                    MaterialSnackUtils.MaterialSnack("刀痕合格！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+        //                    MaterialSnackUtils.MaterialSnack("切割进行中...", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
+        //                }
+        //            }
+        //            catch (OperationCanceledException)
+        //            {
+        //                CancellationToken? token = await WaitContinueAsync(line);
+        //                if (token == null)
+        //                {
+        //                    return RunResult.Fail(RunExceptionType.Stop, "停止切割");
+        //                }
+        //                usingPauseToken = token.Value;
+        //            }
+        //            catch (Exception ex)
+        //            {
+        //                return RunResult.Fail(RunExceptionType.Other, $"执行切割步骤失败！{ex.Message}");
+        //            }
+        //            _isNewestCut = false;
+        //        }
+        //    }
+        //    finally
+        //    {
+        //        //退出全自动切割模式
+        //        await PlcControl.tagControl.cutting.ExitCuttingModeAsync(default);
+        //        _finishedCutTimes = currentCutTimes;
+        //    }
+        //    return RunResult.Success();
+        //}
 
         public void Continue(CancellationToken token)
         {
@@ -569,6 +569,10 @@ namespace 精密切割系统.Model.cut
                 }
             }
             _curCutDistance += cutSize;
+            if (Appsettings.CutDistance is null)
+            {
+                Appsettings.CutDistance = 0;
+            }
             Appsettings.CutDistance += cutSize;
             return res;
         }

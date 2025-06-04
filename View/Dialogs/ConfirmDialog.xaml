@@ -8,7 +8,7 @@
              xmlns:prism="http://prismlibrary.com/"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              d:DataContext="{d:DesignInstance viewModel:ConfirmDialogViewModel, IsDesignTimeCreatable=True}"
-             mc:Ignorable="d" Height="100" Width="300" Background="White">
+             mc:Ignorable="d" Height="100" Width="400" Background="White">
     <Grid>
         <Grid.Resources>
             <ResourceDictionary>
@@ -19,14 +19,14 @@
             </ResourceDictionary>
         </Grid.Resources>
         <Button
-             Height="100" Width="300"
+             Height="100" Width="400"
             FontSize="25"
             FontWeight="Bold"
             materialDesign:ButtonProgressAssist.IsIndeterminate="True"
             materialDesign:ButtonProgressAssist.IsIndicatorVisible="True"
             materialDesign:ButtonProgressAssist.Value="-1"
             Content="{Binding ButtonContent}"
-            d:Content="6666666"
+            d:Content="测高多次失败，请手动吹水!"
             Command="{Binding ConfirmCommand}"
             Style="{StaticResource MaterialDesignFlatButton}" />
     </Grid>

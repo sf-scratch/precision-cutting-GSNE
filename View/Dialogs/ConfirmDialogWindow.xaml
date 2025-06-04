@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:精密切割系统.View.Dialogs"
         mc:Ignorable="d"
-        Title="ConfirmDialogWindow" Height="100" Width="300" WindowStyle="None" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Topmost="True">
+        Title="ConfirmDialogWindow" Height="100" Width="400" WindowStyle="None" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Topmost="True">
     <Grid>
         
     </Grid>

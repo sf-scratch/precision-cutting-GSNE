@@ -302,6 +302,7 @@ namespace 精密切割系统.Model.cut
         {
             bool res = true;
             _curSharpenDistance += cutSize;
+            if (Appsettings.SharpenDistance is null) Appsettings.SharpenDistance = 0;
             Appsettings.SharpenDistance += cutSize;
             if (_thetaDegQueue.Count == 2)
             {

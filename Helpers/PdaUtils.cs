@@ -49,9 +49,6 @@ namespace 精密切割系统.Helpers
             return fieldValuesDTO;
         }
 
-        private static FlowsValuesDTO? MslValues = null;
-        private static int SharpenCount = 1;
-
 
         public static void AddStandardBlade(string blade)
         {
@@ -90,12 +87,12 @@ namespace 精密切割系统.Helpers
             {
                 FlowsValuesDTO dto = value.Clone();
                 dto.GroupOperateId = fieldValues.GroupOperateId;
-                dto.FieldValue = cutSpeed.ToString();
+                dto.FieldValue = Math.Round(cutSpeed).ToString();
                 fieldValues.List.Add(dto);
             }
         }
 
-        public static void AddStandardSharpenSpeed(string sharpenSpeed)
+        public static void AddStandardSharpenSpeed(float sharpenSpeed)
         {
             if (!GlobalParams.OnlineMES || _tuple is null) return;
             FieldValuesDTO fieldValues = _tuple.Item1;
@@ -104,7 +101,21 @@ namespace 精密切割系统.Helpers
             {
                 FlowsValuesDTO dto = value.Clone();
                 dto.GroupOperateId = fieldValues.GroupOperateId;
-                dto.FieldValue = sharpenSpeed;
+                dto.FieldValue = Math.Round(sharpenSpeed).ToString();
+                fieldValues.List.Add(dto);
+            }
+        }
+
+        public static void AddResidueBlade(float blade)
+        {
+            if (!GlobalParams.OnlineMES || _tuple is null) return;
+            FieldValuesDTO fieldValues = _tuple.Item1;
+            Dictionary<string, FlowsValuesDTO> fieldDic = _tuple.Item2;
+            if (fieldDic.TryGetValue("剩余刀刃长度", out FlowsValuesDTO? value))
+            {
+                FlowsValuesDTO dto = value.Clone();
+                dto.GroupOperateId = fieldValues.GroupOperateId;
+                dto.FieldValue = Math.Round(blade).ToString();
                 fieldValues.List.Add(dto);
             }
         }
@@ -137,6 +148,9 @@ namespace 精密切割系统.Helpers
             }
         }
 
+        private static FlowsValuesDTO? MslValues = null;
+        private static int GroupCode = 0;
+
         public static void AddSharpen(float wearAmount, int count)
         {
             if (!GlobalParams.OnlineMES || _tuple is null) return;
@@ -149,19 +163,54 @@ namespace 精密切割系统.Helpers
                 MslValues.GroupOperateId = fieldValues.GroupOperateId;
                 fieldValues.List.Add(MslValues);
             }
-            MslValues.FieldValue = (float.Parse(MslValues.FieldValue) + wearAmount).ToString();
-            FlowsValuesDTO mosunliang = MslValues.Children[0].FieldList[0].ToFlowsValuesDTO();
-            mosunliang.ParentId = MslValues.FieldId;
-            mosunliang.GroupOperateId = fieldValues.GroupOperateId;
-            mosunliang.FieldValue = wearAmount.ToString();
-            mosunliang.GroupCode = SharpenCount.ToString();
-            FlowsValuesDTO mdsl = MslValues.Children[0].FieldList[1].ToFlowsValuesDTO();
-            mdsl.ParentId = MslValues.FieldId;
-            mdsl.GroupOperateId = fieldValues.GroupOperateId;
-            mdsl.FieldValue = count.ToString();
-            mdsl.GroupCode = SharpenCount.ToString();
-            fieldValues.List.Add(mosunliang);
-            fieldValues.List.Add(mdsl);
+            int childrenIndex = GroupCode;
+            GroupCode++;
+            if (childrenIndex == 0)
+            {
+                MslValues.FieldValue = Math.Round(float.Parse(MslValues.FieldValue) + wearAmount * 1000).ToString();
+                FlowsValuesDTO mosunliang = MslValues.Children[0].FieldList[0].ToFlowsValuesDTO();
+                mosunliang.ParentId = MslValues.FieldId;
+                mosunliang.GroupOperateId = fieldValues.GroupOperateId;
+                mosunliang.FieldValue = Math.Round(wearAmount * 1000).ToString();
+                mosunliang.GroupCode = GroupCode.ToString();
+                fieldValues.List.Add(mosunliang);
+                FlowsValuesDTO mdsl = MslValues.Children[0].FieldList[1].ToFlowsValuesDTO();
+                mdsl.ParentId = MslValues.FieldId;
+                mdsl.GroupOperateId = fieldValues.GroupOperateId;
+                mdsl.FieldValue = count.ToString();
+                mdsl.GroupCode = GroupCode.ToString();
+                fieldValues.List.Add(mdsl);
+                FlowsValuesDTO ddmsl = MslValues.Children[0].FieldList[2].ToFlowsValuesDTO();
+                ddmsl.ParentId = MslValues.FieldId;
+                ddmsl.GroupOperateId = fieldValues.GroupOperateId;
+                ddmsl.FieldValue = Math.Round(wearAmount / count * 1000, 2).ToString();
+                ddmsl.GroupCode = GroupCode.ToString();
+                fieldValues.List.Add(ddmsl);
+            }
+            else
+            {
+                MslValues.FieldValue = Math.Round(float.Parse(MslValues.FieldValue) + wearAmount * 1000).ToString();
+                var fieldList = MslValues.Children[0].Clone();
+                MslValues.Children.Add(fieldList);
+                FlowsValuesDTO mosunliang = fieldList.FieldList[0].ToFlowsValuesDTO();
+                mosunliang.ParentId = MslValues.FieldId;
+                mosunliang.GroupOperateId = fieldValues.GroupOperateId;
+                mosunliang.FieldValue = Math.Round(wearAmount * 1000).ToString();
+                mosunliang.GroupCode = GroupCode.ToString();
+                fieldValues.List.Add(mosunliang);
+                FlowsValuesDTO mdsl = fieldList.FieldList[1].ToFlowsValuesDTO();
+                mdsl.ParentId = MslValues.FieldId;
+                mdsl.GroupOperateId = fieldValues.GroupOperateId;
+                mdsl.FieldValue = count.ToString();
+                mdsl.GroupCode = GroupCode.ToString();
+                fieldValues.List.Add(mdsl);
+                FlowsValuesDTO ddmsl = fieldList.FieldList[2].ToFlowsValuesDTO();
+                ddmsl.ParentId = MslValues.FieldId;
+                ddmsl.GroupOperateId = fieldValues.GroupOperateId;
+                ddmsl.FieldValue = Math.Round(wearAmount / count * 1000).ToString();
+                ddmsl.GroupCode = GroupCode.ToString();
+                fieldValues.List.Add(ddmsl);
+            }
         }
 
         public static void AddToolMarkWidth(double toolMarkWidth)
@@ -340,32 +389,47 @@ namespace 精密切割系统.Helpers
             }
         }
 
-        public static void AddSingleWearAmount(float singleWearAmount)
+        public static void AddWearAmountAfterCircle(float wearAmount, int count)
         {
+            //if (!GlobalParams.OnlineMES || _tuple is null) return;
+            //FieldValuesDTO fieldValues = _tuple.Item1;
+            //Dictionary<string, FlowsValuesDTO> fieldDic = _tuple.Item2;
+            //if (fieldDic.TryGetValue("真圆后总磨损量", out FlowsValuesDTO? value))
+            //{
+            //    FlowsValuesDTO dto = value.Clone();
+            //    dto.GroupOperateId = fieldValues.GroupOperateId;
+            //    dto.FieldValue = Math.Round(wearAmountAfterCircle * 1000).ToString();
+            //    fieldValues.List.Add(dto);
+            //}
             if (!GlobalParams.OnlineMES || _tuple is null) return;
             FieldValuesDTO fieldValues = _tuple.Item1;
             Dictionary<string, FlowsValuesDTO> fieldDic = _tuple.Item2;
-            if (fieldDic.TryGetValue("单刀磨损量(修真圆后)", out FlowsValuesDTO? value))
+            if (MslValues is null)
             {
-                FlowsValuesDTO dto = value.Clone();
-                dto.GroupOperateId = fieldValues.GroupOperateId;
-                dto.FieldValue = Math.Round(singleWearAmount * 1000).ToString();
-                fieldValues.List.Add(dto);
+                MslValues = fieldDic["真圆后总磨损量"].Clone();
+                MslValues.FieldValue = "0";
+                MslValues.GroupOperateId = fieldValues.GroupOperateId;
+                fieldValues.List.Add(MslValues);
             }
-        }
-
-        public static void AddWearAmountAfterCircle(float wearAmountAfterCircle)
-        {
-            if (!GlobalParams.OnlineMES || _tuple is null) return;
-            FieldValuesDTO fieldValues = _tuple.Item1;
-            Dictionary<string, FlowsValuesDTO> fieldDic = _tuple.Item2;
-            if (fieldDic.TryGetValue("真圆后磨损量", out FlowsValuesDTO? value))
-            {
-                FlowsValuesDTO dto = value.Clone();
-                dto.GroupOperateId = fieldValues.GroupOperateId;
-                dto.FieldValue = Math.Round(wearAmountAfterCircle * 1000).ToString();
-                fieldValues.List.Add(dto);
-            }
+            MslValues.FieldValue = Math.Round(float.Parse(MslValues.FieldValue) + wearAmount * 1000).ToString();
+            FlowsValuesDTO mosunliang = MslValues.Children[0].FieldList[0].ToFlowsValuesDTO();
+            mosunliang.ParentId = MslValues.FieldId;
+            mosunliang.GroupOperateId = fieldValues.GroupOperateId;
+            mosunliang.FieldValue = Math.Round(wearAmount * 1000).ToString();
+            mosunliang.GroupCode = "1";
+            fieldValues.List.Add(mosunliang);
+            FlowsValuesDTO mdsl = MslValues.Children[0].FieldList[1].ToFlowsValuesDTO();
+            mdsl.ParentId = MslValues.FieldId;
+            mdsl.GroupOperateId = fieldValues.GroupOperateId;
+            mdsl.FieldValue = count.ToString();
+            mdsl.GroupCode = "1";
+            fieldValues.List.Add(mdsl);
+            FlowsValuesDTO ddmsl = MslValues.Children[0].FieldList[2].ToFlowsValuesDTO();
+            ddmsl.ParentId = MslValues.FieldId;
+            ddmsl.GroupOperateId = fieldValues.GroupOperateId;
+            ddmsl.FieldValue = Math.Round(wearAmount / count * 1000, 2).ToString();
+            ddmsl.GroupCode = "1";
+            fieldValues.List.Add(ddmsl);
         }
 
         public static void AddBladeLifeGrade(string bladeLifeGrade)
