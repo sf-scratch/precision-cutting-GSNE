@@ -27,7 +27,6 @@ using System.Windows;
 using System.Drawing.Imaging;
 using System.Collections.Concurrent;
 using Newtonsoft.Json.Linq;
-using Emgu.CV.Reg;
 using 精密切割系统.PubSubEvent;
 using 精密切割系统.Model.common;
 using System.Windows.Interop;
@@ -36,7 +35,6 @@ using 精密切割系统.View.Dialogs;
 using 精密切割系统.Extensions;
 using static SQLite.SQLite3;
 using Point = OpenCvSharp.Point;
-using Emgu.CV.Bioinspired;
 using System.Windows.Shapes;
 using System.Diagnostics;
 
@@ -270,8 +268,9 @@ namespace 精密切割系统.Model.cut
             {
                 if (mode is HeightMeasurementMode.NoContact)
                 {
+                    float startBlowX = 119, endBlowX = 131;
                     //测高前移动到初始位置，主轴旋转，开始吹水吹气
-                    await PlcControl.tagControl.cutting.RunMotionAsync(0, 50, token);
+                    await PlcControl.tagControl.cutting.RunMotionAsync(startBlowX, 50, token);
                     //主轴有旋转速度，则不需要手动触发
                     if (await PlcControl.tagControl.wholeDevice.GetSpindleSpeedAsync() == 0)
                     {
@@ -281,7 +280,13 @@ namespace 精密切割系统.Model.cut
                     //eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹水"));
                     //await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingWaterAsync(2);
                     eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹气"));
-                    await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingAsync(5);
+                    await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingAsync();
+                    for (int count = 0; count < 2; count++)
+                    {
+                        await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(endBlowX, 8);
+                        await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(startBlowX, 8);
+                    }
+                    await PlcControl.tagControl.bladeMantance.CloseOpticalFiberSensorBlowingAsync();
                 }
 
                 //等待测高准备完成信号
@@ -1205,27 +1210,28 @@ namespace 精密切割系统.Model.cut
         /// <returns></returns>
         public static async Task<ImagesAnalysisResult?> CheckKnifeMarksStatus(LineSegment line, IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
-            List<Mat> mats;
+            ConcurrentQueue<Mat> matQueue = new ConcurrentQueue<Mat>();
             try
             {
                 DataPoint<float> relativePos = Appsettings.CameraRelativeBladePosition;
                 //工件吹气
                 eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始工件吹气..."));
+                float rightCheckX = line.EndPoint.X + relativePos.X - 2;
+                float leftCheckX = line.StartPoint.X + relativePos.X + 2;
+                float checkY = line.EndPoint.Y + relativePos.Y;
                 await PlcControl.tagControl.wholeDevice.OpenWorkpieceBlowingAsync();
                 await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(190, 80, token);
-                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(line.EndPoint.X + relativePos.X, 10, token);
-                await PlcControl.tagControl.cutting.RunMotionAsync(line.EndPoint.X + relativePos.X, line.EndPoint.Y + relativePos.Y, token);
+                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(rightCheckX, 7f, token);
+                await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(checkY, 50, token);
                 //await AutoFocusAsync(eventAggregator, token);
                 CancellationTokenSource cts = new CancellationTokenSource();
-                CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(token, cts.Token);
-                CancellationToken linkedToken = linkedCts.Token;
-                Task slowSpeedMoveTask = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(line.StartPoint.X + relativePos.X, 7f, linkedToken);
-                Task<List<Mat>> grabTimerTask = Task.Run(async () =>
+                CancellationToken linkedToken = CancellationTokenSource.CreateLinkedTokenSource(token, cts.Token).Token;
+                Task slowSpeedMoveTask = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(leftCheckX, 7f, linkedToken);
+                Task grabTimerTask = Task.Run(async () =>
                 {
-                    List<Mat> mats = new List<Mat>();
                     try
                     {
-                        using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(150));
+                        using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
                         while (await timer.WaitForNextTickAsync(linkedToken))
                         {
                             await Application.Current.Dispatcher.InvokeAsync(() =>
@@ -1233,7 +1239,7 @@ namespace 精密切割系统.Model.cut
                                 WriteableBitmap? localBitmap = GrabWriteableBitmap();
                                 if (localBitmap != null)
                                 {
-                                    mats.Add(localBitmap.ToMat());
+                                    matQueue.Enqueue(localBitmap.ToMat());
                                 }
                             });
                         }
@@ -1242,35 +1248,114 @@ namespace 精密切割系统.Model.cut
                     {
                         //正常取消任务
                     }
-                    return mats;
-                }, linkedToken);
-                await Task.WhenAny(slowSpeedMoveTask, grabTimerTask);
+                });
+                CancellationTokenSource analysisCts = new CancellationTokenSource();
+                Task<ImagesAnalysisResult> analysisTask = ProcessImagesAnalysisAsync(matQueue, eventAggregator, analysisCts.Token);
+                await Task.WhenAny(slowSpeedMoveTask, grabTimerTask, analysisTask);
                 cts.Cancel();
-                mats = await grabTimerTask;
+                await grabTimerTask;
+                analysisCts.Cancel();
+                return await analysisTask;
             }
             finally
             {
                 //保证工作盘吹气关闭
                 await PlcControl.tagControl.wholeDevice.CloseWorkpieceBlowingAsync();
             }
-            ImagesAnalysisResult? imagesAnalysisRes;
-            try
-            {
-                imagesAnalysisRes = await ProcessImagesAnalysisAsync(mats, eventAggregator, token);
-            }
-            catch(ArgumentException ex)
-            {
-                Tools.LogError($"图像处理异常：{ex.Message}");
-                imagesAnalysisRes = null;
-            }
-            return imagesAnalysisRes;
         }
 
-        public static async Task<ImagesAnalysisResult> ProcessImagesAnalysisAsync(List<Mat> mats, IEventAggregator? eventAggregator = null, CancellationToken token = default)
+        private static void ProcessMat(Mat mat, ImagesAnalysisResult result)
+        {
+            Mat cropMat = CropHorizontalCenter(mat, 80);
+            Mat cropMatJpg = JpegStreamToMat(MatToJpegStream(cropMat));
+            var (bladeWidthMm, collapseWidthMm, bladeTop, bladeBottom, collapseTop, collapseBottom) = VisionAnalyzer.ProcessImage(cropMatJpg);
+            Cv2.PutText(cropMatJpg,
+                $"bladeWidthMm: {bladeWidthMm}",
+                new Point(20, bladeTop),
+                HersheyFonts.HersheySimplex,
+                1.3f,
+                Scalar.Red,
+                2);
+            Cv2.PutText(cropMatJpg,
+                $"collapseWidthMm:{collapseWidthMm}",
+                new Point(900, collapseTop),
+                HersheyFonts.HersheySimplex,
+                1.3f,
+                Scalar.Green,
+                2);
+            Cv2.Line(
+               img: cropMatJpg,
+               pt1: new Point(0, bladeTop),  // 起点
+               pt2: new Point(cropMatJpg.Width, bladeTop), // 终点
+               color: Scalar.Red,         // 颜色 (B,G,R)
+               thickness: 1,             // 线宽
+               lineType: LineTypes.AntiAlias // 抗锯齿
+               );
+            Cv2.Line(
+                img: cropMatJpg,
+                pt1: new Point(0, bladeBottom),  // 起点
+                pt2: new Point(cropMatJpg.Width, bladeBottom), // 终点
+                color: Scalar.Red,         // 颜色 (B,G,R)
+                thickness: 1,             // 线宽
+                lineType: LineTypes.AntiAlias // 抗锯齿
+                );
+            Cv2.Line(
+                img: cropMatJpg,
+                pt1: new Point(0, collapseTop),  // 起点
+                pt2: new Point(cropMatJpg.Width, collapseTop), // 终点
+                color: Scalar.Green,         // 颜色 (B,G,R)
+                thickness: 1,             // 线宽
+                lineType: LineTypes.AntiAlias // 抗锯齿
+                );
+            Cv2.Line(
+                img: cropMatJpg,
+                pt1: new Point(0, collapseBottom),  // 起点
+                pt2: new Point(cropMatJpg.Width, collapseBottom), // 终点
+                color: Scalar.Green,         // 颜色 (B,G,R)
+                thickness: 1,             // 线宽
+                lineType: LineTypes.AntiAlias // 抗锯齿
+                );
+            var imageData = new ImageData
+            {
+                BladeWidth = bladeWidthMm,
+                CollapseWidth = collapseWidthMm,
+                Mat = cropMatJpg
+            };
+            result.ImageDatas.Add(imageData);
+            if (result.BladeWidthMaxImage.BladeWidth < bladeWidthMm)
+                result.BladeWidthMaxImage = imageData;
+            if (result.CollapseWidthMaxImage.CollapseWidth < collapseWidthMm)
+                result.CollapseWidthMaxImage = imageData;
+        }
+
+        public static async Task<ImagesAnalysisResult> ProcessImagesAnalysisAsync(ConcurrentQueue<Mat> matQueue, IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
             var result = new ImagesAnalysisResult();
-            result.IsSnakelike = await Task.Run(() =>
+            result.IsSnakelike = await Task.Run(async () =>
             {
+                List<Mat> mats = new List<Mat>();
+                try
+                {
+                    using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
+                    while (await timer.WaitForNextTickAsync(token))
+                    {
+                        while(matQueue.TryDequeue(out Mat? mat))
+                        {
+                            mats.Add(mat);
+                            ProcessMat(mat, result);
+                        }
+                        
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    // 可能剩余的图像进行处理
+                    while (matQueue.TryDequeue(out Mat? mat))
+                    {
+                        mats.Add(mat);
+                        ProcessMat(mat, result);
+                    }
+                }
                 var stopwatch = Stopwatch.StartNew();
                 //拼接所有图像
                 List<Mat> concatMats = ConcatMats(mats);
@@ -1281,158 +1366,84 @@ namespace 精密切割系统.Model.cut
                 {
                     Mat cropConcatMat = CropHorizontalCenter(concatMat, 80);
                     Mat cropConcatMatJpg = JpegStreamToMat(MatToJpegStream(cropConcatMat));
-                    var (bladeWidthMm, collapseWidthMm, bladeTop, bladeBottom, collapseTop, collapseBottom) = VisionAnalyzer.ProcessImage(cropConcatMatJpg);
-                    Cv2.PutText(cropConcatMatJpg,
-                        $"bladeWidthMm: {bladeWidthMm}",
-                        new Point(20, bladeTop),
-                        HersheyFonts.HersheySimplex,
-                        1.3f,
-                        Scalar.Red,
-                        2);
-                    Cv2.PutText(cropConcatMatJpg,
-                        $"collapseWidthMm:{collapseWidthMm}",
-                        new Point(900, collapseTop),
-                        HersheyFonts.HersheySimplex,
-                        1.3f,
-                        Scalar.Green,
-                        2);
-                    Cv2.Line(
-                        img: cropConcatMatJpg,
-                        pt1: new Point(0, bladeTop),  // 起点
-                        pt2: new Point(cropConcatMatJpg.Width, bladeTop), // 终点
-                        color: Scalar.Red,         // 颜色 (B,G,R)
-                        thickness: 1,             // 线宽
-                        lineType: LineTypes.AntiAlias // 抗锯齿
-                        );
-                    Cv2.Line(
-                        img: cropConcatMatJpg,
-                        pt1: new Point(0, bladeBottom),  // 起点
-                        pt2: new Point(cropConcatMatJpg.Width, bladeBottom), // 终点
-                        color: Scalar.Red,         // 颜色 (B,G,R)
-                        thickness: 1,             // 线宽
-                        lineType: LineTypes.AntiAlias // 抗锯齿
-                        );
-                    Cv2.Line(
-                        img: cropConcatMatJpg,
-                        pt1: new Point(0, collapseTop),  // 起点
-                        pt2: new Point(cropConcatMatJpg.Width, collapseTop), // 终点
-                        color: Scalar.Green,         // 颜色 (B,G,R)
-                        thickness: 1,             // 线宽
-                        lineType: LineTypes.AntiAlias // 抗锯齿
-                        );
-                    Cv2.Line(
-                        img: cropConcatMatJpg,
-                        pt1: new Point(0, collapseBottom),  // 起点
-                        pt2: new Point(cropConcatMatJpg.Width, collapseBottom), // 终点
-                        color: Scalar.Green,         // 颜色 (B,G,R)
-                        thickness: 1,             // 线宽
-                        lineType: LineTypes.AntiAlias // 抗锯齿
-                        );
-                    string imagePath = System.IO.Path.Combine(AppContext.BaseDirectory, "image");
-                    Directory.CreateDirectory(imagePath);
-                    Cv2.ImWrite($"{imagePath}\\{DateTime.Now.Ticks}_cropConcatMatJpg.jpg", cropConcatMatJpg);
+                    //var (bladeWidthMm, collapseWidthMm, bladeTop, bladeBottom, collapseTop, collapseBottom) = VisionAnalyzer.ProcessImage(cropConcatMatJpg);
+                    //Cv2.PutText(cropConcatMatJpg,
+                    //    $"bladeWidthMm: {bladeWidthMm}",
+                    //    new Point(20, bladeTop),
+                    //    HersheyFonts.HersheySimplex,
+                    //    1.3f,
+                    //    Scalar.Red,
+                    //    2);
+                    //Cv2.PutText(cropConcatMatJpg,
+                    //    $"collapseWidthMm:{collapseWidthMm}",
+                    //    new Point(900, collapseTop),
+                    //    HersheyFonts.HersheySimplex,
+                    //    1.3f,
+                    //    Scalar.Green,
+                    //    2);
+                    //Cv2.Line(
+                    //    img: cropConcatMatJpg,
+                    //    pt1: new Point(0, bladeTop),  // 起点
+                    //    pt2: new Point(cropConcatMatJpg.Width, bladeTop), // 终点
+                    //    color: Scalar.Red,         // 颜色 (B,G,R)
+                    //    thickness: 1,             // 线宽
+                    //    lineType: LineTypes.AntiAlias // 抗锯齿
+                    //    );
+                    //Cv2.Line(
+                    //    img: cropConcatMatJpg,
+                    //    pt1: new Point(0, bladeBottom),  // 起点
+                    //    pt2: new Point(cropConcatMatJpg.Width, bladeBottom), // 终点
+                    //    color: Scalar.Red,         // 颜色 (B,G,R)
+                    //    thickness: 1,             // 线宽
+                    //    lineType: LineTypes.AntiAlias // 抗锯齿
+                    //    );
+                    //Cv2.Line(
+                    //    img: cropConcatMatJpg,
+                    //    pt1: new Point(0, collapseTop),  // 起点
+                    //    pt2: new Point(cropConcatMatJpg.Width, collapseTop), // 终点
+                    //    color: Scalar.Green,         // 颜色 (B,G,R)
+                    //    thickness: 1,             // 线宽
+                    //    lineType: LineTypes.AntiAlias // 抗锯齿
+                    //    );
+                    //Cv2.Line(
+                    //    img: cropConcatMatJpg,
+                    //    pt1: new Point(0, collapseBottom),  // 起点
+                    //    pt2: new Point(cropConcatMatJpg.Width, collapseBottom), // 终点
+                    //    color: Scalar.Green,         // 颜色 (B,G,R)
+                    //    thickness: 1,             // 线宽
+                    //    lineType: LineTypes.AntiAlias // 抗锯齿
+                    //    );
                     result.ConcatImages.Add(new ImageData()
                     {
-                        BladeWidth = bladeWidthMm,
-                        CollapseWidth = collapseWidthMm,
-                        IsSnakelike = VisionAnalyzer.SnakeCase(cropConcatMatJpg).Snake,
+                        BladeWidth = 0,
+                        CollapseWidth = 0,
+                        //IsSnakelike = VisionAnalyzer.SnakeCase(cropConcatMatJpg).Snake,
+                        IsSnakelike = true,
                         Mat = cropConcatMatJpg
                     });
                 }
                 stopwatch.Stop();
                 eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"识别拼接图像总用时: {stopwatch.Elapsed.TotalSeconds} 秒"));
                 eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"识别拼接图像平均单张用时（{concatMats.Count}张）: {stopwatch.Elapsed.TotalSeconds / concatMats.Count} 秒"));
+
+
+                stopwatch = Stopwatch.StartNew();
+                //保存拼接图像到指定目录
+                string imagePath = System.IO.Path.Combine(AppContext.BaseDirectory, "image");
+                Directory.CreateDirectory(imagePath);
+                foreach (var image in mats)
+                {
+                    Cv2.ImWrite($"{imagePath}\\{DateTime.Now.Ticks}_cropMatJpg.jpg", image);
+                }
+                foreach (var image in result.ConcatImages)
+                {
+                    Cv2.ImWrite($"{imagePath}\\{DateTime.Now.Ticks}_cropConcatMatJpg.jpg", image.Mat);
+                }
+                stopwatch.Stop();
+                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"保存识别后的拼接图像总用时: {stopwatch.Elapsed.TotalSeconds} 秒"));
                 return result.ConcatImages.All(image => image.IsSnakelike);
             });
 
-            var stopwatch = Stopwatch.StartNew();
-            // 配置参数
-            const int ioMaxConcurrency = 2;
-            using var semaphore = new SemaphoreSlim(ioMaxConcurrency);
-            var tasks = mats.Select(async mat =>
-            {
-                await semaphore.WaitAsync(token);
-                try
-                {
-                    token.ThrowIfCancellationRequested();
-                    Mat cropMat = CropHorizontalCenter(mat, 80);
-                    Mat cropMatJpg = JpegStreamToMat(MatToJpegStream(cropMat));
-                    var (bladeWidthMm, collapseWidthMm, bladeTop, bladeBottom, collapseTop, collapseBottom) = VisionAnalyzer.ProcessImage(cropMatJpg);
-                    Cv2.PutText(cropMatJpg,
-                        $"bladeWidthMm: {bladeWidthMm}",
-                        new Point(20, bladeTop),
-                        HersheyFonts.HersheySimplex,
-                        1.3f,
-                        Scalar.Red,
-                        2);
-                    Cv2.PutText(cropMatJpg,
-                        $"collapseWidthMm:{collapseWidthMm}",
-                        new Point(900, collapseTop),
-                        HersheyFonts.HersheySimplex,
-                        1.3f,
-                        Scalar.Green,
-                        2);
-                    Cv2.Line(
-                       img: cropMatJpg,
-                       pt1: new Point(0, bladeTop),  // 起点
-                       pt2: new Point(cropMatJpg.Width, bladeTop), // 终点
-                       color: Scalar.Red,         // 颜色 (B,G,R)
-                       thickness: 1,             // 线宽
-                       lineType: LineTypes.AntiAlias // 抗锯齿
-                       );
-                    Cv2.Line(
-                        img: cropMatJpg,
-                        pt1: new Point(0, bladeBottom),  // 起点
-                        pt2: new Point(cropMatJpg.Width, bladeBottom), // 终点
-                        color: Scalar.Red,         // 颜色 (B,G,R)
-                        thickness: 1,             // 线宽
-                        lineType: LineTypes.AntiAlias // 抗锯齿
-                        );
-                    Cv2.Line(
-                        img: cropMatJpg,
-                        pt1: new Point(0, collapseTop),  // 起点
-                        pt2: new Point(cropMatJpg.Width, collapseTop), // 终点
-                        color: Scalar.Green,         // 颜色 (B,G,R)
-                        thickness: 1,             // 线宽
-                        lineType: LineTypes.AntiAlias // 抗锯齿
-                        );
-                    Cv2.Line(
-                        img: cropMatJpg,
-                        pt1: new Point(0, collapseBottom),  // 起点
-                        pt2: new Point(cropMatJpg.Width, collapseBottom), // 终点
-                        color: Scalar.Green,         // 颜色 (B,G,R)
-                        thickness: 1,             // 线宽
-                        lineType: LineTypes.AntiAlias // 抗锯齿
-                        );
-
-                    var imageData = new ImageData
-                    {
-                        BladeWidth = bladeWidthMm,
-                        CollapseWidth = collapseWidthMm,
-                        Mat = cropMatJpg
-                    };
-
-                    result.ImageDatas.Add(imageData);
-
-                    // 更新最大值需要线程安全操作
-                    lock (result)
-                    {
-                        if (result.BladeWidthMaxImage.BladeWidth < bladeWidthMm)
-                            result.BladeWidthMaxImage = imageData;
-
-                        if (result.CollapseWidthMaxImage.CollapseWidth < collapseWidthMm)
-                            result.CollapseWidthMaxImage = imageData;
-                    }
-                }
-                finally
-                {
-                    semaphore.Release();
-                }
-            });
-            await Task.WhenAll(tasks);
-            stopwatch.Stop();
-            eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"识别单个图像总用时: {stopwatch.Elapsed.TotalSeconds} 秒"));
-            eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"识别单个图像平均单张用时（{mats.Count}张）: {stopwatch.Elapsed.TotalSeconds / mats.Count} 秒"));
             return result;
         }
 

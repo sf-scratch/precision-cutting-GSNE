@@ -148,6 +148,7 @@ namespace 精密切割系统.Model.cut
                             // 该theta角度第一次切割，切割半圆最下边切为起始位置
                             //_recordCutY = GeometryUtils.FindBottomTangentY(_thetaCenterPoint, workpieceCenterPoint, _workpieceRadius, _thetaDegQueue.Peek() + cutCalibratTheta);
                             _recordCutY = 150;
+                            Appsettings.CutDistance = GlobalParams.ThetaCenterPoint.Y + GlobalParams.WorkpieceRadius - _recordCutY + 2;
                             _isRotateTheta = false;
                         }
                         float cutSize = GetCutSize();

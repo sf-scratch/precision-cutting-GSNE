@@ -128,6 +128,7 @@ namespace 精密切割系统.View.Pages.Hader
 
         private async void ClearAlarmInfo()
         {
+            await PlcControl.tagControl.wholeDevice.CloseBuzzerAsync();
             await PlcControl.tagControl.wholeDevice.AlarmResetAsync();
         }
 

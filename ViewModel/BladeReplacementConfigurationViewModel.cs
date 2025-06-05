@@ -121,13 +121,13 @@ namespace 精密切割系统.ViewModel
             try
             {
                 //await PdaUtils.ComputerPracticeAsync(lunguId);
+                //PdaUtils.AddSharpen(0.5f, 10);
+                //PdaUtils.AddSharpen(0.2f, 11);
                 //PdaUtils.AddWearAmountAfterCircle(0.035f, 10);
                 ////PdaUtils.AddStandardCutSpeed("1");
                 ////PdaUtils.AddStandardSharpenSpeed("2");
                 ////PdaUtils.AddResidueSharpenTimes("3");
                 ////PdaUtils.AddTotalSharpenTimes("4");
-                ////PdaUtils.AddSharpen(0.5f, 10);
-                ////PdaUtils.AddSharpen(0.2f, 11);
                 ////PdaUtils.AddToolMarkWidth("5");
                 ////PdaUtils.AddToolMarkActualWidth("6");
                 ////PdaUtils.AddFirstToolMarkWidth("7");
