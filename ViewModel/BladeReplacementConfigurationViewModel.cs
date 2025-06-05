@@ -94,6 +94,7 @@ namespace 精密切割系统.ViewModel
         private void InitRightButtonOnlyBack()
         {
             _rightButtonParams.Clear();
+            _rightButtonParams.Add(RightButtonParams.YelloRightButton("检查轮毂", "/Assets/icon/menu_0/menu_0_2_white.png", () => Init(LunguId)));
             _rightButtonParams.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }
 
@@ -102,6 +103,7 @@ namespace 精密切割系统.ViewModel
             _rightButtonParams.Clear();
             _rightButtonParams.Add(RightButtonParams.GreenRightButton("自动执行", "/Assets/icon/right/enter.png", AutoRunAsync));
             _rightButtonParams.Add(RightButtonParams.GreenRightButton("重置磨刀", "/Assets/icon/menu_6/menu_6_1_white.png", SharpenService.Instance.Reset));
+            _rightButtonParams.Add(RightButtonParams.YelloRightButton("检查轮毂", "/Assets/icon/menu_0/menu_0_2_white.png", () => Init(LunguId)));
             _rightButtonParams.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }
 

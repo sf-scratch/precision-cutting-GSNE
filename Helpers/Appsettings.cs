@@ -169,6 +169,21 @@ namespace 精密切割系统.Helpers
         }
 
         /// <summary>
+        /// 自更换刀片起刀片切了几道
+        /// </summary>
+        public static int? AfterReplaceBladeCutTimes
+        {
+            get { return GetValue<int>(); }
+            set
+            {
+                if (value is not null)
+                {
+                    UpdateAppSettings(value.Value);
+                }
+            }
+        }
+
+        /// <summary>
         /// 相机相对刀片中心点位置
         /// </summary>
         public static DataPoint<float> CameraRelativeBladePosition

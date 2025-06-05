@@ -82,12 +82,22 @@ namespace 精密切割系统.Behaviors
 
         private void AssociatedObject_TouchLeave(object? sender, TouchEventArgs e)
         {
+            if (!_isRaiseDownEvent) return;
             _isRaiseDownEvent = false;
+            if (TouchAndClickCommand?.CanExecute(e) == true)
+            {
+                TouchAndClickCommand.Execute(e);
+            }
         }
 
         private void AssociatedObject_MouseLeave(object sender, MouseEventArgs e)
         {
+            if (!_isRaiseDownEvent) return;
             _isRaiseDownEvent = false;
+            if (TouchAndClickCommand?.CanExecute(e) == true)
+            {
+                TouchAndClickCommand.Execute(e);
+            }
         }
     }
 }

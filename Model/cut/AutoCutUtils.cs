@@ -178,12 +178,15 @@ namespace 精密切割系统.Model.cut
         public static async Task ReplaceBladeAsync(IEventAggregator? eventAggregator = null)
         {
             MaterialSnackUtils.MaterialSnack("请准备更换刀片,轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+            await PlcControl.tagControl.wholeDevice.StopSpindleAsync();
             Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0);
             Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0);
-            Task taskX = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(0);
-            Task taskY = PlcControl.tagControl.Yaxis.StartAbsoluteAsync(0);
+            await Task.WhenAll(taskZ1, taskZ2);
+            Task taskXY = PlcControl.tagControl.cutting.RunMotionAsync(0, 0);
             Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0);
-            await Task.WhenAll(taskX, taskY, taskZ1, taskZ2, taskTheta);
+            Task speedZero = PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync();
+            await Task.WhenAll(taskXY, taskTheta, speedZero);
+            Appsettings.AfterReplaceBladeCutTimes = 0;
             MaterialSnackUtils.MaterialSnack("请更换刀片！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
         }
 
@@ -194,12 +197,14 @@ namespace 精密切割系统.Model.cut
         public static async Task ReplaceSharpeningBoardAsync(IEventAggregator? eventAggregator = null)
         {
             MaterialSnackUtils.MaterialSnack("请准备更换磨刀板,轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+            await PlcControl.tagControl.wholeDevice.StopSpindleAsync();
             Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0);
             Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0);
-            Task taskX = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(0);
-            Task taskY = PlcControl.tagControl.Yaxis.StartAbsoluteAsync(0);
+            await Task.WhenAll(taskZ1, taskZ2);
+            Task taskXY = PlcControl.tagControl.cutting.RunMotionAsync(0, 0);
             Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0);
-            await Task.WhenAll(taskX, taskY, taskZ1, taskZ2, taskTheta);
+            Task speedZero = PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync();
+            await Task.WhenAll(taskXY, taskTheta, speedZero);
             //清空记录
             Appsettings.SharpenY = null;
             Appsettings.SharpenThetaDegQueue = null;
@@ -214,12 +219,14 @@ namespace 精密切割系统.Model.cut
         public static async Task ReplaceWaferAsync(IEventAggregator? eventAggregator = null)
         {
             MaterialSnackUtils.MaterialSnack("请准备更换硅片,轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+            await PlcControl.tagControl.wholeDevice.StopSpindleAsync();
             Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0);
             Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0);
-            Task taskX = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(0);
-            Task taskY = PlcControl.tagControl.Yaxis.StartAbsoluteAsync(0);
+            await Task.WhenAll(taskZ1, taskZ2);
+            Task taskXY = PlcControl.tagControl.cutting.RunMotionAsync(0, 0);
             Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0);
-            await Task.WhenAll(taskX, taskY, taskZ1, taskZ2, taskTheta);
+            Task speedZero = PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync();
+            await Task.WhenAll(taskXY, taskTheta, speedZero);
             //清空记录
             Appsettings.CutY = null;
             Appsettings.CutThetaDegQueue = null;
@@ -271,12 +278,9 @@ namespace 精密切割系统.Model.cut
                     float startBlowX = 119, endBlowX = 131;
                     //测高前移动到初始位置，主轴旋转，开始吹水吹气
                     await PlcControl.tagControl.cutting.RunMotionAsync(startBlowX, 50, token);
-                    //主轴有旋转速度，则不需要手动触发
-                    if (await PlcControl.tagControl.wholeDevice.GetSpindleSpeedAsync() == 0)
-                    {
-                        eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("主轴开始旋转"));
-                        await PlcControl.tagControl.wholeDevice.TriggerSpindleManuallyRunAsync();
-                    }
+                    //主轴旋转
+                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("主轴开始旋转"));
+                    await PlcControl.tagControl.wholeDevice.StartSpindleAsync();
                     //eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹水"));
                     //await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingWaterAsync(2);
                     eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹气"));

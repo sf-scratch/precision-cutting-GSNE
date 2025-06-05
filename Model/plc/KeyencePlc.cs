@@ -2274,7 +2274,7 @@ namespace 精密切割系统.Driver
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        public async Task WaitSpindleSpeedToZeroAsync(CancellationToken token)
+        public async Task WaitSpindleSpeedToZeroAsync(CancellationToken token = default)
         {
             await TaskUtils.WaitExpectedResultAsync(GetSpindleSpeedAsync, 0, token);
         }
@@ -2313,6 +2313,30 @@ namespace 精密切割系统.Driver
         {
             spindleManuallyRun.writeValue = status + "";
             keyencePlc.writeTag(spindleManuallyRun);
+        }
+
+        /// <summary>
+        /// 启动主轴
+        /// </summary>
+        /// <returns></returns>
+        public async Task StartSpindleAsync()
+        {
+            if (await PlcControl.tagControl.wholeDevice.GetSpindleSpeedAsync() == 0)
+            {
+                await PlcControl.tagControl.wholeDevice.TriggerSpindleManuallyRunAsync();
+            }
+        }
+
+        /// <summary>
+        /// 停止主轴
+        /// </summary>
+        /// <returns></returns>
+        public async Task StopSpindleAsync()
+        {
+            if (await PlcControl.tagControl.wholeDevice.GetSpindleSpeedAsync() != 0)
+            {
+                await PlcControl.tagControl.wholeDevice.TriggerSpindleManuallyRunAsync();
+            }
         }
 
         /// <summary>
@@ -2718,7 +2742,7 @@ namespace 精密切割系统.Driver
         /// <param name="xInterpolationMotionValue"></param>
         /// <param name="yInterpolationMotionValue"></param>
         /// <returns></returns>
-        public async Task RunMotionAsync(float xInterpolationMotionValue, float yInterpolationMotionValue, CancellationToken token)
+        public async Task RunMotionAsync(float xInterpolationMotionValue, float yInterpolationMotionValue, CancellationToken token = default)
         {
             await PlcControl.tagControl.Xaxis.WaitAxisStopAsync(token);
             await PlcControl.tagControl.Yaxis.WaitAxisStopAsync(token);

@@ -135,6 +135,7 @@ namespace 精密切割系统.Model.cut
                 await PlcControl.tagControl.cutting.EnterCuttingModeAsync(usingPauseToken);
                 float abAverageThickness = lunguSksj.ABAverageThickness;
                 float cutDeep = AutoCutUtils.GetCuttingDeep(lunguSksj.BladeType);
+                int chekcTimes = 0;
                 while (cutTime < needCutTimes)
                 {
                     LineSegment? line = null;
@@ -217,9 +218,9 @@ namespace 精密切割系统.Model.cut
                         //停止切割前
                         int beforeStopCutTimes = cutTime + _finishedCutTimes;
                         //判断是否开始检查刀痕
-                        if (beforeStopCutTimes % _checkMarksCutTimes == 0 || beforeStopCutTimes == needCutTimes)
+                        if (beforeStopCutTimes % _checkMarksCutTimes == 1 || beforeStopCutTimes == needCutTimes)
                         {
-                            int chekcTimes = beforeStopCutTimes / _checkMarksCutTimes;
+                            chekcTimes++;
                             MaterialSnackUtils.MaterialSnack("检查刀痕中...", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
                             bool isOkKnifeMarksStatus = false;
                             try
@@ -243,32 +244,30 @@ namespace 精密切割系统.Model.cut
                                 // 处理图像数据
                                 if (result.ImageDatas.Count != 0)
                                 {
+                                    ImageData bladeWidthMaxImage = result.BladeWidthMaxImage;
+                                    switch (chekcTimes)
+                                    {
+                                        case 1:
+                                            PdaUtils.AddFirstToolMarkWidth(bladeWidthMaxImage.BladeWidth);
+                                            PdaUtils.AddFirstToolMarkImage(bladeWidthMaxImage.Mat);
+                                            break;
+                                        case 2:
+                                            PdaUtils.AddToolMarkWidth(bladeWidthMaxImage.BladeWidth);
+                                            PdaUtils.AddToolMarkActualWidth(bladeWidthMaxImage.BladeWidth);
+                                            PdaUtils.AddSecondToolMarkImage(bladeWidthMaxImage.Mat);
+                                            break;
+                                        default:
+                                            break;
+                                    }
                                     if (beforeStopCutTimes == needCutTimes)
                                     {
+                                        //最后一刀上传崩边
                                         double singleCollapseAngle = (result.CollapseWidthMaxImage.CollapseWidth - result.CollapseWidthMaxImage.BladeWidth) / 2;
                                         PdaUtils.AddSingleCollapseAngle(singleCollapseAngle);
                                         PdaUtils.AddMaximumCollapseAngle(result.CollapseWidthMaxImage.CollapseWidth);
                                         PdaUtils.AddMaximumCollapseAngleImage(result.CollapseWidthMaxImage.Mat);
                                         string bladeEdgeBreakageGrade = await GetDpbbdjAsync(lunguId, (float)singleCollapseAngle);
                                         PdaUtils.AddBladeEdgeBreakageGrade(bladeEdgeBreakageGrade);
-                                    } 
-                                    else
-                                    {
-                                        ImageData bladeWidthMaxImage = result.BladeWidthMaxImage;
-                                        switch (chekcTimes)
-                                        {
-                                            case 1:
-                                                PdaUtils.AddFirstToolMarkWidth(bladeWidthMaxImage.BladeWidth);
-                                                PdaUtils.AddFirstToolMarkImage(bladeWidthMaxImage.Mat);
-                                                break;
-                                            case 2:
-                                                PdaUtils.AddToolMarkWidth(bladeWidthMaxImage.BladeWidth);
-                                                PdaUtils.AddToolMarkActualWidth(bladeWidthMaxImage.BladeWidth);
-                                                PdaUtils.AddSecondToolMarkImage(bladeWidthMaxImage.Mat);
-                                                break;
-                                            default:
-                                                break;
-                                        }
                                     }
                                     eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create(
                                         $"最大刀痕宽度：{result.BladeWidthMaxImage.BladeWidth} " +
