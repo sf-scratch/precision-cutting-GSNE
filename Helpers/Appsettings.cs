@@ -184,6 +184,21 @@ namespace 精密切割系统.Helpers
         }
 
         /// <summary>
+        /// 是否需要检查基准线
+        /// </summary>
+        public static bool? IsNeedCheckBaseLine
+        {
+            get { return GetValue(); }
+            set
+            {
+                if (value is not null)
+                {
+                    UpdateAppSettings(value.Value);
+                }
+            }
+        }
+
+        /// <summary>
         /// 相机相对刀片中心点位置
         /// </summary>
         public static DataPoint<float> CameraRelativeBladePosition
@@ -214,6 +229,14 @@ namespace 精密切割系统.Helpers
             File.WriteAllText(_configPath, jsonView);
         }
 
+        public static void UpdateAppSettings(bool value, [CallerMemberName] string? key = null)
+        {
+            if (key is null) return;
+            Configuration.GetSection(key).Value = value.ToString();
+            string jsonView = Configuration.ToJson();
+            File.WriteAllText(_configPath, jsonView);
+        }
+
         public static void UpdateAppSettings<T>(List<T> list, [CallerMemberName] string? key = null) where T : struct, INumber<T>
         {
             if (key is null) return;
@@ -236,6 +259,18 @@ namespace 精密切割系统.Helpers
             }
             string jsonView = Configuration.ToJson();
             File.WriteAllText(_configPath, jsonView);
+        }
+
+        public static bool? GetValue([CallerMemberName] string? key = null)
+        {
+            if (key is null) return null;
+            string? value = Configuration.GetSection(key).Value;
+            if (value is null) return null;
+            if (bool.TryParse(value, out bool res))
+            {
+                return res;
+            }
+            return null;
         }
 
         public static T? GetValue<T>([CallerMemberName] string? key = null) where T : struct, INumber<T>

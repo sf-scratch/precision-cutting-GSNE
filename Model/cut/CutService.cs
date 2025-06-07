@@ -221,6 +221,17 @@ namespace 精密切割系统.Model.cut
                         if (beforeStopCutTimes % _checkMarksCutTimes == 1 || beforeStopCutTimes == needCutTimes)
                         {
                             chekcTimes++;
+                            // 如果是第一次检查刀痕，且需要检查基准线位置，则提示检查基准线位置
+                            if (chekcTimes == 1 && (Appsettings.IsNeedCheckBaseLine ?? true))
+                            {
+                                MaterialSnackUtils.MaterialSnack("请检查基准线位置！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+                                CancellationToken? token = await WaitContinueAsync(line);
+                                if (token == null)
+                                {
+                                    return RunResult.Fail(RunExceptionType.Stop, "停止切割");
+                                }
+                                usingPauseToken = token.Value;
+                            }
                             MaterialSnackUtils.MaterialSnack("检查刀痕中...", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
                             bool isOkKnifeMarksStatus = false;
                             try
@@ -635,7 +646,7 @@ namespace 精密切割系统.Model.cut
             float startX = line.StartPoint.X - margin;
             float endX = line.EndPoint.X + margin;
             //90度切割时，X轴结束位置不加上边距，防止切到磨刀板
-            if (theta == 90)
+            if (theta >= 90)
             {
                 //endX = line.EndPoint.X;
                 endX = 140;

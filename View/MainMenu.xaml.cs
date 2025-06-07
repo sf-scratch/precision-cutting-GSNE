@@ -342,31 +342,7 @@ namespace 精密切割系统.View
                         mainWindow.NavigateToPage(bean.PageUrl);
                         break;
                     }
-                    if (CommonCheck.MlignStatusCheck())
-                    {
-                        PlcControl.tagControl.calibration.AlignInit(1);
-                        MaterialSnackUtils.MaterialSnack("进入校准模式中...", SnackType.WARNING, 0);
-                        MenuButton menu = sender as MenuButton;
-                        menu.resetState = false;
-                        GlobalParams.globalRunFlag = true;
-                        // 校准模式
-                        // 监听状态，如果模式准备完成，则跳转页面
-                        Task.Run(() =>
-                        {
-                            bool flag = Tools.WaitForValue(DeviceKey.alignStatusKey, 1);
-                            GlobalParams.globalRunFlag = false;
-                            if (flag)
-                            {
-                                mainWindow.NavigateToPage(bean.PageUrl);
-                            }
-                            else
-                            {
-                                menu.resetState = true;
-                                PlcControl.tagControl.calibration.AlignInit(0);
-                                MaterialSnackUtils.MaterialSnack("进入校准模式失败！", SnackType.WARNING, 0);
-                            }
-                        });
-                    }
+                    mainWindow.NavigateToPage(bean.PageUrl);
                     break;
                 case 401:
                     if (!GlobalParams.onlineFlag)

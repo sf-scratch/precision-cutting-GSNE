@@ -102,7 +102,6 @@ namespace 精密切割系统.ViewModel
         {
             _rightButtonParams.Clear();
             _rightButtonParams.Add(RightButtonParams.GreenRightButton("自动执行", "/Assets/icon/right/enter.png", AutoRunAsync));
-            _rightButtonParams.Add(RightButtonParams.GreenRightButton("重置磨刀", "/Assets/icon/menu_6/menu_6_1_white.png", SharpenService.Instance.Reset));
             _rightButtonParams.Add(RightButtonParams.YelloRightButton("检查轮毂", "/Assets/icon/menu_0/menu_0_2_white.png", () => Init(LunguId)));
             _rightButtonParams.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }
@@ -139,6 +138,8 @@ namespace 精密切割系统.ViewModel
                 //await PdaUtils.SetCompletedAsync();
                 //轮毂信息
                 //LunguSksjDTO lunguSksjDTO = new LunguSksjDTO();
+                //默认theta轴初始在5的位置，防止theta抖动为负值
+                MaterialSnackUtils.MaterialSnack("检查轮毂信息中...", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
                 LunguSksjDTO? lunguSksjDTO = await HttpUtils.GetLunguSksjAsync(lunguId);
                 if (lunguSksjDTO == null)
                 {
@@ -207,6 +208,7 @@ namespace 精密切割系统.ViewModel
                 //List<Tuple<float, int>>? cutList = await AutoCutUtils.GetCutListAsync(LunguId, lunguSksjDTO.ExistingBlade);
                 InitRightButton();
                 MaterialSnackUtils.MaterialSnack("", MaterialSnackUtils.SnackType.INFO, 0, _eventAggregator);
+                MaterialSnackUtils.MaterialSnack("检查轮毂信息完成，可开始执行自动切割！", MaterialSnackUtils.SnackType.SUCCESS, 0, _eventAggregator);
             }
             finally
             {

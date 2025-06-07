@@ -111,7 +111,6 @@ namespace 精密切割系统.FrmWindow.common
         // theta轴中心点位置 - Y轴 49.707   53.73523   62.386
         public static float thetaCenterLocationY = 0f;
 
-
         /// <summary>
         /// 正常步进距离
         /// </summary>

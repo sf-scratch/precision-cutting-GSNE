@@ -49,7 +49,7 @@ namespace 精密切割系统.Assets.config.menu
         {
             var list = new List<MenuBean>();
             // list.Add(new MenuBean(1, "全自动", "/Assets/icon/menu_0/menu_0_1.png", "/Assets/icon/menu_0/menu_0_1_white.png"));
-            //list.Add(new MenuBean(2, "手动操作", "/Assets/icon/menu_0/menu_0_2.png", "/Assets/icon/menu_0/menu_0_2_white.png"));
+            list.Add(new MenuBean(2, "手动操作", "/Assets/icon/menu_0/menu_0_2.png", "/Assets/icon/menu_0/menu_0_2_white.png"));
             list.Add(new MenuBean(3, "型号目录", "/Assets/icon/menu_0/menu_0_3.png", "/Assets/icon/menu_0/menu_0_3_white.png", 2, "Pages/F3_ModelCatalog/MCDeviceDataListConf"));
             list.Add(new MenuBean(4, "刀片参数维护", "/Assets/icon/menu_0/menu_0_4.png", "/Assets/icon/menu_0/menu_0_4_white.png"));
             list.Add(new MenuBean(5, "一般效能参数维护", "/Assets/icon/menu_0/menu_0_5.png", "/Assets/icon/menu_0/menu_0_5_white.png"));
@@ -66,7 +66,7 @@ namespace 精密切割系统.Assets.config.menu
             list.Add(new MenuBean(202, "校准", "/Assets/icon/menu_2/menu_2_2.png", "/Assets/icon/menu_2/menu_2_2_white.png", 3, "Pages/F2_ManualOperation/MQManualAlignmentConf"));
             // list.Add(new MenuBean(203, "自动切割", "/Assets/icon/menu_2/menu_2_3.png", "/Assets/icon/menu_2/menu_2_3_white.png", 3, "Pages/F2_ManualOperation/MQAutoCutoConf"));
             // list.Add(new MenuBean(204, "自动切割", "/Assets/icon/menu_2/menu_2_4.png", "/Assets/icon/menu_2/menu_2_4_white.png", 3, "Pages/F2_ManualOperation/MQAutoCutoConf"));
-            list.Add(new MenuBean(204, "半自动切割", "/Assets/icon/menu_2/menu_2_4.png", "/Assets/icon/menu_2/menu_2_4_white.png", 3, "Pages/F2_ManualOperation/MQSemiAutomaticCuttingConf"));
+            //list.Add(new MenuBean(204, "半自动切割", "/Assets/icon/menu_2/menu_2_4.png", "/Assets/icon/menu_2/menu_2_4_white.png", 3, "Pages/F2_ManualOperation/MQSemiAutomaticCuttingConf"));
             return list;
         }
         //F4

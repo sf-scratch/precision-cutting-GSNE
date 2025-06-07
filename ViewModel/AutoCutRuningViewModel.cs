@@ -252,12 +252,14 @@ namespace 精密切割系统.ViewModel
                     MaterialSnackUtils.MaterialSnack("轮毂信息获取错误！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
                     return;
                 }
-                // 测高前移动相机位置
-                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(Appsettings.FocusClearZ ?? 0, 1, _pauseCts.Token);
+                // 测高的同时移动相机位置
                 RunStatus = AutoRunStatus.HeightMeasurementInProgress;
                 HeightMeasurementMode heightMeasurementMode = HeightMeasurementMode.NoContact;
+                Task zAxisTask = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(Appsettings.FocusClearZ ?? 0, 1, _pauseCts.Token);
+                Task<float?> measureHeightTask = AutoCutUtils.ProcessMeasureHeightAsync(heightMeasurementMode, _pauseCts.Token, _dialogService, _eventAggregator);
+                await Task.WhenAll(zAxisTask, measureHeightTask);
                 // 开始测高
-                float? firstHeightMeasurementZ = await AutoCutUtils.ProcessMeasureHeightAsync(heightMeasurementMode, _pauseCts.Token, _dialogService, _eventAggregator);
+                float? firstHeightMeasurementZ = measureHeightTask.Result;
                 if (firstHeightMeasurementZ == null)
                 {
                     MaterialSnackUtils.MaterialSnack("测高失败，没有测高数据！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
@@ -282,7 +284,6 @@ namespace 精密切割系统.ViewModel
                 PdaUtils.AddStandardSharpenSpeed(SharpenParams.HightestCutSpeed);
                 // 切割校准
                 float cutCalibratTheta = await AutoCutUtils.CalibratCutAsync(new DataPoint<float>(cameraCenterPoint.X, cameraCenterPoint.Y + GlobalParams.CenterDistance), workpieceRadius, _pauseCts.Token);
-
                 //新刀才磨刀
                 if (lunguSksj.BladeType == "新刀")
                 {

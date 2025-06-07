@@ -269,6 +269,7 @@ namespace 精密切割系统.Model.cut
             _continueTcs = null;
             _finishedSharpenTimes = 0;
             _isNewestSharpen = true;
+            Init();
         }
 
         public void Reset()

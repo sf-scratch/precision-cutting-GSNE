@@ -548,9 +548,9 @@ namespace 精密切割系统.FrmWindow.common
 
                 Tools.LogInfo($"拉直后的Y位置：{A_rotated.Y} A:{A} B:{B} computingAngle:{computingAngle} center:{center}");
                 Debug.WriteLine($"拉直后的Y位置：{A_rotated.Y} A:{A} B:{B} computingAngle:{computingAngle} center:{center}");
-                if (A_rotated.Y > 0)
+                if (A_rotated.X > 0)
                 {
-                    // PlcControl.tagControl.Yaxis.StartAbsolute(GlobalParams.yDefaultSpeed, A_rotated.Y + "", false);
+                    PlcControl.tagControl.Xaxis.StartAbsolute(GlobalParams.xDefaultSpeed, A_rotated.X + "", false);
                 }
                 // 监听是否移动到位
                 Thread _thread = new Thread(() =>

@@ -275,22 +275,25 @@ namespace 精密切割系统.Model.cut
             {
                 if (mode is HeightMeasurementMode.NoContact)
                 {
-                    float startBlowX = 119, endBlowX = 131;
-                    //测高前移动到初始位置，主轴旋转，开始吹水吹气
-                    await PlcControl.tagControl.cutting.RunMotionAsync(startBlowX, 50, token);
                     //主轴旋转
                     eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("主轴开始旋转"));
                     await PlcControl.tagControl.wholeDevice.StartSpindleAsync();
                     //eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹水"));
                     //await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingWaterAsync(2);
                     eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹气"));
-                    await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingAsync();
-                    for (int count = 0; count < 2; count++)
-                    {
-                        await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(endBlowX, 8);
-                        await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(startBlowX, 8);
-                    }
-                    await PlcControl.tagControl.bladeMantance.CloseOpticalFiberSensorBlowingAsync();
+                    await PlcControl.tagControl.cutting.RunMotionAsync(119.5f, 50, token);
+                    await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingAsync(5);
+
+                    //float startBlowX = 119, endBlowX = 131;
+                    ////测高前移动到初始位置，主轴旋转，开始吹水吹气
+                    //await PlcControl.tagControl.cutting.RunMotionAsync(startBlowX, 50, token);
+                    //await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingAsync();
+                    //for (int count = 0; count < 2; count++)
+                    //{
+                    //    await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(endBlowX, 8);
+                    //    await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(startBlowX, 8);
+                    //}
+                    //await PlcControl.tagControl.bladeMantance.CloseOpticalFiberSensorBlowingAsync();
                 }
 
                 //等待测高准备完成信号
@@ -594,9 +597,11 @@ namespace 精密切割系统.Model.cut
                 if (tenengradBlurriness > 200)
                 {
                     eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"图像已清晰无需再次聚焦"));
+                    Appsettings.IsNeedCheckBaseLine = false;
                     return focusClearZ;
                 }
             }
+            Appsettings.IsNeedCheckBaseLine = true;
             float? roughFocusPosition = await AutoFocusAsync(cameraCommon, focusClearZ, 0.5f, 0.05f, token, eventAggregator);
             if (roughFocusPosition == null)
             {
@@ -1220,8 +1225,8 @@ namespace 精密切割系统.Model.cut
                 DataPoint<float> relativePos = Appsettings.CameraRelativeBladePosition;
                 //工件吹气
                 eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始工件吹气..."));
-                float rightCheckX = line.EndPoint.X + relativePos.X - 2;
-                float leftCheckX = line.StartPoint.X + relativePos.X + 2;
+                float rightCheckX = line.EndPoint.X + relativePos.X - 10;
+                float leftCheckX = line.StartPoint.X + relativePos.X + 10;
                 float checkY = line.EndPoint.Y + relativePos.Y;
                 await PlcControl.tagControl.wholeDevice.OpenWorkpieceBlowingAsync();
                 await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(190, 80, token);
@@ -1254,7 +1259,7 @@ namespace 精密切割系统.Model.cut
                     }
                 });
                 CancellationTokenSource analysisCts = new CancellationTokenSource();
-                Task<ImagesAnalysisResult> analysisTask = ProcessImagesAnalysisAsync(matQueue, eventAggregator, analysisCts.Token);
+                Task<ImagesAnalysisResult?> analysisTask = ProcessImagesAnalysisAsync(matQueue, eventAggregator, analysisCts.Token);
                 await Task.WhenAny(slowSpeedMoveTask, grabTimerTask, analysisTask);
                 cts.Cancel();
                 await grabTimerTask;
@@ -1332,10 +1337,10 @@ namespace 精密切割系统.Model.cut
                 result.CollapseWidthMaxImage = imageData;
         }
 
-        public static async Task<ImagesAnalysisResult> ProcessImagesAnalysisAsync(ConcurrentQueue<Mat> matQueue, IEventAggregator? eventAggregator = null, CancellationToken token = default)
+        public static async Task<ImagesAnalysisResult?> ProcessImagesAnalysisAsync(ConcurrentQueue<Mat> matQueue, IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
-            var result = new ImagesAnalysisResult();
-            result.IsSnakelike = await Task.Run(async () =>
+            ImagesAnalysisResult result = new ImagesAnalysisResult();
+            bool? isSnake = await Task.Run<bool?>(async () =>
             {
                 List<Mat> mats = new List<Mat>();
                 try
@@ -1365,7 +1370,7 @@ namespace 精密切割系统.Model.cut
                 List<Mat> concatMats = ConcatMats(mats);
                 stopwatch.Stop();
                 eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"拼接所有图像用时: {stopwatch.Elapsed.TotalSeconds} 秒"));
-                stopwatch = Stopwatch.StartNew();
+                
                 foreach (Mat concatMat in concatMats)
                 {
                     Mat cropConcatMat = CropHorizontalCenter(concatMat, 80);
@@ -1417,18 +1422,26 @@ namespace 精密切割系统.Model.cut
                     //    thickness: 1,             // 线宽
                     //    lineType: LineTypes.AntiAlias // 抗锯齿
                     //    );
-                    result.ConcatImages.Add(new ImageData()
+                    stopwatch = Stopwatch.StartNew();
+                    try
                     {
-                        BladeWidth = 0,
-                        CollapseWidth = 0,
-                        //IsSnakelike = VisionAnalyzer.SnakeCase(cropConcatMatJpg).Snake,
-                        IsSnakelike = true,
-                        Mat = cropConcatMatJpg
-                    });
+                        result.ConcatImages.Add(new ImageData()
+                        {
+                            BladeWidth = 0,
+                            CollapseWidth = 0,
+                            IsSnakelike = VisionAnalyzer.SnakeCase(cropConcatMatJpg).Snake,
+                            //IsSnakelike = true,
+                            Mat = cropConcatMatJpg
+                        });
+                        stopwatch.Stop();
+                        eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"识别蛇形总用时: {stopwatch.Elapsed.TotalSeconds} 秒"));
+                    }
+                    catch(Exception ex)
+                    {
+                        eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create(ex.Message));
+                        return null;
+                    }
                 }
-                stopwatch.Stop();
-                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"识别拼接图像总用时: {stopwatch.Elapsed.TotalSeconds} 秒"));
-                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"识别拼接图像平均单张用时（{concatMats.Count}张）: {stopwatch.Elapsed.TotalSeconds / concatMats.Count} 秒"));
 
 
                 stopwatch = Stopwatch.StartNew();
@@ -1447,7 +1460,14 @@ namespace 精密切割系统.Model.cut
                 eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"保存识别后的拼接图像总用时: {stopwatch.Elapsed.TotalSeconds} 秒"));
                 return result.ConcatImages.All(image => image.IsSnakelike);
             });
-
+            if (isSnake == null)
+            {
+                return null;
+            }
+            else
+            {
+                result.IsSnakelike = isSnake.Value;
+            }
             return result;
         }
 
