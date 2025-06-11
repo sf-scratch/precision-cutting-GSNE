@@ -337,11 +337,6 @@ namespace 精密切割系统.View
                         break;
                     }
                 case 202:
-                    if (!GlobalParams.onlineFlag)
-                    {
-                        mainWindow.NavigateToPage(bean.PageUrl);
-                        break;
-                    }
                     mainWindow.NavigateToPage(bean.PageUrl);
                     break;
                 case 401:

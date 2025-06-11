@@ -15,57 +15,12 @@
              d:DesignHeight="250" d:DesignWidth="1500" IsVisibleChanged="UserControl_IsVisibleChanged">
     <UserControl.Resources>
         <convert:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
-        <Style TargetType="Button">
-            <Setter Property="BorderBrush" Value="{x:Null}"></Setter>
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderBrush" Value="Transparent"/>
-            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" 
-BorderBrush="{TemplateBinding BorderBrush}" 
-BorderThickness="{TemplateBinding BorderThickness}">
-                            <ContentPresenter />
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="RenderTransform">
-                <Setter.Value>
-                    <ScaleTransform ScaleX="1.0" ScaleY="1.0"/>
-                </Setter.Value>
-            </Setter>
-
-            <!-- 按下效果触发器 -->
-            <Style.Triggers>
-                <!-- 鼠标按下时效果 -->
-                <Trigger Property="IsPressed" Value="True">
-
-                    <Setter Property="RenderTransform">
-                        <Setter.Value>
-                            <ScaleTransform ScaleX="0.95" ScaleY="0.95"/>
-                        </Setter.Value>
-                    </Setter>
-                    <Setter Property="BorderBrush" Value="DarkGray"/>
-                </Trigger>
-
-                <!-- 动态恢复效果：动画从按下状态回到正常状态 -->
-                <Trigger Property="IsPressed" Value="False">
-                    <Trigger.EnterActions>
-                        <BeginStoryboard>
-                            <Storyboard>
-                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleX)"
-                                                 To="1.0" Duration="0:0:0.1"/>
-                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleY)"
-                                                 To="1.0" Duration="0:0:0.1"/>
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </Trigger.EnterActions>
-                    <!-- 松开时移除边框 -->
-                    <Setter Property="BorderBrush" Value="Transparent"/>
-                </Trigger>
-            </Style.Triggers>
+        <convert:BoolToMoveModeConverter x:Key="BoolToMoveModeConverter"/>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
     </UserControl.Resources>
     <UserControl.DataContext>
@@ -81,11 +36,11 @@ BorderThickness="{TemplateBinding BorderThickness}">
                 <Border.Effect>
                     <DropShadowEffect 
                     ShadowDepth="4" 
-                    BlurRadius="20" 
+                    BlurRadius="10" 
                     Color="#4DC9EBF7" 
                     Direction="315" />
                 </Border.Effect>
-                <auto:AutoGrid Margin="10" Columns="auto,*,*,*,*,*,*,auto,auto,auto" RowCount="5" ChildMargin="5">
+                <auto:AutoGrid Margin="10" Columns="auto,auto,auto,auto,auto" RowCount="5" ChildMargin="5">
                     <auto:AutoGrid.Resources>
                         <ResourceDictionary>
                             <ResourceDictionary.MergedDictionaries>
@@ -94,77 +49,82 @@ BorderThickness="{TemplateBinding BorderThickness}">
                         </ResourceDictionary>
                     </auto:AutoGrid.Resources>
                     <TextBlock Text="X" Style="{StaticResource MaterialDesignBody1TextBlock}"/>
-                    <TextBox materialDesign:HintAssist.Hint="当前Jog速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedX}" />
-                    <TextBox materialDesign:HintAssist.Hint="当前速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedX}" />
+                    <!--<TextBox materialDesign:HintAssist.Hint="当前Jog速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedX}" />
+                    <TextBox materialDesign:HintAssist.Hint="当前速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedX}" />-->
                     <TextBox materialDesign:HintAssist.Hint="当前位置mm" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentPositionX}" />
-                    <TextBox materialDesign:HintAssist.Hint="运动速度mm/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedX}" />
+                    <!--<TextBox materialDesign:HintAssist.Hint="运动速度mm/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedX}" />
                     <TextBox materialDesign:HintAssist.Hint="目标位置mm" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding TargetPositionX}" />
+                    <TextBlock Text="{Binding IsAbsMoveX, Converter={StaticResource BoolToMoveModeConverter}}"/>
                     <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding IsAbsMoveX, Mode=TwoWay}">
                         <materialDesign:PackIcon Kind="MapMarkerDistance" />
                         <materialDesign:ToggleButtonAssist.OnContent>
                             <materialDesign:PackIcon Kind="MapMarker" />
                         </materialDesign:ToggleButtonAssist.OnContent>
-                    </ToggleButton>
+                    </ToggleButton>-->
                     <Button Content="开始" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding StartXCommand}" IsEnabled="{Binding IsReadyX}"/>
                     <Button Content="原点" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding StartHomingXCommand}"/>
                     <Button Content="放松" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding RelaxXCommand}"/>
                     <TextBlock Text="Y" Style="{StaticResource MaterialDesignBody1TextBlock}"/>
-                    <TextBox materialDesign:HintAssist.Hint="当前Jog速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedY}" />
-                    <TextBox materialDesign:HintAssist.Hint="当前速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedY}" />
+                    <!--<TextBox materialDesign:HintAssist.Hint="当前Jog速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedY}" />
+                    <TextBox materialDesign:HintAssist.Hint="当前速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedY}" />-->
                     <TextBox materialDesign:HintAssist.Hint="当前位置mm" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentPositionY}" />
-                    <TextBox materialDesign:HintAssist.Hint="运动速度mm/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedY}" />
+                    <!--<TextBox materialDesign:HintAssist.Hint="运动速度mm/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedY}" />
                     <TextBox materialDesign:HintAssist.Hint="目标位置mm" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding TargetPositionY}" />
+                    <TextBlock Text="{Binding IsAbsMoveY, Converter={StaticResource BoolToMoveModeConverter}}"/>
                     <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding IsAbsMoveY, Mode=TwoWay}">
                         <materialDesign:PackIcon Kind="MapMarkerDistance" />
                         <materialDesign:ToggleButtonAssist.OnContent>
                             <materialDesign:PackIcon Kind="MapMarker" />
                         </materialDesign:ToggleButtonAssist.OnContent>
-                    </ToggleButton>
+                    </ToggleButton>-->
                     <Button Content="开始" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding StartYCommand}" IsEnabled="{Binding IsReadyY}"/>
                     <Button Content="原点" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding StartHomingYCommand}"/>
                     <Button Content="放松" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding RelaxYCommand}"/>
                     <TextBlock Text="Z1" Style="{StaticResource MaterialDesignBody1TextBlock}"/>
-                    <TextBox materialDesign:HintAssist.Hint="当前Jog速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedZ1}" />
-                    <TextBox materialDesign:HintAssist.Hint="当前速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedZ1}" />
+                    <!--<TextBox materialDesign:HintAssist.Hint="当前Jog速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedZ1}" />
+                    <TextBox materialDesign:HintAssist.Hint="当前速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedZ1}" />-->
                     <TextBox materialDesign:HintAssist.Hint="当前位置mm" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentPositionZ1}" />
-                    <TextBox materialDesign:HintAssist.Hint="运动速度mm/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedZ1}" />
+                    <!--<TextBox materialDesign:HintAssist.Hint="运动速度mm/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedZ1}" />
                     <TextBox materialDesign:HintAssist.Hint="目标位置mm" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding TargetPositionZ1}" />
+                    <TextBlock Text="{Binding IsAbsMoveZ1, Converter={StaticResource BoolToMoveModeConverter}}"/>
                     <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding IsAbsMoveZ1, Mode=TwoWay}">
                         <materialDesign:PackIcon Kind="MapMarkerDistance" />
                         <materialDesign:ToggleButtonAssist.OnContent>
                             <materialDesign:PackIcon Kind="MapMarker" />
                         </materialDesign:ToggleButtonAssist.OnContent>
-                    </ToggleButton>
+                    </ToggleButton>-->
                     <Button Content="开始" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding StartZ1Command}" IsEnabled="{Binding IsReadyZ1}"/>
                     <Button Content="原点" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding StartHomingZ1Command}"/>
                     <Button Content="放松" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding RelaxZ1Command}"/>
                     <TextBlock Text="Z2" Style="{StaticResource MaterialDesignBody1TextBlock}"/>
-                    <TextBox materialDesign:HintAssist.Hint="当前Jog速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedZ2}" />
-                    <TextBox materialDesign:HintAssist.Hint="当前速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedZ2}" />
+                    <!--<TextBox materialDesign:HintAssist.Hint="当前Jog速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedZ2}" />
+                    <TextBox materialDesign:HintAssist.Hint="当前速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedZ2}" />-->
                     <TextBox materialDesign:HintAssist.Hint="当前位置mm" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentPositionZ2}" />
-                    <TextBox materialDesign:HintAssist.Hint="运动速度mm/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedZ2}" />
+                    <!--<TextBox materialDesign:HintAssist.Hint="运动速度mm/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedZ2}" />
                     <TextBox materialDesign:HintAssist.Hint="目标位置mm" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding TargetPositionZ2}" />
+                    <TextBlock Text="{Binding IsAbsMoveZ2, Converter={StaticResource BoolToMoveModeConverter}}"/>
                     <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding IsAbsMoveZ2, Mode=TwoWay}">
                         <materialDesign:PackIcon Kind="MapMarkerDistance" />
                         <materialDesign:ToggleButtonAssist.OnContent>
                             <materialDesign:PackIcon Kind="MapMarker" />
                         </materialDesign:ToggleButtonAssist.OnContent>
-                    </ToggleButton>
+                    </ToggleButton>-->
                     <Button Content="开始" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding StartZ2Command}" IsEnabled="{Binding IsReadyZ2}"/>
                     <Button Content="原点" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding StartHomingZ2Command}"/>
                     <Button Content="放松" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding RelaxZ2Command}"/>
                     <TextBlock Text="θ" Style="{StaticResource MaterialDesignBody1TextBlock}"/>
-                    <TextBox materialDesign:HintAssist.Hint="当前Jog速度deg/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedTheta}" />
-                    <TextBox materialDesign:HintAssist.Hint="当前速度deg/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedTheta}" />
+                    <!--<TextBox materialDesign:HintAssist.Hint="当前Jog速度deg/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedTheta}" />
+                    <TextBox materialDesign:HintAssist.Hint="当前速度deg/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedTheta}" />-->
                     <TextBox materialDesign:HintAssist.Hint="当前位置deg" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentPositionTheta}" />
-                    <TextBox materialDesign:HintAssist.Hint="运动速度deg/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedTheta}" />
+                    <!--<TextBox materialDesign:HintAssist.Hint="运动速度deg/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedTheta}" />
                     <TextBox materialDesign:HintAssist.Hint="目标位置deg" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding TargetPositionTheta}" />
+                    <TextBlock Text="{Binding IsAbsMoveTheta, Converter={StaticResource BoolToMoveModeConverter}}"/>
                     <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding IsAbsMoveTheta, Mode=TwoWay}">
                         <materialDesign:PackIcon Kind="MapMarkerDistance" />
                         <materialDesign:ToggleButtonAssist.OnContent>
                             <materialDesign:PackIcon Kind="MapMarker" />
                         </materialDesign:ToggleButtonAssist.OnContent>
-                    </ToggleButton>
+                    </ToggleButton>-->
                     <Button Content="开始" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding StartThetaCommand}" IsEnabled="{Binding IsReadyTheta}"/>
                     <Button Content="原点" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding StartHomingThetaCommand}"/>
                     <Button Content="放松" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding RelaxThetaCommand}"/>
@@ -174,7 +134,7 @@ BorderThickness="{TemplateBinding BorderThickness}">
                 <Border.Effect>
                     <DropShadowEffect 
                     ShadowDepth="5" 
-                    BlurRadius="20" 
+                    BlurRadius="10" 
                     Color="#4DC9EBF7" 
                     Direction="315" />
                 </Border.Effect>

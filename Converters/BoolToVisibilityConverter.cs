@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System;
+using System.Windows;
+using System.Windows.Data;
 
 namespace 精密切割系统.Converters
 {
-    using System;
-    using System.Windows;
-    using System.Windows.Data;
 
     public class BoolToVisibilityConverter : IValueConverter
     {

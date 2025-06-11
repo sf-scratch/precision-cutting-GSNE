@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Org.BouncyCastle.Crypto.Generators;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -183,6 +184,21 @@ namespace 精密切割系统.ViewModel
             OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调窄", "/Assets/icon/tab_1/03/tab_02.png", BaselineNarrowing, null, 8));
             OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调宽", "/Assets/icon/tab_1/03/tab_05.png", BaselineWidthAdjustment, null, 8));
             OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线校准", "/Assets/icon/tab_1/03/tab_08.png", BaselineCalibration, null, 8));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("报废", "/Assets/icon/tab_1/03/tab_08.png", BladeScrap, null, 8));
+        }
+
+        private bool _isSureBladeScrap = false;
+
+        private async void BladeScrap()
+        {
+            if (!_isSureBladeScrap)
+            {
+                _isSureBladeScrap = true;
+                MaterialSnackUtils.MaterialSnack("再次点击报废，刀片将提交报废并退出自动执行！", MaterialSnackUtils.SnackType.WARNING);
+                return;
+            }
+            _isSureBladeScrap = false;
+            await _autoCutRuningViewModel.StopAsync(ServicePauseResult.BladeScrap);
         }
 
         private void BaselineWidthAdjustment()
@@ -259,7 +275,7 @@ namespace 精密切割系统.ViewModel
 
         private async void StopCommandExecute()
         {
-            await _autoCutRuningViewModel.StopAsync();
+            await _autoCutRuningViewModel.StopAsync(ServicePauseResult.Stop);
         }
 
         public override async void OnNavigatedTo(NavigationContext navigationContext)

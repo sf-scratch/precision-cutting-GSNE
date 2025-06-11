@@ -114,8 +114,8 @@
                         </TextBox.InputBindings>
                     </Controls:InputTextBox>
                     <TextBlock HorizontalAlignment="Left" Text=""/>
-                    <TextBlock Text="订单规格"/>
-                    <Controls:InputTextBox Text="{Binding LunguSks.OrderType}"/>
+                    <TextBlock Text="实际刀刃规格"/>
+                    <Controls:InputTextBox Text="{Binding LunguSks.SjSpec}"/>
                     <TextBlock Text="刀刃平均厚度"/>
                     <Controls:InputTextBox Text="{Binding LunguSks.ABAverageThickness}"/>
                     <TextBlock HorizontalAlignment="Left" Text="um"/>

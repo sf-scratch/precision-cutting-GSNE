@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows;
+using System.Threading;
 
 namespace 精密切割系统.Behaviors
 {
@@ -30,10 +31,9 @@ namespace 精密切割系统.Behaviors
             set => SetValue(StopCommandProperty, value);
         }
 
-        // 是否已触发事件
-        private volatile bool _isRaiseTouchDownEvent = false;
         // 是否已触发命令
-        private volatile bool _isRaiseCommand = false;
+        private int _isRaiseCommand = 0; // 0表示未触发，1表示已触发
+        private CancellationTokenSource _delayCts;
 
         protected override void OnAttached()
         {
@@ -59,67 +59,67 @@ namespace 精密切割系统.Behaviors
             AssociatedObject.TouchUp -= AssociatedObject_TouchUp;
             AssociatedObject.PreviewMouseUp -= AssociatedObject_PreviewMouseUp;
             AssociatedObject.MouseLeave -= AssociatedObject_MouseLeave;
-
             base.OnDetaching();
         }
 
-        private void AssociatedObject_TouchDown(object? sender, TouchEventArgs e)
+        private async void AssociatedObject_TouchDown(object? sender, TouchEventArgs e)
         {
-            _isRaiseCommand = true;
-            _isRaiseTouchDownEvent = true;
-            if (StartCommand?.CanExecute(e) == true)
+            if (_delayCts is not null && !_delayCts.IsCancellationRequested) return;
+            _delayCts = new CancellationTokenSource();
+            try
             {
-                StartCommand.Execute(e);
+                await Task.Delay(TimeSpan.FromSeconds(0.5), _delayCts.Token);
+                ExecuteStart(sender, e);
             }
+            catch (TaskCanceledException) { }
         }
 
-        private void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
+        private async void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            _isRaiseCommand = true;
-            // 执行触摸命令
-            if (!_isRaiseTouchDownEvent && StartCommand?.CanExecute(e) == true)
+            if (_delayCts is not null && !_delayCts.IsCancellationRequested) return;
+            _delayCts = new CancellationTokenSource();
+            try
             {
-                StartCommand.Execute(e);
+                await Task.Delay(TimeSpan.FromSeconds(0.5), _delayCts.Token);
+                ExecuteStart(sender, e);
             }
+            catch (TaskCanceledException) { }
         }
 
         private void AssociatedObject_MouseLeave(object sender, MouseEventArgs e)
         {
-            if (_isRaiseCommand && StopCommand?.CanExecute(e) == true)
-            {
-                StopCommand.Execute(e);
-                _isRaiseCommand = false;
-                _isRaiseTouchDownEvent = false;
-            }
+            ExecuteStop(sender, e);
         }
 
         private void AssociatedObject_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
-            if (_isRaiseCommand && StopCommand?.CanExecute(e) == true)
-            {
-                StopCommand.Execute(e);
-                _isRaiseCommand = false;
-                _isRaiseTouchDownEvent = false;
-            }
+            ExecuteStop(sender, e);
         }
 
         private void AssociatedObject_TouchUp(object? sender, TouchEventArgs e)
         {
-            if (_isRaiseCommand && StopCommand?.CanExecute(e) == true)
-            {
-                StopCommand.Execute(e);
-                _isRaiseCommand = false;
-                _isRaiseTouchDownEvent = false;
-            }
+            ExecuteStop(sender, e);
         }
 
         private void AssociatedObject_TouchLeave(object? sender, TouchEventArgs e)
         {
-            if (_isRaiseCommand && StopCommand?.CanExecute(e) == true)
+            ExecuteStop(sender, e);
+        }
+
+        private void ExecuteStart(object? sender, object e)
+        {
+            if (Interlocked.CompareExchange(ref _isRaiseCommand, 1, 0) == 0 && StartCommand?.CanExecute(e) == true)
+            {
+                StartCommand.Execute(e);
+            }
+        }
+
+        private void ExecuteStop(object? sender, object e)
+        {
+            _delayCts?.Cancel();
+            if (Interlocked.CompareExchange(ref _isRaiseCommand, 0, 1) == 1 && StopCommand?.CanExecute(e) == true)
             {
                 StopCommand.Execute(e);
-                _isRaiseCommand = false;
-                _isRaiseTouchDownEvent = false;
             }
         }
     }

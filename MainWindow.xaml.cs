@@ -256,8 +256,6 @@ namespace 精密切割系统
             
             // 关闭Y轴光栅尺校准
             PlcControl.tagControl.cutting.SetYAxisCompStatus(0);
-            // 关闭插补
-            PlcControl.tagControl.wholeDevice.SetInterpositionStatus(0);
 
             // 记录异常日志
             PlcControl.AddAlarmLog();

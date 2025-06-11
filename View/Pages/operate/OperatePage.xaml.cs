@@ -420,20 +420,9 @@ namespace 精密切割系统.View.Pages.operate
             switch (e.Code)
             {
                 case 1:
-                    //if (CommonCheck.ModeCheck())
-                    //{
-                    //    return;
-                    //}
-                    // 测高
-                    //ToBladeHeight(sender as OperateButton);
                     await OpticalFiberSensorBlowingAsync();
                     break;
                 case 2:
-                    //if (CommonCheck.ModeCheck())
-                    //{
-                    //    return;
-                    //}
-                    //mainWindow.NavigateToPage("Pages/F3_ModelCatalog/MCDeviceDataListConf");
                     await OpticalFiberSensorBlowingWaterAsync();
                     break;
                 case 3:
@@ -465,10 +454,6 @@ namespace 精密切割系统.View.Pages.operate
                     SpindleManuallyRun();
                     break;
                 case 5:
-                    if (!GlobalParams.onlineFlag)
-                    {
-                        return;
-                    }
                     // 切割水
                     await CutWaterOperateAsync();
                     break;
@@ -497,10 +482,6 @@ namespace 精密切割系统.View.Pages.operate
                     Door2Operate();
                     break;
                 case 9:
-                    if (!GlobalParams.onlineFlag)
-                    {
-                        return;
-                    }
                     // 相机吹气
                     await CameraBlowingOperateAsync();
                     break;
@@ -509,8 +490,6 @@ namespace 精密切割系统.View.Pages.operate
                     {
                         return;
                     }
-                    // 工件更换
-                    //ReplaceWorkpiece();
                     if (await PlcControl.tagControl.wholeDevice.IsOpenWorkVacuumSwitchStatusAsync())
                     {
                         await PlcControl.tagControl.wholeDevice.CloseWorkVacuumSwitchAsync();

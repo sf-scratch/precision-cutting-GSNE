@@ -17,6 +17,7 @@ namespace 精密切割系统.Helpers
         private static FlowsValuesDTO? MslValues = null;
         private static FlowsValuesDTO? AfterCircleMslValues = null;
         private static int GroupCode = 0;
+        private static string _lunguId;
 
         private static void InitParams()
         {
@@ -28,20 +29,23 @@ namespace 精密切割系统.Helpers
         public static async Task<bool> ComputerPracticeAsync(string lunguId)
         {
             if (!GlobalParams.OnlineMES) return true;
+            _lunguId = lunguId;
             List<FlowSettingDTO>? allFieldValues = await HttpUtils.QueryFlowSettingByIdAsync();
             if (allFieldValues == null)
             {
+                MaterialSnackUtils.MaterialSnack("QueryFlowSettingByIdAsync失败", MaterialSnackUtils.SnackType.WARNING, 0);
                 return false;
             }
             Dictionary<string, FlowsValuesDTO> flowsDic = allFieldValues.Select(x => x.ToFlowsValuesDTO()).ToDictionary(x => x.FieldLabel);
             FieldValuesDTO fieldValues = GetFieldValuesDTO(flowsDic, "QG-03", lunguId);
-            string? groupOperateId = await HttpUtils.InsertFlowValuesAsync(fieldValues);
-            if (groupOperateId == null)
+            HttpUtilsResult<string> groupOperateIdRes = await HttpUtils.InsertFlowValuesAsync(fieldValues);
+            if (groupOperateIdRes.Data == null)
             {
+                MaterialSnackUtils.MaterialSnack(groupOperateIdRes.Msg, MaterialSnackUtils.SnackType.WARNING, 0);
                 return false;
             }
-            fieldValues.GroupOperateId = groupOperateId;
-            fieldValues.List[0].GroupOperateId = groupOperateId;
+            fieldValues.GroupOperateId = groupOperateIdRes.Data;
+            fieldValues.List[0].GroupOperateId = groupOperateIdRes.Data;
             fieldValues.List.RemoveAt(1);
             _tuple = new Tuple<FieldValuesDTO, Dictionary<string, FlowsValuesDTO>>(fieldValues, flowsDic);
             InitParams();
@@ -171,15 +175,16 @@ namespace 精密切割系统.Helpers
                 MslValues.GroupOperateId = fieldValues.GroupOperateId;
                 fieldValues.List.Add(MslValues);
             }
+            int wearAmountInt = (int)Math.Round(wearAmount * 1000);
             int childrenIndex = GroupCode;
             GroupCode++;
             if (childrenIndex == 0)
             {
-                MslValues.FieldValue = Math.Round(float.Parse(MslValues.FieldValue) + wearAmount * 1000).ToString();
+                MslValues.FieldValue = Math.Round(float.Parse(MslValues.FieldValue) + wearAmountInt).ToString();
                 FlowsValuesDTO mosunliang = MslValues.Children[0].FieldList[0].ToFlowsValuesDTO();
                 mosunliang.ParentId = MslValues.FieldId;
                 mosunliang.GroupOperateId = fieldValues.GroupOperateId;
-                mosunliang.FieldValue = Math.Round(wearAmount * 1000).ToString();
+                mosunliang.FieldValue = wearAmountInt.ToString();
                 mosunliang.GroupCode = GroupCode.ToString();
                 fieldValues.List.Add(mosunliang);
                 FlowsValuesDTO mdsl = MslValues.Children[0].FieldList[1].ToFlowsValuesDTO();
@@ -191,7 +196,7 @@ namespace 精密切割系统.Helpers
                 FlowsValuesDTO ddmsl = MslValues.Children[0].FieldList[2].ToFlowsValuesDTO();
                 ddmsl.ParentId = MslValues.FieldId;
                 ddmsl.GroupOperateId = fieldValues.GroupOperateId;
-                ddmsl.FieldValue = Math.Round(wearAmount / count * 1000, 2).ToString();
+                ddmsl.FieldValue = Math.Round((float)wearAmountInt / count, 2).ToString();
                 ddmsl.GroupCode = GroupCode.ToString();
                 fieldValues.List.Add(ddmsl);
             }
@@ -278,13 +283,13 @@ namespace 精密切割系统.Helpers
             }
         }
 
-        public static void AddSecondToolMarkImage(Mat Mat)
+        public static void AddSecondToolMarkImage(Mat mat)
         {
             if (!GlobalParams.OnlineMES || _tuple is null) return;
             FieldValuesDTO fieldValues = _tuple.Item1;
             Dictionary<string, FlowsValuesDTO> fieldDic = _tuple.Item2;
             // 上传第二刀图片
-            string? secondUrl = HttpUtils.UploadImage(Mat);
+            string? secondUrl = HttpUtils.UploadImage(mat);
             if (secondUrl == null)
             {
                 return;
@@ -306,12 +311,12 @@ namespace 精密切割系统.Helpers
             }
         }
 
-        public static void AddMaximumCollapseAngleImage(Mat Mat)
+        public static void AddMaximumCollapseAngleImage(Mat mat)
         {
             if (!GlobalParams.OnlineMES || _tuple is null) return;
             FieldValuesDTO fieldValues = _tuple.Item1;
             Dictionary<string, FlowsValuesDTO> fieldDic = _tuple.Item2;
-            string? imageUrl = HttpUtils.UploadImage(Mat);
+            string? imageUrl = HttpUtils.UploadImage(mat);
             if (imageUrl == null)
             {
                 return;
@@ -419,12 +424,15 @@ namespace 精密切割系统.Helpers
                 AfterCircleMslValues.GroupOperateId = fieldValues.GroupOperateId;
                 fieldValues.List.Add(AfterCircleMslValues);
             }
+            int wearAmountInt = (int)Math.Round(wearAmount * 1000);
             GroupCode++;
-            AfterCircleMslValues.FieldValue = Math.Round(float.Parse(AfterCircleMslValues.FieldValue) + wearAmount * 1000).ToString();
+            AfterCircleMslValues.FieldValue = Math.Round(float.Parse(AfterCircleMslValues.FieldValue) + wearAmountInt).ToString();
+            if (MslValues is not null)
+                MslValues.FieldValue = Math.Round(float.Parse(MslValues.FieldValue) + wearAmountInt).ToString();
             FlowsValuesDTO mosunliang = AfterCircleMslValues.Children[0].FieldList[0].ToFlowsValuesDTO();
             mosunliang.ParentId = AfterCircleMslValues.FieldId;
             mosunliang.GroupOperateId = fieldValues.GroupOperateId;
-            mosunliang.FieldValue = Math.Round(wearAmount * 1000).ToString();
+            mosunliang.FieldValue = wearAmountInt.ToString();
             mosunliang.GroupCode = "1";
             fieldValues.List.Add(mosunliang);
             FlowsValuesDTO mdsl = AfterCircleMslValues.Children[0].FieldList[1].ToFlowsValuesDTO();
@@ -436,7 +444,7 @@ namespace 精密切割系统.Helpers
             FlowsValuesDTO ddmsl = AfterCircleMslValues.Children[0].FieldList[2].ToFlowsValuesDTO();
             ddmsl.ParentId = AfterCircleMslValues.FieldId;
             ddmsl.GroupOperateId = fieldValues.GroupOperateId;
-            ddmsl.FieldValue = Math.Round(wearAmount / count * 1000, 2).ToString();
+            ddmsl.FieldValue = Math.Round((float)wearAmountInt / count, 2).ToString();
             ddmsl.GroupCode = "1";
             fieldValues.List.Add(ddmsl);
         }
@@ -468,6 +476,60 @@ namespace 精密切割系统.Helpers
             FieldValuesDTO fieldValues = _tuple.Item1;
             fieldValues.Status = "3";
             await HttpUtils.InsertFlowValuesAsync(fieldValues);
+        }
+
+        public static async Task ScrapAsync(Mat mat)
+        {
+            if (!GlobalParams.OnlineMES || _tuple is null) return;
+            FieldValuesDTO fieldValues = _tuple.Item1;
+            UpdateOperateStatusDTO updateOperateStatus = new UpdateOperateStatusDTO
+            {
+                CoGroupCode = fieldValues.CoGroupCode,
+                OperateId = fieldValues.GroupOperateId,
+                UserId = fieldValues.UserId
+            };
+            string? imageUrl = HttpUtils.UploadImage(mat);
+            updateOperateStatus.UpdateOperateStatusHubVoList.Add(new UpdateOperateStatusHubDTO
+            {
+                BadCoGroupCode = fieldValues.CoGroupCode,
+                UserId = fieldValues.UserId,
+                HubNumber = _lunguId,
+                QualityImgUrl = imageUrl ?? string.Empty,
+                ScrapFlag = "1",
+                BadCoGroupName = "切割车间",
+                ScrapYxId = "f7ef7df636624a209ef69acf77bbfec2",
+                ScrapYxName = "蛇形",
+                ScrapYxValue = "F",
+                ScrapTypeName = "生产报废",
+                ScrapTypeValue = "C",
+                QualityResult = "2",
+            });
+            await HttpUtils.UpdateGroupStatusAsync(updateOperateStatus);
+        }
+
+        /// <summary>
+        /// 合格
+        /// </summary>
+        /// <returns></returns>
+        public static async Task QualifiedAsync()
+        {
+            if (!GlobalParams.OnlineMES || _tuple is null) return;
+            FieldValuesDTO fieldValues = _tuple.Item1;
+            UpdateOperateStatusDTO updateOperateStatus = new UpdateOperateStatusDTO
+            {
+                CoGroupCode = fieldValues.CoGroupCode,
+                OperateId = fieldValues.GroupOperateId,
+                UserId = fieldValues.UserId
+            };
+            updateOperateStatus.UpdateOperateStatusHubVoList.Add(new UpdateOperateStatusHubDTO
+            {
+                BadCoGroupCode = fieldValues.CoGroupCode,
+                UserId = fieldValues.UserId,
+                HubNumber = _lunguId,
+                QualityResult = "0",
+                ScrapFlag = "0",
+            });
+            await HttpUtils.UpdateGroupStatusAsync(updateOperateStatus);
         }
     }
 }

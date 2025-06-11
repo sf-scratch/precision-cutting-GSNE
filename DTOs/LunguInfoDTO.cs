@@ -10,9 +10,9 @@ namespace 精密切割系统.DTOs
     public class LunguInfoDTO
     {
         /// <summary>
-        /// 刀片类型
+        /// 当前车间
         /// </summary>
-        [JsonProperty("finishType")]
-        public string BladeType { get; set; }
+        [JsonProperty("currentGroup")]
+        public string CurrentGroup { get; set; }
     }
 }

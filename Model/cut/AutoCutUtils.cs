@@ -42,135 +42,6 @@ namespace 精密切割系统.Model.cut
 {
     public class AutoCutUtils
     {
-        private static CancellationToken RunAutoCancellationToken { get; set; } = new CancellationToken();
-
-        /// <summary>
-        /// 自动切割
-        /// </summary>
-        public static async Task RunAuto()
-        {
-            LunguSksjDTO? lunguInfo = await HttpUtils.GetLunguSksjAsync(CameraUtils.GetLunguId());
-
-            // 开始测高
-            //float? afterHeightMeasurementZ = await ProcessMeasureHeightAsync();
-            float? afterHeightMeasurementZ = 0;
-            if (afterHeightMeasurementZ == null)
-            {
-                MaterialSnackUtils.MaterialSnack("测高失败！", MaterialSnackUtils.SnackType.ERROR);
-                return;
-            }
-            // 切割校准
-            //float cutCalibratTheta = await CalibratCutAsync();
-            // 磨刀校准
-            //float sharpenCalibratTheta = await CalibratSharpenAsync();
-            // 获取型号目录ID
-            long deviceDataId = CurrentUtils.GetCurrentConfiguration().DeviceDataId;
-            // 获取切割序列
-            Queue<CutStep>? cutSteps = await GetAllCutSequenceAsync(deviceDataId, afterHeightMeasurementZ.Value);
-            if (cutSteps == null)
-            {
-                MaterialSnackUtils.MaterialSnack("获取切割序列失败！", MaterialSnackUtils.SnackType.ERROR);
-                return;
-            }
-            int bmSharpParamId = 1;
-            // 磨刀板尺寸
-            DataRectangleF sharpenRect = GlobalParams.SharpenRect;
-            // 获取磨刀序列
-            Queue<SharpenStep>? sharpenSteps = await GetAllSharpenStepSequenceAsync(bmSharpParamId, afterHeightMeasurementZ.Value, sharpenRect);
-            if (sharpenSteps == null)
-            {
-                MaterialSnackUtils.MaterialSnack("获取磨刀序列失败！", MaterialSnackUtils.SnackType.ERROR);
-                return;
-            }
-            // theta轴中心点位置
-            DataPoint<float> thetaCenterPoint = GlobalParams.ThetaCenterPoint;
-            //工件半径
-            float workpieceRadius = GlobalParams.WorkpieceRadius;
-            //工件中心点到theta轴中心点距离
-            float centerDistance = GlobalParams.CenterDistance;
-            // 切割多少次开始磨刀
-            int cutCount = GlobalParams.CutThenSharpenStepNum;
-            // 磨刀次数
-            int sharpCount = GlobalParams.SharpenStepNum;
-            //Y轴切割起始位置
-            float cutStartY = 0;
-            //Y轴磨刀起始位置
-            float sharpStartY = 0;
-            ProcessResult sharpenResult;
-            ProcessResult cutResult;
-            while (!RunAutoCancellationToken.IsCancellationRequested)
-            {
-                //开始磨刀
-                sharpenResult = await ProcessSharpenAsync(thetaCenterPoint, sharpenRect, sharpStartY, sharpenSteps, sharpCount);
-                if (!sharpenResult.IsSuccess)
-                {
-                    throw new Exception("磨刀异常！");
-                }
-                //记录当前Y位置，作为下次磨刀的起始位置
-                sharpStartY = sharpenResult.CurrentY;
-                //磨刀序列是否已经使用完
-                if (sharpenSteps.Count == 0)
-                {
-                    //提示换磨刀板
-                    Tools.LogDebug("提示换磨刀板");
-                    //获取磨刀序列
-                    sharpenSteps = await GetAllSharpenStepSequenceAsync(bmSharpParamId, afterHeightMeasurementZ.Value, sharpenRect);
-                    if (sharpenSteps == null)
-                    {
-                        MaterialSnackUtils.MaterialSnack("获取磨刀序列失败！", MaterialSnackUtils.SnackType.ERROR);
-                        return;
-                    }
-                    //指定磨刀数是否磨刀完毕
-                    if (sharpenResult.RemainTimes != 0)
-                    {
-                        //开始磨刀
-                        sharpenResult = await ProcessSharpenAsync(thetaCenterPoint, sharpenRect, sharpStartY, sharpenSteps, sharpenResult.RemainTimes);
-                        if (!sharpenResult.IsSuccess)
-                        {
-                            throw new Exception("磨刀异常！");
-                        }
-                        //记录当前Y位置，作为下次磨刀的起始位置
-                        sharpStartY = sharpenResult.CurrentY;
-                    }
-                }
-
-                //开始切割
-                cutResult = await ProcessSemicircleCutSequenceAsync(thetaCenterPoint, workpieceRadius, centerDistance, cutStartY, cutSteps, cutCount);
-                if (!cutResult.IsSuccess)
-                {
-                    throw new Exception("切割异常！");
-                }
-                //记录当前Y位置，作为下次切割的起始位置
-                cutStartY = cutResult.CurrentY;
-                //切割序列是否已经切割完毕
-                if (cutSteps.Count == 0)
-                {
-                    //提示换工件
-                    Tools.LogDebug("提示换工件");
-                    //获取切割序列
-                    cutSteps = await GetAllCutSequenceAsync(deviceDataId, afterHeightMeasurementZ.Value);
-                    if (cutSteps == null)
-                    {
-                        MaterialSnackUtils.MaterialSnack("获取切割序列失败！", MaterialSnackUtils.SnackType.ERROR);
-                        return;
-                    }
-                    //指定切割数是否切割完毕
-                    if (cutResult.RemainTimes != 0)
-                    {
-                        //开始切割
-                        cutResult = await ProcessSemicircleCutSequenceAsync(thetaCenterPoint, workpieceRadius, centerDistance, cutStartY, cutSteps, cutResult.RemainTimes);
-                        if (!cutResult.IsSuccess)
-                        {
-                            throw new Exception("切割异常！");
-                        }
-                        //记录当前Y位置，作为下次切割的起始位置
-                        cutStartY = cutResult.CurrentY;
-                    }
-                }
-            }
-
-        }
-
         /// <summary>
         /// 换刀片
         /// </summary>
@@ -1103,35 +974,27 @@ namespace 精密切割系统.Model.cut
             return list;
         }
 
-        public static float GetSharpenDeep(string bladeType)
+        public static float GetSharpenDeep(float abAverageThickness)
         {
-            switch (bladeType)
+            if (10 <= abAverageThickness && abAverageThickness <= 24)
             {
-                case "A":
-                case "B":
-                    return 0.2f;
-                case "C":
-                    return 0.3f;
-                case "D":
-                    return 0.35f;
-                default:
-                    return 0.2f;
+                return 0.2f; // 10-24mm 切割深度 0.2mm
+            }
+            else
+            {
+                return 0.3f; // 其他情况切割深度 0.3mm
             }
         }
 
-        public static float GetCuttingDeep(string bladeType)
+        public static float GetCuttingDeep(float abAverageThickness)
         {
-            switch (bladeType)
+            if (10 <= abAverageThickness && abAverageThickness <= 24)
             {
-                case "A":
-                case "B":
-                    return 0.2f;
-                case "C":
-                    return 0.3f;
-                case "D":
-                    return 0.35f;
-                default:
-                    return 0.2f;
+                return 0.2f; // 10-24mm 切割深度 0.2mm
+            }
+            else
+            {
+                return 0.3f; // 其他情况切割深度 0.3mm
             }
         }
 
@@ -1217,7 +1080,7 @@ namespace 精密切割系统.Model.cut
         /// 检查刀痕状态
         /// </summary>
         /// <returns></returns>
-        public static async Task<ImagesAnalysisResult?> CheckKnifeMarksStatus(LineSegment line, IEventAggregator? eventAggregator = null, CancellationToken token = default)
+        public static async Task<ImagesAnalysisResult> CheckKnifeMarksStatus(LineSegment line, IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
             ConcurrentQueue<Mat> matQueue = new ConcurrentQueue<Mat>();
             try
@@ -1259,7 +1122,7 @@ namespace 精密切割系统.Model.cut
                     }
                 });
                 CancellationTokenSource analysisCts = new CancellationTokenSource();
-                Task<ImagesAnalysisResult?> analysisTask = ProcessImagesAnalysisAsync(matQueue, eventAggregator, analysisCts.Token);
+                Task<ImagesAnalysisResult> analysisTask = ProcessImagesAnalysisAsync(matQueue, eventAggregator, analysisCts.Token);
                 await Task.WhenAny(slowSpeedMoveTask, grabTimerTask, analysisTask);
                 cts.Cancel();
                 await grabTimerTask;
@@ -1337,10 +1200,11 @@ namespace 精密切割系统.Model.cut
                 result.CollapseWidthMaxImage = imageData;
         }
 
-        public static async Task<ImagesAnalysisResult?> ProcessImagesAnalysisAsync(ConcurrentQueue<Mat> matQueue, IEventAggregator? eventAggregator = null, CancellationToken token = default)
+        public static async Task<ImagesAnalysisResult> ProcessImagesAnalysisAsync(ConcurrentQueue<Mat> matQueue, IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
             ImagesAnalysisResult result = new ImagesAnalysisResult();
-            bool? isSnake = await Task.Run<bool?>(async () =>
+            result.IsSuccess = true;
+            await Task.Run(async () =>
             {
                 List<Mat> mats = new List<Mat>();
                 try
@@ -1353,7 +1217,6 @@ namespace 精密切割系统.Model.cut
                             mats.Add(mat);
                             ProcessMat(mat, result);
                         }
-                        
                     }
                 }
                 catch (OperationCanceledException)
@@ -1370,10 +1233,25 @@ namespace 精密切割系统.Model.cut
                 List<Mat> concatMats = ConcatMats(mats);
                 stopwatch.Stop();
                 eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"拼接所有图像用时: {stopwatch.Elapsed.TotalSeconds} 秒"));
-                
+
+                stopwatch = Stopwatch.StartNew();
+                //保存拼接图像到指定目录
+                string imagePath = System.IO.Path.Combine(AppContext.BaseDirectory, "image");
+                Directory.CreateDirectory(imagePath);
+                foreach (var image in mats)
+                {
+                    Cv2.ImWrite($"{imagePath}\\{DateTime.Now.Ticks}_cropMatJpg.jpg", image);
+                }
+                foreach (var image in result.ConcatImages)
+                {
+                    Cv2.ImWrite($"{imagePath}\\{DateTime.Now.Ticks}_cropConcatMatJpg.jpg", image.Mat);
+                }
+                stopwatch.Stop();
+                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"保存识别后的拼接图像总用时: {stopwatch.Elapsed.TotalSeconds} 秒"));
+
                 foreach (Mat concatMat in concatMats)
                 {
-                    Mat cropConcatMat = CropHorizontalCenter(concatMat, 80);
+                    Mat cropConcatMat = CropHorizontalCenter(concatMat, 90);
                     Mat cropConcatMatJpg = JpegStreamToMat(MatToJpegStream(cropConcatMat));
                     //var (bladeWidthMm, collapseWidthMm, bladeTop, bladeBottom, collapseTop, collapseBottom) = VisionAnalyzer.ProcessImage(cropConcatMatJpg);
                     //Cv2.PutText(cropConcatMatJpg,
@@ -1422,52 +1300,46 @@ namespace 精密切割系统.Model.cut
                     //    thickness: 1,             // 线宽
                     //    lineType: LineTypes.AntiAlias // 抗锯齿
                     //    );
-                    stopwatch = Stopwatch.StartNew();
                     try
                     {
+                        stopwatch = Stopwatch.StartNew();
                         result.ConcatImages.Add(new ImageData()
                         {
                             BladeWidth = 0,
                             CollapseWidth = 0,
                             IsSnakelike = VisionAnalyzer.SnakeCase(cropConcatMatJpg).Snake,
-                            //IsSnakelike = true,
                             Mat = cropConcatMatJpg
                         });
-                        stopwatch.Stop();
-                        eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"识别蛇形总用时: {stopwatch.Elapsed.TotalSeconds} 秒"));
                     }
                     catch(Exception ex)
                     {
+                        result.AnalysisFailMats.Add(cropConcatMatJpg);
+                        result.IsSuccess = false;
                         eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create(ex.Message));
-                        return null;
+                    }
+                    finally
+                    {
+                        stopwatch.Stop();
+                        eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"识别蛇形总用时: {stopwatch.Elapsed.TotalSeconds} 秒"));
                     }
                 }
 
+                if (result.AnalysisFailMats.Count != 0)
+                {
+                    stopwatch = Stopwatch.StartNew();
+                    //保存拼接图像到指定目录
+                    string analysisFailMatsPath = System.IO.Path.Combine(AppContext.BaseDirectory, "image\\AnalysisFail");
+                    Directory.CreateDirectory(analysisFailMatsPath);
+                    foreach (var failMat in result.AnalysisFailMats)
+                    {
+                        Cv2.ImWrite($"{analysisFailMatsPath}\\{DateTime.Now.Ticks}.jpg", failMat);
+                    }
+                    stopwatch.Stop();
+                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"保存识别失败图像总用时: {stopwatch.Elapsed.TotalSeconds} 秒"));
+                }
 
-                stopwatch = Stopwatch.StartNew();
-                //保存拼接图像到指定目录
-                string imagePath = System.IO.Path.Combine(AppContext.BaseDirectory, "image");
-                Directory.CreateDirectory(imagePath);
-                foreach (var image in mats)
-                {
-                    Cv2.ImWrite($"{imagePath}\\{DateTime.Now.Ticks}_cropMatJpg.jpg", image);
-                }
-                foreach (var image in result.ConcatImages)
-                {
-                    Cv2.ImWrite($"{imagePath}\\{DateTime.Now.Ticks}_cropConcatMatJpg.jpg", image.Mat);
-                }
-                stopwatch.Stop();
-                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"保存识别后的拼接图像总用时: {stopwatch.Elapsed.TotalSeconds} 秒"));
-                return result.ConcatImages.All(image => image.IsSnakelike);
+                result.IsSnakelike = result.ConcatImages.All(image => image.IsSnakelike);
             });
-            if (isSnake == null)
-            {
-                return null;
-            }
-            else
-            {
-                result.IsSnakelike = isSnake.Value;
-            }
             return result;
         }
 

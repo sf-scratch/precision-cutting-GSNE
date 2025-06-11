@@ -46,6 +46,16 @@ namespace 精密切割系统.Model.cut
             set { _orderType = value; OnPropertyChanged(); }
         }
 
+        private string _sjSpec;
+        /// <summary>
+        /// 实际刀刃规格
+        /// </summary>
+        public string SjSpec
+        {
+            get { return _sjSpec; }
+            set { _sjSpec = value; OnPropertyChanged(); }
+        }
+
         private string _bladeEdgeType;
         /// <summary>
         /// 刀刃规格

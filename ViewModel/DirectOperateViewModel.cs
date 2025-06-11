@@ -575,7 +575,7 @@ namespace 精密切割系统.ViewModel
 
         async void ExecuteStartRaiseZ2Command()
         {
-            await PlcControl.tagControl.Z2axis.StartJogAsync(1);
+            await PlcControl.tagControl.Z2axis.StartJogAsync(0);
         }
 
         private DelegateCommand _startDropZ2Command;
@@ -584,7 +584,7 @@ namespace 精密切割系统.ViewModel
 
         async void ExecuteStartDropZ2Command()
         {
-            await PlcControl.tagControl.Z2axis.StartJogAsync(0);
+            await PlcControl.tagControl.Z2axis.StartJogAsync(1);
         }
 
         private DelegateCommand _stopJogZ2Command;
@@ -661,25 +661,25 @@ namespace 精密切割系统.ViewModel
                         CurrentPositionZ1 = await PlcControl.tagControl.Z1axis.GetCurrentLocationAsync() ?? float.NaN;
                         CurrentPositionZ2 = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync() ?? float.NaN;
                         CurrentPositionTheta = await PlcControl.tagControl.ThetaAxis.GetCurrentLocationAsync() ?? float.NaN;
-                        CurrentSpeedX = await PlcControl.tagControl.Xaxis.GetAbsoluteSpeedAsync() ?? float.NaN;
-                        CurrentSpeedY = await PlcControl.tagControl.Yaxis.GetAbsoluteSpeedAsync() ?? float.NaN;
-                        CurrentSpeedZ1 = await PlcControl.tagControl.Z1axis.GetAbsoluteSpeedAsync() ?? float.NaN;
-                        CurrentSpeedZ2 = await PlcControl.tagControl.Z2axis.GetAbsoluteSpeedAsync() ?? float.NaN;
-                        CurrentSpeedTheta = await PlcControl.tagControl.ThetaAxis.GetAbsoluteSpeedAsync() ?? float.NaN;
-                        CurrentJogSpeedX = await PlcControl.tagControl.Xaxis.GetJogRelativeSpeedAsync() ?? float.NaN;
-                        CurrentJogSpeedY = await PlcControl.tagControl.Yaxis.GetJogRelativeSpeedAsync() ?? float.NaN;
-                        CurrentJogSpeedZ1 = await PlcControl.tagControl.Z1axis.GetJogRelativeSpeedAsync() ?? float.NaN;
-                        CurrentJogSpeedZ2 = await PlcControl.tagControl.Z2axis.GetJogRelativeSpeedAsync() ?? float.NaN;
-                        CurrentJogSpeedTheta = await PlcControl.tagControl.ThetaAxis.GetJogRelativeSpeedAsync() ?? float.NaN;
-                        IsReadyX = await PlcControl.tagControl.Xaxis.IsReadyAsync();
-                        IsReadyY = await PlcControl.tagControl.Yaxis.IsReadyAsync();
-                        IsReadyZ1 = await PlcControl.tagControl.Z1axis.IsReadyAsync();
-                        IsReadyZ2 = await PlcControl.tagControl.Z2axis.IsReadyAsync();
-                        IsReadyTheta = await PlcControl.tagControl.ThetaAxis.IsReadyAsync();
+                        //CurrentSpeedX = await PlcControl.tagControl.Xaxis.GetAbsoluteSpeedAsync() ?? float.NaN;
+                        //CurrentSpeedY = await PlcControl.tagControl.Yaxis.GetAbsoluteSpeedAsync() ?? float.NaN;
+                        //CurrentSpeedZ1 = await PlcControl.tagControl.Z1axis.GetAbsoluteSpeedAsync() ?? float.NaN;
+                        //CurrentSpeedZ2 = await PlcControl.tagControl.Z2axis.GetAbsoluteSpeedAsync() ?? float.NaN;
+                        //CurrentSpeedTheta = await PlcControl.tagControl.ThetaAxis.GetAbsoluteSpeedAsync() ?? float.NaN;
+                        //CurrentJogSpeedX = await PlcControl.tagControl.Xaxis.GetJogRelativeSpeedAsync() ?? float.NaN;
+                        //CurrentJogSpeedY = await PlcControl.tagControl.Yaxis.GetJogRelativeSpeedAsync() ?? float.NaN;
+                        //CurrentJogSpeedZ1 = await PlcControl.tagControl.Z1axis.GetJogRelativeSpeedAsync() ?? float.NaN;
+                        //CurrentJogSpeedZ2 = await PlcControl.tagControl.Z2axis.GetJogRelativeSpeedAsync() ?? float.NaN;
+                        //CurrentJogSpeedTheta = await PlcControl.tagControl.ThetaAxis.GetJogRelativeSpeedAsync() ?? float.NaN;
+                        //IsReadyX = await PlcControl.tagControl.Xaxis.IsReadyAsync();
+                        //IsReadyY = await PlcControl.tagControl.Yaxis.IsReadyAsync();
+                        //IsReadyZ1 = await PlcControl.tagControl.Z1axis.IsReadyAsync();
+                        //IsReadyZ2 = await PlcControl.tagControl.Z2axis.IsReadyAsync();
+                        //IsReadyTheta = await PlcControl.tagControl.ThetaAxis.IsReadyAsync();
                     }
                     catch (Exception ex)
                     {
-                        Tools.LogError($"报警监控异常: {ex.Message}");
+                        Tools.LogError($"StartGetAxisInfo()报警监控异常: {ex.Message}");
                     }
                 }
             });

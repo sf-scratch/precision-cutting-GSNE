@@ -38,7 +38,6 @@
                 <Grid>
                     <Label x:Name="titleName" Margin="30,30,0,0" Content="单一切割面校准 (1.1)" FontSize="22" FontWeight="Bold"/>
                 </Grid>
-                <Button Content="保存图片" Click="Button_Click"/>
                 <Grid>
                     <StackPanel Margin="30,30,0,0">
                         <StackPanel x:Name="channelPanel" Orientation="Horizontal" Visibility="Visible">

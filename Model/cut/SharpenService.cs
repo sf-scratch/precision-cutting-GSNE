@@ -130,7 +130,7 @@ namespace 精密切割系统.Model.cut
                 //进入全自动切割模式
                 await PlcControl.tagControl.cutting.EnterCuttingModeAsync(usingPauseToken);
                 float abAverageThickness = lunguSksj.ABAverageThickness / 1000;
-                float cutDeep = AutoCutUtils.GetSharpenDeep(lunguSksj.BladeType);
+                float cutDeep = AutoCutUtils.GetSharpenDeep(lunguSksj.ABAverageThickness);
                 int curSharpenTimes = 0;
                 //开始磨刀，磨指定刀数
                 while (curSharpenTimes < sharpenTimes)

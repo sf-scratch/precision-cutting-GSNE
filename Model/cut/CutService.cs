@@ -17,6 +17,7 @@ using 精密切割系统.Model.plc;
 using 精密切割系统.PubSubEvent;
 using 精密切割系统.Utils;
 using 精密切割系统.ViewModel;
+using static 精密切割系统.Model.cut.ServicePauseResult;
 
 namespace 精密切割系统.Model.cut
 {
@@ -29,9 +30,10 @@ namespace 精密切割系统.Model.cut
         }
 
         public event Action<CutServiceProcess>? CutServiceProcessChanged;
-        public event Action<LineSegment?>? CutServicePaused;
+        public event Action<LineSegment?,string?>? CutServicePaused;
         public event Action? RemindReplaceWafer;
-        private TaskCompletionSource<CancellationToken?>? _continueTcs;
+        private TaskCompletionSource<ServicePauseResult>? _continueTcs;
+        private CancellationToken _usingPauseToken;
 
         /// <summary>
         /// 工件半径
@@ -126,15 +128,15 @@ namespace 精密切割系统.Model.cut
                 //保存切割参数
                 Appsettings.CutThetaDegQueue = _thetaDegQueue.ToList();
             }
-            CancellationToken usingPauseToken = pauseToken;
+            _usingPauseToken = pauseToken;
             int needCutTimes = cutSpeedList.Count;
             int cutTime = 0;
             try
             {
                 //进入全自动切割模式
-                await PlcControl.tagControl.cutting.EnterCuttingModeAsync(usingPauseToken);
+                await PlcControl.tagControl.cutting.EnterCuttingModeAsync(_usingPauseToken);
                 float abAverageThickness = lunguSksj.ABAverageThickness;
-                float cutDeep = AutoCutUtils.GetCuttingDeep(lunguSksj.BladeType);
+                float cutDeep = AutoCutUtils.GetCuttingDeep(lunguSksj.ABAverageThickness);
                 int chekcTimes = 0;
                 while (cutTime < needCutTimes)
                 {
@@ -149,7 +151,7 @@ namespace 精密切割系统.Model.cut
                             // 该theta角度第一次切割，切割半圆最下边切为起始位置
                             //_recordCutY = GeometryUtils.FindBottomTangentY(_thetaCenterPoint, workpieceCenterPoint, _workpieceRadius, _thetaDegQueue.Peek() + cutCalibratTheta);
                             _recordCutY = 150;
-                            Appsettings.CutDistance = GlobalParams.ThetaCenterPoint.Y + GlobalParams.WorkpieceRadius - _recordCutY + 2;
+                            Appsettings.CutDistance = GlobalParams.ThetaCenterPoint.Y + GlobalParams.WorkpieceRadius + GlobalParams.CenterDistance - _recordCutY + 2;
                             _isRotateTheta = false;
                         }
                         float cutSize = GetCutSize();
@@ -159,12 +161,11 @@ namespace 精密切割系统.Model.cut
                             if (_thetaDegQueue.Count == 0)
                             {
                                 RemindReplaceWafer?.Invoke();
-                                CancellationToken? token = await WaitContinueAsync(line);
-                                if (token == null)
+                                ServicePauseResult result = await WaitContinueAsync(line);
+                                if (result.Type == ServicePauseResult.ServicePauseResultType.Stop)
                                 {
                                     return RunResult.Fail(RunExceptionType.Stop, "停止切割");
                                 }
-                                usingPauseToken = token.Value;
                                 InitThetaDegQueue(cutCalibratTheta);
                             }
                             //保存切割参数
@@ -192,14 +193,13 @@ namespace 精密切割系统.Model.cut
                         float endZ = bladeContactWorkingDiscZ1 - GlobalParams.WaferThickness - GlobalParams.FilmThickness + cutDeep;
                         float startZ = endZ - bladeLiftingHeight;
                         //检查是否暂停
-                        if (usingPauseToken.IsCancellationRequested)
+                        if (_usingPauseToken.IsCancellationRequested)
                         {
-                            CancellationToken? token = await WaitContinueAsync(line);
-                            if (token == null)
+                            ServicePauseResult result = await WaitContinueAsync(line);
+                            if (result.Type == ServicePauseResult.ServicePauseResultType.Stop)
                             {
                                 return RunResult.Fail(RunExceptionType.Stop, "停止切割");
                             }
-                            usingPauseToken = token.Value;
                         }
                         //触发切割进度更新事件
                         CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, needCutTimes + _finishedCutTimes, cutTime + _finishedCutTimes));
@@ -211,7 +211,7 @@ namespace 精密切割系统.Model.cut
                         //开始切割信号
                         await PlcControl.tagControl.cutting.StartCutAsync();
                         //等待磨刀次数变化
-                        await PlcControl.tagControl.cutting.WaitCutNumUdatedAsync(curCutNum.Value, usingPauseToken);
+                        await PlcControl.tagControl.cutting.WaitCutNumUdatedAsync(curCutNum.Value, _usingPauseToken);
                         cutTime++;
                         //触发切割进度更新事件
                         CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, needCutTimes + _finishedCutTimes, cutTime + _finishedCutTimes, true));
@@ -224,33 +224,34 @@ namespace 精密切割系统.Model.cut
                             // 如果是第一次检查刀痕，且需要检查基准线位置，则提示检查基准线位置
                             if (chekcTimes == 1 && (Appsettings.IsNeedCheckBaseLine ?? true))
                             {
-                                MaterialSnackUtils.MaterialSnack("请检查基准线位置！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
-                                CancellationToken? token = await WaitContinueAsync(line);
-                                if (token == null)
+                                ServicePauseResult result = await WaitContinueAsync(line, "请检查基准线位置！");
+                                if (result.Type == ServicePauseResult.ServicePauseResultType.Stop)
                                 {
                                     return RunResult.Fail(RunExceptionType.Stop, "停止切割");
                                 }
-                                usingPauseToken = token.Value;
                             }
                             MaterialSnackUtils.MaterialSnack("检查刀痕中...", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
                             bool isOkKnifeMarksStatus = false;
                             try
                             {
                                 //退出全自动切割模式
-                                await PlcControl.tagControl.cutting.ExitCuttingModeAsync(usingPauseToken);
+                                await PlcControl.tagControl.cutting.ExitCuttingModeAsync(_usingPauseToken);
                                 //刀痕检查
-                                ImagesAnalysisResult? result = await AutoCutUtils.CheckKnifeMarksStatus(line, eventAggregator, usingPauseToken);
-                                //刀痕检查结果为空，表示未检测到刀痕
-                                if (result == null)
+                                ImagesAnalysisResult result = await AutoCutUtils.CheckKnifeMarksStatus(line, eventAggregator, _usingPauseToken);
+                                //刀痕检查结果失败，表示未检测到刀痕
+                                if (!result.IsSuccess)
                                 {
-                                    MaterialSnackUtils.MaterialSnack("图像识别刀痕异常，请人工检查刀痕状态！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
-                                    CancellationToken? token = await WaitContinueAsync(line);
-                                    if (token == null)
+                                    ServicePauseResult pauseResult = await WaitContinueAsync(line, "图像识别刀痕异常，请人工检查刀痕状态！");
+                                    switch (pauseResult.Type)
                                     {
-                                        return RunResult.Fail(RunExceptionType.Stop, "停止切割");
+                                        case ServicePauseResultType.BladeScrap:
+                                            await PdaUtils.ScrapAsync(result.AnalysisFailMats.First());
+                                            return RunResult.Fail(RunExceptionType.Stop, "刀片已报废！");
+                                        case ServicePauseResultType.Stop:
+                                            return RunResult.Fail(RunExceptionType.Stop, "停止切割");
+                                        default:
+                                            continue;
                                     }
-                                    usingPauseToken = token.Value;
-                                    continue;
                                 }
                                 // 处理图像数据
                                 if (result.ImageDatas.Count != 0)
@@ -259,26 +260,23 @@ namespace 精密切割系统.Model.cut
                                     switch (chekcTimes)
                                     {
                                         case 1:
-                                            PdaUtils.AddFirstToolMarkWidth(bladeWidthMaxImage.BladeWidth);
-                                            PdaUtils.AddFirstToolMarkImage(bladeWidthMaxImage.Mat);
-                                            break;
-                                        case 2:
                                             PdaUtils.AddToolMarkWidth(bladeWidthMaxImage.BladeWidth);
                                             PdaUtils.AddToolMarkActualWidth(bladeWidthMaxImage.BladeWidth);
+                                            PdaUtils.AddFirstToolMarkWidth(bladeWidthMaxImage.BladeWidth);
+                                            PdaUtils.AddFirstToolMarkImage(bladeWidthMaxImage.Mat);
+                                            //上传崩边
+                                            double singleCollapseAngle = (result.CollapseWidthMaxImage.CollapseWidth - result.CollapseWidthMaxImage.BladeWidth) / 2;
+                                            PdaUtils.AddSingleCollapseAngle(singleCollapseAngle);
+                                            PdaUtils.AddMaximumCollapseAngle(result.CollapseWidthMaxImage.CollapseWidth);
+                                            PdaUtils.AddMaximumCollapseAngleImage(result.CollapseWidthMaxImage.Mat);
+                                            string bladeEdgeBreakageGrade = await GetDpbbdjAsync(lunguId, (float)singleCollapseAngle);
+                                            PdaUtils.AddBladeEdgeBreakageGrade(bladeEdgeBreakageGrade);
+                                            break;
+                                        case 2:
                                             PdaUtils.AddSecondToolMarkImage(bladeWidthMaxImage.Mat);
                                             break;
                                         default:
                                             break;
-                                    }
-                                    if (beforeStopCutTimes == needCutTimes)
-                                    {
-                                        //最后一刀上传崩边
-                                        double singleCollapseAngle = (result.CollapseWidthMaxImage.CollapseWidth - result.CollapseWidthMaxImage.BladeWidth) / 2;
-                                        PdaUtils.AddSingleCollapseAngle(singleCollapseAngle);
-                                        PdaUtils.AddMaximumCollapseAngle(result.CollapseWidthMaxImage.CollapseWidth);
-                                        PdaUtils.AddMaximumCollapseAngleImage(result.CollapseWidthMaxImage.Mat);
-                                        string bladeEdgeBreakageGrade = await GetDpbbdjAsync(lunguId, (float)singleCollapseAngle);
-                                        PdaUtils.AddBladeEdgeBreakageGrade(bladeEdgeBreakageGrade);
                                     }
                                     eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create(
                                         $"最大刀痕宽度：{result.BladeWidthMaxImage.BladeWidth} " +
@@ -290,7 +288,7 @@ namespace 精密切割系统.Model.cut
                             finally
                             {
                                 //进入全自动切割模式
-                                await PlcControl.tagControl.cutting.EnterCuttingModeAsync(usingPauseToken);
+                                await PlcControl.tagControl.cutting.EnterCuttingModeAsync(_usingPauseToken);
                             }
                             if (!isOkKnifeMarksStatus)
                             {
@@ -302,12 +300,11 @@ namespace 精密切割系统.Model.cut
                     }
                     catch (OperationCanceledException)
                     {
-                        CancellationToken? token = await WaitContinueAsync(line);
-                        if (token == null)
+                        ServicePauseResult pauseResult = await WaitContinueAsync(line);
+                        if (pauseResult.Type == ServicePauseResult.ServicePauseResultType.Stop)
                         {
                             return RunResult.Fail(RunExceptionType.Stop, "停止切割");
                         }
-                        usingPauseToken = token.Value;
                     }
                     catch (Exception ex)
                     {
@@ -521,20 +518,25 @@ namespace 精密切割系统.Model.cut
 
         public void Continue(CancellationToken token)
         {
-            _continueTcs?.TrySetResult(token); // 继续执行
+            _continueTcs?.TrySetResult(ServicePauseResult.Continue(token)); // 继续执行
             _continueTcs = null;
         }
 
-        private async Task<CancellationToken?> WaitContinueAsync(LineSegment? line)
+        private async Task<ServicePauseResult> WaitContinueAsync(LineSegment? line, string? message = null)
         {
-            CutServicePaused?.Invoke(line);
-            _continueTcs = new TaskCompletionSource<CancellationToken?>();
-            return await _continueTcs.Task;
+            CutServicePaused?.Invoke(line, message);
+            _continueTcs = new TaskCompletionSource<ServicePauseResult>();
+            ServicePauseResult result = await _continueTcs.Task;
+            if (result.Type == ServicePauseResultType.Continue)
+            {
+                _usingPauseToken = result.Token ?? default; // 更新使用的暂停令牌
+            }
+            return result;
         }
 
-        public void Stop()
+        public void Stop(ServicePauseResult pauseResult)
         {
-            _continueTcs?.TrySetResult(null); // 停止切割
+            _continueTcs?.TrySetResult(pauseResult); // 停止切割
             _continueTcs = null;
             _finishedCutTimes = 0;
             _isNewestCut = true;

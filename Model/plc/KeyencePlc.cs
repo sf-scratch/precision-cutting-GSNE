@@ -1495,24 +1495,19 @@ namespace 精密切割系统.Driver
             if (!await IsReadyAsync()) return;
             // 设置运动类型为点动
             runType.writeValue = "0";
-            keyencePlc.writeTag(runType);
-            // 关闭正转
-            jogStart.writeValue = "0";
-            keyencePlc.writeTag(jogStart);
-            // 关闭反转
-            jogAntiStart.writeValue = "0";
-            keyencePlc.writeTag(jogAntiStart);
+            await keyencePlc.WriteTagAsync(runType);
+            await StopJogAsync();
             if (jogDirection == 0)
             {
                 // 开启正转
                 jogStart.writeValue = "1";
-                keyencePlc.writeTag(jogStart);
+                await keyencePlc.WriteTagAsync(jogStart);
             }
             else
             {
                 // 开启反转
                 jogAntiStart.writeValue = "1";
-                keyencePlc.writeTag(jogAntiStart);
+                await keyencePlc.WriteTagAsync(jogAntiStart);
             }
         }
 

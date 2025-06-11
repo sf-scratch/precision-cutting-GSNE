@@ -22,7 +22,7 @@ namespace 精密切割系统.HttpClients
         /// </summary>
         /// <param name="lunguId"></param>
         /// <returns></returns>
-        public static async Task<LunguInfoDTO?> GetLunguInfoAsync(string lunguId)
+        public static async Task<HttpUtilsResult<LunguInfoDTO>> GetLunguInfoAsync(string lunguId)
         {
             ApiRequest request = new ApiRequest
             {
@@ -32,25 +32,21 @@ namespace 精密切割系统.HttpClients
             ApiResponse? response = await HttpRestClient.Instance.ExecuteAsync(request);
             if (response == null)
             {
-                Tools.LogDebug("获取轮毂信息失败！");
-                return null;
+                return HttpUtilsResult<LunguInfoDTO>.Fail("获取轮毂信息失败！");
             }
             if (response.IsSuccess())
             {
                 try
                 {
-                    return JsonConvert.DeserializeObject<LunguInfoDTO>(response.Data.ToString());
+                    var data = JsonConvert.DeserializeObject<LunguInfoDTO>(response.Data.ToString());
+                    return HttpUtilsResult<LunguInfoDTO>.Success(data);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    return null; // 反序列化失败，返回null
+                    return HttpUtilsResult<LunguInfoDTO>.Fail(ex.Message);
                 }
             }
-            else
-            {
-                Tools.LogDebug(response.Msg);
-            }
-            return null;
+            return HttpUtilsResult<LunguInfoDTO>.Fail(response.Msg);
         }
 
         /// <summary>
@@ -58,7 +54,7 @@ namespace 精密切割系统.HttpClients
         /// </summary>
         /// <param name="lunguId"></param>
         /// <returns></returns>
-        public static async Task<LunguSksjDTO?> GetLunguSksjAsync(string lunguId)
+        public static async Task<HttpUtilsResult<LunguSksjDTO>> GetLunguSksjAsync(string lunguId)
         {
             ApiRequest request = new ApiRequest
             {
@@ -68,28 +64,24 @@ namespace 精密切割系统.HttpClients
             ApiResponse? response = await HttpRestClient.Instance.ExecuteAsync(request);
             if (response == null)
             {
-                Tools.LogDebug("获取轮毂蚀刻数据失败！");
-                return null;
+                return HttpUtilsResult<LunguSksjDTO>.Fail("获取轮毂蚀刻数据失败！");
             }
             if (response.IsSuccess())
             {
                 try
                 {
-                    return JsonConvert.DeserializeObject<LunguSksjDTO>(response.Data.ToString());
+                    var data = JsonConvert.DeserializeObject<LunguSksjDTO>(response.Data.ToString());
+                    return HttpUtilsResult<LunguSksjDTO>.Success(data);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    return null; // 反序列化失败，返回null
+                    return HttpUtilsResult<LunguSksjDTO>.Fail(ex.Message);
                 }
             }
-            else
-            {
-                Tools.LogDebug(response.Msg);
-            }
-            return null;
+            return HttpUtilsResult<LunguSksjDTO>.Fail(response.Msg);
         }
 
-        public static async Task<string?> InsertFlowValuesAsync(FieldValuesDTO fieldValues)
+        public static async Task<HttpUtilsResult<string>> InsertFlowValuesAsync(FieldValuesDTO fieldValues)
         {
             ApiRequest request = new ApiRequest
             {
@@ -100,22 +92,49 @@ namespace 精密切割系统.HttpClients
             ApiResponse? response = await HttpRestClient.Instance.ExecuteAsync(request);
             if (response == null)
             {
-                Tools.LogDebug("InsertFlowValues失败！");
-                return null;
+                return HttpUtilsResult<string>.Fail("InsertFlowValues失败！");
             }
             if (response.IsSuccess())
             {
                 try
                 {
-                    return JsonConvert.DeserializeObject<InsertFlowValuesResponseDTO>(response.Data.ToString()).GroupOperateId;
+                    var data = JsonConvert.DeserializeObject<InsertFlowValuesResponseDTO>(response.Data.ToString()).GroupOperateId;
+                    return HttpUtilsResult<string>.Success(data);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    return null; // 反序列化失败，返回null
+                    return HttpUtilsResult<string>.Fail(ex.Message);
                 }
             }
-            Tools.LogDebug(response.Msg);
-            return null;
+            return HttpUtilsResult<string>.Fail(response.Msg);
+        }
+
+        public static async Task<HttpUtilsResult<string>> UpdateGroupStatusAsync(UpdateOperateStatusDTO updateOperateStatus)
+        {
+            ApiRequest request = new ApiRequest
+            {
+                Method = RestSharp.Method.Post,
+                Route = $"n2baseDev-osb/http/interface/pda/sop/updateGroupStatus",
+                Parameters = updateOperateStatus
+            };
+            ApiResponse? response = await HttpRestClient.Instance.ExecuteAsync(request);
+            if (response == null)
+            {
+                return HttpUtilsResult<string>.Fail("通信异常！");
+            }
+            if (response.IsSuccess())
+            {
+                try
+                {
+                    var data = response.Data.ToString();
+                    return HttpUtilsResult<string>.Success(data);
+                }
+                catch (Exception ex)
+                {
+                    return HttpUtilsResult<string>.Fail(ex.Message);
+                }
+            }
+            return HttpUtilsResult<string>.Fail(response.Msg);
         }
 
         public static async Task<List<FlowSettingDTO>?> QueryFlowSettingByIdAsync(string? businessId = null)

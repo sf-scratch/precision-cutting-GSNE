@@ -887,7 +887,6 @@
   {
     "Address": "MR61101",
     "Level": "Error",
-    "Level": "Error",
     "Message": "A2-Y轴伺服到达+极限"
   },
   {

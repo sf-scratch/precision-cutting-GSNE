@@ -167,42 +167,21 @@ namespace 精密切割系统.View.Controls
 
         private void onClick(OperateBean bean)
         {
-            if (bean.Code == 6)
-            {
-                OperateClicked?.Invoke(this, bean);
-                return;
-            }
-            if (AlarmConfig.Instance.HasActiveErrorAlarm())
-            {
-                MaterialSnackUtils.MaterialSnack("请先解除报警！", MaterialSnackUtils.SnackType.WARNING, 5);
-                return;
-            }
-            if (!GlobalParams.systemInitFlag && bean.Code != 6)
-            {
-                MaterialSnackUtils.MaterialSnack("请先进行初始化！", MaterialSnackUtils.SnackType.WARNING, 5);
-                return;
-            }
-
-            bool ignoreFlag = true;
-            // 判断当前菜单code是否在可以操作的里面
-            if (GlobalParams.globalRunEnableOperateBtnCodes.Count > 0)
-            {
-                if (GlobalParams.globalRunEnableOperateBtnCodes.Contains(bean.Code))
-                {
-                    ignoreFlag = false;
-                }
-            }
-            // 判断是否有在进行中的操作，如果有，则不执行点击事件
-            if (GlobalParams.globalRunFlag && ignoreFlag && GlobalParams.systemInitFlag)
-            {
-                // MaterialSnackUtils.MaterialSnack("操作进行中！", MaterialSnackUtils.SnackType.WARNING, 5);
-                return;
-            }
-            // 如果有报警，且没有在运行中的，则可以点击
-            if (AlarmConfig.Instance.HasActiveErrorAlarm() && !GlobalParams.globalRunFlag && bean.Code != 6)
-            {
-                return;
-            }
+            //if (bean.Code == 6 || bean.Code == 10)
+            //{
+            //    OperateClicked?.Invoke(this, bean);
+            //    return;
+            //}
+            //if (AlarmConfig.Instance.HasActiveErrorAlarm())
+            //{
+            //    MaterialSnackUtils.MaterialSnack("请先解除报警！", MaterialSnackUtils.SnackType.WARNING, 5);
+            //    return;
+            //}
+            //if (!GlobalParams.systemInitFlag && bean.Code != 6)
+            //{
+            //    MaterialSnackUtils.MaterialSnack("请先进行初始化！", MaterialSnackUtils.SnackType.WARNING, 5);
+            //    return;
+            //}
             OperateClicked?.Invoke(this, bean);
         }
         public event EventHandler<OperateBean> OperateClicked;

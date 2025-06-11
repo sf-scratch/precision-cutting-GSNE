@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DryIoc.ImTools;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -122,6 +123,27 @@ namespace 精密切割系统.Model.plc
                 for (int i = 0; i < _newestAlarms.Length; i++)
                 {
                     if (_newestAlarms[i] && _alarmInfos[i].Level == AlarmLevel.Error)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
+        public bool HasActiveAxisAlarm()
+        {
+            if (GlobalParams.onlineFlag == false) return false; // 如果不在线，则不检查报警
+            lock (_lock)
+            {
+                if (_newestAlarms is null || _newestAlarms.Length == 0 || _newestAlarms.Length != _alarmInfos.Length) return true;
+                var indexes = _alarmInfos.Select((info, index) => new { info, index })
+                    .Where(x => x.info.Address == "MR61000" || x.info.Address == "MR61100" || x.info.Address == "MR61200" || x.info.Address == "MR61300" || x.info.Address == "MR61400")
+                    .Select(x => x.index)
+                    .ToList();
+                foreach (int index in indexes)
+                {
+                    if (_newestAlarms.AsSpan(index, index + 8).IndexOf(true) == -1)
                     {
                         return true;
                     }

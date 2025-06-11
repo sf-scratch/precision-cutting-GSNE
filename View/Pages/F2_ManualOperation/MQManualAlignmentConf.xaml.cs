@@ -106,8 +106,6 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             CommonOperate.xLocation = 0;
             cutWidth.Text = Tools.FormatDecimalString((cameraCommon._cutMarkWidth / 1000).ToString(), 4);
             edgesWidth.Text = Tools.FormatDecimalString((cameraCommon._edgeChipWidth / 1000).ToString(), 4);
-            // 开启插补
-            PlcControl.tagControl.wholeDevice.SetInterpositionStatus(1);
             LoadPosition();
         }
         bool confirmFlag = false;
@@ -462,23 +460,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            // 关闭插补
-            PlcControl.tagControl.wholeDevice.SetInterpositionStatus(0);
             axisRealTimeFlag = false;
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            Mat mat = cameraCommon.localBitmap.ToMat();
-            // 保存Mat到本地文件
-            bool success = Cv2.ImWrite($"C:\\Users\\17632\\Desktop\\image\\{DateTime.Now.Ticks}_mat.jpg", mat);
-            Mat cropMat = AutoCutUtils.CropHorizontalCenter(mat, (int)(mat.Height * 0.05));
-            // 保存Mat到本地文件
-            bool success2 = Cv2.ImWrite($"C:\\Users\\17632\\Desktop\\image\\{DateTime.Now.Ticks}_cropMat.jpg", cropMat);
-            Mat cropMatJpg = AutoCutUtils.JpegStreamToMat(AutoCutUtils.MatToJpegStream(cropMat));
-            // 保存Mat到本地文件
-            bool success3 = Cv2.ImWrite($"C:\\Users\\17632\\Desktop\\image\\{DateTime.Now.Ticks}_cropMatJpg.jpg", cropMatJpg);
-            var (bladeWidthMm, collapseWidthMm, bladeTop, bladeBottom, collapseTop, collapseBottom) = VisionAnalyzer.ProcessImage(cropMatJpg);
         }
     }
 }

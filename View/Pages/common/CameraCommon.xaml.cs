@@ -528,7 +528,6 @@ namespace 精密切割系统.View.Pages.common
                 DrawLine(line.StartPoint, line.EndPoint, line.LineColor, line.LineThickness, line.DashStyle);
             }
         }
-        
 
         private void DrawLine(Point start, Point end, Color color, double thickness, DoubleCollection dashStyle)
         {
@@ -550,7 +549,24 @@ namespace 精密切割系统.View.Pages.common
             // 将线条添加到 Canvas
             MyCanvas.Children.Add(line);
         }
-        
+
+        private void cameraImage_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (CommonCheck.CheckGlobalRunStatus())
+            {
+                return;
+            }
+            if (!CommonCheck.AxisReady(false))
+            {
+                return;
+            }
+            // 获取当前点击的坐标
+            var touchPoint = e.GetPosition(this);
+            double x = touchPoint.X - centerLocation.X;
+            double y = touchPoint.Y - centerLocation.Y;
+            cameraPictureClick(x, y);
+        }
+
 
         private void cameraImage_TouchDown(object sender, TouchEventArgs e)
         {
