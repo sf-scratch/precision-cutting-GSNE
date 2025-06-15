@@ -20,9 +20,9 @@ namespace 精密切割系统.ViewModel
         {
             if (GlobalParams.onlineFlag)
             {
-                readTags = new Thread(updateAllTags);
-                readTags.IsBackground = true;
-                readTags.Start();
+                //readTags = new Thread(updateAllTags);
+                //readTags.IsBackground = true;
+                //readTags.Start();
             }
         }
 

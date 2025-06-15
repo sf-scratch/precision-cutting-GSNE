@@ -80,7 +80,7 @@ namespace 精密切割系统.ViewModel
         {
             _regionManager = regionManager;
             _eventAggregator = eventAggregator;
-            LunguId = CameraUtils.GetLunguId();
+            LunguId = "T25051502B0002";
             _rightButtonParams = WindowLayout.RightPageButtons;
             _operatePageButtonCollection = WindowLayout.OperatePageButtons;
             AutoRunCommand = new RelayCommand(AutoRunAsync);
@@ -240,9 +240,24 @@ namespace 精密切割系统.ViewModel
 
         private async void AutoRunAsync()
         {
-            if (!await PlcControl.tagControl.wholeDevice.IsOpenVacuumSwitchAsync())
+            if (!GlobalParams.onlineFlag)
             {
-                MaterialSnackUtils.MaterialSnack("未打开工作盘真空！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                _regionManager.RequestNavigate(RegionName.MainRegion, nameof(AutoCut), new NavigationParameters { { "SharpenParams", SharpenParams }, { "CutParams", CutParams }, { "LunguId", LunguId } });
+                return;
+            }
+            //if (!await PlcControl.tagControl.wholeDevice.IsOpenVacuumSwitchAsync())
+            //{
+            //    MaterialSnackUtils.MaterialSnack("未打开工作盘真空！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+            //    return;
+            //}
+            if (await PlcControl.tagControl.wholeDevice.IsOpenCutSecurityDoorAsync())
+            {
+                MaterialSnackUtils.MaterialSnack("切割安全门未关闭！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                return;
+            }
+            if (await PlcControl.tagControl.wholeDevice.IsOpenCameraSecurityDoorAsync())
+            {
+                MaterialSnackUtils.MaterialSnack("相机安全门未关闭！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
                 return;
             }
             NavigationParameters parameters = new NavigationParameters
@@ -251,7 +266,7 @@ namespace 精密切割系统.ViewModel
                 { "CutParams", CutParams },
                 { "LunguId", LunguId }
             };
-            _regionManager.RequestNavigate(RegionName.MainRegion, nameof(AutoCutRuning), parameters);
+            _regionManager.RequestNavigate(RegionName.MainRegion, nameof(AutoCut), parameters);
         }
 
         private void Back()

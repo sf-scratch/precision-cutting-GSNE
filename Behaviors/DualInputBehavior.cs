@@ -12,7 +12,11 @@ namespace 精密切割系统.Behaviors
 {
     public class DualInputBehavior : Behavior<UIElement>
     {
-        // 依赖属性，可用于绑定命令
+        public const float TouchDelaySeconds = 0.5f; // 触摸延迟时间，单位为秒
+
+        public static readonly DependencyProperty PromptCommandProperty =
+            DependencyProperty.Register("PromptCommand", typeof(ICommand), typeof(DualInputBehavior));
+
         public static readonly DependencyProperty StartCommandProperty =
             DependencyProperty.Register("StartCommand", typeof(ICommand), typeof(DualInputBehavior));
 
@@ -31,14 +35,19 @@ namespace 精密切割系统.Behaviors
             set => SetValue(StopCommandProperty, value);
         }
 
+        public ICommand PromptCommand
+        {
+            get => (ICommand)GetValue(PromptCommandProperty);
+            set => SetValue(PromptCommandProperty, value);
+        }
+
         // 是否已触发命令
         private int _isRaiseCommand = 0; // 0表示未触发，1表示已触发
-        private CancellationTokenSource _delayCts;
+        private CancellationTokenSource? _delayCts;
 
         protected override void OnAttached()
         {
             base.OnAttached();
-
             // 订阅事件
             AssociatedObject.TouchDown += AssociatedObject_TouchDown;
             //AssociatedObject.MouseDown += OnMouseDown;
@@ -68,7 +77,8 @@ namespace 精密切割系统.Behaviors
             _delayCts = new CancellationTokenSource();
             try
             {
-                await Task.Delay(TimeSpan.FromSeconds(0.5), _delayCts.Token);
+                ExecutePrompt(sender, e);
+                await Task.Delay(TimeSpan.FromSeconds(TouchDelaySeconds), _delayCts.Token);
                 ExecuteStart(sender, e);
             }
             catch (TaskCanceledException) { }
@@ -80,7 +90,8 @@ namespace 精密切割系统.Behaviors
             _delayCts = new CancellationTokenSource();
             try
             {
-                await Task.Delay(TimeSpan.FromSeconds(0.5), _delayCts.Token);
+                ExecutePrompt(sender, e);
+                await Task.Delay(TimeSpan.FromSeconds(TouchDelaySeconds), _delayCts.Token);
                 ExecuteStart(sender, e);
             }
             catch (TaskCanceledException) { }
@@ -104,6 +115,14 @@ namespace 精密切割系统.Behaviors
         private void AssociatedObject_TouchLeave(object? sender, TouchEventArgs e)
         {
             ExecuteStop(sender, e);
+        }
+
+        private void ExecutePrompt(object? sender, object e)
+        {
+            if (Volatile.Read(ref _isRaiseCommand) == 0 && PromptCommand?.CanExecute(e) == true)
+            {
+                PromptCommand.Execute(e);
+            }
         }
 
         private void ExecuteStart(object? sender, object e)

@@ -300,7 +300,7 @@ namespace 精密切割系统.FrmWindow.common
         /// <summary>
         /// theta 横向拉直
         /// </summary>
-        public void ThetaAlign1()
+        public async Task ThetaAlign1Async()
         {
             if (!CommonCheck.AxisReady(false))
             {
@@ -323,47 +323,27 @@ namespace 精密切割系统.FrmWindow.common
             // 当xLocation 为0的时候点击，设置locationA
             if (xLocation == 0 || xLocation == 2)
             {
-                locationAX = parseFloat(PlcControl.plc.GetPlcValueString(xTagKey));
+                locationAX = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0;
                 float tempLocationAX = locationAX + 1;
                 // 解决回程误差的问题，先往正方向移动1mm
                 // PlcControl.tagControl.Xaxis.StartAbsolute(xSpeed, tempLocationAX + "", false);
-                // 设置locationA
                 locationAX = tempLocationAX;
-                locationAY = parseFloat(PlcControl.plc.GetPlcValueString(yTagKey));
+                locationAY = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0;
                 locationBY = locationAY;
                 // X轴向右移动30mm
-                string xCurrentPosition = PlcControl.plc.GetPlcValueString(DeviceKey.curLocationKey);
-                float newPosition = float.Parse(xCurrentPosition) + xRunDistance;
+                float newPosition = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0 + xRunDistance;
                 locationBX = (locationBX == 0 ? newPosition : locationBX);
-                PlcControl.tagControl.Xaxis.StartAbsolute(xSpeed, locationBX + "", false);
-                // 监听是否移动到位
-                Thread _thread = new Thread(() =>
-                {
-                    Thread.Sleep(500);
-                    bool flag = Tools.WaitForValue(PlcControl.allTags[DeviceKey.curSpeedKey], "0");
-                    if (flag)
-                    {
-                        // 到位后设置locationB的位置
-                        xLocation = 1;
-                    } else
-                    {
-                        MaterialSnackUtils.MaterialSnack("Theta轴校准失败！请重新开始。", MaterialSnackUtils.SnackType.WARNING);
-                        xLocation = 0;
-                    }
-                    thetaAlignRunStatus = false;
-                    GlobalParams.globalRunFlag = false;
-                    MaterialSnackUtils.MaterialSnack("请再次点击Theta轴校准，完成校准！", MaterialSnackUtils.SnackType.WARNING);
-                });
-                _thread.IsBackground = true;
-                _thread.Start();
+                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(locationBX);
+                xLocation = 1;
+                thetaAlignRunStatus = false;
+                GlobalParams.globalRunFlag = false;
+                MaterialSnackUtils.MaterialSnack("请再次点击Theta轴校准，完成校准！", MaterialSnackUtils.SnackType.WARNING);
             }
             else if (xLocation == 1)
             {
                 // 如果是第二次点击，则设置locationC的定位 = 当前y轴位置 - locationYB的值
                 // locationBX = parseFloat(PlcControl.plc.GetPlcValueString(xTagKey));
-                Thread.Sleep(5);
-                float _tempLocationBY = parseFloat(PlcControl.plc.GetPlcValueString(yTagKey));
-                Thread.Sleep(5);
+                float _tempLocationBY = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0;
                 locationC = _tempLocationBY - locationBY;
 
                 // 构建计算角度需要的参数
@@ -374,23 +354,18 @@ namespace 精密切割系统.FrmWindow.common
                 double x3 = dis, y3 = Math.Abs(locationC);
                 Tools.LogInfo($"x1:{x1}, y1:{y1}, x2:{x2}, y2:{y2}, x3:{x3}, y3:{y3}");
                 // 计算并输出角度
-                double angle = TriangleAngles.GetTriangleAngles(x1, y1, x2, y2, x3, y3);
+                float angle = (float)TriangleAngles.GetTriangleAngles(x1, y1, x2, y2, x3, y3);
                 Thread.Sleep(5);
                 Tools.LogInfo("angle:" + angle);
                 // 旋转Theta轴角度
-                // 如果Y轴是正数，则theta正转
-                int jogDirection = 0;
-                string thetaKey = thetaPosKey;// 默认正转
-                if (locationC > 0)
+                if (locationC < 0)
                 {
-                    jogDirection = 1;
-                    thetaKey = thetaAntiKey;
+                    angle = -angle;
                 }
                 // 旋转theta轴
-                PlcControl.tagControl.ThetaAxis.StartRelative(GlobalParams.thetaDefaultSpeed, angle.ToString(), jogDirection);
+                await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(angle);
                 // 复位Y轴
                 // 计算Y轴移动后的位置
-                string xCurrLocation = PlcControl.plc.GetPlcValueString(DeviceKey.curLocationKey);
                 // 计算原点X轴位置 = 
 
                 // 定义直线端点
@@ -401,50 +376,33 @@ namespace 精密切割系统.FrmWindow.common
                 TriangleAngles.Point center = new TriangleAngles.Point(GlobalParams.thetaCameraLocationX
                     , GlobalParams.thetaCameraLocationY);
 
-                double computingAngle = jogDirection == 0 ? angle : -angle;
                 // 调用 RotateLine 方法
-                var (A_rotated, B_rotated) = TriangleAngles.RotateLine(A, B, computingAngle, center);
+                var (A_rotated, B_rotated) = TriangleAngles.RotateLine(A, B, angle, center);
 
                 Tools.LogInfo($"当前Y轴位置：{PlcControl.plc.GetPlcValueString(DeviceKey.yCurLocationKey)}" +
-                    $"，拉直后的Y位置：{A_rotated.Y} A:{A} B:{B} computingAngle:{computingAngle} center:{center}");
-                Debug.WriteLine($"拉直后的Y位置：{A_rotated.Y} A:{A} B:{B} computingAngle:{computingAngle} center:{center}");
+                    $"，拉直后的Y位置：{A_rotated.Y} A:{A} B:{B} computingAngle:{angle} center:{center}");
+                Debug.WriteLine($"拉直后的Y位置：{A_rotated.Y} A:{A} B:{B} computingAngle:{angle} center:{center}");
 
                 if (A_rotated.Y > 0)
                 {
                     Tools.LogInfo("进入Theta轴拉直后Y轴回位");
-                    PlcControl.tagControl.Yaxis.StartAbsolute(GlobalParams.yDefaultSpeed, A_rotated.Y + "", false);
+                    await PlcControl.tagControl.Yaxis.StartAbsoluteAsync((float)A_rotated.Y);
                 }
-                // 监听是否移动到位
-                Thread _thread = new Thread(() =>
-                {
-                    // X轴向右移动回原位
-                    PlcControl.tagControl.Xaxis.StartAbsolute(xSpeed, locationAX + "", false);
-                    Thread.Sleep(300);
-                    // 等待X轴移动完成后，可以操作
-                    bool flag = Tools.WaitForValue(PlcControl.allTags[DeviceKey.curSpeedKey], "0");
-                    if (flag)
-                    {
-                        SetCalibrationAngle();
-                        CutOperateUtils.thetaAlignFlag = true;
-                        MaterialSnackUtils.MaterialSnack("Theta轴完成校准!", MaterialSnackUtils.SnackType.SUCCESS);
-                    }
-                    else
-                    {
-                        MaterialSnackUtils.MaterialSnack("Theta轴校准失败,请重新开始！", MaterialSnackUtils.SnackType.ERROR);
-                    }
-                    thetaAlignRunStatus = false;
-                    GlobalParams.globalRunFlag = false;
-                    xLocation = 2;
-                });
-                _thread.IsBackground = true;
-                _thread.Start();
+                // X轴向右移动回原位
+                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(locationAX);
+                SetCalibrationAngle();
+                CutOperateUtils.thetaAlignFlag = true;
+                MaterialSnackUtils.MaterialSnack("Theta轴完成校准!", MaterialSnackUtils.SnackType.SUCCESS);
+                thetaAlignRunStatus = false;
+                GlobalParams.globalRunFlag = false;
+                xLocation = 2;
             }
 
         }
         /// <summary>
         /// theta 竖向拉直
         /// </summary>
-        public void ThetaAlign()
+        public async Task ThetaAlignAsync()
         {
             if (!CommonCheck.AxisReady(false))
             {
@@ -461,48 +419,30 @@ namespace 精密切割系统.FrmWindow.common
                 return;
             }
             int yRunDistance = 60;
-            GlobalParams.globalRunFlag = true;
             thetaAlignRunStatus = true;
             // 设置当前位置：0 左边 1 右边 
             // 当xLocation 为0的时候点击，设置locationA
             if (xVerticalLocation == 0 || xVerticalLocation == 2)
             {
                 // 设置locationA
-                locationAX = parseFloat(PlcControl.plc.GetPlcValueString(xTagKey));
-                locationAY = parseFloat(PlcControl.plc.GetPlcValueString(yTagKey));
+                locationAX = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0;
+                locationAY = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0;
                 locationBX1 = locationAX;
                 // Y轴向右移动30mm
-                string yCurrentPosition = PlcControl.plc.GetPlcValueString(DeviceKey.yCurLocationKey);
-                float newPosition = float.Parse(yCurrentPosition) - yRunDistance;
+                float newPosition = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0 - yRunDistance;
                 locationBY1 = (locationBY1 == 0 ? newPosition : locationBY1);
-                PlcControl.tagControl.Yaxis.StartAbsolute(ySpeed, locationBY1 + "", false);
-                // 监听是否移动到位
-                Thread _thread = new Thread(() =>
-                {
-                    Thread.Sleep(500);
-                    bool flag = Tools.WaitForValue(PlcControl.allTags[DeviceKey.curSpeedKey], "0");
-                    if (flag)
-                    {
-                        // 到位后设置locationB的位置
-                        xVerticalLocation = 1;
-                    } else
-                    {
-                        MaterialSnackUtils.MaterialSnack("Theta轴校准失败！请重新开始。", MaterialSnackUtils.SnackType.WARNING);
-                        xVerticalLocation = 0;
-                    }
-                    thetaAlignRunStatus = false;
-                    GlobalParams.globalRunFlag = false;
-                    MaterialSnackUtils.MaterialSnack("请再次点击Theta轴校准，完成校准！", MaterialSnackUtils.SnackType.WARNING);
-                });
-                _thread.IsBackground = true;
-                _thread.Start();
+                await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(locationBY1);
+                bool flag = Tools.WaitForValue(PlcControl.allTags[DeviceKey.curSpeedKey], "0");
+                xVerticalLocation = 1;
+                thetaAlignRunStatus = false;
+                MaterialSnackUtils.MaterialSnack("请再次点击Theta轴校准，完成校准！", MaterialSnackUtils.SnackType.WARNING);
             }
             else if (xVerticalLocation == 1)
             {
                 // 如果是第二次点击，则设置locationC的定位 = 当前y轴位置 - locationYB的值
                 // locationBY1 = parseFloat(PlcControl.plc.GetPlcValueString(yTagKey));
                 Thread.Sleep(5);
-                float _tempLocationBX = parseFloat(PlcControl.plc.GetPlcValueString(xTagKey));
+                float _tempLocationBX = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0;
                 Thread.Sleep(5);
                 locationC = _tempLocationBX - locationBX1;
 
@@ -515,24 +455,16 @@ namespace 精密切割系统.FrmWindow.common
                 double x3 = Math.Abs(locationC), y3 = dis;
                 Tools.LogInfo($"x1:{x1}, y1:{y1}, x2:{x2}, y2:{y2}, x3:{x3}, y3:{y3}");
                 // 计算并输出角度
-                double angle = TriangleAngles.GetTriangleAngles(x1, y1, x2, y2, x3, y3);
+                float angle = (float)TriangleAngles.GetTriangleAngles(x1, y1, x2, y2, x3, y3);
                 Thread.Sleep(5);
                 Tools.LogInfo("angle:" + angle);
                 // 旋转Theta轴角度
-                // 如果Y轴是正数，则theta正转
-                int jogDirection = 0;
-                string thetaKey = thetaPosKey;// 默认正转
-                if (locationC > 0)
+                if (locationC < 0)
                 {
-                    jogDirection = 1;
-                    thetaKey = thetaAntiKey;
+                    angle = -angle;
                 }
                 // 旋转theta轴
-                PlcControl.tagControl.ThetaAxis.StartRelative(GlobalParams.thetaDefaultSpeed, angle.ToString(), jogDirection);
-                // 复位Y轴
-                // 计算Y轴移动后的位置
-                string xCurrLocation = PlcControl.plc.GetPlcValueString(DeviceKey.curLocationKey);
-                // 计算原点X轴位置 = 
+                await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(angle);
 
                 // 定义直线端点
                 TriangleAngles.Point A = new TriangleAngles.Point(locationAX, locationAY);
@@ -542,40 +474,24 @@ namespace 精密切割系统.FrmWindow.common
                 TriangleAngles.Point center = new TriangleAngles.Point(GlobalParams.thetaCameraLocationX
                     , GlobalParams.thetaCameraLocationY);
 
-                double computingAngle = jogDirection == 0 ? angle : -angle;
                 // 调用 RotateLine 方法
-                var (A_rotated, B_rotated) = TriangleAngles.RotateLine(A, B, computingAngle, center);
+                var (A_rotated, B_rotated) = TriangleAngles.RotateLine(A, B, angle, center);
 
-                Tools.LogInfo($"拉直后的Y位置：{A_rotated.Y} A:{A} B:{B} computingAngle:{computingAngle} center:{center}");
-                Debug.WriteLine($"拉直后的Y位置：{A_rotated.Y} A:{A} B:{B} computingAngle:{computingAngle} center:{center}");
+                Tools.LogInfo($"拉直后的Y位置：{A_rotated.Y} A:{A} B:{B} computingAngle:{angle} center:{center}");
+                Debug.WriteLine($"拉直后的Y位置：{A_rotated.Y} A:{A} B:{B} computingAngle:{angle} center:{center}");
                 if (A_rotated.X > 0)
                 {
-                    PlcControl.tagControl.Xaxis.StartAbsolute(GlobalParams.xDefaultSpeed, A_rotated.X + "", false);
+                    await PlcControl.tagControl.Xaxis.StartAbsoluteAsync((float)A_rotated.X);
                 }
-                // 监听是否移动到位
-                Thread _thread = new Thread(() =>
-                {
-                    // X轴向右移动回原位
-                    PlcControl.tagControl.Yaxis.StartAbsolute(ySpeed, locationAY + "", false);
-                    Thread.Sleep(200);
-                    // 等待X轴移动完成后，可以操作
-                    bool flag = Tools.WaitForValue(PlcControl.allTags[DeviceKey.yCurSpeedKey], "0");
-                    if (flag)
-                    {
-                        SetCalibrationAngle();
-                        CutOperateUtils.thetaAlignFlag = true;
-                        MaterialSnackUtils.MaterialSnack("Theta轴完成校准!", MaterialSnackUtils.SnackType.SUCCESS);
-                    }
-                    else
-                    {
-                        MaterialSnackUtils.MaterialSnack("Theta轴校准失败,请重新开始！", MaterialSnackUtils.SnackType.ERROR);
-                    }
-                    thetaAlignRunStatus = false;
-                    GlobalParams.globalRunFlag = false;
-                    xVerticalLocation = 2;
-                });
-                _thread.IsBackground = true;
-                _thread.Start();
+                // X轴向右移动回原位
+                await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(locationAY);
+                Thread.Sleep(200);
+                // 等待X轴移动完成后，可以操作
+                SetCalibrationAngle();
+                CutOperateUtils.thetaAlignFlag = true;
+                MaterialSnackUtils.MaterialSnack("Theta轴完成校准!", MaterialSnackUtils.SnackType.SUCCESS);
+                thetaAlignRunStatus = false;
+                xVerticalLocation = 2;
             }
 
         }

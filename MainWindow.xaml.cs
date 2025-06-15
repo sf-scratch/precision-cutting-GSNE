@@ -258,7 +258,7 @@ namespace 精密切割系统
             PlcControl.tagControl.cutting.SetYAxisCompStatus(0);
 
             // 记录异常日志
-            PlcControl.AddAlarmLog();
+            //PlcControl.AddAlarmLog();
         }
 
         private void SetInputLanguageToEnglishUS()

@@ -167,21 +167,6 @@ namespace 精密切割系统.View.Controls
 
         private void onClick(OperateBean bean)
         {
-            //if (bean.Code == 6 || bean.Code == 10)
-            //{
-            //    OperateClicked?.Invoke(this, bean);
-            //    return;
-            //}
-            //if (AlarmConfig.Instance.HasActiveErrorAlarm())
-            //{
-            //    MaterialSnackUtils.MaterialSnack("请先解除报警！", MaterialSnackUtils.SnackType.WARNING, 5);
-            //    return;
-            //}
-            //if (!GlobalParams.systemInitFlag && bean.Code != 6)
-            //{
-            //    MaterialSnackUtils.MaterialSnack("请先进行初始化！", MaterialSnackUtils.SnackType.WARNING, 5);
-            //    return;
-            //}
             OperateClicked?.Invoke(this, bean);
         }
         public event EventHandler<OperateBean> OperateClicked;

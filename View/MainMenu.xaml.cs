@@ -205,38 +205,6 @@ namespace 精密切割系统.View
 
         private void MenuButton_MenuClicked(object? sender, MenuBean bean)
         {
-            if (AlarmConfig.Instance.HasActiveErrorAlarm())
-            {
-                MaterialSnackUtils.MaterialSnack("请先解除报警！", MaterialSnackUtils.SnackType.WARNING, 5);
-                return;
-            }
-            GlobalParams.currentPageIsHome = false;
-            if (!GlobalParams.systemInitFlag && (bean.Code != 7 || bean.Code != 5|| bean.Code != 3))
-            {
-                MaterialSnackUtils.MaterialSnack("请先进行初始化！", MaterialSnackUtils.SnackType.WARNING, 5);
-                return;
-            }
-            MenuButton menuButton = sender as MenuButton;
-            bool ignoreFlag = true;
-            // 判断当前菜单code是否在可以操作的里面
-            if (GlobalParams.globalEnableMainBtnCodes.Count > 0)
-            {
-                if (GlobalParams.globalEnableMainBtnCodes.FindAll(code => code == bean.Code).Count > 0)
-                {
-                    ignoreFlag = false;
-                }
-            }
-            // 判断是否有在进行中的操作，如果有，则不执行点击事件
-            if (GlobalParams.globalRunFlag && ignoreFlag)
-            {
-                GlobalParams.globalRunFlag = false;
-                // MaterialSnackUtils.MaterialSnack("操作进行中！", MaterialSnackUtils.SnackType.WARNING, 5);
-                //return;
-            }
-            if (AlarmConfig.Instance.HasActiveErrorAlarm())
-            {
-                return;
-            }
             Tools.LogInfo("当点事件：" + bean.Code + ":" + bean.Title);
             if (bean.Type == 2)
             {

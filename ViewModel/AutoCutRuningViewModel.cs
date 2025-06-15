@@ -186,11 +186,6 @@ namespace 精密切割系统.ViewModel
             _pauseCts = new CancellationTokenSource();
             _monitoringAlarmCts = new CancellationTokenSource();
             InitCommand = new RelayCommand(Init);
-            _eventAggregator.GetEvent<AutoRuningMessageEvent>().Subscribe(message =>
-            {
-                Tools.LogDebug(message.Message);
-                Application.Current.Dispatcher.Invoke(() => MessageList.Add(message));
-            });
         }
 
         public AutoCutRuningViewModel()
@@ -236,7 +231,7 @@ namespace 精密切割系统.ViewModel
             //单刀磨损量
             float singleBladeWear = GlobalParams.SingleBladeWear;
             //开始监控报警
-            Task monitorTask = StartMonitoringAlarmAsync(_monitoringAlarmCts.Token);
+            //Task monitorTask = StartMonitoringAlarmAsync(_monitoringAlarmCts.Token);
             try
             {
                 //PDA上机操作
@@ -436,7 +431,7 @@ namespace 精密切割系统.ViewModel
                 await StopAsync(ServicePauseResult.Stop);
                 await PdaUtils.UpdateFlowValuesAsync();
                 await PdaUtils.SetCompletedAsync();
-                await PdaUtils.QualifiedAsync();
+                //await PdaUtils.QualifiedAsync();
                 RunStatus = AutoRunStatus.End;
             }
         }
@@ -494,7 +489,7 @@ namespace 精密切割系统.ViewModel
             finally
             {
                 NavigationParameters parameters = new NavigationParameters { { "AutoCutRuningViewModel", this } };
-                _regionManager.RequestNavigate(RegionName.MainRegion, nameof(AutoCutPausing), parameters);
+                _regionManager.RequestNavigate(RegionName.AutoCutStateRegion, nameof(AutoCutPausing), parameters);
             }
         }
 
@@ -553,7 +548,7 @@ namespace 精密切割系统.ViewModel
             if (!GlobalParams.onlineFlag)
             {
                 NavigationParameters parameters = new NavigationParameters{{ "AutoCutRuningViewModel", this } };
-                _regionManager.RequestNavigate(RegionName.MainRegion, nameof(AutoCutPausing), parameters);
+                _regionManager.RequestNavigate(RegionName.AutoCutStateRegion, nameof(AutoCutPausing), parameters);
                 return;
             }
             if (_pauseCts.IsCancellationRequested)
@@ -566,7 +561,7 @@ namespace 精密切割系统.ViewModel
                 if (!_isForcedPause)
                 {
                     _isForcedPause = true;
-                    MaterialSnackUtils.MaterialSnack("当前状态不能暂停，再次点击暂停将退出自动执行！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                    MaterialSnackUtils.MaterialSnack("当前状态不能暂停，再次点击暂停将退出自动执行！", MaterialSnackUtils.SnackType.WARNING, 5, _eventAggregator);
                     return;
                 }
             }
@@ -611,7 +606,6 @@ namespace 精密切割系统.ViewModel
                     //等待完成测高信号
                     await PlcControl.tagControl.bladeMantance.WaitHeightMeasurementCompletedAsync(default);
                 }
-                //MaterialSnackUtils.MaterialSnack("退出自动执行成功！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
             }
             _regionManager.RequestNavigate(RegionName.MainRegion, nameof(BladeReplacementConfiguration));
         }
@@ -684,17 +678,36 @@ namespace 精密切割系统.ViewModel
         private (int sharpenTimes, bool isEndSharpen) CalculateSharpenTimes(LunguSksjDTO lunguSksj, float singleBladeWear, float? firstHeightMeasurementZ = null, float? curHeightZ = null)
         {
             float needWearAmount = 2 * lunguSksj.Ymhtxd / 1000;
+            float totalWearAmount = 0;
             if (firstHeightMeasurementZ != null && curHeightZ != null)
             {
-                float wearAmount = Math.Abs(curHeightZ.Value - firstHeightMeasurementZ.Value);
-                needWearAmount -= wearAmount;
+                totalWearAmount = Math.Abs(curHeightZ.Value - firstHeightMeasurementZ.Value);
+                needWearAmount -= totalWearAmount;
             }
+            // 是否磨完真圆2a
             if (needWearAmount <= 0)
             {
-                return (10, true);
+                // 是否满足长宽比
+                if ((lunguSksj.LongestBlade - totalWearAmount) / lunguSksj.ABAverageThickness <= 28)
+                {
+                    return (10, true);
+                }
+                else
+                {
+                    return ((int)Math.Ceiling(lunguSksj.LongestBlade - lunguSksj.ABAverageThickness * 28 - totalWearAmount / singleBladeWear + 5) + 5, false);
+                }
             }
-            //算出的磨刀数的基础上加5次，防止磨刀次数过少
-            return ((int)Math.Ceiling(needWearAmount / singleBladeWear) + 5, false);
+            else
+            {
+                //算出的磨刀数的基础上加5次，防止磨刀次数过少
+                return ((int)Math.Ceiling(needWearAmount / singleBladeWear) + 5, false);
+            }
+        }
+
+        private void ReceivedAutoRuningMessage(MessageModel message)
+        {
+            Tools.LogDebug(message.Message);
+            Application.Current.Dispatcher.Invoke(() => MessageList.Add(message));
         }
 
         public override void OnNavigatedTo(NavigationContext navigationContext)
@@ -707,6 +720,13 @@ namespace 精密切割系统.ViewModel
             CutParams = navigationContext.Parameters.GetValue<CutParamsModel>("CutParams");
             CutBladeHeight = CutParams.CutHeight;
             _deviceDataNo = CutParams.DeviceDataNo;
+            _eventAggregator.GetEvent<AutoRuningMessageEvent>().Subscribe(ReceivedAutoRuningMessage);
+        }
+
+        public override void OnNavigatedFrom(NavigationContext navigationContext)
+        {
+            base.OnNavigatedFrom(navigationContext);
+            _eventAggregator.GetEvent<AutoRuningMessageEvent>().Unsubscribe(ReceivedAutoRuningMessage);
         }
 
         public override bool IsNavigationTarget(NavigationContext navigationContext)

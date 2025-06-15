@@ -21,6 +21,7 @@ using 精密切割系统.Assets.config.menu;
 using 精密切割系统.Driver;
 using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
+using 精密切割系统.Model.cut;
 using 精密切割系统.Model.plc;
 using 精密切割系统.Utils;
 using 精密切割系统.View.Controls;
@@ -78,7 +79,7 @@ namespace 精密切割系统.View.Pages.operate
 
         public async void ShowOperateBtn()
         {
-            bool door1Status = false;
+            bool cutSecurityDoor = false;
             bool door2Status = false;
             bool vacuumState = false;
             bool spindleCuttingWater = false;
@@ -87,29 +88,29 @@ namespace 精密切割系统.View.Pages.operate
             bool systemInitFlagStatus = false;
             bool panelStatus = false;
             bool firstJoin = true;
-            bool spindleManuallyRunStatus = true;
+            bool cameraSecurityDoor = true;
             while (true)
             {
-                bool tempDoor1Status = await PlcControl.tagControl.wholeDevice.IsOpenSecurityDoor1Async();
+                bool tempCutSecurityDoor = !await PlcControl.tagControl.wholeDevice.IsOpenCutSecurityDoorAsync();
+                bool tempCameraSecurityDoor = !await PlcControl.tagControl.wholeDevice.IsOpenCameraSecurityDoorAsync();
                 bool tempDoor2Status = CommonCheck.GetDoorStatus(DeviceKey.securityDoor2StatusKey);
                 bool tempVacuumState = await PlcControl.tagControl.wholeDevice.IsOpenVacuumSwitchAsync();
                 bool tempSpindleCuttingWater = await PlcControl.tagControl.wholeDevice.IsOpenSpindleCuttingWaterAsync();
                 bool tempIsOpenOpticalFiberSensorBlowing = IsOpenOpticalFiberSensorBlowing;
                 bool tempWorkpieceBlowingStatus = await PlcControl.tagControl.wholeDevice.IsOpenWorkpieceBlowingAsync();
                 bool tempSystemInitFlagStatus = await PlcControl.tagControl.wholeDevice.IsCompletedSystemInitAsync();
-                bool tempIsOpenWorkVacuumSwitchStatus = await PlcControl.tagControl.wholeDevice.IsOpenWorkVacuumSwitchStatusAsync();
+                bool tempIsOpenWorkVacuumSwitchStatus = await PlcControl.tagControl.wholeDevice.IsOpenWorkVacuumSwitchAsync();
                 bool tempPanelStatus = CommonCheck.GetParamsStatus(DeviceKey.panelStatusKey);
-                bool tempSpindleManuallyRunStatus = CommonCheck.GetParamsStatus(DeviceKey.spindleManuallyRunStatusKey);
                 Application.Current.Dispatcher.Invoke(() => {
                     if (tempVacuumState != vacuumState || firstJoin)
                     {
                         vacuumState = tempVacuumState;
                         isSwitchOpen(tempVacuumState, 3);
                     }
-                    if (spindleManuallyRunStatus != tempSpindleManuallyRunStatus || firstJoin)
+                    if (cameraSecurityDoor != tempCameraSecurityDoor || firstJoin)
                     {
-                        spindleManuallyRunStatus = tempSpindleManuallyRunStatus;
-                        isSwitchOpen(spindleManuallyRunStatus, 4);
+                        cameraSecurityDoor = tempCameraSecurityDoor;
+                        isSwitchOpen(cameraSecurityDoor, 4);
                     }
                     if (tempSpindleCuttingWater != spindleCuttingWater || firstJoin)
                     {
@@ -122,10 +123,10 @@ namespace 精密切割系统.View.Pages.operate
                         GlobalParams.systemInitFlag = systemInitFlagStatus;
                         isSwitchOpen(tempSystemInitFlagStatus, 6);
                     }
-                    if (tempDoor1Status != door1Status || firstJoin)
+                    if (tempCutSecurityDoor != cutSecurityDoor || firstJoin)
                     {
-                        door1Status = tempDoor1Status;
-                        isSwitchOpen(!tempDoor1Status, 7);
+                        cutSecurityDoor = tempCutSecurityDoor;
+                        isSwitchOpen(cutSecurityDoor, 7);
                     }
                     if (tempDoor2Status != door2Status || firstJoin)
                     {
@@ -427,38 +428,17 @@ namespace 精密切割系统.View.Pages.operate
                     break;
                 case 3:
                     // CT 真空
-                    // 如果是切割中，则单独处理
-                    if (CommonCheck.CutModeCheck())
-                    {
-                        // 真空状态 false 关闭 true 打开
-                        bool tempVacuumState = CommonCheck.GetParamsStatus(DeviceKey.vacuumSwitchStatusKey);
-                        if (tempVacuumState)
-                        {
-                            // 如果是打开状态，则执行工件更换后关闭真空
-                            ReplaceWorkpiece(true);
-                        } else
-                        {
-                            // 打开真空
-                            await VacuumOperateAsync();
-                        }
-                    } else
-                    {
-                        await VacuumOperateAsync();
-                    }
-                    break;
-                case 2433:
-                    // CT 真空
-                    ReplaceWorkpiece(true);
+                    await VacuumOperateAsync();
                     break;
                 case 4:
-                    SpindleManuallyRun();
+                    await OperateCameraSecurityDoorAsync();
                     break;
                 case 5:
                     // 切割水
                     await CutWaterOperateAsync();
                     break;
                 case 6:
-                    if (!GlobalParams.onlineFlag && !CommonCheck.CheckDoor1())
+                    if (!GlobalParams.onlineFlag)
                     {
                         return;
                     }
@@ -470,8 +450,8 @@ namespace 精密切割系统.View.Pages.operate
                     {
                         return;
                     }
-                    // 翻盖门操作
-                    Door1Operate();
+                    // 操作切割安全门
+                    await OperateCutSecurityDoorAsync();
                     break;
                 case 8:
                     if (!GlobalParams.onlineFlag)
@@ -479,7 +459,7 @@ namespace 精密切割系统.View.Pages.operate
                         return;
                     }
                     // 推拉门操作
-                    Door2Operate();
+                    await OperateCameraSecurityDoorAsync();
                     break;
                 case 9:
                     // 相机吹气
@@ -490,18 +470,8 @@ namespace 精密切割系统.View.Pages.operate
                     {
                         return;
                     }
-                    if (await PlcControl.tagControl.wholeDevice.IsOpenWorkVacuumSwitchStatusAsync())
-                    {
-                        await PlcControl.tagControl.wholeDevice.CloseWorkVacuumSwitchAsync();
-                    }
-                    else
-                    {
-                        await PlcControl.tagControl.wholeDevice.OpenWorkVacuumSwitchAsync();
-                    }
-                    break;
-                case 2406:
-                    // 切割停止
-                    StopCut();
+                    // 操作工作盘真空
+                    await OperateWorkVacuumSwitchAsync();
                     break;
                 case 5302:
                         // 弹出确认对话框
@@ -521,49 +491,6 @@ namespace 精密切割系统.View.Pages.operate
                     onClicked?.Invoke(this, e.Code);
                     break;
             }
-        }
-        bool SpindleManuallyRunFlag = false;
-        /// <summary>
-        /// 主轴电机
-        /// </summary>
-        private void SpindleManuallyRun()
-        {
-            if (!GlobalParams.onlineFlag)
-            {
-                return;
-            }
-            if (SpindleManuallyRunFlag)
-            {
-                return;
-            }
-            if (CommonCheck.ModeCheck())
-            {
-                return;
-            }
-            if (!CommonCheck.CheckDoor() || !CommonCheck.SpindleAirCheck() || !CommonCheck.SpindleStatusCheck())
-            {
-                return;
-            }
-            GlobalParams.globalRunFlag = true;
-            SpindleManuallyRunFlag = true;
-            int status = spindRunStatus ? 0 : 1;
-            // 主轴电机
-            PlcControl.tagControl.wholeDevice.SetSpindleManuallyRunStatus(status);
-            MaterialSnackUtils.MaterialSnack($"主轴{(status == 1 ? "启动" : "关闭")}中！", SnackType.WARNING, 0);
-            Task.Run(() => {
-                bool flag = Tools.WaitForValue(DeviceKey.spindleManuallyRunStatusKey, status);
-                if (flag)
-                {
-                    spindRunStatus = !spindRunStatus;
-                    MaterialSnackUtils.MaterialSnack($"主轴已{(status == 1 ? "启动" : "关闭")}！", SnackType.SUCCESS);
-                }
-                else
-                {
-                    MaterialSnackUtils.MaterialSnack("主轴操作异常！", SnackType.WARNING);
-                }
-            });
-            GlobalParams.globalRunFlag = false;
-            SpindleManuallyRunFlag = false;
         }
 
         private void ToBladeHeight(OperateButton operateBtn)
@@ -719,49 +646,48 @@ namespace 精密切割系统.View.Pages.operate
 
 
         /// <summary>
-        /// 翻盖门1操作
+        /// 操作切割安全门
         /// </summary>
-        private async void Door1Operate()
+        private async Task OperateCutSecurityDoorAsync()
         {
-            if (CommonCheck.CheckSpindleRunStatus())
+            if (await PlcControl.tagControl.wholeDevice.GetCutSecurityDoorAddressAsync())
             {
-                return;
-            }
-            if (await PlcControl.tagControl.wholeDevice.IsOpenSecurityDoor1Async())
-            {
-                await PlcControl.tagControl.wholeDevice.CloseSecurityDoor1Async();
+                await PlcControl.tagControl.wholeDevice.CloseCutSecurityDoorAsync();
             }
             else
             {
-                await PlcControl.tagControl.wholeDevice.OpenSecurityDoor1Async();
+                await PlcControl.tagControl.wholeDevice.OpenCutSecurityDoorAsync();
             }
         }
 
-        // 安全门1 状态
-        static int door1Status = 0;
-        // 安全门2 状态
-        static int door2Status = 0;
-
         /// <summary>
-        /// 推拉门操作
+        /// 操作相机安全门
         /// </summary>
-        private void Door2Operate()
+        private async Task OperateCameraSecurityDoorAsync()
         {
-            if (CommonCheck.CheckSpindleRunStatus())
+            if (await PlcControl.tagControl.wholeDevice.GetCameraSecurityDoorAddressAsync())
             {
-                return;
-            }
-            String door2StatusStr = PlcControl.plc.GetPlcValueString(DeviceKey.securityDoor2StatusKey);
-            if ("1".Equals(door2StatusStr))
-            {
-                door2Status = 1;
+                await PlcControl.tagControl.wholeDevice.CloseCameraSecurityDoorAsync();
             }
             else
             {
-                door2Status = 0;
+                await PlcControl.tagControl.wholeDevice.OpenCameraSecurityDoorAsync();
             }
-            // 打开安全门2
-            PlcControl.tagControl.wholeDevice.OperateSecurityDoor2(door2Status);
+        }
+
+        /// <summary>
+        /// 操作工作盘真空
+        /// </summary>
+        private async Task OperateWorkVacuumSwitchAsync()
+        {
+            if (await PlcControl.tagControl.wholeDevice.IsOpenWorkVacuumSwitchAsync())
+            {
+                await PlcControl.tagControl.wholeDevice.CloseWorkVacuumSwitchAsync();
+            }
+            else
+            {
+                await PlcControl.tagControl.wholeDevice.OpenWorkVacuumSwitchAsync();
+            }
         }
 
         /// <summary>

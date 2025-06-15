@@ -16,10 +16,10 @@ namespace 精密切割系统.Assets.config.buttom
             list.Add(new OperateBean(5302, "关机", "/Assets/icon/tab_5/tab_04.png"));
             list.Add(new OperateBean(1, "传感器吹气", "/Assets/icon/tab_0/tab_01.png"));
             list.Add(new OperateBean(2, "传感器吹水", "/Assets/icon/tab_0/tab_02.png"));
-            list.Add(new OperateBean(4, "主轴电机", "/Assets/icon/tab_0/tab_04.png"));
-            list.Add(new OperateBean(5, "切割水", "/Assets/icon/tab_0/tab_05.png"));
+            list.Add(new OperateBean(7, "切割安全门", "/Assets/icon/tab_0/tab_09.png"));
+            list.Add(new OperateBean(4, "相机安全门", "/Assets/icon/tab_0/tab_04.png"));
             list.Add(new OperateBean(6, "系统初始化", "/Assets/icon/tab_0/tab_08.png"));
-            list.Add(new OperateBean(7, "安全门", "/Assets/icon/tab_0/tab_09.png"));
+            list.Add(new OperateBean(5, "切割水", "/Assets/icon/tab_0/tab_05.png"));
             list.Add(new OperateBean(9, "相机吹气", "/Assets/icon/tab_0/tab_06.png"));
             list.Add(new OperateBean(10, "工作盘真空", "/Assets/icon/tab_0/replace_workspace.png.png"));
             list.Add(new OperateBean(3, "C/T真空", "/Assets/icon/tab_0/tab_03.png"));

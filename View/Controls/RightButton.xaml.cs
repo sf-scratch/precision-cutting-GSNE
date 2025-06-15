@@ -164,46 +164,7 @@ namespace 精密切割系统.View.Controls
 
         private void onClick(Boolean isOK)
         {
-            if (AlarmConfig.Instance.HasActiveErrorAlarm() && !GlobalRunOperateFlag)
-            {
-                MaterialSnackUtils.MaterialSnack("请先解除报警！", MaterialSnackUtils.SnackType.WARNING, 5);
-                return;
-            }
-            if (!GlobalParams.systemInitFlag && !GlobalRunOperateFlag)
-            {
-                MaterialSnackUtils.MaterialSnack("请先进行初始化！", MaterialSnackUtils.SnackType.WARNING, 5);
-                return;
-            }
-            // 判断是否有在进行中的操作，如果有，则不执行点击事件
-            if (GlobalParams.globalRunFlag && !GlobalRunOperateFlag)
-            {
-                // MaterialSnackUtils.MaterialSnack("操作进行中！", MaterialSnackUtils.SnackType.WARNING, 5);
-                return;
-            }
-            //保证下面的按钮控件页面回去的时候不在软键盘上
-            OperatePage operatePage = mainWindow.operateFrame.Content as OperatePage;
-            if (operatePage==null)
-            {
-                operatePage.SetOperateShowType(0);
-            }
-            if (AlarmConfig.Instance.HasActiveErrorAlarm() && !GlobalRunOperateFlag)
-            {
-                return;
-            }
-            Uri currentPageUri = mainWindow.mainFrame.CurrentSource;
-            if (currentPageUri!=null&&BackFlag && mainWindow.mainFrame.CanGoBack 
-                && !currentPageUri.ToString().Contains("MainMenu.xaml"))
-            {
-                mainWindow.mainFrame.GoBack();
-                if (RightClicked != null)
-                {
-                    RightClicked?.Invoke(this, isOK);
-                }
-            }
-            else
-            {
-                RightClicked?.Invoke(this, isOK);
-            }
+            RightClicked?.Invoke(this, isOK);
         }
         // 设置事件处理器的方法
         public void SetRightClickedHandler(EventHandler<Boolean> handler)

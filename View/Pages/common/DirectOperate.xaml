@@ -180,6 +180,10 @@
                                 <ResourceDictionary.MergedDictionaries>
                                     <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml"/>
                                 </ResourceDictionary.MergedDictionaries>
+                                <Style TargetType="Button">
+                                    <Setter Property="FontSize" Value="18"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                </Style>
                             </ResourceDictionary>
                         </Grid.Resources>
                         <Grid.ColumnDefinitions>
@@ -193,7 +197,7 @@
                                 <RowDefinition></RowDefinition>
                                 <RowDefinition></RowDefinition>
                             </Grid.RowDefinitions>
-                            <Button Style="{StaticResource MaterialDesignFloatingActionLightButton}" VerticalAlignment="Center" x:Name="scanLeftBottomBtn" Background="#5087Cb" Foreground="White" Content="{materialDesign:PackIcon ArrowDownLeftBold,Size=30}">
+                            <Button Style="{StaticResource MaterialDesignFloatingActionLightButton}" VerticalAlignment="Center" x:Name="scanLeftBottomBtn" Background="#5087Cb" Foreground="White" Content="{materialDesign:PackIcon ArrowDownLeftBold,Size=40}">
                                 <behaviors:Interaction.Behaviors>
                                     <behav:DualInputBehavior StartCommand="{Binding StartThetaReversalCommand}" StopCommand="{Binding StopJogThetaCommand}"/>
                                 </behaviors:Interaction.Behaviors>
@@ -207,13 +211,6 @@
                                 <behaviors:Interaction.Behaviors>
                                     <behav:DualInputBehavior StartCommand="{Binding StartDropZ1Command}" StopCommand="{Binding StopJogZ1Command}"/>
                                 </behaviors:Interaction.Behaviors>
-                                <Button.Resources>
-                                    <ResourceDictionary>
-                                        <ResourceDictionary.MergedDictionaries>
-                                            <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml"/>
-                                        </ResourceDictionary.MergedDictionaries>
-                                    </ResourceDictionary>
-                                </Button.Resources>
                             </Button>
                         </Grid>
                         <Grid Grid.Column="1" >
@@ -223,9 +220,9 @@
                                 <RowDefinition></RowDefinition>
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <Button Style="{StaticResource MaterialDesignFloatingActionLightButton}" VerticalAlignment="Top" x:Name="scanTopBtn" Background="#5087Cb" Foreground="White" Content="{materialDesign:PackIcon ArrowTopThick,Size=30}">
+                                <Button Style="{StaticResource MaterialDesignFloatingActionLightButton}" VerticalAlignment="Top" x:Name="scanTopBtn" Background="#5087Cb" Foreground="White" Content="{materialDesign:PackIcon ArrowTopThick,Size=40}">
                                     <behaviors:Interaction.Behaviors>
-                                        <behav:DualInputBehavior StartCommand="{Binding StartYReversalCommand}" StopCommand="{Binding StopJogYCommand}"/>
+                                        <behav:DualInputBehavior PromptCommand="{Binding YRelativeNegativeCommand}" StartCommand="{Binding StartYReversalCommand}" StopCommand="{Binding StopJogYCommand}"/>
                                     </behaviors:Interaction.Behaviors>
                                 </Button>
                             </Grid>
@@ -235,24 +232,24 @@
                                     <ColumnDefinition></ColumnDefinition>
                                 </Grid.ColumnDefinitions>
                                 <Grid Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                    <Button Style="{StaticResource MaterialDesignFloatingActionLightButton}" VerticalAlignment="Top" x:Name="scanLeftBtn" Background="#5087Cb" Foreground="White" Content="{materialDesign:PackIcon ArrowLeftThick,Size=30}">
+                                    <Button Style="{StaticResource MaterialDesignFloatingActionLightButton}" VerticalAlignment="Top" x:Name="scanLeftBtn" Background="#5087Cb" Foreground="White" Content="{materialDesign:PackIcon ArrowLeftThick,Size=40}">
                                         <behaviors:Interaction.Behaviors>
-                                            <behav:DualInputBehavior StartCommand="{Binding StartXCorotationCommand}" StopCommand="{Binding StopJogXCommand}"/>
+                                            <behav:DualInputBehavior PromptCommand="{Binding XRelativePositiveCommand}" StartCommand="{Binding StartXCorotationCommand}" StopCommand="{Binding StopJogXCommand}"/>
                                         </behaviors:Interaction.Behaviors>
                                     </Button>
                                 </Grid>
                                 <Grid Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                    <Button Style="{StaticResource MaterialDesignFloatingActionLightButton}" VerticalAlignment="Center" x:Name="scanRightBtn" Background="#5087Cb" Foreground="White" Content="{materialDesign:PackIcon ArrowRightThick,Size=30}">
+                                    <Button Style="{StaticResource MaterialDesignFloatingActionLightButton}" VerticalAlignment="Center" x:Name="scanRightBtn" Background="#5087Cb" Foreground="White" Content="{materialDesign:PackIcon ArrowRightThick,Size=40}">
                                         <behaviors:Interaction.Behaviors>
-                                            <behav:DualInputBehavior StartCommand="{Binding StartXReversalCommand}" StopCommand="{Binding StopJogXCommand}"/>
+                                            <behav:DualInputBehavior PromptCommand="{Binding XRelativeNegativeCommand}" StartCommand="{Binding StartXReversalCommand}" StopCommand="{Binding StopJogXCommand}"/>
                                         </behaviors:Interaction.Behaviors>
                                     </Button>
                                 </Grid>
                             </Grid>
                             <Grid Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <Button Style="{StaticResource MaterialDesignFloatingActionLightButton}" VerticalAlignment="Top" x:Name="scanBottomBtn" Background="#5087Cb" Foreground="White" Content="{materialDesign:PackIcon ArrowBottomThick,Size=30}">
+                                <Button Style="{StaticResource MaterialDesignFloatingActionLightButton}" VerticalAlignment="Top" x:Name="scanBottomBtn" Background="#5087Cb" Foreground="White" Content="{materialDesign:PackIcon ArrowBottomThick,Size=40}">
                                     <behaviors:Interaction.Behaviors>
-                                        <behav:DualInputBehavior StartCommand="{Binding StartYCorotationCommand}" StopCommand="{Binding StopJogYCommand}"/>
+                                        <behav:DualInputBehavior PromptCommand="{Binding YRelativePositiveCommand}" StartCommand="{Binding StartYCorotationCommand}" StopCommand="{Binding StopJogYCommand}"/>
                                     </behaviors:Interaction.Behaviors>
                                 </Button>
                             </Grid>
@@ -263,7 +260,7 @@
                                 <RowDefinition></RowDefinition>
                                 <RowDefinition></RowDefinition>
                             </Grid.RowDefinitions>
-                            <Button Style="{StaticResource MaterialDesignFloatingActionLightButton}" VerticalAlignment="Center" x:Name="scanRightBottomBtn" Background="#5087Cb" Foreground="White" Content="{materialDesign:PackIcon ArrowDownRightBold,Size=30}">
+                            <Button Style="{StaticResource MaterialDesignFloatingActionLightButton}" VerticalAlignment="Center" x:Name="scanRightBottomBtn" Background="#5087Cb" Foreground="White" Content="{materialDesign:PackIcon ArrowDownRightBold,Size=40}">
                                 <behaviors:Interaction.Behaviors>
                                     <behav:DualInputBehavior StartCommand="{Binding StartThetaCorotationCommand}" StopCommand="{Binding StopJogThetaCommand}"/>
                                 </behaviors:Interaction.Behaviors>
@@ -272,25 +269,11 @@
                                 <behaviors:Interaction.Behaviors>
                                     <behav:DualInputBehavior StartCommand="{Binding StartRaiseZ2Command}" StopCommand="{Binding StopJogZ2Command}"/>
                                 </behaviors:Interaction.Behaviors>
-                                <Button.Resources>
-                                    <ResourceDictionary>
-                                        <ResourceDictionary.MergedDictionaries>
-                                            <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml"/>
-                                        </ResourceDictionary.MergedDictionaries>
-                                    </ResourceDictionary>
-                                </Button.Resources>
                             </Button>
                             <Button Height="40" Width="90" Grid.Row="2" Background="#5087Cb" Foreground="White" Content="Z2下降">
                                 <behaviors:Interaction.Behaviors>
                                     <behav:DualInputBehavior StartCommand="{Binding StartDropZ2Command}" StopCommand="{Binding StopJogZ2Command}"/>
                                 </behaviors:Interaction.Behaviors>
-                                <Button.Resources>
-                                    <ResourceDictionary>
-                                        <ResourceDictionary.MergedDictionaries>
-                                            <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml"/>
-                                        </ResourceDictionary.MergedDictionaries>
-                                    </ResourceDictionary>
-                                </Button.Resources>
                             </Button>
                         </Grid>
                     </Grid>

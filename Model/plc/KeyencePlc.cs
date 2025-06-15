@@ -985,49 +985,6 @@ namespace 精密切割系统.Driver
             return true;
         }
 
-        public bool writeTag1(Tag tag)
-        {
-            // 判断PLC是否是连接状态，不是的话，重连3次，继续发送数据
-
-            if (tag == null || (string.IsNullOrEmpty(tag.Value) && string.IsNullOrEmpty(tag.writeValue)))
-            {
-                Tools.LogError($"写入PLC失败：tag或tag.writeValue为空");
-                return false;
-            }
-
-            string writeValue = tag.writeValue;
-            // 判断是否有上限和下限值
-            if (tag.maxValue != null && !string.IsNullOrEmpty(tag.maxValue))
-            {
-                if (float.TryParse(tag.value, out float value) && float.TryParse(tag.maxValue, out float upperValue))
-                {
-                    if (value > upperValue)
-                    {
-                        Tools.LogInfo($"{tag.addr}写入值：{tag.writeValue}超过上限{upperValue}");
-                        writeValue = tag.maxValue;
-                    }
-                }
-            }
-            // 判断是否有下限值
-            if (tag.minValue != null && !string.IsNullOrEmpty(tag.minValue))
-            {
-                if (float.TryParse(tag.Value, out float value) && float.TryParse(tag.minValue, out float lowerValue))
-                {
-                    if (value < lowerValue)
-                    {
-                        Tools.LogInfo($"{tag.addr}写入值：{tag.writeValue}低于下限{lowerValue}");
-                        writeValue = tag.minValue;
-                    }
-                }
-            }
-            OperateResult? res = WriteData(tag.addr, writeValue, typeMap[tag.valueType]);
-            if (res == null)
-            {
-                return false;
-            }
-            return res.IsSuccess;
-        }
-
         public bool writeTag(Tag tag)
         {
             if (!GlobalParams.onlineFlag)
@@ -1042,7 +999,7 @@ namespace 精密切割系统.Driver
             }
 
             // 检查输入参数有效性
-            if (tag == null || string.IsNullOrEmpty(tag.Value) || string.IsNullOrEmpty(tag.writeValue))
+            if (tag == null || string.IsNullOrEmpty(tag.writeValue))
             {
                 Tools.LogError("写入PLC失败：tag或tag.writeValue为空");
                 return false;
@@ -1091,7 +1048,7 @@ namespace 精密切割系统.Driver
             //}
 
             // 检查输入参数有效性
-            if (tag == null || (string.IsNullOrEmpty(tag.Value) && string.IsNullOrEmpty(tag.writeValue)))
+            if (tag == null || string.IsNullOrEmpty(tag.writeValue))
             {
                 Tools.LogError("写入PLC失败：tag或tag.writeValue为空");
                 return false;
@@ -1558,7 +1515,7 @@ namespace 精密切割系统.Driver
         /// <param name="token"></param>
         /// <param name="highSpeed"></param>
         /// <returns></returns>
-        public async Task StartRelativeAsync(float distance, float speed, CancellationToken token = default)
+        public async Task StartRelativeAsync(float distance, float? speed = null, CancellationToken token = default)
         {
             float? curLocation = await GetCurrentLocationAsync();
             if (curLocation != null)
@@ -2142,12 +2099,11 @@ namespace 精密切割系统.Driver
         public Tag systemInitStatus { get; set; }
         public Tag systemStop { get; set; }
         public Tag clearAxisAlarm { get; set; }
-        public Tag securityDoor1 { get; set; }
+        public Tag cutSecurityDoor { get; set; }
         public Tag alarmReset { get; set; }
-        public Tag securityDoor2Close { get; set; }
-        public Tag securityDoor2Open { get; set; }
-        public Tag securityDoor1Status { get; set; }
-        public Tag securityDoor2Status { get; set; }
+        public Tag cameraSecurityDoor { get; set; }
+        public Tag cutSecurityDoorStatus { get; set; }
+        public Tag cameraSecurityDoorStatus { get; set; }
         public Tag vacuumState { get; set; }
         public Tag spindleAir { get; set; }
         public Tag spindleCuttingWater { get; set; }
@@ -2426,7 +2382,7 @@ namespace 精密切割系统.Driver
         /// <summary>
         /// 工作盘是否打开真空
         /// </summary>
-        public async Task<bool> IsOpenWorkVacuumSwitchStatusAsync()
+        public async Task<bool> IsOpenWorkVacuumSwitchAsync()
         {
             return await keyencePlc.ReadDataAsync(workVacuumSwitch.addr) == true;
         }
@@ -2458,47 +2414,70 @@ namespace 精密切割系统.Driver
             return await keyencePlc.ReadDataAsync(workpieceBlowingStatus.addr) == true;
         }
 
-        public async Task<bool> IsOpenSecurityDoor1Async()
+        /// <summary>
+        /// 是否打开切割安全门
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> IsOpenCutSecurityDoorAsync()
         {
-            return await keyencePlc.ReadDataAsync(securityDoor1.addr) == false;
-        }
-
-        public async Task OpenSecurityDoor1Async()
-        {
-            securityDoor1.writeValue = "0";
-            await keyencePlc.WriteTagAsync(securityDoor1);
-        }
-
-        public async Task CloseSecurityDoor1Async()
-        {
-            securityDoor1.writeValue = "1";
-            await keyencePlc.WriteTagAsync(securityDoor1);
+            return await keyencePlc.ReadDataAsync(cutSecurityDoorStatus.addr) == false;
         }
 
         /// <summary>
-        /// 操作安全门2
+        /// 获取切割安全门地址信息
         /// </summary>
-        /// <param name="status">0关闭 1 打开</param>
-        public void OperateSecurityDoor2(int status)
+        /// <returns></returns>
+        public async Task<bool> GetCutSecurityDoorAddressAsync()
         {
-            if (status == 0)
-            {
-                securityDoor2Open.writeValue = "0";
-                keyencePlc.writeTag(securityDoor2Open);
-                Thread.Sleep(10);
-                securityDoor2Close.writeValue = "1";
-                keyencePlc.writeTag(securityDoor2Close);
-
-            } else
-            {
-                securityDoor2Close.writeValue = "0";
-                keyencePlc.writeTag(securityDoor2Close);
-                Thread.Sleep(10);
-                securityDoor2Open.writeValue = "1";
-                keyencePlc.writeTag(securityDoor2Open);
-            }
+            return await keyencePlc.ReadDataAsync(cutSecurityDoor.addr) == false;
         }
 
+        public async Task OpenCutSecurityDoorAsync()
+        {
+            cutSecurityDoor.writeValue = "0";
+            await keyencePlc.WriteTagAsync(cutSecurityDoor);
+        }
+
+        public async Task CloseCutSecurityDoorAsync()
+        {
+            cutSecurityDoor.writeValue = "1";
+            await keyencePlc.WriteTagAsync(cutSecurityDoor);
+        }
+
+        /// <summary>
+        /// 是否打开相机安全门
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> IsOpenCameraSecurityDoorAsync()
+        {
+            return await keyencePlc.ReadDataAsync(cameraSecurityDoorStatus.addr) == false;
+        }
+
+        /// <summary>
+        /// 获取相机安全门地址信息
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> GetCameraSecurityDoorAddressAsync()
+        {
+            return await keyencePlc.ReadDataAsync(cameraSecurityDoor.addr) == false;
+        }
+
+        public async Task OpenCameraSecurityDoorAsync()
+        {
+            cameraSecurityDoor.writeValue = "0";
+            await keyencePlc.WriteTagAsync(cameraSecurityDoor);
+        }
+
+        public async Task CloseCameraSecurityDoorAsync()
+        {
+            cameraSecurityDoor.writeValue = "1";
+            await keyencePlc.WriteTagAsync(cameraSecurityDoor);
+        }
+
+        /// <summary>
+        /// 真空状态
+        /// </summary>
+        /// <returns></returns>
         public async Task<bool> IsOpenVacuumSwitchAsync()
         {
             return await keyencePlc.ReadDataAsync(vacuumState.addr) == true;

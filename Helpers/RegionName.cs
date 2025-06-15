@@ -9,5 +9,6 @@ namespace 精密切割系统.Helpers
     public class RegionName
     {
         public const string MainRegion = "MainRegion";
+        public const string AutoCutStateRegion = "AutoCutStateRegion";
     }
 }

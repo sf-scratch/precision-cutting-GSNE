@@ -35,11 +35,11 @@ namespace 精密切割系统.FrmWindow.common
         // 全局参数配置 0 设备参数 1 测高参数
         public static int GlobalParamsConfType = 1;
         // 默认光源亮度 第一台 0.8 第二台 0.07
-        public static double intensityRatio = 0.02;
+        public static double intensityRatio = 0.95;
         public static double lowIntensityRatio = 0.02;
         public static double RingIntensityRatio = 0.02;
         // 使用的光源通道 第一台 1  第二台 4
-        public static int LightIntensityChannel = 4;
+        public static int LightIntensityChannel = 3;
         // 低倍光源通道
         public static int LowLightIntensityChannel = 3;
         // 环光光源通道

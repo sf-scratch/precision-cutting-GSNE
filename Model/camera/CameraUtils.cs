@@ -657,10 +657,5 @@ namespace 精密切割系统.Driver
             }
 
         }
-
-        public static string GetLunguId()
-        {
-            return "YL24081330B077";
-        }
     }
 }

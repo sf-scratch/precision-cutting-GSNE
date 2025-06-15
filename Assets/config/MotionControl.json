@@ -974,41 +974,35 @@
       "name": "确认硬件报警",
       "describe": "确认设备硬件报警"
     },
-    "securityDoor1": {
-      "valueType": "bool",
-      "addr": "MR604",
-      "name": "翻转安全门",
-      "describe": "翻转安全门"
-    },
     "alarmReset": {
       "valueType": "bool",
       "addr": "MR3002",
       "name": "报警复位",
       "describe": "报警复位"
     },
-    "securityDoor2Close": {
+    "cutSecurityDoor": {
       "valueType": "bool",
-      "addr": "MR605",
-      "name": "关闭推拉安全门",
-      "describe": "关闭推拉安全门"
+      "addr": "MR604",
+      "name": "切割安全门关闭",
+      "describe": "切割安全门关闭"
     },
-    "securityDoor2Open": {
+    "cameraSecurityDoor": {
       "valueType": "bool",
       "addr": "MR606",
-      "name": "打开推拉安全门",
-      "describe": "打开推拉安全门"
+      "name": "相机安全门关闭",
+      "describe": "相机安全门关闭"
     },
-    "securityDoor1Status": {
+    "cutSecurityDoorStatus": {
       "valueType": "bool",
       "addr": "MR614",
-      "name": "安全门1状态",
-      "describe": "安全门1状态"
+      "name": "切割安全门状态",
+      "describe": "切割安全门状态"
     },
-    "securityDoor2Status": {
-      "valueType": "int16",
-      "addr": "DM007",
-      "name": "安全门2状态",
-      "describe": "安全门2状态"
+    "cameraSecurityDoorStatus": {
+      "valueType": "bool",
+      "addr": "MR615",
+      "name": "相机安全门状态",
+      "describe": "相机安全门状态"
     },
     "spindleSpeedStatus": {
       "valueType": "int16",

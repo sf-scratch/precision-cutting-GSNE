@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using 精密切割系统.Behaviors;
 using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Utils;
 
@@ -11,6 +12,9 @@ namespace 精密切割系统.ViewModel
 {
     public class DirectOperateViewModel : BindableBase
     {
+        private static readonly float RelativeDistance = 0.01f; // 相对移动距离
+        private static readonly float RelativeSpeed = 0.2f; // 相对移动速度
+        private static readonly float RelativeTime = DualInputBehavior.TouchDelaySeconds * 2; // 相对移动最长时间，超过取消
         private CancellationTokenSource _cancelGetAxisInfoCts;
 
         private DelegateCommand _startXCommand;
@@ -286,7 +290,7 @@ namespace 精密切割系统.ViewModel
             if (IsAbsMoveZ2)
             {
 
-               await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(TargetPositionZ2, SpeedZ2);
+                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(TargetPositionZ2, SpeedZ2);
             }
             else
             {
@@ -461,6 +465,40 @@ namespace 精密切割系统.ViewModel
             set { SetProperty(ref _isShowKeyboard, value); }
         }
 
+        private DelegateCommand _xRelativeNegativeCommand;
+        public DelegateCommand XRelativeNegativeCommand =>
+            _xRelativeNegativeCommand ?? (_xRelativeNegativeCommand = new DelegateCommand(ExecuteXRelativeNegativeCommand));
+
+        async void ExecuteXRelativeNegativeCommand()
+        {
+            try
+            {
+                var cts = new CancellationTokenSource();
+                cts.CancelAfter(TimeSpan.FromSeconds(RelativeTime));
+                await PlcControl.tagControl.Xaxis.StartRelativeAsync(-RelativeDistance, RelativeSpeed, cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+        }
+
+        private DelegateCommand _xRelativePositiveCommand;
+        public DelegateCommand XRelativePositiveCommand =>
+            _xRelativePositiveCommand ?? (_xRelativePositiveCommand = new DelegateCommand(ExecuteXRelativePositiveCommand));
+
+        async void ExecuteXRelativePositiveCommand()
+        {
+            try
+            {
+                var cts = new CancellationTokenSource();
+                cts.CancelAfter(TimeSpan.FromSeconds(RelativeTime));
+                await PlcControl.tagControl.Xaxis.StartRelativeAsync(RelativeDistance, RelativeSpeed, cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+        }
+
         private DelegateCommand _startXCorotationCommand;
         public DelegateCommand StartXCorotationCommand =>
             _startXCorotationCommand ?? (_startXCorotationCommand = new DelegateCommand(ExecuteStartXCorotationCommand));
@@ -486,6 +524,40 @@ namespace 精密切割系统.ViewModel
         async void ExecuteStopJogXCommand()
         {
             await PlcControl.tagControl.Xaxis.StopJogAsync();
+        }
+
+        private DelegateCommand _yRelativeNegativeCommand;
+        public DelegateCommand YRelativeNegativeCommand =>
+            _yRelativeNegativeCommand ?? (_yRelativeNegativeCommand = new DelegateCommand(ExecuteYRelativeNegativeCommand));
+
+        async void ExecuteYRelativeNegativeCommand()
+        {
+            try
+            {
+                var cts = new CancellationTokenSource();
+                cts.CancelAfter(TimeSpan.FromSeconds(RelativeTime));
+                await PlcControl.tagControl.Yaxis.StartRelativeAsync(-RelativeDistance, RelativeSpeed, cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+        }
+
+        private DelegateCommand _yRelativePositiveCommand;
+        public DelegateCommand YRelativePositiveCommand =>
+            _yRelativePositiveCommand ?? (_yRelativePositiveCommand = new DelegateCommand(ExecuteYRelativePositiveCommand));
+
+        async void ExecuteYRelativePositiveCommand()
+        {
+            try
+            {
+                var cts = new CancellationTokenSource();
+                cts.CancelAfter(TimeSpan.FromSeconds(RelativeTime));
+                await PlcControl.tagControl.Yaxis.StartRelativeAsync(RelativeDistance, RelativeSpeed, cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+            }
         }
 
         private DelegateCommand _startYCorotationCommand;
@@ -600,8 +672,8 @@ namespace 精密切割系统.ViewModel
         public bool IsHighSpeed
         {
             get { return _isHighSpeed; }
-            set 
-            { 
+            set
+            {
                 SetProperty(ref _isHighSpeed, value);
                 if (_isHighSpeed)
                 {
@@ -651,7 +723,7 @@ namespace 精密切割系统.ViewModel
             CancellationToken token = _cancelGetAxisInfoCts.Token;
             Task.Run(async () =>
             {
-                using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(1000));
+                using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
                 while (await timer.WaitForNextTickAsync(token))
                 {
                     try

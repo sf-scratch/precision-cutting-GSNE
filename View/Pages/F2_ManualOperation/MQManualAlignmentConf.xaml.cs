@@ -98,10 +98,6 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             if (operateType == 0)
             {
                 MaterialSnack("进入校准模式成功！", SnackType.WARNING);
-            } else
-            {
-                // 其它模式進入后，自动打开门
-                // PlcControl.tagControl.wholeDevice.OperateSecurityDoor2(1);
             }
             CommonOperate.xLocation = 0;
             cutWidth.Text = Tools.FormatDecimalString((cameraCommon._cutMarkWidth / 1000).ToString(), 4);
@@ -124,41 +120,11 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 return;
             }
             // 根据当前的切割面，设置开始切割位置
-            SetChCutStartPosition();
             ToNextPage();
-        }
-
-        private void SetChCutStartPosition()
-        {
-            string currentCh = CurrentUtils.GetCurrentChNo();
-            string currentYPositionStr = PlcControl.plc.GetPlcValueString(DeviceKey.yCurLocationKey);
-            float currentYPosition = Tools.GetFloatStringValue(currentYPositionStr);
-            switch (currentCh)
-            {
-                case "Ch 1":
-                    GlobalParams.ch1CutStartPosition = currentYPosition;
-                    break;
-                case "Ch 2":
-                    GlobalParams.ch2CutStartPosition = currentYPosition;
-                    break;
-                case "Ch 3":
-                    GlobalParams.ch3CutStartPosition = currentYPosition;
-                    break;
-                case "Ch 4":
-                    GlobalParams.ch4CutStartPosition = currentYPosition;
-                    break;
-                default:
-                    break;
-            }
-            Tools.LogInfo($"GlobalParams.ch1CutStartPosition:{GlobalParams.ch1CutStartPosition}");
-            Tools.LogInfo($"GlobalParams.ch2CutStartPosition:{GlobalParams.ch2CutStartPosition}");
-            Tools.LogInfo($"GlobalParams.ch3CutStartPosition:{GlobalParams.ch3CutStartPosition}");
-            Tools.LogInfo($"GlobalParams.ch4CutStartPosition:{GlobalParams.ch4CutStartPosition}");
         }
 
         private void bakClickHandle(object sender, bool e)
         {
-            SetChCutStartPosition();
             ToNextPage();
         }
 
@@ -204,7 +170,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
 
         }
 
-        public void ClickHandler(object sender, int code)
+        public async void ClickHandler(object sender, int code)
         {
             Debug.WriteLine("ClickHandler");
             switch (code)
@@ -235,20 +201,19 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                     {
                         break;
                     }
-                    CommonOperate.GetInstance().ThetaAlign();
+                    await CommonOperate.GetInstance().ThetaAlignAsync();
                     break;
                 case 2453:
                     if (!CommonCheck.ThetaAlignStatsCheck())
                     {
                         break;
                     }
-                    CommonOperate.GetInstance().ThetaAlign1();
+                    await CommonOperate.GetInstance().ThetaAlign1Async();
                     break;
                 case 2479:
                     // 倍率变更
                     cameraCommon.ChangeCamera();
-                    Thread.Sleep(100);
-                    // Tools.GetChildObject<CommonDimming>(this, "commonDimming");
+                    Thread.Sleep(100);;
                     commonDimming.InitData();
                     break;
                 case 2050:
@@ -405,19 +370,6 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             }
         }
 
-        public void SetBtnImage(Image image, string direction, bool isSelected, int type)
-        {
-            string resourceName = null;
-            if (type == 1)
-            {
-                resourceName = isSelected ? $"scr_{direction}_sel" : $"scr_{direction}";
-            }
-            else if (type == 2)
-            {
-                resourceName = isSelected ? $"scan_{direction}_sel" : $"scan_{direction}";
-            }
-            image.Source = Tools.BitmapImageToBitmap("/Assets/picture/" + resourceName + ".png");
-        }
         /// <summary>
         /// 设置当前通道
         /// </summary>

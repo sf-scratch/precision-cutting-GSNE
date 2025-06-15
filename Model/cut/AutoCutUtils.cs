@@ -144,28 +144,17 @@ namespace 精密切割系统.Model.cut
             }
             for (int times = 1; times <= 10; times++)
             {
-                if (mode is HeightMeasurementMode.NoContact)
-                {
-                    //主轴旋转
-                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("主轴开始旋转"));
-                    await PlcControl.tagControl.wholeDevice.StartSpindleAsync();
-                    //eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹水"));
-                    //await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingWaterAsync(2);
-                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹气"));
-                    await PlcControl.tagControl.cutting.RunMotionAsync(119.5f, 50, token);
-                    await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingAsync(5);
-
-                    //float startBlowX = 119, endBlowX = 131;
-                    ////测高前移动到初始位置，主轴旋转，开始吹水吹气
-                    //await PlcControl.tagControl.cutting.RunMotionAsync(startBlowX, 50, token);
-                    //await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingAsync();
-                    //for (int count = 0; count < 2; count++)
-                    //{
-                    //    await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(endBlowX, 8);
-                    //    await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(startBlowX, 8);
-                    //}
-                    //await PlcControl.tagControl.bladeMantance.CloseOpticalFiberSensorBlowingAsync();
-                }
+                //if (mode is HeightMeasurementMode.NoContact)
+                //{
+                //    //主轴旋转
+                //    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("主轴开始旋转"));
+                //    await PlcControl.tagControl.wholeDevice.StartSpindleAsync();
+                //    //eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹水"));
+                //    //await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingWaterAsync(2);
+                //    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹气"));
+                //    await PlcControl.tagControl.cutting.RunMotionAsync(119.5f, 50, token);
+                //    await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingAsync(5);
+                //}
 
                 //等待测高准备完成信号
                 await PlcControl.tagControl.bladeMantance.WaitReadyToMeasureHeightAsync(token);
@@ -229,17 +218,140 @@ namespace 精密切割系统.Model.cut
                 eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高平均值：{setupValueList.Average()}"));
                 float maxDeviation = setupValueList.Max() - setupValueList.Min();
                 eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高最大偏差：{maxDeviation}"));
-                if (maxDeviation >= 0.01)
-                {
-                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高偏差过大，重新测高"));
-                    if (times % 3 == 0)
+                //if (maxDeviation >= 0.01)
+                //{
+                //    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高偏差过大，重新测高"));
+                //    if (times % 3 == 0)
+                //    {
+                //        await WaitManualBlowing(dialogService, token);
+                //    }
+                //    continue;
+                //}
+                //// 计算3次的平均值，为测高值
+                //return setupValueList.Average();
+            }
+            return null;
+        }
+        
+        public static async Task<float?> ProcessMeasureWearAmountAsync(HeightMeasurementMode mode, CancellationToken token, IDialogService dialogService, IEventAggregator? eventAggregator = null)
+        {
+            //测高前移动到初始位置，手动吹水
+            //await PlcControl.tagControl.cutting.RunMotionAsync(0, 0, token);
+            //await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, token);
+            //await PlcControl.tagControl.wholeDevice.OpenBuzzerAsync();
+            //await dialogService.ShowDialogWindowAsync(nameof(ConfirmDialog), new DialogParameters() { { "ButtonContent", "请手动完成吹水操作" } }, r => { }, nameof(ConfirmDialogWindow));
+            //await PlcControl.tagControl.wholeDevice.CloseBuzzerAsync();
+            InitialPositionModel? initPos = await GetInitialPositionAsync();
+            if (initPos is null) return null;
+            switch (mode)
+            {
+                //接触测高
+                case HeightMeasurementMode.Contact:
+                    int? thetaDeg = Appsettings.ContactHeightMeasurementThetaDeg;
+                    if (thetaDeg == null)
                     {
-                        await WaitManualBlowing(dialogService, token);
+                        MaterialSnackUtils.MaterialSnack("接触测高配置文件异常！", MaterialSnackUtils.SnackType.ERROR, 0, eventAggregator);
+                        return null;
                     }
-                    continue;
+                    Appsettings.ContactHeightMeasurementThetaDeg = thetaDeg.Value + 1;
+                    await PlcControl.tagControl.bladeMantance.SetBladeSetuInitPositionAsync(initPos.BladeSetupInitX, initPos.BladeSetupInitY, thetaDeg.Value);
+                    await PlcControl.tagControl.bladeMantance.StartContactHeightMeasurement();
+                    break;
+                //非接触测高
+                case HeightMeasurementMode.NoContact:
+                    await PlcControl.tagControl.bladeMantance.SetBladeSetuInitPositionAsync(initPos.NoContactBladeSetupInitX, initPos.NoContactBladeSetupInitY);
+                    await PlcControl.tagControl.bladeMantance.StartNoContactHeightMeasurement();
+                    break;
+                default:
+                    break;
+            }
+            for (int times = 1; times <= 10; times++)
+            {
+                //if (mode is HeightMeasurementMode.NoContact)
+                //{
+                //    //主轴旋转
+                //    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("主轴开始旋转"));
+                //    await PlcControl.tagControl.wholeDevice.StartSpindleAsync();
+                //    //eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹水"));
+                //    //await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingWaterAsync(2);
+                //    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹气"));
+                //    await PlcControl.tagControl.cutting.RunMotionAsync(119.5f, 50, token);
+                //    await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingAsync(5);
+                //}
+
+                //等待测高准备完成信号
+                await PlcControl.tagControl.bladeMantance.WaitReadyToMeasureHeightAsync(token);
+                //进入测高模式
+                await PlcControl.tagControl.bladeMantance.StartBladeSetupAsync();
+                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始测高！"));
+                BladeHeightModel bladeHeightModel;
+                //测高参数的数据
+                List<BladeHeightModel> list = await SqlHelper.TableAsync<BladeHeightModel>()
+                        .Where(t => t.Id == 1).ToListAsync();
+                //数据不存在，则初始化数据
+                if (list == null || list.Count == 0)
+                {
+                    MaterialSnackUtils.MaterialSnack("获取测高参数失败！", MaterialSnackUtils.SnackType.ERROR, 0, eventAggregator);
+                    return null;
                 }
-                // 计算3次的平均值，为测高值
-                return setupValueList.Average();
+                bladeHeightModel = list[0];
+                if (!int.TryParse(bladeHeightModel.Retry, out int retry))
+                {
+                    MaterialSnackUtils.MaterialSnack("测高参数异常！", MaterialSnackUtils.SnackType.ERROR, 0, eventAggregator);
+                    return null;
+                }
+                // 发送测高开始信号到PLC
+                await PlcControl.tagControl.bladeMantance.StartSetupAsync();
+                List<float> setupValueList = new List<float>();
+                int? measureHeightTimes = await PlcControl.tagControl.bladeMantance.GetHeightMeasurementSetupNumber();
+                if (measureHeightTimes == null)
+                {
+                    MaterialSnackUtils.MaterialSnack("测高次数获取失败！", MaterialSnackUtils.SnackType.ERROR, 0, eventAggregator);
+                    return null;
+                }
+                using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
+                while (measureHeightTimes.Value < retry && await timer.WaitForNextTickAsync(token))
+                {
+                    int? curMeasureHeightTimes = await PlcControl.tagControl.bladeMantance.GetHeightMeasurementSetupNumber();
+                    if (curMeasureHeightTimes == null)
+                    {
+                        MaterialSnackUtils.MaterialSnack("测高次数获取失败！", MaterialSnackUtils.SnackType.ERROR, 0, eventAggregator);
+                        return null;
+                    }
+                    // 如果不相等，则记录值
+                    if (curMeasureHeightTimes.Value != measureHeightTimes.Value)
+                    {
+                        float? setupValue = await PlcControl.tagControl.bladeMantance.GetHeightMeasurementSetupValue();
+                        if (setupValue == null)
+                        {
+                            MaterialSnackUtils.MaterialSnack("测高值获取失败！", MaterialSnackUtils.SnackType.ERROR, 0, eventAggregator);
+                            return null;
+                        }
+                        eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"第{curMeasureHeightTimes.Value}次测高：{setupValue.Value}"));
+                        setupValueList.Add(setupValue.Value);
+                        measureHeightTimes = curMeasureHeightTimes;
+                    }
+                }
+                if (setupValueList.Count == 0)
+                {
+                    return null;
+                }
+                //等待完成测高信号
+                await PlcControl.tagControl.bladeMantance.WaitHeightMeasurementCompletedAsync(token);
+                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高平均值：{setupValueList.Average()}"));
+                float maxDeviation = setupValueList.Max() - setupValueList.Min();
+                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高最大偏差：{maxDeviation}"));
+                //if (maxDeviation >= 0.01)
+                //{
+                //    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高偏差过大，重新测高"));
+                //    if (times % 3 == 0)
+                //    {
+                //        await WaitManualBlowing(dialogService, token);
+                //    }
+                //    continue;
+                //}
+                //// 计算3次的平均值，为测高值
+                //return setupValueList.Average();
             }
             return null;
         }

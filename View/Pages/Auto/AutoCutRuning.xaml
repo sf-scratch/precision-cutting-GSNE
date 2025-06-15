@@ -12,7 +12,7 @@
       xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
       mc:Ignorable="d" 
-      d:DesignHeight="676" d:DesignWidth="1448"
+      d:DesignHeight="676" d:DesignWidth="724"
       d:DataContext="{d:DesignInstance viewModel:AutoCutRuningViewModel, IsDesignTimeCreatable=True}">
     <behaviors:Interaction.Triggers>
         <behaviors:EventTrigger EventName="Loaded">
@@ -152,13 +152,6 @@
         </Style>
     </UserControl.Resources>
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="50*" />
-            <ColumnDefinition Width="50*" />
-        </Grid.ColumnDefinitions>
-        <Grid Grid.Column="0">
-            <common:CameraCommon Width="765" Height="640" />
-        </Grid>
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
