@@ -16,6 +16,10 @@ Width="25" Height="25" RenderTransformOrigin="0.964,1.2" Source="/Assets/icon/ta
                     </Label>
                 </StackPanel>
             </Border>
+        <Image x:Name="operate01" Visibility="Collapsed"  Source="{Binding ImageSource01}"  Width="29" Height="16"   HorizontalAlignment="Right" VerticalAlignment="Top"
+       Margin="0,12,20,0" /> 
+        <Image x:Name="operate02" Visibility="Collapsed"  Source="{Binding ImageSource02}"  Width="29" Height="16"   HorizontalAlignment="Right" VerticalAlignment="Top"
+       Margin="0,12,20,0" />
         <Image x:Name="operate03" Visibility="Collapsed"  Source="{Binding ImageSource03}"  Width="29" Height="16"   HorizontalAlignment="Right" VerticalAlignment="Top"
        Margin="0,12,20,0" />
         <Image x:Name="operate04" Visibility="Collapsed" Source="{Binding ImageSource04}"  Width="29" Height="16"   HorizontalAlignment="Right" VerticalAlignment="Top"

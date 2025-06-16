@@ -13,7 +13,7 @@ namespace 精密切割系统.DTOs
         /// 轮毂ID
         /// </summary>
         [JsonProperty("lungu")]
-        public float LunguId { get; set; }
+        public string LunguId { get; set; }
 
         /// <summary>
         /// AB平均厚度

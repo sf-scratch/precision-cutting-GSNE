@@ -74,6 +74,12 @@ namespace 精密切割系统.View.Controls
             //根据条件开放按钮显示
             switch (bean.Code)
             {
+                case 1:
+                    operate01.Visibility = Visibility.Visible;
+                    break;
+                case 2:
+                    operate02.Visibility = Visibility.Visible;
+                    break;
                 case 3:
                     operate03.Visibility = Visibility.Visible;
                     break;

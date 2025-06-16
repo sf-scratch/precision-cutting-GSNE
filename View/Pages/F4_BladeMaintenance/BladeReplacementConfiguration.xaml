@@ -115,19 +115,19 @@
                     </Controls:InputTextBox>
                     <TextBlock HorizontalAlignment="Left" Text=""/>
                     <TextBlock Text="实际刀刃规格"/>
-                    <Controls:InputTextBox Text="{Binding LunguSks.SjSpec}"/>
+                    <Controls:InputTextBox Text="{Binding LunguSksj.SjSpec}"/>
                     <TextBlock Text="刀刃平均厚度"/>
-                    <Controls:InputTextBox Text="{Binding LunguSks.ABAverageThickness}"/>
+                    <Controls:InputTextBox Text="{Binding LunguSksj.ABAverageThickness}"/>
                     <TextBlock HorizontalAlignment="Left" Text="um"/>
                     <TextBlock Text="刀片类型"/>
-                    <Controls:InputTextBox Text="{Binding LunguSks.BladeType}"/>
+                    <Controls:InputTextBox Text="{Binding LunguSksj.BladeType}"/>
                     <TextBlock Text="最长刀刃长度"/>
-                    <Controls:InputTextBox Text="{Binding LunguSks.LongestBlade}"/>
+                    <Controls:InputTextBox Text="{Binding LunguSksj.LongestBlade}"/>
                     <TextBlock HorizontalAlignment="Left" Text="um"/>
                     <TextBlock Text="刀刃规格"/>
-                    <Controls:InputTextBox Text="{Binding LunguSks.BladeEdgeType}"/>
+                    <Controls:InputTextBox Text="{Binding LunguSksj.BladeEdgeType}"/>
                     <TextBlock Text="刀片外径"/>
-                    <Controls:InputTextBox Text="{Binding LunguSks.BladeOuterDiameter}"/>
+                    <Controls:InputTextBox Text="{Binding LunguSksj.BladeOuterDiameter}"/>
                     <TextBlock HorizontalAlignment="Left" Text="um"/>
                 </auto:AutoGrid>
             </GroupBox>

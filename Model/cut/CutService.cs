@@ -210,8 +210,8 @@ namespace 精密切割系统.Model.cut
                         await PlcControl.tagControl.cutting.SetCutParamsAsync(cutSpeed, endZ, startZ, startX, endX, line.StartPoint.Y, "0", _thetaDegQueue.Peek() + cutCalibratTheta, spindleRev, _cutDirection);
                         //开始切割信号
                         await PlcControl.tagControl.cutting.StartCutAsync();
-                        //等待磨刀次数变化
-                        await PlcControl.tagControl.cutting.WaitCutNumUdatedAsync(curCutNum.Value, _usingPauseToken);
+                        //等待切割次数变化
+                        await PlcControl.tagControl.cutting.WaitCutNumUdatedAsync(curCutNum.Value + 1, _usingPauseToken);
                         cutTime++;
                         //触发切割进度更新事件
                         CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, needCutTimes + _finishedCutTimes, cutTime + _finishedCutTimes, true));

@@ -204,7 +204,7 @@ namespace 精密切割系统.Model.cut
                         try
                         {
                             //等待磨刀次数变化
-                            await PlcControl.tagControl.cutting.WaitCutNumUdatedAsync(curCutNum.Value, usingPauseToken);
+                            await PlcControl.tagControl.cutting.WaitCutNumUdatedAsync(curCutNum.Value + 1, usingPauseToken);
                         }
                         finally
                         {

@@ -319,17 +319,6 @@ namespace 精密切割系统.Model.cut
                 //等待完成测高信号
                 await PlcControl.tagControl.bladeMantance.WaitHeightMeasurementCompletedAsync(token);
                 eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"磨损量平均值：{setupValueList.Average()}"));
-                float maxDeviation = setupValueList.Max() - setupValueList.Min();
-                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"磨损量最大偏差：{maxDeviation}"));
-                if (maxDeviation >= 0.01)
-                {
-                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"磨损量偏差过大，重新测高"));
-                    if (times % 3 == 0)
-                    {
-                        await WaitManualBlowing(dialogService, token);
-                    }
-                    continue;
-                }
                 // 计算3次的平均值，为测高值
                 return CommonResult<float>.Success(setupValueList.Average());
             }

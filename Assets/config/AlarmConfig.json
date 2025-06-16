@@ -361,8 +361,8 @@
   },
   {
     "Address": "MR60408",
-    "Level": "None",
-    "Message": ""
+    "Level": "Error",
+    "Message": "测高传感器脏污，请清洁"
   },
   {
     "Address": "MR60409",

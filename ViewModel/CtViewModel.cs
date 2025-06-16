@@ -151,6 +151,12 @@ namespace 精密切割系统.ViewModel
             string imagePath = type ? "/Assets/icon/right/open.png" : "/Assets/icon/right/close.png";
             switch (code)
             {
+                case 1:
+                    ImageSource01 = new BitmapImage(new Uri(imagePath, UriKind.Relative));
+                    break;
+                case 2:
+                    ImageSource02 = new BitmapImage(new Uri(imagePath, UriKind.Relative));
+                    break;
                 case 3:
                     ImageSource03 = new BitmapImage(new Uri(imagePath, UriKind.Relative));
                     break;
@@ -165,9 +171,6 @@ namespace 精密切割系统.ViewModel
                     break;
                 case 7:
                     ImageSource07 = new BitmapImage(new Uri(imagePath, UriKind.Relative));
-                    break;
-                case 8:
-                    ImageSource08 = new BitmapImage(new Uri(imagePath, UriKind.Relative));
                     break;
                 case 9:
                     ImageSource09 = new BitmapImage(new Uri(imagePath, UriKind.Relative));

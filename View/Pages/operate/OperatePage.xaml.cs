@@ -56,6 +56,8 @@ namespace 精密切割系统.View.Pages.operate
                 btn.KeyPressed -= btnClick;
                 btn.KeyPressed += btnClick;
             });
+            ctViewModel.UpdateImage(false, 1);
+            ctViewModel.UpdateImage(false, 2);
             ctViewModel.UpdateImage(false, 3);
             ctViewModel.UpdateImage(false, 4);
             ctViewModel.UpdateImage(false, 5);
@@ -80,28 +82,39 @@ namespace 精密切割系统.View.Pages.operate
         public async void ShowOperateBtn()
         {
             bool cutSecurityDoor = false;
-            bool door2Status = false;
             bool vacuumState = false;
             bool spindleCuttingWater = false;
             bool workpieceBlowingStatus = false;
             bool isOpenWorkVacuumSwitchStatus = false;
             bool systemInitFlagStatus = false;
             bool panelStatus = false;
+            bool cameraSecurityDoor = false;
+            bool isOpenOpticalFiberSensorBlowing = false;
+            bool isOpenOpticalFiberSensorBlowingWater = false;
             bool firstJoin = true;
-            bool cameraSecurityDoor = true;
             while (true)
             {
                 bool tempCutSecurityDoor = !await PlcControl.tagControl.wholeDevice.IsOpenCutSecurityDoorAsync();
                 bool tempCameraSecurityDoor = !await PlcControl.tagControl.wholeDevice.IsOpenCameraSecurityDoorAsync();
-                bool tempDoor2Status = CommonCheck.GetDoorStatus(DeviceKey.securityDoor2StatusKey);
                 bool tempVacuumState = await PlcControl.tagControl.wholeDevice.IsOpenVacuumSwitchAsync();
                 bool tempSpindleCuttingWater = await PlcControl.tagControl.wholeDevice.IsOpenSpindleCuttingWaterAsync();
-                bool tempIsOpenOpticalFiberSensorBlowing = IsOpenOpticalFiberSensorBlowing;
+                bool tempIsOpenOpticalFiberSensorBlowing = await PlcControl.tagControl.bladeMantance.GetOpticalFiberSensorBlowingAsync();
+                bool tempIsOpenOpticalFiberSensorBlowingWater = await PlcControl.tagControl.bladeMantance.GetOpticalFiberSensorBlowingWaterAsync();
                 bool tempWorkpieceBlowingStatus = await PlcControl.tagControl.wholeDevice.IsOpenWorkpieceBlowingAsync();
                 bool tempSystemInitFlagStatus = await PlcControl.tagControl.wholeDevice.IsCompletedSystemInitAsync();
                 bool tempIsOpenWorkVacuumSwitchStatus = await PlcControl.tagControl.wholeDevice.IsOpenWorkVacuumSwitchAsync();
                 bool tempPanelStatus = CommonCheck.GetParamsStatus(DeviceKey.panelStatusKey);
                 Application.Current.Dispatcher.Invoke(() => {
+                    if (tempIsOpenOpticalFiberSensorBlowing != isOpenOpticalFiberSensorBlowing || firstJoin)
+                    {
+                        isOpenOpticalFiberSensorBlowing = tempIsOpenOpticalFiberSensorBlowing;
+                        isSwitchOpen(isOpenOpticalFiberSensorBlowing, 1);
+                    }
+                    if (tempIsOpenOpticalFiberSensorBlowingWater != isOpenOpticalFiberSensorBlowingWater || firstJoin)
+                    {
+                        isOpenOpticalFiberSensorBlowingWater = tempIsOpenOpticalFiberSensorBlowingWater;
+                        isSwitchOpen(isOpenOpticalFiberSensorBlowingWater, 2);
+                    }
                     if (tempVacuumState != vacuumState || firstJoin)
                     {
                         vacuumState = tempVacuumState;
@@ -127,11 +140,6 @@ namespace 精密切割系统.View.Pages.operate
                     {
                         cutSecurityDoor = tempCutSecurityDoor;
                         isSwitchOpen(cutSecurityDoor, 7);
-                    }
-                    if (tempDoor2Status != door2Status || firstJoin)
-                    {
-                        door2Status = tempDoor2Status;
-                        isSwitchOpen(!tempDoor2Status, 8);
                     }
                     if (tempWorkpieceBlowingStatus != workpieceBlowingStatus || firstJoin)
                     {
@@ -571,40 +579,35 @@ namespace 精密切割系统.View.Pages.operate
             }
         }
 
-        public static bool IsOpenOpticalFiberSensorBlowing { get; set; } = false;
-
         /// <summary>
         /// 光纤传感器吹气
         /// </summary>
         private async Task OpticalFiberSensorBlowingAsync()
         {
-            if (IsOpenOpticalFiberSensorBlowing)
-            {
-                await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingAsync();
-            }
-            else
+            if (await PlcControl.tagControl.bladeMantance.GetOpticalFiberSensorBlowingAsync())
             {
                 await PlcControl.tagControl.bladeMantance.CloseOpticalFiberSensorBlowingAsync();
             }
-            IsOpenOpticalFiberSensorBlowing = !IsOpenOpticalFiberSensorBlowing;
+            else
+            {
+                await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingAsync();
+            }
         }
 
-        public static bool IsOpenOpticalFiberSensorBlowingWater { get; set; } = false;
 
         /// <summary>
         /// 光纤传感器吹水
         /// </summary>
         private async Task OpticalFiberSensorBlowingWaterAsync()
         {
-            if (IsOpenOpticalFiberSensorBlowingWater)
-            {
-                await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingWaterAsync();
-            }
-            else
+            if (await PlcControl.tagControl.bladeMantance.GetOpticalFiberSensorBlowingWaterAsync())
             {
                 await PlcControl.tagControl.bladeMantance.CloseOpticalFiberSensorBlowingWaterAsync();
             }
-            IsOpenOpticalFiberSensorBlowingWater = !IsOpenOpticalFiberSensorBlowingWater;
+            else
+            {
+                await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingWaterAsync();
+            }
         }
 
         /// <summary>
@@ -656,7 +659,9 @@ namespace 精密切割系统.View.Pages.operate
             }
             else
             {
-                await PlcControl.tagControl.wholeDevice.OpenCutSecurityDoorAsync();
+                Task cameraSecurityDoorTask = PlcControl.tagControl.wholeDevice.CloseCameraSecurityDoorAsync();
+                Task cutSecurityDoorTask = PlcControl.tagControl.wholeDevice.OpenCutSecurityDoorAsync();
+                await Task.WhenAll(cameraSecurityDoorTask, cutSecurityDoorTask);
             }
         }
 
@@ -671,7 +676,9 @@ namespace 精密切割系统.View.Pages.operate
             }
             else
             {
-                await PlcControl.tagControl.wholeDevice.OpenCameraSecurityDoorAsync();
+                Task cutSecurityDoorTask = PlcControl.tagControl.wholeDevice.CloseCutSecurityDoorAsync();
+                Task cameraSecurityDoorTask = PlcControl.tagControl.wholeDevice.OpenCameraSecurityDoorAsync();
+                await Task.WhenAll(cameraSecurityDoorTask, cutSecurityDoorTask);
             }
         }
 

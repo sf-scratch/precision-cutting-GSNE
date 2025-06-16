@@ -1375,11 +1375,6 @@ namespace 精密切割系统.Driver
             return curLoacation != null && curLoacation.Value.NearlyEquals(targetPosition, 0.1f);
         }
 
-        public async Task WaitNearlyPositionAsync(float targetPosition, CancellationToken token)
-        {
-            await TaskUtils.WaitExpectedResultAsync(IsNearlyPosition, targetPosition, token);
-        }
-
         public async Task<float?> GetCurrentLocationAsync()
         {
             return await keyencePlc.ReadDataAsync<float>(curLocation.addr);
@@ -1447,9 +1442,10 @@ namespace 精密切割系统.Driver
         /// </summary>
         /// <param name="speed">速度</param>
         /// <param name="jogDirection">方向 0 正 1 负</param>
-        public async Task StartJogAsync(int jogDirection)
+        public async Task StartJogAsync(int jogDirection, CancellationToken token = default)
         {
-            if (!await IsReadyAsync()) return;
+            //等待轴准备好
+            await WaitAxisReadyAsync(token);
             // 设置运动类型为点动
             runType.writeValue = "0";
             await keyencePlc.WriteTagAsync(runType);
@@ -1897,6 +1893,11 @@ namespace 精密切割系统.Driver
             await CloseOpticalFiberSensorBlowingAsync();
         }
 
+        public async Task<bool> GetOpticalFiberSensorBlowingAsync()
+        {
+            return await PlcControl.plc.ReadDataAsync(opticalFiberSensorBlowing.addr) == true;
+        }
+
         /// <summary>
         /// 开启光纤传感器吹气
         /// </summary>
@@ -1926,6 +1927,11 @@ namespace 精密切割系统.Driver
             await OpenOpticalFiberSensorBlowingWaterAsync();
             await Task.Delay(TimeSpan.FromSeconds(blowingWaterSeconds));
             await CloseOpticalFiberSensorBlowingWaterAsync();
+        }
+
+        public async Task<bool> GetOpticalFiberSensorBlowingWaterAsync()
+        {
+            return await PlcControl.plc.ReadDataAsync(opticalFiberSensorBlowingWater.addr) == true;
         }
 
         /// <summary>
@@ -2212,7 +2218,7 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task WaitSystemInitCompletedAsync(CancellationToken token)
         {
-            await TaskUtils.WaitExpectedResultAsync(IsCompletedSystemInitAsync, true, token);
+            await TaskUtils.WaitExpectedResultAsync(IsCompletedSystemInitAsync, token);
         }
 
         public async Task AlarmResetAsync()
@@ -2759,7 +2765,7 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task WaitInterpolationMotionCompletedAsync(CancellationToken token)
         {
-            await TaskUtils.WaitExpectedResultAsync(IsCompleteInterpolationMotionAsync, true, token);
+            await TaskUtils.WaitExpectedResultAsync(IsCompleteInterpolationMotionAsync, token);
         }
 
         /// <summary>
@@ -2772,7 +2778,7 @@ namespace 精密切割系统.Driver
 
         public async Task WaitReadyToCuttingAsync(CancellationToken token)
         {
-            await TaskUtils.WaitExpectedResultAsync(IsReadyToCuttingAsync, true, token);
+            await TaskUtils.WaitExpectedResultAsync(IsReadyToCuttingAsync, token);
         }
 
         /// <summary>
@@ -2829,7 +2835,7 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task WaitExitCuttingModeAsync(CancellationToken token)
         {
-            await TaskUtils.WaitExpectedResultAsync(IsExitCuttingModeAsync, true, token);
+            await TaskUtils.WaitExpectedResultAsync(IsExitCuttingModeAsync, token);
         }
 
         /// <summary>
@@ -2848,7 +2854,7 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task WaitEnterCuttingModeAsync(CancellationToken token)
         {
-            await TaskUtils.WaitExpectedResultAsync(IsEnterCuttingModeAsync, true, token);
+            await TaskUtils.WaitExpectedResultAsync(IsEnterCuttingModeAsync, token);
         }
 
         /// <summary>
@@ -2889,11 +2895,7 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task WaitCutNumUdatedAsync(int preCutNum, CancellationToken token)
         {
-            await TaskUtils.WaitExpectedResultAsync(async () =>
-            {
-                int? curCutNum = await GetCutNumAsync();
-                return curCutNum != null && curCutNum != preCutNum;
-            }, token);
+            await TaskUtils.WaitExpectedResultAsync(GetCutNumAsync, preCutNum, token);
         }
 
         /// <summary>

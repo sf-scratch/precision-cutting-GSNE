@@ -169,7 +169,7 @@ namespace 精密切割系统.FrmWindow.common
         //public static DataPoint<float> ThetaCenterPoint = new DataPoint<float>(146.48f, 81.86f);
         public static DataPoint<float> ThetaCenterPoint = new DataPoint<float>(140.485f, 81.86f);
 
-        public static readonly float ZAxisZeroToWorkingDiscDistance = 20f;
+        public static readonly float ZAxisZeroToWorkingDiscDistance = 49.675f;
 
         /// <summary>
         /// 相机中心点位置

@@ -48,12 +48,12 @@ namespace 精密切割系统.ViewModel
             set { _lunguId = value; RaisePropertyChanged(); }
         }
 
-        private LunguSksjModel _lunguSks;
+        private LunguSksjModel _lunguSksj;
 
-        public LunguSksjModel LunguSks
+        public LunguSksjModel LunguSksj
         {
-            get { return _lunguSks; }
-            set { _lunguSks = value; RaisePropertyChanged(); }
+            get { return _lunguSksj; }
+            set { _lunguSksj = value; RaisePropertyChanged(); }
         }
 
         private SharpenParamsModel _sharpenParams;
@@ -160,8 +160,7 @@ namespace 精密切割系统.ViewModel
                     MaterialSnackUtils.MaterialSnack(lunguSksjResult.Msg, MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
                     return;
                 }
-                LunguSksjDTO lunguSksj = lunguSksjResult.Data;
-                LunguSks = MapperConfig.Mapper.Map<LunguSksjModel>(lunguSksj);
+                LunguSksj = MapperConfig.Mapper.Map<LunguSksjModel>(lunguSksjResult.Data);
                 //磨刀参数
                 int bmSharpParamId = 1;
                 List<BmSharpenParameterModel> list = await SqlHelper.TableAsync<BmSharpenParameterModel>()
@@ -177,11 +176,11 @@ namespace 精密切割系统.ViewModel
                     RotateSpeed = sharpenParam.RotateSpeed.ToInt(),
                     CutThickness = sharpenParam.CutThickness,
                     CoJiaoHeight = sharpenParam.CoJiaoHeight,
-                    CutHeight = float.Parse(sharpenParam.CutThickness) + sharpenParam.CoJiaoHeight - AutoCutUtils.GetSharpenDeep(LunguSks.ABAverageThickness),
+                    CutHeight = float.Parse(sharpenParam.CutThickness) + sharpenParam.CoJiaoHeight - AutoCutUtils.GetSharpenDeep(LunguSksj.ABAverageThickness),
                     CoOffsetX = sharpenParam.CoOffsetX,
                     CutSize = 0.3f,
                     CutNum = 0,
-                    HightestCutSpeed = SharpenService.GetCutSpeed(lunguSksj.ABAverageThickness / 1000, false),
+                    HightestCutSpeed = SharpenService.GetCutSpeed(LunguSksj.ABAverageThickness / 1000, false),
                     CutNum1 = 0,
                     CutNum2 = 0
                 };
@@ -207,7 +206,7 @@ namespace 精密切割系统.ViewModel
                 FileTableItemChModel fileTableCh = chModels[0];
                 CutParams = new CutParamsModel
                 {
-                    CutHeight = float.Parse(fileTable.TapeThickness) + float.Parse(fileTable.WorkThickness) - AutoCutUtils.GetCuttingDeep(LunguSks.ABAverageThickness),
+                    CutHeight = float.Parse(fileTable.TapeThickness) + float.Parse(fileTable.WorkThickness) - AutoCutUtils.GetCuttingDeep(LunguSksj.ABAverageThickness),
                     TapeThickness = fileTable.TapeThickness,
                     SpindleRev = fileTable.SpindleRev,
                     PrecutProcessNo = fileTable.PrecutProcessNo,
@@ -242,14 +241,14 @@ namespace 精密切割系统.ViewModel
         {
             if (!GlobalParams.onlineFlag)
             {
-                _regionManager.RequestNavigate(RegionName.MainRegion, nameof(AutoCut), new NavigationParameters { { "SharpenParams", SharpenParams }, { "CutParams", CutParams }, { "LunguId", LunguId } });
+                _regionManager.RequestNavigate(RegionName.MainRegion, nameof(AutoCut), new NavigationParameters { { "SharpenParams", SharpenParams }, { "CutParams", CutParams }, { "LunguSksj", LunguSksj } });
                 return;
             }
-            //if (!await PlcControl.tagControl.wholeDevice.IsOpenVacuumSwitchAsync())
-            //{
-            //    MaterialSnackUtils.MaterialSnack("未打开工作盘真空！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
-            //    return;
-            //}
+            if (!await PlcControl.tagControl.wholeDevice.IsOpenVacuumSwitchAsync())
+            {
+                MaterialSnackUtils.MaterialSnack("未打开工作盘真空！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                return;
+            }
             if (await PlcControl.tagControl.wholeDevice.IsOpenCutSecurityDoorAsync())
             {
                 MaterialSnackUtils.MaterialSnack("切割安全门未关闭！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
@@ -264,7 +263,7 @@ namespace 精密切割系统.ViewModel
             {
                 { "SharpenParams", SharpenParams },
                 { "CutParams", CutParams },
-                { "LunguSks", LunguSks }
+                { "LunguSksj", LunguSksj }
             };
             _regionManager.RequestNavigate(RegionName.MainRegion, nameof(AutoCut), parameters);
         }
@@ -293,7 +292,7 @@ namespace 精密切割系统.ViewModel
         public override void OnNavigatedTo(NavigationContext navigationContext)
         {
             base.OnNavigatedTo(navigationContext);
-            LunguSks = new LunguSksjModel();
+            LunguSksj = new LunguSksjModel();
             SharpenParams = new SharpenParamsModel();
             CutParams = new CutParamsModel();
             InitRightButtonOnlyBack();

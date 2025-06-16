@@ -673,7 +673,7 @@
     },
     "firstMeasureHight": {
       "valueType": "bool",
-      "addr": "MR616",
+      "addr": "MR608",
       "name": "是否第一次测高（适用于测磨损量）",
       "describe": "是否第一次测高（适用于测磨损量）"
     },
