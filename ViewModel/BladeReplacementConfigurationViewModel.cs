@@ -264,7 +264,7 @@ namespace 精密切割系统.ViewModel
             {
                 { "SharpenParams", SharpenParams },
                 { "CutParams", CutParams },
-                { "LunguId", LunguId }
+                { "LunguSks", LunguSks }
             };
             _regionManager.RequestNavigate(RegionName.MainRegion, nameof(AutoCut), parameters);
         }

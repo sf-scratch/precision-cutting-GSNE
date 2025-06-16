@@ -119,7 +119,7 @@ namespace 精密切割系统.Model.cut
             _recordCutY = 0;
         }
 
-        public async Task<RunResult> Run(string lunguId, LunguSksjDTO lunguSksj, List<float> cutSpeedList, float bladeContactWorkingDiscZ1, float bladeLiftingHeight, int spindleRev, float margin, float cutCalibratTheta, IEventAggregator? eventAggregator, CancellationToken pauseToken = default)
+        public async Task<RunResult> Run(LunguSksjModel lunguSksj, List<float> cutSpeedList, float bladeContactWorkingDiscZ1, float bladeLiftingHeight, int spindleRev, float margin, float cutCalibratTheta, IEventAggregator? eventAggregator, CancellationToken pauseToken = default)
         {
             InitFromAppsettings();
             if (_thetaDegQueue.Count == 0)
@@ -269,7 +269,7 @@ namespace 精密切割系统.Model.cut
                                             PdaUtils.AddSingleCollapseAngle(singleCollapseAngle);
                                             PdaUtils.AddMaximumCollapseAngle(result.CollapseWidthMaxImage.CollapseWidth);
                                             PdaUtils.AddMaximumCollapseAngleImage(result.CollapseWidthMaxImage.Mat);
-                                            string bladeEdgeBreakageGrade = await GetDpbbdjAsync(lunguId, (float)singleCollapseAngle);
+                                            string bladeEdgeBreakageGrade = await GetDpbbdjAsync(lunguSksj.LunguId, (float)singleCollapseAngle);
                                             PdaUtils.AddBladeEdgeBreakageGrade(bladeEdgeBreakageGrade);
                                             break;
                                         case 2:

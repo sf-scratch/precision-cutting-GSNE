@@ -12,6 +12,15 @@ namespace 精密切割系统.Model.cut
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
+        private string _lunguId;
+
+        public string LunguId
+        {
+            get { return _lunguId; }
+            set { _lunguId = value; OnPropertyChanged(); }
+        }
+
+
         private float _abAverageThickness;
         public float ABAverageThickness
         {
@@ -25,6 +34,15 @@ namespace 精密切割系统.Model.cut
             get { return _longestBlade; }
             set { _longestBlade = value; OnPropertyChanged(); }
         }
+
+        private float _existingBlade;
+
+        public float ExistingBlade
+        {
+            get { return _existingBlade; }
+            set { _existingBlade = value; }
+        }
+
 
         private string _bladeType;
         /// <summary>
@@ -66,15 +84,25 @@ namespace 精密切割系统.Model.cut
             set { _bladeEdgeType = value; OnPropertyChanged(); }
         }
 
-        private string _bladeOuterDiameter;
+        private float _bladeOuterDiameter;
         /// <summary>
         /// 刀片外径
         /// </summary>
-        public string BladeOuterDiameter
+        public float BladeOuterDiameter
         {
             get { return _bladeOuterDiameter; }
             set { _bladeOuterDiameter = value; OnPropertyChanged(); }
         }
+
+        private float _ymhtxd;
+
+        public float Ymhtxd
+        {
+            get { return _ymhtxd; }
+            set { _ymhtxd = value; }
+        }
+
+
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

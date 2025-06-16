@@ -10,6 +10,12 @@ namespace 精密切割系统.DTOs
     public class LunguSksjDTO
     {
         /// <summary>
+        /// 轮毂ID
+        /// </summary>
+        [JsonProperty("lungu")]
+        public float LunguId { get; set; }
+
+        /// <summary>
         /// AB平均厚度
         /// </summary>
         [JsonProperty("abhdpj")]
@@ -55,7 +61,7 @@ namespace 精密切割系统.DTOs
         /// 刀片外径
         /// </summary>
         [JsonProperty("dpwj")]
-        public string BladeOuterDiameter { get; set; }
+        public float BladeOuterDiameter { get; set; }
 
         /// <summary>
         /// 研磨后同心度

@@ -60,6 +60,19 @@ namespace 精密切割系统
 
         private static event EventHandler<int> onClicked;
 
+        protected override void OnInitialized(EventArgs e)
+        {
+            base.OnInitialized(e);
+            if (!App.MUTEX.WaitOne(TimeSpan.Zero, true))
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    MessageBox.Show("精密切割系统正在运行中。", "提示", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.ServiceNotification);
+                });
+                Environment.Exit(0);
+            }
+        }
+
         public void NavigateToPage(string pageName, string paramsStr = "")
         {
             Application.Current.Dispatcher.Invoke(() =>

@@ -26,30 +26,28 @@ namespace 精密切割系统.Helpers
             GroupCode = 0;
         }
 
-        public static async Task<bool> ComputerPracticeAsync(string lunguId)
+        public static async Task<CommonResult> ComputerPracticeAsync(string lunguId)
         {
-            if (!GlobalParams.OnlineMES) return true;
+            if (!GlobalParams.OnlineMES) return CommonResult.Success();
             _lunguId = lunguId;
             List<FlowSettingDTO>? allFieldValues = await HttpUtils.QueryFlowSettingByIdAsync();
             if (allFieldValues == null)
             {
-                MaterialSnackUtils.MaterialSnack("QueryFlowSettingByIdAsync失败", MaterialSnackUtils.SnackType.WARNING, 0);
-                return false;
+                return CommonResult.Failure("QueryFlowSettingByIdAsync失败");
             }
             Dictionary<string, FlowsValuesDTO> flowsDic = allFieldValues.Select(x => x.ToFlowsValuesDTO()).ToDictionary(x => x.FieldLabel);
             FieldValuesDTO fieldValues = GetFieldValuesDTO(flowsDic, "QG-03", lunguId);
             HttpUtilsResult<string> groupOperateIdRes = await HttpUtils.InsertFlowValuesAsync(fieldValues);
             if (groupOperateIdRes.Data == null)
             {
-                MaterialSnackUtils.MaterialSnack(groupOperateIdRes.Msg, MaterialSnackUtils.SnackType.WARNING, 0);
-                return false;
+                return CommonResult.Failure(groupOperateIdRes.Msg);
             }
             fieldValues.GroupOperateId = groupOperateIdRes.Data;
             fieldValues.List[0].GroupOperateId = groupOperateIdRes.Data;
             fieldValues.List.RemoveAt(1);
             _tuple = new Tuple<FieldValuesDTO, Dictionary<string, FlowsValuesDTO>>(fieldValues, flowsDic);
             InitParams();
-            return true;
+            return CommonResult.Success();
         }
 
         private static FieldValuesDTO GetFieldValuesDTO(Dictionary<string, FlowsValuesDTO> flowsDic, string deviceCode, string lungu)

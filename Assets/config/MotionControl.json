@@ -671,6 +671,12 @@
       "name": "进入换刀画面",
       "describe": "进入换刀画面"
     },
+    "firstMeasureHight": {
+      "valueType": "bool",
+      "addr": "MR616",
+      "name": "是否第一次测高（适用于测磨损量）",
+      "describe": "是否第一次测高（适用于测磨损量）"
+    },
     "heightMeasurementEarlyEnd": {
       "valueType": "bool",
       "addr": "MR602",

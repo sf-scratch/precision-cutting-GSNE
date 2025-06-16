@@ -114,7 +114,7 @@ namespace 精密切割系统.Model.cut
             _recordSharpenY = 0;
         }
 
-        public async Task<RunResult> Run(LunguSksjDTO lunguSksj, float bladeContactWorkingDiscZ1, float bladeLiftingHeight, int spindleRev, float margin, float sharpenCalibratTheta, int sharpenTimes, CancellationToken pauseToken)
+        public async Task<RunResult> Run(LunguSksjModel lunguSksj, float bladeContactWorkingDiscZ1, float bladeLiftingHeight, int spindleRev, float margin, float sharpenCalibratTheta, int sharpenTimes, CancellationToken pauseToken)
         {
             InitFromAppsettings();
             if (_thetaDegQueue.Count == 0)

@@ -1047,14 +1047,14 @@ namespace 精密切割系统.Driver
             //    return false;
             //}
 
+            string writeValue = tag.writeValue;
+
             // 检查输入参数有效性
-            if (tag == null || string.IsNullOrEmpty(tag.writeValue))
+            if (tag == null || string.IsNullOrEmpty(writeValue))
             {
                 Tools.LogError("写入PLC失败：tag或tag.writeValue为空");
                 return false;
             }
-
-            string writeValue = tag.writeValue;
 
             // 检查上下限值
             writeValue = GetValidatedWriteValue(tag);
@@ -1733,6 +1733,7 @@ namespace 精密切割系统.Driver
         private KeyencePlc keyencePlc = KeyencePlc.GetInstance();
         // ============刀片维护相关
         public Tag initReplaceLocation { get; set; }
+        public Tag firstMeasureHight { get; set; }
         public Tag heightMeasurementEarlyEnd { get; set; }
         public Tag NoContactHeightMeasurement { get; set; }
         public Tag HeightMeasurementCompleted { get; set; }
@@ -1963,6 +1964,17 @@ namespace 精密切割系统.Driver
         {
             initReplaceLocation.writeValue = status + "";
             await keyencePlc.WriteTagAsync(initReplaceLocation);
+        }
+
+        /// <summary>
+        /// 第一次测高（用于获取初始电压值）
+        /// </summary>
+        public async Task SetFirstMeasureHight()
+        {
+            firstMeasureHight.writeValue = "0";
+            await keyencePlc.WriteTagAsync(firstMeasureHight);
+            firstMeasureHight.writeValue = "1";
+            await keyencePlc.WriteTagAsync(firstMeasureHight);
         }
 
         /// <summary>

@@ -19,6 +19,9 @@ namespace 精密切割系统
     /// </summary>
     public partial class App : PrismApplication
     {
+        //用于控制应用程序单开
+        public static readonly Mutex MUTEX = new Mutex(true, "精密切割系统");
+
         protected override Window CreateShell()
         {
             return Container.Resolve<MainWindow>();

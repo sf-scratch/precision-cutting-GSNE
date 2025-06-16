@@ -110,16 +110,10 @@ namespace 精密切割系统.Model.cut
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        public static async Task<float?> ProcessMeasureHeightAsync(HeightMeasurementMode mode, CancellationToken token, IDialogService dialogService, IEventAggregator? eventAggregator = null)
+        public static async Task<CommonResult<float>> ProcessMeasureHeightAsync(HeightMeasurementMode mode, CancellationToken token, IDialogService dialogService, IEventAggregator? eventAggregator = null)
         {
-            //测高前移动到初始位置，手动吹水
-            //await PlcControl.tagControl.cutting.RunMotionAsync(0, 0, token);
-            //await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, token);
-            //await PlcControl.tagControl.wholeDevice.OpenBuzzerAsync();
-            //await dialogService.ShowDialogWindowAsync(nameof(ConfirmDialog), new DialogParameters() { { "ButtonContent", "请手动完成吹水操作" } }, r => { }, nameof(ConfirmDialogWindow));
-            //await PlcControl.tagControl.wholeDevice.CloseBuzzerAsync();
             InitialPositionModel? initPos = await GetInitialPositionAsync();
-            if (initPos is null) return null;
+            if (initPos is null) return CommonResult<float>.Failure("获取初始化位置信息失败！");
             switch (mode)
             {
                 //接触测高
@@ -127,8 +121,7 @@ namespace 精密切割系统.Model.cut
                     int? thetaDeg = Appsettings.ContactHeightMeasurementThetaDeg;
                     if (thetaDeg == null)
                     {
-                        MaterialSnackUtils.MaterialSnack("接触测高配置文件异常！", MaterialSnackUtils.SnackType.ERROR, 0, eventAggregator);
-                        return null;
+                        return CommonResult<float>.Failure("接触测高配置文件异常！");
                     }
                     Appsettings.ContactHeightMeasurementThetaDeg = thetaDeg.Value + 1;
                     await PlcControl.tagControl.bladeMantance.SetBladeSetuInitPositionAsync(initPos.BladeSetupInitX, initPos.BladeSetupInitY, thetaDeg.Value);
@@ -144,17 +137,17 @@ namespace 精密切割系统.Model.cut
             }
             for (int times = 1; times <= 10; times++)
             {
-                //if (mode is HeightMeasurementMode.NoContact)
-                //{
-                //    //主轴旋转
-                //    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("主轴开始旋转"));
-                //    await PlcControl.tagControl.wholeDevice.StartSpindleAsync();
-                //    //eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹水"));
-                //    //await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingWaterAsync(2);
-                //    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹气"));
-                //    await PlcControl.tagControl.cutting.RunMotionAsync(119.5f, 50, token);
-                //    await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingAsync(5);
-                //}
+                if (mode is HeightMeasurementMode.NoContact)
+                {
+                    //主轴旋转
+                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("主轴开始旋转"));
+                    await PlcControl.tagControl.wholeDevice.StartSpindleAsync();
+                    //eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹水"));
+                    //await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingWaterAsync(2);
+                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹气"));
+                    await PlcControl.tagControl.cutting.RunMotionAsync(119.5f, 50, token);
+                    await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingAsync(5);
+                }
 
                 //等待测高准备完成信号
                 await PlcControl.tagControl.bladeMantance.WaitReadyToMeasureHeightAsync(token);
@@ -168,14 +161,12 @@ namespace 精密切割系统.Model.cut
                 //数据不存在，则初始化数据
                 if (list == null || list.Count == 0)
                 {
-                    MaterialSnackUtils.MaterialSnack("获取测高参数失败！", MaterialSnackUtils.SnackType.ERROR, 0, eventAggregator);
-                    return null;
+                    return CommonResult<float>.Failure("获取测高参数失败！");
                 }
                 bladeHeightModel = list[0];
                 if (!int.TryParse(bladeHeightModel.Retry, out int retry))
                 {
-                    MaterialSnackUtils.MaterialSnack("测高参数异常！", MaterialSnackUtils.SnackType.ERROR, 0, eventAggregator);
-                    return null;
+                    return CommonResult<float>.Failure("测高参数异常！");
                 }
                 // 发送测高开始信号到PLC
                 await PlcControl.tagControl.bladeMantance.StartSetupAsync();
@@ -183,8 +174,7 @@ namespace 精密切割系统.Model.cut
                 int? measureHeightTimes = await PlcControl.tagControl.bladeMantance.GetHeightMeasurementSetupNumber();
                 if (measureHeightTimes == null)
                 {
-                    MaterialSnackUtils.MaterialSnack("测高次数获取失败！", MaterialSnackUtils.SnackType.ERROR, 0, eventAggregator);
-                    return null;
+                    return CommonResult<float>.Failure("测高次数获取失败！");
                 }
                 using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
                 while (measureHeightTimes.Value < retry && await timer.WaitForNextTickAsync(token))
@@ -192,8 +182,7 @@ namespace 精密切割系统.Model.cut
                     int? curMeasureHeightTimes = await PlcControl.tagControl.bladeMantance.GetHeightMeasurementSetupNumber();
                     if (curMeasureHeightTimes == null)
                     {
-                        MaterialSnackUtils.MaterialSnack("测高次数获取失败！", MaterialSnackUtils.SnackType.ERROR, 0, eventAggregator);
-                        return null;
+                        return CommonResult<float>.Failure("测高次数获取失败！");
                     }
                     // 如果不相等，则记录值
                     if (curMeasureHeightTimes.Value != measureHeightTimes.Value)
@@ -201,8 +190,7 @@ namespace 精密切割系统.Model.cut
                         float? setupValue = await PlcControl.tagControl.bladeMantance.GetHeightMeasurementSetupValue();
                         if (setupValue == null)
                         {
-                            MaterialSnackUtils.MaterialSnack("测高值获取失败！", MaterialSnackUtils.SnackType.ERROR, 0, eventAggregator);
-                            return null;
+                            return CommonResult<float>.Failure("测高值获取失败！");
                         }
                         eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"第{curMeasureHeightTimes.Value}次测高：{setupValue.Value}"));
                         setupValueList.Add(setupValue.Value);
@@ -211,38 +199,32 @@ namespace 精密切割系统.Model.cut
                 }
                 if (setupValueList.Count == 0)
                 {
-                    return null;
+                    return CommonResult<float>.Failure("没有测高数据！");
                 }
                 //等待完成测高信号
                 await PlcControl.tagControl.bladeMantance.WaitHeightMeasurementCompletedAsync(token);
                 eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高平均值：{setupValueList.Average()}"));
                 float maxDeviation = setupValueList.Max() - setupValueList.Min();
                 eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高最大偏差：{maxDeviation}"));
-                //if (maxDeviation >= 0.01)
-                //{
-                //    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高偏差过大，重新测高"));
-                //    if (times % 3 == 0)
-                //    {
-                //        await WaitManualBlowing(dialogService, token);
-                //    }
-                //    continue;
-                //}
-                //// 计算3次的平均值，为测高值
-                //return setupValueList.Average();
+                if (maxDeviation >= 0.01)
+                {
+                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高偏差过大，重新测高"));
+                    if (times % 3 == 0)
+                    {
+                        await WaitManualBlowing(dialogService, token);
+                    }
+                    continue;
+                }
+                // 计算3次的平均值，为测高值
+                return CommonResult<float>.Success(setupValueList.Average());
             }
-            return null;
+            return CommonResult<float>.Failure("测高失败次数过多！");
         }
-        
-        public static async Task<float?> ProcessMeasureWearAmountAsync(HeightMeasurementMode mode, CancellationToken token, IDialogService dialogService, IEventAggregator? eventAggregator = null)
+
+        public static async Task<CommonResult<float>> ProcessMeasureWearAmountAsync(HeightMeasurementMode mode, bool isFirst, IDialogService dialogService, IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
-            //测高前移动到初始位置，手动吹水
-            //await PlcControl.tagControl.cutting.RunMotionAsync(0, 0, token);
-            //await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, token);
-            //await PlcControl.tagControl.wholeDevice.OpenBuzzerAsync();
-            //await dialogService.ShowDialogWindowAsync(nameof(ConfirmDialog), new DialogParameters() { { "ButtonContent", "请手动完成吹水操作" } }, r => { }, nameof(ConfirmDialogWindow));
-            //await PlcControl.tagControl.wholeDevice.CloseBuzzerAsync();
             InitialPositionModel? initPos = await GetInitialPositionAsync();
-            if (initPos is null) return null;
+            if (initPos is null) return CommonResult<float>.Failure("获取初始化位置信息失败！");
             switch (mode)
             {
                 //接触测高
@@ -250,8 +232,7 @@ namespace 精密切割系统.Model.cut
                     int? thetaDeg = Appsettings.ContactHeightMeasurementThetaDeg;
                     if (thetaDeg == null)
                     {
-                        MaterialSnackUtils.MaterialSnack("接触测高配置文件异常！", MaterialSnackUtils.SnackType.ERROR, 0, eventAggregator);
-                        return null;
+                        return CommonResult<float>.Failure("接触测高配置文件异常！");
                     }
                     Appsettings.ContactHeightMeasurementThetaDeg = thetaDeg.Value + 1;
                     await PlcControl.tagControl.bladeMantance.SetBladeSetuInitPositionAsync(initPos.BladeSetupInitX, initPos.BladeSetupInitY, thetaDeg.Value);
@@ -261,23 +242,27 @@ namespace 精密切割系统.Model.cut
                 case HeightMeasurementMode.NoContact:
                     await PlcControl.tagControl.bladeMantance.SetBladeSetuInitPositionAsync(initPos.NoContactBladeSetupInitX, initPos.NoContactBladeSetupInitY);
                     await PlcControl.tagControl.bladeMantance.StartNoContactHeightMeasurement();
+                    if (isFirst)
+                    {
+                        await PlcControl.tagControl.bladeMantance.SetFirstMeasureHight();
+                    }
                     break;
                 default:
                     break;
             }
             for (int times = 1; times <= 10; times++)
             {
-                //if (mode is HeightMeasurementMode.NoContact)
-                //{
-                //    //主轴旋转
-                //    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("主轴开始旋转"));
-                //    await PlcControl.tagControl.wholeDevice.StartSpindleAsync();
-                //    //eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹水"));
-                //    //await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingWaterAsync(2);
-                //    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹气"));
-                //    await PlcControl.tagControl.cutting.RunMotionAsync(119.5f, 50, token);
-                //    await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingAsync(5);
-                //}
+                if (mode is HeightMeasurementMode.NoContact)
+                {
+                    //主轴旋转
+                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("主轴开始旋转"));
+                    await PlcControl.tagControl.wholeDevice.StartSpindleAsync();
+                    //eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹水"));
+                    //await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingWaterAsync(2);
+                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹气"));
+                    await PlcControl.tagControl.cutting.RunMotionAsync(119.5f, 50, token);
+                    await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingAsync(5);
+                }
 
                 //等待测高准备完成信号
                 await PlcControl.tagControl.bladeMantance.WaitReadyToMeasureHeightAsync(token);
@@ -291,14 +276,12 @@ namespace 精密切割系统.Model.cut
                 //数据不存在，则初始化数据
                 if (list == null || list.Count == 0)
                 {
-                    MaterialSnackUtils.MaterialSnack("获取测高参数失败！", MaterialSnackUtils.SnackType.ERROR, 0, eventAggregator);
-                    return null;
+                    return CommonResult<float>.Failure("获取测高参数失败！");
                 }
                 bladeHeightModel = list[0];
                 if (!int.TryParse(bladeHeightModel.Retry, out int retry))
                 {
-                    MaterialSnackUtils.MaterialSnack("测高参数异常！", MaterialSnackUtils.SnackType.ERROR, 0, eventAggregator);
-                    return null;
+                    return CommonResult<float>.Failure("测高参数异常！");
                 }
                 // 发送测高开始信号到PLC
                 await PlcControl.tagControl.bladeMantance.StartSetupAsync();
@@ -306,8 +289,7 @@ namespace 精密切割系统.Model.cut
                 int? measureHeightTimes = await PlcControl.tagControl.bladeMantance.GetHeightMeasurementSetupNumber();
                 if (measureHeightTimes == null)
                 {
-                    MaterialSnackUtils.MaterialSnack("测高次数获取失败！", MaterialSnackUtils.SnackType.ERROR, 0, eventAggregator);
-                    return null;
+                    return CommonResult<float>.Failure("重复次数获取失败！");
                 }
                 using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
                 while (measureHeightTimes.Value < retry && await timer.WaitForNextTickAsync(token))
@@ -315,8 +297,7 @@ namespace 精密切割系统.Model.cut
                     int? curMeasureHeightTimes = await PlcControl.tagControl.bladeMantance.GetHeightMeasurementSetupNumber();
                     if (curMeasureHeightTimes == null)
                     {
-                        MaterialSnackUtils.MaterialSnack("测高次数获取失败！", MaterialSnackUtils.SnackType.ERROR, 0, eventAggregator);
-                        return null;
+                        return CommonResult<float>.Failure("重复次数获取失败！");
                     }
                     // 如果不相等，则记录值
                     if (curMeasureHeightTimes.Value != measureHeightTimes.Value)
@@ -324,36 +305,35 @@ namespace 精密切割系统.Model.cut
                         float? setupValue = await PlcControl.tagControl.bladeMantance.GetHeightMeasurementSetupValue();
                         if (setupValue == null)
                         {
-                            MaterialSnackUtils.MaterialSnack("测高值获取失败！", MaterialSnackUtils.SnackType.ERROR, 0, eventAggregator);
-                            return null;
+                            return CommonResult<float>.Failure("磨损量获取失败！");
                         }
-                        eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"第{curMeasureHeightTimes.Value}次测高：{setupValue.Value}"));
+                        eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"第{curMeasureHeightTimes.Value}次获取磨损量：{setupValue.Value}"));
                         setupValueList.Add(setupValue.Value);
                         measureHeightTimes = curMeasureHeightTimes;
                     }
                 }
                 if (setupValueList.Count == 0)
                 {
-                    return null;
+                    return CommonResult<float>.Failure("没有磨损量数据！");
                 }
                 //等待完成测高信号
                 await PlcControl.tagControl.bladeMantance.WaitHeightMeasurementCompletedAsync(token);
-                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高平均值：{setupValueList.Average()}"));
+                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"磨损量平均值：{setupValueList.Average()}"));
                 float maxDeviation = setupValueList.Max() - setupValueList.Min();
-                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高最大偏差：{maxDeviation}"));
-                //if (maxDeviation >= 0.01)
-                //{
-                //    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高偏差过大，重新测高"));
-                //    if (times % 3 == 0)
-                //    {
-                //        await WaitManualBlowing(dialogService, token);
-                //    }
-                //    continue;
-                //}
-                //// 计算3次的平均值，为测高值
-                //return setupValueList.Average();
+                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"磨损量最大偏差：{maxDeviation}"));
+                if (maxDeviation >= 0.01)
+                {
+                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"磨损量偏差过大，重新测高"));
+                    if (times % 3 == 0)
+                    {
+                        await WaitManualBlowing(dialogService, token);
+                    }
+                    continue;
+                }
+                // 计算3次的平均值，为测高值
+                return CommonResult<float>.Success(setupValueList.Average());
             }
-            return null;
+            return CommonResult<float>.Failure("获取磨损量失败次数过多！");
         }
 
         public static async Task WaitManualBlowing(IDialogService dialogService, CancellationToken token)
@@ -453,7 +433,6 @@ namespace 精密切割系统.Model.cut
         public static async Task<float> CalibratCutAsync(DataPoint<float> workpieceCenterPoint, float workpieceRadius, CancellationToken token)
         {
             return 0;
-            await WaitAllAxisStopAsync(token);
             await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(workpieceCenterPoint.Y + 10, default, token);
             await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(workpieceCenterPoint.X - workpieceRadius, default, token);
             CancellationTokenSource cts = new CancellationTokenSource();
@@ -503,7 +482,6 @@ namespace 精密切割系统.Model.cut
         public static async Task<float> CalibratSharpenAsync(DataRectangleF sharpenRect, CancellationToken token)
         {
             return 0;
-            await WaitAllAxisStopAsync(token);
             await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(sharpenRect.Bottom - 10, default, token);
             await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(sharpenRect.X, default, token);
             CancellationTokenSource cts = new CancellationTokenSource();
@@ -534,16 +512,6 @@ namespace 精密切割系统.Model.cut
             return 0;
         }
 
-        public static async Task WaitAllAxisStopAsync(CancellationToken token)
-        {
-            Task taskWhole = TaskUtils.WaitExpectedResultAsync(PlcControl.tagControl.wholeDevice.IsSpindleStopAsync, token);
-            Task taskX = PlcControl.tagControl.Xaxis.WaitAxisStopAsync(token);
-            Task taskY = PlcControl.tagControl.Yaxis.WaitAxisStopAsync(token);
-            Task taskZ1 = PlcControl.tagControl.Z1axis.WaitAxisStopAsync(token);
-            Task taskZ2 = PlcControl.tagControl.Z2axis.WaitAxisStopAsync(token);
-            await Task.WhenAll(taskWhole, taskX, taskY, taskZ1, taskZ2);
-        }
-
         public static CameraCommon? GetCameraCommon()
         {
             MainWindow? mainWindow = Application.Current.MainWindow as MainWindow;
@@ -560,14 +528,13 @@ namespace 精密切割系统.Model.cut
             return cameraCommons.FirstOrDefault();
         }
 
-        public static async Task<float?> AutoFocusAsync(IEventAggregator? eventAggregator = null, CancellationToken token = default)
+        public static async Task<CommonResult<float>> AutoFocusAsync(IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
             eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始相机对焦..."));
             CameraCommon? cameraCommon = GetCameraCommon();
             if (cameraCommon is null)
             {
-                MaterialSnackUtils.MaterialSnack("相机获取失败！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
-                return null;
+                return CommonResult<float>.Failure("相机获取失败！");
             }
             float focusClearZ = Appsettings.FocusClearZ ?? 0;
             await PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0, default, token);
@@ -581,21 +548,20 @@ namespace 精密切割系统.Model.cut
                 {
                     eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"图像已清晰无需再次聚焦"));
                     Appsettings.IsNeedCheckBaseLine = false;
-                    return focusClearZ;
+                    return CommonResult<float>.Success(focusClearZ);
                 }
             }
             Appsettings.IsNeedCheckBaseLine = true;
-            float? roughFocusPosition = await AutoFocusAsync(cameraCommon, focusClearZ, 0.5f, 0.05f, token, eventAggregator);
-            if (roughFocusPosition == null)
+            CommonResult<float> roughFocusPosition = await AutoFocusAsync(cameraCommon, focusClearZ, 0.5f, 0.05f, token, eventAggregator);
+            if (!roughFocusPosition.IsSuccess)
             {
-                MaterialSnackUtils.MaterialSnack("粗调聚焦失败！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
-                return null;
+                return CommonResult<float>.Failure("粗调聚焦失败！");
             }
             // 进行精调聚焦
-            return await AutoFocusAsync(cameraCommon, roughFocusPosition.Value, 0.05f, 0.01f, token, eventAggregator);
+            return await AutoFocusAsync(cameraCommon, roughFocusPosition.Data, 0.05f, 0.01f, token, eventAggregator);
         }
 
-        private static async Task<float?> AutoFocusAsync(CameraCommon cameraCommon, float startPositionZ2, float margin, float singleMoveDistance, CancellationToken token, IEventAggregator? eventAggregator = null)
+        private static async Task<CommonResult<float>> AutoFocusAsync(CameraCommon cameraCommon, float startPositionZ2, float margin, float singleMoveDistance, CancellationToken token, IEventAggregator? eventAggregator = null)
         {
             float lastBlurriness = 0;
             float lastPosition = 0;
@@ -612,7 +578,7 @@ namespace 精密切割系统.Model.cut
                         eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"最清晰的图片已找到，Z2位置{lastPosition}"));
                         // 调用plc方法，走到上一个位置
                         await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(lastPosition, 0.2f, token);
-                        return lastPosition;
+                        return CommonResult<float>.Success(lastPosition);
                     }
                     lastBlurriness = tenengradBlurriness;
                     lastPosition = newPosition;
@@ -622,7 +588,7 @@ namespace 精密切割系统.Model.cut
                     eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("聚焦获取当前帧失败！"));
                 }
             }
-            return null;
+            return CommonResult<float>.Failure("聚焦失败！");
         }
 
         /// <summary>
@@ -642,375 +608,6 @@ namespace 精密切割系统.Model.cut
             finally
             {
                 await PlcControl.tagControl.wholeDevice.CloseWorkpieceBlowingAsync();
-            }
-        }
-
-        private static async Task<Queue<CutStep>?> GetAllCutSequenceAsync(long id, float afterHeightMeasurementZ)
-        {
-            // 判断是否确认配置信息
-            if (id == 0)
-            {
-                MaterialSnackUtils.MaterialSnack("未确认配置信息！", MaterialSnackUtils.SnackType.WARNING);
-                return null;
-            }
-            // 查询配置信息
-            var listConf = await SqlHelper.TableAsync<FileTableItemModel>().Where(t => t.Id == id).ToListAsync();
-            if (listConf.Count == 0)
-            {
-                MaterialSnackUtils.MaterialSnack("未确认配置信息！", MaterialSnackUtils.SnackType.WARNING);
-                return null;
-            }
-            FileTableItemModel fileTable = listConf[0];
-            // 查询通道信息
-            List<FileTableItemChModel> chModels = await SqlHelper.TableAsync<FileTableItemChModel>()
-                .Where(t => t.ItemId == fileTable.Id).ToListAsync();
-
-            Queue<CutStep>? cutSteps = new Queue<CutStep>();
-            int[] chSeqs = Tools.StringToIntegerArray(fileTable.CuttingChSeq);
-            foreach (int chIndex in chSeqs)
-            {
-                int tempChIndex = chIndex - 1;
-                // 获取当前子ch信息 
-                FileTableItemChModel ch = chModels[tempChIndex];
-                Queue<CutStep>? cutStepsQueue = GetCutSequence(fileTable, ch, afterHeightMeasurementZ);
-                if (cutStepsQueue == null)
-                {
-                    Tools.LogError("获取切割序列失败！");
-                    return null;
-                }
-                while (cutStepsQueue.TryDequeue(out CutStep? cutStep))
-                {
-                    cutSteps.Enqueue(cutStep);
-                }
-
-            }
-            return cutSteps;
-        }
-
-        private static async Task<Queue<SharpenStep>?> GetAllSharpenStepSequenceAsync(int bmSharpParamId, float afterHeightMeasurementZ, DataRectangleF sharpenRect)
-        {
-            List<BmSharpenParameterModel> list = await SqlHelper.TableAsync<BmSharpenParameterModel>()
-                                .Where(t => t.Id == bmSharpParamId).ToListAsync();
-            if (list.Count <= 0)
-            {
-                Tools.LogError("磨刀参数获取错误！");
-                MaterialSnackUtils.MaterialSnack("磨刀参数获取错误！", MaterialSnackUtils.SnackType.WARNING);
-                return null;
-            }
-            BmSharpenParameterModel sharpenParam = list[0];
-
-            Queue<SharpenStep> sharpenSteps = new Queue<SharpenStep>();
-            // 获取两个theta的磨刀序列
-            float theta0 = 0;
-            float theta90 = 90;
-            Queue<SharpenStep>? sharpenStepsTheta0 = GetSharpenStepSequence(sharpenParam, theta0, afterHeightMeasurementZ, sharpenRect.Height);
-            if (sharpenStepsTheta0 != null)
-            {
-                while (sharpenStepsTheta0.TryDequeue(out SharpenStep? sharpenStep))
-                {
-                    sharpenSteps.Enqueue(sharpenStep);
-                }
-            }
-            Queue<SharpenStep>? sharpenStepsTheta90 = GetSharpenStepSequence(sharpenParam, theta90, afterHeightMeasurementZ, sharpenRect.Width);
-            if (sharpenStepsTheta90 != null)
-            {
-                while (sharpenStepsTheta90.TryDequeue(out SharpenStep? sharpenStep))
-                {
-                    sharpenSteps.Enqueue(sharpenStep);
-                }
-            }
-
-            return sharpenSteps;
-        }
-
-        /// <summary>
-        /// 磨刀
-        /// </summary>
-        /// <returns>磨刀剩余刀数</returns>
-        private static async Task<ProcessResult> ProcessSharpenAsync(DataPoint<float> thetaCenterPoint, DataRectangleF sharpenRect, float startY, Queue<SharpenStep> sharpenStepsQueue, int totalSharpTimes)
-        {
-            Tools.LogDebug("开始磨刀");
-            float recordSharpenY = startY;
-            int sharpTimes;
-            for (sharpTimes = 0; sharpTimes < totalSharpTimes; sharpTimes++)
-            {
-                if (sharpenStepsQueue.TryDequeue(out SharpenStep? sharpenStep))
-                {
-                    try
-                    {
-                        if (sharpenStep.IsChanelFirstStep)
-                        {
-                            // 通道第一次切割，切割矩形最下边切为起始位置
-                            recordSharpenY = GeometryUtils.FindBottomTangentY(thetaCenterPoint, sharpenRect, sharpenStep.ThetaDeg);
-                        }
-                        recordSharpenY = CalculateCutY(recordSharpenY, sharpenStep.CutSize, sharpenStep.Direction);
-                        LineSegment? line = CalculateRectangleCuttingLine(thetaCenterPoint, sharpenRect, sharpenStep.ThetaDeg, recordSharpenY, 3);
-                        if (line == null)
-                        {
-                            Tools.LogDebug("获取磨刀线失败！");
-                            return ProcessResult.FAIL;
-                        }
-                        await PlcControl.tagControl.cutting.SetCutParamsAsync(sharpenStep.FeedSpeed, sharpenStep.CutZ, sharpenStep.CutZ - 2, line.StartPoint.X,
-                            line.EndPoint.X, line.StartPoint.Y, "0", sharpenStep.ThetaDeg, 20000, sharpenStep.Direction);
-                        await PlcControl.tagControl.cutting.StartCutAsync();
-                    }
-                    catch (Exception ex)
-                    {
-                        Tools.LogDebug($"执行磨刀步骤失败！{ex.Message}");
-                        return ProcessResult.FAIL;
-                    }
-                }
-                else
-                {
-                    break;
-                }
-            }
-            Tools.LogDebug("结束磨刀");
-            return new ProcessResult(totalSharpTimes - sharpTimes, recordSharpenY);
-        }
-
-        /// <summary>
-        /// 执行切割
-        /// </summary>
-        /// <returns>未切割刀数</returns>
-        private static async Task<ProcessResult> ProcessSemicircleCutSequenceAsync(DataPoint<float> thetaCenterPoint, float workpieceRadius, float centerDistance, float startY, Queue<CutStep> cutStepsQueue, int totalCutTimes)
-        {
-            Tools.LogDebug("开始切割");
-            //记录切割Y轴位置
-            float recordCutY = startY;
-            //记录已切割次数
-            int cutTimes;
-            for (cutTimes = 0; cutTimes < totalCutTimes; cutTimes++)
-            {
-                if (cutStepsQueue.TryDequeue(out CutStep? cutStep))
-                {
-                    try
-                    {
-                        if (cutStep.IsChanelFirstStep)
-                        {
-                            // 每个通道theta可能不同，如果是通道第一个切割步骤，则重新计算起始Y轴位置
-                            //计算工件圆心坐标
-                            DataPoint<float> workpieceCenterPoint = GeometryUtils.RotatePoint(new DataPoint<float>(thetaCenterPoint.X, thetaCenterPoint.Y + centerDistance), thetaCenterPoint, cutStep.ThetaDeg);
-                            //Y轴切割起始位置
-                            recordCutY = GeometryUtils.FindBottomTangentY(thetaCenterPoint, workpieceCenterPoint, workpieceRadius, cutStep.ThetaDeg);
-                        }
-                        recordCutY = CalculateCutY(recordCutY, cutStep.CutSize, cutStep.Direction);
-                        LineSegment? cutLine = CalculateSemicircleCuttingLine(thetaCenterPoint, cutStep.ThetaDeg, workpieceRadius, centerDistance, recordCutY);
-                        if (cutLine == null)
-                        {
-                            Tools.LogError("获取切割线失败！");
-                            return ProcessResult.FAIL;
-                        }
-                        //深度模式会有多次不同深度的切割
-                        foreach (float cutZ in cutStep.CutZ)
-                        {
-                            await PlcControl.tagControl.cutting.SetCutParamsAsync(cutStep.FeedSpeed, cutZ, cutZ - 2, cutLine.StartPoint.X,
-                                cutLine.EndPoint.X, cutLine.StartPoint.Y, "0", cutStep.ThetaDeg, 20000, cutStep.Direction);
-                            await PlcControl.tagControl.cutting.StartCutAsync();
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Tools.LogError($"执行切割步骤失败！{ex.Message}");
-                        return ProcessResult.FAIL;
-                    }
-                }
-                else
-                {
-                    break;
-                }
-            }
-            Tools.LogDebug("结束切割");
-            return new ProcessResult(totalCutTimes - cutTimes, recordCutY);
-        }
-
-        /// <summary>
-        /// 获取切割序列
-        /// </summary>
-        /// <param name="fileTableItemModel"></param>
-        /// <param name="ch"></param>
-        /// <returns></returns>
-        private static Queue<CutStep>? GetCutSequence(FileTableItemModel fileTableItemModel, FileTableItemChModel ch, float afterHeightMeasurementZ)
-        {
-            if (!float.TryParse(fileTableItemModel.TapeThickness, out float tapeThickness) ||
-                !float.TryParse(fileTableItemModel.WorkThickness, out float workThickness) ||
-                !int.TryParse(ch.CutLine, out int totalCutNum) ||
-                !float.TryParse(ch.ThetaDeg, out float thetaDeg) ||
-                !Tools.TryParseStringToFloatArray(ch.BladeHeight, out float[] setBladeHeights) ||
-                !Tools.TryParseStringToFloatArray(ch.DepthSteps, out float[] depthSteps) ||
-                !Tools.TryParseStringToFloatArray(ch.FeedSpeed, out float[] feedSpeeds) ||
-                !Tools.TryParseStringToFloatArray(ch.YIndex, out float[] yIndexs) ||
-                !Tools.TryParseStringToFloatArray(ch.RepeatTimes, out float[] repeatTimes))
-            {
-                return null; // 任意一个转换失败则返回null
-            }
-            CutDirection cutDirection = ch.CutDir == "FRONT" ? CutDirection.Forward : CutDirection.Backward;
-
-
-            // 检查索引是否连续
-            int maxIndex = CutUtils.AreIndexesContinuous(setBladeHeights, feedSpeeds, yIndexs, repeatTimes);
-            if (maxIndex == 0)
-            {
-                MaterialSnackUtils.MaterialSnack("切割参数错误！", MaterialSnackUtils.SnackType.ERROR);
-                Tools.LogError("切割参数错误！");
-                return null;
-            }
-            // 获取循环控制信息
-            List<string> loops = Tools.StringToStringArray(ch.Loop).ToList();
-            List<int> sequences = CutUtils.CombineSequences(GenerateNumberList(maxIndex), loops);
-            Queue<CutStep> cutStepQueue = new Queue<CutStep>();
-            foreach (int i in sequences)
-            {
-                float repeatTime = repeatTimes[i];
-                float setBladeHeight = setBladeHeights[i];
-                float feedSpeed = feedSpeeds[i];
-                float yIndex = yIndexs[i];
-                float depthStep = depthSteps[i];
-                // 刀数
-                for (int repeatNum = 0; repeatNum < repeatTime; repeatNum++)
-                {
-                    CutStep cutStep = new CutStep
-                    {
-                        CutZ = [],
-                        FeedSpeed = feedSpeed,
-                        CutSize = yIndex,
-                        Direction = cutDirection,
-                        ThetaDeg = thetaDeg
-                    };
-                    // 判断深度模式
-                    if (depthStep == 0)
-                    {
-                        cutStep.CutZ.Add(afterHeightMeasurementZ - setBladeHeight);
-                    }
-                    else
-                    {
-                        // 固定切割深度，多次切割以达到目标深度
-                        float cuttingDepth = tapeThickness + workThickness - setBladeHeight;
-                        int stepCount = (int)(cuttingDepth / depthStep);
-                        if (stepCount == 0)
-                        {
-                            // 固定切割深度大于目标深度
-                            cutStep.CutZ.Add(afterHeightMeasurementZ - setBladeHeight);
-                        }
-                        else
-                        {
-                            float curBladeHeight = tapeThickness + workThickness;
-                            for (int stepNum = 0; stepNum < stepCount; stepNum++)
-                            {
-                                curBladeHeight -= depthStep;
-                                cutStep.CutZ.Add(afterHeightMeasurementZ - curBladeHeight);
-                            }
-                            if (curBladeHeight > setBladeHeight)
-                            {
-                                //未完全到达目标深度
-                                cutStep.CutZ.Add(afterHeightMeasurementZ - setBladeHeight);
-                            }
-                        }
-                    }
-                    cutStepQueue.Enqueue(cutStep);
-                    //切割数够了就返回
-                    if (cutStepQueue.Count == totalCutNum)
-                    {
-                        return cutStepQueue;
-                    }
-                }
-            }
-            // 切割数不够，继续添加，直到达到切割数
-            if (cutStepQueue.Count < totalCutNum)
-            {
-                int cycleCount = (totalCutNum - cutStepQueue.Count) / cutStepQueue.Count;
-                int remainCount = (totalCutNum - cutStepQueue.Count) % cutStepQueue.Count;
-                List<CutStep> list = cutStepQueue.ToList();
-                for (int i = 0; i < cycleCount; i++)
-                {
-                    foreach (CutStep step in list)
-                    {
-                        cutStepQueue.Enqueue(step.DeepCopy());
-                    }
-                }
-                for (int i = 0; i < remainCount; i++)
-                {
-                    cutStepQueue.Enqueue(list[i].DeepCopy());
-                }
-            }
-            // 设置第一个切割线的标记
-            if (cutStepQueue.Count > 0)
-            {
-                cutStepQueue.Peek().IsChanelFirstStep = true;
-            }
-            return cutStepQueue;
-        }
-
-        private static Queue<SharpenStep>? GetSharpenStepSequence(BmSharpenParameterModel sharpenParam, float theta, float afterHeightMeasurementZ, float sharpenDistance)
-        {
-            try
-            {
-                // 初始化数据
-                Tuple<float, float>[] sharpenNumAndSpeed =
-                [
-                    new Tuple<float, float>(Tools.GetIntStringValue(sharpenParam.MoCutOneNo), Tools.GetFloatStringValue(sharpenParam.MoCutOneSpeed)),
-                    new Tuple<float, float>(Tools.GetIntStringValue(sharpenParam.MoCutTwoNo), Tools.GetFloatStringValue(sharpenParam.MoCutTwoSpeed)),
-                    new Tuple<float, float>(Tools.GetIntStringValue(sharpenParam.MoCutThreeNo), Tools.GetFloatStringValue(sharpenParam.MoCutThreeSpeed)),
-                    new Tuple<float, float>(Tools.GetIntStringValue(sharpenParam.MoCutFourNo), Tools.GetFloatStringValue(sharpenParam.MoCutFourSpeed)),
-                    new Tuple<float, float>(Tools.GetIntStringValue(sharpenParam.MoCutFiveNo), Tools.GetFloatStringValue(sharpenParam.MoCutFiveSpeed)),
-                    new Tuple<float, float>(Tools.GetIntStringValue(sharpenParam.MoCutSixNo), Tools.GetFloatStringValue(sharpenParam.MoCutSixSpeed)),
-                    new Tuple<float, float>(Tools.GetIntStringValue(sharpenParam.MoCutSevenNo), Tools.GetFloatStringValue(sharpenParam.MoCutSevenSpeed)),
-                    new Tuple<float, float>(Tools.GetIntStringValue(sharpenParam.MoCutEightNo), Tools.GetFloatStringValue(sharpenParam.MoCutEightSpeed)),
-                    new Tuple<float, float>(Tools.GetIntStringValue(sharpenParam.MoCutNineNo), Tools.GetFloatStringValue(sharpenParam.MoCutNineSpeed)),
-                    new Tuple<float, float>(Tools.GetIntStringValue(sharpenParam.MoCutTenNo), Tools.GetFloatStringValue(sharpenParam.MoCutTenSpeed))
-                ];
-                float setBladeHeight = sharpenParam.CutHeight;
-                float cutSize = sharpenParam.CoCutSize;
-                CutDirection cutDirection = sharpenParam.CoCutDirection == "FRONT" ? CutDirection.Forward : CutDirection.Backward;
-                float curSharpenDistance = 0;
-
-                Queue<SharpenStep> sharpenSteps = new Queue<SharpenStep>();
-                foreach (var tuple in sharpenNumAndSpeed)
-                {
-                    //切割刀数
-                    for (int i = 0; i < tuple.Item1; i++)
-                    {
-                        sharpenSteps.Enqueue(new SharpenStep
-                        {
-                            CutZ = afterHeightMeasurementZ - setBladeHeight,
-                            FeedSpeed = tuple.Item2,
-                            CutSize = cutSize,
-                            Direction = cutDirection,
-                            ThetaDeg = theta,
-                        });
-                        curSharpenDistance += cutSize;
-                        //磨刀距离达到设定值
-                        if (curSharpenDistance >= sharpenDistance)
-                        {
-                            return sharpenSteps;
-                        }
-                    }
-                }
-                List<SharpenStep> list = sharpenSteps.ToList();
-                // 磨刀距离未达到设定值，继续添加，直到达到
-                while (curSharpenDistance < sharpenDistance)
-                {
-                    foreach (SharpenStep step in list)
-                    {
-                        curSharpenDistance += cutSize;
-                        if (curSharpenDistance >= sharpenDistance)
-                        {
-                            break;
-                        }
-                        sharpenSteps.Enqueue(step.DeepCopy());
-                    }
-                }
-                // 设置第一个切割线的标记
-                if (sharpenSteps.Count > 0)
-                {
-                    sharpenSteps.Peek().IsChanelFirstStep = true;
-                }
-                return sharpenSteps;
-            }
-            catch (Exception ex)
-            {
-                Tools.LogError($"获取磨刀序列失败！{ex.Message}");
-                return null;
             }
         }
 
@@ -1155,37 +752,19 @@ namespace 精密切割系统.Model.cut
         public static bool CheckIsMeetsCuttingConditions(LunguSksjDTO lunguSksj, float firstHeightMeasurementZ, float curHeightZ)
         {
             return true;
-            float wearAmount = Math.Abs(curHeightZ - firstHeightMeasurementZ);
-            if (float.TryParse(lunguSksj.BladeOuterDiameter, out float bladeOuterDiameter))
-            {
-                bool isMeetCutting = true;
-                //磨刀后当前刀刃长度 <=【刀刃蚀刻后最长暴露量范围】最大值
-                isMeetCutting = isMeetCutting && bladeOuterDiameter - wearAmount <= lunguSksj.LongestBlade;
-                //长宽比 <=【刀刃初始长宽比范围】最大值
+            //float wearAmount = Math.Abs(curHeightZ - firstHeightMeasurementZ);
+            //if (float.TryParse(lunguSksj.BladeOuterDiameter, out float bladeOuterDiameter))
+            //{
+            //    bool isMeetCutting = true;
+            //    //磨刀后当前刀刃长度 <=【刀刃蚀刻后最长暴露量范围】最大值
+            //    isMeetCutting = isMeetCutting && bladeOuterDiameter - wearAmount <= lunguSksj.LongestBlade;
+            //    //长宽比 <=【刀刃初始长宽比范围】最大值
 
-                //刀厚 > =21，单次磨损量<=20；刀厚<21，单次磨损量<=50
+            //    //刀厚 > =21，单次磨损量<=20；刀厚<21，单次磨损量<=50
 
-                return isMeetCutting;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// 获取当前刀刃长度
-        /// </summary>
-        /// <returns></returns>
-        public static float GetCurrentBladeLength()
-        {
-            return 0.38f;
-        }
-
-        /// <summary>
-        /// 检查是否达到进入切割的条件
-        /// </summary>
-        /// <returns></returns>
-        public static bool CheckHasMeetCuttingCondition()
-        {
-            return true;
+            //    return isMeetCutting;
+            //}
+            //return false;
         }
 
         /// <summary>
@@ -1517,44 +1096,6 @@ namespace 精密切割系统.Model.cut
 
             return groups;
         }
-
-        //public static async Task<ImagesAnalysisResult> ProcessImagesAnalysisAsync(List<Mat> mats, CancellationToken token)
-        //{
-        //    // 配置参数
-        //    const int ioMaxConcurrency = 4; // 机械硬盘建议 2，SSD 可提高到 4-8
-        //    Task<ImagesAnalysisResult> ioTask = Task.Run(async () =>
-        //    {
-        //        ImagesAnalysisResult result = new ImagesAnalysisResult();
-        //        using var semaphore = new SemaphoreSlim(ioMaxConcurrency);
-        //        var tasks = new List<Task>();
-        //        foreach (var mat in mats)
-        //        {
-        //            token.ThrowIfCancellationRequested();
-        //            //tasks.Add(SaveImageDataAsync($"C:\\Users\\17632\\Desktop\\image\\{DateTime.Now.Ticks}_mat.jpg", mat, semaphore, token));
-        //            Mat cropMat = CropHorizontalCenter(mat, (int)(mat.Height * 0.13));
-        //            //tasks.Add(SaveImageDataAsync($"C:\\Users\\17632\\Desktop\\image\\{DateTime.Now.Ticks}_cropMat.jpg", cropMat, semaphore, token));
-        //            Mat cropMatJpg = JpegStreamToMat(MatToJpegStream(cropMat));
-        //            //tasks.Add(SaveImageDataAsync($"C:\\Users\\17632\\Desktop\\image\\{DateTime.Now.Ticks}_cropMatJpg.jpg", cropMatJpg, semaphore, token));
-        //            var (bladeWidthMm, collapseWidthMm) = VisionAnalyzer.ProcessImage(cropMatJpg);
-        //            Cv2.PutText(cropMatJpg, $"bladeWidthMm: {bladeWidthMm} collapseWidthMm:{collapseWidthMm}", new OpenCvSharp.Point(10, 40), HersheyFonts.HersheySimplex, 1.5f, new Scalar(0, 0, 255));
-        //            ImageData imageData = new ImageData() { BladeWidth = bladeWidthMm, CollapseWidth = collapseWidthMm, Mat = cropMat };
-        //            result.ImageDatas.Add(imageData);
-        //            tasks.Add(SaveImageDataAsync($"C:\\Users\\17632\\Desktop\\image\\{DateTime.Now.Ticks}_cropMatJpgText.jpg", cropMatJpg, semaphore, token));
-        //            if (result.BladeWidthMaxImage.BladeWidth < bladeWidthMm)
-        //            {
-        //                result.BladeWidthMaxImage = imageData;
-        //            }
-        //            if (result.CollapseWidthMaxImage.CollapseWidth < collapseWidthMm)
-        //            {
-        //                result.CollapseWidthMaxImage = imageData;
-        //            }
-        //        }
-        //        await Task.WhenAll(tasks);
-        //        return result;
-        //    }, token);
-
-        //    return await ioTask;
-        //}
 
         private static async Task SaveImageDataAsync(string filePath, Mat mat, SemaphoreSlim semaphore, CancellationToken token)
         {

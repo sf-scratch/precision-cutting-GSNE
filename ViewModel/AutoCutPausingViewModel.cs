@@ -281,7 +281,7 @@ namespace 精密切割系统.ViewModel
             {
                 { "SharpenParams", _autoCutRuningViewModel.SharpenParams },
                 { "CutParams", _autoCutRuningViewModel.CutParams },
-                { "LunguId", _autoCutRuningViewModel.LunguId }
+                { "LunguSksj", _autoCutRuningViewModel.LunguSksj }
             };
             _regionManager.RequestNavigate(RegionName.AutoCutStateRegion, nameof(AutoCutRuning), parameters);
         }

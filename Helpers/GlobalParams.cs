@@ -1,4 +1,5 @@
-﻿using NPOI.SS.Formula.Functions;
+﻿using MathNet.Numerics;
+using NPOI.SS.Formula.Functions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
@@ -6,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using 精密切割系统.Assets.config.buttom;
+using 精密切割系统.Driver;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.cut;
 
@@ -166,6 +168,8 @@ namespace 精密切割系统.FrmWindow.common
         /// </summary>
         //public static DataPoint<float> ThetaCenterPoint = new DataPoint<float>(146.48f, 81.86f);
         public static DataPoint<float> ThetaCenterPoint = new DataPoint<float>(140.485f, 81.86f);
+
+        public static readonly float ZAxisZeroToWorkingDiscDistance = 20f;
 
         /// <summary>
         /// 相机中心点位置
