@@ -4,13 +4,9 @@ using OpenCvSharp;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Diagnostics;
-using MathNet.Numerics.LinearAlgebra;
-using MathNet.Numerics.LinearAlgebra.Double;
 using static 精密切割系统.Model.cut.EdgeAnalyzer;
+using System.Printing;
 
 namespace 精密切割系统.Model.cut
 {
@@ -41,8 +37,8 @@ namespace 精密切割系统.Model.cut
         /// <exception cref="ArgumentException">当像素比例小于等于0时抛出</exception>
         /// <exception cref="FileNotFoundException">当图像文件不存在时抛出</exception>
         /// <exception cref="Exception">当图像无法读取时抛出</exception>
-        //public static (double bladeWidthMm, double collapseWidthMm) ProcessImage(string imagePath, double pixelToMmRatio = 0.000439)
         public static (double bladeWidthMm, double collapseWidthMm, double bladeTop, double bladeBottom, double collapseTop, double collapseBottom) ProcessImage(string imagePath, double pixelToMmRatio = 0.0004575)
+        //public static (double bladeWidthMm, double collapseWidthMm, double bladeTop, double bladeBottom, double collapseTop, double collapseBottom) ProcessImage(string imagePath, double pixelToMmRatio = 0.0004575)
         {
             if (string.IsNullOrEmpty(imagePath))
                 throw new ArgumentNullException(nameof(imagePath), "图像路径不能为空");
@@ -158,9 +154,31 @@ namespace 精密切割系统.Model.cut
                         ["bottom"] = new List<Point>()
                     };
                 }
-
+                // 过滤掉面积小于阈值的轮廓
+                contours = contours.Where(contour => Cv2.ContourArea(contour) >= THRESHOLD_AREA).ToArray();
                 contours = contours.OrderBy(c => Cv2.BoundingRect(c).X).ToArray();
                 Debug.WriteLine($"检测到{contours.Length}个轮廓");
+
+                // 创建一个空白图像用于绘制轮廓
+                Mat mask = new Mat(binary.Size(), MatType.CV_8UC1, Scalar.All(0));
+
+                // 绘制过滤后的轮廓
+                foreach (var contour in contours)
+                {
+                    Cv2.DrawContours(mask, new[] { contour }, -1, new Scalar(255), -1); // 填充轮廓
+                }
+                Cv2.ImWrite("mask.jpg", mask);
+                Cv2.FindContours(mask, out contours, out hierarchy, RetrievalModes.External, ContourApproximationModes.ApproxSimple);
+
+                if (contours == null || contours.Length == 0)
+                {
+                    Debug.WriteLine("未检测到有效轮廓");
+                    return new Dictionary<string, List<Point>>
+                    {
+                        ["top"] = new List<Point>(),
+                        ["bottom"] = new List<Point>()
+                    };
+                }
 
                 // 分类点数据容器
                 var contourData = new Dictionary<string, List<Point>>
@@ -192,9 +210,15 @@ namespace 精密切割系统.Model.cut
                         double adjustedYMin = isTop ? yMin + rect.Height / 2.0 : yMin;
                         double adjustedYMax = isTop ? yMax : yMax - rect.Height / 2.0;
 
+                        Point leftPos, rightPos, centerPos;
+                        GetTrianglePoints(contour, isTop, out leftPos, out rightPos, out centerPos);
+
+                        Point[] filtered = FilterPointsInTriangle(contour, leftPos, rightPos, centerPos);
+
+
                         // 提取有效点
                         List<Point> validPoints = new();
-                        foreach (var pt in contour)
+                        foreach (var pt in filtered)
                         {
                             if (pt.X >= xMin && pt.X <= xMax && pt.Y >= adjustedYMin && pt.Y <= adjustedYMax)
                                 validPoints.Add(pt);
@@ -219,6 +243,77 @@ namespace 精密切割系统.Model.cut
                 throw;
             }
         }
+        public static Point[] FilterPointsInTriangle(Point[] points, Point v1, Point v2, Point v3)
+        {
+            List<Point> filterPoints = new List<Point>();
+
+            foreach (var point in points)
+            {
+                if (IsPointInTriangle(point, v1, v2, v3))
+                {
+                    filterPoints.Add(point);
+                }
+            }
+
+            return filterPoints.ToArray(); // 等价于 np.array(filter_points)
+        }
+        public static bool IsPointInTriangle(Point pt, Point v1, Point v2, Point v3, double eps = 1e-10)
+        {
+            double Sign(Point p1, Point p2, Point p3)
+            {
+                return (p1.X - p3.X) * (p2.Y - p3.Y) - (p2.X - p3.X) * (p1.Y - p3.Y);
+            }
+
+            double d1 = Sign(pt, v1, v2);
+            double d2 = Sign(pt, v2, v3);
+            double d3 = Sign(pt, v3, v1);
+
+            bool hasNeg = (d1 < -eps) || (d2 < -eps) || (d3 < -eps);
+            bool hasPos = (d1 > eps) || (d2 > eps) || (d3 > eps);
+
+            return !(hasNeg && hasPos);
+        }
+        public static void GetTrianglePoints(Point[] contour, bool isTop, out Point leftPos, out Point rightPos, out Point centerPos)
+        {
+            // 拉平成二维数组
+            var pts = contour;
+            Rect rect = Cv2.BoundingRect(contour);
+            int yMin = rect.Y;
+            int yMax = rect.Y + rect.Height;
+            if (isTop)
+            {
+                // 获取左下角点：最大 y - x
+                Point leftBottom = pts.OrderByDescending(p => p.Y - p.X).First();
+                // 获取右下角点：最大 y + x
+                Point rightBottom = pts.OrderByDescending(p => p.Y + p.X).First();
+                // 最小 y 值（最上方）
+                int minY = pts.Min(p => p.Y);
+                // 中点
+                Point midBottom = new Point((leftBottom.X + rightBottom.X) / 2, minY + (rect.Height / 2.0));
+
+                // 三个顶点
+                leftPos = new Point(leftBottom.X, yMax);
+                rightPos = new Point(rightBottom.X, yMax);
+                centerPos = midBottom;
+            }
+            else
+            {
+                // 获取左上角点：最小 x + y
+                Point leftTop = pts.OrderBy(p => p.X + p.Y).First();
+                // 获取右上角点：最大 x - y
+                Point rightTop = pts.OrderByDescending(p => p.X - p.Y).First();
+                // 最大 y 值（最下方）
+                int maxY = pts.Max(p => p.Y);
+                // 中点
+                Point midTop = new Point((leftTop.X + rightTop.X) / 2, maxY - (rect.Height / 2.0));
+
+                // 三个顶点
+                leftPos = new Point(leftTop.X, yMin);
+                rightPos = new Point(rightTop.X, yMin);
+                centerPos = midTop;
+            }
+        }
+
         /// <summary>
         /// 蛇形判断
         /// </summary>
@@ -541,6 +636,85 @@ namespace 精密切割系统.Model.cut
             return Tuple.Create<Point?, double>(center, maxVal);
         }
 
+        /// <summary>
+        /// 检测图像中的多条横向条纹，只返回第一条条纹的中心线位置
+        /// </summary>
+        /// <param name="imagePath">图像路径</param>
+        /// <returns>第一条横向条纹的中心 y 坐标，如果未检测到则返回 null</returns>
+        public static int? DetectFirstHorizontalStripeCenter(string imagePath)
+        {
+            // 读取灰度图像
+            Mat img = Cv2.ImRead(imagePath, ImreadModes.Grayscale);
+            if (img.Empty())
+            {
+                throw new FileNotFoundException("图像读取失败，请检查路径");
+            }
+
+            // CLAHE 对比度增强
+            CLAHE clahe = Cv2.CreateCLAHE(clipLimit: 3.0, tileGridSize: new Size(8, 8));
+            Mat imgEq = new Mat();
+            clahe.Apply(img, imgEq);
+
+            // OTSU 二值化并取反，使条纹为白
+            Mat binary = new Mat();
+            Cv2.Threshold(imgEq, binary, 0, 255, ThresholdTypes.BinaryInv | ThresholdTypes.Otsu);
+
+            // 水平投影
+            int[] projection = new int[binary.Rows];
+            for (int i = 0; i < binary.Rows; i++)
+            {
+                projection[i] = Cv2.CountNonZero(binary.Row(i));
+            }
+
+            // 设置阈值，检测高投影区域
+            int maxProj = projection.Max();
+            double threshold = 0.5 * maxProj;
+
+            // 找出所有连续的高投影区域段
+            List<(int top, int bottom)> stripeRegions = new List<(int, int)>();
+            bool inRegion = false;
+            int regionStart = 0;
+
+            for (int i = 0; i < projection.Length; i++)
+            {
+                if (projection[i] > threshold)
+                {
+                    if (!inRegion)
+                    {
+                        // 新的条纹开始
+                        regionStart = i;
+                        inRegion = true;
+                    }
+                }
+                else
+                {
+                    if (inRegion)
+                    {
+                        // 条纹结束
+                        stripeRegions.Add((regionStart, i - 1));
+                        inRegion = false;
+                    }
+                }
+            }
+
+            // 如果最后仍在区域中，补充添加最后一段
+            if (inRegion)
+            {
+                stripeRegions.Add((regionStart, projection.Length - 1));
+            }
+
+            // 无条纹区域则返回 null
+            if (stripeRegions.Count == 0)
+            {
+                Console.WriteLine("未检测到任何横向条纹");
+                return null;
+            }
+
+            // 返回第一条条纹的中心线位置
+            var (top, bottom) = stripeRegions[0];
+            int center = (top + bottom) / 2;
+            return center;
+        }
 
     }
 }
