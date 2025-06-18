@@ -14,8 +14,7 @@ namespace 精密切割系统.Helpers
     {
         public static async Task WaitExpectedResultAsync<T>(Func<Task<T>> func, T expectedResult, CancellationToken cancellationToken = default, TimeSpan? checkInterval = null)
         {
-            if (func == null)
-                throw new ArgumentNullException(nameof(func));
+            ArgumentNullException.ThrowIfNull(func);
             var tcs = new TaskCompletionSource<bool>();
             var interval = checkInterval ?? TimeSpan.FromMilliseconds(500);
             var timer = new System.Timers.Timer()
@@ -68,8 +67,7 @@ namespace 精密切割系统.Helpers
 
         public static async Task WaitExpectedResultAsync(Func<Task<bool>> func, CancellationToken cancellationToken = default, TimeSpan? checkInterval = null)
         {
-            if (func == null)
-                throw new ArgumentNullException(nameof(func));
+            ArgumentNullException.ThrowIfNull(func);
             var tcs = new TaskCompletionSource<bool>();
             var interval = checkInterval ?? TimeSpan.FromMilliseconds(500);
             var timer = new System.Timers.Timer()

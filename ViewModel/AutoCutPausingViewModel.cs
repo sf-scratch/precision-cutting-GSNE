@@ -182,9 +182,11 @@ namespace 精密切割系统.ViewModel
         private void InitBottomButton()
         {
             OperatePageButtonCollection.Clear();
-            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调窄", "/Assets/icon/tab_1/03/tab_02.png", BaselineNarrowing, null, 8));
-            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调宽", "/Assets/icon/tab_1/03/tab_05.png", BaselineWidthAdjustment, null, 8));
             OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线校准", "/Assets/icon/tab_1/03/tab_08.png", BaselineCalibration, null, 8));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调窄", "/Assets/icon/tab_1/03/tab_02.png", BaselineNarrowing, null, 8));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调宽", "/Assets/icon/tab_1/03/tab_05.png", BaselineWidening, null, 8));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("崩边调窄", "/Assets/icon/tab_1/03/tab_02.png", BrokenEdgeNarrowing, null, 8));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("崩边调宽", "/Assets/icon/tab_1/03/tab_05.png", BrokenEdgeWidening, null, 8));
             OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("报废", "/Assets/icon/tab_1/03/tab_08.png", BladeScrap, null, 8));
         }
 
@@ -202,7 +204,7 @@ namespace 精密切割系统.ViewModel
             await _autoCutRuningViewModel.StopAsync(ServicePauseResult.BladeScrap);
         }
 
-        private void BaselineWidthAdjustment()
+        private void BaselineWidening()
         {
             _cameraCommon?.SetCutMarkWidth(1, 2);
             UpdateBaselineWidth();
@@ -212,6 +214,18 @@ namespace 精密切割系统.ViewModel
         {
             _cameraCommon?.SetCutMarkWidth(-1, 2);
             UpdateBaselineWidth();
+        }
+
+        private void BrokenEdgeWidening()
+        {
+            _cameraCommon?.SetEdgeWidth(1, 2);
+            UpdateBrokenEdgeWidth();
+        }
+
+        private void BrokenEdgeNarrowing()
+        {
+            _cameraCommon?.SetEdgeWidth(-1, 2);
+            UpdateBrokenEdgeWidth();
         }
 
         private async void BaselineCalibration()
@@ -238,6 +252,11 @@ namespace 精密切割系统.ViewModel
         private void UpdateBaselineWidth()
         {
             BaselineWidth = (float)Math.Round(_cameraCommon?._cutMarkWidth / 1000 ?? 0, 4);
+        }
+
+        private void UpdateBrokenEdgeWidth()
+        {
+            BrokenEdgeWidth = (float)Math.Round(_cameraCommon?._edgeChipWidth / 1000 ?? 0, 4);
         }
 
         public async Task StartMonitoringAlarmAsync(CancellationToken token)
@@ -307,6 +326,7 @@ namespace 精密切割系统.ViewModel
             CutProgress = _autoCutRuningViewModel.CutProgress;
             AfterReplaceBladeCutTimes = _autoCutRuningViewModel.AfterReplaceBladeCutTimes;
             UpdateBaselineWidth();
+            UpdateBrokenEdgeWidth();
             float? xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync();
             float? yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync();
             // 初始化起始点位置

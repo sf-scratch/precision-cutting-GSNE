@@ -1444,23 +1444,42 @@ namespace 精密切割系统.Driver
         /// <param name="jogDirection">方向 0 正 1 负</param>
         public async Task StartJogAsync(int jogDirection, CancellationToken token = default)
         {
-            //等待轴准备好
-            await WaitAxisReadyAsync(token);
-            // 设置运动类型为点动
-            runType.writeValue = "0";
-            await keyencePlc.WriteTagAsync(runType);
-            await StopJogAsync();
-            if (jogDirection == 0)
+            try
             {
-                // 开启正转
-                jogStart.writeValue = "1";
-                await keyencePlc.WriteTagAsync(jogStart);
+                await StopJogAsync();
+                CancellationToken useToken = token;
+                if (useToken == CancellationToken.None)
+                {
+                    using var cts = new CancellationTokenSource();
+                    cts.CancelAfter(TimeSpan.FromSeconds(1)); // 设置超时时间
+                    useToken = cts.Token;
+                }
+                //等待轴准备好
+                await WaitAxisReadyAsync(useToken);
+                // 设置运动类型为点动
+                runType.writeValue = "0";
+                await keyencePlc.WriteTagAsync(runType);
+                if (jogDirection == 0)
+                {
+                    // 开启正转
+                    jogStart.writeValue = "1";
+                    await keyencePlc.WriteTagAsync(jogStart);
+                }
+                else
+                {
+                    // 开启反转
+                    jogAntiStart.writeValue = "1";
+                    await keyencePlc.WriteTagAsync(jogAntiStart);
+                }
             }
-            else
+            catch (OperationCanceledException)
             {
-                // 开启反转
-                jogAntiStart.writeValue = "1";
-                await keyencePlc.WriteTagAsync(jogAntiStart);
+                // 等待轴准备好超时,发停止jog信号
+                await StopJogAsync();
+            }
+            catch (Exception)
+            {
+
             }
         }
 

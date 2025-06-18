@@ -1,5 +1,4 @@
 using Emgu.CV.Dnn;
-using HslCommunication.Secs.Types;
 using Microsoft.Win32;
 using NPOI.SS.Formula.Functions;
 using SQLite;

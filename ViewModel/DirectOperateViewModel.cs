@@ -647,7 +647,7 @@ namespace 精密切割系统.ViewModel
 
         async void ExecuteStartRaiseZ2Command()
         {
-            await PlcControl.tagControl.Z2axis.StartJogAsync(0);
+            await PlcControl.tagControl.Z2axis.StartJogAsync(1);
         }
 
         private DelegateCommand _startDropZ2Command;
@@ -656,7 +656,7 @@ namespace 精密切割系统.ViewModel
 
         async void ExecuteStartDropZ2Command()
         {
-            await PlcControl.tagControl.Z2axis.StartJogAsync(1);
+            await PlcControl.tagControl.Z2axis.StartJogAsync(0);
         }
 
         private DelegateCommand _stopJogZ2Command;

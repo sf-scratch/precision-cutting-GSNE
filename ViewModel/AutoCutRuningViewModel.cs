@@ -551,7 +551,7 @@ namespace 精密切割系统.ViewModel
                         for (int failTimes = 1; failTimes <= 10; failTimes++)
                         {
                             // 开始测高
-                            curTotalWearAmount = await AutoCutUtils.ProcessMeasureHeightAsync(heightMeasurementMode, _pauseCts.Token, _dialogService, _eventAggregator);
+                            curTotalWearAmount = await AutoCutUtils.ProcessMeasureWearAmountAsync(heightMeasurementMode, false, _dialogService, _eventAggregator, _pauseCts.Token);
                             if (!curTotalWearAmount.IsSuccess)
                             {
                                 MaterialSnackUtils.MaterialSnack(curTotalWearAmount.Message, MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
@@ -679,7 +679,7 @@ namespace 精密切割系统.ViewModel
         private async Task AfterPauseThenMoveToPosition(LineSegment? line, string? message)
         {
             MaterialSnackUtils.MaterialSnack("正在暂停切割...", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
-            int runTime = 30;
+            int runTime = 40;
             _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"暂停超时时间：{runTime}"));
             try
             {
@@ -696,13 +696,14 @@ namespace 精密切割系统.ViewModel
                         break;
                     default:
                         // 轴不报警时移动到指定位置
-                        if (line != null && !AlarmConfig.Instance.HasActiveAxisAlarm())
+                        if (line != null)
                         {
                             // 执行默认动作
                             var offsetPos = Appsettings.CameraRelativeBladePosition;
-                            await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default);
-                            await PlcControl.tagControl.cutting.RunMotionAsync((line.StartPoint.X + line.EndPoint.X) / 2 + offsetPos.X, line.StartPoint.Y + offsetPos.Y, default);
-                            await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(Appsettings.FocusClearZ ?? 0);
+                            Task z1Task = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, cts.Token);
+                            Task z2Task = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(Appsettings.FocusClearZ ?? 0, default, cts.Token);
+                            await Task.WhenAll(z1Task, z2Task);
+                            await PlcControl.tagControl.cutting.RunMotionAsync((line.StartPoint.X + line.EndPoint.X) / 2 + offsetPos.X, line.StartPoint.Y + offsetPos.Y, cts.Token);
                         }
                         MaterialSnackUtils.MaterialSnack(message ?? "暂停中...", MaterialSnackUtils.SnackType.SUCCESS, 0, _eventAggregator);
                         break;

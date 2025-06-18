@@ -250,79 +250,78 @@ namespace 精密切割系统.Model.cut
                 default:
                     break;
             }
-            for (int times = 1; times <= 10; times++)
+            if (mode is HeightMeasurementMode.NoContact)
             {
-                if (mode is HeightMeasurementMode.NoContact)
-                {
-                    //主轴旋转
-                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("主轴开始旋转"));
-                    await PlcControl.tagControl.wholeDevice.StartSpindleAsync();
-                    //eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹水"));
-                    //await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingWaterAsync(2);
-                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹气"));
-                    await PlcControl.tagControl.cutting.RunMotionAsync(119.5f, 50, token);
-                    await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingAsync(5);
-                }
+                //主轴旋转
+                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("主轴开始旋转"));
+                await PlcControl.tagControl.wholeDevice.StartSpindleAsync();
+                //eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹水"));
+                //await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingWaterAsync(2);
+                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹气"));
+                await PlcControl.tagControl.cutting.RunMotionAsync(128f, 50, token);
+                Task blowingTask = PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingAsync(5);
+                Task z1StartHomingTask = PlcControl.tagControl.Z1axis.StartHomingAsync();
+                Task z1WaitReadyTask = PlcControl.tagControl.Z1axis.WaitAxisReadyAsync(token);
+                await Task.WhenAll(blowingTask, z1StartHomingTask, z1WaitReadyTask);
+            }
 
-                //等待测高准备完成信号
-                await PlcControl.tagControl.bladeMantance.WaitReadyToMeasureHeightAsync(token);
-                //进入测高模式
-                await PlcControl.tagControl.bladeMantance.StartBladeSetupAsync();
-                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始测高！"));
-                BladeHeightModel bladeHeightModel;
-                //测高参数的数据
-                List<BladeHeightModel> list = await SqlHelper.TableAsync<BladeHeightModel>()
-                        .Where(t => t.Id == 1).ToListAsync();
-                //数据不存在，则初始化数据
-                if (list == null || list.Count == 0)
-                {
-                    return CommonResult<float>.Failure("获取测高参数失败！");
-                }
-                bladeHeightModel = list[0];
-                if (!int.TryParse(bladeHeightModel.Retry, out int retry))
-                {
-                    return CommonResult<float>.Failure("测高参数异常！");
-                }
-                // 发送测高开始信号到PLC
-                await PlcControl.tagControl.bladeMantance.StartSetupAsync();
-                List<float> setupValueList = new List<float>();
-                int? measureHeightTimes = await PlcControl.tagControl.bladeMantance.GetHeightMeasurementSetupNumber();
-                if (measureHeightTimes == null)
+            //等待测高准备完成信号
+            await PlcControl.tagControl.bladeMantance.WaitReadyToMeasureHeightAsync(token);
+            //进入测高模式
+            await PlcControl.tagControl.bladeMantance.StartBladeSetupAsync();
+            eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始测高！"));
+            BladeHeightModel bladeHeightModel;
+            //测高参数的数据
+            List<BladeHeightModel> list = await SqlHelper.TableAsync<BladeHeightModel>()
+                    .Where(t => t.Id == 1).ToListAsync();
+            //数据不存在，则初始化数据
+            if (list == null || list.Count == 0)
+            {
+                return CommonResult<float>.Failure("获取测高参数失败！");
+            }
+            bladeHeightModel = list[0];
+            if (!int.TryParse(bladeHeightModel.Retry, out int retry))
+            {
+                return CommonResult<float>.Failure("测高参数异常！");
+            }
+            // 发送测高开始信号到PLC
+            await PlcControl.tagControl.bladeMantance.StartSetupAsync();
+            List<float> setupValueList = new List<float>();
+            int? measureHeightTimes = await PlcControl.tagControl.bladeMantance.GetHeightMeasurementSetupNumber();
+            if (measureHeightTimes == null)
+            {
+                return CommonResult<float>.Failure("重复次数获取失败！");
+            }
+            using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
+            while (measureHeightTimes.Value < retry && await timer.WaitForNextTickAsync(token))
+            {
+                int? curMeasureHeightTimes = await PlcControl.tagControl.bladeMantance.GetHeightMeasurementSetupNumber();
+                if (curMeasureHeightTimes == null)
                 {
                     return CommonResult<float>.Failure("重复次数获取失败！");
                 }
-                using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
-                while (measureHeightTimes.Value < retry && await timer.WaitForNextTickAsync(token))
+                // 如果不相等，则记录值
+                if (curMeasureHeightTimes.Value != measureHeightTimes.Value)
                 {
-                    int? curMeasureHeightTimes = await PlcControl.tagControl.bladeMantance.GetHeightMeasurementSetupNumber();
-                    if (curMeasureHeightTimes == null)
+                    float? setupValue = await PlcControl.tagControl.bladeMantance.GetHeightMeasurementSetupValue();
+                    if (setupValue == null)
                     {
-                        return CommonResult<float>.Failure("重复次数获取失败！");
+                        return CommonResult<float>.Failure("磨损量获取失败！");
                     }
-                    // 如果不相等，则记录值
-                    if (curMeasureHeightTimes.Value != measureHeightTimes.Value)
-                    {
-                        float? setupValue = await PlcControl.tagControl.bladeMantance.GetHeightMeasurementSetupValue();
-                        if (setupValue == null)
-                        {
-                            return CommonResult<float>.Failure("磨损量获取失败！");
-                        }
-                        eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"第{curMeasureHeightTimes.Value}次获取磨损量：{setupValue.Value}"));
-                        setupValueList.Add(setupValue.Value);
-                        measureHeightTimes = curMeasureHeightTimes;
-                    }
+                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"第{curMeasureHeightTimes.Value}次获取磨损量：{setupValue.Value}"));
+                    setupValueList.Add(setupValue.Value);
+                    measureHeightTimes = curMeasureHeightTimes;
                 }
-                if (setupValueList.Count == 0)
-                {
-                    return CommonResult<float>.Failure("没有磨损量数据！");
-                }
-                //等待完成测高信号
-                await PlcControl.tagControl.bladeMantance.WaitHeightMeasurementCompletedAsync(token);
-                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"磨损量平均值：{setupValueList.Average()}"));
-                // 计算3次的平均值，为测高值
-                return CommonResult<float>.Success(setupValueList.Average());
             }
-            return CommonResult<float>.Failure("获取磨损量失败次数过多！");
+            if (setupValueList.Count == 0)
+            {
+                return CommonResult<float>.Failure("没有磨损量数据！");
+            }
+            //等待完成测高信号
+            await PlcControl.tagControl.bladeMantance.WaitHeightMeasurementCompletedAsync(token);
+            eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"磨损量平均值：{setupValueList.Average()}"));
+            // 计算3次的平均值，为测高值
+            return CommonResult<float>.Success(setupValueList.Average());
         }
 
         public static async Task WaitManualBlowing(IDialogService dialogService, CancellationToken token)
