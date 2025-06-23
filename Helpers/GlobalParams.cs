@@ -185,7 +185,7 @@ namespace 精密切割系统.FrmWindow.common
         /// <summary>
         /// 磨刀板尺寸
         /// </summary>
-        public static DataRectangleF SharpenRect = new DataRectangleF(ThetaCenterPoint.X - 35, ThetaCenterPoint.Y - 73, 70, 70);
+        public static DataRectangleF SharpenRect = new DataRectangleF(ThetaCenterPoint.X - 33, ThetaCenterPoint.Y - 73, 70, 70);
 
         /// <summary>
         /// 切割多少刀后开始磨刀
@@ -203,7 +203,9 @@ namespace 精密切割系统.FrmWindow.common
         //public static readonly float NonContactHeightMeasurementToWorkbenchZ1 = 19.029453f;
         //public static readonly float NonContactHeightMeasurementToWorkbenchZ1 = 19f;
         //public static readonly float NonContactHeightMeasurementToWorkbenchZ1 = 7.53f;
-        public static readonly float NonContactHeightMeasurementToWorkbenchZ1 = 7.5f;
+        //public static readonly float NonContactHeightMeasurementToWorkbenchZ1 = 7.5f;
+        //public static readonly float NonContactHeightMeasurementToWorkbenchZ1 = 9.98f;
+        public static readonly float NonContactHeightMeasurementToWorkbenchZ1 = 8.8f;
 
         // x轴默认速度
         public const float XDefaultSpeed = 10;

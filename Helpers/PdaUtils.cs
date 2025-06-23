@@ -173,7 +173,7 @@ namespace 精密切割系统.Helpers
                 MslValues.GroupOperateId = fieldValues.GroupOperateId;
                 fieldValues.List.Add(MslValues);
             }
-            int wearAmountInt = (int)Math.Round(wearAmount * 1000);
+            int wearAmountInt = (int)MathF.Round(wearAmount * 1000);
             int childrenIndex = GroupCode;
             GroupCode++;
             if (childrenIndex == 0)
@@ -194,7 +194,7 @@ namespace 精密切割系统.Helpers
                 FlowsValuesDTO ddmsl = MslValues.Children[0].FieldList[2].ToFlowsValuesDTO();
                 ddmsl.ParentId = MslValues.FieldId;
                 ddmsl.GroupOperateId = fieldValues.GroupOperateId;
-                ddmsl.FieldValue = Math.Round((float)wearAmountInt / count, 2).ToString();
+                ddmsl.FieldValue = MathF.Round((float)wearAmountInt / count, 2).ToString();
                 ddmsl.GroupCode = GroupCode.ToString();
                 fieldValues.List.Add(ddmsl);
             }
@@ -395,7 +395,7 @@ namespace 精密切割系统.Helpers
             {
                 FlowsValuesDTO dto = value.Clone();
                 dto.GroupOperateId = fieldValues.GroupOperateId;
-                dto.FieldValue = Math.Round(wearAmountBeforeCircle * 1000).ToString();
+                dto.FieldValue = MathF.Round(wearAmountBeforeCircle * 1000).ToString();
                 fieldValues.List.Add(dto);
             }
         }
@@ -422,11 +422,11 @@ namespace 精密切割系统.Helpers
                 AfterCircleMslValues.GroupOperateId = fieldValues.GroupOperateId;
                 fieldValues.List.Add(AfterCircleMslValues);
             }
-            int wearAmountInt = (int)Math.Round(wearAmount * 1000);
+            int wearAmountInt = (int)MathF.Round(wearAmount * 1000);
             GroupCode++;
-            AfterCircleMslValues.FieldValue = Math.Round(float.Parse(AfterCircleMslValues.FieldValue) + wearAmountInt).ToString();
+            AfterCircleMslValues.FieldValue = MathF.Round(float.Parse(AfterCircleMslValues.FieldValue) + wearAmountInt).ToString();
             if (MslValues is not null)
-                MslValues.FieldValue = Math.Round(float.Parse(MslValues.FieldValue) + wearAmountInt).ToString();
+                MslValues.FieldValue = MathF.Round(float.Parse(MslValues.FieldValue) + wearAmountInt).ToString();
             FlowsValuesDTO mosunliang = AfterCircleMslValues.Children[0].FieldList[0].ToFlowsValuesDTO();
             mosunliang.ParentId = AfterCircleMslValues.FieldId;
             mosunliang.GroupOperateId = fieldValues.GroupOperateId;
@@ -442,7 +442,7 @@ namespace 精密切割系统.Helpers
             FlowsValuesDTO ddmsl = AfterCircleMslValues.Children[0].FieldList[2].ToFlowsValuesDTO();
             ddmsl.ParentId = AfterCircleMslValues.FieldId;
             ddmsl.GroupOperateId = fieldValues.GroupOperateId;
-            ddmsl.FieldValue = Math.Round((float)wearAmountInt / count, 2).ToString();
+            ddmsl.FieldValue = MathF.Round((float)wearAmountInt / count, 2).ToString();
             ddmsl.GroupCode = "1";
             fieldValues.List.Add(ddmsl);
         }

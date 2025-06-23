@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Numerics;
+using Emgu.CV.Dnn;
 using HslCommunication;
 using HslCommunication.Profinet.Keyence;
 using Newtonsoft.Json.Linq;
@@ -1446,7 +1447,6 @@ namespace 精密切割系统.Driver
         {
             try
             {
-                await StopJogAsync();
                 CancellationToken useToken = token;
                 if (useToken == CancellationToken.None)
                 {
@@ -1456,9 +1456,6 @@ namespace 精密切割系统.Driver
                 }
                 //等待轴准备好
                 await WaitAxisReadyAsync(useToken);
-                // 设置运动类型为点动
-                runType.writeValue = "0";
-                await keyencePlc.WriteTagAsync(runType);
                 if (jogDirection == 0)
                 {
                     // 开启正转
@@ -1618,8 +1615,16 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task StartAbsoluteAsync(float location, float? speed = default, CancellationToken token = default)
         {
+            await StopJogAsync();
+            CancellationToken useToken = token;
+            if (useToken == CancellationToken.None)
+            {
+                using var cts = new CancellationTokenSource();
+                cts.CancelAfter(TimeSpan.FromSeconds(1)); // 设置超时时间
+                useToken = cts.Token;
+            }
             //等待轴准备好
-            await WaitAxisReadyAsync(token);
+            await WaitAxisReadyAsync(useToken);
             // 设置绝对运动位置
             absoluteLocation.writeValue = location.ToString();
             await keyencePlc.WriteTagAsync(absoluteLocation);
@@ -1809,6 +1814,26 @@ namespace 精密切割系统.Driver
             ConfirmParams();
         }
 
+        public async Task SetSetupParamsAsync(BladeHeightModel model)
+        {
+            setupZAxisMaxDistance.writeValue = model.SetupZAxisMaxDistance;
+            setupZAxisHighSpeed.writeValue = model.HighSpeedCt;
+            setupZAxisLowSpeed.writeValue = model.LowSpeedCt;
+            setupZAxisLowDistance.writeValue = model.LowSpeedStrokeCt;
+            setupSetNumber.writeValue = model.Retry;
+            await keyencePlc.WriteTagAsync(setupZAxisMaxDistance);
+            await keyencePlc.WriteTagAsync(setupZAxisHighSpeed);
+            await keyencePlc.WriteTagAsync(setupZAxisLowSpeed);
+            await keyencePlc.WriteTagAsync(setupZAxisLowDistance);
+            await keyencePlc.WriteTagAsync(setupSetNumber);
+        }
+
+        public async Task SetZAxisMaxDistanceAsync(float maxDistance)
+        {
+            setupZAxisMaxDistance.writeValue = MathF.Round(maxDistance, 3).ToString();
+            await keyencePlc.WriteTagAsync(setupZAxisMaxDistance);
+        }
+
         /// <summary>
         /// 开始测高
         /// </summary>
@@ -1868,9 +1893,20 @@ namespace 精密切割系统.Driver
         /// 获取测高次数
         /// </summary>
         /// <returns></returns>
-        public async Task<int?> GetHeightMeasurementSetupNumber()
+        public async Task<int?> GetHeightMeasureSetupNumberAsync()
         {
            return await PlcControl.plc.ReadDataAsync<int>(setupNumber.addr);
+        }
+
+        /// <summary>
+        /// 等待测高次数更新
+        /// </summary>
+        /// <param name="preNum"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public async Task WaitHeightMeasureSetupNumberUdatedAsync(int preNum, CancellationToken token)
+        {
+            await TaskUtils.WaitExpectedResultAsync(GetHeightMeasureSetupNumberAsync, preNum, token);
         }
 
         /// <summary>
@@ -2916,6 +2952,11 @@ namespace 精密切割系统.Driver
         {
             await TaskUtils.WaitExpectedResultAsync(GetCutNumAsync, preCutNum, token);
         }
+
+        //public async Task WaitCutNumUdatedAsync(int preCutNum, int timeoutSeconds = 30)
+        //{
+        //    await TaskUtils.WaitExpectedResultAsync(GetCutNumAsync, preCutNum, TimeSpan.FromSeconds(timeoutSeconds));
+        //}
 
         /// <summary>
         /// 切割方法

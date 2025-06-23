@@ -76,6 +76,13 @@
                     <DataGridTextColumn Header="消息" Binding="{Binding Message}"/>
                 </DataGrid.Columns>
             </DataGrid>
+            <ListBox ItemsSource="{Binding WaitingFuncNames}" d:ItemsSource="{d:SampleData}" Visibility="{Binding WaitingFuncNamesVisibility}" Background="Transparent" FontWeight="Bold">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </StackPanel>
 
         <ListBox Margin="0,0,0,125"

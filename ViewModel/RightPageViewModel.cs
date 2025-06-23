@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using 精密切割系统.Helpers;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.plc;
 using 精密切割系统.Utils;
@@ -22,6 +23,8 @@ namespace 精密切割系统.ViewModel
         public ObservableCollection<RightButtonParams> RightButtonParams { get; set; }
         public ObservableCollection<ActiveAlarmModel> ActiveAlarms { get; set; }
 
+        public ObservableCollection<string> WaitingFuncNames { get; set; }
+
         private Visibility _alarmVisibility;
         public Visibility AlarmVisibility
         {
@@ -29,11 +32,19 @@ namespace 精密切割系统.ViewModel
             set => SetProperty(ref _alarmVisibility, value);
         }
 
+        private Visibility _waitingFuncNamesVisibility;
+        public Visibility WaitingFuncNamesVisibility
+        {
+            get => _waitingFuncNamesVisibility;
+            set => SetProperty(ref _waitingFuncNamesVisibility, value);
+        }
+
 
         public RightPageViewModel()
         {
             RightButtonParams = WindowLayout.RightPageButtons;
             ActiveAlarms = new ObservableCollection<ActiveAlarmModel>();
+            WaitingFuncNames = new ObservableCollection<string>();
             _alarmVisibility = Visibility.Visible;
             Task.Run(async () => 
             {
@@ -67,6 +78,19 @@ namespace 精密切割系统.ViewModel
                             });
                             
                         }
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            WaitingFuncNames.Clear();
+                            WaitingFuncNames.AddRange(TaskUtils.CurrentWaitingFuncDict.Values);
+                            if (WaitingFuncNames.Count == 0)
+                            {
+                                WaitingFuncNamesVisibility = Visibility.Hidden;
+                            }
+                            else
+                            {
+                                WaitingFuncNamesVisibility = Visibility.Visible;
+                            }
+                        });
                     }
                     catch (Exception ex)
                     {

@@ -77,7 +77,7 @@
                 <Label x:Name="labSetupSetNumber"  Height="35" Content="测高次数" FontWeight="Bold" FontSize="16" />
                 <StackPanel Orientation="Horizontal" >
                     <Controls:InputTextBox Text="{Binding Path=Retry,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" 
-                                           x:Name="setupSetNumber" Width="200" InputType="Numeral" TextWrapping="Wrap" XMax="3" Height="35" MaxLength="20" />
+                                           x:Name="setupSetNumber" Width="200" InputType="Numeral" TextWrapping="Wrap" XMax="20" Height="35" MaxLength="20" />
                     <Label Height="35" Content="次" FontWeight="Bold" FontSize="16" />
                 </StackPanel>
             </StackPanel>

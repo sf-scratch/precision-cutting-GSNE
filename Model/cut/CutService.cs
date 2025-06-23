@@ -136,7 +136,7 @@ namespace 精密切割系统.Model.cut
                 //进入全自动切割模式
                 await PlcControl.tagControl.cutting.EnterCuttingModeAsync(_usingPauseToken);
                 float abAverageThickness = lunguSksj.ABAverageThickness;
-                float cutDeep = AutoCutUtils.GetCuttingDeep(lunguSksj.ABAverageThickness);
+                float cutDeep = GetCuttingDeep(lunguSksj.ABAverageThickness);
                 int chekcTimes = 0;
                 while (cutTime < needCutTimes)
                 {
@@ -196,7 +196,7 @@ namespace 精密切割系统.Model.cut
                         if (_usingPauseToken.IsCancellationRequested)
                         {
                             ServicePauseResult result = await WaitContinueAsync(line);
-                            if (result.Type == ServicePauseResult.ServicePauseResultType.Stop)
+                            if (result.Type == ServicePauseResultType.Stop)
                             {
                                 return RunResult.Fail(RunExceptionType.Stop, "停止切割");
                             }
@@ -222,10 +222,11 @@ namespace 精密切割系统.Model.cut
                         {
                             chekcTimes++;
                             // 如果是第一次检查刀痕，且需要检查基准线位置，则提示检查基准线位置
-                            if (chekcTimes == 1 && (Appsettings.IsNeedCheckBaseLine ?? true))
+                            //if (chekcTimes == 1 && (Appsettings.IsNeedCheckBaseLine ?? true))
+                            if (chekcTimes == 1)
                             {
                                 ServicePauseResult result = await WaitContinueAsync(line, "请检查基准线位置！");
-                                if (result.Type == ServicePauseResult.ServicePauseResultType.Stop)
+                                if (result.Type == ServicePauseResultType.Stop)
                                 {
                                     return RunResult.Fail(RunExceptionType.Stop, "停止切割");
                                 }
@@ -654,6 +655,18 @@ namespace 精密切割系统.Model.cut
                 endX = 140;
             }
             return (startX, endX);
+        }
+
+        public static float GetCuttingDeep(float abAverageThickness)
+        {
+            if (10 <= abAverageThickness && abAverageThickness <= 24)
+            {
+                return 0.2f; // 10-24mm 切割深度 0.2mm
+            }
+            else
+            {
+                return 0.3f; // 其他情况切割深度 0.3mm
+            }
         }
     }
 

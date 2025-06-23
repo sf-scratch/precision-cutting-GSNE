@@ -159,7 +159,7 @@ namespace 精密切割系统.ViewModel
             {
                 MaterialSnackUtils.MaterialSnack("相机获取失败！", MaterialSnackUtils.SnackType.WARNING);
             }
-            Task monitorTask = StartMonitoringAlarmAsync(default);
+            //Task monitorTask = StartMonitoringAlarmAsync(default);
         }
 
         public AutoCutPausingViewModel()
@@ -182,6 +182,7 @@ namespace 精密切割系统.ViewModel
         private void InitBottomButton()
         {
             OperatePageButtonCollection.Clear();
+            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("工件吹气", "/Assets/icon/tab_1/03/tab_08.png", WorkpieceBlowing, null, 8));
             OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线校准", "/Assets/icon/tab_1/03/tab_08.png", BaselineCalibration, null, 8));
             OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调窄", "/Assets/icon/tab_1/03/tab_02.png", BaselineNarrowing, null, 8));
             OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调宽", "/Assets/icon/tab_1/03/tab_05.png", BaselineWidening, null, 8));
@@ -249,14 +250,19 @@ namespace 精密切割系统.ViewModel
             MaterialSnackUtils.MaterialSnack($"基准线校准完成", MaterialSnackUtils.SnackType.SUCCESS, 0);
         }
 
+        private async void WorkpieceBlowing()
+        {
+            await AutoCutUtils.WorkpieceBlowingAsync();
+        }
+
         private void UpdateBaselineWidth()
         {
-            BaselineWidth = (float)Math.Round(_cameraCommon?._cutMarkWidth / 1000 ?? 0, 4);
+            BaselineWidth = MathF.Round(_cameraCommon?._cutMarkWidth / 1000 ?? 0, 4);
         }
 
         private void UpdateBrokenEdgeWidth()
         {
-            BrokenEdgeWidth = (float)Math.Round(_cameraCommon?._edgeChipWidth / 1000 ?? 0, 4);
+            BrokenEdgeWidth = MathF.Round(_cameraCommon?._edgeChipWidth / 1000 ?? 0, 4);
         }
 
         public async Task StartMonitoringAlarmAsync(CancellationToken token)
@@ -296,6 +302,11 @@ namespace 精密切割系统.ViewModel
 
         private void ContinueCommandExecute()
         {
+            if (AlarmConfig.Instance.HasActiveErrorAlarm())
+            {
+                MaterialSnackUtils.MaterialSnack("请先处理错误报警！", MaterialSnackUtils.SnackType.WARNING);
+                return;
+            }
             NavigationParameters parameters = new NavigationParameters
             {
                 { "SharpenParams", _autoCutRuningViewModel.SharpenParams },

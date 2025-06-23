@@ -176,7 +176,7 @@ namespace 精密切割系统.ViewModel
                     RotateSpeed = sharpenParam.RotateSpeed.ToInt(),
                     CutThickness = sharpenParam.CutThickness,
                     CoJiaoHeight = sharpenParam.CoJiaoHeight,
-                    CutHeight = float.Parse(sharpenParam.CutThickness) + sharpenParam.CoJiaoHeight - AutoCutUtils.GetSharpenDeep(LunguSksj.ABAverageThickness),
+                    CutHeight = float.Parse(sharpenParam.CutThickness) + sharpenParam.CoJiaoHeight - SharpenService.GetSharpenDeep(LunguSksj.ABAverageThickness),
                     CoOffsetX = sharpenParam.CoOffsetX,
                     CutSize = 0.3f,
                     CutNum = 0,
@@ -206,7 +206,7 @@ namespace 精密切割系统.ViewModel
                 FileTableItemChModel fileTableCh = chModels[0];
                 CutParams = new CutParamsModel
                 {
-                    CutHeight = float.Parse(fileTable.TapeThickness) + float.Parse(fileTable.WorkThickness) - AutoCutUtils.GetCuttingDeep(LunguSksj.ABAverageThickness),
+                    CutHeight = float.Parse(fileTable.TapeThickness) + float.Parse(fileTable.WorkThickness) - CutService.GetCuttingDeep(LunguSksj.ABAverageThickness),
                     TapeThickness = fileTable.TapeThickness,
                     SpindleRev = fileTable.SpindleRev,
                     PrecutProcessNo = fileTable.PrecutProcessNo,

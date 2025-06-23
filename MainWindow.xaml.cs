@@ -223,7 +223,7 @@ namespace 精密切割系统
                         CameraUtils.connectDevice();
                         if (!CameraUtils.m_bDeviceOpened)
                         {
-                            MaterialSnackUtils.MaterialSnack("相机连接失败，重试中...", MaterialSnackUtils.SnackType.WARNING);
+                            MaterialSnackUtils.MaterialSnack($"相机连接失败: {CameraUtils.errorMessage}", MaterialSnackUtils.SnackType.WARNING);
                             Thread.Sleep(2000);
                         }
                     }

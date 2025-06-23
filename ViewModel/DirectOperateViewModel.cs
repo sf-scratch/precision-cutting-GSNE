@@ -728,11 +728,11 @@ namespace 精密切割系统.ViewModel
                 {
                     try
                     {
-                        CurrentPositionX = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? float.NaN;
-                        CurrentPositionY = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? float.NaN;
-                        CurrentPositionZ1 = await PlcControl.tagControl.Z1axis.GetCurrentLocationAsync() ?? float.NaN;
-                        CurrentPositionZ2 = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync() ?? float.NaN;
-                        CurrentPositionTheta = await PlcControl.tagControl.ThetaAxis.GetCurrentLocationAsync() ?? float.NaN;
+                        CurrentPositionX = MathF.Round(await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? float.NaN, 3);
+                        CurrentPositionY = MathF.Round(await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? float.NaN, 3);
+                        CurrentPositionZ1 = MathF.Round(await PlcControl.tagControl.Z1axis.GetCurrentLocationAsync() ?? float.NaN, 3);
+                        CurrentPositionZ2 = MathF.Round(await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync() ?? float.NaN, 3);
+                        CurrentPositionTheta = MathF.Round(await PlcControl.tagControl.ThetaAxis.GetCurrentLocationAsync() ?? float.NaN, 3);
                         //CurrentSpeedX = await PlcControl.tagControl.Xaxis.GetAbsoluteSpeedAsync() ?? float.NaN;
                         //CurrentSpeedY = await PlcControl.tagControl.Yaxis.GetAbsoluteSpeedAsync() ?? float.NaN;
                         //CurrentSpeedZ1 = await PlcControl.tagControl.Z1axis.GetAbsoluteSpeedAsync() ?? float.NaN;

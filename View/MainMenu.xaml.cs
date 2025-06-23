@@ -361,43 +361,7 @@ namespace 精密切割系统.View
                 case 440:
                 case 204:
                 case 607:
-                    if (!GlobalParams.onlineFlag)
-                    {
-                        mainWindow.NavigateToPage(bean.PageUrl);
-                        break;
-                    }
-                    // 自动/手动切割模式
-                    if (CommonCheck.CutStatusCheck())
-                    {
-                        string modelName = bean.Code == 706 ? "测量" : bean.Code == 440 ? "磨刀" : bean.Code == 607 ? "Theta轴中心点校正" : "切割";
-                        // 初始化校准角度为0
-                        GlobalParams.calibrationAngle = 0;
-                        MaterialSnackUtils.MaterialSnack($"进入{modelName}模式中...", SnackType.WARNING, 0);
-                        PlcControl.tagControl.cutting.EnterFullAutoInit(1);
-                        MenuButton menu = sender as MenuButton;
-                        menu.resetState = false;
-                        GlobalParams.globalRunFlag = true;
-                        // 监听状态，如果模式准备完成，则跳转页面
-                        Task.Run(() =>
-                        {
-                            bool flag = Tools.WaitForValue(DeviceKey.cutStatusKey, 1, 30);
-                            GlobalParams.globalRunFlag = false;
-                            if (flag)
-                            {
-                                GlobalParams.ch1CutStartPosition = 0;
-                                GlobalParams.ch2CutStartPosition = 0;
-                                GlobalParams.ch3CutStartPosition = 0;
-                                GlobalParams.ch4CutStartPosition = 0;
-                                mainWindow.NavigateToPage(bean.PageUrl);
-                            }
-                            else
-                            {
-                                CutOperateUtils.thetaAlignFlag = false;
-                                PlcControl.tagControl.cutting.EnterFullAutoInit(0);
-                                MaterialSnackUtils.MaterialSnack($"进入{modelName}模式失败！", SnackType.WARNING, 0);
-                            }
-                        });
-                    }
+                    mainWindow.NavigateToPage(bean.PageUrl);
                     break;
                 case 709:
                     PlcControl.tagControl.flange.JoinTrimming(1);

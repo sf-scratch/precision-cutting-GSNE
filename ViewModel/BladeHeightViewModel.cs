@@ -22,7 +22,7 @@ namespace 精密切割系统.ViewModel
         public List<string> ChuckTableShapeItems { get; set; } = new List<string> { "ROUND", "SQUARE" };
         //TableType
         public List<string> TableTypeItems { get; set; } = new List<string> { "POROUS", "UNIVERSAL", "SPECIAL" };
-        public List<string> SetupDefaultItems { get; set; } = new List<string> { "CONTACT" }; //"CONTACT", "NONCONTACT", "ALL"
+        public List<string> SetupDefaultItems { get; set; } = new List<string> { "CONTACT", "NONCONTACT" }; //"CONTACT", "NONCONTACT", "ALL"
         public List<string> CallOperatorWhenAutoSetupItems { get; set; } = new List<string> { "NO" }; // "AUTO", "NO" 
         public List<string> PrecutAfterNonContactSetupItems { get; set; } = new List<string> { "NO" }; //"YES", "NO"
 
