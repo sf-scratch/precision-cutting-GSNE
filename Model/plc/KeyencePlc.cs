@@ -1447,15 +1447,14 @@ namespace 精密切割系统.Driver
         {
             try
             {
-                CancellationToken useToken = token;
-                if (useToken == CancellationToken.None)
-                {
-                    using var cts = new CancellationTokenSource();
-                    cts.CancelAfter(TimeSpan.FromSeconds(1)); // 设置超时时间
-                    useToken = cts.Token;
-                }
-                //等待轴准备好
-                await WaitAxisReadyAsync(useToken);
+                //await StopJogAsync();
+                //CancellationToken useToken = token;
+                //if (useToken == CancellationToken.None)
+                //{
+                //    using var cts = new CancellationTokenSource();
+                //    cts.CancelAfter(TimeSpan.FromSeconds(1)); // 设置超时时间
+                //    useToken = cts.Token;
+                //}
                 if (jogDirection == 0)
                 {
                     // 开启正转
@@ -1502,6 +1501,14 @@ namespace 精密切割系统.Driver
             await keyencePlc.WriteTagAsync(jogStart);
             jogAntiStart.writeValue = "0";
             await keyencePlc.WriteTagAsync(jogAntiStart);
+
+            while (await PlcControl.plc.ReadDataAsync(jogStart.addr) != false || await PlcControl.plc.ReadDataAsync(jogAntiStart.addr) != false)
+            {
+                jogStart.writeValue = "0";
+                await keyencePlc.WriteTagAsync(jogStart);
+                jogAntiStart.writeValue = "0";
+                await keyencePlc.WriteTagAsync(jogAntiStart);
+            }
         }
 
         public void StartRelative(string speed, string distance, int jogDirection)

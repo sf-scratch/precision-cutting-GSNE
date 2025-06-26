@@ -10,7 +10,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
 using Emgu.CV;
-using Emgu.CV.CvEnum;
 using Microsoft.Win32;
 using NPOI.Util;
 using SciCamera.Net;
@@ -51,12 +50,13 @@ namespace 精密切割系统.View.Pages.common
 
         private Point centerLocation;
         private float scalingRatio; // 缩放比例
-        public float _cutMarkWidth = 180; // 刀痕宽度
-        public float _edgeChipWidth = 230; // 崩边
+        public float _cutMarkWidth = 0; // 刀痕宽度
+        public float _edgeChipWidth = 0; // 崩边
         private Point[] triangle1, triangle2, triangle3, triangle4;
         private static List<CustomLine> _lines = new List<CustomLine>();
         private TextBlock cutWidthTextBlock;
         private TextBlock edgeWidthTextBlock;
+        public event Action LineChanged;
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
@@ -414,6 +414,21 @@ namespace 精密切割系统.View.Pages.common
             _edgeChipWidth = (float)CameraOperateUtils.ConvertPictureBoxToRealSize(tempEdgeWidth);
             SetCutWidthTextBlockY();
         }
+
+        public void UpdateLine(float baselineWidth, float edgeChipWidth)
+        {
+            _cutMarkWidth = baselineWidth;
+            _edgeChipWidth = edgeChipWidth;
+            // 根据宽度设置线条
+            double cutWidth = CameraOperateUtils.ConvertToPictureBoxSize(_cutMarkWidth);
+            double edgesWidth = CameraOperateUtils.ConvertToPictureBoxSize(_edgeChipWidth);
+            DrawLineForWidth((float)cutWidth, (float)edgesWidth);
+            AddTextToCanvas();
+            SetCutWidthTextBlockY();
+            SetEdgeWidthTextBlockY();
+            LineChanged?.Invoke();
+        }
+
         private void SetupOverlayPanel()
         {
             // 根据宽度设置线条
@@ -472,7 +487,7 @@ namespace 精密切割系统.View.Pages.common
             {
                 Text = "",
                 FontSize = 18,
-                Foreground = new SolidColorBrush(Colors.LightBlue),
+                Foreground = new SolidColorBrush(Colors.Red),
                 Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3B444B")),
                 FontWeight = FontWeights.Bold
             };
@@ -529,8 +544,8 @@ namespace 精密切割系统.View.Pages.common
                 {
                     new CustomLine(new Point(startX, startTopCutMarkY), new Point(enxX, startTopCutMarkY), Color.FromRgb(159, 254, 0), 1, dotCollection),
                     new CustomLine(new Point(startX, startBottomCutMarkY), new Point(enxX, startBottomCutMarkY), Color.FromRgb(159, 254, 0), 1, dotCollection),
-                    new CustomLine(new Point(startX, startToEdgeChipY), new Point(enxX, startToEdgeChipY), Colors.LightBlue, 1, dotCollection),
-                    new CustomLine(new Point(startX, startBottomEdgeChipY), new Point(enxX, startBottomEdgeChipY), Colors.LightBlue, 1, dotCollection),
+                    new CustomLine(new Point(startX, startToEdgeChipY), new Point(enxX, startToEdgeChipY), Colors.Red, 1, dotCollection),
+                    new CustomLine(new Point(startX, startBottomEdgeChipY), new Point(enxX, startBottomEdgeChipY), Colors.Red, 1, dotCollection),
                     new CustomLine(new Point(0, 320), new Point(765, 320), Color.FromRgb(159, 254, 0), 1, DashStyles.Solid.Dashes),
                     // 短竖
                     new CustomLine(new Point(382.5, 307.5), new Point(382.5, 332.5), Color.FromRgb(159, 254, 0), 1, DashStyles.Solid.Dashes),

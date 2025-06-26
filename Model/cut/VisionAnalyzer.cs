@@ -26,6 +26,8 @@ namespace 精密切割系统.Model.cut
         const int THRESHOLD_AREA = 5000;
         /// <summary>边界偏移量，用于去除边缘干扰</summary>
         const int BORDER_OFFSET = 10;
+        // 默认像素到毫米的转换比例
+        public const double PixelToMmRatio = 0.0004075;
 
         /// <summary>
         /// 传入图片，识别刀痕和崩边
@@ -37,7 +39,7 @@ namespace 精密切割系统.Model.cut
         /// <exception cref="ArgumentException">当像素比例小于等于0时抛出</exception>
         /// <exception cref="FileNotFoundException">当图像文件不存在时抛出</exception>
         /// <exception cref="Exception">当图像无法读取时抛出</exception>
-        public static (double bladeWidthMm, double collapseWidthMm, double bladeTop, double bladeBottom, double collapseTop, double collapseBottom) ProcessImage(string imagePath, double pixelToMmRatio = 0.0004575)
+        public static (double bladeWidthMm, double collapseWidthMm, double bladeTop, double bladeBottom, double collapseTop, double collapseBottom) ProcessImage(string imagePath, double pixelToMmRatio = PixelToMmRatio)
         //public static (double bladeWidthMm, double collapseWidthMm, double bladeTop, double bladeBottom, double collapseTop, double collapseBottom) ProcessImage(string imagePath, double pixelToMmRatio = 0.0004575)
         {
             if (string.IsNullOrEmpty(imagePath))
@@ -71,7 +73,7 @@ namespace 精密切割系统.Model.cut
         }
 
         //public static (double bladeWidthMm, double collapseWidthMm) ProcessImage(Mat image, double pixelToMmRatio = 0.00074)
-        public static (double bladeWidthMm, double collapseWidthMm, double bladeTop, double bladeBottom, double collapseTop, double collapseBottom) ProcessImage(Mat image, double pixelToMmRatio = 0.0004575)
+        public static (double bladeWidthMm, double collapseWidthMm, double bladeTop, double bladeBottom, double collapseTop, double collapseBottom) ProcessImage(Mat image, double pixelToMmRatio = PixelToMmRatio)
         {
             try
             {
@@ -132,7 +134,7 @@ namespace 精密切割系统.Model.cut
 
                 // Otsu阈值
                 binary = new Mat();
-                Cv2.Threshold(gray, binary, 100, 255, ThresholdTypes.Binary | ThresholdTypes.Otsu);
+                Cv2.Threshold(gray, binary, 80, 255, ThresholdTypes.Binary | ThresholdTypes.Otsu);
 
                 // 开运算去噪
                 kernel = Cv2.GetStructuringElement(MorphShapes.Rect, new Size(3, 3));
@@ -716,5 +718,72 @@ namespace 精密切割系统.Model.cut
             return center;
         }
 
+        public static int? DetectFirstHorizontalStripeCenter(Mat img)
+        {
+            // CLAHE 对比度增强
+            CLAHE clahe = Cv2.CreateCLAHE(clipLimit: 3.0, tileGridSize: new Size(8, 8));
+            Mat imgEq = new Mat();
+            clahe.Apply(img, imgEq);
+
+            // OTSU 二值化并取反，使条纹为白
+            Mat binary = new Mat();
+            Cv2.Threshold(imgEq, binary, 0, 255, ThresholdTypes.BinaryInv | ThresholdTypes.Otsu);
+
+            // 水平投影
+            int[] projection = new int[binary.Rows];
+            for (int i = 0; i < binary.Rows; i++)
+            {
+                projection[i] = Cv2.CountNonZero(binary.Row(i));
+            }
+
+            // 设置阈值，检测高投影区域
+            int maxProj = projection.Max();
+            double threshold = 0.5 * maxProj;
+
+            // 找出所有连续的高投影区域段
+            List<(int top, int bottom)> stripeRegions = new List<(int, int)>();
+            bool inRegion = false;
+            int regionStart = 0;
+
+            for (int i = 0; i < projection.Length; i++)
+            {
+                if (projection[i] > threshold)
+                {
+                    if (!inRegion)
+                    {
+                        // 新的条纹开始
+                        regionStart = i;
+                        inRegion = true;
+                    }
+                }
+                else
+                {
+                    if (inRegion)
+                    {
+                        // 条纹结束
+                        stripeRegions.Add((regionStart, i - 1));
+                        inRegion = false;
+                    }
+                }
+            }
+
+            // 如果最后仍在区域中，补充添加最后一段
+            if (inRegion)
+            {
+                stripeRegions.Add((regionStart, projection.Length - 1));
+            }
+
+            // 无条纹区域则返回 null
+            if (stripeRegions.Count == 0)
+            {
+                Console.WriteLine("未检测到任何横向条纹");
+                return null;
+            }
+
+            // 返回第一条条纹的中心线位置
+            var (top, bottom) = stripeRegions[0];
+            int center = (top + bottom) / 2;
+            return center;
+        }
     }
 }

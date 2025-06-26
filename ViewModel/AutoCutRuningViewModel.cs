@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
+using OpenCvSharp;
+using OpenCvSharp.WpfExtensions;
 using Prism.Dialogs;
 using Prism.Events;
 using System;
@@ -6,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -13,6 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
+using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
 using 精密切割系统.database.db.modle;
@@ -31,6 +35,7 @@ using 精密切割系统.Utils;
 using 精密切割系统.View.common;
 using 精密切割系统.View.Dialogs;
 using 精密切割系统.View.Pages.Auto;
+using 精密切割系统.View.Pages.common;
 using 精密切割系统.View.Pages.F4_BladeMaintenance;
 using static NPOI.HSSF.Util.HSSFColor;
 
@@ -231,6 +236,7 @@ namespace 精密切割系统.ViewModel
             float nonContactHeightMeasurementToWorkbenchZ1 = GlobalParams.NonContactHeightMeasurementToWorkbenchZ1;
             //开始监控报警
             Task monitorTask = StartMonitoringAlarmAsync(_monitoringAlarmCts.Token);
+            Stopwatch stopwatch = Stopwatch.StartNew();
             try
             {
                 //PDA上机操作
@@ -246,6 +252,7 @@ namespace 精密切割系统.ViewModel
                 // 设置测高参数
                 await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
                 Task zAxisTask = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(Appsettings.FocusClearZ ?? 0, 1, _pauseCts.Token);
+                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(LunguSksj.BladeOuterDiameter / 2 - 10.2f);
                 Task<CommonResult<float>> measureHeightTask = AutoCutUtils.ProcessMeasureHeightAsync(heightMeasurementMode, _dialogService, _eventAggregator, _pauseCts.Token);
                 await Task.WhenAll(zAxisTask, measureHeightTask);
                 // 开始测高
@@ -276,92 +283,95 @@ namespace 精密切割系统.ViewModel
                 //新刀才磨刀
                 if (LunguSksj.BladeType == "新刀")
                 {
-                    _sharpenService.SharpenServiceProcessChanged += SharpenService_SharpenServiceProcessChanged;
-                    _sharpenService.RemindReplaceSharpenBoard += SharpenService_RemindReplaceSharpenBoard;
-                    _sharpenService.SharpenServicePaused += SharpenService_SharpenServicePaused;
-                    int defaultSharpenTimes = 10; // 默认磨刀次数
-                    var sharpenDatas = new List<(int sharpenTimes, float wearAmount)>(); // 记录每次磨刀的次数和磨损量
-                    float singleBladeWear = 0; //单刀磨损量
-                    CommonResult<float>? curHeightZ = null;
-                    while(true)
+                   if (SharpenParams.IsExecuteSharpen)
                     {
-                        bool isEndSharpen;
-                        int sharpenTimes;
-                        if (singleBladeWear == 0)
+                        _sharpenService.SharpenServiceProcessChanged += SharpenService_SharpenServiceProcessChanged;
+                        _sharpenService.RemindReplaceSharpenBoard += SharpenService_RemindReplaceSharpenBoard;
+                        _sharpenService.SharpenServicePaused += SharpenService_SharpenServicePaused;
+                        int defaultSharpenTimes = 10; // 默认磨刀次数
+                        var sharpenDatas = new List<(int sharpenTimes, float wearAmount)>(); // 记录每次磨刀的次数和磨损量
+                        float singleBladeWear = 0; //单刀磨损量
+                        CommonResult<float>? curHeightZ = null;
+                        while (true)
                         {
-                            isEndSharpen = false;
-                            sharpenTimes = defaultSharpenTimes; // 默认磨刀次数
-                        }
-                        else
-                        {
-                            var (times, isEnd) = CalculateSharpenTimes(LunguSksj, singleBladeWear, firstHeightMeasurementZ.Data, curHeightZ?.Data);
-                            isEndSharpen = isEnd;
-                            sharpenTimes = times > 1000 ? 1000 : times;
-                        }
-                        // 开始磨刀
-                        RunStatus = AutoRunStatus.SharpeningInProgress;
-                        float sharpenContactWorkingDiscZ1 = CalculateBladeContactWorkingDiscZ1(heightMeasurementMode, AfterHeightMeasurementZ, nonContactHeightMeasurementToWorkbenchZ1);
-                        RunResult sharpenResult = await _sharpenService.Run(LunguSksj, sharpenContactWorkingDiscZ1, bladeLiftingHeight, SharpenParams.RotateSpeed, SharpenParams.CoOffsetX, sharpenCalibratTheta, sharpenTimes, singleBladeWear, _pauseCts.Token);
-                        if (!sharpenResult.IsSuccess)
-                        {
-                            MaterialSnackUtils.MaterialSnack($"磨刀失败：{sharpenResult.Message}", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
-                            return;
-                        }
-
-                        RunStatus = AutoRunStatus.HeightMeasurementInProgress;
-                        float wearAmount = 0;
-                        for (int failTimes = 1; failTimes <= 10; failTimes++)
-                        {
-                            // 开始测高
-                            curHeightZ = await AutoCutUtils.ProcessMeasureHeightAsync(heightMeasurementMode, _dialogService, _eventAggregator, _pauseCts.Token);
-                            if (!curHeightZ.IsSuccess)
+                            bool isEndSharpen;
+                            int sharpenTimes;
+                            if (singleBladeWear == 0)
                             {
-                                MaterialSnackUtils.MaterialSnack(curHeightZ.Message, MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                                isEndSharpen = false;
+                                sharpenTimes = defaultSharpenTimes; // 默认磨刀次数
+                            }
+                            else
+                            {
+                                var (times, isEnd) = CalculateSharpenTimes(LunguSksj, singleBladeWear, firstHeightMeasurementZ.Data, curHeightZ?.Data);
+                                isEndSharpen = isEnd;
+                                sharpenTimes = times > 1000 ? 1000 : times;
+                            }
+                            // 开始磨刀
+                            RunStatus = AutoRunStatus.SharpeningInProgress;
+                            float sharpenContactWorkingDiscZ1 = CalculateBladeContactWorkingDiscZ1(heightMeasurementMode, AfterHeightMeasurementZ, nonContactHeightMeasurementToWorkbenchZ1);
+                            RunResult sharpenResult = await _sharpenService.Run(LunguSksj, sharpenContactWorkingDiscZ1, bladeLiftingHeight, SharpenParams.RotateSpeed, SharpenParams.CoOffsetX, sharpenCalibratTheta, sharpenTimes, singleBladeWear, _pauseCts.Token);
+                            if (!sharpenResult.IsSuccess)
+                            {
+                                MaterialSnackUtils.MaterialSnack($"磨刀失败：{sharpenResult.Message}", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
                                 return;
                             }
-                            wearAmount = curHeightZ.Data - AfterHeightMeasurementZ;
-                            _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"本次磨损量: {wearAmount}"));
-                            // 如果磨损量小于0，说明测高数据有问题，继续测高
-                            if (wearAmount > 0)
+
+                            RunStatus = AutoRunStatus.HeightMeasurementInProgress;
+                            float wearAmount = 0;
+                            for (int failTimes = 1; failTimes <= 10; failTimes++)
                             {
-                                TotalWearAmount = MathF.Round(curHeightZ.Data - firstHeightMeasurementZ.Data, 4);
+                                // 开始测高
+                                curHeightZ = await AutoCutUtils.ProcessMeasureHeightAsync(heightMeasurementMode, _dialogService, _eventAggregator, _pauseCts.Token);
+                                if (!curHeightZ.IsSuccess)
+                                {
+                                    MaterialSnackUtils.MaterialSnack(curHeightZ.Message, MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                                    return;
+                                }
+                                wearAmount = curHeightZ.Data - AfterHeightMeasurementZ;
+                                _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"本次磨损量: {wearAmount}"));
+                                // 如果磨损量小于0，说明测高数据有问题，继续测高
+                                if (wearAmount > 0)
+                                {
+                                    TotalWearAmount = MathF.Round(curHeightZ.Data - firstHeightMeasurementZ.Data, 4);
+                                    break;
+                                }
+                                curHeightZ = null;
+                                if (failTimes % 3 == 0)
+                                {
+                                    //测高多次失败，手动吹水
+                                    await AutoCutUtils.WaitManualBlowing(_dialogService, _pauseCts.Token);
+                                }
+                                _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("测高数据异常，重新测高"));
+                            }
+                            if (curHeightZ == null)
+                            {
+                                MaterialSnackUtils.MaterialSnack("测高失败，请检查设备！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                                return;
+                            }
+                            AfterHeightMeasurementZ = curHeightZ.Data;
+                            // 记录磨刀数据
+                            sharpenDatas.Add((sharpenTimes, wearAmount));
+                            if (singleBladeWear == 0)
+                            {
+                                singleBladeWear = TotalWearAmount / defaultSharpenTimes;
+                                _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"单刀磨损量: {singleBladeWear}"));
+                            }
+                            if (isEndSharpen)
+                            {
+                                string drsmdj = await CutService.GetDrsmdjAsync(LunguSksj.LunguId, (float)Math.Round(singleBladeWear * 1000, 1));
+                                PdaUtils.AddBladeLifeGrade(drsmdj);
+                                PdaUtils.AddWearAmountBeforeCircle(sharpenDatas.SkipLast(1).Sum(p => p.wearAmount));
+                                PdaUtils.AddWearAmountAfterCircle(wearAmount, sharpenTimes);
                                 break;
                             }
-                            curHeightZ = null;
-                            if (failTimes % 3 == 0)
-                            {
-                                //测高多次失败，手动吹水
-                                await AutoCutUtils.WaitManualBlowing(_dialogService, _pauseCts.Token);
-                            }
-                            _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("测高数据异常，重新测高"));
+                            //上传磨刀数据
+                            PdaUtils.AddSharpen(wearAmount, sharpenTimes);
                         }
-                        if (curHeightZ == null)
-                        {
-                            MaterialSnackUtils.MaterialSnack("测高失败，请检查设备！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
-                            return;
-                        }
-                        AfterHeightMeasurementZ = curHeightZ.Data;
-                        // 记录磨刀数据
-                        sharpenDatas.Add((sharpenTimes, wearAmount));
-                        if (singleBladeWear == 0)
-                        {
-                            singleBladeWear = TotalWearAmount / defaultSharpenTimes;
-                            _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"单刀磨损量: {singleBladeWear}"));
-                        }
-                        if (isEndSharpen)
-                        {
-                            string drsmdj = await CutService.GetDrsmdjAsync(LunguSksj.LunguId, singleBladeWear);
-                            PdaUtils.AddBladeLifeGrade(drsmdj);
-                            PdaUtils.AddWearAmountBeforeCircle(sharpenDatas.SkipLast(1).Sum(p => p.wearAmount));
-                            PdaUtils.AddWearAmountAfterCircle(wearAmount, sharpenTimes);
-                            break;
-                        }
-                        //上传磨刀数据
-                        PdaUtils.AddSharpen(wearAmount, sharpenTimes);
+                        PdaUtils.AddResidueSharpenTimes(0);
+                        PdaUtils.AddResidueBlade(LunguSksj.LongestBlade - (TotalWearAmount * 1000));
+                        PdaUtils.AddTotalSharpenTimes(sharpenDatas.Sum(p => p.sharpenTimes));
                     }
-                    PdaUtils.AddResidueSharpenTimes(0);
-                    PdaUtils.AddResidueBlade(LunguSksj.LongestBlade - (TotalWearAmount * 1000));
-                    PdaUtils.AddTotalSharpenTimes(sharpenDatas.Sum(p => p.sharpenTimes));
                     // 开始切割
                     RunStatus = AutoRunStatus.CutingInProgress;
                     _cutService.CutServiceProcessChanged += CutService_CutServiceProcessChanged;
@@ -382,7 +392,10 @@ namespace 精密切割系统.ViewModel
                         MaterialSnackUtils.MaterialSnack($"切割失败：{cutResult.Message}", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
                         return;
                     }
-                    MaterialSnackUtils.MaterialSnack($"切割完成！请更换刀片", MaterialSnackUtils.SnackType.SUCCESS, 0, _eventAggregator);
+                    stopwatch.Stop();
+                    TimeSpan timeSpan = TimeSpan.FromSeconds(stopwatch.Elapsed.TotalSeconds);
+                    string formattedTime = $"{timeSpan.Hours:D2}:{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}";
+                    MaterialSnackUtils.MaterialSnack($"切割完成，请更换刀片！  总用时：{formattedTime}", MaterialSnackUtils.SnackType.SUCCESS, 0, _eventAggregator);
                 }
                 else
                 {
@@ -391,18 +404,26 @@ namespace 精密切割系统.ViewModel
                     _cutService.CutServicePaused += CutService_CutServicePaused;
                     _cutService.RemindReplaceWafer += CutService_RemindReplaceWafer;
                     float cutContactWorkingDiscZ1 = CalculateBladeContactWorkingDiscZ1(heightMeasurementMode, AfterHeightMeasurementZ, nonContactHeightMeasurementToWorkbenchZ1);
-                    List<float> cutSpeedList = new List<float>() { 60 };
-                    PdaUtils.AddStandardCutSpeed(cutSpeedList.Last());
-                    PdaUtils.AddMaxCutSpeed(cutSpeedList.Last());
-                    RunResult cutResult = await _cutService.Run(LunguSksj, cutSpeedList, cutContactWorkingDiscZ1, bladeLiftingHeight, CutParams.SpindleRev, CutParams.OffsetX, cutCalibratTheta, _eventAggregator, _pauseCts.Token);
+                    List<float>? cutSpeedList = await AutoCutUtils.GetCutListAsync(LunguSksj.LunguId, LunguSksj.LongestBlade - TotalWearAmount * 1000);
+                    if (cutSpeedList is null)
+                    {
+                        MaterialSnackUtils.MaterialSnack($"切割序列获取失败，请检查切割参数配置！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                        return;
+                    }
+                    PdaUtils.AddStandardCutSpeed(cutSpeedList.First());
+                    PdaUtils.AddMaxCutSpeed(cutSpeedList.First());
+                    RunResult cutResult = await _cutService.Run(LunguSksj, [cutSpeedList.First()], cutContactWorkingDiscZ1, bladeLiftingHeight, CutParams.SpindleRev, CutParams.OffsetX, cutCalibratTheta, _eventAggregator, _pauseCts.Token);
                     if (!cutResult.IsSuccess)
                     {
                         MaterialSnackUtils.MaterialSnack($"切割失败：{cutResult.Message}", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
                         return;
                     }
-                    MaterialSnackUtils.MaterialSnack($"切割完成！请更换刀片", MaterialSnackUtils.SnackType.SUCCESS, 0, _eventAggregator); 
-                    await PlcControl.tagControl.wholeDevice.OpenBuzzerAsync();
+                    stopwatch.Stop();
+                    TimeSpan timeSpan = TimeSpan.FromSeconds(stopwatch.Elapsed.TotalSeconds);
+                    string formattedTime = $"{timeSpan.Hours:D2}:{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}";
+                    MaterialSnackUtils.MaterialSnack($"切割完成，请更换刀片！  总用时：{formattedTime}", MaterialSnackUtils.SnackType.SUCCESS, 0, _eventAggregator);
                 }
+                await PlcControl.tagControl.wholeDevice.OpenBuzzerAsync();
             }
             catch (OperationCanceledException)
             {
@@ -422,7 +443,11 @@ namespace 精密切割系统.ViewModel
                 await StopAsync(ServicePauseResult.Stop);
                 await PdaUtils.UpdateFlowValuesAsync();
                 await PdaUtils.SetCompletedAsync();
-                //await PdaUtils.QualifiedAsync();
+                if (!stopwatch.IsRunning)
+                {
+                    await PdaUtils.QualifiedAsync();
+                }
+                stopwatch.Stop();
                 RunStatus = AutoRunStatus.End;
             }
         }
@@ -699,20 +724,69 @@ namespace 精密切割系统.ViewModel
                             await AutoCutUtils.WorkpieceBlowingAsync(_eventAggregator, cts.Token);
                             await PlcControl.tagControl.cutting.RunMotionAsync((line.StartPoint.X + line.EndPoint.X) / 2 + offsetPos.X, line.StartPoint.Y + offsetPos.Y, cts.Token);
                         }
-                        MaterialSnackUtils.MaterialSnack(message ?? "暂停中...", MaterialSnackUtils.SnackType.SUCCESS, 0, _eventAggregator);
+                        await Application.Current.Dispatcher.InvokeAsync(async () =>
+                        {
+                            WriteableBitmap? localBitmap = AutoCutUtils.GrabWriteableBitmap();
+                            if (localBitmap != null)
+                            {
+                                string imagePath = System.IO.Path.Combine(AppContext.BaseDirectory, $"image\\Temp");
+                                Directory.CreateDirectory(imagePath);
+                                Mat mat = new Mat();
+                                Cv2.Flip(localBitmap.ToMat(), mat, FlipMode.XY);  // 同时水平和垂直翻转
+                                mat.SaveImage($"{imagePath}\\{DateTime.Now.Ticks}.png"); // 保存图像以供调试
+                                int? imageY = VisionAnalyzer.DetectFirstHorizontalStripeCenter(mat);
+                                if (imageY is null)
+                                {
+                                    MaterialSnackUtils.MaterialSnack("未检测到水平条纹，请检查相机位置！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                                    return;
+                                }
+
+                                Cv2.Line(
+                                    img: mat,
+                       pt1: new OpenCvSharp.Point(0, imageY.Value),  // 起点
+                       pt2: new OpenCvSharp.Point(mat.Width, imageY.Value), // 终点
+                       color: Scalar.Red,         // 颜色 (B,G,R)
+                       thickness: 1,             // 线宽
+                       lineType: LineTypes.AntiAlias // 抗锯齿
+                       );
+                                Cv2.Line(
+                       img: mat,
+                       pt1: new OpenCvSharp.Point(0, mat.Height / 2),  // 起点
+                       pt2: new OpenCvSharp.Point(mat.Width, mat.Height / 2), // 终点
+                       color: Scalar.Green,         // 颜色 (B,G,R)
+                       thickness: 1,             // 线宽
+                       lineType: LineTypes.AntiAlias // 抗锯齿
+                       );
+                                mat.SaveImage($"{imagePath}\\{DateTime.Now}.png");
+                                CameraCommon? cameraCommon = AutoCutUtils.GetCameraCommon();
+                                if (cameraCommon is not null)
+                                {
+                                    Mat cropMat = AutoCutUtils.CropHorizontalCenter(mat, AutoCutUtils.HeightRange);
+                                    Mat cropMatJpg = AutoCutUtils.JpegStreamToMat(AutoCutUtils.MatToJpegStream(cropMat));
+                                    var (bladeWidthMm, collapseWidthMm, bladeTop, bladeBottom, collapseTop, collapseBottom) = VisionAnalyzer.ProcessImage(cropMatJpg);
+                                    cameraCommon.UpdateLine((float)bladeWidthMm * 1000, (float)collapseWidthMm * 1000);
+                                }
+                                float offsetY = (float)Math.Round((imageY.Value - (mat.Height / 2)) * VisionAnalyzer.PixelToMmRatio, 4);
+                                if (MathF.Abs(offsetY) > 0.01f) offsetY = 0;
+                                MaterialSnackUtils.MaterialSnack($"{message ?? "暂停中..."}   Y轴自动偏移{offsetY}mm", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                                await PlcControl.tagControl.Yaxis.StartRelativeAsync(offsetY);
+                            }
+                        });
+                        //MaterialSnackUtils.MaterialSnack(message ?? "暂停中...", MaterialSnackUtils.SnackType.SUCCESS, 0, _eventAggregator);
                         break;
                 }
+                NavigationParameters parameters = new NavigationParameters { { "AutoCutRuningViewModel", this } };
+                _regionManager.RequestNavigate(RegionName.AutoCutStateRegion, nameof(AutoCutPausing), parameters);
             }
             catch (OperationCanceledException)
             {
                 MaterialSnackUtils.MaterialSnack("暂停切割超时", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                NavigationParameters parameters = new NavigationParameters { { "AutoCutRuningViewModel", this } };
+                _regionManager.RequestNavigate(RegionName.AutoCutStateRegion, nameof(AutoCutPausing), parameters);
             }
             catch (Exception ex)
             {
                 MaterialSnackUtils.MaterialSnack($"暂停切割时遇到其他错误: {ex.Message}", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
-            }
-            finally
-            {
                 NavigationParameters parameters = new NavigationParameters { { "AutoCutRuningViewModel", this } };
                 _regionManager.RequestNavigate(RegionName.AutoCutStateRegion, nameof(AutoCutPausing), parameters);
             }
@@ -772,7 +846,7 @@ namespace 精密切割系统.ViewModel
         {
             if (!GlobalParams.onlineFlag)
             {
-                NavigationParameters parameters = new NavigationParameters{{ "AutoCutRuningViewModel", this } };
+                NavigationParameters parameters = new NavigationParameters { { "AutoCutRuningViewModel", this } };
                 _regionManager.RequestNavigate(RegionName.AutoCutStateRegion, nameof(AutoCutPausing), parameters);
                 return;
             }
@@ -977,9 +1051,9 @@ namespace 精密切割系统.ViewModel
             InitRightButton();
             LunguSksj = navigationContext.Parameters.GetValue<LunguSksjModel>("LunguSksj");
             SharpenParams = navigationContext.Parameters.GetValue<SharpenParamsModel>("SharpenParams");
-            SharpenBladeHeight = SharpenParams.CutHeight;
+            SharpenBladeHeight = MathF.Round(SharpenParams.CutHeight, 3);
             CutParams = navigationContext.Parameters.GetValue<CutParamsModel>("CutParams");
-            CutBladeHeight = CutParams.CutHeight;
+            CutBladeHeight = MathF.Round(CutParams.CutHeight, 3);
             DeviceDataNo = CutParams.DeviceDataNo;
             _eventAggregator.GetEvent<AutoRuningMessageEvent>().Subscribe(ReceivedAutoRuningMessage);
         }

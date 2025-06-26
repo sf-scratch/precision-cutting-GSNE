@@ -48,8 +48,8 @@ namespace 精密切割系统.DTOs
         /// <summary>
         /// 实际刀刃规格
         /// </summary>
-        [JsonProperty("sjSpec")]
-        public string SjSpec { get; set; }
+        [JsonProperty("sjDrcd")]
+        public string SjDrcd { get; set; }
 
         /// <summary>
         /// 刀刃规格

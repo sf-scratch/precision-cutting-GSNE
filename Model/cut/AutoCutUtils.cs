@@ -43,6 +43,8 @@ namespace 精密切割系统.Model.cut
 {
     public class AutoCutUtils
     {
+        public const int HeightRange = 240;
+
         /// <summary>
         /// 换刀片
         /// </summary>
@@ -54,7 +56,7 @@ namespace 精密切割系统.Model.cut
             Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0);
             Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0);
             await Task.WhenAll(taskZ1, taskZ2);
-            Task taskXY = PlcControl.tagControl.cutting.RunMotionAsync(0, 0);
+            Task taskXY = PlcControl.tagControl.cutting.RunMotionAsync(0, 150);
             Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0);
             Task speedZero = PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync();
             await Task.WhenAll(taskXY, taskTheta, speedZero);
@@ -209,7 +211,7 @@ namespace 精密切割系统.Model.cut
                     eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"第{curMeasureHeightTimes}次测高：{setupValue.Value}"));
                     setupValueList.Add(setupValue.Value);
                     // 设置下次测高最大距离，优化流程时间
-                    await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(setupValue.Value + 0.4f);
+                    await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(setupValue.Value - 0.15f);
                 }
                 if (setupValueList.Count == 0)
                 {
@@ -524,7 +526,7 @@ namespace 精密切割系统.Model.cut
         public static CameraCommon? GetCameraCommon()
         {
             MainWindow? mainWindow = Application.Current.MainWindow as MainWindow;
-            if (mainWindow == null || !CommonCheck.AxisReady(false))
+            if (mainWindow == null)
             {
                 return null;
             }
@@ -622,7 +624,7 @@ namespace 精密切割系统.Model.cut
             {
                 await PlcControl.tagControl.wholeDevice.OpenWorkpieceBlowingAsync();
                 await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(190, 100, token);
-                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(2, 20, token);
+                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(2, 15, token);
             }
             finally
             {
@@ -774,8 +776,8 @@ namespace 精密切割系统.Model.cut
                 DataPoint<float> relativePos = Appsettings.CameraRelativeBladePosition;
                 //工件吹气
                 eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始工件吹气..."));
-                float rightCheckX = line.EndPoint.X + relativePos.X - 10;
-                float leftCheckX = line.StartPoint.X + relativePos.X + 10;
+                float rightCheckX = line.EndPoint.X + relativePos.X - 20;
+                float leftCheckX = line.StartPoint.X + relativePos.X + 20;
                 float checkY = line.EndPoint.Y + relativePos.Y;
                 await PlcControl.tagControl.wholeDevice.OpenWorkpieceBlowingAsync();
                 await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(190, 80, token);
@@ -824,7 +826,7 @@ namespace 精密切割系统.Model.cut
 
         private static void ProcessMat(Mat mat, ImagesAnalysisResult result)
         {
-            Mat cropMat = CropHorizontalCenter(mat, 80);
+            Mat cropMat = CropHorizontalCenter(mat, HeightRange);
             Mat cropMatJpg = JpegStreamToMat(MatToJpegStream(cropMat));
             var (bladeWidthMm, collapseWidthMm, bladeTop, bladeBottom, collapseTop, collapseBottom) = VisionAnalyzer.ProcessImage(cropMatJpg);
             Cv2.PutText(cropMatJpg,
@@ -840,6 +842,13 @@ namespace 精密切割系统.Model.cut
                 HersheyFonts.HersheySimplex,
                 1.3f,
                 Scalar.Green,
+                2);
+            Cv2.PutText(cropMatJpg,
+                $"No: {result.ImageDatas.Count}",
+                new Point(900, (bladeTop + bladeBottom) / 2),
+                HersheyFonts.HersheySimplex,
+                1.3f,
+                Scalar.Blue,
                 2);
             Cv2.Line(
                img: cropMatJpg,
@@ -922,70 +931,79 @@ namespace 精密切割系统.Model.cut
 
                 stopwatch = Stopwatch.StartNew();
                 //保存拼接图像到指定目录
-                string imagePath = System.IO.Path.Combine(AppContext.BaseDirectory, "image");
+                string uuid = Guid.NewGuid().ToString();
+                string imagePath = System.IO.Path.Combine(AppContext.BaseDirectory, $"image\\{DateTime.Now.Ticks}");
                 Directory.CreateDirectory(imagePath);
-                foreach (var image in mats)
+                if (mats.Count == result.ImageDatas.Count)
                 {
-                    Cv2.ImWrite($"{imagePath}\\{DateTime.Now.Ticks}_cropMatJpg.jpg", image);
+                    for (int i = 0; i < mats.Count; i++)
+                    {
+                        Cv2.ImWrite($"{imagePath}\\{uuid}_{i}_原图_{i}.jpg", mats[i]);
+                        Cv2.ImWrite($"{imagePath}\\{uuid}_{i}_裁剪识别图_{i}.jpg", result.ImageDatas[i].Mat);
+                    }
                 }
-                foreach (var image in result.ConcatImages)
+                else
                 {
-                    Cv2.ImWrite($"{imagePath}\\{DateTime.Now.Ticks}_cropConcatMatJpg.jpg", image.Mat);
+                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"保存原图和识别后的图片失败！"));
+                }
+                foreach (var image in concatMats)
+                {
+                    Cv2.ImWrite($"{imagePath}\\{DateTime.Now.Ticks}_拼接图原图.jpg", image);
                 }
                 stopwatch.Stop();
                 eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"保存识别后的拼接图像总用时: {stopwatch.Elapsed.TotalSeconds} 秒"));
 
                 foreach (Mat concatMat in concatMats)
                 {
-                    Mat cropConcatMat = CropHorizontalCenter(concatMat, 90);
+                    Mat cropConcatMat = CropHorizontalCenter(concatMat, HeightRange);
                     Mat cropConcatMatJpg = JpegStreamToMat(MatToJpegStream(cropConcatMat));
-                    //var (bladeWidthMm, collapseWidthMm, bladeTop, bladeBottom, collapseTop, collapseBottom) = VisionAnalyzer.ProcessImage(cropConcatMatJpg);
-                    //Cv2.PutText(cropConcatMatJpg,
-                    //    $"bladeWidthMm: {bladeWidthMm}",
-                    //    new Point(20, bladeTop),
-                    //    HersheyFonts.HersheySimplex,
-                    //    1.3f,
-                    //    Scalar.Red,
-                    //    2);
-                    //Cv2.PutText(cropConcatMatJpg,
-                    //    $"collapseWidthMm:{collapseWidthMm}",
-                    //    new Point(900, collapseTop),
-                    //    HersheyFonts.HersheySimplex,
-                    //    1.3f,
-                    //    Scalar.Green,
-                    //    2);
-                    //Cv2.Line(
-                    //    img: cropConcatMatJpg,
-                    //    pt1: new Point(0, bladeTop),  // 起点
-                    //    pt2: new Point(cropConcatMatJpg.Width, bladeTop), // 终点
-                    //    color: Scalar.Red,         // 颜色 (B,G,R)
-                    //    thickness: 1,             // 线宽
-                    //    lineType: LineTypes.AntiAlias // 抗锯齿
-                    //    );
-                    //Cv2.Line(
-                    //    img: cropConcatMatJpg,
-                    //    pt1: new Point(0, bladeBottom),  // 起点
-                    //    pt2: new Point(cropConcatMatJpg.Width, bladeBottom), // 终点
-                    //    color: Scalar.Red,         // 颜色 (B,G,R)
-                    //    thickness: 1,             // 线宽
-                    //    lineType: LineTypes.AntiAlias // 抗锯齿
-                    //    );
-                    //Cv2.Line(
-                    //    img: cropConcatMatJpg,
-                    //    pt1: new Point(0, collapseTop),  // 起点
-                    //    pt2: new Point(cropConcatMatJpg.Width, collapseTop), // 终点
-                    //    color: Scalar.Green,         // 颜色 (B,G,R)
-                    //    thickness: 1,             // 线宽
-                    //    lineType: LineTypes.AntiAlias // 抗锯齿
-                    //    );
-                    //Cv2.Line(
-                    //    img: cropConcatMatJpg,
-                    //    pt1: new Point(0, collapseBottom),  // 起点
-                    //    pt2: new Point(cropConcatMatJpg.Width, collapseBottom), // 终点
-                    //    color: Scalar.Green,         // 颜色 (B,G,R)
-                    //    thickness: 1,             // 线宽
-                    //    lineType: LineTypes.AntiAlias // 抗锯齿
-                    //    );
+                    var (bladeWidthMm, collapseWidthMm, bladeTop, bladeBottom, collapseTop, collapseBottom) = VisionAnalyzer.ProcessImage(cropConcatMatJpg);
+                    Cv2.PutText(cropConcatMatJpg,
+                        $"bladeWidthMm: {bladeWidthMm}",
+                        new Point(20, bladeTop),
+                        HersheyFonts.HersheySimplex,
+                        1.3f,
+                        Scalar.Red,
+                        2);
+                    Cv2.PutText(cropConcatMatJpg,
+                        $"collapseWidthMm:{collapseWidthMm}",
+                        new Point(900, collapseTop),
+                        HersheyFonts.HersheySimplex,
+                        1.3f,
+                        Scalar.Green,
+                        2);
+                    Cv2.Line(
+                        img: cropConcatMatJpg,
+                        pt1: new Point(0, bladeTop),  // 起点
+                        pt2: new Point(cropConcatMatJpg.Width, bladeTop), // 终点
+                        color: Scalar.Red,         // 颜色 (B,G,R)
+                        thickness: 1,             // 线宽
+                        lineType: LineTypes.AntiAlias // 抗锯齿
+                        );
+                    Cv2.Line(
+                        img: cropConcatMatJpg,
+                        pt1: new Point(0, bladeBottom),  // 起点
+                        pt2: new Point(cropConcatMatJpg.Width, bladeBottom), // 终点
+                        color: Scalar.Red,         // 颜色 (B,G,R)
+                        thickness: 1,             // 线宽
+                        lineType: LineTypes.AntiAlias // 抗锯齿
+                        );
+                    Cv2.Line(
+                        img: cropConcatMatJpg,
+                        pt1: new Point(0, collapseTop),  // 起点
+                        pt2: new Point(cropConcatMatJpg.Width, collapseTop), // 终点
+                        color: Scalar.Green,         // 颜色 (B,G,R)
+                        thickness: 1,             // 线宽
+                        lineType: LineTypes.AntiAlias // 抗锯齿
+                        );
+                    Cv2.Line(
+                        img: cropConcatMatJpg,
+                        pt1: new Point(0, collapseBottom),  // 起点
+                        pt2: new Point(cropConcatMatJpg.Width, collapseBottom), // 终点
+                        color: Scalar.Green,         // 颜色 (B,G,R)
+                        thickness: 1,             // 线宽
+                        lineType: LineTypes.AntiAlias // 抗锯齿
+                        );
                     try
                     {
                         stopwatch = Stopwatch.StartNew();
@@ -1008,6 +1026,12 @@ namespace 精密切割系统.Model.cut
                         stopwatch.Stop();
                         eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"识别蛇形总用时: {stopwatch.Elapsed.TotalSeconds} 秒"));
                     }
+                }
+
+
+                foreach (var image in result.ConcatImages)
+                {
+                    Cv2.ImWrite($"{imagePath}\\{DateTime.Now.Ticks}_拼接图识别图.jpg", image.Mat);
                 }
 
                 if (result.AnalysisFailMats.Count != 0)

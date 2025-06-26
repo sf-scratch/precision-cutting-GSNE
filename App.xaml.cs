@@ -22,6 +22,16 @@ namespace 精密切割系统
         //用于控制应用程序单开
         public static readonly Mutex MUTEX = new Mutex(true, "精密切割系统");
 
+        protected override void Initialize()
+        {
+            base.Initialize();
+            if (!HslCommunication.Authorization.SetAuthorizationCode("c6f33910-f831-44c2-8cbb-99b96a80f432"))
+            {
+                MessageBox.Show("HSL授权码错误，请联系作者获取最新授权码！", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Environment.Exit(0);
+            }
+        }
+
         protected override Window CreateShell()
         {
             return Container.Resolve<MainWindow>();

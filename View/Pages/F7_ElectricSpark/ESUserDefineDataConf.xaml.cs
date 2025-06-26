@@ -118,7 +118,14 @@ namespace 精密切割系统.View.F7_ElectricSpark
             } 
             else if (code == 5301)
             {
-                PlcControl.tagControl.wholeDevice.SetWorkVacuumSwitch();
+                if (await PlcControl.tagControl.wholeDevice.IsOpenWorkVacuumSwitchAsync())
+                {
+                    await PlcControl.tagControl.wholeDevice.CloseWorkVacuumSwitchAsync();
+                }
+                else
+                {
+                    await PlcControl.tagControl.wholeDevice.OpenWorkVacuumSwitchAsync();
+                }
             }
             else if (code == 5302)
             {

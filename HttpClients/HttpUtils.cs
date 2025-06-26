@@ -193,6 +193,7 @@ namespace 精密切割系统.HttpClients
                     [nameof(zyhddmsl)] = zyhddmsl,
                 }.ToString()
             };
+            Tools.LogDebug($"GetQgParamsByHub:   {request.Parameters.ToString()}");
             ApiResponse? response = await HttpRestClient.Instance.ExecuteAsync(request);
             if (response == null)
             {

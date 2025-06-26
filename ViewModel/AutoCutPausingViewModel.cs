@@ -28,7 +28,7 @@ namespace 精密切割系统.ViewModel
         public RelayCommand ContinueCommand { get; set; }
         public RelayCommand StopCommand { get; set; }
         private readonly IRegionManager _regionManager;
-        private readonly CameraCommon? _cameraCommon;
+        private CameraCommon? _cameraCommon;
         private AutoCutRuningViewModel _autoCutRuningViewModel;
         private DataPoint<float>? _originPoint;
 
@@ -154,11 +154,6 @@ namespace 精密切割系统.ViewModel
             OperatePageButtonCollection = WindowLayout.OperatePageButtons;
             ContinueCommand = new RelayCommand(ContinueCommandExecute);
             StopCommand = new RelayCommand(StopCommandExecute);
-            _cameraCommon = AutoCutUtils.GetCameraCommon();
-            if (_cameraCommon is null)
-            {
-                MaterialSnackUtils.MaterialSnack("相机获取失败！", MaterialSnackUtils.SnackType.WARNING);
-            }
             //Task monitorTask = StartMonitoringAlarmAsync(default);
         }
 
@@ -201,6 +196,7 @@ namespace 精密切割系统.ViewModel
                 MaterialSnackUtils.MaterialSnack("再次点击报废，刀片将提交报废并退出自动执行！", MaterialSnackUtils.SnackType.WARNING);
                 return;
             }
+            InitRightButtonOnlyStop();
             _isSureBladeScrap = false;
             await _autoCutRuningViewModel.StopAsync(ServicePauseResult.BladeScrap);
         }
@@ -326,6 +322,11 @@ namespace 精密切割系统.ViewModel
             base.OnNavigatedTo(navigationContext);
             InitBottomButton();
             InitRightButton();
+            _cameraCommon = AutoCutUtils.GetCameraCommon();
+            if (_cameraCommon is not null)
+            {
+                _cameraCommon.LineChanged += CameraCommon_LineChanged;
+            }
             _autoCutRuningViewModel = navigationContext.Parameters.GetValue<AutoCutRuningViewModel>("AutoCutRuningViewModel");
             AfterHeightMeasurementZ = _autoCutRuningViewModel.AfterHeightMeasurementZ;
             SharpenBladeHeight = _autoCutRuningViewModel.SharpenBladeHeight;
@@ -344,6 +345,21 @@ namespace 精密切割系统.ViewModel
             if (xLocation != null && yLocation != null)
             {
                 _originPoint = new DataPoint<float>(xLocation.Value, yLocation.Value);
+            }
+        }
+
+        private void CameraCommon_LineChanged()
+        {
+            UpdateBaselineWidth();
+            UpdateBrokenEdgeWidth();
+        }
+
+        public override void OnNavigatedFrom(NavigationContext navigationContext)
+        {
+            base.OnNavigatedFrom(navigationContext);
+            if (_cameraCommon is not null)
+            {
+                _cameraCommon.LineChanged -= CameraCommon_LineChanged;
             }
         }
     }
