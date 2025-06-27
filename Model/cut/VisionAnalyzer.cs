@@ -637,11 +637,12 @@ namespace 精密切割系统.Model.cut
         }
 
         /// <summary>
-        /// 检测图像中的多条横向条纹，只返回第一条条纹的中心线位置
+        /// 检测图像中的多条横向条纹，只返回第一条有效条纹的中心线位置
         /// </summary>
         /// <param name="imagePath">图像路径</param>
-        /// <returns>第一条横向条纹的中心 y 坐标，如果未检测到则返回 null</returns>
-        public static int? DetectFirstHorizontalStripeCenter(string imagePath)
+        /// <param name="minAreaThreshold">最小有效条纹区域面积阈值（默认1000）</param>
+        /// <returns>第一条有效条纹的中心 y 坐标，如果未检测到则返回 null</returns>
+        public static int? DetectFirstHorizontalStripeCenter(string imagePath, double minAreaThreshold = 1000.0)
         {
             // 读取灰度图像
             Mat img = Cv2.ImRead(imagePath, ImreadModes.Grayscale);
@@ -650,70 +651,121 @@ namespace 精密切割系统.Model.cut
                 throw new FileNotFoundException("图像读取失败，请检查路径");
             }
 
-            // CLAHE 对比度增强
+            // 使用 CLAHE 进行对比度自适应增强（局部对比度提升）
             CLAHE clahe = Cv2.CreateCLAHE(clipLimit: 3.0, tileGridSize: new Size(8, 8));
             Mat imgEq = new Mat();
             clahe.Apply(img, imgEq);
 
-            // OTSU 二值化并取反，使条纹为白
+            // OTSU 自动阈值 + 反转，使图像中条纹为白（像素值255）
             Mat binary = new Mat();
             Cv2.Threshold(imgEq, binary, 0, 255, ThresholdTypes.BinaryInv | ThresholdTypes.Otsu);
 
-            // 水平投影
-            int[] projection = new int[binary.Rows];
-            for (int i = 0; i < binary.Rows; i++)
+            int imageWidth = binary.Cols;
+            int imageHeight = binary.Rows;
+
+            // 水平投影：统计每一行中非零（白色）像素数量
+            int[] projection = new int[imageHeight];
+            for (int i = 0; i < imageHeight; i++)
             {
                 projection[i] = Cv2.CountNonZero(binary.Row(i));
             }
 
-            // 设置阈值，检测高投影区域
+            // 根据投影最大值设定阈值，判定是否为“可能条纹”行
             int maxProj = projection.Max();
             double threshold = 0.5 * maxProj;
 
-            // 找出所有连续的高投影区域段
-            List<(int top, int bottom)> stripeRegions = new List<(int, int)>();
-            bool inRegion = false;
-            int regionStart = 0;
-
-            for (int i = 0; i < projection.Length; i++)
+            // 构建 bool 数组，标记每一行是否为条纹
+            bool[] isLine = new bool[imageHeight];
+            for (int i = 0; i < imageHeight; i++)
             {
-                if (projection[i] > threshold)
+                isLine[i] = projection[i] > threshold;
+            }
+
+            // 条纹区域检测：根据 isLine 连续值构建区段，并进行多重判断
+            List<(int top, int bottom)> validLines = new List<(int, int)>();
+            int? start = null;
+
+            for (int i = 0; i < isLine.Length; i++)
+            {
+                int y = i;
+
+                if (isLine[i] && start == null)
                 {
-                    if (!inRegion)
-                    {
-                        // 新的条纹开始
-                        regionStart = i;
-                        inRegion = true;
-                    }
+                    // 检测到新条纹起始
+                    start = y;
                 }
-                else
+                else if (!isLine[i] && start != null)
                 {
-                    if (inRegion)
+                    // 条纹结束，计算条纹特征
+                    int top = start.Value;
+                    int bottom = y - 1;
+                    int lineHeight = bottom - top + 1;
+                    double lineArea = lineHeight * imageWidth;
+
+                    // 高度 + 面积初步过滤
+                    if (lineHeight > 2 && lineArea > minAreaThreshold)
                     {
-                        // 条纹结束
-                        stripeRegions.Add((regionStart, i - 1));
-                        inRegion = false;
+                        // 计算实际区域中“白色像素”（条纹）占比
+                        Mat lineRegion = binary.SubMat(top, bottom + 1, 0, imageWidth);
+                        int actualWhitePixels = Cv2.CountNonZero(lineRegion);
+                        double areaRatio = (double)actualWhitePixels / lineArea;
+
+                        if (areaRatio > 0.5)
+                        {
+                            // 符合要求，加入结果
+                            Console.WriteLine($"检测到有效横线: Y={top}-{bottom}, 高度={lineHeight}, 面积={lineArea}, 黑色像素比例={areaRatio:F2}");
+                            validLines.Add((top, bottom));
+                        }
+                        else
+                        {
+                            Console.WriteLine($"跳过低密度区域: Y={top}-{bottom}, 黑色像素比例={areaRatio:F2}");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"跳过小区域: Y={top}-{bottom}, 高度={lineHeight}, 面积={lineArea}");
+                    }
+
+                    // 结束当前条纹记录
+                    start = null;
+                }
+            }
+
+            // 补处理：若最后一行仍处于条纹区域
+            if (start != null)
+            {
+                int top = start.Value;
+                int bottom = imageHeight - 1;
+                int lineHeight = bottom - top + 1;
+                double lineArea = lineHeight * imageWidth;
+
+                if (lineHeight > 2 && lineArea > minAreaThreshold)
+                {
+                    Mat lineRegion = binary.SubMat(top, bottom + 1, 0, imageWidth);
+                    int actualWhitePixels = Cv2.CountNonZero(lineRegion);
+                    double areaRatio = (double)actualWhitePixels / lineArea;
+
+                    if (areaRatio > 0.5)
+                    {
+                        Console.WriteLine($"检测到有效横线(末尾): Y={top}-{bottom}, 高度={lineHeight}, 面积={lineArea}, 黑色像素比例={areaRatio:F2}");
+                        validLines.Add((top, bottom));
                     }
                 }
             }
 
-            // 如果最后仍在区域中，补充添加最后一段
-            if (inRegion)
-            {
-                stripeRegions.Add((regionStart, projection.Length - 1));
-            }
+            // 输出结果
+            Console.WriteLine($"\n总共检测到 {validLines.Count} 条有效横线");
 
-            // 无条纹区域则返回 null
-            if (stripeRegions.Count == 0)
+            // 返回第一条有效横线的中心 y 坐标
+            if (validLines.Count > 0)
             {
-                Console.WriteLine("未检测到任何横向条纹");
+                var (top, bottom) = validLines[0];
+                return (top + bottom) / 2;
+            }
+            else
+            {
                 return null;
             }
-
-            // 返回第一条条纹的中心线位置
-            var (top, bottom) = stripeRegions[0];
-            int center = (top + bottom) / 2;
-            return center;
         }
 
     }
