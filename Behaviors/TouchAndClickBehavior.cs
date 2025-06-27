@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using 精密切割系统.Model.common;
+using 精密切割系统.View.Controls;
 
 namespace 精密切割系统.Behaviors
 {
@@ -20,13 +22,11 @@ namespace 精密切割系统.Behaviors
             set => SetValue(TouchAndClickCommandProperty, value);
         }
 
-        // 是否已触发事件
-        private volatile bool _isRaiseDownEvent = false;
+        private int _isRaiseCommand = 1; // 0表示未触发，1表示已触发
 
         protected override void OnAttached()
         {
             base.OnAttached();
-
             // 订阅事件
             //AssociatedObject.MouseDown += OnMouseDown;
             AssociatedObject.PreviewMouseDown += OnPreviewMouseDown;
@@ -39,6 +39,7 @@ namespace 精密切割系统.Behaviors
 
         protected override void OnDetaching()
         {
+            base.OnDetaching();
             // 清理事件订阅
             //AssociatedObject.MouseDown -= OnMouseDown;
             AssociatedObject.PreviewMouseDown -= OnPreviewMouseDown;
@@ -47,24 +48,25 @@ namespace 精密切割系统.Behaviors
             AssociatedObject.TouchDown -= AssociatedObject_TouchDown;
             AssociatedObject.TouchUp -= AssociatedObject_TouchUp;
             AssociatedObject.TouchLeave -= AssociatedObject_TouchLeave;
-            base.OnDetaching();
         }
 
         private void AssociatedObject_TouchDown(object? sender, TouchEventArgs e)
         {
-            _isRaiseDownEvent = true;
+            Interlocked.CompareExchange(ref _isRaiseCommand, 0, 1);
         }
 
         private void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            _isRaiseDownEvent = true;
+            Interlocked.CompareExchange(ref _isRaiseCommand, 0, 1);
         }
 
         private void AssociatedObject_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
-            if (!_isRaiseDownEvent) return;
-            _isRaiseDownEvent = false;
-            if (TouchAndClickCommand?.CanExecute(e) == true)
+            if (sender is not null && sender is RightButton rightButton && rightButton.DataContext is RightButtonParams rightButtonParams)
+            {
+                rightButton.btnBorder.Background = rightButtonParams.BackgroundDefColor;
+            }
+            if (Interlocked.CompareExchange(ref _isRaiseCommand, 1, 0) == 0 && TouchAndClickCommand?.CanExecute(e) == true)
             {
                 TouchAndClickCommand.Execute(e);
             }
@@ -72,9 +74,7 @@ namespace 精密切割系统.Behaviors
 
         private void AssociatedObject_TouchUp(object? sender, TouchEventArgs e)
         {
-            if (!_isRaiseDownEvent) return;
-            _isRaiseDownEvent = false;
-            if (TouchAndClickCommand?.CanExecute(e) == true)
+            if (Interlocked.CompareExchange(ref _isRaiseCommand, 1, 0) == 0 && TouchAndClickCommand?.CanExecute(e) == true)
             {
                 TouchAndClickCommand.Execute(e);
             }
@@ -82,22 +82,12 @@ namespace 精密切割系统.Behaviors
 
         private void AssociatedObject_TouchLeave(object? sender, TouchEventArgs e)
         {
-            if (!_isRaiseDownEvent) return;
-            _isRaiseDownEvent = false;
-            if (TouchAndClickCommand?.CanExecute(e) == true)
-            {
-                TouchAndClickCommand.Execute(e);
-            }
+            //Interlocked.CompareExchange(ref _isRaiseCommand, 0, 1);
         }
 
         private void AssociatedObject_MouseLeave(object sender, MouseEventArgs e)
         {
-            if (!_isRaiseDownEvent) return;
-            _isRaiseDownEvent = false;
-            if (TouchAndClickCommand?.CanExecute(e) == true)
-            {
-                TouchAndClickCommand.Execute(e);
-            }
+            //Interlocked.CompareExchange(ref _isRaiseCommand, 0, 1);
         }
     }
 }

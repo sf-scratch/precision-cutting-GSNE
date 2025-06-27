@@ -112,52 +112,8 @@ namespace 精密切割系统
             AlarmConfig alarmConfig = AlarmConfig.Instance;
             Dispatcher.BeginInvoke(new Action(() =>
             {
-                //var result = VisionAnalyzer.ProcessImage("C:\\MySpace\\Dev\\OPT Camera Viewer_v4.0.0.1\\Pictures\\PIC_2025-05-09 15-35-09.807(1).bmp");
-                //var result1 = VisionAnalyzer.SnakeCase("C:\\MySpace\\Dev\\OPT Camera Viewer_v4.0.0.1\\Pictures\\PIC_2025-05-09 15-35-09.807(1).bmp");
-                //Debug.WriteLine(result);
-
-
-
-
-
-
-
-       //         string imagePath = System.IO.Path.Combine(AppContext.BaseDirectory, $"image\\临时");
-       //         Directory.CreateDirectory(imagePath);
-       //         Mat mat = Cv2.ImRead("C:\\MySpace\\Dev\\ProjectXiHua\\precision-cutting-321\\bin\\x64\\Debug\\net8.0-windows\\image\\638862689686693423_cropMatJpg.jpg");
-       //         mat.SaveImage($"{imagePath}\\{DateTime.Now}.png"); // 保存图像以供调试
-       //         int? imageY = VisionAnalyzer.DetectFirstHorizontalStripeCenter(mat);
-       //         if (imageY is null)
-       //         {
-       //             MaterialSnackUtils.MaterialSnack("未检测到水平条纹，请检查相机位置！", MaterialSnackUtils.SnackType.WARNING, 0);
-       //             return;
-       //         }
-       //         float offsetY = (float)Math.Round((imageY.Value - (mat.Height / 2)) * VisionAnalyzer.PixelToMmRatio, 4);
-
-       //         Cv2.Line(
-       //             img: mat,
-       //pt1: new OpenCvSharp.Point(0, imageY.Value),  // 起点
-       //pt2: new OpenCvSharp.Point(mat.Width, imageY.Value), // 终点
-       //color: Scalar.Red,         // 颜色 (B,G,R)
-       //thickness: 1,             // 线宽
-       //lineType: LineTypes.AntiAlias // 抗锯齿
-       //);
-       //         Cv2.Line(
-       //img: mat,
-       //pt1: new OpenCvSharp.Point(0, mat.Height / 2),  // 起点
-       //pt2: new OpenCvSharp.Point(mat.Width, mat.Height / 2), // 终点
-       //color: Scalar.Green,         // 颜色 (B,G,R)
-       //thickness: 1,             // 线宽
-       //lineType: LineTypes.AntiAlias // 抗锯齿
-       //);
-       //         mat.SaveImage($"{imagePath}\\{DateTime.Now}.png");
-
-
-
-
-
-
-
+                //Mat mat = Cv2.ImRead("C:\\MySpace\\Dev\\ProjectXiHua\\precision-cutting-321\\bin\\x64\\Debug\\net8.0-windows\\image\\Temp\\ec869cd1-84b7-485b-bc0c-5d37af48c781_7_原图_7(1).jpg");
+                //int? aaaa = VisionAnalyzer.DetectFirstHorizontalStripeCenter(mat);
 
                 string logDirectory = "logs";
                 int daysThreshold = 30; // 清理超过 30 天的日志

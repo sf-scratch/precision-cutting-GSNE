@@ -12,9 +12,15 @@ namespace 精密切割系统.HttpClients
 {
     public class HttpRestClient
     {
-        private static readonly string BaseUrl = "http://192.168.1.252:8280/";
-        private static readonly string PDABaseUrl = "http://192.168.1.252:89/";
-        public static readonly string UploadFileUrl = $"{BaseUrl}n2baseDev-osb/http/interface/uploadFile";
+        public static readonly string PreName = "n2baseDev";
+        public static readonly string Port = "252";
+        //public static readonly string PreName = "n2baseProd";
+        //public static readonly string Port = "251";
+        public static readonly string PreUrl = $"{PreName}-osb";
+        public static readonly string BaseUrl = $"http://192.168.1.{Port}:8280/";
+        public static readonly string PDABaseUrl = $"http://192.168.1.{Port}:89/";
+        public static readonly string UploadFileUrl = $"{BaseUrl}{PreUrl}/http/interface/uploadFile";
+
         private static readonly Lazy<HttpRestClient> _lazy = new(() => new HttpRestClient());
 
         private HttpRestClient() { }

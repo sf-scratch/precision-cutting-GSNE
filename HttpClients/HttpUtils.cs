@@ -27,7 +27,7 @@ namespace 精密切割系统.HttpClients
             ApiRequest request = new ApiRequest
             {
                 Method = RestSharp.Method.Post,
-                Route = $"n2baseDev-osb/http/interface/getHubInfoById?hubNumber={lunguId}"
+                Route = $"{HttpRestClient.PreUrl}/http/interface/getHubInfoById?hubNumber={lunguId}"
             };
             ApiResponse? response = await HttpRestClient.Instance.ExecuteAsync(request);
             if (response == null)
@@ -59,7 +59,7 @@ namespace 精密切割系统.HttpClients
             ApiRequest request = new ApiRequest
             {
                 Method = RestSharp.Method.Get,
-                Route = $"n2baseDev-osb/http/interface/getLunguSksj?lungu={lunguId}"
+                Route = $"{HttpRestClient.PreUrl}/http/interface/getLunguSksj?lungu={lunguId}"
             };
             ApiResponse? response = await HttpRestClient.Instance.ExecuteAsync(request);
             if (response == null)
@@ -86,7 +86,7 @@ namespace 精密切割系统.HttpClients
             ApiRequest request = new ApiRequest
             {
                 Method = RestSharp.Method.Post,
-                Route = $"n2baseDev-osb/http/interface/insertFlowValues",
+                Route = $"{HttpRestClient.PreUrl}/http/interface/insertFlowValues",
                 Parameters = fieldValues
             };
             ApiResponse? response = await HttpRestClient.Instance.ExecuteAsync(request);
@@ -114,7 +114,7 @@ namespace 精密切割系统.HttpClients
             ApiRequest request = new ApiRequest
             {
                 Method = RestSharp.Method.Post,
-                Route = $"n2baseDev-osb/http/interface/pda/sop/updateGroupStatus",
+                Route = $"{HttpRestClient.PreUrl}/http/interface/pda/sop/updateGroupStatus",
                 Parameters = updateOperateStatus
             };
             ApiResponse? response = await HttpRestClient.Instance.ExecuteAsync(request);
@@ -148,7 +148,7 @@ namespace 精密切割系统.HttpClients
             ApiRequest request = new ApiRequest
             {
                 Method = RestSharp.Method.Post,
-                Route = $"n2baseDev-osb/http/interface/queryFlowSettingById",
+                Route = $"{HttpRestClient.PreUrl}/http/interface/queryFlowSettingById",
                 Parameters = data
             };
             ApiResponse? response = await HttpRestClient.Instance.ExecuteAsync(request);
@@ -184,7 +184,7 @@ namespace 精密切割系统.HttpClients
             ApiRequest request = new ApiRequest
             {
                 Method = RestSharp.Method.Post,
-                Route = $"n2baseDev-osb/http/interface/getQgParamsByHub",
+                Route = $"{HttpRestClient.PreUrl}/http/interface/getQgParamsByHub",
                 Parameters = new JsonObject
                 {
                     [nameof(hubNumber)] = hubNumber,

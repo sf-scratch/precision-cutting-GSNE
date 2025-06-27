@@ -232,6 +232,7 @@ namespace 精密切割系统.Model.cut
                             //if (chekcTimes == 1 && (Appsettings.IsNeedCheckBaseLine ?? true))
                             if (chekcTimes == 1)
                             {
+                                await PlcControl.tagControl.wholeDevice.OpenBuzzerAsync();
                                 ServicePauseResult result = await WaitContinueAsync(line, "请检查基准线位置！");
                                 switch (result.Type)
                                 {
@@ -259,16 +260,17 @@ namespace 精密切割系统.Model.cut
                                 //刀痕检查
                                 ImagesAnalysisResult result = await AutoCutUtils.CheckKnifeMarksStatus(line, eventAggregator, _usingPauseToken);
                                 eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create(
-                                    $"最大刀痕宽度：{result.BladeWidthMaxImage.BladeWidth} " +
-                                    $"最大崩边宽度：{result.CollapseWidthMaxImage.CollapseWidth} " +
-                                    $"是否蛇形：{result.IsSnakelike}"));
+                                    $"最大刀痕宽度：{Math.Round(result.BladeWidthMaxImage.BladeWidth, 3)} " +
+                                    $"最大崩边宽度：{Math.Round(result.CollapseWidthMaxImage.CollapseWidth, 3)} " +
+                                    $"是否蛇形：{result.HasSnakelike()}"));
                                 double bladeWidthMax, collapseWidthMax;
                                 Mat bladeWidthMaxMat, collapseWidthMaxMat;
                                 // 刀痕检查结果未成功，表示未检测到刀痕
-                                if (!result.IsSuccess || result.IsSnakelike)
+                                if (!result.IsSuccess)
                                 {
+                                    await PlcControl.tagControl.wholeDevice.OpenBuzzerAsync();
                                     //刀痕检查结果失败，表示未检测到刀痕
-                                    ServicePauseResult pauseResult = await WaitContinueAsync(line, result.IsSnakelike ? "图像识别刀痕刀痕为蛇形，请人工检查刀痕状态！" : "图像识别刀痕异常，请人工检查刀痕状态！");
+                                    ServicePauseResult pauseResult = await WaitContinueAsync(line, result.Message);
                                     switch (pauseResult.Type)
                                     {
                                         case ServicePauseResultType.BladeScrap:
@@ -292,10 +294,9 @@ namespace 精密切割系统.Model.cut
                                         continue;
                                     }
                                     bladeWidthMax = cameraCommon._cutMarkWidth / 1000;
-                                    bladeWidthMaxMat = Cv2.ImRead(System.IO.Path.Combine(AppContext.BaseDirectory, "Assets\\config\\empty.png"));
-                                    bladeWidthMaxMat = AutoCutUtils.JpegStreamToMat(AutoCutUtils.MatToJpegStream(bladeWidthMaxMat));
+                                    bladeWidthMaxMat = result.BladeWidthMaxImage.Mat;
                                     collapseWidthMax = cameraCommon._edgeChipWidth / 1000;
-                                    collapseWidthMaxMat = bladeWidthMaxMat;
+                                    collapseWidthMaxMat = result.CollapseWidthMaxImage.Mat;
                                 }
                                 else
                                 {

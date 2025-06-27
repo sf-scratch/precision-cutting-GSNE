@@ -10,12 +10,12 @@ namespace 精密切割系统.Model.cut
     public class ImagesAnalysisResult
     {
         public bool IsSuccess { get; set; }
+        public string Message { get; set; }
         public List<Mat> AnalysisFailMats { get; set; }
         public ImageData BladeWidthMaxImage { get; set; }
         public ImageData CollapseWidthMaxImage { get; set; }
         public List<ImageData> ImageDatas{ get; set; }
         public List<ImageData> ConcatImages { get; set; }
-        public bool IsSnakelike { get; set; }
 
         public ImagesAnalysisResult()
         {
@@ -25,6 +25,11 @@ namespace 精密切割系统.Model.cut
             ImageDatas = new List<ImageData>();
             ConcatImages = new List<ImageData>();
         }
+
+        public bool HasSnakelike()
+        {
+            return ConcatImages.Count == 0 || ConcatImages.Any(image => image.IsSnakelike);
+        }
     }
 
     public class ImageData
@@ -33,5 +38,6 @@ namespace 精密切割系统.Model.cut
         public double CollapseWidth { get; set; }
         public bool IsSnakelike { get; set; }
         public Mat Mat { get; set; }
+        public Mat OriginMat { get; set; }
     }
 }

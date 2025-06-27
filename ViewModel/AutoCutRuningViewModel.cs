@@ -283,7 +283,7 @@ namespace 精密切割系统.ViewModel
                 //新刀才磨刀
                 if (LunguSksj.BladeType == "新刀")
                 {
-                   if (SharpenParams.IsExecuteSharpen)
+                    if (SharpenParams.IsExecuteSharpen)
                     {
                         _sharpenService.SharpenServiceProcessChanged += SharpenService_SharpenServiceProcessChanged;
                         _sharpenService.RemindReplaceSharpenBoard += SharpenService_RemindReplaceSharpenBoard;
@@ -733,60 +733,69 @@ namespace 精密切割系统.ViewModel
                                 Directory.CreateDirectory(imagePath);
                                 Mat mat = new Mat();
                                 Cv2.Flip(localBitmap.ToMat(), mat, FlipMode.XY);  // 同时水平和垂直翻转
-                                mat.SaveImage($"{imagePath}\\{DateTime.Now.Ticks}.png"); // 保存图像以供调试
-                                int? imageY = VisionAnalyzer.DetectFirstHorizontalStripeCenter(mat);
-                                if (imageY is null)
+                                long preName = DateTime.Now.Ticks;
+                                mat.SaveImage($"{imagePath}\\{preName}_原图.png"); // 保存图像以供调试
+                                Mat matJpg = AutoCutUtils.JpegStreamToMat(AutoCutUtils.MatToJpegStream(AutoCutUtils.CropHorizontalCenter(mat, AutoCutUtils.HeightRange)));
+                                int? imageY = null;
+                                try
                                 {
-                                    MaterialSnackUtils.MaterialSnack("未检测到水平条纹，请检查相机位置！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
-                                    return;
+                                    CameraCommon? cameraCommon = AutoCutUtils.GetCameraCommon();
+                                    if (cameraCommon is not null)
+                                    {
+                                        Mat cropMatJpg = AutoCutUtils.JpegStreamToMat(AutoCutUtils.MatToJpegStream(AutoCutUtils.CropHorizontalCenter(matJpg, AutoCutUtils.HeightRange)));
+                                        var (bladeWidthMm, collapseWidthMm, bladeTop, bladeBottom, collapseTop, collapseBottom) = VisionAnalyzer.ProcessImage(cropMatJpg);
+                                        cameraCommon.UpdateLine((float)bladeWidthMm * 1000, (float)collapseWidthMm * 1000);
+                                    }
+                                    imageY = VisionAnalyzer.DetectFirstHorizontalStripeCenter(matJpg);
                                 }
-
-                                Cv2.Line(
-                                    img: mat,
-                       pt1: new OpenCvSharp.Point(0, imageY.Value),  // 起点
-                       pt2: new OpenCvSharp.Point(mat.Width, imageY.Value), // 终点
-                       color: Scalar.Red,         // 颜色 (B,G,R)
-                       thickness: 1,             // 线宽
-                       lineType: LineTypes.AntiAlias // 抗锯齿
-                       );
-                                Cv2.Line(
-                       img: mat,
-                       pt1: new OpenCvSharp.Point(0, mat.Height / 2),  // 起点
-                       pt2: new OpenCvSharp.Point(mat.Width, mat.Height / 2), // 终点
-                       color: Scalar.Green,         // 颜色 (B,G,R)
-                       thickness: 1,             // 线宽
-                       lineType: LineTypes.AntiAlias // 抗锯齿
-                       );
-                                mat.SaveImage($"{imagePath}\\{DateTime.Now}.png");
-                                CameraCommon? cameraCommon = AutoCutUtils.GetCameraCommon();
-                                if (cameraCommon is not null)
+                                catch (Exception ex)
                                 {
-                                    Mat cropMat = AutoCutUtils.CropHorizontalCenter(mat, AutoCutUtils.HeightRange);
-                                    Mat cropMatJpg = AutoCutUtils.JpegStreamToMat(AutoCutUtils.MatToJpegStream(cropMat));
-                                    var (bladeWidthMm, collapseWidthMm, bladeTop, bladeBottom, collapseTop, collapseBottom) = VisionAnalyzer.ProcessImage(cropMatJpg);
-                                    cameraCommon.UpdateLine((float)bladeWidthMm * 1000, (float)collapseWidthMm * 1000);
+                                    MaterialSnackUtils.MaterialSnack($"未检测到水平条纹，{ex.Message}", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
                                 }
-                                float offsetY = (float)Math.Round((imageY.Value - (mat.Height / 2)) * VisionAnalyzer.PixelToMmRatio, 4);
-                                if (MathF.Abs(offsetY) > 0.01f) offsetY = 0;
-                                MaterialSnackUtils.MaterialSnack($"{message ?? "暂停中..."}   Y轴自动偏移{offsetY}mm", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
-                                await PlcControl.tagControl.Yaxis.StartRelativeAsync(offsetY);
+                                if (imageY != null)
+                                {
+                                    Cv2.Line(
+                                    img: matJpg,
+                                    pt1: new OpenCvSharp.Point(0, imageY.Value),  // 起点
+                                    pt2: new OpenCvSharp.Point(matJpg.Width, imageY.Value), // 终点
+                                    color: Scalar.Red,         // 颜色 (B,G,R)
+                                    thickness: 1,             // 线宽
+                                    lineType: LineTypes.AntiAlias // 抗锯齿
+                                    );
+                                    Cv2.Line
+                                    (
+                                        img: matJpg,
+                                        pt1: new OpenCvSharp.Point(0, matJpg.Height / 2),  // 起点
+                                        pt2: new OpenCvSharp.Point(matJpg.Width, matJpg.Height / 2), // 终点
+                                        color: Scalar.Green,         // 颜色 (B,G,R)
+                                        thickness: 1,             // 线宽
+                                        lineType: LineTypes.AntiAlias // 抗锯齿
+                                        );
+                                    matJpg.SaveImage($"{imagePath}\\{preName}_裁剪.png");
+                                    float offsetY = (float)Math.Round((imageY.Value - (matJpg.Height / 2)) * VisionAnalyzer.PixelToMmRatio, 4);
+                                    if (MathF.Abs(offsetY) > 0.02f) offsetY = 0;
+                                    MaterialSnackUtils.MaterialSnack($"{message ?? "暂停中..."}   Y轴自动偏移{offsetY}mm", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                                    await PlcControl.tagControl.Yaxis.StartRelativeAsync(offsetY);
+                                }
+                                else
+                                {
+                                    MaterialSnackUtils.MaterialSnack(message ?? "暂停中...", MaterialSnackUtils.SnackType.SUCCESS, 0, _eventAggregator);
+                                }
                             }
                         });
-                        //MaterialSnackUtils.MaterialSnack(message ?? "暂停中...", MaterialSnackUtils.SnackType.SUCCESS, 0, _eventAggregator);
                         break;
                 }
-                NavigationParameters parameters = new NavigationParameters { { "AutoCutRuningViewModel", this } };
-                _regionManager.RequestNavigate(RegionName.AutoCutStateRegion, nameof(AutoCutPausing), parameters);
             }
             catch (OperationCanceledException)
             {
                 MaterialSnackUtils.MaterialSnack("暂停切割超时", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
-                NavigationParameters parameters = new NavigationParameters { { "AutoCutRuningViewModel", this } };
-                _regionManager.RequestNavigate(RegionName.AutoCutStateRegion, nameof(AutoCutPausing), parameters);
             }
             catch (Exception ex)
             {
                 MaterialSnackUtils.MaterialSnack($"暂停切割时遇到其他错误: {ex.Message}", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+            }
+            finally
+            {
                 NavigationParameters parameters = new NavigationParameters { { "AutoCutRuningViewModel", this } };
                 _regionManager.RequestNavigate(RegionName.AutoCutStateRegion, nameof(AutoCutPausing), parameters);
             }

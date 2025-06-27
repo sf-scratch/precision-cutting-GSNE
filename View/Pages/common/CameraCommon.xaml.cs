@@ -691,7 +691,7 @@ namespace 精密切割系统.View.Pages.common
             {
                 yPosition = yLowerValue;
             }
-            await PlcControl.tagControl.cutting.RunMotionAsync((float)xPosition, (float)yPosition, default);
+            await PlcControl.tagControl.cutting.RunMotionNoWaitAsync((float)xPosition, (float)yPosition);
         }
     }
 

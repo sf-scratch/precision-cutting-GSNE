@@ -114,12 +114,9 @@ namespace 精密切割系统.View.Controls
                 btnBorder.MouseDown += BtnBorder_MouseDown;
                 btnBorder.MouseUp += BtnBorder_MouseUp;
                 btnBorder.MouseLeave += BtnBorder_MouseLeave;
+                btnBorder.PreviewMouseDown += BtnBorder_PreviewMouseDown;
+                btnBorder.PreviewMouseUp += BtnBorder_PreviewMouseUp;
             }
-        }
-
-        private void BtnBorder_MouseLeave(object sender, MouseEventArgs e)
-        {
-            btnBorder.Background = BackgroundDefColor;
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -127,35 +124,49 @@ namespace 精密切割系统.View.Controls
             btnBorder.Background = BackgroundDefColor;
         }
 
-        private void BtnBorder_TouchUp(object? sender, TouchEventArgs e)
+        private void BtnBorder_MouseLeave(object sender, MouseEventArgs e)
         {
             btnBorder.Background = BackgroundDefColor;
-            RaiseRightClickedEvent();
-            onClick(true);
         }
 
         private void BtnBorder_TouchLeave(object? sender, TouchEventArgs e)
         {
+            //btnBorder.Background = BackgroundDefColor;
+        }
+
+        private void BtnBorder_TouchUp(object? sender, TouchEventArgs e)
+        {
             btnBorder.Background = BackgroundDefColor;
+            onClick(true);
         }
 
         private void BtnBorder_MouseUp(object sender, MouseButtonEventArgs e)
         {
             btnBorder.Background = BackgroundDefColor;
-            RaiseRightClickedEvent();
             onClick(true);
+        }
+
+        private void BtnBorder_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            btnBorder.Background = BackgroundDefColor;
         }
 
         private void BtnBorder_TouchDown(object? sender, TouchEventArgs e)
         {
             btnBorder.Background = BackgroundDownColor;
-            
         }
 
         private void BtnBorder_MouseDown(object sender, MouseButtonEventArgs e)
         {
             btnBorder.Background = BackgroundDownColor;
         }
+
+
+        private void BtnBorder_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            btnBorder.Background = BackgroundDownColor;
+        }
+
 
         private void onClick(Boolean isOK)
         {
@@ -174,25 +185,6 @@ namespace 精密切割系统.View.Controls
         public void resetBg()
         {
             btnBorder.Background = BackgroundDefColor;
-        }
-
-        public static readonly RoutedEvent RightClickedEvent =
-            EventManager.RegisterRoutedEvent(
-                "RightClicked",
-                RoutingStrategy.Bubble,  // 使用冒泡路由
-                typeof(RoutedEventHandler),
-                typeof(RightButton));
-
-        public event RoutedEventHandler RightButtonClicked
-        {
-            add { AddHandler(RightClickedEvent, value); }
-            remove { RemoveHandler(RightClickedEvent, value); }
-        }
-
-        private void RaiseRightClickedEvent()
-        {
-            RoutedEventArgs args = new RoutedEventArgs(RightClickedEvent);
-            RaiseEvent(args);
         }
     }
 }

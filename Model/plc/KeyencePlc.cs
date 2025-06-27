@@ -2811,6 +2811,18 @@ namespace 精密切割系统.Driver
             await WaitInterpolationMotionCompletedAsync(token);
         }
 
+        public async Task RunMotionNoWaitAsync(float xInterpolationMotionValue, float yInterpolationMotionValue)
+        {
+            xInterpolationMotion.writeValue = xInterpolationMotionValue.ToString();
+            await keyencePlc.WriteTagAsync(xInterpolationMotion);
+            yInterpolationMotion.writeValue = yInterpolationMotionValue.ToString();
+            await keyencePlc.WriteTagAsync(yInterpolationMotion);
+            startInterpolationMotion.writeValue = "0";
+            await keyencePlc.WriteTagAsync(startInterpolationMotion);
+            startInterpolationMotion.writeValue = "1";
+            await keyencePlc.WriteTagAsync(startInterpolationMotion);
+        }
+
         /// <summary>
         /// xy插补运动是否完成
         /// </summary>

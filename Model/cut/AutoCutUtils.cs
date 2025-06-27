@@ -828,6 +828,7 @@ namespace 精密切割系统.Model.cut
         {
             Mat cropMat = CropHorizontalCenter(mat, HeightRange);
             Mat cropMatJpg = JpegStreamToMat(MatToJpegStream(cropMat));
+            Mat originMatJpg = cropMatJpg.Clone();
             var (bladeWidthMm, collapseWidthMm, bladeTop, bladeBottom, collapseTop, collapseBottom) = VisionAnalyzer.ProcessImage(cropMatJpg);
             Cv2.PutText(cropMatJpg,
                 $"bladeWidthMm: {bladeWidthMm}",
@@ -886,7 +887,8 @@ namespace 精密切割系统.Model.cut
             {
                 BladeWidth = bladeWidthMm,
                 CollapseWidth = collapseWidthMm,
-                Mat = cropMatJpg
+                Mat = cropMatJpg,
+                OriginMat = originMatJpg
             };
             result.ImageDatas.Add(imageData);
             if (result.BladeWidthMaxImage.BladeWidth < bladeWidthMm)
@@ -924,16 +926,19 @@ namespace 精密切割系统.Model.cut
                     }
                 }
                 var stopwatch = Stopwatch.StartNew();
-                //拼接所有图像
+                // 拼接所有图像
                 List<Mat> concatMats = ConcatMats(mats);
                 stopwatch.Stop();
-                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"拼接所有图像用时: {stopwatch.Elapsed.TotalSeconds} 秒"));
+                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"拼接所有图像用时: {Math.Round(stopwatch.Elapsed.TotalSeconds, 2)} 秒"));
 
+                #region 保存图片
                 stopwatch = Stopwatch.StartNew();
-                //保存拼接图像到指定目录
+                // 保存拼接图像到指定目录
                 string uuid = Guid.NewGuid().ToString();
                 string imagePath = System.IO.Path.Combine(AppContext.BaseDirectory, $"image\\{DateTime.Now.Ticks}");
                 Directory.CreateDirectory(imagePath);
+                string concatImagesPath = System.IO.Path.Combine(imagePath, "ConcatImages");
+                Directory.CreateDirectory(concatImagesPath);
                 if (mats.Count == result.ImageDatas.Count)
                 {
                     for (int i = 0; i < mats.Count; i++)
@@ -948,107 +953,128 @@ namespace 精密切割系统.Model.cut
                 }
                 foreach (var image in concatMats)
                 {
-                    Cv2.ImWrite($"{imagePath}\\{DateTime.Now.Ticks}_拼接图原图.jpg", image);
+                    Cv2.ImWrite($"{concatImagesPath}\\{DateTime.Now.Ticks}_拼接图原图.jpg", image);
                 }
                 stopwatch.Stop();
-                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"保存识别后的拼接图像总用时: {stopwatch.Elapsed.TotalSeconds} 秒"));
+                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"保存识别后的拼接图像总用时: {Math.Round(stopwatch.Elapsed.TotalSeconds, 2)} 秒"));
+                #endregion
 
                 foreach (Mat concatMat in concatMats)
                 {
-                    Mat cropConcatMat = CropHorizontalCenter(concatMat, HeightRange);
-                    Mat cropConcatMatJpg = JpegStreamToMat(MatToJpegStream(cropConcatMat));
-                    var (bladeWidthMm, collapseWidthMm, bladeTop, bladeBottom, collapseTop, collapseBottom) = VisionAnalyzer.ProcessImage(cropConcatMatJpg);
-                    Cv2.PutText(cropConcatMatJpg,
-                        $"bladeWidthMm: {bladeWidthMm}",
-                        new Point(20, bladeTop),
-                        HersheyFonts.HersheySimplex,
-                        1.3f,
-                        Scalar.Red,
-                        2);
-                    Cv2.PutText(cropConcatMatJpg,
-                        $"collapseWidthMm:{collapseWidthMm}",
-                        new Point(900, collapseTop),
-                        HersheyFonts.HersheySimplex,
-                        1.3f,
-                        Scalar.Green,
-                        2);
-                    Cv2.Line(
-                        img: cropConcatMatJpg,
-                        pt1: new Point(0, bladeTop),  // 起点
-                        pt2: new Point(cropConcatMatJpg.Width, bladeTop), // 终点
-                        color: Scalar.Red,         // 颜色 (B,G,R)
-                        thickness: 1,             // 线宽
-                        lineType: LineTypes.AntiAlias // 抗锯齿
-                        );
-                    Cv2.Line(
-                        img: cropConcatMatJpg,
-                        pt1: new Point(0, bladeBottom),  // 起点
-                        pt2: new Point(cropConcatMatJpg.Width, bladeBottom), // 终点
-                        color: Scalar.Red,         // 颜色 (B,G,R)
-                        thickness: 1,             // 线宽
-                        lineType: LineTypes.AntiAlias // 抗锯齿
-                        );
-                    Cv2.Line(
-                        img: cropConcatMatJpg,
-                        pt1: new Point(0, collapseTop),  // 起点
-                        pt2: new Point(cropConcatMatJpg.Width, collapseTop), // 终点
-                        color: Scalar.Green,         // 颜色 (B,G,R)
-                        thickness: 1,             // 线宽
-                        lineType: LineTypes.AntiAlias // 抗锯齿
-                        );
-                    Cv2.Line(
-                        img: cropConcatMatJpg,
-                        pt1: new Point(0, collapseBottom),  // 起点
-                        pt2: new Point(cropConcatMatJpg.Width, collapseBottom), // 终点
-                        color: Scalar.Green,         // 颜色 (B,G,R)
-                        thickness: 1,             // 线宽
-                        lineType: LineTypes.AntiAlias // 抗锯齿
-                        );
+                    Mat cropConcatMatJpg = JpegStreamToMat(MatToJpegStream(CropHorizontalCenter(concatMat, HeightRange)));
                     try
                     {
                         stopwatch = Stopwatch.StartNew();
-                        result.ConcatImages.Add(new ImageData()
+                        int? centerY = VisionAnalyzer.DetectFirstHorizontalStripeCenter(cropConcatMatJpg);
+                        stopwatch.Stop();
+                        eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"识别有无刀痕用时: {Math.Round(stopwatch.Elapsed.TotalSeconds, 2)} 秒"));
+                        if (centerY is null)
                         {
-                            BladeWidth = 0,
-                            CollapseWidth = 0,
-                            IsSnakelike = VisionAnalyzer.SnakeCase(cropConcatMatJpg).Snake,
-                            Mat = cropConcatMatJpg
-                        });
+                            result.AnalysisFailMats.Add(cropConcatMatJpg);
+                            result.IsSuccess = false;
+                            result.Message = string.IsNullOrEmpty(result.Message) ? "未识别到刀痕，请人工检查刀痕状态！" : result.Message;
+                        }
+                        else
+                        {
+                            stopwatch = Stopwatch.StartNew();
+                            var (bladeWidthMm, collapseWidthMm, bladeTop, bladeBottom, collapseTop, collapseBottom) = VisionAnalyzer.ProcessImage(cropConcatMatJpg);
+                            stopwatch.Stop();
+                            eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"识别刀痕宽度和崩边用时: {Math.Round(stopwatch.Elapsed.TotalSeconds, 2)} 秒"));
+                            Cv2.PutText(cropConcatMatJpg,
+                                $"bladeWidthMm: {bladeWidthMm}",
+                                new Point(20, bladeTop),
+                                HersheyFonts.HersheySimplex,
+                                1.3f,
+                                Scalar.Red,
+                                2);
+                            Cv2.PutText(cropConcatMatJpg,
+                                $"collapseWidthMm:{collapseWidthMm}",
+                                new Point(900, collapseTop),
+                                HersheyFonts.HersheySimplex,
+                                1.3f,
+                                Scalar.Green,
+                                2);
+                            Cv2.Line(
+                                img: cropConcatMatJpg,
+                                pt1: new Point(0, bladeTop),  // 起点
+                                pt2: new Point(cropConcatMatJpg.Width, bladeTop), // 终点
+                                color: Scalar.Red,         // 颜色 (B,G,R)
+                                thickness: 1,             // 线宽
+                                lineType: LineTypes.AntiAlias // 抗锯齿
+                                );
+                            Cv2.Line(
+                                img: cropConcatMatJpg,
+                                pt1: new Point(0, bladeBottom),  // 起点
+                                pt2: new Point(cropConcatMatJpg.Width, bladeBottom), // 终点
+                                color: Scalar.Red,         // 颜色 (B,G,R)
+                                thickness: 1,             // 线宽
+                                lineType: LineTypes.AntiAlias // 抗锯齿
+                                );
+                            Cv2.Line(
+                                img: cropConcatMatJpg,
+                                pt1: new Point(0, collapseTop),  // 起点
+                                pt2: new Point(cropConcatMatJpg.Width, collapseTop), // 终点
+                                color: Scalar.Green,         // 颜色 (B,G,R)
+                                thickness: 1,             // 线宽
+                                lineType: LineTypes.AntiAlias // 抗锯齿
+                                );
+                            Cv2.Line(
+                                img: cropConcatMatJpg,
+                                pt1: new Point(0, collapseBottom),  // 起点
+                                pt2: new Point(cropConcatMatJpg.Width, collapseBottom), // 终点
+                                color: Scalar.Green,         // 颜色 (B,G,R)
+                                thickness: 1,             // 线宽
+                                lineType: LineTypes.AntiAlias // 抗锯齿
+                                );
+                            stopwatch = Stopwatch.StartNew();
+                            result.ConcatImages.Add(new ImageData()
+                            {
+                                BladeWidth = bladeWidthMm,
+                                CollapseWidth = collapseWidthMm,
+                                IsSnakelike = VisionAnalyzer.SnakeCase(cropConcatMatJpg).Snake,
+                                Mat = cropConcatMatJpg
+                            });
+                            stopwatch.Stop();
+                            eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"识别蛇形用时: {Math.Round(stopwatch.Elapsed.TotalSeconds, 2)} 秒"));
+                        }
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         result.AnalysisFailMats.Add(cropConcatMatJpg);
                         result.IsSuccess = false;
+                        result.Message = string.IsNullOrEmpty(result.Message) ? "图像识别刀痕异常，请人工检查刀痕状态！" : result.Message;
                         eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create(ex.Message));
                     }
                     finally
                     {
                         stopwatch.Stop();
-                        eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"识别蛇形总用时: {stopwatch.Elapsed.TotalSeconds} 秒"));
                     }
                 }
-
-
+                #region 保存图片
                 foreach (var image in result.ConcatImages)
                 {
-                    Cv2.ImWrite($"{imagePath}\\{DateTime.Now.Ticks}_拼接图识别图.jpg", image.Mat);
+                    Cv2.ImWrite($"{concatImagesPath}\\{DateTime.Now.Ticks}_拼接图识别图{(image.IsSnakelike ? "蛇形" : "正常")}.jpg", image.Mat);
                 }
-
                 if (result.AnalysisFailMats.Count != 0)
                 {
                     stopwatch = Stopwatch.StartNew();
                     //保存拼接图像到指定目录
-                    string analysisFailMatsPath = System.IO.Path.Combine(AppContext.BaseDirectory, "image\\AnalysisFail");
+                    string analysisFailMatsPath = System.IO.Path.Combine(imagePath, "AnalysisFail");
                     Directory.CreateDirectory(analysisFailMatsPath);
                     foreach (var failMat in result.AnalysisFailMats)
                     {
                         Cv2.ImWrite($"{analysisFailMatsPath}\\{DateTime.Now.Ticks}.jpg", failMat);
                     }
                     stopwatch.Stop();
-                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"保存识别失败图像总用时: {stopwatch.Elapsed.TotalSeconds} 秒"));
+                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"保存识别失败图像总用时: {Math.Round(stopwatch.Elapsed.TotalSeconds, 2)} 秒"));
                 }
+                #endregion
 
-                result.IsSnakelike = result.ConcatImages.All(image => image.IsSnakelike);
+                if (result.HasSnakelike())
+                {
+                    result.IsSuccess = false;
+                    result.Message = string.IsNullOrEmpty(result.Message) ? "图像识别刀痕刀痕为蛇形，请人工检查刀痕状态！" : result.Message;
+                }
             });
             return result;
         }
