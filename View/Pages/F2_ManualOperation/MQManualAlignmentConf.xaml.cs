@@ -60,7 +60,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
 
 
 
-        private void Page_Loaded(object sender, RoutedEventArgs e)
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             // 加载右边和底部按钮
             rightPage = mainWindow.rightFrame.Content as RightPage;
@@ -103,6 +103,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             cutWidth.Text = Tools.FormatDecimalString((cameraCommon._cutMarkWidth / 1000).ToString(), 4);
             edgesWidth.Text = Tools.FormatDecimalString((cameraCommon._edgeChipWidth / 1000).ToString(), 4);
             LoadPosition();
+            //await AutoCutUtils.GoPreCutLineAsync(_pauseCts.Token);
         }
         bool confirmFlag = false;
         private void sureHandler(object sender, bool e)

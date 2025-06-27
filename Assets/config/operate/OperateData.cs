@@ -21,7 +21,7 @@ namespace 精密切割系统.Assets.config.buttom
             list.Add(new OperateBean(6, "系统初始化", "/Assets/icon/tab_0/tab_08.png"));
             list.Add(new OperateBean(5, "切割水", "/Assets/icon/tab_0/tab_05.png"));
             list.Add(new OperateBean(9, "相机吹气", "/Assets/icon/tab_0/tab_06.png"));
-            list.Add(new OperateBean(10, "工作盘真空", "/Assets/icon/tab_0/replace_workspace.png.png"));
+            //list.Add(new OperateBean(10, "工作盘真空", "/Assets/icon/tab_0/replace_workspace.png.png"));
             list.Add(new OperateBean(3, "C/T真空", "/Assets/icon/tab_0/tab_03.png"));
             return list;
         }

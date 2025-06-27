@@ -42,13 +42,15 @@ using 精密切割系统.View.Pages.Auto;
 using 精密切割系统.Model.cut;
 using System.Windows.Threading;
 using 精密切割系统.View.common;
+using OpenCvSharp;
+using System.IO;
 
 namespace 精密切割系统
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : System.Windows.Window
     {
         public MainWindow()
         {
@@ -113,6 +115,50 @@ namespace 精密切割系统
                 //var result = VisionAnalyzer.ProcessImage("C:\\MySpace\\Dev\\OPT Camera Viewer_v4.0.0.1\\Pictures\\PIC_2025-05-09 15-35-09.807(1).bmp");
                 //var result1 = VisionAnalyzer.SnakeCase("C:\\MySpace\\Dev\\OPT Camera Viewer_v4.0.0.1\\Pictures\\PIC_2025-05-09 15-35-09.807(1).bmp");
                 //Debug.WriteLine(result);
+
+
+
+
+
+
+
+       //         string imagePath = System.IO.Path.Combine(AppContext.BaseDirectory, $"image\\临时");
+       //         Directory.CreateDirectory(imagePath);
+       //         Mat mat = Cv2.ImRead("C:\\MySpace\\Dev\\ProjectXiHua\\precision-cutting-321\\bin\\x64\\Debug\\net8.0-windows\\image\\638862689686693423_cropMatJpg.jpg");
+       //         mat.SaveImage($"{imagePath}\\{DateTime.Now}.png"); // 保存图像以供调试
+       //         int? imageY = VisionAnalyzer.DetectFirstHorizontalStripeCenter(mat);
+       //         if (imageY is null)
+       //         {
+       //             MaterialSnackUtils.MaterialSnack("未检测到水平条纹，请检查相机位置！", MaterialSnackUtils.SnackType.WARNING, 0);
+       //             return;
+       //         }
+       //         float offsetY = (float)Math.Round((imageY.Value - (mat.Height / 2)) * VisionAnalyzer.PixelToMmRatio, 4);
+
+       //         Cv2.Line(
+       //             img: mat,
+       //pt1: new OpenCvSharp.Point(0, imageY.Value),  // 起点
+       //pt2: new OpenCvSharp.Point(mat.Width, imageY.Value), // 终点
+       //color: Scalar.Red,         // 颜色 (B,G,R)
+       //thickness: 1,             // 线宽
+       //lineType: LineTypes.AntiAlias // 抗锯齿
+       //);
+       //         Cv2.Line(
+       //img: mat,
+       //pt1: new OpenCvSharp.Point(0, mat.Height / 2),  // 起点
+       //pt2: new OpenCvSharp.Point(mat.Width, mat.Height / 2), // 终点
+       //color: Scalar.Green,         // 颜色 (B,G,R)
+       //thickness: 1,             // 线宽
+       //lineType: LineTypes.AntiAlias // 抗锯齿
+       //);
+       //         mat.SaveImage($"{imagePath}\\{DateTime.Now}.png");
+
+
+
+
+
+
+
+
                 string logDirectory = "logs";
                 int daysThreshold = 30; // 清理超过 30 天的日志
                 TimeSpan interval = TimeSpan.FromDays(1); // 每天触发一次
@@ -223,7 +269,7 @@ namespace 精密切割系统
                         CameraUtils.connectDevice();
                         if (!CameraUtils.m_bDeviceOpened)
                         {
-                            MaterialSnackUtils.MaterialSnack("相机连接失败，重试中...", MaterialSnackUtils.SnackType.WARNING);
+                            MaterialSnackUtils.MaterialSnack($"相机连接失败: {CameraUtils.errorMessage}", MaterialSnackUtils.SnackType.WARNING);
                             Thread.Sleep(2000);
                         }
                     }

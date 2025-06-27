@@ -32,6 +32,8 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
     /// </summary>
     public partial class BladeReplacementConfiguration : UserControl
     {
+        private MainWindow? _mainWindow;
+
         public BladeReplacementConfiguration(IEventAggregator eventAggregator)
         {
             InitializeComponent();
@@ -40,6 +42,17 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 if (target == "lunguTextBox")
                     lunguTextBox.Focus();
             });
+            _mainWindow = Application.Current.MainWindow as MainWindow;
+        }
+
+        private void lunguTextBox_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            _mainWindow?.ShowKeyboardPage(1);
+        }
+
+        private void lunguTextBox_TouchDown(object sender, TouchEventArgs e)
+        {
+            _mainWindow?.ShowKeyboardPage(1);
         }
     }
 }

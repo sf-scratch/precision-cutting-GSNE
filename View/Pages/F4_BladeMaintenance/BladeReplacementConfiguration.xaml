@@ -7,6 +7,7 @@
       xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
       xmlns:auto="clr-namespace:WpfAutoGrid;assembly=WpfAutoGrid.Core" xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
       xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
       mc:Ignorable="d" 
       d:DesignHeight="676" d:DesignWidth="1448"
       d:DataContext="{d:DesignInstance viewModel:BladeReplacementConfigurationViewModel, IsDesignTimeCreatable=True}">
@@ -103,7 +104,7 @@
                 </GroupBox.Header>
                 <auto:AutoGrid Margin="10" Columns="2*,3*,*,2*,5*" RowCount="7" ChildMargin="5">
                     <TextBlock Text="轮毂号"/>
-                    <Controls:InputTextBox x:Name="lunguTextBox" Text="{Binding LunguId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    <Controls:InputTextBox x:Name="lunguTextBox" Text="{Binding LunguId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PreviewMouseDown="lunguTextBox_PreviewMouseDown" TouchDown="lunguTextBox_TouchDown">
                         <!--<behaviors:Interaction.Triggers>
                             <behaviors:EventTrigger EventName="KeyUp">
                                 <behaviors:InvokeCommandAction Command="{Binding InitCommand}" CommandParameter="{Binding Text, ElementName=lunguTextBox}"/>
@@ -115,20 +116,20 @@
                     </Controls:InputTextBox>
                     <TextBlock HorizontalAlignment="Left" Text=""/>
                     <TextBlock Text="实际刀刃规格"/>
-                    <Controls:InputTextBox Text="{Binding LunguSksj.SjSpec}"/>
+                    <Controls:InputTextBox Text="{Binding LunguSksj.SjDrcd}"/>
                     <TextBlock Text="刀刃平均厚度"/>
                     <Controls:InputTextBox Text="{Binding LunguSksj.ABAverageThickness}"/>
                     <TextBlock HorizontalAlignment="Left" Text="um"/>
-                    <TextBlock Text="刀片类型"/>
-                    <Controls:InputTextBox Text="{Binding LunguSksj.BladeType}"/>
+                    <TextBlock Text="订单刀刃规格"/>
+                    <Controls:InputTextBox Text="{Binding LunguSksj.BladeEdgeType}"/>
                     <TextBlock Text="最长刀刃长度"/>
                     <Controls:InputTextBox Text="{Binding LunguSksj.LongestBlade}"/>
                     <TextBlock HorizontalAlignment="Left" Text="um"/>
-                    <TextBlock Text="刀刃规格"/>
-                    <Controls:InputTextBox Text="{Binding LunguSksj.BladeEdgeType}"/>
+                    <TextBlock Text="刀片类型"/>
+                    <Controls:InputTextBox Text="{Binding LunguSksj.BladeType}"/>
                     <TextBlock Text="刀片外径"/>
                     <Controls:InputTextBox Text="{Binding LunguSksj.BladeOuterDiameter}"/>
-                    <TextBlock HorizontalAlignment="Left" Text="um"/>
+                    <TextBlock HorizontalAlignment="Left" Text="mm"/>
                 </auto:AutoGrid>
             </GroupBox>
 
@@ -201,6 +202,32 @@
                         <TextBlock Text="最高磨刀速率"/>
                         <Controls:InputTextBox Text="{Binding SharpenParams.HightestCutSpeed}"/>
                         <TextBlock HorizontalAlignment="Left" Text="mm/s"/>
+                    </auto:AutoGrid>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Margin="10">
+                <GroupBox.Header>
+                    <TextBlock Text="自动执行数据" FontWeight="Bold" FontSize="20"/>
+                </GroupBox.Header>
+                <StackPanel>
+                    <auto:AutoGrid Margin="10" Columns="2*,2*,*,2*,2*,*" RowCount="7" ChildMargin="5">
+                        <TextBlock Text="磨刀开始位置"/>
+                        <Controls:InputTextBox Text="{Binding SharpenY}"/>
+                        <TextBlock HorizontalAlignment="Left" Text="mm"/>
+                        <TextBlock Text="执行自动磨刀"/>
+                        <ToggleButton IsChecked="{Binding SharpenParams.IsExecuteSharpen, Mode=TwoWay}">
+                            <ToggleButton.Resources>
+                                <ResourceDictionary>
+                                    <ResourceDictionary.MergedDictionaries>
+                                        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml"/>
+                                    </ResourceDictionary.MergedDictionaries>
+                                </ResourceDictionary>
+                            </ToggleButton.Resources>
+                        </ToggleButton>
+                        <TextBlock HorizontalAlignment="Left" Text=""/>
+                        <TextBlock Text="切割开始位置"/>
+                        <Controls:InputTextBox Text="{Binding CutY}"/>
+                        <TextBlock HorizontalAlignment="Left" Text="mm"/>
                     </auto:AutoGrid>
                 </StackPanel>
             </GroupBox>

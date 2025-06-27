@@ -32,7 +32,6 @@ namespace 精密切割系统.View.Controls
     /// </summary>
     public partial class RightButton : UserControl
     {
-        private MainWindow? mainWindow;
         //文字
         public static readonly DependencyProperty ContentTextProperty =
         DependencyProperty.Register("ContentText", typeof(string), typeof(RightButton), new PropertyMetadata(null));
@@ -105,7 +104,6 @@ namespace 精密切割系统.View.Controls
         public RightButton()
         {
             InitializeComponent();
-            mainWindow = Application.Current.MainWindow as MainWindow;
             if (DevicesUtis.IsTouchSupported()) {
                 btnBorder.TouchDown += BtnBorder_TouchDown;
                 btnBorder.TouchLeave += BtnBorder_TouchLeave;
@@ -138,10 +136,7 @@ namespace 精密切割系统.View.Controls
 
         private void BtnBorder_TouchLeave(object? sender, TouchEventArgs e)
         {
-            if (resetState)
-            {
-                btnBorder.Background = BackgroundDefColor;
-            }
+            btnBorder.Background = BackgroundDefColor;
         }
 
         private void BtnBorder_MouseUp(object sender, MouseButtonEventArgs e)
@@ -175,8 +170,6 @@ namespace 精密切割系统.View.Controls
             RightClicked += handler;
         }
         public event EventHandler<Boolean> RightClicked;
-
-        public bool resetState { get; set; } = true;
 
         public void resetBg()
         {

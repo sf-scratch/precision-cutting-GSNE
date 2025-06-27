@@ -27,7 +27,7 @@ namespace 精密切割系统.Model.cut
         {
             get
             {
-                return new ServicePauseResult { Type = ServicePauseResultType.BladeScrap };
+                return new ServicePauseResult { Type = ServicePauseResultType.Stop };
             }
         }
 

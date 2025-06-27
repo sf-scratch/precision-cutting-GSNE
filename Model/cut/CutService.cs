@@ -1,11 +1,14 @@
 ﻿using Newtonsoft.Json.Linq;
 using OpenCvSharp;
+using OpenCvSharp.WpfExtensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Printing;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using 精密切割系统.Driver;
 using 精密切割系统.DTOs;
@@ -16,7 +19,9 @@ using 精密切割系统.Model.common;
 using 精密切割系统.Model.plc;
 using 精密切割系统.PubSubEvent;
 using 精密切割系统.Utils;
+using 精密切割系统.View.Pages.common;
 using 精密切割系统.ViewModel;
+using static SQLite.SQLite3;
 using static 精密切割系统.Model.cut.ServicePauseResult;
 
 namespace 精密切割系统.Model.cut
@@ -30,7 +35,7 @@ namespace 精密切割系统.Model.cut
         }
 
         public event Action<CutServiceProcess>? CutServiceProcessChanged;
-        public event Action<LineSegment?,string?>? CutServicePaused;
+        public event Action<LineSegment?, string?>? CutServicePaused;
         public event Action? RemindReplaceWafer;
         private TaskCompletionSource<ServicePauseResult>? _continueTcs;
         private CancellationToken _usingPauseToken;
@@ -119,6 +124,8 @@ namespace 精密切割系统.Model.cut
             _recordCutY = 0;
         }
 
+        private double _secondToolMarkWidth;
+
         public async Task<RunResult> Run(LunguSksjModel lunguSksj, List<float> cutSpeedList, float bladeContactWorkingDiscZ1, float bladeLiftingHeight, int spindleRev, float margin, float cutCalibratTheta, IEventAggregator? eventAggregator, CancellationToken pauseToken = default)
         {
             InitFromAppsettings();
@@ -136,7 +143,7 @@ namespace 精密切割系统.Model.cut
                 //进入全自动切割模式
                 await PlcControl.tagControl.cutting.EnterCuttingModeAsync(_usingPauseToken);
                 float abAverageThickness = lunguSksj.ABAverageThickness;
-                float cutDeep = AutoCutUtils.GetCuttingDeep(lunguSksj.ABAverageThickness);
+                float cutDeep = GetCuttingDeep(lunguSksj.ABAverageThickness);
                 int chekcTimes = 0;
                 while (cutTime < needCutTimes)
                 {
@@ -162,7 +169,7 @@ namespace 精密切割系统.Model.cut
                             {
                                 RemindReplaceWafer?.Invoke();
                                 ServicePauseResult result = await WaitContinueAsync(line);
-                                if (result.Type == ServicePauseResult.ServicePauseResultType.Stop)
+                                if (result.Type == ServicePauseResultType.Stop)
                                 {
                                     return RunResult.Fail(RunExceptionType.Stop, "停止切割");
                                 }
@@ -196,7 +203,7 @@ namespace 精密切割系统.Model.cut
                         if (_usingPauseToken.IsCancellationRequested)
                         {
                             ServicePauseResult result = await WaitContinueAsync(line);
-                            if (result.Type == ServicePauseResult.ServicePauseResultType.Stop)
+                            if (result.Type == ServicePauseResultType.Stop)
                             {
                                 return RunResult.Fail(RunExceptionType.Stop, "停止切割");
                             }
@@ -222,77 +229,122 @@ namespace 精密切割系统.Model.cut
                         {
                             chekcTimes++;
                             // 如果是第一次检查刀痕，且需要检查基准线位置，则提示检查基准线位置
-                            if (chekcTimes == 1 && (Appsettings.IsNeedCheckBaseLine ?? true))
+                            //if (chekcTimes == 1 && (Appsettings.IsNeedCheckBaseLine ?? true))
+                            if (chekcTimes == 1)
                             {
                                 ServicePauseResult result = await WaitContinueAsync(line, "请检查基准线位置！");
-                                if (result.Type == ServicePauseResult.ServicePauseResultType.Stop)
+                                switch (result.Type)
                                 {
-                                    return RunResult.Fail(RunExceptionType.Stop, "停止切割");
+                                    case ServicePauseResultType.BladeScrap:
+                                        await Application.Current.Dispatcher.InvokeAsync(async () =>
+                                        {
+                                            WriteableBitmap? localBitmap = AutoCutUtils.GrabWriteableBitmap();
+                                            if (localBitmap != null)
+                                            {
+                                                await PdaUtils.ScrapAsync(localBitmap.ToMat());
+                                            }
+                                        });
+                                        return RunResult.Fail(RunExceptionType.Stop, "刀片已报废！");
+                                    case ServicePauseResultType.Stop:
+                                        return RunResult.Fail(RunExceptionType.Stop, "停止切割");
+                                    default:
+                                        break;
                                 }
                             }
                             MaterialSnackUtils.MaterialSnack("检查刀痕中...", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
-                            bool isOkKnifeMarksStatus = false;
                             try
                             {
                                 //退出全自动切割模式
                                 await PlcControl.tagControl.cutting.ExitCuttingModeAsync(_usingPauseToken);
                                 //刀痕检查
                                 ImagesAnalysisResult result = await AutoCutUtils.CheckKnifeMarksStatus(line, eventAggregator, _usingPauseToken);
-                                //刀痕检查结果失败，表示未检测到刀痕
-                                if (!result.IsSuccess)
+                                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create(
+                                    $"最大刀痕宽度：{result.BladeWidthMaxImage.BladeWidth} " +
+                                    $"最大崩边宽度：{result.CollapseWidthMaxImage.CollapseWidth} " +
+                                    $"是否蛇形：{result.IsSnakelike}"));
+                                double bladeWidthMax, collapseWidthMax;
+                                Mat bladeWidthMaxMat, collapseWidthMaxMat;
+                                // 刀痕检查结果未成功，表示未检测到刀痕
+                                if (!result.IsSuccess || result.IsSnakelike)
                                 {
-                                    ServicePauseResult pauseResult = await WaitContinueAsync(line, "图像识别刀痕异常，请人工检查刀痕状态！");
+                                    //刀痕检查结果失败，表示未检测到刀痕
+                                    ServicePauseResult pauseResult = await WaitContinueAsync(line, result.IsSnakelike ? "图像识别刀痕刀痕为蛇形，请人工检查刀痕状态！" : "图像识别刀痕异常，请人工检查刀痕状态！");
                                     switch (pauseResult.Type)
                                     {
                                         case ServicePauseResultType.BladeScrap:
-                                            await PdaUtils.ScrapAsync(result.AnalysisFailMats.First());
+                                            await Application.Current.Dispatcher.InvokeAsync(async () =>
+                                            {
+                                                WriteableBitmap? localBitmap = AutoCutUtils.GrabWriteableBitmap();
+                                                if (localBitmap is not null && result is not null)
+                                                {
+                                                    await PdaUtils.ScrapAsync(result.ConcatImages.First().Mat);
+                                                }
+                                            });
                                             return RunResult.Fail(RunExceptionType.Stop, "刀片已报废！");
                                         case ServicePauseResultType.Stop:
                                             return RunResult.Fail(RunExceptionType.Stop, "停止切割");
                                         default:
-                                            continue;
+                                            break;
                                     }
+                                    CameraCommon? cameraCommon = AutoCutUtils.GetCameraCommon();
+                                    if (cameraCommon is null)
+                                    {
+                                        continue;
+                                    }
+                                    bladeWidthMax = cameraCommon._cutMarkWidth / 1000;
+                                    bladeWidthMaxMat = Cv2.ImRead(System.IO.Path.Combine(AppContext.BaseDirectory, "Assets\\config\\empty.png"));
+                                    bladeWidthMaxMat = AutoCutUtils.JpegStreamToMat(AutoCutUtils.MatToJpegStream(bladeWidthMaxMat));
+                                    collapseWidthMax = cameraCommon._edgeChipWidth / 1000;
+                                    collapseWidthMaxMat = bladeWidthMaxMat;
                                 }
+                                else
+                                {
+                                    bladeWidthMax = result.BladeWidthMaxImage.BladeWidth;
+                                    bladeWidthMaxMat = result.BladeWidthMaxImage.Mat;
+                                    collapseWidthMax = result.CollapseWidthMaxImage.CollapseWidth;
+                                    collapseWidthMaxMat = result.CollapseWidthMaxImage.Mat;
+                                }
+
                                 // 处理图像数据
                                 if (result.ImageDatas.Count != 0)
                                 {
-                                    ImageData bladeWidthMaxImage = result.BladeWidthMaxImage;
                                     switch (chekcTimes)
                                     {
                                         case 1:
-                                            PdaUtils.AddToolMarkWidth(bladeWidthMaxImage.BladeWidth);
-                                            PdaUtils.AddToolMarkActualWidth(bladeWidthMaxImage.BladeWidth);
-                                            PdaUtils.AddFirstToolMarkWidth(bladeWidthMaxImage.BladeWidth);
-                                            PdaUtils.AddFirstToolMarkImage(bladeWidthMaxImage.Mat);
-                                            //上传崩边
-                                            double singleCollapseAngle = (result.CollapseWidthMaxImage.CollapseWidth - result.CollapseWidthMaxImage.BladeWidth) / 2;
-                                            PdaUtils.AddSingleCollapseAngle(singleCollapseAngle);
-                                            PdaUtils.AddMaximumCollapseAngle(result.CollapseWidthMaxImage.CollapseWidth);
-                                            PdaUtils.AddMaximumCollapseAngleImage(result.CollapseWidthMaxImage.Mat);
-                                            string bladeEdgeBreakageGrade = await GetDpbbdjAsync(lunguSksj.LunguId, (float)singleCollapseAngle);
-                                            PdaUtils.AddBladeEdgeBreakageGrade(bladeEdgeBreakageGrade);
+                                            PdaUtils.AddFirstToolMarkWidth(bladeWidthMax);
+                                            PdaUtils.AddFirstToolMarkImage(bladeWidthMaxMat);
+                                            if (lunguSksj.BladeType != "新刀")
+                                            {
+                                                PdaUtils.AddToolMarkWidth(bladeWidthMax);
+                                                PdaUtils.AddToolMarkActualWidth(bladeWidthMax);
+                                                _secondToolMarkWidth = bladeWidthMax;
+                                            }
                                             break;
                                         case 2:
-                                            PdaUtils.AddSecondToolMarkImage(bladeWidthMaxImage.Mat);
+                                            PdaUtils.AddToolMarkWidth(bladeWidthMax);
+                                            PdaUtils.AddToolMarkActualWidth(bladeWidthMax);
+                                            PdaUtils.AddSecondToolMarkImage(bladeWidthMaxMat);
+                                            _secondToolMarkWidth = bladeWidthMax;
                                             break;
                                         default:
                                             break;
                                     }
-                                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create(
-                                        $"最大刀痕宽度：{result.BladeWidthMaxImage.BladeWidth} " +
-                                        $"最大崩边宽度：{result.BladeWidthMaxImage.CollapseWidth} " +
-                                        $"是否蛇形：{result.IsSnakelike}"));
+                                    if (beforeStopCutTimes == needCutTimes)
+                                    {
+                                        //上传崩边
+                                        double singleCollapseAngle = (Math.Round(collapseWidthMax, 3) - Math.Round(_secondToolMarkWidth, 3)) / 2;
+                                        PdaUtils.AddSingleCollapseAngle(singleCollapseAngle);
+                                        PdaUtils.AddMaximumCollapseAngle(collapseWidthMax);
+                                        PdaUtils.AddMaximumCollapseAngleImage(collapseWidthMaxMat);
+                                        string bladeEdgeBreakageGrade = await GetDpbbdjAsync(lunguSksj.LunguId, (float)Math.Round(singleCollapseAngle * 1000, 1));
+                                        PdaUtils.AddBladeEdgeBreakageGrade(bladeEdgeBreakageGrade);
+                                    }
                                 }
-                                isOkKnifeMarksStatus = true;
                             }
                             finally
                             {
                                 //进入全自动切割模式
                                 await PlcControl.tagControl.cutting.EnterCuttingModeAsync(_usingPauseToken);
-                            }
-                            if (!isOkKnifeMarksStatus)
-                            {
-                                return RunResult.Fail(RunExceptionType.BladeScrap, "刀痕不合格！");
                             }
                             MaterialSnackUtils.MaterialSnack("刀痕合格！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
                             MaterialSnackUtils.MaterialSnack("切割进行中...", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
@@ -301,7 +353,7 @@ namespace 精密切割系统.Model.cut
                     catch (OperationCanceledException)
                     {
                         ServicePauseResult pauseResult = await WaitContinueAsync(line);
-                        if (pauseResult.Type == ServicePauseResult.ServicePauseResultType.Stop)
+                        if (pauseResult.Type == ServicePauseResultType.Stop)
                         {
                             return RunResult.Fail(RunExceptionType.Stop, "停止切割");
                         }
@@ -654,6 +706,18 @@ namespace 精密切割系统.Model.cut
                 endX = 140;
             }
             return (startX, endX);
+        }
+
+        public static float GetCuttingDeep(float abAverageThickness)
+        {
+            if (10 <= abAverageThickness && abAverageThickness <= 24)
+            {
+                return 0.2f; // 10-24mm 切割深度 0.2mm
+            }
+            else
+            {
+                return 0.3f; // 其他情况切割深度 0.3mm
+            }
         }
     }
 

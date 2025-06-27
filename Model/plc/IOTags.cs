@@ -1,5 +1,4 @@
-﻿using HslCommunication.Instrument.CJT;
-using SixLabors.Fonts.Tables.AdvancedTypographic;
+﻿using SixLabors.Fonts.Tables.AdvancedTypographic;
 using System;
 using System.Collections.Generic;
 using System.Linq;

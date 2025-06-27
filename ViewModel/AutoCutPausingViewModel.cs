@@ -28,7 +28,7 @@ namespace 精密切割系统.ViewModel
         public RelayCommand ContinueCommand { get; set; }
         public RelayCommand StopCommand { get; set; }
         private readonly IRegionManager _regionManager;
-        private readonly CameraCommon? _cameraCommon;
+        private CameraCommon? _cameraCommon;
         private AutoCutRuningViewModel _autoCutRuningViewModel;
         private DataPoint<float>? _originPoint;
 
@@ -154,12 +154,7 @@ namespace 精密切割系统.ViewModel
             OperatePageButtonCollection = WindowLayout.OperatePageButtons;
             ContinueCommand = new RelayCommand(ContinueCommandExecute);
             StopCommand = new RelayCommand(StopCommandExecute);
-            _cameraCommon = AutoCutUtils.GetCameraCommon();
-            if (_cameraCommon is null)
-            {
-                MaterialSnackUtils.MaterialSnack("相机获取失败！", MaterialSnackUtils.SnackType.WARNING);
-            }
-            Task monitorTask = StartMonitoringAlarmAsync(default);
+            //Task monitorTask = StartMonitoringAlarmAsync(default);
         }
 
         public AutoCutPausingViewModel()
@@ -182,9 +177,12 @@ namespace 精密切割系统.ViewModel
         private void InitBottomButton()
         {
             OperatePageButtonCollection.Clear();
-            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调窄", "/Assets/icon/tab_1/03/tab_02.png", BaselineNarrowing, null, 8));
-            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调宽", "/Assets/icon/tab_1/03/tab_05.png", BaselineWidthAdjustment, null, 8));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("工件吹气", "/Assets/icon/tab_1/03/tab_08.png", WorkpieceBlowing, null, 8));
             OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线校准", "/Assets/icon/tab_1/03/tab_08.png", BaselineCalibration, null, 8));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调窄", "/Assets/icon/tab_1/03/tab_02.png", BaselineNarrowing, null, 8));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调宽", "/Assets/icon/tab_1/03/tab_05.png", BaselineWidening, null, 8));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("崩边调窄", "/Assets/icon/tab_1/03/tab_02.png", BrokenEdgeNarrowing, null, 8));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("崩边调宽", "/Assets/icon/tab_1/03/tab_05.png", BrokenEdgeWidening, null, 8));
             OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("报废", "/Assets/icon/tab_1/03/tab_08.png", BladeScrap, null, 8));
         }
 
@@ -198,11 +196,12 @@ namespace 精密切割系统.ViewModel
                 MaterialSnackUtils.MaterialSnack("再次点击报废，刀片将提交报废并退出自动执行！", MaterialSnackUtils.SnackType.WARNING);
                 return;
             }
+            InitRightButtonOnlyStop();
             _isSureBladeScrap = false;
             await _autoCutRuningViewModel.StopAsync(ServicePauseResult.BladeScrap);
         }
 
-        private void BaselineWidthAdjustment()
+        private void BaselineWidening()
         {
             _cameraCommon?.SetCutMarkWidth(1, 2);
             UpdateBaselineWidth();
@@ -212,6 +211,18 @@ namespace 精密切割系统.ViewModel
         {
             _cameraCommon?.SetCutMarkWidth(-1, 2);
             UpdateBaselineWidth();
+        }
+
+        private void BrokenEdgeWidening()
+        {
+            _cameraCommon?.SetEdgeWidth(1, 2);
+            UpdateBrokenEdgeWidth();
+        }
+
+        private void BrokenEdgeNarrowing()
+        {
+            _cameraCommon?.SetEdgeWidth(-1, 2);
+            UpdateBrokenEdgeWidth();
         }
 
         private async void BaselineCalibration()
@@ -235,9 +246,19 @@ namespace 精密切割系统.ViewModel
             MaterialSnackUtils.MaterialSnack($"基准线校准完成", MaterialSnackUtils.SnackType.SUCCESS, 0);
         }
 
+        private async void WorkpieceBlowing()
+        {
+            await AutoCutUtils.WorkpieceBlowingAsync();
+        }
+
         private void UpdateBaselineWidth()
         {
-            BaselineWidth = (float)Math.Round(_cameraCommon?._cutMarkWidth / 1000 ?? 0, 4);
+            BaselineWidth = MathF.Round(_cameraCommon?._cutMarkWidth / 1000 ?? 0, 4);
+        }
+
+        private void UpdateBrokenEdgeWidth()
+        {
+            BrokenEdgeWidth = MathF.Round(_cameraCommon?._edgeChipWidth / 1000 ?? 0, 4);
         }
 
         public async Task StartMonitoringAlarmAsync(CancellationToken token)
@@ -277,6 +298,11 @@ namespace 精密切割系统.ViewModel
 
         private void ContinueCommandExecute()
         {
+            if (AlarmConfig.Instance.HasActiveErrorAlarm())
+            {
+                MaterialSnackUtils.MaterialSnack("请先处理错误报警！", MaterialSnackUtils.SnackType.WARNING);
+                return;
+            }
             NavigationParameters parameters = new NavigationParameters
             {
                 { "SharpenParams", _autoCutRuningViewModel.SharpenParams },
@@ -296,6 +322,11 @@ namespace 精密切割系统.ViewModel
             base.OnNavigatedTo(navigationContext);
             InitBottomButton();
             InitRightButton();
+            _cameraCommon = AutoCutUtils.GetCameraCommon();
+            if (_cameraCommon is not null)
+            {
+                _cameraCommon.LineChanged += CameraCommon_LineChanged;
+            }
             _autoCutRuningViewModel = navigationContext.Parameters.GetValue<AutoCutRuningViewModel>("AutoCutRuningViewModel");
             AfterHeightMeasurementZ = _autoCutRuningViewModel.AfterHeightMeasurementZ;
             SharpenBladeHeight = _autoCutRuningViewModel.SharpenBladeHeight;
@@ -307,12 +338,28 @@ namespace 精密切割系统.ViewModel
             CutProgress = _autoCutRuningViewModel.CutProgress;
             AfterReplaceBladeCutTimes = _autoCutRuningViewModel.AfterReplaceBladeCutTimes;
             UpdateBaselineWidth();
+            UpdateBrokenEdgeWidth();
             float? xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync();
             float? yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync();
             // 初始化起始点位置
             if (xLocation != null && yLocation != null)
             {
                 _originPoint = new DataPoint<float>(xLocation.Value, yLocation.Value);
+            }
+        }
+
+        private void CameraCommon_LineChanged()
+        {
+            UpdateBaselineWidth();
+            UpdateBrokenEdgeWidth();
+        }
+
+        public override void OnNavigatedFrom(NavigationContext navigationContext)
+        {
+            base.OnNavigatedFrom(navigationContext);
+            if (_cameraCommon is not null)
+            {
+                _cameraCommon.LineChanged -= CameraCommon_LineChanged;
             }
         }
     }

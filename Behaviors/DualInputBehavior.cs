@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows;
 using System.Threading;
+using NPOI.SS.Formula.Functions;
+using System.Diagnostics;
 
 namespace 精密切割系统.Behaviors
 {
@@ -74,11 +76,11 @@ namespace 精密切割系统.Behaviors
         private async void AssociatedObject_TouchDown(object? sender, TouchEventArgs e)
         {
             if (_delayCts is not null && !_delayCts.IsCancellationRequested) return;
-            _delayCts = new CancellationTokenSource();
+            //_delayCts = new CancellationTokenSource();
             try
             {
-                ExecutePrompt(sender, e);
-                await Task.Delay(TimeSpan.FromSeconds(TouchDelaySeconds), _delayCts.Token);
+                //ExecutePrompt(sender, e);
+                //await Task.Delay(TimeSpan.FromSeconds(TouchDelaySeconds), _delayCts.Token);
                 ExecuteStart(sender, e);
             }
             catch (TaskCanceledException) { }
@@ -87,11 +89,11 @@ namespace 精密切割系统.Behaviors
         private async void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             if (_delayCts is not null && !_delayCts.IsCancellationRequested) return;
-            _delayCts = new CancellationTokenSource();
+            //_delayCts = new CancellationTokenSource();
             try
             {
-                ExecutePrompt(sender, e);
-                await Task.Delay(TimeSpan.FromSeconds(TouchDelaySeconds), _delayCts.Token);
+                //ExecutePrompt(sender, e);
+                //await Task.Delay(TimeSpan.FromSeconds(TouchDelaySeconds), _delayCts.Token);
                 ExecuteStart(sender, e);
             }
             catch (TaskCanceledException) { }

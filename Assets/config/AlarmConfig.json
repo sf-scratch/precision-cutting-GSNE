@@ -362,7 +362,7 @@
   {
     "Address": "MR60408",
     "Level": "Error",
-    "Message": "测高传感器脏污，请清洁"
+    "Message": "测高导电异常"
   },
   {
     "Address": "MR60409",
@@ -482,12 +482,12 @@
   {
     "Address": "MR60600",
     "Level": "Error",
-    "Message": "安全门1打开中#"
+    "Message": "切割安全门打开中#"
   },
   {
     "Address": "MR60601",
     "Level": "Error",
-    "Message": "安全门2打开中#"
+    "Message": "相机安全门打开中#"
   },
   {
     "Address": "MR60602",

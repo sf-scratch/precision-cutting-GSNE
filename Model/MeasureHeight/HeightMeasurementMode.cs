@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace 精密切割系统.Model.cut
+namespace 精密切割系统.Model.MeasureHeight
 {
     public enum HeightMeasurementMode
     {

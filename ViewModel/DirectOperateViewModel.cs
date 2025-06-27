@@ -12,7 +12,7 @@ namespace 精密切割系统.ViewModel
 {
     public class DirectOperateViewModel : BindableBase
     {
-        private static readonly float RelativeDistance = 0.01f; // 相对移动距离
+        private static readonly float RelativeDistance = 0.001f; // 相对移动距离
         private static readonly float RelativeSpeed = 0.2f; // 相对移动速度
         private static readonly float RelativeTime = DualInputBehavior.TouchDelaySeconds * 2; // 相对移动最长时间，超过取消
         private CancellationTokenSource _cancelGetAxisInfoCts;
@@ -647,7 +647,7 @@ namespace 精密切割系统.ViewModel
 
         async void ExecuteStartRaiseZ2Command()
         {
-            await PlcControl.tagControl.Z2axis.StartJogAsync(0);
+            await PlcControl.tagControl.Z2axis.StartJogAsync(1);
         }
 
         private DelegateCommand _startDropZ2Command;
@@ -656,7 +656,7 @@ namespace 精密切割系统.ViewModel
 
         async void ExecuteStartDropZ2Command()
         {
-            await PlcControl.tagControl.Z2axis.StartJogAsync(1);
+            await PlcControl.tagControl.Z2axis.StartJogAsync(0);
         }
 
         private DelegateCommand _stopJogZ2Command;
@@ -666,6 +666,74 @@ namespace 精密切割系统.ViewModel
         async void ExecuteStopJogZ2Command()
         {
             await PlcControl.tagControl.Z2axis.StopJogAsync();
+        }
+
+        private DelegateCommand _z1RelativePositiveCommand;
+        public DelegateCommand Z1RelativePositiveCommand =>
+            _z1RelativePositiveCommand ?? (_z1RelativePositiveCommand = new DelegateCommand(ExecuteZ1RelativePositiveCommand));
+
+        async void ExecuteZ1RelativePositiveCommand()
+        {
+            try
+            {
+                var cts = new CancellationTokenSource();
+                cts.CancelAfter(TimeSpan.FromSeconds(RelativeTime));
+                await PlcControl.tagControl.Z1axis.StartRelativeAsync(RelativeDistance, RelativeSpeed, cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+        }
+
+        private DelegateCommand _z1RelativeNegativeCommand;
+        public DelegateCommand Z1RelativeNegativeCommand =>
+            _z1RelativeNegativeCommand ?? (_z1RelativeNegativeCommand = new DelegateCommand(ExecuteZ1RelativeNegativeCommand));
+
+        async void ExecuteZ1RelativeNegativeCommand()
+        {
+            try
+            {
+                var cts = new CancellationTokenSource();
+                cts.CancelAfter(TimeSpan.FromSeconds(RelativeTime));
+                await PlcControl.tagControl.Z1axis.StartRelativeAsync(-RelativeDistance, RelativeSpeed, cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+        }
+
+        private DelegateCommand _z2RelativePositiveCommand;
+        public DelegateCommand Z2RelativePositiveCommand =>
+            _z2RelativePositiveCommand ?? (_z2RelativePositiveCommand = new DelegateCommand(ExecuteZ2RelativePositiveCommand));
+
+        async void ExecuteZ2RelativePositiveCommand()
+        {
+            try
+            {
+                var cts = new CancellationTokenSource();
+                cts.CancelAfter(TimeSpan.FromSeconds(RelativeTime));
+                await PlcControl.tagControl.Z2axis.StartRelativeAsync(RelativeDistance, RelativeSpeed, cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+        }
+
+        private DelegateCommand _z2RelativeNegativeCommand;
+        public DelegateCommand Z2RelativeNegativeCommand =>
+            _z2RelativeNegativeCommand ?? (_z2RelativeNegativeCommand = new DelegateCommand(ExecuteZ2RelativeNegativeCommand));
+
+        async void ExecuteZ2RelativeNegativeCommand()
+        {
+            try
+            {
+                var cts = new CancellationTokenSource();
+                cts.CancelAfter(TimeSpan.FromSeconds(RelativeTime));
+                await PlcControl.tagControl.Z2axis.StartRelativeAsync(-RelativeDistance, RelativeSpeed, cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+            }
         }
 
         private bool _isHighSpeed;
@@ -728,11 +796,11 @@ namespace 精密切割系统.ViewModel
                 {
                     try
                     {
-                        CurrentPositionX = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? float.NaN;
-                        CurrentPositionY = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? float.NaN;
-                        CurrentPositionZ1 = await PlcControl.tagControl.Z1axis.GetCurrentLocationAsync() ?? float.NaN;
-                        CurrentPositionZ2 = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync() ?? float.NaN;
-                        CurrentPositionTheta = await PlcControl.tagControl.ThetaAxis.GetCurrentLocationAsync() ?? float.NaN;
+                        CurrentPositionX = MathF.Round(await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? float.NaN, 3);
+                        CurrentPositionY = MathF.Round(await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? float.NaN, 3);
+                        CurrentPositionZ1 = MathF.Round(await PlcControl.tagControl.Z1axis.GetCurrentLocationAsync() ?? float.NaN, 3);
+                        CurrentPositionZ2 = MathF.Round(await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync() ?? float.NaN, 3);
+                        CurrentPositionTheta = MathF.Round(await PlcControl.tagControl.ThetaAxis.GetCurrentLocationAsync() ?? float.NaN, 3);
                         //CurrentSpeedX = await PlcControl.tagControl.Xaxis.GetAbsoluteSpeedAsync() ?? float.NaN;
                         //CurrentSpeedY = await PlcControl.tagControl.Yaxis.GetAbsoluteSpeedAsync() ?? float.NaN;
                         //CurrentSpeedZ1 = await PlcControl.tagControl.Z1axis.GetAbsoluteSpeedAsync() ?? float.NaN;

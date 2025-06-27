@@ -47,6 +47,7 @@ namespace 精密切割系统.View.Pages.passowrd
             rightPage.btnBack.Visibility = Visibility.Visible;
             rightPage.btnSure.Visibility = Visibility.Visible;
             rightPage.btnBack.BackFlag = true;
+            rightPage.btnBack.SetRightClickedHandler(BtnBack_RightClicked);
             rightPage.btnSure.GlobalRunOperateFlag = true;
             rightPage.btnSure.SetRightClickedHandler(BtnSure_RightClicked);
             operatePage = mainWindow.operateFrame.Content as OperatePage;
@@ -72,6 +73,11 @@ namespace 精密切割系统.View.Pages.passowrd
             {
                 userDefineDataModel = list[0];
             }
+        }
+
+        private void BtnBack_RightClicked(object? sender, bool e) 
+        {
+            mainWindow.NavigateToPage("MainMenu");
         }
 
         private void BtnSure_RightClicked(object? sender, bool e) {

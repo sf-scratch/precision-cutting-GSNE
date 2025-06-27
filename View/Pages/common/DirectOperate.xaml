@@ -204,12 +204,12 @@
                             </Button>
                             <Button Height="40" Width="90" Grid.Row="1" Background="#5087Cb" Foreground="White" Content="Z1抬起">
                                 <behaviors:Interaction.Behaviors>
-                                    <behav:DualInputBehavior StartCommand="{Binding StartRaiseZ1Command}" StopCommand="{Binding StopJogZ1Command}"/>
+                                    <behav:DualInputBehavior PromptCommand="{Binding Z1RelativeNegativeCommand}" StartCommand="{Binding StartRaiseZ1Command}" StopCommand="{Binding StopJogZ1Command}"/>
                                 </behaviors:Interaction.Behaviors>
                             </Button>
                             <Button Height="40" Width="90" Grid.Row="2" Background="#5087Cb" Foreground="White" Content="Z1下降">
                                 <behaviors:Interaction.Behaviors>
-                                    <behav:DualInputBehavior StartCommand="{Binding StartDropZ1Command}" StopCommand="{Binding StopJogZ1Command}"/>
+                                    <behav:DualInputBehavior PromptCommand="{Binding Z1RelativePositiveCommand}" StartCommand="{Binding StartDropZ1Command}" StopCommand="{Binding StopJogZ1Command}"/>
                                 </behaviors:Interaction.Behaviors>
                             </Button>
                         </Grid>
@@ -267,12 +267,12 @@
                             </Button>
                             <Button Height="40" Width="90" Grid.Row="1" Background="#5087Cb" Foreground="White" Content="Z2抬起">
                                 <behaviors:Interaction.Behaviors>
-                                    <behav:DualInputBehavior StartCommand="{Binding StartRaiseZ2Command}" StopCommand="{Binding StopJogZ2Command}"/>
+                                    <behav:DualInputBehavior PromptCommand="{Binding Z2RelativeNegativeCommand}" StartCommand="{Binding StartRaiseZ2Command}" StopCommand="{Binding StopJogZ2Command}"/>
                                 </behaviors:Interaction.Behaviors>
                             </Button>
                             <Button Height="40" Width="90" Grid.Row="2" Background="#5087Cb" Foreground="White" Content="Z2下降">
                                 <behaviors:Interaction.Behaviors>
-                                    <behav:DualInputBehavior StartCommand="{Binding StartDropZ2Command}" StopCommand="{Binding StopJogZ2Command}"/>
+                                    <behav:DualInputBehavior PromptCommand="{Binding Z2RelativePositiveCommand}" StartCommand="{Binding StartDropZ2Command}" StopCommand="{Binding StopJogZ2Command}"/>
                                 </behaviors:Interaction.Behaviors>
                             </Button>
                         </Grid>

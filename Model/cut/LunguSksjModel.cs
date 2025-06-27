@@ -64,14 +64,14 @@ namespace 精密切割系统.Model.cut
             set { _orderType = value; OnPropertyChanged(); }
         }
 
-        private string _sjSpec;
+        private string _sjDrcd;
         /// <summary>
         /// 实际刀刃规格
         /// </summary>
-        public string SjSpec
+        public string SjDrcd
         {
-            get { return _sjSpec; }
-            set { _sjSpec = value; OnPropertyChanged(); }
+            get { return _sjDrcd; }
+            set { _sjDrcd = value; OnPropertyChanged(); }
         }
 
         private string _bladeEdgeType;
