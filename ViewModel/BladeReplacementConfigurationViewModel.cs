@@ -299,13 +299,13 @@ namespace 精密切割系统.ViewModel
         private async void ReplaceWafer()
         {
             await AutoCutUtils.ReplaceWaferAsync();
-            RaisePropertyChanged(nameof(CutY));
+            CutY = Appsettings.CutY ?? 0;
         }
 
         private async void ReplaceSharpeningBoard()
         {
             await AutoCutUtils.ReplaceSharpeningBoardAsync();
-            RaisePropertyChanged(nameof(SharpenY));
+            SharpenY = Appsettings.SharpenY ?? 0;
         }
 
         private async void ReplaceBlade()

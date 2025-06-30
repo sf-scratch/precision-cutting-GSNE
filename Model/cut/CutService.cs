@@ -279,7 +279,7 @@ namespace 精密切割系统.Model.cut
                                                 WriteableBitmap? localBitmap = AutoCutUtils.GrabWriteableBitmap();
                                                 if (localBitmap is not null && result is not null)
                                                 {
-                                                    await PdaUtils.ScrapAsync(result.ConcatImages.First().Mat);
+                                                    await PdaUtils.ScrapAsync(result.ConcatImages.First().CropMatJpg);
                                                 }
                                             });
                                             return RunResult.Fail(RunExceptionType.Stop, "刀片已报废！");
@@ -294,16 +294,16 @@ namespace 精密切割系统.Model.cut
                                         continue;
                                     }
                                     bladeWidthMax = cameraCommon._cutMarkWidth / 1000;
-                                    bladeWidthMaxMat = result.BladeWidthMaxImage.Mat;
                                     collapseWidthMax = cameraCommon._edgeChipWidth / 1000;
-                                    collapseWidthMaxMat = result.CollapseWidthMaxImage.Mat;
+                                    bladeWidthMaxMat = cameraCommon.CaptureControl();
+                                    collapseWidthMaxMat = cameraCommon.CaptureControl();
                                 }
                                 else
                                 {
                                     bladeWidthMax = result.BladeWidthMaxImage.BladeWidth;
-                                    bladeWidthMaxMat = result.BladeWidthMaxImage.Mat;
+                                    bladeWidthMaxMat = result.BladeWidthMaxImage.CropMatJpg;
                                     collapseWidthMax = result.CollapseWidthMaxImage.CollapseWidth;
-                                    collapseWidthMaxMat = result.CollapseWidthMaxImage.Mat;
+                                    collapseWidthMaxMat = result.CollapseWidthMaxImage.CropMatJpg;
                                 }
 
                                 // 处理图像数据

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using 精密切割系统.Model.common;
+using 精密切割系统.Utils;
 using 精密切割系统.View.Controls;
 
 namespace 精密切割系统.Behaviors
@@ -35,6 +36,8 @@ namespace 精密切割系统.Behaviors
             AssociatedObject.TouchDown += AssociatedObject_TouchDown;
             AssociatedObject.TouchUp += AssociatedObject_TouchUp;
             AssociatedObject.TouchLeave += AssociatedObject_TouchLeave;
+            AssociatedObject.PreviewTouchDown += AssociatedObject_PreviewTouchDown;
+            AssociatedObject.PreviewTouchUp += AssociatedObject_PreviewTouchUp;
         }
 
         protected override void OnDetaching()
@@ -48,20 +51,44 @@ namespace 精密切割系统.Behaviors
             AssociatedObject.TouchDown -= AssociatedObject_TouchDown;
             AssociatedObject.TouchUp -= AssociatedObject_TouchUp;
             AssociatedObject.TouchLeave -= AssociatedObject_TouchLeave;
+            AssociatedObject.PreviewTouchDown -= AssociatedObject_PreviewTouchDown;
+            AssociatedObject.PreviewTouchUp -= AssociatedObject_PreviewTouchUp;
         }
 
         private void AssociatedObject_TouchDown(object? sender, TouchEventArgs e)
         {
+            Tools.LogDebug(nameof(AssociatedObject_TouchDown));
             Interlocked.CompareExchange(ref _isRaiseCommand, 0, 1);
         }
 
         private void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
+            Tools.LogDebug(nameof(OnPreviewMouseDown));
             Interlocked.CompareExchange(ref _isRaiseCommand, 0, 1);
+        }
+
+        private void AssociatedObject_PreviewTouchDown(object? sender, TouchEventArgs e)
+        {
+            Tools.LogDebug(nameof(AssociatedObject_PreviewTouchDown));
+            Interlocked.CompareExchange(ref _isRaiseCommand, 0, 1);
+        }
+
+        private void AssociatedObject_PreviewTouchUp(object? sender, TouchEventArgs e)
+        {
+            Tools.LogDebug(nameof(AssociatedObject_PreviewTouchUp));
+            if (sender is not null && sender is RightButton rightButton && rightButton.DataContext is RightButtonParams rightButtonParams)
+            {
+                rightButton.btnBorder.Background = rightButtonParams.BackgroundDefColor;
+            }
+            if (Interlocked.CompareExchange(ref _isRaiseCommand, 1, 0) == 0 && TouchAndClickCommand?.CanExecute(e) == true)
+            {
+                TouchAndClickCommand.Execute(e);
+            }
         }
 
         private void AssociatedObject_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
+            Tools.LogDebug(nameof(AssociatedObject_PreviewMouseUp));
             if (sender is not null && sender is RightButton rightButton && rightButton.DataContext is RightButtonParams rightButtonParams)
             {
                 rightButton.btnBorder.Background = rightButtonParams.BackgroundDefColor;
@@ -74,6 +101,11 @@ namespace 精密切割系统.Behaviors
 
         private void AssociatedObject_TouchUp(object? sender, TouchEventArgs e)
         {
+            Tools.LogDebug(nameof(AssociatedObject_TouchUp));
+            if (sender is not null && sender is RightButton rightButton && rightButton.DataContext is RightButtonParams rightButtonParams)
+            {
+                rightButton.btnBorder.Background = rightButtonParams.BackgroundDefColor;
+            }
             if (Interlocked.CompareExchange(ref _isRaiseCommand, 1, 0) == 0 && TouchAndClickCommand?.CanExecute(e) == true)
             {
                 TouchAndClickCommand.Execute(e);

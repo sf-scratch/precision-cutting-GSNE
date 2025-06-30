@@ -744,6 +744,8 @@ namespace 精密切割系统.ViewModel
                                     {
                                         Mat cropMatJpg = AutoCutUtils.JpegStreamToMat(AutoCutUtils.MatToJpegStream(AutoCutUtils.CropHorizontalCenter(matJpg, AutoCutUtils.HeightRange)));
                                         var (bladeWidthMm, collapseWidthMm, bladeTop, bladeBottom, collapseTop, collapseBottom) = VisionAnalyzer.ProcessImage(cropMatJpg);
+                                        bladeWidthMm = Math.Round(bladeWidthMm, 4);
+                                        collapseWidthMm = Math.Round(collapseWidthMm, 4);
                                         cameraCommon.UpdateLine((float)bladeWidthMm * 1000, (float)collapseWidthMm * 1000);
                                     }
                                     imageY = VisionAnalyzer.DetectFirstHorizontalStripeCenter(matJpg);

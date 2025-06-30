@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:精密切割系统.View.Pages.common"
              mc:Ignorable="d" 
              d:DesignHeight="640" d:DesignWidth="765" Loaded="UserControl_Loaded" Unloaded="UserControl_Unloaded">
-    <Grid Width="765" Height="640"  ClipToBounds="True">
+    <Grid x:Name="CameraCommonGrid" Width="765" Height="640"  ClipToBounds="True">
         <Image x:Name="cameraImage" HorizontalAlignment="Left" VerticalAlignment="Top" Width="765" Height="640"
        RenderTransformOrigin="0.5,0.5" Stretch="Fill" TouchDown="cameraImage_TouchDown" MouseDown="cameraImage_MouseDown"
        RenderOptions.BitmapScalingMode="HighQuality" RenderOptions.EdgeMode="Aliased">

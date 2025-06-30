@@ -37,7 +37,8 @@ namespace 精密切割系统.Model.cut
         public double BladeWidth { get; set; }
         public double CollapseWidth { get; set; }
         public bool IsSnakelike { get; set; }
-        public Mat Mat { get; set; }
+        public Mat CropMatJpg { get; set; }
+        public Mat OriginCropMatJpg { get; set; }
         public Mat OriginMat { get; set; }
     }
 }

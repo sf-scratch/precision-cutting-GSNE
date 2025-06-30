@@ -9,13 +9,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
-using Emgu.CV;
 using Microsoft.Win32;
 using NPOI.Util;
+using OpenCvSharp.WpfExtensions;
 using SciCamera.Net;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
 using 精密切割系统.FrmWindow.common;
+using 精密切割系统.Model.cut;
 using 精密切割系统.Model.plc;
 using 精密切割系统.Utils;
 using 精密切割系统.ViewModel;
@@ -38,7 +39,6 @@ namespace 精密切割系统.View.Pages.common
         SciCam m_currentDev = new SciCam();
 
         WriteableBitmap bitmap;
-        public static Mat? curMat;
         bool m_bDeviceReady = false;         //是否存在相机
         bool m_bDeviceOpened = false;        //相机是否打开
         bool m_bStartGrabbing = false;       //开始采集状态
@@ -693,7 +693,60 @@ namespace 精密切割系统.View.Pages.common
             }
             await PlcControl.tagControl.cutting.RunMotionNoWaitAsync((float)xPosition, (float)yPosition);
         }
+
+        //// 截取指定Grid控件内容
+        //public BitmapSource Capture()
+        //{
+        //    Grid grid = CameraCommonGrid;
+        //    grid.Background = new SolidColorBrush(Color.FromRgb(0,0,0));
+        //    //// 获取控件实际渲染尺寸
+        //    //Size renderSize = new Size(grid.ActualWidth, grid.ActualHeight);
+        //    //// 创建渲染目标
+        //    //RenderTargetBitmap rtb = new RenderTargetBitmap(
+        //    //    (int)renderSize.Width * 2,
+        //    //    (int)renderSize.Height * 2,
+        //    //    96, 96, PixelFormats.Pbgra32);
+        //    //// 渲染控件
+        //    //rtb.Render(grid);
+        //    // 强制布局更新
+        //    grid.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        //    grid.Arrange(new Rect(grid.DesiredSize));
+
+        //    RenderTargetBitmap rtb = new RenderTargetBitmap(
+        //        (int)grid.DesiredSize.Width,
+        //        (int)grid.DesiredSize.Height,
+        //        96, 96, PixelFormats.Pbgra32);
+
+        //    rtb.Render(grid);
+        //    rtb.ToMat().ImWrite("C:\\MySpace\\Dev\\ProjectXiHua\\precision-cutting-321\\bin\\x64\\Debug\\image\\2.jpg");
+        //    return rtb;
+        //}
+
+        public OpenCvSharp.Mat CaptureControl()
+        {
+            // 强制布局更新
+            CameraCommonGrid.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            CameraCommonGrid.Arrange(new Rect(CameraCommonGrid.DesiredSize));
+            // 确保渲染完成
+            CameraCommonGrid.UpdateLayout();
+
+            // 创建一个DrawingVisual对象
+            DrawingVisual drawingVisual = new DrawingVisual();
+            using (DrawingContext drawingContext = drawingVisual.RenderOpen())
+            {
+                // 将控件绘制到DrawingContext中
+                drawingContext.DrawRectangle(new VisualBrush(CameraCommonGrid), null, new Rect(new Point(), CameraCommonGrid.RenderSize));
+            }
+
+            // 创建一个RenderTargetBitmap对象，用于捕获DrawingVisual的内容
+            RenderTargetBitmap renderTargetBitmap = new RenderTargetBitmap((int)CameraCommonGrid.ActualWidth, (int)CameraCommonGrid.ActualHeight, 96, 96, PixelFormats.Pbgra32);
+            renderTargetBitmap.Render(drawingVisual);
+
+            return new FormatConvertedBitmap(renderTargetBitmap, PixelFormats.Bgr32, null, 0).ToMat();
+        }
     }
+
+
 
     public class CustomLine
     {

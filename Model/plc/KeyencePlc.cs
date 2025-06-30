@@ -2514,6 +2514,11 @@ namespace 精密切割系统.Driver
 
         public async Task OpenCutSecurityDoorAsync()
         {
+            if (await GetSpindleSpeedAsync() != 0)
+            {
+                MaterialSnackUtils.MaterialSnack("打开安全门失败，主轴未停止！", MaterialSnackUtils.SnackType.WARNING, 0);
+                return;
+            }
             cutSecurityDoor.writeValue = "0";
             await keyencePlc.WriteTagAsync(cutSecurityDoor);
         }
@@ -2544,6 +2549,11 @@ namespace 精密切割系统.Driver
 
         public async Task OpenCameraSecurityDoorAsync()
         {
+            if (await GetSpindleSpeedAsync() != 0)
+            {
+                MaterialSnackUtils.MaterialSnack("打开安全门失败，主轴未停止！", MaterialSnackUtils.SnackType.WARNING, 0);
+                return;
+            }
             cameraSecurityDoor.writeValue = "0";
             await keyencePlc.WriteTagAsync(cameraSecurityDoor);
         }
