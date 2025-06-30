@@ -12,10 +12,10 @@ namespace 精密切割系统.HttpClients
 {
     public class HttpRestClient
     {
-        public static readonly string PreName = "n2baseDev";
-        public static readonly string Port = "252";
-        //public static readonly string PreName = "n2baseProd";
-        //public static readonly string Port = "251";
+        //public static readonly string PreName = "n2baseDev";
+        //public static readonly string Port = "252";
+        public static readonly string PreName = "n2baseProd";
+        public static readonly string Port = "251";
         public static readonly string PreUrl = $"{PreName}-osb";
         public static readonly string BaseUrl = $"http://192.168.1.{Port}:8280/";
         public static readonly string PDABaseUrl = $"http://192.168.1.{Port}:89/";

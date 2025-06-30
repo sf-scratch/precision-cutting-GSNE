@@ -791,7 +791,7 @@ namespace 精密切割系统.Model.cut
                 {
                     try
                     {
-                        using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
+                        using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(300));
                         while (await timer.WaitForNextTickAsync(linkedToken))
                         {
                             await Application.Current.Dispatcher.InvokeAsync(() =>
@@ -903,6 +903,7 @@ namespace 精密切割系统.Model.cut
             result.IsSuccess = true;
             await Task.Run(async () =>
             {
+                var stopwatch = Stopwatch.StartNew();
                 List<Mat> mats = new List<Mat>();
                 try
                 {
@@ -925,7 +926,9 @@ namespace 精密切割系统.Model.cut
                         ProcessMat(mat, result);
                     }
                 }
-                var stopwatch = Stopwatch.StartNew();
+                stopwatch.Stop();
+                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"识别所有单张图像用时: {Math.Round(stopwatch.Elapsed.TotalSeconds, 2)} 秒"));
+                stopwatch = Stopwatch.StartNew();
                 // 拼接所有图像
                 List<Mat> concatMats = ConcatMats(mats);
                 stopwatch.Stop();
@@ -1042,7 +1045,7 @@ namespace 精密切割系统.Model.cut
                     {
                         result.AnalysisFailMats.Add(cropConcatMatJpg);
                         result.IsSuccess = false;
-                        result.Message = string.IsNullOrEmpty(result.Message) ? "图像识别刀痕异常，请人工检查刀痕状态！" : result.Message;
+                        result.Message = string.IsNullOrEmpty(result.Message) ? "图像识别: 刀痕异常，请人工检查刀痕状态！" : result.Message;
                         eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create(ex.Message));
                     }
                     finally
@@ -1050,14 +1053,26 @@ namespace 精密切割系统.Model.cut
                         stopwatch.Stop();
                     }
                 }
-                #region 保存图片
-                foreach (var image in result.ConcatImages)
+                double singleCollapse =(Math.Round(result.CollapseWidthMaxImage.CollapseWidth, 3) - Math.Round(result.CollapseWidthMaxImage.BladeWidth, 3)) / 2;
+                if (singleCollapse > 10)
                 {
-                    Cv2.ImWrite($"{concatImagesPath}\\{DateTime.Now.Ticks}_拼接图识别图{(image.IsSnakelike ? "蛇形" : "正常")}.jpg", image.Mat);
+                    result.IsSuccess = false;
+                    result.Message = string.IsNullOrEmpty(result.Message) ? $"图像识别: 崩边过大，单边最大为 {singleCollapse}um ！" : result.Message;
                 }
+                if (result.HasSnakelike())
+                {
+                    result.IsSuccess = false;
+                    result.Message = string.IsNullOrEmpty(result.Message) ? "图像识别: 刀痕刀痕为蛇形，请人工检查刀痕状态！" : result.Message;
+                }
+
+                #region 保存图片
                 if (result.AnalysisFailMats.Count != 0)
                 {
                     stopwatch = Stopwatch.StartNew();
+                    foreach (var image in result.ConcatImages)
+                    {
+                        Cv2.ImWrite($"{concatImagesPath}\\{DateTime.Now.Ticks}_拼接图识别图_{(image.IsSnakelike ? "蛇形" : "正常")}.jpg", image.Mat);
+                    }
                     //保存拼接图像到指定目录
                     string analysisFailMatsPath = System.IO.Path.Combine(imagePath, "AnalysisFail");
                     Directory.CreateDirectory(analysisFailMatsPath);
@@ -1066,15 +1081,9 @@ namespace 精密切割系统.Model.cut
                         Cv2.ImWrite($"{analysisFailMatsPath}\\{DateTime.Now.Ticks}.jpg", failMat);
                     }
                     stopwatch.Stop();
-                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"保存识别失败图像总用时: {Math.Round(stopwatch.Elapsed.TotalSeconds, 2)} 秒"));
+                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"保存识别图像总用时: {Math.Round(stopwatch.Elapsed.TotalSeconds, 2)} 秒"));
                 }
                 #endregion
-
-                if (result.HasSnakelike())
-                {
-                    result.IsSuccess = false;
-                    result.Message = string.IsNullOrEmpty(result.Message) ? "图像识别刀痕刀痕为蛇形，请人工检查刀痕状态！" : result.Message;
-                }
             });
             return result;
         }

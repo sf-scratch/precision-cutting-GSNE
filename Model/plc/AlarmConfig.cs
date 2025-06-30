@@ -59,7 +59,7 @@ namespace 精密切割系统.Model.plc
             }
             TotalAlarmCount = _alarmInfos.Length;
             StartAddress = _alarmInfos.FirstOrDefault()?.Address ?? string.Empty;
-            Task.Run(() => StartAlarmMonitoring(default));
+            Task.Factory.StartNew(() => StartAlarmMonitoring(default), TaskCreationOptions.LongRunning);
         }
 
         private async Task StartAlarmMonitoring(CancellationToken token)
