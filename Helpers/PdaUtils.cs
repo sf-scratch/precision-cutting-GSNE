@@ -16,6 +16,7 @@ namespace 精密切割系统.Helpers
         private static Tuple<FieldValuesDTO, Dictionary<string, FlowsValuesDTO>> _tuple;
         private static FlowsValuesDTO? MslValues = null;
         private static FlowsValuesDTO? AfterCircleMslValues = null;
+        private static FlowsValuesDTO? AfterCutMslValues = null;
         private static int GroupCode = 0;
         private static string _lunguId;
 
@@ -23,6 +24,7 @@ namespace 精密切割系统.Helpers
         {
             MslValues = null;
             AfterCircleMslValues = null;
+            AfterCutMslValues = null;
             GroupCode = 0;
         }
 
@@ -411,16 +413,6 @@ namespace 精密切割系统.Helpers
 
         public static void AddWearAmountAfterCircle(float wearAmount, int count)
         {
-            //if (!GlobalParams.OnlineMES || _tuple is null) return;
-            //FieldValuesDTO fieldValues = _tuple.Item1;
-            //Dictionary<string, FlowsValuesDTO> fieldDic = _tuple.Item2;
-            //if (fieldDic.TryGetValue("真圆后总磨损量", out FlowsValuesDTO? value))
-            //{
-            //    FlowsValuesDTO dto = value.Clone();
-            //    dto.GroupOperateId = fieldValues.GroupOperateId;
-            //    dto.FieldValue = Math.Round(wearAmountAfterCircle * 1000).ToString();
-            //    fieldValues.List.Add(dto);
-            //}
             if (!GlobalParams.OnlineMES || _tuple is null) return;
             FieldValuesDTO fieldValues = _tuple.Item1;
             Dictionary<string, FlowsValuesDTO> fieldDic = _tuple.Item2;
@@ -450,6 +442,43 @@ namespace 精密切割系统.Helpers
             fieldValues.List.Add(mdsl);
             FlowsValuesDTO ddmsl = AfterCircleMslValues.Children[0].FieldList[2].ToFlowsValuesDTO();
             ddmsl.ParentId = AfterCircleMslValues.FieldId;
+            ddmsl.GroupOperateId = fieldValues.GroupOperateId;
+            ddmsl.FieldValue = MathF.Round((float)wearAmountInt / count, 2).ToString();
+            ddmsl.GroupCode = "1";
+            fieldValues.List.Add(ddmsl);
+        }
+
+        public static void AddWearAmountAfterCut(float wearAmount, int count)
+        {
+            if (!GlobalParams.OnlineMES || _tuple is null) return;
+            FieldValuesDTO fieldValues = _tuple.Item1;
+            Dictionary<string, FlowsValuesDTO> fieldDic = _tuple.Item2;
+            if (AfterCutMslValues is null)
+            {
+                AfterCutMslValues = fieldDic["切割后总磨损量"].Clone();
+                AfterCutMslValues.FieldValue = "0";
+                AfterCutMslValues.GroupOperateId = fieldValues.GroupOperateId;
+                fieldValues.List.Add(AfterCutMslValues);
+            }
+            int wearAmountInt = (int)MathF.Round(wearAmount * 1000);
+            GroupCode++;
+            AfterCutMslValues.FieldValue = MathF.Round(float.Parse(AfterCutMslValues.FieldValue) + wearAmountInt).ToString();
+            if (MslValues is not null)
+                MslValues.FieldValue = MathF.Round(float.Parse(MslValues.FieldValue) + wearAmountInt).ToString();
+            FlowsValuesDTO mosunliang = AfterCutMslValues.Children[0].FieldList[0].ToFlowsValuesDTO();
+            mosunliang.ParentId = AfterCutMslValues.FieldId;
+            mosunliang.GroupOperateId = fieldValues.GroupOperateId;
+            mosunliang.FieldValue = wearAmountInt.ToString();
+            mosunliang.GroupCode = "1";
+            fieldValues.List.Add(mosunliang);
+            FlowsValuesDTO mdsl = AfterCutMslValues.Children[0].FieldList[1].ToFlowsValuesDTO();
+            mdsl.ParentId = AfterCutMslValues.FieldId;
+            mdsl.GroupOperateId = fieldValues.GroupOperateId;
+            mdsl.FieldValue = count.ToString();
+            mdsl.GroupCode = "1";
+            fieldValues.List.Add(mdsl);
+            FlowsValuesDTO ddmsl = AfterCutMslValues.Children[0].FieldList[2].ToFlowsValuesDTO();
+            ddmsl.ParentId = AfterCutMslValues.FieldId;
             ddmsl.GroupOperateId = fieldValues.GroupOperateId;
             ddmsl.FieldValue = MathF.Round((float)wearAmountInt / count, 2).ToString();
             ddmsl.GroupCode = "1";

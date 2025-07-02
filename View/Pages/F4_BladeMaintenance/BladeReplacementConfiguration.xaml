@@ -228,6 +228,9 @@
                         <TextBlock Text="切割开始位置"/>
                         <Controls:InputTextBox Text="{Binding CutY}"/>
                         <TextBlock HorizontalAlignment="Left" Text="mm"/>
+                        <TextBlock Text="切割几刀检测"/>
+                        <Controls:InputTextBox Text="{Binding CutParams.CheckMarksCutTimes}" PreviewMouseDown="lunguTextBox_PreviewMouseDown" TouchDown="lunguTextBox_TouchDown"/>
+                        <TextBlock HorizontalAlignment="Left" Text="刀"/>
                     </auto:AutoGrid>
                 </StackPanel>
             </GroupBox>

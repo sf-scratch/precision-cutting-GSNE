@@ -74,7 +74,14 @@ namespace 精密切割系统.Model.cut
             get { return _offsetX; }
             set { _offsetX = value; OnPropertyChanged(); }
         }
-        
+
+        private int _checkMarksCutTimes;
+        public int CheckMarksCutTimes
+        {
+            get { return _checkMarksCutTimes; }
+            set { _checkMarksCutTimes = value; OnPropertyChanged(); }
+        }
+
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

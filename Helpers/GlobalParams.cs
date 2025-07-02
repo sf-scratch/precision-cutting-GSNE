@@ -126,7 +126,7 @@ namespace 精密切割系统.FrmWindow.common
         /// <summary>
         /// 在切割几次后检测
         /// </summary>
-        public static readonly int CheckMarksCutTimes = 10;
+        public static readonly int CheckMarksCutTimes = 15;
 
         /// <summary>
         /// 单刀磨损量

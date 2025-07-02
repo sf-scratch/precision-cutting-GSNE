@@ -44,6 +44,7 @@ namespace 精密切割系统.Model.cut
     public class AutoCutUtils
     {
         public const int HeightRange = 240;
+        public const int VisionSnakeHeightRange = 100;
 
         /// <summary>
         /// 换刀片
@@ -961,31 +962,31 @@ namespace 精密切割系统.Model.cut
             var stopwatch = Stopwatch.StartNew();
             foreach (Mat concatMat in concatMats)
             {
-                Mat cropConcatMatJpg = JpegStreamToMat(MatToJpegStream(CropHorizontalCenter(concatMat, HeightRange)));
-                Mat originCropConcatMatJpg = cropConcatMatJpg.Clone();
+                Mat originCropConcatMatJpg = JpegStreamToMat(MatToJpegStream(CropHorizontalCenter(concatMat, VisionSnakeHeightRange)));
+                Mat cropConcatMatJpg = originCropConcatMatJpg.Clone();
                 try
                 {
                     stopwatch.Restart();
-                    int? centerY = await Task.Run(() => VisionAnalyzer.DetectFirstHorizontalStripeCenter(cropConcatMatJpg));
+                    int? centerY = await Task.Run(() => VisionAnalyzer.DetectFirstHorizontalStripeCenter(originCropConcatMatJpg));
                     stopwatch.Stop();
                     PublishTiming(eventAggregator, "识别有无刀痕", stopwatch.Elapsed);
                     if (centerY is null)
                     {
-                        result.AnalysisFailMats.Add(cropConcatMatJpg);
+                        result.AnalysisFailMats.Add(originCropConcatMatJpg);
                         result.IsSuccess = false;
                         result.Message = string.IsNullOrEmpty(result.Message) ? "未识别到刀痕，请人工检查刀痕状态！" : result.Message;
                     }
                     else
                     {
                         stopwatch.Restart();
-                        var (bladeWidthMm, collapseWidthMm, bladeTop, bladeBottom, collapseTop, collapseBottom) = await Task.Run(() => VisionAnalyzer.ProcessImage(cropConcatMatJpg));
+                        var (bladeWidthMm, collapseWidthMm, bladeTop, bladeBottom, collapseTop, collapseBottom) = await Task.Run(() => VisionAnalyzer.ProcessImage(originCropConcatMatJpg));
                         bladeWidthMm = Math.Round(bladeWidthMm, 4);
                         collapseWidthMm = Math.Round(collapseWidthMm, 4);
                         stopwatch.Stop();
                         PublishTiming(eventAggregator, "识别刀痕宽度和崩边", stopwatch.Elapsed);
                         DrawMat(cropConcatMatJpg, bladeWidthMm, collapseWidthMm, bladeTop, bladeBottom, collapseTop, collapseBottom);
                         stopwatch.Restart();
-                        bool isSnakelike = await Task.Run(() => VisionAnalyzer.SnakeCase(cropConcatMatJpg).Snake);
+                        bool isSnakelike = await Task.Run(() => VisionAnalyzer.SnakeCase(originCropConcatMatJpg).Snake);
                         result.ConcatImages.Add(new ImageData()
                         {
                             BladeWidth = bladeWidthMm,

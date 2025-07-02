@@ -175,11 +175,6 @@ namespace 精密切割系统.ViewModel
                     MaterialSnackUtils.MaterialSnack(lunguSksjResult.Msg, MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
                     return;
                 }
-                if (lunguSksjResult.Data.BladeOuterDiameter <= 0)
-                {
-                    MaterialSnackUtils.MaterialSnack("轮毂信息不完整，请检查！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
-                    return;
-                }
                 LunguSksj = MapperConfig.Mapper.Map<LunguSksjModel>(lunguSksjResult.Data);
                 //磨刀参数
                 int bmSharpParamId = 1;
@@ -322,7 +317,10 @@ namespace 精密切割系统.ViewModel
             {
                 IsExecuteSharpen = true
             };
-            CutParams = new CutParamsModel();
+            CutParams = new CutParamsModel()
+            {
+                CheckMarksCutTimes = GlobalParams.CheckMarksCutTimes
+            };
             SharpenY = Appsettings.SharpenY ?? 0;
             CutY = Appsettings.CutY ?? 0;
             InitRightButtonOnlyBack();

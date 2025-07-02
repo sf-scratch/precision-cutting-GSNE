@@ -126,7 +126,7 @@ namespace 精密切割系统.Model.cut
 
         private double _secondToolMarkWidth;
 
-        public async Task<RunResult> Run(LunguSksjModel lunguSksj, List<float> cutSpeedList, float bladeContactWorkingDiscZ1, float bladeLiftingHeight, int spindleRev, float margin, float cutCalibratTheta, IEventAggregator? eventAggregator, CancellationToken pauseToken = default)
+        public async Task<RunResult> Run(LunguSksjModel lunguSksj, List<float> cutSpeedList, CutParamsModel cutParams, float bladeContactWorkingDiscZ1, float bladeLiftingHeight, float cutCalibratTheta, IEventAggregator? eventAggregator, CancellationToken pauseToken = default)
         {
             InitFromAppsettings();
             if (_thetaDegQueue.Count == 0)
@@ -211,10 +211,10 @@ namespace 精密切割系统.Model.cut
                         //触发切割进度更新事件
                         CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, needCutTimes + _finishedCutTimes, cutTime + _finishedCutTimes));
                         //加上边距
-                        var (startX, endX) = CalculateCuttingX(line, _thetaDegQueue.Peek(), margin);
+                        var (startX, endX) = CalculateCuttingX(line, _thetaDegQueue.Peek(), cutParams.OffsetX);
                         await PlcControl.tagControl.ThetaAxis.SetAbsoluteSpeedAsync(GlobalParams.ThetaDefaultSpeed);
                         //设置切割参数
-                        await PlcControl.tagControl.cutting.SetCutParamsAsync(cutSpeed, endZ, startZ, startX, endX, line.StartPoint.Y, "0", _thetaDegQueue.Peek() + cutCalibratTheta, spindleRev, _cutDirection);
+                        await PlcControl.tagControl.cutting.SetCutParamsAsync(cutSpeed, endZ, startZ, startX, endX, line.StartPoint.Y, "0", _thetaDegQueue.Peek() + cutCalibratTheta, cutParams.SpindleRev, _cutDirection);
                         //开始切割信号
                         await PlcControl.tagControl.cutting.StartCutAsync();
                         //等待切割次数变化
@@ -224,62 +224,29 @@ namespace 精密切割系统.Model.cut
                         CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, needCutTimes + _finishedCutTimes, cutTime + _finishedCutTimes, true));
                         //停止切割前
                         int beforeStopCutTimes = cutTime + _finishedCutTimes;
+                        int checkMarksCutTimes = cutParams.CheckMarksCutTimes > 0 ? cutParams.CheckMarksCutTimes : _checkMarksCutTimes;
                         //判断是否开始检查刀痕
-                        if (beforeStopCutTimes % _checkMarksCutTimes == 1 || beforeStopCutTimes == needCutTimes)
+                        if (beforeStopCutTimes % checkMarksCutTimes == 1 || beforeStopCutTimes == needCutTimes)
                         {
                             chekcTimes++;
-                            // 如果是第一次检查刀痕，且需要检查基准线位置，则提示检查基准线位置
-                            //if (chekcTimes == 1 && (Appsettings.IsNeedCheckBaseLine ?? true))
-                            if (chekcTimes == 1)
-                            {
-                                await PlcControl.tagControl.wholeDevice.OpenBuzzerAsync();
-                                ServicePauseResult result = await WaitContinueAsync(line, "请检查基准线位置！");
-                                switch (result.Type)
-                                {
-                                    case ServicePauseResultType.BladeScrap:
-                                        await Application.Current.Dispatcher.InvokeAsync(async () =>
-                                        {
-                                            WriteableBitmap? localBitmap = AutoCutUtils.GrabWriteableBitmap();
-                                            if (localBitmap != null)
-                                            {
-                                                await PdaUtils.ScrapAsync(localBitmap.ToMat());
-                                            }
-                                        });
-                                        return RunResult.Fail(RunExceptionType.Stop, "刀片已报废！");
-                                    case ServicePauseResultType.Stop:
-                                        return RunResult.Fail(RunExceptionType.Stop, "停止切割");
-                                    default:
-                                        break;
-                                }
-                            }
-                            MaterialSnackUtils.MaterialSnack("检查刀痕中...", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+                            double bladeWidthMax, collapseWidthMax;
+                            Mat bladeWidthMaxMat, collapseWidthMaxMat;
                             try
                             {
-                                //退出全自动切割模式
-                                await PlcControl.tagControl.cutting.ExitCuttingModeAsync(_usingPauseToken);
-                                //刀痕检查
-                                ImagesAnalysisResult result = await AutoCutUtils.CheckKnifeMarksStatus(line, eventAggregator, _usingPauseToken);
-                                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create(
-                                    $"最大刀痕宽度：{Math.Round(result.BladeWidthMaxImage.BladeWidth, 3)} " +
-                                    $"最大崩边宽度：{Math.Round(result.CollapseWidthMaxImage.CollapseWidth, 3)} " +
-                                    $"是否蛇形：{result.HasSnakelike()}"));
-                                double bladeWidthMax, collapseWidthMax;
-                                Mat bladeWidthMaxMat, collapseWidthMaxMat;
-                                // 刀痕检查结果未成功，表示未检测到刀痕
-                                if (!result.IsSuccess)
+                                // 如果是第一次检查刀痕，且需要检查基准线位置，则提示检查基准线位置
+                                if (chekcTimes == 1)
                                 {
                                     await PlcControl.tagControl.wholeDevice.OpenBuzzerAsync();
-                                    //刀痕检查结果失败，表示未检测到刀痕
-                                    ServicePauseResult pauseResult = await WaitContinueAsync(line, result.Message);
-                                    switch (pauseResult.Type)
+                                    ServicePauseResult checkResult = await WaitContinueAsync(line, "请检查基准线位置！");
+                                    switch (checkResult.Type)
                                     {
                                         case ServicePauseResultType.BladeScrap:
                                             await Application.Current.Dispatcher.InvokeAsync(async () =>
                                             {
                                                 WriteableBitmap? localBitmap = AutoCutUtils.GrabWriteableBitmap();
-                                                if (localBitmap is not null && result is not null)
+                                                if (localBitmap != null)
                                                 {
-                                                    await PdaUtils.ScrapAsync(result.ConcatImages.First().CropMatJpg);
+                                                    await PdaUtils.ScrapAsync(localBitmap.ToMat());
                                                 }
                                             });
                                             return RunResult.Fail(RunExceptionType.Stop, "刀片已报废！");
@@ -289,57 +256,93 @@ namespace 精密切割系统.Model.cut
                                             break;
                                     }
                                     CameraCommon? cameraCommon = AutoCutUtils.GetCameraCommon();
-                                    if (cameraCommon is null)
-                                    {
-                                        continue;
-                                    }
+                                    if (cameraCommon is null) continue;
                                     bladeWidthMax = cameraCommon._cutMarkWidth / 1000;
                                     collapseWidthMax = cameraCommon._edgeChipWidth / 1000;
                                     bladeWidthMaxMat = cameraCommon.CaptureControl();
-                                    collapseWidthMaxMat = cameraCommon.CaptureControl();
+                                    collapseWidthMaxMat = bladeWidthMaxMat;
                                 }
                                 else
                                 {
-                                    bladeWidthMax = result.BladeWidthMaxImage.BladeWidth;
-                                    bladeWidthMaxMat = result.BladeWidthMaxImage.CropMatJpg;
-                                    collapseWidthMax = result.CollapseWidthMaxImage.CollapseWidth;
-                                    collapseWidthMaxMat = result.CollapseWidthMaxImage.CropMatJpg;
+                                    //退出全自动切割模式
+                                    await PlcControl.tagControl.cutting.ExitCuttingModeAsync(_usingPauseToken);
+                                    //刀痕检查
+                                    MaterialSnackUtils.MaterialSnack("检查刀痕中...", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+                                    ImagesAnalysisResult result = await AutoCutUtils.CheckKnifeMarksStatus(line, eventAggregator, _usingPauseToken);
+                                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create(
+                                        $"最大刀痕宽度：{Math.Round(result.BladeWidthMaxImage.BladeWidth, 3)} " +
+                                        $"最大崩边宽度：{Math.Round(result.CollapseWidthMaxImage.CollapseWidth, 3)} " +
+                                        $"是否蛇形：{result.HasSnakelike()}"));
+                                    // 刀痕检查结果未成功，表示未检测到刀痕
+                                    if (!result.IsSuccess)
+                                    {
+                                        await PlcControl.tagControl.wholeDevice.OpenBuzzerAsync();
+                                        //刀痕检查结果失败，表示未检测到刀痕
+                                        ServicePauseResult pauseResult = await WaitContinueAsync(line, result.Message);
+                                        switch (pauseResult.Type)
+                                        {
+                                            case ServicePauseResultType.BladeScrap:
+                                                await Application.Current.Dispatcher.InvokeAsync(async () =>
+                                                {
+                                                    WriteableBitmap? localBitmap = AutoCutUtils.GrabWriteableBitmap();
+                                                    if (localBitmap is not null && result is not null)
+                                                    {
+                                                        await PdaUtils.ScrapAsync(result.ConcatImages.First().CropMatJpg);
+                                                    }
+                                                });
+                                                return RunResult.Fail(RunExceptionType.Stop, "刀片已报废！");
+                                            case ServicePauseResultType.Stop:
+                                                return RunResult.Fail(RunExceptionType.Stop, "停止切割");
+                                            default:
+                                                break;
+                                        }
+                                        CameraCommon? cameraCommon = AutoCutUtils.GetCameraCommon();
+                                        if (cameraCommon is null) continue;
+                                        bladeWidthMax = cameraCommon._cutMarkWidth / 1000;
+                                        collapseWidthMax = cameraCommon._edgeChipWidth / 1000;
+                                        bladeWidthMaxMat = cameraCommon.CaptureControl();
+                                        collapseWidthMaxMat = bladeWidthMaxMat;
+                                    }
+                                    else
+                                    {
+                                        bladeWidthMax = result.BladeWidthMaxImage.BladeWidth;
+                                        bladeWidthMaxMat = result.BladeWidthMaxImage.CropMatJpg;
+                                        collapseWidthMax = result.CollapseWidthMaxImage.CollapseWidth;
+                                        collapseWidthMaxMat = result.CollapseWidthMaxImage.CropMatJpg;
+                                    }
                                 }
 
                                 // 处理图像数据
-                                if (result.ImageDatas.Count != 0)
+                                switch (chekcTimes)
                                 {
-                                    switch (chekcTimes)
-                                    {
-                                        case 1:
-                                            PdaUtils.AddFirstToolMarkWidth(bladeWidthMax);
-                                            PdaUtils.AddFirstToolMarkImage(bladeWidthMaxMat);
-                                            if (lunguSksj.BladeType != "新刀")
-                                            {
-                                                PdaUtils.AddToolMarkWidth(bladeWidthMax);
-                                                PdaUtils.AddToolMarkActualWidth(bladeWidthMax);
-                                                _secondToolMarkWidth = bladeWidthMax;
-                                            }
-                                            break;
-                                        case 2:
+                                    case 1:
+                                        PdaUtils.AddFirstToolMarkWidth(bladeWidthMax);
+                                        PdaUtils.AddFirstToolMarkImage(bladeWidthMaxMat);
+                                        if (lunguSksj.BladeType != "新刀")
+                                        {
                                             PdaUtils.AddToolMarkWidth(bladeWidthMax);
                                             PdaUtils.AddToolMarkActualWidth(bladeWidthMax);
-                                            PdaUtils.AddSecondToolMarkImage(bladeWidthMaxMat);
                                             _secondToolMarkWidth = bladeWidthMax;
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                    if (beforeStopCutTimes == needCutTimes)
-                                    {
-                                        //上传崩边
-                                        double singleCollapseAngle = (Math.Round(collapseWidthMax, 3) - Math.Round(_secondToolMarkWidth, 3)) / 2;
-                                        PdaUtils.AddSingleCollapseAngle(singleCollapseAngle);
-                                        PdaUtils.AddMaximumCollapseAngle(collapseWidthMax);
-                                        PdaUtils.AddMaximumCollapseAngleImage(collapseWidthMaxMat);
-                                        string bladeEdgeBreakageGrade = await GetDpbbdjAsync(lunguSksj.LunguId, (float)Math.Round(singleCollapseAngle * 1000, 1));
-                                        PdaUtils.AddBladeEdgeBreakageGrade(bladeEdgeBreakageGrade);
-                                    }
+                                        }
+                                        break;
+                                    case 2:
+                                        PdaUtils.AddToolMarkWidth(bladeWidthMax);
+                                        PdaUtils.AddToolMarkActualWidth(bladeWidthMax);
+                                        PdaUtils.AddSecondToolMarkImage(bladeWidthMaxMat);
+                                        _secondToolMarkWidth = bladeWidthMax;
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                if (beforeStopCutTimes == needCutTimes)
+                                {
+                                    //上传崩边
+                                    double singleCollapseAngle = (Math.Round(collapseWidthMax, 3) - Math.Round(_secondToolMarkWidth, 3)) / 2;
+                                    PdaUtils.AddSingleCollapseAngle(singleCollapseAngle);
+                                    PdaUtils.AddMaximumCollapseAngle(collapseWidthMax);
+                                    PdaUtils.AddMaximumCollapseAngleImage(collapseWidthMaxMat);
+                                    string bladeEdgeBreakageGrade = await GetDpbbdjAsync(lunguSksj.LunguId, (float)Math.Round(singleCollapseAngle * 1000, 1));
+                                    PdaUtils.AddBladeEdgeBreakageGrade(bladeEdgeBreakageGrade);
                                 }
                             }
                             finally

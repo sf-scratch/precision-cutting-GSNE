@@ -1,4 +1,8 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.Win32;
+using NPOI.Util;
+using OpenCvSharp.WpfExtensions;
+using SciCamera.Net;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Runtime.InteropServices;
@@ -9,10 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
-using Microsoft.Win32;
-using NPOI.Util;
-using OpenCvSharp.WpfExtensions;
-using SciCamera.Net;
+using System.Windows.Threading;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
 using 精密切割系统.FrmWindow.common;
@@ -722,27 +723,85 @@ namespace 精密切割系统.View.Pages.common
         //    return rtb;
         //}
 
+        //public OpenCvSharp.Mat CaptureControl()
+        //{
+        //    // 强制布局更新
+        //    CameraCommonGrid.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        //    CameraCommonGrid.Arrange(new Rect(CameraCommonGrid.DesiredSize));
+        //    // 确保渲染完成
+        //    CameraCommonGrid.UpdateLayout();
+
+        //    // 创建一个DrawingVisual对象
+        //    DrawingVisual drawingVisual = new DrawingVisual();
+        //    using (DrawingContext drawingContext = drawingVisual.RenderOpen())
+        //    {
+        //        // 将控件绘制到DrawingContext中
+        //        drawingContext.DrawRectangle(new VisualBrush(CameraCommonGrid), null, new Rect(new Point(), CameraCommonGrid.RenderSize));
+        //    }
+
+        //    // 创建一个RenderTargetBitmap对象，用于捕获DrawingVisual的内容
+        //    RenderTargetBitmap renderTargetBitmap = new RenderTargetBitmap((int)CameraCommonGrid.ActualWidth, (int)CameraCommonGrid.ActualHeight, 96, 96, PixelFormats.Pbgra32);
+        //    renderTargetBitmap.Render(drawingVisual);
+
+        //    return new FormatConvertedBitmap(renderTargetBitmap, PixelFormats.Bgr32, null, 0).ToMat();
+        //}
+
+        //public OpenCvSharp.Mat CaptureControl()
+        //{
+        //    // 强制同步布局和渲染
+        //    CameraCommonGrid.Dispatcher.Invoke(() =>
+        //    {
+        //        CameraCommonGrid.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        //        CameraCommonGrid.Arrange(new Rect(CameraCommonGrid.DesiredSize));
+        //        CameraCommonGrid.UpdateLayout();
+        //    }, DispatcherPriority.Render);
+
+        //    // 使用RenderTargetBitmap直接渲染控件
+        //    var rtb = new RenderTargetBitmap(
+        //        (int)CameraCommonGrid.ActualWidth,
+        //        (int)CameraCommonGrid.ActualHeight,
+        //        96, 96, PixelFormats.Pbgra32);
+
+        //    rtb.Render(CameraCommonGrid);
+
+        //    return new FormatConvertedBitmap(rtb, PixelFormats.Bgr32, null, 0).ToMat();
+        //}
+
         public OpenCvSharp.Mat CaptureControl()
         {
-            // 强制布局更新
-            CameraCommonGrid.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-            CameraCommonGrid.Arrange(new Rect(CameraCommonGrid.DesiredSize));
-            // 确保渲染完成
-            CameraCommonGrid.UpdateLayout();
+            OpenCvSharp.Mat result = new OpenCvSharp.Mat();
 
-            // 创建一个DrawingVisual对象
-            DrawingVisual drawingVisual = new DrawingVisual();
-            using (DrawingContext drawingContext = drawingVisual.RenderOpen())
+            // 使用最高优先级强制同步
+            CameraCommonGrid.Dispatcher.Invoke(() =>
             {
-                // 将控件绘制到DrawingContext中
-                drawingContext.DrawRectangle(new VisualBrush(CameraCommonGrid), null, new Rect(new Point(), CameraCommonGrid.RenderSize));
-            }
+                // 强制布局更新
+                CameraCommonGrid.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                CameraCommonGrid.Arrange(new Rect(CameraCommonGrid.DesiredSize));
 
-            // 创建一个RenderTargetBitmap对象，用于捕获DrawingVisual的内容
-            RenderTargetBitmap renderTargetBitmap = new RenderTargetBitmap((int)CameraCommonGrid.ActualWidth, (int)CameraCommonGrid.ActualHeight, 96, 96, PixelFormats.Pbgra32);
-            renderTargetBitmap.Render(drawingVisual);
+                // 等待渲染完成的事件
+                var frameEvent = new ManualResetEventSlim(false);
 
-            return new FormatConvertedBitmap(renderTargetBitmap, PixelFormats.Bgr32, null, 0).ToMat();
+                CompositionTarget.Rendering += OnRendering;
+                void OnRendering(object sender, EventArgs e)
+                {
+                    CompositionTarget.Rendering -= OnRendering;
+                    frameEvent.Set();
+                }
+
+                // 等待下一帧渲染
+                frameEvent.Wait(TimeSpan.FromMilliseconds(100));
+
+                // 直接渲染控件
+                var rtb = new RenderTargetBitmap(
+                    (int)CameraCommonGrid.ActualWidth,
+                    (int)CameraCommonGrid.ActualHeight,
+                    96, 96, PixelFormats.Pbgra32);
+
+                rtb.Render(CameraCommonGrid);
+                result = new FormatConvertedBitmap(rtb, PixelFormats.Bgr32, null, 0).ToMat();
+            }, DispatcherPriority.Send);
+
+            return result;
         }
     }
 
