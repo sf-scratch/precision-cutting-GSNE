@@ -12,14 +12,15 @@ namespace 精密切割系统.HttpClients
 {
     public class HttpRestClient
     {
-        //public static readonly string PreName = "n2baseDev";
-        //public static readonly string Port = "252";
-        public static readonly string PreName = "n2baseProd";
-        public static readonly string Port = "251";
-        public static readonly string PreUrl = $"{PreName}-osb";
-        public static readonly string BaseUrl = $"http://192.168.1.{Port}:8280/";
-        public static readonly string PDABaseUrl = $"http://192.168.1.{Port}:89/";
-        public static readonly string UploadFileUrl = $"{BaseUrl}{PreUrl}/http/interface/uploadFile";
+        public static readonly string DevPreName = "n2baseDev";
+        public static readonly string DevIP = "192.168.1.252";
+        public static readonly string ProdPreName = "n2baseProd";
+        public static readonly string ProdIP = "192.168.1.251";
+
+        public static string PreUrl = $"{ProdPreName}-osb";
+        public static string BaseUrl = $"http://{ProdIP}:8280/";
+        public static string PDABaseUrl = $"http://{ProdIP}:89/";
+        public static string UploadFileUrl = $"{BaseUrl}{PreUrl}/http/interface/uploadFile";
 
         private static readonly Lazy<HttpRestClient> _lazy = new(() => new HttpRestClient());
 
@@ -31,6 +32,22 @@ namespace 精密切割系统.HttpClients
             {
                 return _lazy.Value;
             }
+        }
+
+        public static void UpdateDev()
+        {
+            PreUrl = $"{DevPreName}-osb";
+            BaseUrl = $"http://{DevIP}:8280/";
+            PDABaseUrl = $"http://{DevIP}:89/";
+            UploadFileUrl = $"{BaseUrl}{PreUrl}/http/interface/uploadFile";
+        }
+
+        public static void UpdateProd()
+        {
+            PreUrl = $"{ProdPreName}-osb";
+            BaseUrl = $"http://{ProdIP}:8280/";
+            PDABaseUrl = $"http://{ProdIP}:89/";
+            UploadFileUrl = $"{BaseUrl}{PreUrl}/http/interface/uploadFile";
         }
 
         /// <summary>

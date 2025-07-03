@@ -793,7 +793,7 @@ namespace 精密切割系统.ViewModel
                                         );
                                     matJpg.SaveImage($"{imagePath}\\{preName}_裁剪.png");
                                     float offsetY = (float)Math.Round((imageY.Value - (matJpg.Height / 2)) * VisionAnalyzer.PixelToMmRatio, 4);
-                                    if (MathF.Abs(offsetY) > 0.02f) offsetY = 0;
+                                    if (MathF.Abs(offsetY) >= GlobalParams.NormalStepDistance) offsetY = 0;
                                     MaterialSnackUtils.MaterialSnack($"{message ?? "暂停中..."}   Y轴自动偏移{offsetY}mm", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
                                     await PlcControl.tagControl.Yaxis.StartRelativeAsync(offsetY);
                                 }

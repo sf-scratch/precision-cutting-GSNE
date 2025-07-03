@@ -91,6 +91,27 @@ namespace 精密切割系统.ViewModel
             set { _cutY = value; RaisePropertyChanged(); }
         }
 
+        private bool _isProductEnvironment;
+
+        public bool IsProductEnvironment
+        {
+            get { return _isProductEnvironment; }
+            set 
+            { 
+                _isProductEnvironment = value; 
+                if (_isProductEnvironment)
+                {
+                    HttpRestClient.UpdateProd();
+                }
+                else
+                {
+                    HttpRestClient.UpdateDev();
+                }
+                RaisePropertyChanged(); 
+            }
+        }
+
+
         public BladeReplacementConfigurationViewModel(IRegionManager regionManager, IEventAggregator eventAggregator)
         {
             _regionManager = regionManager;
@@ -321,6 +342,7 @@ namespace 精密切割系统.ViewModel
             {
                 CheckMarksCutTimes = GlobalParams.CheckMarksCutTimes
             };
+            IsProductEnvironment = true;
             SharpenY = Appsettings.SharpenY ?? 0;
             CutY = Appsettings.CutY ?? 0;
             InitRightButtonOnlyBack();

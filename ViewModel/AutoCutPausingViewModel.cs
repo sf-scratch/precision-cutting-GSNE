@@ -241,7 +241,7 @@ namespace 精密切割系统.ViewModel
             };
             float offsetX = _originPoint.X - curPoint.X;
             float offsetY = _originPoint.Y - curPoint.Y;
-            Appsettings.CameraRelativeBladePosition = new DataPoint<float>(relativePostion.X - offsetX, relativePostion.Y - offsetY);
+            Appsettings.CameraRelativeBladePosition = new DataPoint<float>(relativePostion.X, relativePostion.Y - offsetY);
             _originPoint = curPoint;
             MaterialSnackUtils.MaterialSnack($"基准线校准完成", MaterialSnackUtils.SnackType.SUCCESS, 0);
         }
