@@ -10,25 +10,34 @@ namespace 精密切割系统.Model.cut
 {
     public class SharpenParamsModel : BindableBase
     {
-        private int _rotateSpeed;
-        public int RotateSpeed
+        private long _id;
+
+        public long Id
         {
-            get { return _rotateSpeed; }
-            set { _rotateSpeed = value; RaisePropertyChanged(); }
+            get { return _id; }
+            set { _id = value; RaisePropertyChanged(); }
         }
 
-        private string _cutThickness;
-        public string CutThickness
+
+        private int _spindleRev;
+        public int SpindleRev
         {
-            get { return _cutThickness; }
-            set { _cutThickness = value; RaisePropertyChanged(); }
+            get { return _spindleRev; }
+            set { _spindleRev = value; RaisePropertyChanged(); }
         }
 
-        private float _coJiaoHeight;
-        public float CoJiaoHeight
+        private float _sharpenThickness;
+        public float SharpenThickness
         {
-            get { return _coJiaoHeight; }
-            set { _coJiaoHeight = value; RaisePropertyChanged(); }
+            get { return _sharpenThickness; }
+            set { _sharpenThickness = value; RaisePropertyChanged(); }
+        }
+
+        private float _tapeThickness;
+        public float TapeThickness
+        {
+            get { return _tapeThickness; }
+            set { _tapeThickness = value; RaisePropertyChanged(); }
         }
 
         private float _cutHeight;
@@ -45,18 +54,18 @@ namespace 精密切割系统.Model.cut
             set { _cutSize = value; RaisePropertyChanged(); }
         }
 
-        private float _cutNum;
-        public float CutNum
+        private int _cutNum;
+        public int CutNum
         {
             get { return _cutNum; }
             set { _cutNum = value; RaisePropertyChanged(); }
         }
 
-        private float _coOffsetX;
-        public float CoOffsetX
+        private float _offsetX;
+        public float OffsetX
         {
-            get { return _coOffsetX; }
-            set { _coOffsetX = value; RaisePropertyChanged(); }
+            get { return _offsetX; }
+            set { _offsetX = value; RaisePropertyChanged(); }
         }
 
         private float _hightestCutSpeed;
@@ -64,20 +73,6 @@ namespace 精密切割系统.Model.cut
         {
             get { return _hightestCutSpeed; }
             set { _hightestCutSpeed = value; RaisePropertyChanged(); }
-        }
-
-        private float _cutNum1;
-        public float CutNum1
-        {
-            get { return _cutNum1; }
-            set { _cutNum1 = value; RaisePropertyChanged(); }
-        }
-
-        private float _cutNum2;
-        public float CutNum2
-        {
-            get { return _cutNum2; }
-            set { _cutNum2 = value; RaisePropertyChanged(); }
         }
 
         private bool _isExecuteSharpen;

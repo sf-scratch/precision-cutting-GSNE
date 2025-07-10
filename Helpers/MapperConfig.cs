@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using 精密切割系统.DTOs;
+using 精密切割系统.Entities;
 using 精密切割系统.Model.cut;
 
 namespace 精密切割系统.Helpers
@@ -17,7 +18,9 @@ namespace 精密切割系统.Helpers
         {
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<LunguSksjDTO, LunguSksjModel>();
+                cfg.CreateMap<LunguSksjDTO, LunguSksjModel>().ReverseMap();
+                cfg.CreateMap<SharpenParamsEntity, SharpenParamsModel>().ReverseMap();
+                cfg.CreateMap<CutParamsEntity, CutParamsModel>().ReverseMap();
             });
             return config.CreateMapper();
         });

@@ -1381,6 +1381,12 @@ namespace 精密切割系统.Driver
             return await keyencePlc.ReadDataAsync<float>(curLocation.addr);
         }
 
+        public async Task<float?> GetCurrentLocationAsync(CancellationToken token)
+        {
+            await WaitAxisStopAsync(token);
+            return await GetCurrentLocationAsync();
+        }
+
         /// <summary>
         /// 回零点
         /// </summary>
@@ -2879,8 +2885,6 @@ namespace 精密切割系统.Driver
         /// </summary>
         public async Task EnterCuttingModeAsync(CancellationToken token)
         {
-            //打开切割水
-            await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
             await WaitReadyToCuttingAsync(token);
             fullAutoInit.writeValue = "0";
             await keyencePlc.WriteTagAsync(fullAutoInit);

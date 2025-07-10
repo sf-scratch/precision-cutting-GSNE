@@ -177,21 +177,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             switch (code)
             {
                 case 2442:
-                    if (!GlobalParams.onlineFlag)
-                    {
-                        return;
-                    }
-                    // 聚焦
-                    if (!CommonCheck.FocusStatsCheck())
-                    {
-                        break;
-                    }
-                    int focusType = 1;
-                    if (operateType == 2)
-                    {
-                        focusType = 4;
-                    }
-                    CommonOperate.GetInstance().AutoFocus(focusType, mainWindow, BladeLotID);
+                    await AutoCutUtils.AutoFocusAsync();
                     break;
                 case 2443:
                     if (!GlobalParams.onlineFlag)
@@ -202,14 +188,14 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                     {
                         break;
                     }
-                    await CommonOperate.GetInstance().ThetaAlignAsync();
+                    await CommonOperate.GetInstance().ThetaVerticalAlignAsync();
                     break;
                 case 2453:
                     if (!CommonCheck.ThetaAlignStatsCheck())
                     {
                         break;
                     }
-                    await CommonOperate.GetInstance().ThetaAlign1Async();
+                    await CommonOperate.GetInstance().ThetaHorizontalAlignAsync();
                     break;
                 case 2479:
                     // 倍率变更

@@ -308,17 +308,10 @@ namespace 精密切割系统.View
                     mainWindow.NavigateToPage(bean.PageUrl);
                     break;
                 case 401:
-                    if (!GlobalParams.onlineFlag)
-                    {
-                        ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(BladeReplacementConfiguration));
-                        break;
-                    }
-                    // 刀片更换
-                    if (CommonCheck.MlignStatusCheck())
-                    {
-                        MaterialSnackUtils.MaterialSnack("进入刀片更换模式中...", SnackType.WARNING, 0);
-                        ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(BladeReplacementConfiguration));
-                    }
+                    ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(BladeReplacementConfiguration));
+                    break;
+                case 439:
+                    ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(AutoCutSelectConfig));
                     break;
                 case 402:
                     if (!GlobalParams.onlineFlag)

@@ -1,43 +1,44 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NPOI.OpenXml4Net.OPC.Internal.Unmarshallers;
 using OpenCvSharp;
+using OpenCvSharp.WpfExtensions;
+using Prism.Events;
+using SciCamera.Net;
+using SQLite;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
+using System.Windows;
+using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
 using 精密切割系统.DTOs;
+using 精密切割系统.Extensions;
 using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
 using 精密切割系统.HttpClients;
+using 精密切割系统.Model.common;
+using 精密切割系统.Model.MeasureHeight;
 using 精密切割系统.Model.plc;
 using 精密切割系统.Model.sqlite;
-using 精密切割系统.Utils;
-using 精密切割系统.ViewModel;
-using System.Runtime.InteropServices;
-using OpenCvSharp.WpfExtensions;
-using SciCamera.Net;
-using 精密切割系统.View.Pages.common;
-using System.IO;
-using System.Windows;
-using System.Drawing.Imaging;
-using System.Collections.Concurrent;
-using Newtonsoft.Json.Linq;
 using 精密切割系统.PubSubEvent;
-using 精密切割系统.Model.common;
-using System.Windows.Interop;
-using Prism.Events;
+using 精密切割系统.Utils;
 using 精密切割系统.View.Dialogs;
-using 精密切割系统.Extensions;
+using 精密切割系统.View.Pages.common;
+using 精密切割系统.ViewModel;
 using static SQLite.SQLite3;
 using Point = OpenCvSharp.Point;
-using System.Windows.Shapes;
-using System.Diagnostics;
-using 精密切割系统.Model.MeasureHeight;
 
 namespace 精密切割系统.Model.cut
 {
@@ -360,7 +361,7 @@ namespace 精密切割系统.Model.cut
         /// <summary>
         /// 预切割序列
         /// </summary>
-        public static async Task<List<float>?> GetCutListAsync(string lunguId, float sydrcd)
+        public static List<float>? GetCutList()
         {
             // 查询当前配置获取预切割开始编号
             FileTableItemModel fileTableItemModel = CurrentUtils.GetFileTableItemModel();
@@ -373,7 +374,6 @@ namespace 精密切割系统.Model.cut
             // 获取
             float[] feedSpds = Tools.StringToFloatArray(preCutModel.FeedSpd); // 获取进刀速度
             float[] ofLinesList = Tools.StringToFloatArray(preCutModel.OfLines); // 获取切割刀数
-            float cutSpeed = await CutService.GetCutSpeed(lunguId, sydrcd);
             List<float> cutSpeedList = new List<float>();
             // 从预切割开始编号开始
             for (int i = preCutModel.NewBladeNo; i <= feedSpds.Length; i++)
@@ -381,7 +381,7 @@ namespace 精密切割系统.Model.cut
                 // 获取进刀速度
                 float feedspeed = feedSpds[i - 1];
                 float cutLine = ofLinesList[i - 1];
-                if (feedspeed != 0 && cutLine != 0 && feedspeed <= cutSpeed)
+                if (feedspeed != 0 && cutLine != 0)
                 {
                     for (int j = 0; j < cutLine; j++)
                     {
@@ -393,9 +393,56 @@ namespace 精密切割系统.Model.cut
         }
 
         /// <summary>
+        /// 预切割序列
+        /// </summary>
+        public static async Task<List<float>?> GetCutListAsync(CutParamsModel cutParams)
+        {
+            SQLiteAsyncConnection connection = SqlHelper.SQLiteAsync;
+            // 查询当前预切割流程信息
+            PreCutModel? preCutModel = (await connection.Table<PreCutModel>().Where(t => t.PrecutNo == cutParams.PrecutProcessNo).ToListAsync()).FirstOrDefault();
+            if (preCutModel is null || preCutModel.NewBladeNo == 0)
+            {
+                return null;
+            }
+            // 获取
+            float[] feedSpds = Tools.StringToFloatArray(preCutModel.FeedSpd); // 获取进刀速度
+            float[] ofLinesList = Tools.StringToFloatArray(preCutModel.OfLines); // 获取切割刀数
+            List<float> cutSpeedList = new List<float>();
+            // 从预切割开始编号开始
+            for (int i = preCutModel.NewBladeNo; i <= feedSpds.Length; i++)
+            {
+                // 获取进刀速度
+                float feedspeed = feedSpds[i - 1];
+                float cutLine = ofLinesList[i - 1];
+                if (feedspeed != 0 && cutLine != 0 && feedspeed < cutParams.HightestCutSpeed)
+                {
+                    for (int j = 0; j < cutLine; j++)
+                    {
+                        cutSpeedList.Add(feedspeed);
+                    }
+                }
+            }
+
+            if (cutParams.CutNum == 0)
+            {
+                return cutSpeedList;
+            }
+            else if (cutParams.CutNum > cutSpeedList.Count)
+            {
+                return Enumerable.Range(0, cutParams.CutNum)
+                      .Select(i => cutSpeedList[i % cutSpeedList.Count])
+                      .ToList();
+            }
+            else
+            {
+                return cutSpeedList.GetRange(0, cutParams.CutNum);
+            }
+        }
+
+        /// <summary>
         /// 获取总切割刀数
         /// </summary>
-        public static async Task<int?> GetTotalCutTimesAsync(string lunguId, float sydrcd)
+        public static int? GetTotalCutTimes()
         {
             // 查询当前配置获取预切割开始编号
             FileTableItemModel fileTableItemModel = CurrentUtils.GetFileTableItemModel();
@@ -408,7 +455,6 @@ namespace 精密切割系统.Model.cut
             // 获取
             float[] feedSpds = Tools.StringToFloatArray(preCutModel.FeedSpd); // 获取进刀速度
             float[] ofLinesList = Tools.StringToFloatArray(preCutModel.OfLines); // 获取切割刀数
-            float cutSpeed = await CutService.GetCutSpeed(lunguId, sydrcd);
             int totalCutTimes = 0;
             // 从预切割开始编号开始
             for (int i = preCutModel.NewBladeNo; i <= feedSpds.Length; i++)
@@ -416,7 +462,7 @@ namespace 精密切割系统.Model.cut
                 // 获取进刀速度
                 float feedspeed = feedSpds[i - 1];
                 float cutLine = ofLinesList[i - 1];
-                if (feedspeed != 0 && cutLine != 0 && feedspeed <= cutSpeed)
+                if (feedspeed != 0 && cutLine != 0)
                 {
                     totalCutTimes += (int)cutLine;
                 }
@@ -559,7 +605,6 @@ namespace 精密切割系统.Model.cut
                 return CommonResult<float>.Failure("相机获取失败！");
             }
             float focusClearZ = Appsettings.FocusClearZ ?? 0;
-            await PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0, default, token);
             await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(focusClearZ, 2, token);
             // 模糊度大于200时，直接返回清晰位置
             if (cameraCommon.localBitmap != null)

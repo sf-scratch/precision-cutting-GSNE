@@ -40,16 +40,6 @@ namespace 精密切割系统.Model.cut
         public readonly static DataRectangleF _sharpenRect = GlobalParams.SharpenRect;
 
         /// <summary>
-        /// 正常步进距离
-        /// </summary>
-        private readonly float _normalStepDistance = 0.1f;
-
-        /// <summary>
-        /// 跳跃步进距离
-        /// </summary>
-        private readonly float _jumpStepDistance = 0.2f;
-
-        /// <summary>
         /// 在磨刀几次后检测
         /// </summary>
         private readonly int _checkMarksSharpenTimes = GlobalParams.CheckMarksCutTimes;
@@ -114,7 +104,7 @@ namespace 精密切割系统.Model.cut
             _recordSharpenY = 0;
         }
 
-        public async Task<RunResult> Run(LunguSksjModel lunguSksj, float bladeContactWorkingDiscZ1, float bladeLiftingHeight, int spindleRev, float margin, float sharpenCalibratTheta, int sharpenTimes, float singleBladeWear, CancellationToken pauseToken)
+        public async Task<RunResult> Run(LunguSksjModel lunguSksj, SharpenParamsModel sharpenParams, float bladeContactWorkingDiscZ1, float bladeLiftingHeight, float sharpenCalibratTheta, int sharpenTimes, float singleBladeWear, CancellationToken pauseToken)
         {
             InitFromAppsettings();
             if (_thetaDegQueue.Count == 0)
@@ -127,10 +117,12 @@ namespace 精密切割系统.Model.cut
             int currentSharpenTimes = 0;
             try
             {
+                //打开切割水
+                await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
                 //进入全自动切割模式
                 await PlcControl.tagControl.cutting.EnterCuttingModeAsync(usingPauseToken);
                 float abAverageThickness = lunguSksj.ABAverageThickness / 1000;
-                float cutDeep = GetSharpenDeep(lunguSksj.ABAverageThickness);
+                float cutDeep = 0.3f;
                 int curSharpenTimes = 0;
                 //开始磨刀，磨指定刀数
                 while (curSharpenTimes < sharpenTimes)
@@ -144,7 +136,7 @@ namespace 精密切割系统.Model.cut
                             _recordSharpenY = GeometryUtils.FindBottomTangentY(_thetaCenterPoint, _sharpenRect, _thetaDegQueue.Peek());
                             _isRotateTheta = false;
                         }
-                        float cutSize = GetCutSize();
+                        float cutSize = GetCutSize(sharpenParams.CutSize);
                         if (!CheckSharpenDistance(_sharpenRect, cutSize))
                         {
                             _thetaDegQueue.Dequeue();
@@ -170,21 +162,15 @@ namespace 精密切割系统.Model.cut
                         _recordSharpenY = AutoCutUtils.CalculateCutY(_recordSharpenY, cutSize, _cutDirection);
                         //保存磨刀参数
                         Appsettings.SharpenY = _recordSharpenY;
-                        line = AutoCutUtils.CalculateRectangleCuttingLine(_thetaCenterPoint, _sharpenRect, _thetaDegQueue.Peek(), _recordSharpenY, margin);
+                        line = AutoCutUtils.CalculateRectangleCuttingLine(_thetaCenterPoint, _sharpenRect, _thetaDegQueue.Peek(), _recordSharpenY, sharpenParams.OffsetX);
                         if (line == null)
                         {
                             return RunResult.Fail(RunExceptionType.Other, "获取磨刀线失败！");
                         }
-                        //当前磨刀次数
-                        int? curCutNum = await PlcControl.tagControl.cutting.GetCutNumAsync();
-                        if (curCutNum == null)
-                        {
-                            return RunResult.Fail(RunExceptionType.None, "读取磨刀次数失败！");
-                        }
                         float bladeWaer = singleBladeWear * curSharpenTimes <= 0.1f ? singleBladeWear * curSharpenTimes : 0.1f;
-                        float endZ = bladeContactWorkingDiscZ1 - GlobalParams.SharpeningBoardThickness - GlobalParams.FilmThickness + cutDeep + bladeWaer;
+                        float endZ = bladeContactWorkingDiscZ1 - sharpenParams.SharpenThickness - sharpenParams.TapeThickness + cutDeep + bladeWaer;
                         float startZ = endZ - bladeLiftingHeight;
-                        float sharpenSpeed = GetCutSpeed(abAverageThickness, _isNewestSharpen);
+                        float sharpenSpeed = GetCutSpeed(sharpenParams.HightestCutSpeed);
                         //检查是否暂停
                         if (usingPauseToken.IsCancellationRequested)
                         {
@@ -195,11 +181,17 @@ namespace 精密切割系统.Model.cut
                             }
                             usingPauseToken = token.Value;
                         }
+                        //当前磨刀次数
+                        int? curCutNum = await PlcControl.tagControl.cutting.GetCutNumAsync();
+                        if (curCutNum == null)
+                        {
+                            return RunResult.Fail(RunExceptionType.None, "读取磨刀次数失败！");
+                        }
                         //触发磨刀进度更新事件
                         SharpenServiceProcessChanged?.Invoke(new SharpenServiceProcess(endZ, sharpenSpeed, sharpenTimes + _finishedSharpenTimes, currentSharpenTimes + _finishedSharpenTimes));
                         await PlcControl.tagControl.ThetaAxis.SetAbsoluteSpeedAsync(GlobalParams.ThetaDefaultSpeed);
                         //设置磨刀参数
-                        await PlcControl.tagControl.cutting.SetCutParamsAsync(sharpenSpeed, endZ, startZ, line.StartPoint.X, line.EndPoint.X, line.StartPoint.Y, "0", _thetaDegQueue.Peek(), spindleRev, _cutDirection);
+                        await PlcControl.tagControl.cutting.SetCutParamsAsync(sharpenSpeed, endZ, startZ, line.StartPoint.X, line.EndPoint.X, line.StartPoint.Y, "0", _thetaDegQueue.Peek(), sharpenParams.SpindleRev, _cutDirection);
                         //开始磨刀
                         await PlcControl.tagControl.cutting.StartCutAsync();
                         try
@@ -325,27 +317,14 @@ namespace 精密切割系统.Model.cut
             return res;
         }
 
-        private float GetCutSize()
+        private float GetCutSize(float stepDistance)
         {
-            return _isNewestSharpen ? _jumpStepDistance : _normalStepDistance;
+            return _isNewestSharpen ? stepDistance * 2 : stepDistance;
         }
 
-        public static float GetCutSpeed(float abAverageThickness, bool isNewestSharpen)
+        public float GetCutSpeed(float speed)
         {
-            float cutSpeed;
-            if (abAverageThickness <= 0.016f)
-            {
-                cutSpeed = 10f;
-            }
-            else if (abAverageThickness > 0.016 && abAverageThickness <= 0.021)
-            {
-                cutSpeed = isNewestSharpen ? 10f : 30f;
-            }
-            else
-            {
-                cutSpeed = isNewestSharpen ? 10f : 60f;
-            }
-            return cutSpeed;
+            return _isNewestSharpen ? 10 : speed;
         }
 
         public static float GetSharpenDeep(float abAverageThickness)

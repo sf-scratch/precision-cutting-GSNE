@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Runtime.ExceptionServices;
 using System.Security;
@@ -297,6 +298,229 @@ namespace 精密切割系统.FrmWindow.common
             return cutEdgeWidths;
         }
 
+        private const int AlignOutTime = 40;
+        private const int AlignDefaultMoveDistance = 50;
+        public ThetaAlignStatus CurrentThetaAlignStatus = ThetaAlignStatus.None;
+        private PointF _pointA;
+        private SemaphoreSlim _thetaAlignSemaphore = new SemaphoreSlim(1, 1);
+
+        public async Task ThetaHorizontalAlignAsync()
+        {
+            if (!await _thetaAlignSemaphore.WaitAsync(TimeSpan.Zero))
+            {
+                MaterialSnackUtils.MaterialSnack("拉直中，请勿重复点击！", MaterialSnackUtils.SnackType.WARNING);
+                return;
+            }
+            try
+            {
+                using CancellationTokenSource cts = new CancellationTokenSource();
+                cts.CancelAfter(TimeSpan.FromSeconds(AlignOutTime));
+                CancellationToken token = cts.Token;
+                PointF center = new PointF(GlobalParams.thetaCameraLocationX, GlobalParams.thetaCameraLocationY);
+                float xLocation, yLocation;
+                switch (CurrentThetaAlignStatus)
+                {
+                    case ThetaAlignStatus.Horizontal:
+                        MaterialSnackUtils.MaterialSnack("横向拉直中！", MaterialSnackUtils.SnackType.SUCCESS, 0);
+                        xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync(token) ?? 0;
+                        yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync(token) ?? 0;
+                        PointF pointB = new PointF(xLocation, yLocation);
+                        float angle = CalculateAngleToHorizontal(_pointA, pointB);
+                        float distance = -CalculateSignedDistance(_pointA, pointB, center);
+                        PointF rotatePointA = RotatePointAroundCenter(_pointA, center, angle);
+                        Tools.LogInfo($"A点 X:{_pointA.X} Y:{_pointA.Y}");
+                        Tools.LogInfo($"B点 X:{xLocation} Y:{yLocation}");
+                        Tools.LogInfo($"center X:{center.X} Y:{center.Y}");
+                        Tools.LogInfo($"校正角度:{angle}");
+                        Tools.LogInfo($"返回A位置:{rotatePointA.X}  {center.Y + distance}");
+                        Task thetaTask = PlcControl.tagControl.ThetaAxis.StartRelativeAsync(angle, default, token);
+                        Task xTask = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(rotatePointA.X, default, token);
+                        Task yTask = PlcControl.tagControl.Yaxis.StartAbsoluteAsync(center.Y + distance, default, token);
+                        await Task.WhenAll(thetaTask, xTask, yTask);
+                        CurrentThetaAlignStatus = ThetaAlignStatus.Completed;
+                        SetCalibrationAngle();
+                        MaterialSnackUtils.MaterialSnack("横向拉直完成！", MaterialSnackUtils.SnackType.SUCCESS);
+                        break;
+                    case ThetaAlignStatus.Vertical:
+                        CurrentThetaAlignStatus = ThetaAlignStatus.None;
+                        MaterialSnackUtils.MaterialSnack("已取消竖向拉直!", MaterialSnackUtils.SnackType.WARNING);
+                        break;
+                    default:
+                        xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync(token) ?? 0;
+                        yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync(token) ?? 0;
+                        _pointA = new PointF(xLocation, yLocation);
+                        await PlcControl.tagControl.Xaxis.StartRelativeAsync(AlignDefaultMoveDistance, 80);
+                        CurrentThetaAlignStatus = ThetaAlignStatus.Horizontal;
+                        MaterialSnackUtils.MaterialSnack("请继续横向拉直第二点", MaterialSnackUtils.SnackType.SUCCESS);
+                        break;
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                MaterialSnackUtils.MaterialSnack("横向拉直超时！", MaterialSnackUtils.SnackType.WARNING);
+            }
+            finally
+            {
+                _thetaAlignSemaphore.Release();
+            }
+        }
+
+        public async Task ThetaVerticalAlignAsync()
+        {
+            if (!await _thetaAlignSemaphore.WaitAsync(TimeSpan.Zero))
+            {
+                MaterialSnackUtils.MaterialSnack("拉直中，请勿重复点击！", MaterialSnackUtils.SnackType.WARNING);
+                return;
+            }
+            try
+            {
+                using CancellationTokenSource cts = new CancellationTokenSource();
+                cts.CancelAfter(TimeSpan.FromSeconds(AlignOutTime));
+                CancellationToken token = cts.Token;
+                PointF center = new PointF(GlobalParams.thetaCameraLocationX, GlobalParams.thetaCameraLocationY);
+                float xLocation, yLocation;
+                switch (CurrentThetaAlignStatus)
+                {
+                    case ThetaAlignStatus.Horizontal:
+                        CurrentThetaAlignStatus = ThetaAlignStatus.None;
+                        MaterialSnackUtils.MaterialSnack("已取消横向拉直!", MaterialSnackUtils.SnackType.WARNING);
+                        break;
+                    case ThetaAlignStatus.Vertical:
+                        MaterialSnackUtils.MaterialSnack("竖向拉直中！", MaterialSnackUtils.SnackType.SUCCESS, 0);
+                        xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync(token) ?? 0;
+                        yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync(token) ?? 0;
+                        PointF pointB = new PointF(xLocation, yLocation);
+                        float angle = CalculateAngleToVertical(_pointA, pointB);
+                        float distance = -CalculateSignedDistance(_pointA, pointB, center);
+                        PointF rotatePointA = RotatePointAroundCenter(_pointA, center, angle);
+                        Tools.LogInfo($"A点 X:{_pointA.X} Y:{_pointA.Y}");
+                        Tools.LogInfo($"B点 X:{xLocation} Y:{yLocation}");
+                        Tools.LogInfo($"center X:{center.X} Y:{center.Y}");
+                        Tools.LogInfo($"校正角度:{angle}");
+                        Tools.LogInfo($"返回A位置:{center.X + distance}  {rotatePointA.Y}");
+                        Task thetaTask = PlcControl.tagControl.ThetaAxis.StartRelativeAsync(angle, default, token);
+                        Task xTask = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(center.X + distance, default, token);
+                        Task yTask = PlcControl.tagControl.Yaxis.StartAbsoluteAsync(rotatePointA.Y, default, token);
+                        await Task.WhenAll(thetaTask, xTask, yTask);
+                        CurrentThetaAlignStatus = ThetaAlignStatus.Completed;
+                        SetCalibrationAngle();
+                        MaterialSnackUtils.MaterialSnack("竖向拉直完成！", MaterialSnackUtils.SnackType.SUCCESS);
+                        break;
+                    default:
+                        xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync(token) ?? 0;
+                        yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync(token) ?? 0;
+                        _pointA = new PointF(xLocation, yLocation);
+                        await PlcControl.tagControl.Yaxis.StartRelativeAsync(-AlignDefaultMoveDistance, 60);
+                        CurrentThetaAlignStatus = ThetaAlignStatus.Vertical;
+                        MaterialSnackUtils.MaterialSnack("请继续竖向拉直第二点", MaterialSnackUtils.SnackType.SUCCESS);
+                        break;
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                MaterialSnackUtils.MaterialSnack("竖向拉直超时！", MaterialSnackUtils.SnackType.WARNING);
+            }
+            finally
+            {
+                _thetaAlignSemaphore.Release();
+            }
+        }
+
+        public static float CalculateAngleToVertical(PointF pointA, PointF pointB)
+        {
+            // 计算两点之间的差值（向量）
+            float dx = pointB.X - pointA.X;
+            float dy = pointB.Y - pointA.Y;
+
+            // 计算相对于正Y轴（竖直向上）的角度
+            float angleRadians = MathF.Atan2(dx, dy); // 注意参数顺序为(dx, dy)
+
+            // 转换为角度（弧度转角度）
+            float angleDegrees = angleRadians * (180.0f / MathF.PI);
+
+            // 调整角度范围到[-180, 180]
+            if (angleDegrees > 180)
+                angleDegrees -= 360;
+            else if (angleDegrees < -180)
+                angleDegrees += 360;
+
+            // 检查是否需要转换为负角度（如果绝对值更小）
+            if (angleDegrees > 90)
+                angleDegrees -= 180;
+            else if (angleDegrees < -90)
+                angleDegrees += 180;
+
+            return angleDegrees;
+        }
+
+        public static float CalculateAngleToHorizontal(PointF pointA, PointF pointB)
+        {
+            // 计算两点之间的差值
+            float dx = pointB.X - pointA.X;
+            float dy = pointB.Y - pointA.Y;
+
+            // 使用Math.Atan2计算角度（弧度）
+            // 注意：Atan2返回的是从正X轴逆时针方向的角度
+            float angleRadians = MathF.Atan2(dy, dx);
+
+            // 转换为顺时针为正的角度（取负值）
+            angleRadians = -angleRadians;
+
+            // 将弧度转换为角度
+            float angleDegrees = angleRadians * (180.0f / MathF.PI);
+
+            // 规范化角度到[-180, 180]范围
+            if (angleDegrees > 180)
+                angleDegrees -= 360;
+            else if (angleDegrees < -180)
+                angleDegrees += 360;
+
+            // 检查是否需要转换为负角度（如果绝对值更小）
+            if (angleDegrees > 90)
+                angleDegrees -= 180;
+            else if (angleDegrees < -90)
+                angleDegrees += 180;
+
+            return angleDegrees;
+        }
+
+        public static float CalculateSignedDistance(PointF linePointA, PointF linePointB, PointF testPoint)
+        {
+            // 计算直线向量
+            float dx = linePointB.X - linePointA.X;
+            float dy = linePointB.Y - linePointA.Y;
+
+            // 计算叉积 (dx*(testY-linePointA.Y) - dy*(testX-linePointA.X))
+            float cross = dx * (testPoint.Y - linePointA.Y) - dy * (testPoint.X - linePointA.X);
+
+            // 计算直线长度（取正值）
+            float len = MathF.Sqrt(dx * dx + dy * dy);
+
+            // 避免除以零（如果两点重合）
+            if (len == 0)
+                throw new ArgumentException("直线的两个端点不能重合");
+
+            // 返回有向距离（向上为负，向下为正）
+            return cross / len;
+        }
+
+        /// <summary>
+        /// 点绕圆心旋转（顺时针）
+        /// </summary>
+        private static PointF RotatePointAroundCenter(PointF point, PointF center, float angle)
+        {
+            // 转换为弧度
+            float theta = angle * MathF.PI / 180f;
+            float x = point.X - center.X;
+            float y = point.Y - center.Y;
+
+            // 右手系顺时针旋转矩阵
+            float newX = x * MathF.Cos(theta) - y * MathF.Sin(theta);  // sin项取负
+            float newY = x * MathF.Sin(theta) + y * MathF.Cos(theta);  // 与左手系相反
+
+            return new PointF(newX + center.X, newY + center.Y);
+        }
+
         public async Task ThetaAlign1Async()
         {
             if (!CommonCheck.AxisReady(false))
@@ -501,99 +725,99 @@ namespace 精密切割系统.FrmWindow.common
         /// <summary>
         /// theta 竖向拉直
         /// </summary>
-        public async Task ThetaAlignAsync()
-        {
-            if (!CommonCheck.AxisReady(false))
-            {
-                return;
-            }
-            // 如果在运行中，则不执行
-            if (thetaAlignRunStatus)
-            {
-                return;
-            }
-            if (xLocation == 1) 
-            {
-                MaterialSnackUtils.MaterialSnack("请先完成横向拉直。", MaterialSnackUtils.SnackType.WARNING);
-                return;
-            }
-            int yRunDistance = 60;
-            thetaAlignRunStatus = true;
-            // 设置当前位置：0 左边 1 右边 
-            // 当xLocation 为0的时候点击，设置locationA
-            if (xVerticalLocation == 0 || xVerticalLocation == 2)
-            {
-                // 设置locationA
-                locationAX = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0;
-                locationAY = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0;
-                locationBX1 = locationAX;
-                // Y轴向右移动30mm
-                float newPosition = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0 - yRunDistance;
-                locationBY1 = (locationBY1 == 0 ? newPosition : locationBY1);
-                await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(locationBY1);
-                bool flag = Tools.WaitForValue(PlcControl.allTags[DeviceKey.curSpeedKey], "0");
-                xVerticalLocation = 1;
-                thetaAlignRunStatus = false;
-                MaterialSnackUtils.MaterialSnack("请再次点击Theta轴校准，完成校准！", MaterialSnackUtils.SnackType.WARNING);
-            }
-            else if (xVerticalLocation == 1)
-            {
-                // 如果是第二次点击，则设置locationC的定位 = 当前y轴位置 - locationYB的值
-                // locationBY1 = parseFloat(PlcControl.plc.GetPlcValueString(yTagKey));
-                Thread.Sleep(5);
-                float _tempLocationBX = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0;
-                Thread.Sleep(5);
-                locationC = _tempLocationBX - locationBX1;
+        //public async Task ThetaVerticalAlignAsync()
+        //{
+        //    if (!CommonCheck.AxisReady(false))
+        //    {
+        //        return;
+        //    }
+        //    // 如果在运行中，则不执行
+        //    if (thetaAlignRunStatus)
+        //    {
+        //        return;
+        //    }
+        //    if (xLocation == 1) 
+        //    {
+        //        MaterialSnackUtils.MaterialSnack("请先完成横向拉直。", MaterialSnackUtils.SnackType.WARNING);
+        //        return;
+        //    }
+        //    int yRunDistance = 60;
+        //    thetaAlignRunStatus = true;
+        //    // 设置当前位置：0 左边 1 右边 
+        //    // 当xLocation 为0的时候点击，设置locationA
+        //    if (xVerticalLocation == 0 || xVerticalLocation == 2)
+        //    {
+        //        // 设置locationA
+        //        locationAX = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0;
+        //        locationAY = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0;
+        //        locationBX1 = locationAX;
+        //        // Y轴向右移动30mm
+        //        float newPosition = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0 - yRunDistance;
+        //        locationBY1 = (locationBY1 == 0 ? newPosition : locationBY1);
+        //        await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(locationBY1);
+        //        bool flag = Tools.WaitForValue(PlcControl.allTags[DeviceKey.curSpeedKey], "0");
+        //        xVerticalLocation = 1;
+        //        thetaAlignRunStatus = false;
+        //        MaterialSnackUtils.MaterialSnack("请再次点击Theta轴校准，完成校准！", MaterialSnackUtils.SnackType.WARNING);
+        //    }
+        //    else if (xVerticalLocation == 1)
+        //    {
+        //        // 如果是第二次点击，则设置locationC的定位 = 当前y轴位置 - locationYB的值
+        //        // locationBY1 = parseFloat(PlcControl.plc.GetPlcValueString(yTagKey));
+        //        Thread.Sleep(5);
+        //        float _tempLocationBX = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0;
+        //        Thread.Sleep(5);
+        //        locationC = _tempLocationBX - locationBX1;
 
-                // 构建计算角度需要的参数
-                // 三角形的顶点坐标
-                double x1 = 0, y1 = 0;
-                double dis = locationBY1 - locationAY;
+        //        // 构建计算角度需要的参数
+        //        // 三角形的顶点坐标
+        //        double x1 = 0, y1 = 0;
+        //        double dis = locationBY1 - locationAY;
                
-                double x2 = 0, y2 = dis;
-                double x3 = Math.Abs(locationC), y3 = dis;
-                Tools.LogInfo($"x1:{x1}, y1:{y1}, x2:{x2}, y2:{y2}, x3:{x3}, y3:{y3}");
-                // 计算并输出角度
-                float angle = (float)TriangleAngles.GetTriangleAngles(x1, y1, x2, y2, x3, y3);
-                Thread.Sleep(5);
-                Tools.LogInfo("angle:" + angle);
-                // 旋转Theta轴角度
-                if (locationC < 0)
-                {
-                    angle = -angle;
-                }
-                // 旋转theta轴
-                await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(angle);
+        //        double x2 = 0, y2 = dis;
+        //        double x3 = Math.Abs(locationC), y3 = dis;
+        //        Tools.LogInfo($"x1:{x1}, y1:{y1}, x2:{x2}, y2:{y2}, x3:{x3}, y3:{y3}");
+        //        // 计算并输出角度
+        //        float angle = (float)TriangleAngles.GetTriangleAngles(x1, y1, x2, y2, x3, y3);
+        //        Thread.Sleep(5);
+        //        Tools.LogInfo("angle:" + angle);
+        //        // 旋转Theta轴角度
+        //        if (locationC < 0)
+        //        {
+        //            angle = -angle;
+        //        }
+        //        // 旋转theta轴
+        //        await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(angle);
 
-                // 定义直线端点
-                TriangleAngles.Point A = new TriangleAngles.Point(locationAX, locationAY);
-                TriangleAngles.Point B = new TriangleAngles.Point(locationBY1, _tempLocationBX);
+        //        // 定义直线端点
+        //        TriangleAngles.Point A = new TriangleAngles.Point(locationAX, locationAY);
+        //        TriangleAngles.Point B = new TriangleAngles.Point(locationBY1, _tempLocationBX);
 
-                // 圆心位置 (不是原点)
-                TriangleAngles.Point center = new TriangleAngles.Point(GlobalParams.thetaCameraLocationX
-                    , GlobalParams.thetaCameraLocationY);
+        //        // 圆心位置 (不是原点)
+        //        TriangleAngles.Point center = new TriangleAngles.Point(GlobalParams.thetaCameraLocationX
+        //            , GlobalParams.thetaCameraLocationY);
 
-                // 调用 RotateLine 方法
-                var (A_rotated, B_rotated) = TriangleAngles.RotateLine(A, B, angle, center);
+        //        // 调用 RotateLine 方法
+        //        var (A_rotated, B_rotated) = TriangleAngles.RotateLine(A, B, angle, center);
 
-                Tools.LogInfo($"拉直后的Y位置：{A_rotated.Y} A:{A} B:{B} computingAngle:{angle} center:{center}");
-                Debug.WriteLine($"拉直后的Y位置：{A_rotated.Y} A:{A} B:{B} computingAngle:{angle} center:{center}");
-                if (A_rotated.X > 0)
-                {
-                    await PlcControl.tagControl.Xaxis.StartAbsoluteAsync((float)A_rotated.X);
-                }
-                // X轴向右移动回原位
-                await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(locationAY);
-                Thread.Sleep(200);
-                // 等待X轴移动完成后，可以操作
-                SetCalibrationAngle();
-                CutOperateUtils.thetaAlignFlag = true;
-                MaterialSnackUtils.MaterialSnack("Theta轴完成校准!", MaterialSnackUtils.SnackType.SUCCESS);
-                thetaAlignRunStatus = false;
-                xVerticalLocation = 2;
-            }
+        //        Tools.LogInfo($"拉直后的Y位置：{A_rotated.Y} A:{A} B:{B} computingAngle:{angle} center:{center}");
+        //        Debug.WriteLine($"拉直后的Y位置：{A_rotated.Y} A:{A} B:{B} computingAngle:{angle} center:{center}");
+        //        if (A_rotated.X > 0)
+        //        {
+        //            await PlcControl.tagControl.Xaxis.StartAbsoluteAsync((float)A_rotated.X);
+        //        }
+        //        // X轴向右移动回原位
+        //        await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(locationAY);
+        //        Thread.Sleep(200);
+        //        // 等待X轴移动完成后，可以操作
+        //        SetCalibrationAngle();
+        //        CutOperateUtils.thetaAlignFlag = true;
+        //        MaterialSnackUtils.MaterialSnack("Theta轴完成校准!", MaterialSnackUtils.SnackType.SUCCESS);
+        //        thetaAlignRunStatus = false;
+        //        xVerticalLocation = 2;
+        //    }
 
-        }
+        //}
 
         private float parseFloat(string value)
         {
@@ -620,6 +844,15 @@ namespace 精密切割系统.FrmWindow.common
             Tools.LogInfo($"tempCh:{tempCh}");
         }
     }
+
+    public enum ThetaAlignStatus
+    {
+        None,
+        Horizontal,
+        Vertical,
+        Completed
+    }
+
     class ImageDataComparer : IEqualityComparer<ImageData>
     {
         public bool Equals(ImageData x, ImageData y)

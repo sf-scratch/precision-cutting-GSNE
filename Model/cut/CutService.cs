@@ -140,6 +140,8 @@ namespace 精密切割系统.Model.cut
             int cutTime = 0;
             try
             {
+                //打开切割水
+                await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
                 //进入全自动切割模式
                 await PlcControl.tagControl.cutting.EnterCuttingModeAsync(_usingPauseToken);
                 float abAverageThickness = lunguSksj.ABAverageThickness;
@@ -191,13 +193,7 @@ namespace 精密切割系统.Model.cut
                         {
                             return RunResult.Fail(RunExceptionType.Other, "获取切割线失败！");
                         }
-                        //当前切割次数
-                        int? curCutNum = await PlcControl.tagControl.cutting.GetCutNumAsync();
-                        if (curCutNum == null)
-                        {
-                            return RunResult.Fail(RunExceptionType.Other, "获取当前切割次数失败！");
-                        }
-                        float endZ = bladeContactWorkingDiscZ1 - GlobalParams.WaferThickness - GlobalParams.FilmThickness + cutDeep;
+                        float endZ = bladeContactWorkingDiscZ1 - cutParams.WorkThickness - cutParams.TapeThickness + cutDeep;
                         float startZ = endZ - bladeLiftingHeight;
                         //检查是否暂停
                         if (_usingPauseToken.IsCancellationRequested)
@@ -207,6 +203,12 @@ namespace 精密切割系统.Model.cut
                             {
                                 return RunResult.Fail(RunExceptionType.Stop, "停止切割");
                             }
+                        }
+                        //当前切割次数
+                        int? curCutNum = await PlcControl.tagControl.cutting.GetCutNumAsync();
+                        if (curCutNum == null)
+                        {
+                            return RunResult.Fail(RunExceptionType.Other, "获取当前切割次数失败！");
                         }
                         //触发切割进度更新事件
                         CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, needCutTimes + _finishedCutTimes, cutTime + _finishedCutTimes));
@@ -274,7 +276,8 @@ namespace 精密切割系统.Model.cut
                                         $"最大崩边宽度：{Math.Round(result.CollapseWidthMaxImage.CollapseWidth, 3)} " +
                                         $"是否蛇形：{result.HasSnakelike()}"));
                                     // 刀痕检查结果未成功，表示未检测到刀痕
-                                    if (!result.IsSuccess)
+                                    //if (!result.IsSuccess)
+                                    if (true)
                                     {
                                         await PlcControl.tagControl.wholeDevice.OpenBuzzerAsync();
                                         //刀痕检查结果失败，表示未检测到刀痕
@@ -347,6 +350,8 @@ namespace 精密切割系统.Model.cut
                             }
                             finally
                             {
+                                //打开切割水
+                                await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
                                 //进入全自动切割模式
                                 await PlcControl.tagControl.cutting.EnterCuttingModeAsync(_usingPauseToken);
                             }

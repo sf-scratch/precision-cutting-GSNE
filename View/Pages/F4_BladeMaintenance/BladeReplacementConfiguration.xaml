@@ -11,12 +11,12 @@
       mc:Ignorable="d" 
       d:DesignHeight="676" d:DesignWidth="1448"
       d:DataContext="{d:DesignInstance viewModel:BladeReplacementConfigurationViewModel, IsDesignTimeCreatable=True}">
-    <!--<behaviors:Interaction.Triggers>
+    <behaviors:Interaction.Triggers>
         <behaviors:EventTrigger EventName="Loaded">
             <behaviors:InvokeCommandAction 
                 Command="{Binding InitCommand}"/>
         </behaviors:EventTrigger>
-    </behaviors:Interaction.Triggers>-->
+    </behaviors:Interaction.Triggers>
     <Control.Resources>
         <Style TargetType="TextBlock">
             <Setter Property="FontSize" Value="16"/>
@@ -105,13 +105,8 @@
                 <auto:AutoGrid Margin="10" Columns="2*,3*,*,2*,5*" RowCount="7" ChildMargin="5">
                     <TextBlock Text="轮毂号"/>
                     <Controls:InputTextBox x:Name="lunguTextBox" Text="{Binding LunguId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PreviewMouseDown="lunguTextBox_PreviewMouseDown" TouchDown="lunguTextBox_TouchDown">
-                        <!--<behaviors:Interaction.Triggers>
-                            <behaviors:EventTrigger EventName="KeyUp">
-                                <behaviors:InvokeCommandAction Command="{Binding InitCommand}" CommandParameter="{Binding Text, ElementName=lunguTextBox}"/>
-                            </behaviors:EventTrigger>
-                        </behaviors:Interaction.Triggers>-->
                         <TextBox.InputBindings>
-                            <KeyBinding  Key="Enter" Command="{Binding InitCommand}" CommandParameter="{Binding Text, ElementName=lunguTextBox}"/>
+                            <KeyBinding  Key="Enter" Command="{Binding CheckLunguCommand}" CommandParameter="{Binding Text, ElementName=lunguTextBox}"/>
                         </TextBox.InputBindings>
                     </Controls:InputTextBox>
                     <TextBlock HorizontalAlignment="Left" Text=""/>
@@ -135,84 +130,15 @@
 
             <GroupBox Margin="10">
                 <GroupBox.Header>
-                    <TextBlock Text="切割参数" FontWeight="Bold" FontSize="20"/>
-                </GroupBox.Header>
-                <auto:AutoGrid Margin="10" Columns="2*,2*,*,2*,2*,*" RowCount="7" ChildMargin="5">
-                    <TextBlock Text="型号参数号"/>
-                    <Controls:InputTextBox Text="{Binding CutParams.DeviceDataNo}"/>
-                    <TextBlock HorizontalAlignment="Left" Text=""/>
-                    <TextBlock Text="胶片厚度"/>
-                    <Controls:InputTextBox Text="{Binding CutParams.TapeThickness}"/>
-                    <TextBlock HorizontalAlignment="Left" Text="mm"/>
-                    <TextBlock Text="旋转轴转速"/>
-                    <Controls:InputTextBox Text="{Binding CutParams.SpindleRev}"/>
-                    <TextBlock HorizontalAlignment="Left" Text="转/min"/>
-                    <TextBlock Text="刀片高度"/>
-                    <Controls:InputTextBox Text="{Binding CutParams.CutHeight}"/>
-                    <TextBlock HorizontalAlignment="Left" Text="mm"/>
-                    <TextBlock Text="预切割过程No"/>
-                    <Controls:InputTextBox Text="{Binding CutParams.PrecutProcessNo}"/>
-                    <TextBlock HorizontalAlignment="Left" Text=""/>
-                    <TextBlock Text="最高切割速率"/>
-                    <Controls:InputTextBox Text="{Binding CutParams.MaxCutSpeed}"/>
-                    <TextBlock HorizontalAlignment="Left" Text="mm/s"/>
-                    <TextBlock Text="晶片尺寸"/>
-                    <Controls:InputTextBox/>
-                    <TextBlock HorizontalAlignment="Left" Text="mm"/>
-                    <TextBlock Text="切割刀数"/>
-                    <Controls:InputTextBox Text="{Binding CutParams.CutNum}"/>
-                    <TextBlock HorizontalAlignment="Left" Text="刀"/>
-                    <TextBlock Text="晶片厚度"/>
-                    <Controls:InputTextBox Text="{Binding CutParams.WorkThickness}"/>
-                    <TextBlock HorizontalAlignment="Left" Text="mm"/>
-                </auto:AutoGrid>
-            </GroupBox>
-        </StackPanel>
-        <StackPanel Grid.Column="2" Grid.Row="1">
-            <GroupBox Margin="10">
-                <GroupBox.Header>
-                    <TextBlock Text="磨刀参数" FontWeight="Bold" FontSize="20"/>
-                </GroupBox.Header>
-                <StackPanel>
-                    <auto:AutoGrid Margin="10" Columns="2*,2*,*,2*,2*,*" RowCount="7" ChildMargin="5">
-                        <TextBlock Text="旋转轴转速"/>
-                        <Controls:InputTextBox Text="{Binding SharpenParams.RotateSpeed}"/>
-                        <TextBlock HorizontalAlignment="Left" Text="转/min"/>
-                        <TextBlock Text="磨刀板尺寸"/>
-                        <Controls:InputTextBox/>
-                        <TextBlock HorizontalAlignment="Left" Text="mm"/>
-                        <TextBlock Text="磨刀板厚度"/>
-                        <Controls:InputTextBox Text="{Binding SharpenParams.CutThickness}"/>
-                        <TextBlock HorizontalAlignment="Left" Text="mm"/>
-                        <TextBlock Text="胶片厚度"/>
-                        <Controls:InputTextBox Text="{Binding SharpenParams.CoJiaoHeight}"/>
-                        <TextBlock HorizontalAlignment="Left" Text="mm"/>
-                        <TextBlock Text="刀片高度"/>
-                        <Controls:InputTextBox Text="{Binding SharpenParams.CutHeight}"/>
-                        <TextBlock HorizontalAlignment="Left" Text="mm"/>
-                        <TextBlock Text="进刀尺寸"/>
-                        <Controls:InputTextBox Text="{Binding SharpenParams.CutSize}"/>
-                        <TextBlock HorizontalAlignment="Left" Text="mm"/>
-                        <TextBlock Text="磨刀刀数"/>
-                        <Controls:InputTextBox Text="{Binding SharpenParams.CutNum}"/>
-                        <TextBlock HorizontalAlignment="Left" Text="刀"/>
-                        <TextBlock Text="X轴偏移量"/>
-                        <Controls:InputTextBox Text="{Binding SharpenParams.CoOffsetX}"/>
-                        <TextBlock HorizontalAlignment="Left" Text="mm"/>
-                        <TextBlock Text="最高磨刀速率"/>
-                        <Controls:InputTextBox Text="{Binding SharpenParams.HightestCutSpeed}"/>
-                        <TextBlock HorizontalAlignment="Left" Text="mm/s"/>
-                    </auto:AutoGrid>
-                </StackPanel>
-            </GroupBox>
-            <GroupBox Margin="10">
-                <GroupBox.Header>
                     <TextBlock Text="自动执行数据" FontWeight="Bold" FontSize="20"/>
                 </GroupBox.Header>
                 <StackPanel>
                     <auto:AutoGrid Margin="10" Columns="2*,2*,*,2*,2*,*" RowCount="7" ChildMargin="5">
                         <TextBlock Text="磨刀开始位置"/>
                         <Controls:InputTextBox Text="{Binding SharpenY}"/>
+                        <TextBlock HorizontalAlignment="Left" Text="mm"/>
+                        <TextBlock Text="切割开始位置"/>
+                        <Controls:InputTextBox Text="{Binding CutY}"/>
                         <TextBlock HorizontalAlignment="Left" Text="mm"/>
                         <TextBlock Text="执行自动磨刀"/>
                         <ToggleButton IsChecked="{Binding SharpenParams.IsExecuteSharpen, Mode=TwoWay}">
@@ -225,9 +151,6 @@
                             </ToggleButton.Resources>
                         </ToggleButton>
                         <TextBlock HorizontalAlignment="Left" Text=""/>
-                        <TextBlock Text="切割开始位置"/>
-                        <Controls:InputTextBox Text="{Binding CutY}"/>
-                        <TextBlock HorizontalAlignment="Left" Text="mm"/>
                         <TextBlock Text="运行环境"/>
                         <StackPanel Orientation="Horizontal">
                             <StackPanel.Resources>
@@ -244,20 +167,78 @@
                             </ListBox>
                         </StackPanel>
                         <TextBlock HorizontalAlignment="Left" Text=""/>
-                        <TextBlock Text="切割几刀检测"/>
-                        <Controls:InputTextBox Text="{Binding CutParams.CheckMarksCutTimes}" PreviewMouseDown="lunguTextBox_PreviewMouseDown" TouchDown="lunguTextBox_TouchDown"/>
-                        <TextBlock HorizontalAlignment="Left" Text="刀"/>
                     </auto:AutoGrid>
                 </StackPanel>
             </GroupBox>
-            <!--<Controls:RightButton
-                        BackFlag="False"
-                        BackgroundDefColor="#39D11A"
-                        BackgroundDownColor="#39B41A"
-                        ContentText="开始"
-                        ImagePath="/Assets/icon/right/enter.png"
-                        Visibility="Visible"/>-->
-            <!--<Button Content="自动执行" FontSize="30" Width="200" HorizontalAlignment="Right" Margin="20" Command="{Binding AutoRunCommand}"/>-->
+        </StackPanel>
+        <StackPanel Grid.Column="2" Grid.Row="1" IsEnabled="False">
+            <GroupBox Margin="10">
+                <GroupBox.Header>
+                    <TextBlock Text="磨刀参数" FontWeight="Bold" FontSize="20"/>
+                </GroupBox.Header>
+                <StackPanel>
+                    <auto:AutoGrid Margin="10" Columns="2*,2*,*,2*,2*,*" RowCount="7" ChildMargin="5">
+                        <TextBlock Text="旋转轴转速"/>
+                        <Controls:InputTextBox Text="{Binding SharpenParams.SpindleRev}"/>
+                        <TextBlock HorizontalAlignment="Left" Text="转/min"/>
+                        <TextBlock Text="磨刀板厚度"/>
+                        <Controls:InputTextBox Text="{Binding SharpenParams.SharpenThickness}"/>
+                        <TextBlock HorizontalAlignment="Left" Text="mm"/>
+                        <TextBlock Text="胶片厚度"/>
+                        <Controls:InputTextBox Text="{Binding SharpenParams.TapeThickness}"/>
+                        <TextBlock HorizontalAlignment="Left" Text="mm"/>
+                        <TextBlock Text="刀片高度"/>
+                        <Controls:InputTextBox Text="{Binding SharpenParams.CutHeight}"/>
+                        <TextBlock HorizontalAlignment="Left" Text="mm"/>
+                        <TextBlock Text="进刀尺寸"/>
+                        <Controls:InputTextBox Text="{Binding SharpenParams.CutSize}"/>
+                        <TextBlock HorizontalAlignment="Left" Text="mm"/>
+                        <TextBlock Text="磨刀刀数"/>
+                        <Controls:InputTextBox Text="{Binding SharpenParams.CutNum}"/>
+                        <TextBlock HorizontalAlignment="Left" Text="刀"/>
+                        <TextBlock Text="X轴偏移量"/>
+                        <Controls:InputTextBox Text="{Binding SharpenParams.OffsetX}"/>
+                        <TextBlock HorizontalAlignment="Left" Text="mm"/>
+                        <TextBlock Text="最高磨刀速率"/>
+                        <Controls:InputTextBox Text="{Binding SharpenParams.HightestCutSpeed}"/>
+                        <TextBlock HorizontalAlignment="Left" Text="mm/s"/>
+                    </auto:AutoGrid>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Margin="10">
+                <GroupBox.Header>
+                    <TextBlock Text="切割参数" FontWeight="Bold" FontSize="20"/>
+                </GroupBox.Header>
+                <auto:AutoGrid Margin="10" Columns="2*,2*,*,2*,2*,*" RowCount="7" ChildMargin="5">
+                    <TextBlock Text="预切割过程No"/>
+                    <Controls:InputTextBox Text="{Binding CutParams.PrecutProcessNo}"/>
+                    <TextBlock HorizontalAlignment="Left" Text=""/>
+                    <TextBlock Text="切割刀数"/>
+                    <Controls:InputTextBox Text="{Binding CutParams.CutNum}"/>
+                    <TextBlock HorizontalAlignment="Left" Text="刀"/>
+                    <TextBlock Text="胶片厚度"/>
+                    <Controls:InputTextBox Text="{Binding CutParams.TapeThickness}"/>
+                    <TextBlock HorizontalAlignment="Left" Text="mm"/>
+                    <TextBlock Text="旋转轴转速"/>
+                    <Controls:InputTextBox Text="{Binding CutParams.SpindleRev}"/>
+                    <TextBlock HorizontalAlignment="Left" Text="转/min"/>
+                    <TextBlock Text="刀片高度"/>
+                    <Controls:InputTextBox Text="{Binding CutParams.CutHeight}"/>
+                    <TextBlock HorizontalAlignment="Left" Text="mm"/>
+                    <TextBlock Text="最高切割速率"/>
+                    <Controls:InputTextBox Text="{Binding CutParams.HightestCutSpeed}"/>
+                    <TextBlock HorizontalAlignment="Left" Text="mm/s"/>
+                    <!--<TextBlock Text="晶片尺寸"/>
+                    <Controls:InputTextBox/>
+                    <TextBlock HorizontalAlignment="Left" Text="mm"/>-->
+                    <TextBlock Text="晶片厚度"/>
+                    <Controls:InputTextBox Text="{Binding CutParams.WorkThickness}"/>
+                    <TextBlock HorizontalAlignment="Left" Text="mm"/>
+                    <TextBlock Text="切割几刀检测"/>
+                    <Controls:InputTextBox Text="{Binding CutParams.CheckMarksCutTimes}"/>
+                    <TextBlock HorizontalAlignment="Left" Text="刀"/>
+                </auto:AutoGrid>
+            </GroupBox>
         </StackPanel>
     </Grid>
 </UserControl>

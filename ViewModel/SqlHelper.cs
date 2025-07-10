@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using 精密切割系统.database.db.modle;
+using 精密切割系统.Entities;
 using 精密切割系统.Model.sqlite;
 using 精密切割系统.View.Pages.F4_BladeMaintenance;
 
@@ -55,6 +56,9 @@ namespace 精密切割系统.ViewModel
                 db.CreateTable<RunLogsModel>(); // 运行日志
                 db.CreateTable<FlangeTrimmingModel>(); // 法兰修整
                 db.CreateTable<ThetaCenterAlignModel>(); // theta轴中心位置校正
+                db.CreateTable<SharpenParamsEntity>();
+                db.CreateTable<CutParamsEntity>();
+                db.CreateTable<SelectedConfigEntity>();
             }
             catch (Exception ex)
             {
@@ -68,10 +72,19 @@ namespace 精密切割系统.ViewModel
             return db;
         }
 
+        public static SQLiteAsyncConnection SQLiteAsync
+        {
+            get
+            {
+                return dbAsync;
+            }
+        }
+
         public static int Add(object model)
         {
             return db.Insert(model);
         }
+
         public static async Task<int> AddAsync(object model)
         {
             return await dbAsync.InsertAsync(model);

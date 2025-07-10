@@ -8,83 +8,84 @@ using System.Threading.Tasks;
 
 namespace 精密切割系统.Model.cut
 {
-    public class CutParamsModel : INotifyPropertyChanged
+    public class CutParamsModel : BindableBase
     {
-        public event PropertyChangedEventHandler? PropertyChanged;
+        private long _id;
 
-        private string _deviceDataNo;
-        public string DeviceDataNo
+        public long Id
         {
-            get { return _deviceDataNo; }
-            set { _deviceDataNo = value; OnPropertyChanged(); }
+            get { return _id; }
+            set { _id = value; RaisePropertyChanged(); }
         }
 
-        private string _tapeThickness;
-        public string TapeThickness
+        private float _tapeThickness;
+        public float TapeThickness
         {
             get { return _tapeThickness; }
-            set { _tapeThickness = value; OnPropertyChanged(); }
+            set { _tapeThickness = value; RaisePropertyChanged(); }
         }
 
         private int _spindleRev;
         public int SpindleRev
         {
             get { return _spindleRev; }
-            set { _spindleRev = value; OnPropertyChanged(); }
+            set { _spindleRev = value; RaisePropertyChanged(); }
         }
 
         private float _cutHeight;
         public float CutHeight
         {
             get { return _cutHeight; }
-            set { _cutHeight = value; OnPropertyChanged(); }
+            set { _cutHeight = value; RaisePropertyChanged(); }
         }
 
         private string _precutProcessNo;
         public string PrecutProcessNo
         {
             get { return _precutProcessNo; }
-            set { _precutProcessNo = value; OnPropertyChanged(); }
+            set { _precutProcessNo = value; RaisePropertyChanged(); }
         }
 
-        private float _maxCutSpeed;
-        public float MaxCutSpeed
+        private float _hightestCutSpeed;
+        public float HightestCutSpeed
         {
-            get { return _maxCutSpeed; }
-            set { _maxCutSpeed = value; OnPropertyChanged(); }
+            get { return _hightestCutSpeed; }
+            set { _hightestCutSpeed = value; RaisePropertyChanged(); }
         }
 
         private int _cutNum;
         public int CutNum
         {
             get { return _cutNum; }
-            set { _cutNum = value; OnPropertyChanged(); }
+            set { _cutNum = value; RaisePropertyChanged(); }
         }
 
-        private string _workThickness;
-        public string WorkThickness
+        private float _cutSize;
+        public float CutSize
+        {
+            get { return _cutSize; }
+            set { _cutSize = value; RaisePropertyChanged(); }
+        }
+
+        private float _workThickness;
+        public float WorkThickness
         {
             get { return _workThickness; }
-            set { _workThickness = value; OnPropertyChanged(); }
+            set { _workThickness = value; RaisePropertyChanged(); }
         }
 
         private float _offsetX;
         public float OffsetX
         {
             get { return _offsetX; }
-            set { _offsetX = value; OnPropertyChanged(); }
+            set { _offsetX = value; RaisePropertyChanged(); }
         }
 
         private int _checkMarksCutTimes;
         public int CheckMarksCutTimes
         {
             get { return _checkMarksCutTimes; }
-            set { _checkMarksCutTimes = value; OnPropertyChanged(); }
-        }
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            set { _checkMarksCutTimes = value; RaisePropertyChanged(); }
         }
     }
 }

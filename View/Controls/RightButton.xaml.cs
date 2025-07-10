@@ -181,10 +181,5 @@ namespace 精密切割系统.View.Controls
             RightClicked += handler;
         }
         public event EventHandler<Boolean> RightClicked;
-
-        public void resetBg()
-        {
-            btnBorder.Background = BackgroundDefColor;
-        }
     }
 }

@@ -38,6 +38,8 @@ namespace 精密切割系统.Behaviors
             AssociatedObject.TouchLeave += AssociatedObject_TouchLeave;
             AssociatedObject.PreviewTouchDown += AssociatedObject_PreviewTouchDown;
             AssociatedObject.PreviewTouchUp += AssociatedObject_PreviewTouchUp;
+            AssociatedObject.GotTouchCapture += AssociatedObject_GotTouchCapture;
+            AssociatedObject.LostTouchCapture += AssociatedObject_LostTouchCapture;
         }
 
         protected override void OnDetaching()
@@ -53,11 +55,27 @@ namespace 精密切割系统.Behaviors
             AssociatedObject.TouchLeave -= AssociatedObject_TouchLeave;
             AssociatedObject.PreviewTouchDown -= AssociatedObject_PreviewTouchDown;
             AssociatedObject.PreviewTouchUp -= AssociatedObject_PreviewTouchUp;
+            AssociatedObject.GotTouchCapture -= AssociatedObject_GotTouchCapture;
+            AssociatedObject.LostTouchCapture -= AssociatedObject_LostTouchCapture;
+        }
+
+        private void AssociatedObject_LostTouchCapture(object? sender, TouchEventArgs e)
+        {
+            Tools.LogDebug(nameof(AssociatedObject_LostTouchCapture));
+        }
+
+        private void AssociatedObject_GotTouchCapture(object? sender, TouchEventArgs e)
+        {
+            Tools.LogDebug(nameof(AssociatedObject_GotTouchCapture));
         }
 
         private void AssociatedObject_TouchDown(object? sender, TouchEventArgs e)
         {
             Tools.LogDebug(nameof(AssociatedObject_TouchDown));
+            if (AssociatedObject.CaptureTouch(e.TouchDevice))
+            {
+                Tools.LogDebug("触摸捕获成功");
+            }
             Interlocked.CompareExchange(ref _isRaiseCommand, 0, 1);
         }
 
@@ -102,6 +120,7 @@ namespace 精密切割系统.Behaviors
         private void AssociatedObject_TouchUp(object? sender, TouchEventArgs e)
         {
             Tools.LogDebug(nameof(AssociatedObject_TouchUp));
+            AssociatedObject.ReleaseTouchCapture(e.TouchDevice);
             if (sender is not null && sender is RightButton rightButton && rightButton.DataContext is RightButtonParams rightButtonParams)
             {
                 rightButton.btnBorder.Background = rightButtonParams.BackgroundDefColor;
@@ -114,11 +133,13 @@ namespace 精密切割系统.Behaviors
 
         private void AssociatedObject_TouchLeave(object? sender, TouchEventArgs e)
         {
+            Tools.LogDebug(nameof(AssociatedObject_TouchLeave));
             //Interlocked.CompareExchange(ref _isRaiseCommand, 0, 1);
         }
 
         private void AssociatedObject_MouseLeave(object sender, MouseEventArgs e)
         {
+            Tools.LogDebug(nameof(AssociatedObject_MouseLeave));
             //Interlocked.CompareExchange(ref _isRaiseCommand, 0, 1);
         }
     }
