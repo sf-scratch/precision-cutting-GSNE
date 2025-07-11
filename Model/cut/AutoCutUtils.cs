@@ -63,7 +63,7 @@ namespace 精密切割系统.Model.cut
             Task speedZero = PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync();
             await Task.WhenAll(taskXY, taskTheta, speedZero);
             Appsettings.AfterReplaceBladeCutTimes = 0;
-            MaterialSnackUtils.MaterialSnack("请更换刀片！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+            MaterialSnackUtils.MaterialSnack("请打开切割安全门，更换刀片！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace 精密切割系统.Model.cut
             Appsettings.SharpenY = null;
             Appsettings.SharpenThetaDegQueue = null;
             Appsettings.SharpenDistance = null;
-            MaterialSnackUtils.MaterialSnack("请更换磨刀板！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+            MaterialSnackUtils.MaterialSnack("请打开相机安全门，更换磨刀板！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
         }
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace 精密切割系统.Model.cut
             Appsettings.CutY = null;
             Appsettings.CutThetaDegQueue = null;
             Appsettings.CutDistance = null;
-            MaterialSnackUtils.MaterialSnack("请更换硅片！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+            MaterialSnackUtils.MaterialSnack("请打开相机安全门，更换硅片！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
         }
 
         /// <summary>
@@ -622,10 +622,15 @@ namespace 精密切割系统.Model.cut
             CommonResult<float> roughFocusPosition = await AutoFocusAsync(cameraCommon, focusClearZ, 0.5f, 0.05f, token, eventAggregator);
             if (!roughFocusPosition.IsSuccess)
             {
-                return CommonResult<float>.Failure("粗调聚焦失败！");
+                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, 2, token);
+                roughFocusPosition = await AutoFocusAsync(cameraCommon, 10, 9, 0.05f, token, eventAggregator);
+                if (!roughFocusPosition.IsSuccess)
+                {
+                    return CommonResult<float>.Failure("聚焦失败，请检查硅片位置！");
+                }
             }
             // 进行精调聚焦
-            return await AutoFocusAsync(cameraCommon, roughFocusPosition.Data, 0.05f, 0.01f, token, eventAggregator);
+            return await AutoFocusAsync(cameraCommon, roughFocusPosition.Data, 0.04f, 0.01f, token, eventAggregator);
         }
 
         private static async Task<CommonResult<float>> AutoFocusAsync(CameraCommon cameraCommon, float startPositionZ2, float margin, float singleMoveDistance, CancellationToken token, IEventAggregator? eventAggregator = null)

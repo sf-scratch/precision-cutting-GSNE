@@ -164,9 +164,9 @@ namespace 精密切割系统.ViewModel
 
         private void InitBottomButton()
         {
-            _operatePageButtonCollection.Add(RightButtonParams.BlueRightButton("换刀片", "/Assets/icon/tab_1/03/tab_02.png", ReplaceBlade, null, 8));
-            _operatePageButtonCollection.Add(RightButtonParams.BlueRightButton("换磨刀板", "/Assets/icon/tab_1/03/tab_05.png", ReplaceSharpeningBoard, null, 8));
-            _operatePageButtonCollection.Add(RightButtonParams.BlueRightButton("换硅片", "/Assets/icon/tab_1/03/tab_05.png", ReplaceWafer, null, 8));
+            _operatePageButtonCollection.Add(RightButtonParams.BlueRightButton("换刀片", "SawBlade", ReplaceBlade, null, 8));
+            _operatePageButtonCollection.Add(RightButtonParams.BlueRightButton("换磨刀板", "Square", ReplaceSharpeningBoard, null, 8));
+            _operatePageButtonCollection.Add(RightButtonParams.BlueRightButton("换硅片", "CircleOpacity", ReplaceWafer, null, 8));
         }
 
         private async void CheckLungu(string lunguId)

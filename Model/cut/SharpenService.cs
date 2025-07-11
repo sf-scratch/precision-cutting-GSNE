@@ -122,7 +122,7 @@ namespace 精密切割系统.Model.cut
                 //进入全自动切割模式
                 await PlcControl.tagControl.cutting.EnterCuttingModeAsync(usingPauseToken);
                 float abAverageThickness = lunguSksj.ABAverageThickness / 1000;
-                float cutDeep = 0.3f;
+                float cutDeep = sharpenParams.SharpenThickness + sharpenParams.TapeThickness - sharpenParams.CutHeight;
                 int curSharpenTimes = 0;
                 //开始磨刀，磨指定刀数
                 while (curSharpenTimes < sharpenTimes)
@@ -146,8 +146,9 @@ namespace 精密切割系统.Model.cut
                                 CancellationToken? token = await WaitContinueAsync(line);
                                 if (token == null)
                                 {
-                                    return RunResult.Fail(RunExceptionType.Stop, "停止切割");
+                                    return RunResult.Fail("停止切割");
                                 }
+                                await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
                                 usingPauseToken = token.Value;
                                 InitThetaDegQueue(sharpenCalibratTheta);
                             }
@@ -165,7 +166,7 @@ namespace 精密切割系统.Model.cut
                         line = AutoCutUtils.CalculateRectangleCuttingLine(_thetaCenterPoint, _sharpenRect, _thetaDegQueue.Peek(), _recordSharpenY, sharpenParams.OffsetX);
                         if (line == null)
                         {
-                            return RunResult.Fail(RunExceptionType.Other, "获取磨刀线失败！");
+                            return RunResult.Fail("获取磨刀线失败！");
                         }
                         float bladeWaer = singleBladeWear * curSharpenTimes <= 0.1f ? singleBladeWear * curSharpenTimes : 0.1f;
                         float endZ = bladeContactWorkingDiscZ1 - sharpenParams.SharpenThickness - sharpenParams.TapeThickness + cutDeep + bladeWaer;
@@ -177,15 +178,16 @@ namespace 精密切割系统.Model.cut
                             CancellationToken? token = await WaitContinueAsync(line);
                             if (token == null)
                             {
-                                return RunResult.Fail(RunExceptionType.Stop, "停止切割");
+                                return RunResult.Fail("停止切割");
                             }
+                            await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
                             usingPauseToken = token.Value;
                         }
                         //当前磨刀次数
                         int? curCutNum = await PlcControl.tagControl.cutting.GetCutNumAsync();
                         if (curCutNum == null)
                         {
-                            return RunResult.Fail(RunExceptionType.None, "读取磨刀次数失败！");
+                            return RunResult.Fail("读取磨刀次数失败！");
                         }
                         //触发磨刀进度更新事件
                         SharpenServiceProcessChanged?.Invoke(new SharpenServiceProcess(endZ, sharpenSpeed, sharpenTimes + _finishedSharpenTimes, currentSharpenTimes + _finishedSharpenTimes));
@@ -206,29 +208,20 @@ namespace 精密切割系统.Model.cut
                             //触发磨刀进度更新事件
                             SharpenServiceProcessChanged?.Invoke(new SharpenServiceProcess(endZ, sharpenSpeed, sharpenTimes + _finishedSharpenTimes, currentSharpenTimes + _finishedSharpenTimes, true));
                         }
-                        //判断是否开始检查刀痕
-                        //if (_totalSharpenTimes % GlobalParams.CheckMarksSharpenTimes == 0)
-                        //{
-                        //    await HttpUtils.SendSharpenDataToMES();
-                        //    if (!AutoCutUtils.CheckKnifeMarksStatus())
-                        //    {
-                        //        Tools.LogDebug("刀痕不合格！");
-                        //        return RunResult.Fail(RunExceptionType.BladeScrap, "刀痕不合格！");
-                        //    }
-                        //}
                     }
                     catch (OperationCanceledException)
                     {
                         CancellationToken? token = await WaitContinueAsync(line);
                         if (token == null)
                         {
-                            return RunResult.Fail(RunExceptionType.Stop, "停止切割");
+                            return RunResult.Fail("停止切割");
                         }
+                        await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
                         usingPauseToken = token.Value;
                     }
                     catch (Exception ex)
                     {
-                        return RunResult.Fail(RunExceptionType.Other, $"执行磨刀失败！{ex.Message}");
+                        return RunResult.Fail($"执行磨刀失败！{ex.Message}");
                     }
                     _isNewestSharpen = false;
                 }

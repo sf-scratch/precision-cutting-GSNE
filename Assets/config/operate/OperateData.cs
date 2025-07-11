@@ -23,6 +23,7 @@ namespace 精密切割系统.Assets.config.buttom
             list.Add(new OperateBean(9, "相机吹气", "/Assets/icon/tab_0/tab_06.png"));
             //list.Add(new OperateBean(10, "工作盘真空", "/Assets/icon/tab_0/replace_workspace.png.png"));
             list.Add(new OperateBean(3, "C/T真空", "/Assets/icon/tab_0/tab_03.png"));
+            list.Add(new OperateBean(8, "主轴", "/Assets/icon/tab_5/tab_01.png"));
             return list;
         }
 

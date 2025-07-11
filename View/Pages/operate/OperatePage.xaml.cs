@@ -462,12 +462,7 @@ namespace 精密切割系统.View.Pages.operate
                     await OperateCutSecurityDoorAsync();
                     break;
                 case 8:
-                    if (!GlobalParams.onlineFlag)
-                    {
-                        return;
-                    }
-                    // 推拉门操作
-                    await OperateCameraSecurityDoorAsync();
+                    await SpindleManuallyRunAsync();
                     break;
                 case 9:
                     // 相机吹气
@@ -709,6 +704,33 @@ namespace 精密切割系统.View.Pages.operate
             else
             {
                 await PlcControl.tagControl.wholeDevice.OpenWorkpieceBlowingAsync();
+            }
+        }
+
+        private SemaphoreSlim _spindleSemaphore = new SemaphoreSlim(1, 1);
+
+        private async Task SpindleManuallyRunAsync()
+        {
+            if (!await _spindleSemaphore.WaitAsync(TimeSpan.Zero))
+            {
+                MaterialSnackUtils.MaterialSnack("主轴加减速中，请勿重复点击！", MaterialSnackUtils.SnackType.WARNING);
+                return;
+            }
+            try
+            {
+                if (await PlcControl.tagControl.wholeDevice.GetSpindleSpeedAsync() == 0)
+                {
+                    await PlcControl.tagControl.wholeDevice.StartSpindleAsync();
+                }
+                else
+                {
+                    await PlcControl.tagControl.wholeDevice.StopSpindleAsync();
+                    await PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync();
+                }
+            }
+            finally
+            {
+                _spindleSemaphore.Release();
             }
         }
 

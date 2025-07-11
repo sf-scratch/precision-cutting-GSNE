@@ -18,16 +18,6 @@ namespace 精密切割系统.Model.cut
             set { _isSuccess = value; }
         }
 
-        private RunExceptionType _type;
-        /// <summary>
-        /// 运行异常类型
-        /// </summary>
-        public RunExceptionType Type
-        {
-            get { return _type; }
-            set { _type = value; }
-        }
-
         private string _message;
         /// <summary>
         /// 异常信息
@@ -38,44 +28,20 @@ namespace 精密切割系统.Model.cut
             set { _message = value; }
         }
 
-        public RunResult(bool isSuccess, RunExceptionType type, string message)
+        public RunResult(bool isSuccess, string message)
         {
             _isSuccess = isSuccess;
-            _type = type;
             _message = message;
         }
 
-        public static RunResult Fail(RunExceptionType type, string message)
+        public static RunResult Fail(string message)
         {
-            return new RunResult(false, type, message);
+            return new RunResult(false, message);
         }
 
         public static RunResult Success()
         {
-            return new RunResult(true, RunExceptionType.None, string.Empty);
+            return new RunResult(true, string.Empty);
         }
-    }
-
-    public enum RunExceptionType
-    {
-        /// <summary>
-        /// 无异常
-        /// </summary>
-        None,
-
-        /// <summary>
-        /// 刀片报废
-        /// </summary>
-        BladeScrap,
-
-        /// <summary>
-        /// 停止
-        /// </summary>
-        Stop,
-
-        /// <summary>
-        /// 其他
-        /// </summary>
-        Other
     }
 }
