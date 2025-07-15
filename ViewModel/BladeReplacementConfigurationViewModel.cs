@@ -29,6 +29,7 @@ using 精密切割系统.PubSubEvent;
 using 精密切割系统.Utils;
 using 精密切割系统.View.common;
 using 精密切割系统.View.Pages.Auto;
+using 精密切割系统.View.Pages.F4_BladeMaintenance;
 
 namespace 精密切割系统.ViewModel
 {
@@ -151,6 +152,7 @@ namespace 精密切割系统.ViewModel
         {
             _rightButtonParams.Clear();
             _rightButtonParams.Add(RightButtonParams.YelloRightButton("检查轮毂", "/Assets/icon/menu_0/menu_0_2_white.png", () => CheckLungu(LunguId)));
+            _rightButtonParams.Add(RightButtonParams.YelloRightButton("操作记录", "ClipboardTextClockOutline", GoToHistory));
             _rightButtonParams.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }
 
@@ -159,6 +161,7 @@ namespace 精密切割系统.ViewModel
             _rightButtonParams.Clear();
             _rightButtonParams.Add(RightButtonParams.GreenRightButton("自动执行", "/Assets/icon/right/enter.png", AutoRunAsync));
             _rightButtonParams.Add(RightButtonParams.YelloRightButton("检查轮毂", "/Assets/icon/menu_0/menu_0_2_white.png", () => CheckLungu(LunguId)));
+            _rightButtonParams.Add(RightButtonParams.YelloRightButton("操作记录", "ClipboardTextClockOutline", GoToHistory));
             _rightButtonParams.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }
 
@@ -167,6 +170,11 @@ namespace 精密切割系统.ViewModel
             _operatePageButtonCollection.Add(RightButtonParams.BlueRightButton("换刀片", "SawBlade", ReplaceBlade, null, 8));
             _operatePageButtonCollection.Add(RightButtonParams.BlueRightButton("换磨刀板", "Square", ReplaceSharpeningBoard, null, 8));
             _operatePageButtonCollection.Add(RightButtonParams.BlueRightButton("换硅片", "CircleOpacity", ReplaceWafer, null, 8));
+        }
+
+        private void GoToHistory()
+        {
+            _regionManager.RequestNavigate(RegionName.MainRegion, nameof(AutoCutHistory));
         }
 
         private async void CheckLungu(string lunguId)
@@ -178,26 +186,6 @@ namespace 精密切割系统.ViewModel
             bool isInitSuccess = false;
             try
             {
-                //await PdaUtils.ComputerPracticeAsync(lunguId);
-                //PdaUtils.AddSharpen(0.5f, 10);
-                //PdaUtils.AddSharpen(0.2f, 11);
-                //PdaUtils.AddWearAmountAfterCircle(0.035f, 10);
-                ////PdaUtils.AddStandardCutSpeed("1");
-                ////PdaUtils.AddStandardSharpenSpeed("2");
-                ////PdaUtils.AddResidueSharpenTimes("3");
-                ////PdaUtils.AddTotalSharpenTimes("4");
-                ////PdaUtils.AddToolMarkWidth("5");
-                ////PdaUtils.AddToolMarkActualWidth("6");
-                ////PdaUtils.AddFirstToolMarkWidth("7");
-                ////PdaUtils.AddMaximumCollapseAngle("8");
-                ////PdaUtils.AddMaxCutSpeed("9");
-                ////PdaUtils.AddSingleCollapseAngle("10");
-                //await PdaUtils.SetCompletedAsync();
-                //await PdaUtils.QualifiedAsync();
-                //await PdaUtils.ScrapAsync(Cv2.ImRead("C:\\MySpace\\Dev\\ProjectXiHua\\precision-cutting-321\\bin\\x64\\Debug\\net8.0-windows\\image\\638851675110259848_cropMatJpg.jpg"));
-                //轮毂信息
-                //LunguSksjDTO lunguSksjDTO = new LunguSksjDTO();
-                //默认theta轴初始在5的位置，防止theta抖动为负值
                 MaterialSnackUtils.MaterialSnack("检查轮毂信息中...", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
                 HttpUtilsResult<LunguInfoDTO> lunguResult = await HttpUtils.GetLunguInfoAsync(LunguId);
                 if (lunguResult.Data is null)

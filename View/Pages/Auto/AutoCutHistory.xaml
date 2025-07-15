@@ -1,0 +1,209 @@
+﻿<UserControl x:Class="精密切割系统.View.Pages.Auto.AutoCutHistory"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:精密切割系统.View.Pages.Auto"
+             xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
+             xmlns:behvr="clr-namespace:精密切割系统.Behaviors"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             d:DesignHeight="676" d:DesignWidth="1448"
+             d:DataContext="{d:DesignInstance viewModel:AutoCutHistoryViewModel, IsDesignTimeCreatable=True}">
+    <UserControl.Resources>
+        <Style TargetType="TextBlock" x:Key="CenteredTextBlockStyle">
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="HeaderTextBlockStyle">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="16"/>
+        </Style>
+        <Style TargetType="Image" x:Key="CenteredImageStyle">
+            <Setter Property="Width" Value="80"/>
+            <Setter Property="Height" Value="60"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Stretch" Value="UniformToFill"/>
+        </Style>
+    </UserControl.Resources>
+
+    <materialDesign:DialogHost>
+        <materialDesign:DialogHost.Resources>
+            <ResourceDictionary>
+                <ResourceDictionary.MergedDictionaries>
+                    <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="LightBlue"  SecondaryColor="Lime" />
+                    <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml"/>
+                </ResourceDictionary.MergedDictionaries>
+            </ResourceDictionary>
+        </materialDesign:DialogHost.Resources>
+        <Grid Margin="30,30,0,0">
+            <Grid.RowDefinitions >
+                <RowDefinition Height="60"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" >
+                <Label Content="自动切割操作记录" VerticalAlignment="Bottom" FontWeight="Bold" FontSize="22" Margin="0,0,10,0"/>
+            </StackPanel>
+            <ListView Grid.Row="1" ItemsSource="{Binding KnifeWearList}" Grid.IsSharedSizeScope="True" d:ItemsSource="{d:SampleData}" >
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        <!-- 让内容填充整个单元格 -->
+                        <Setter Property="Margin" Value="0,0,0,5"/>
+                        <Setter Property="Padding" Value="0"/>
+                        <Setter Property="materialDesign:ListBoxItemAssist.ShowSelection" Value="False"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn>
+                            <GridViewColumn.Header>
+                                <TextBlock Text="开始时间" Style="{StaticResource HeaderTextBlockStyle}"/>
+                            </GridViewColumn.Header>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding StartTime,StringFormat='MM-dd HH:mm'}" Style="{StaticResource CenteredTextBlockStyle}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn>
+                            <GridViewColumn.Header>
+                                <TextBlock Text="结束时间" Style="{StaticResource HeaderTextBlockStyle}"/>
+                            </GridViewColumn.Header>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding StartTime,StringFormat='MM-dd HH:mm'}" Style="{StaticResource CenteredTextBlockStyle}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn>
+                            <GridViewColumn.Header>
+                                <TextBlock Text="第一刀刀痕" Style="{StaticResource HeaderTextBlockStyle}"/>
+                            </GridViewColumn.Header>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Image Source="{Binding FirstCutImage}" Style="{StaticResource CenteredImageStyle}">
+                                        <behaviors:Interaction.Behaviors>
+                                            <behvr:TouchAndClickBehavior TouchAndClickCommand="{x:Static materialDesign:DialogHost.OpenDialogCommand}">
+                                                <behvr:TouchAndClickBehavior.CommandParameter>
+                                                    <Grid>
+                                                        <Image Source="{Binding FirstCutImage}" Stretch="Uniform" MaxWidth="1448" MaxHeight="676">
+                                                            <behaviors:Interaction.Behaviors>
+                                                                <behvr:TouchAndClickBehavior TouchAndClickCommand="{x:Static materialDesign:DialogHost.CloseDialogCommand}"/>
+                                                            </behaviors:Interaction.Behaviors>
+                                                        </Image>
+                                                    </Grid>
+                                                </behvr:TouchAndClickBehavior.CommandParameter>
+                                            </behvr:TouchAndClickBehavior>
+                                        </behaviors:Interaction.Behaviors>
+                                    </Image>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn>
+                            <GridViewColumn.Header>
+                                <TextBlock Text="第二刀刀痕" Style="{StaticResource HeaderTextBlockStyle}"/>
+                            </GridViewColumn.Header>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Image Source="{Binding SecondCutImage}" Style="{StaticResource CenteredImageStyle}">
+                                        <behaviors:Interaction.Behaviors>
+                                            <behvr:TouchAndClickBehavior TouchAndClickCommand="{x:Static materialDesign:DialogHost.OpenDialogCommand}">
+                                                <behvr:TouchAndClickBehavior.CommandParameter>
+                                                    <Grid>
+                                                        <Image Source="{Binding SecondCutImage}" Stretch="Uniform" MaxWidth="1448" MaxHeight="676">
+                                                            <behaviors:Interaction.Behaviors>
+                                                                <behvr:TouchAndClickBehavior TouchAndClickCommand="{x:Static materialDesign:DialogHost.CloseDialogCommand}"/>
+                                                            </behaviors:Interaction.Behaviors>
+                                                        </Image>
+                                                    </Grid>
+                                                </behvr:TouchAndClickBehavior.CommandParameter>
+                                            </behvr:TouchAndClickBehavior>
+                                        </behaviors:Interaction.Behaviors>
+                                    </Image>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn>
+                            <GridViewColumn.Header>
+                                <TextBlock Text="最后一刀刀痕" Style="{StaticResource HeaderTextBlockStyle}"/>
+                            </GridViewColumn.Header>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Image Source="{Binding LastCutImage}" Style="{StaticResource CenteredImageStyle}">
+                                        <behaviors:Interaction.Behaviors>
+                                            <behvr:TouchAndClickBehavior TouchAndClickCommand="{x:Static materialDesign:DialogHost.OpenDialogCommand}">
+                                                <behvr:TouchAndClickBehavior.CommandParameter>
+                                                    <Grid>
+                                                        <Image Source="{Binding LastCutImage}" Stretch="Uniform" MaxWidth="1448" MaxHeight="676">
+                                                            <behaviors:Interaction.Behaviors>
+                                                                <behvr:TouchAndClickBehavior TouchAndClickCommand="{x:Static materialDesign:DialogHost.CloseDialogCommand}"/>
+                                                            </behaviors:Interaction.Behaviors>
+                                                        </Image>
+                                                    </Grid>
+                                                </behvr:TouchAndClickBehavior.CommandParameter>
+                                            </behvr:TouchAndClickBehavior>
+                                        </behaviors:Interaction.Behaviors>
+                                    </Image>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn>
+                            <GridViewColumn.Header>
+                                <TextBlock Text="磨刀次数" Style="{StaticResource HeaderTextBlockStyle}"/>
+                            </GridViewColumn.Header>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding SharpenCount}" Style="{StaticResource CenteredTextBlockStyle}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn>
+                            <GridViewColumn.Header>
+                                <TextBlock Text="磨损量(mm)" Style="{StaticResource HeaderTextBlockStyle}"/>
+                            </GridViewColumn.Header>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding WearAmount}" Style="{StaticResource CenteredTextBlockStyle}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn>
+                            <GridViewColumn.Header>
+                                <TextBlock Text="最后磨刀次数" Style="{StaticResource HeaderTextBlockStyle}"/>
+                            </GridViewColumn.Header>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding LastSharpenCount}" Style="{StaticResource CenteredTextBlockStyle}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn>
+                            <GridViewColumn.Header>
+                                <TextBlock Text="最后磨损量(mm)" Style="{StaticResource HeaderTextBlockStyle}"/>
+                            </GridViewColumn.Header>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding LastWearAmount}" Style="{StaticResource CenteredTextBlockStyle}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn>
+                            <GridViewColumn.Header>
+                                <TextBlock Text="切割刀数" Style="{StaticResource HeaderTextBlockStyle}"/>
+                            </GridViewColumn.Header>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding CutCount}" Style="{StaticResource CenteredTextBlockStyle}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Grid>
+    </materialDesign:DialogHost>
+</UserControl>

@@ -46,6 +46,7 @@ namespace 精密切割系统
             containerRegistry.RegisterForNavigation<AutoCut, AutoCutViewModel>();
             containerRegistry.RegisterForNavigation<AutoCutSelectConfig, AutoCutSelectConfigViewModel>();
             containerRegistry.RegisterForNavigation<AutoCutConfig, AutoCutConfigViewModel>();
+            containerRegistry.RegisterForNavigation<AutoCutHistory, AutoCutHistoryViewModel>();
             containerRegistry.RegisterDialog<ConfirmDialog, ConfirmDialogViewModel>();
             containerRegistry.Register<IDialogWindow, ConfirmDialogWindow>(nameof(ConfirmDialogWindow));
         }

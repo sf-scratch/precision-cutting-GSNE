@@ -251,6 +251,7 @@ namespace 精密切割系统.ViewModel
                     MaterialSnackUtils.MaterialSnack(computerPractice.Message, MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
                     return;
                 }
+                AutoCutHistoryUtils.SetStartTime();
                 //检查预切割
                 List<float>? cutSpeedList = await AutoCutUtils.GetCutListAsync(CutParams);
                 if (cutSpeedList is null)
@@ -347,10 +348,11 @@ namespace 精密切割系统.ViewModel
                         _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"单刀磨损量: {singleBladeWear}"));
                         string drsmdj = await CutService.GetDrsmdjAsync(LunguSksj.LunguId, (float)Math.Round(singleBladeWear * 1000, 1));
                         PdaUtils.AddBladeLifeGrade(drsmdj);
-                        PdaUtils.AddSharpen(wearAmount, defaultSharpenTimes); 
+                        PdaUtils.AddSharpen(wearAmount, defaultSharpenTimes);
                         PdaUtils.AddResidueSharpenTimes(0);
                         PdaUtils.AddResidueBlade(LunguSksj.LongestBlade - (TotalWearAmount * 1000));
                         PdaUtils.AddTotalSharpenTimes(defaultSharpenTimes);
+                        AutoCutHistoryUtils.SetSharpen(wearAmount, defaultSharpenTimes);
                     }
                     // 开始切割
                     RunStatus = AutoRunStatus.CutingInProgress;
@@ -409,6 +411,7 @@ namespace 精密切割系统.ViewModel
                         }
                         AfterHeightMeasurementZ = curHeightZ.Data;
                         PdaUtils.AddWearAmountAfterCut(wearAmount, defaultSharpenTimes);
+                        AutoCutHistoryUtils.SetLastSharpen(wearAmount, defaultSharpenTimes);
                     }
 
                     stopwatch.Stop();
@@ -461,6 +464,7 @@ namespace 精密切割系统.ViewModel
                     await PdaUtils.QualifiedAsync();
                 }
                 stopwatch.Stop();
+                AutoCutHistoryUtils.SetEndTime();
                 RunStatus = AutoRunStatus.End;
             }
         }
@@ -742,12 +746,8 @@ namespace 精密切割系统.ViewModel
                             WriteableBitmap? localBitmap = AutoCutUtils.GrabWriteableBitmap();
                             if (localBitmap != null)
                             {
-                                string imagePath = System.IO.Path.Combine(AppContext.BaseDirectory, $"image\\Temp");
-                                Directory.CreateDirectory(imagePath);
                                 Mat mat = new Mat();
                                 Cv2.Flip(localBitmap.ToMat(), mat, FlipMode.XY);  // 同时水平和垂直翻转
-                                long preName = DateTime.Now.Ticks;
-                                mat.SaveImage($"{imagePath}\\{preName}_原图.png"); // 保存图像以供调试
                                 Mat matJpg = AutoCutUtils.JpegStreamToMat(AutoCutUtils.MatToJpegStream(AutoCutUtils.CropHorizontalCenter(mat, AutoCutUtils.HeightRange)));
                                 int? imageY = null;
                                 try
@@ -769,24 +769,6 @@ namespace 精密切割系统.ViewModel
                                 }
                                 if (imageY != null)
                                 {
-                                    Cv2.Line(
-                                    img: matJpg,
-                                    pt1: new OpenCvSharp.Point(0, imageY.Value),  // 起点
-                                    pt2: new OpenCvSharp.Point(matJpg.Width, imageY.Value), // 终点
-                                    color: Scalar.Red,         // 颜色 (B,G,R)
-                                    thickness: 1,             // 线宽
-                                    lineType: LineTypes.AntiAlias // 抗锯齿
-                                    );
-                                    Cv2.Line
-                                    (
-                                        img: matJpg,
-                                        pt1: new OpenCvSharp.Point(0, matJpg.Height / 2),  // 起点
-                                        pt2: new OpenCvSharp.Point(matJpg.Width, matJpg.Height / 2), // 终点
-                                        color: Scalar.Green,         // 颜色 (B,G,R)
-                                        thickness: 1,             // 线宽
-                                        lineType: LineTypes.AntiAlias // 抗锯齿
-                                        );
-                                    matJpg.SaveImage($"{imagePath}\\{preName}_裁剪.png");
                                     float offsetY = (float)Math.Round((imageY.Value - (matJpg.Height / 2)) * VisionAnalyzer.PixelToMmRatio, 4);
                                     if (MathF.Abs(offsetY) >= GlobalParams.NormalStepDistance) offsetY = 0;
                                     MaterialSnackUtils.MaterialSnack($"{message ?? "暂停中..."}   Y轴自动偏移{offsetY}mm", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
@@ -794,7 +776,7 @@ namespace 精密切割系统.ViewModel
                                 }
                                 else
                                 {
-                                    MaterialSnackUtils.MaterialSnack(message ?? "暂停中...", MaterialSnackUtils.SnackType.SUCCESS, 0, _eventAggregator);
+                                    MaterialSnackUtils.MaterialSnack(message ?? "暂停中...", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
                                 }
                             }
                         });

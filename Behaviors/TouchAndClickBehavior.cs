@@ -23,6 +23,8 @@ namespace 精密切割系统.Behaviors
             set => SetValue(TouchAndClickCommandProperty, value);
         }
 
+        public object? CommandParameter { get; set; }
+
         private int _isRaiseCommand = 1; // 0表示未触发，1表示已触发
 
         protected override void OnAttached()
@@ -100,7 +102,7 @@ namespace 精密切割系统.Behaviors
             }
             if (Interlocked.CompareExchange(ref _isRaiseCommand, 1, 0) == 0 && TouchAndClickCommand?.CanExecute(e) == true)
             {
-                TouchAndClickCommand.Execute(e);
+                TouchAndClickCommand.Execute(CommandParameter);
             }
         }
 
@@ -113,7 +115,7 @@ namespace 精密切割系统.Behaviors
             }
             if (Interlocked.CompareExchange(ref _isRaiseCommand, 1, 0) == 0 && TouchAndClickCommand?.CanExecute(e) == true)
             {
-                TouchAndClickCommand.Execute(e);
+                TouchAndClickCommand.Execute(CommandParameter);
             }
         }
 
@@ -127,7 +129,7 @@ namespace 精密切割系统.Behaviors
             }
             if (Interlocked.CompareExchange(ref _isRaiseCommand, 1, 0) == 0 && TouchAndClickCommand?.CanExecute(e) == true)
             {
-                TouchAndClickCommand.Execute(e);
+                TouchAndClickCommand.Execute(CommandParameter);
             }
         }
 

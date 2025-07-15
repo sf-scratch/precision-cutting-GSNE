@@ -297,6 +297,7 @@ namespace 精密切割系统.Model.cut
                                     case 1:
                                         PdaUtils.AddFirstToolMarkWidth(bladeWidthMax);
                                         PdaUtils.AddFirstToolMarkImage(bladeWidthMaxMat);
+                                        AutoCutHistoryUtils.SetFirstCutImage(bladeWidthMaxMat);
                                         if (lunguSksj.BladeType != "新刀")
                                         {
                                             PdaUtils.AddToolMarkWidth(bladeWidthMax);
@@ -308,6 +309,7 @@ namespace 精密切割系统.Model.cut
                                         PdaUtils.AddToolMarkWidth(bladeWidthMax);
                                         PdaUtils.AddToolMarkActualWidth(bladeWidthMax);
                                         PdaUtils.AddSecondToolMarkImage(bladeWidthMaxMat);
+                                        AutoCutHistoryUtils.SetFirstCutImage(bladeWidthMaxMat);
                                         _secondToolMarkWidth = bladeWidthMax;
                                         break;
                                     default:
@@ -320,6 +322,7 @@ namespace 精密切割系统.Model.cut
                                     PdaUtils.AddSingleCollapseAngle(singleCollapseAngle);
                                     PdaUtils.AddMaximumCollapseAngle(collapseWidthMax);
                                     PdaUtils.AddMaximumCollapseAngleImage(collapseWidthMaxMat);
+                                    AutoCutHistoryUtils.SetFirstCutImage(collapseWidthMaxMat);
                                     string bladeEdgeBreakageGrade = await GetDpbbdjAsync(lunguSksj.LunguId, (float)Math.Round(singleCollapseAngle * 1000, 1));
                                     PdaUtils.AddBladeEdgeBreakageGrade(bladeEdgeBreakageGrade);
                                 }
@@ -356,6 +359,7 @@ namespace 精密切割系统.Model.cut
                 //退出全自动切割模式
                 await PlcControl.tagControl.cutting.ExitCuttingModeAsync(default);
                 _finishedCutTimes = cutTime;
+                AutoCutHistoryUtils.SetCutCount(cutTime);
             }
             return RunResult.Success();
         }
