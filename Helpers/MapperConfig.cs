@@ -22,6 +22,7 @@ namespace 精密切割系统.Helpers
                 cfg.CreateMap<SharpenParamsEntity, SharpenParamsModel>().ReverseMap();
                 cfg.CreateMap<CutParamsEntity, CutParamsModel>().ReverseMap();
                 cfg.CreateMap<KnifeWearEntity, KnifeWearModel>().ReverseMap();
+                cfg.CreateMap<ParamsConfigEntity, ParamsConfigModel>().ReverseMap();
             });
             return config.CreateMapper();
         });

@@ -4,13 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:精密切割系统.View.Pages.Auto"
-      xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
-      xmlns:auto="clr-namespace:WpfAutoGrid;assembly=WpfAutoGrid.Core" xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
-      xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
-      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-      mc:Ignorable="d" 
-      d:DesignHeight="676" d:DesignWidth="1448"
-      d:DataContext="{d:DesignInstance viewModel:AutoCutConfigViewModel, IsDesignTimeCreatable=True}">
+             xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
+             xmlns:auto="clr-namespace:WpfAutoGrid;assembly=WpfAutoGrid.Core" xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
+             xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             d:DesignHeight="676" d:DesignWidth="1448"
+             d:DataContext="{d:DesignInstance viewModel:AutoCutConfigViewModel, IsDesignTimeCreatable=True}">
     <Control.Resources>
         <Style TargetType="TextBlock">
             <Setter Property="FontSize" Value="16"/>
@@ -20,6 +20,9 @@
         </Style>
     </Control.Resources>
     <Grid Margin="30,30,0,0">
+        <Grid.Resources>
+            <ResourceDictionary Source="/Themes/MaterialDesignResources.xaml"/>
+        </Grid.Resources>
         <Grid.RowDefinitions >
             <RowDefinition Height="60"/>
             <RowDefinition/>
@@ -43,6 +46,10 @@
                 </StackPanel.Style>
                 <Label Content="当前参数号:" VerticalAlignment="Bottom" FontSize="16"/>
                 <Label Content="{Binding SelectedConfigId}" VerticalAlignment="Bottom" FontSize="16"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="描述:" VerticalAlignment="Bottom" FontSize="16" Margin="15,0,0,0"/>
+                <Controls:InputTextBox d:Text="参数AAA" MinWidth="120" Text="{Binding ParamsConfig.Describe}" VerticalAlignment="Bottom"/>
             </StackPanel>
         </StackPanel>
 

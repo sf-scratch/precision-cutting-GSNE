@@ -27,10 +27,10 @@ namespace 精密切割系统.ViewModel
         // 控制底部侧按钮
         public ObservableCollection<RightButtonParams> _operatePageButtonCollection;
 
-        public ObservableCollection<long> AutoCutConfigIdList { get; set; }
+        public ObservableCollection<ParamsConfigEntity> AutoCutConfigIdList { get; set; }
 
-        private long _selectedConfigId;
-        public long SelectedConfigId
+        private ParamsConfigEntity _selectedConfigId;
+        public ParamsConfigEntity SelectedParamsConfig
         {
             get { return _selectedConfigId; }
             set { _selectedConfigId = value; RaisePropertyChanged(); }
@@ -43,11 +43,18 @@ namespace 精密切割系统.ViewModel
             set { _currentSelectedConfigId = value; RaisePropertyChanged(); }
         }
 
+        private string _describe;
+        public string Describe
+        {
+            get { return _describe; }
+            set { SetProperty(ref _describe, value); }
+        }
+
         public AutoCutSelectConfigViewModel()
         {
             _rightButtonParams = WindowLayout.RightPageButtons;
             _operatePageButtonCollection = WindowLayout.OperatePageButtons;
-            AutoCutConfigIdList = new ObservableCollection<long>();
+            AutoCutConfigIdList = new ObservableCollection<ParamsConfigEntity>();
         }
 
         private void InitRightButton()
@@ -70,7 +77,7 @@ namespace 精密切割系统.ViewModel
 
         private void Sure()
         {
-            NavigationParameters parameters = new NavigationParameters { { nameof(SelectedConfigId), SelectedConfigId } };
+            NavigationParameters parameters = new NavigationParameters { { "SelectedConfigId", SelectedParamsConfig.Id } };
             ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(AutoCutConfig), parameters);
         }
 
@@ -81,14 +88,20 @@ namespace 精密切割系统.ViewModel
 
         private async void DeleteSelectConfig()
         {
-            if (CurrentSelectedConfigId == SelectedConfigId)
+            if (CurrentSelectedConfigId == SelectedParamsConfig.Id)
             {
                 MaterialSnackUtils.MaterialSnack("已选择该自动切割参数，无法删除！", MaterialSnackUtils.SnackType.WARNING);
                 return;
             }
             SQLiteAsyncConnection connection = SqlHelper.SQLiteAsync;
-            SharpenParamsEntity? sharpenParamsEnt = await connection.Table<SharpenParamsEntity>().Where(p => p.Id == SelectedConfigId).FirstOrDefaultAsync();
-            CutParamsEntity? cutParamsEntity = await connection.Table<CutParamsEntity>().Where(p => p.Id == SelectedConfigId).FirstOrDefaultAsync();
+            ParamsConfigEntity? paramsConfig = await connection.Table<ParamsConfigEntity>().Where(p => p.Id == SelectedParamsConfig.Id).FirstOrDefaultAsync();
+            if (paramsConfig == null)
+            {
+                MaterialSnackUtils.MaterialSnack($"ParamsConfigEntity ID: {SelectedParamsConfig.Id} 不存在！", MaterialSnackUtils.SnackType.WARNING);
+                return;
+            }
+            SharpenParamsEntity? sharpenParamsEnt = await connection.Table<SharpenParamsEntity>().Where(p => p.Id == paramsConfig.SharpenParamsId).FirstOrDefaultAsync();
+            CutParamsEntity? cutParamsEntity = await connection.Table<CutParamsEntity>().Where(p => p.Id == paramsConfig.CutParamsId).FirstOrDefaultAsync();
             if (sharpenParamsEnt == null || cutParamsEntity == null)
             {
                 MaterialSnackUtils.MaterialSnack("该自动切割参数ID不存在！", MaterialSnackUtils.SnackType.WARNING);
@@ -98,6 +111,7 @@ namespace 精密切割系统.ViewModel
             {
                 await connection.RunInTransactionAsync(tx =>
                 {
+                    tx.Delete(paramsConfig);
                     tx.Delete(sharpenParamsEnt);
                     tx.Delete(cutParamsEntity);
                 });
@@ -113,18 +127,16 @@ namespace 精密切割系统.ViewModel
         private async Task UpdateAutoCutConfigIdListAsync()
         {
             SQLiteAsyncConnection connection = SqlHelper.SQLiteAsync;
-            List<long> sharpenParamsIdList = (await connection.Table<SharpenParamsEntity>().ToListAsync()).Select(p => p.Id).ToList();
-            List<long> cutParamsIdList = (await connection.Table<CutParamsEntity>().ToListAsync()).Select(p => p.Id).ToList();
+            List<ParamsConfigEntity> paramsConfigList = (await connection.Table<ParamsConfigEntity>().ToListAsync()).ToList();
             AutoCutConfigIdList.Clear();
-            if (sharpenParamsIdList.SequenceEqual(cutParamsIdList))
+            AutoCutConfigIdList.AddRange(paramsConfigList);
+            long selectId = await SelectedConfigEntity.GetCurrentSelectedConfigIdAsync(connection);
+            SelectedParamsConfig = paramsConfigList.Where(x => x.Id == selectId).FirstOrDefault() ?? new ParamsConfigEntity();
+            CurrentSelectedConfigId = selectId;
+            ParamsConfigEntity? paramsConfig = paramsConfigList.Where(p => p.Id == CurrentSelectedConfigId).FirstOrDefault();
+            if (paramsConfig != null)
             {
-                AutoCutConfigIdList.AddRange(sharpenParamsIdList);
-                SelectedConfigId = await SelectedConfigEntity.GetCurrentSelectedConfigIdAsync(connection);
-                CurrentSelectedConfigId = await SelectedConfigEntity.GetCurrentSelectedConfigIdAsync(connection);
-            }
-            else
-            {
-                MaterialSnackUtils.MaterialSnack("自动切割参数列表异常！", MaterialSnackUtils.SnackType.WARNING);
+                Describe = paramsConfig.Describe;
             }
         }
 

@@ -50,6 +50,13 @@ namespace 精密切割系统.ViewModel
             set { _cutParams = value; RaisePropertyChanged(); }
         }
 
+        private ParamsConfigModel paramsConfig;
+        public ParamsConfigModel ParamsConfig
+        {
+            get { return paramsConfig; }
+            set { SetProperty(ref paramsConfig, value); }
+        }
+
         private long _selectedConfigId;
         public long SelectedConfigId
         {
@@ -80,10 +87,16 @@ namespace 精密切割系统.ViewModel
                 {
                     await connection.RunInTransactionAsync(tx =>
                     {
-                        SharpenParamsEntity sharpenParamsEntity = MapperConfig.Mapper.Map<SharpenParamsEntity>(SharpenParams);
-                        tx.Insert(sharpenParamsEntity);
-                        SelectedConfigId = sharpenParamsEntity.Id;
-                        CutParams.Id = SelectedConfigId;
+                        ParamsConfigEntity paramsConfig = MapperConfig.Mapper.Map<ParamsConfigEntity>(ParamsConfig);
+                        paramsConfig.Id = SelectedConfigId;
+                        tx.Insert(paramsConfig);
+                        paramsConfig.SharpenParamsId = paramsConfig.Id;
+                        paramsConfig.CutParamsId = paramsConfig.Id;
+                        tx.Update(paramsConfig);
+                        SelectedConfigId = paramsConfig.Id;
+                        SharpenParams.Id = paramsConfig.Id;
+                        CutParams.Id = paramsConfig.Id;
+                        tx.Insert(MapperConfig.Mapper.Map<SharpenParamsEntity>(SharpenParams));
                         tx.Insert(MapperConfig.Mapper.Map<CutParamsEntity>(CutParams));
                     });
                 }
@@ -91,6 +104,7 @@ namespace 精密切割系统.ViewModel
                 {
                     await connection.RunInTransactionAsync(tx =>
                     {
+                        tx.Update(MapperConfig.Mapper.Map<ParamsConfigEntity>(ParamsConfig));
                         tx.Update(MapperConfig.Mapper.Map<SharpenParamsEntity>(SharpenParams));
                         tx.Update(MapperConfig.Mapper.Map<CutParamsEntity>(CutParams));
                     });
@@ -120,23 +134,20 @@ namespace 精密切割系统.ViewModel
             SQLiteAsyncConnection connection = SqlHelper.SQLiteAsync;
             PrecutProcessNoList.Clear();
             PrecutProcessNoList.AddRange((await connection.Table<PreCutModel>().ToListAsync()).Select(p => p.PrecutNo));
-            if (navigationContext.Parameters.TryGetValue<long>(nameof(SelectedConfigId), out var configId))
+            if (navigationContext.Parameters.TryGetValue(nameof(SelectedConfigId), out long configId))
             {
                 SelectedConfigId = configId;
-                SharpenParamsEntity? sharpenParamsEnt = await connection.Table<SharpenParamsEntity>().Where(p => p.Id == SelectedConfigId).FirstOrDefaultAsync();
-                if (sharpenParamsEnt != null)
-                {
-                    SharpenParams = MapperConfig.Mapper.Map<SharpenParamsModel>(sharpenParamsEnt);
-                }
-                CutParamsEntity? cutParamsEnt = await connection.Table<CutParamsEntity>().Where(p => p.Id == SelectedConfigId).FirstOrDefaultAsync();
-                if (cutParamsEnt != null)
-                {
-                    CutParams = MapperConfig.Mapper.Map<CutParamsModel>(cutParamsEnt);
-                }
+                ParamsConfigEntity paramsConfig = await connection.Table<ParamsConfigEntity>().Where(p => p.Id == configId).FirstOrDefaultAsync();
+                ParamsConfig = MapperConfig.Mapper.Map<ParamsConfigModel>(paramsConfig);
+                SharpenParamsEntity? sharpenParamsEnt = await connection.Table<SharpenParamsEntity>().Where(p => p.Id == paramsConfig.SharpenParamsId).FirstOrDefaultAsync();
+                SharpenParams = MapperConfig.Mapper.Map<SharpenParamsModel>(sharpenParamsEnt) ?? new SharpenParamsModel();
+                CutParamsEntity? cutParamsEnt = await connection.Table<CutParamsEntity>().Where(p => p.Id == paramsConfig.CutParamsId).FirstOrDefaultAsync();
+                CutParams = MapperConfig.Mapper.Map<CutParamsModel>(cutParamsEnt) ?? new CutParamsModel();
             }
             else
             {
                 SelectedConfigId = -1;
+                ParamsConfig = new ParamsConfigModel();
                 SharpenParams = new SharpenParamsModel() { Id = SelectedConfigId };
                 CutParams = new CutParamsModel() { Id = SelectedConfigId };
             }

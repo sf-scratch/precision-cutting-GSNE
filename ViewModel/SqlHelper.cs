@@ -60,6 +60,7 @@ namespace 精密切割系统.ViewModel
                 db.CreateTable<CutParamsEntity>();
                 db.CreateTable<SelectedConfigEntity>();
                 db.CreateTable<KnifeWearEntity>();
+                db.CreateTable<ParamsConfigEntity>();
             }
             catch (Exception ex)
             {

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using MaterialDesignThemes.Wpf;
+using Newtonsoft.Json;
 using NPOI.OpenXmlFormats.Wordprocessing;
 using NPOI.SS.Formula.Functions;
 using OpenCvSharp;
@@ -28,8 +29,11 @@ using 精密切割系统.Model.sqlite;
 using 精密切割系统.PubSubEvent;
 using 精密切割系统.Utils;
 using 精密切割系统.View.common;
+using 精密切割系统.View.Dialogs;
 using 精密切割系统.View.Pages.Auto;
+using 精密切割系统.View.Pages.common;
 using 精密切割系统.View.Pages.F4_BladeMaintenance;
+using 精密切割系统.ViewModel.Dialogs;
 
 namespace 精密切割系统.ViewModel
 {
@@ -111,7 +115,7 @@ namespace 精密切割系统.ViewModel
                 {
                     HttpRestClient.UpdateDev();
                 }
-                RaisePropertyChanged(); 
+                RaisePropertyChanged();
             }
         }
 
@@ -271,19 +275,40 @@ namespace 精密切割系统.ViewModel
 
         private async void ReplaceWafer()
         {
-            await AutoCutUtils.ReplaceWaferAsync();
+            var res = await DialogHost.Show(new SelectionDialog());
+            if (res is string dialogResult)
+            {
+                if (dialogResult == SelectionDialog.YES)
+                {
+                    await AutoCutUtils.ReplaceWaferAndResetAsync();
+                }
+                else
+                {
+                    await AutoCutUtils.ReplaceWaferAsync();
+                }
+            }
             CutY = Appsettings.CutY ?? 0;
         }
 
         private async void ReplaceSharpeningBoard()
         {
-            await AutoCutUtils.ReplaceSharpeningBoardAsync();
+            var res = await DialogHost.Show(new SelectionDialog());
+            if (res is string dialogResult)
+            {
+                if (dialogResult == SelectionDialog.YES)
+                {
+                    await AutoCutUtils.ReplaceSharpeningBoardAndResetAsync();
+                }
+                else
+                {
+                    await AutoCutUtils.ReplaceSharpeningBoardAsync();
+                }
+            }
             SharpenY = Appsettings.SharpenY ?? 0;
         }
 
         private async void ReplaceBlade()
         {
-            await PlcControl.tagControl.wholeDevice.CloseBuzzerAsync();
             await AutoCutUtils.ReplaceBladeAsync();
         }
 

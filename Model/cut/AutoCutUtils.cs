@@ -81,11 +81,20 @@ namespace 精密切割系统.Model.cut
             Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0);
             Task speedZero = PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync();
             await Task.WhenAll(taskXY, taskTheta, speedZero);
+            MaterialSnackUtils.MaterialSnack("请打开相机安全门，更换磨刀板！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
+        }
+
+        /// <summary>
+        /// 换磨刀板
+        /// </summary>
+        /// <returns></returns>
+        public static async Task ReplaceSharpeningBoardAndResetAsync(IEventAggregator? eventAggregator = null)
+        {
             //清空记录
             Appsettings.SharpenY = null;
             Appsettings.SharpenThetaDegQueue = null;
             Appsettings.SharpenDistance = null;
-            MaterialSnackUtils.MaterialSnack("请打开相机安全门，更换磨刀板！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
+            await ReplaceSharpeningBoardAsync(eventAggregator);
         }
 
         /// <summary>
@@ -103,11 +112,20 @@ namespace 精密切割系统.Model.cut
             Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0);
             Task speedZero = PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync();
             await Task.WhenAll(taskXY, taskTheta, speedZero);
+            MaterialSnackUtils.MaterialSnack("请打开相机安全门，更换硅片！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
+        }
+
+        /// <summary>
+        /// 换硅片
+        /// </summary>
+        /// <returns></returns>
+        public static async Task ReplaceWaferAndResetAsync(IEventAggregator? eventAggregator = null)
+        {
             //清空记录
             Appsettings.CutY = null;
             Appsettings.CutThetaDegQueue = null;
             Appsettings.CutDistance = null;
-            MaterialSnackUtils.MaterialSnack("请打开相机安全门，更换硅片！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
+            await ReplaceWaferAsync(eventAggregator);
         }
 
         /// <summary>

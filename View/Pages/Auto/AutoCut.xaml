@@ -5,10 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:精密切割系统.View.Pages.Auto"
              xmlns:common="clr-namespace:精密切割系统.View.Pages.common"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:prism="http://prismlibrary.com/"
              mc:Ignorable="d" 
              d:DesignHeight="676" d:DesignWidth="1448">
     <Grid>
+        <Grid.Resources>
+            <ResourceDictionary Source="/Themes/MaterialDesignResources.xaml"/>
+        </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="*" />

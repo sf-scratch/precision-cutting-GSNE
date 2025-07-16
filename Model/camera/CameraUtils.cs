@@ -207,7 +207,16 @@ namespace 精密切割系统.Driver
             // 当前设备默认是第一个
             m_currentDev = sciCams[currentCameraIndex];
             m_bDeviceOpened = true;
-        }private static void OpenDevice1()
+        }
+
+        private static void SetDeviceParams()
+        {
+
+        }
+
+
+
+        private static void OpenDevice1()
         {
             if (m_stDevList.count == 0)
             {

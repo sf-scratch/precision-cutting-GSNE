@@ -5,11 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:精密切割系统"
         xmlns:prism="http://prismlibrary.com/"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Title="MainWindow" Height="1080" Width="1920"
         Background="#FFDFFCFF" Loaded="Window_Loaded" WindowStyle="None" WindowState="Maximized">
-    <!-- WindowState="Maximized" -->
     <Window.Resources>
         <Style TargetType="Button" x:Key="MyButtonStyle">
             <Setter Property="Template">
@@ -37,33 +37,109 @@
             </Setter>
         </Style>
     </Window.Resources>
-    <!-- <Button Content="Button1" HorizontalAlignment="Left" Margin="0,58,0,0" VerticalAlignment="Top" Height="65" Width="157" x:Name="myButton"/> -->
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="140"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="15"/>
-        </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
-            <Frame x:Name="headerFrame" Source="View/Pages/Header/HeaderPage.xaml" NavigationUIVisibility="Hidden"/>
-            <!-- 
+    <materialDesign:DialogHost>
+        <materialDesign:DialogHost.Resources>
+            <ResourceDictionary Source="/Themes/MaterialDesignResources.xaml"/>
+        </materialDesign:DialogHost.Resources>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="140"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="15"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Frame x:Name="headerFrame" Source="View/Pages/Header/HeaderPage.xaml" NavigationUIVisibility="Hidden"/>
+                <!-- 
             <Grid>
                 <TextBox Width="120" Height="30" GotFocus="TextBox_GotFocus" HorizontalAlignment="Left"></TextBox>
                 <TextBox Width="120" Height="30" GotFocus="TextBox_GotFocus" VerticalContentAlignment="Stretch"></TextBox> 
             </Grid>
             -->
-        </Grid>
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition Width="320"></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-            <Grid Grid.Column="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition></RowDefinition>
-                    <RowDefinition Height="250"></RowDefinition>
-                </Grid.RowDefinitions>
-                <Border Grid.Row="0" Background="#DFFCFF" CornerRadius="10" Margin="30,20,10,10">
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition Width="320"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition Height="250"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Border Grid.Row="0" Background="#DFFCFF" CornerRadius="10" Margin="30,20,10,10">
+                        <Border.Effect>
+                            <DropShadowEffect 
+                        ShadowDepth="5" 
+                        BlurRadius="20" 
+                        Color="#4DC9EBF7" 
+                        Direction="315" />
+                        </Border.Effect>
+                        <Grid Grid.Row="0">
+                            <Frame x:Name="mainFrame" Grid.Row="1" Grid.Column="0" Source="View/MainMenu.xaml" NavigationUIVisibility="Hidden"/>
+                            <ContentControl prism:RegionManager.RegionName="MainRegion" />
+                        </Grid>
+                    </Border>
+
+
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition Width="130"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="0">
+                            <Frame x:Name="operateFrame" Source="View/Pages/operate/OperatePage.xaml" NavigationUIVisibility="Hidden"/>
+                        </Grid>
+                        <Grid Grid.Column="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0">
+                                <Border Width="95" Height="110" 
+                                    x:Name="shortcutTopBtn"
+                                    CornerRadius="10,10,10,10" Background="#FFFFFF">
+                                    <Image x:Name="shortcutTopIcon" Width="34" Height="34" Source="/Assets/picture/shortcut_top_btn_icon.png"></Image>
+                                    <Border.Effect>
+                                        <DropShadowEffect 
+                                        ShadowDepth="5" 
+                                        BlurRadius="20" 
+                                        Color="#4DC9EBF7" 
+                                        Direction="315" />
+                                    </Border.Effect>
+                                    <!-- 设置按钮内容的偏移效果 -->
+                                    <Border.RenderTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform x:Name="ScaleTransform" ScaleX="1" ScaleY="1" />
+                                            <TranslateTransform x:Name="ContentTransform" X="0" Y="0" />
+                                        </TransformGroup>
+                                    </Border.RenderTransform>
+                                </Border>
+                            </Grid>
+                            <Grid Grid.Row="1">
+                                <Border Width="95" Height="110" 
+                                    x:Name="shortcutDirectBtn"
+                                    CornerRadius="10,10,10,10" Background="#FFFFFF">
+                                    <Image x:Name="shortcutDirectIcon" Width="25" Height="22" Source="/Assets/picture/shortcut_direct.png"></Image>
+                                    <Border.Effect>
+                                        <DropShadowEffect 
+                                       ShadowDepth="5" 
+                                       BlurRadius="20" 
+                                       Color="#4DC9EBF7" 
+                                       Direction="315" />
+                                    </Border.Effect>
+                                    <!-- 设置按钮内容的偏移效果 -->
+                                    <Border.RenderTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform x:Name="shortcutScaleTransform" ScaleX="1" ScaleY="1" />
+                                            <TranslateTransform x:Name="shortcutDirectTransform" X="0" Y="0" />
+                                        </TransformGroup>
+                                    </Border.RenderTransform>
+                                </Border>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Grid>
+                <Border Grid.Column="1" Background="#DFFCFF" CornerRadius="10" Margin="10,20,20,10">
                     <Border.Effect>
                         <DropShadowEffect 
                         ShadowDepth="5" 
@@ -71,84 +147,12 @@
                         Color="#4DC9EBF7" 
                         Direction="315" />
                     </Border.Effect>
-                    <Grid Grid.Row="0">
-                        <Frame x:Name="mainFrame" Grid.Row="1" Grid.Column="0" Source="View/MainMenu.xaml" NavigationUIVisibility="Hidden"/>
-                        <ContentControl prism:RegionManager.RegionName="MainRegion" />
+                    <Grid Grid.Column="1" >
+                        <Frame x:Name="rightFrame" Source="View/Pages/right/RightPage.xaml" NavigationUIVisibility="Hidden"/>
                     </Grid>
                 </Border>
-
-
-                <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition Width="130"></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
-                    <Grid Grid.Column="0">
-                         <Frame x:Name="operateFrame" Source="View/Pages/operate/OperatePage.xaml" NavigationUIVisibility="Hidden"/>
-                    </Grid>
-                    <Grid Grid.Column="1">
-                        <Grid.RowDefinitions>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                        </Grid.RowDefinitions>
-                        <Grid Grid.Row="0">
-                            <Border Width="95" Height="110" 
-                                    x:Name="shortcutTopBtn"
-                                    CornerRadius="10,10,10,10" Background="#FFFFFF">
-                                <Image x:Name="shortcutTopIcon" Width="34" Height="34" Source="/Assets/picture/shortcut_top_btn_icon.png"></Image>
-                                <Border.Effect>
-                                    <DropShadowEffect 
-                                        ShadowDepth="5" 
-                                        BlurRadius="20" 
-                                        Color="#4DC9EBF7" 
-                                        Direction="315" />
-                                </Border.Effect>
-                                <!-- 设置按钮内容的偏移效果 -->
-                                <Border.RenderTransform>
-                                    <TransformGroup>
-                                        <ScaleTransform x:Name="ScaleTransform" ScaleX="1" ScaleY="1" />
-                                        <TranslateTransform x:Name="ContentTransform" X="0" Y="0" />
-                                    </TransformGroup>
-                                </Border.RenderTransform>
-                            </Border>
-                        </Grid>
-                        <Grid Grid.Row="1">
-                            <Border Width="95" Height="110" 
-                                    x:Name="shortcutDirectBtn"
-                                    CornerRadius="10,10,10,10" Background="#FFFFFF">
-                                <Image x:Name="shortcutDirectIcon" Width="25" Height="22" Source="/Assets/picture/shortcut_direct.png"></Image>
-                                <Border.Effect>
-                                    <DropShadowEffect 
-                                       ShadowDepth="5" 
-                                       BlurRadius="20" 
-                                       Color="#4DC9EBF7" 
-                                       Direction="315" />
-                                </Border.Effect>
-                                <!-- 设置按钮内容的偏移效果 -->
-                                <Border.RenderTransform>
-                                    <TransformGroup>
-                                        <ScaleTransform x:Name="shortcutScaleTransform" ScaleX="1" ScaleY="1" />
-                                        <TranslateTransform x:Name="shortcutDirectTransform" X="0" Y="0" />
-                                    </TransformGroup>
-                                </Border.RenderTransform>
-                            </Border>
-                        </Grid>
-                    </Grid>
-                </Grid>
             </Grid>
-            <Border Grid.Column="1" Background="#DFFCFF" CornerRadius="10" Margin="10,20,20,10">
-                <Border.Effect>
-                    <DropShadowEffect 
-                        ShadowDepth="5" 
-                        BlurRadius="20" 
-                        Color="#4DC9EBF7" 
-                        Direction="315" />
-                </Border.Effect>
-                <Grid Grid.Column="1" >
-                    <Frame x:Name="rightFrame" Source="View/Pages/right/RightPage.xaml" NavigationUIVisibility="Hidden"/>
-                </Grid>
-            </Border>
+            <Grid Grid.Row="2" ></Grid>
         </Grid>
-        <Grid Grid.Row="2" ></Grid>
-    </Grid>
+    </materialDesign:DialogHost>
 </Window>
