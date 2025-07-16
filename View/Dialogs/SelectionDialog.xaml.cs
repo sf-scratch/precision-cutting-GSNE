@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using 精密切割系统.ViewModel.Dialogs;
 
 namespace 精密切割系统.View.Dialogs
 {
@@ -22,9 +23,24 @@ namespace 精密切割系统.View.Dialogs
     {
         public const string YES = "YES";
         public const string NO = "NO";
+
         public SelectionDialog()
         {
             InitializeComponent();
+        }
+
+        public SelectionDialog(string yesBtnContent, string? cancelBtnContent = null, string? noBtnContent = null)
+        {
+            InitializeComponent();
+            DataContext = new SelectionDialogViewModel 
+            { 
+                YesButtonContent = yesBtnContent,
+                YesButtonVisibility = Visibility.Visible,
+                CancelButtonContent = cancelBtnContent ?? "取消",
+                CancelButtonVisibility = Visibility.Visible,
+                NoButtonContent = noBtnContent ?? string.Empty,
+                NoButtonVisibility = noBtnContent is null ? Visibility.Collapsed : Visibility,
+            };
         }
     }
 }

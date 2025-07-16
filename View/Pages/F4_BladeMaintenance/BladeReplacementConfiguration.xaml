@@ -88,8 +88,8 @@
                         <Controls:InputTextBox Text="{Binding CutY}"/>
                         <!--<materialDesign:DecimalUpDown Padding="2" Value="{Binding CutY}" BorderThickness="1" BorderBrush="Silver"/>-->
                         <TextBlock HorizontalAlignment="Left" Text="mm"/>
-                        <TextBlock Text="执行自动磨刀"/>
-                        <ToggleButton IsChecked="{Binding SharpenParams.IsExecuteSharpen, Mode=TwoWay}">
+                        <TextBlock Text="最后磨10刀"/>
+                        <ToggleButton IsChecked="{Binding SharpenParams.IsExecuteLastSharpen, Mode=TwoWay}">
                             <ToggleButton.Resources>
                                 <ResourceDictionary>
                                     <ResourceDictionary.MergedDictionaries>

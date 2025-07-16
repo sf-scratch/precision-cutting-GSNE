@@ -1,4 +1,5 @@
 ﻿using DryIoc;
+using MaterialDesignThemes.Wpf;
 using SQLite;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut;
 using 精密切割系统.PubSubEvent;
 using 精密切割系统.View.common;
+using 精密切割系统.View.Dialogs;
 using 精密切割系统.View.Pages.Auto;
 using static NPOI.HSSF.Util.HSSFColor;
 
@@ -60,18 +62,53 @@ namespace 精密切割系统.ViewModel
         private void InitRightButton()
         {
             _rightButtonParams.Clear();
-            _rightButtonParams.Add(RightButtonParams.GreenRightButton("确定", "/Assets/icon/right/enter.png", Sure));
+            _rightButtonParams.Add(RightButtonParams.GreenRightButton("进入", "/Assets/icon/right/enter.png", Sure));
             _rightButtonParams.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }
 
         private void InitBottomButton()
         {
-            _operatePageButtonCollection.Add(RightButtonParams.BlueRightButton("删除", "/Assets/icon/tab_1/01/tab_15.png", DeleteSelectConfig, null, 8));
-            _operatePageButtonCollection.Add(RightButtonParams.BlueRightButton("新增", "/Assets/icon/tab_1/01/tab_18.png", AddConfig, null, 8));
+            _operatePageButtonCollection.Add(RightButtonParams.BlueRightButton("新增", "FormatListGroupPlus", AddConfig, null, 8));
+            _operatePageButtonCollection.Add(RightButtonParams.BlueRightButton("删除", "DeleteOutline", DeleteSelectConfig, null, 8));
+            _operatePageButtonCollection.Add(RightButtonParams.BlueRightButton("拷贝", "ContentCopy", CopyConfig, null, 8));
+        }
+
+        private async void CopyConfig()
+        {
+            if ((await DialogHost.Show(new SelectionDialog("确认拷贝"))) is not string dialogResult || dialogResult != SelectionDialog.YES)
+            {
+                return;
+            }
+            SQLiteAsyncConnection connection = SqlHelper.SQLiteAsync; 
+            try
+            {
+                await connection.RunInTransactionAsync(tx =>
+                {
+                    ParamsConfigEntity paramsConfig = tx.Table<ParamsConfigEntity>().Where(p => p.Id == SelectedParamsConfig.Id).FirstOrDefault();
+                    paramsConfig.Id = -1;
+                    tx.Insert(paramsConfig);
+                    paramsConfig.SharpenParamsId = paramsConfig.Id;
+                    paramsConfig.CutParamsId = paramsConfig.Id;
+                    tx.Update(paramsConfig);
+                    SharpenParamsEntity sharpenParams = tx.Table<SharpenParamsEntity>().Where(p => p.Id == SelectedParamsConfig.SharpenParamsId).FirstOrDefault();
+                    sharpenParams.Id = paramsConfig.SharpenParamsId;
+                    tx.Insert(MapperConfig.Mapper.Map<SharpenParamsEntity>(sharpenParams));
+                    CutParamsEntity cutParams = tx.Table<CutParamsEntity>().Where(p => p.Id == SelectedParamsConfig.CutParamsId).FirstOrDefault();
+                    cutParams.Id = paramsConfig.CutParamsId;
+                    tx.Insert(MapperConfig.Mapper.Map<CutParamsEntity>(cutParams));
+                });
+                await UpdateAutoCutConfigIdListAsync();
+                MaterialSnackUtils.MaterialSnack("自动切割参数拷贝成功！", MaterialSnackUtils.SnackType.SUCCESS);
+            }
+            catch (Exception)
+            {
+                MaterialSnackUtils.MaterialSnack("自动切割参数拷贝失败！", MaterialSnackUtils.SnackType.WARNING);
+            }
         }
 
         private void AddConfig()
         {
+            SQLiteAsyncConnection connection = SqlHelper.SQLiteAsync;
             ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(AutoCutConfig));
         }
 
@@ -88,6 +125,10 @@ namespace 精密切割系统.ViewModel
 
         private async void DeleteSelectConfig()
         {
+            if ((await DialogHost.Show(new SelectionDialog("确认删除"))) is not string dialogResult || dialogResult != SelectionDialog.YES)
+            {
+                return;
+            }
             if (CurrentSelectedConfigId == SelectedParamsConfig.Id)
             {
                 MaterialSnackUtils.MaterialSnack("已选择该自动切割参数，无法删除！", MaterialSnackUtils.SnackType.WARNING);

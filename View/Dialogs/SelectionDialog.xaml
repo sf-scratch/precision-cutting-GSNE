@@ -4,44 +4,47 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:精密切割系统.View.Dialogs"
+             xmlns:viewModel="clr-namespace:精密切割系统.ViewModel.Dialogs"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:prism="http://prismlibrary.com/"
              mc:Ignorable="d" 
-             Height="150" Width="550">
+             Height="150" Width="550"
+             d:DataContext="{d:DesignInstance viewModel:SelectionDialogViewModel, IsDesignTimeCreatable=True}">
     <Grid>
         <Grid.Resources>
-            <ResourceDictionary>
-                <ResourceDictionary.MergedDictionaries>
-                    <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="LightBlue"  SecondaryColor="Lime" />
-                    <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml"/>
-                </ResourceDictionary.MergedDictionaries>
-            </ResourceDictionary>
+            <ResourceDictionary Source="/Themes/MaterialDesignResources.xaml"/>
         </Grid.Resources>
         <StackPanel Margin="16">
             <TextBlock Text="请确认操作" FontWeight="Bold" FontSize="22" Margin="0,0,0,10"/>
 
             <!-- 按钮区域 -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
-                <Button Content="仅移动位置" 
+                <Button d:Content="仅移动位置" 
+                        Content="{Binding NoButtonContent}"
+                        Visibility="{Binding NoButtonVisibility}"
                         Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
                         CommandParameter="NO"
                         Style="{StaticResource MaterialDesignOutlinedButton}"
-                        Width="150"
-                        Height="50"
+                        Height="55"
                         FontSize="18"
-                        Margin="0,0,20,0"/>
+                        Margin="0,0,25,0"/>
 
-                <Button Content="移动并重置数据" Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                <Button d:Content="移动并重置数据" 
+                        Content="{Binding YesButtonContent}"
+                        Visibility="{Binding YesButtonVisibility}"
+                        Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
                         CommandParameter="YES"
                         Style="{StaticResource MaterialDesignRaisedButton}"
-                        Width="170"
-                        Height="50"
+                        Height="55"
                         FontSize="18"
-                        Margin="0,0,20,0"/>
+                        Margin="0,0,25,0"/>
 
-                <Button Content="取消" Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" 
+                <Button d:Content="取消" 
+                        Content="{Binding CancelButtonContent}"
+                        Visibility="{Binding CancelButtonVisibility}"
+                        Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
                         Style="{StaticResource MaterialDesignFlatLightButton}"
-                        Height="50"
+                        Height="55"
                         FontSize="18"/>
             </StackPanel>
         </StackPanel>

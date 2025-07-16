@@ -413,14 +413,19 @@ namespace 精密切割系统.Model.cut
         /// <summary>
         /// 预切割序列
         /// </summary>
-        public static async Task<List<float>?> GetCutListAsync(CutParamsModel cutParams)
+        public static async Task<CommonResult<List<float>>> GetCutListAsync(CutParamsModel cutParams)
         {
             SQLiteAsyncConnection connection = SqlHelper.SQLiteAsync;
             // 查询当前预切割流程信息
             PreCutModel? preCutModel = (await connection.Table<PreCutModel>().Where(t => t.PrecutNo == cutParams.PrecutProcessNo).ToListAsync()).FirstOrDefault();
-            if (preCutModel is null || preCutModel.NewBladeNo == 0)
+            if (preCutModel is null)
             {
-                return null;
+                return CommonResult<List<float>>.Failure("预切割序列异常，请检查预切割参数配置！");
+            }
+            //起始为0，直接返回空集合
+            if (preCutModel.NewBladeNo == 0)
+            {
+                return CommonResult<List<float>>.Success([]);
             }
             // 获取
             float[] feedSpds = Tools.StringToFloatArray(preCutModel.FeedSpd); // 获取进刀速度
@@ -432,7 +437,7 @@ namespace 精密切割系统.Model.cut
                 // 获取进刀速度
                 float feedspeed = feedSpds[i - 1];
                 float cutLine = ofLinesList[i - 1];
-                if (feedspeed != 0 && cutLine != 0 && feedspeed < cutParams.HightestCutSpeed)
+                if (feedspeed != 0 && cutLine != 0 && feedspeed <= cutParams.HightestCutSpeed)
                 {
                     for (int j = 0; j < cutLine; j++)
                     {
@@ -443,17 +448,18 @@ namespace 精密切割系统.Model.cut
 
             if (cutParams.CutNum == 0)
             {
-                return cutSpeedList;
+                return CommonResult<List<float>>.Success(cutSpeedList);
             }
             else if (cutParams.CutNum > cutSpeedList.Count)
             {
-                return Enumerable.Range(0, cutParams.CutNum)
-                      .Select(i => cutSpeedList[i % cutSpeedList.Count])
-                      .ToList();
+                return CommonResult<List<float>>.Success(
+                    Enumerable.Range(0, cutParams.CutNum)
+                    .Select(i => cutSpeedList[i % cutSpeedList.Count])
+                    .ToList());
             }
             else
             {
-                return cutSpeedList.GetRange(0, cutParams.CutNum);
+                return CommonResult<List<float>>.Success(cutSpeedList.GetRange(0, cutParams.CutNum));
             }
         }
 

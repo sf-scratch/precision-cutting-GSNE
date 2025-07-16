@@ -70,6 +70,7 @@ namespace 精密切割系统.Driver
                 // 打开相机
                 OpenDevice();
             }
+            SetDeviceParams();
         }
         /// <summary>
         /// 连接光源控制器
@@ -211,7 +212,8 @@ namespace 精密切割系统.Driver
 
         private static void SetDeviceParams()
         {
-
+            string configPath = Path.Combine(AppContext.BaseDirectory, "Assets\\config\\OPT-CC1-M050-GG3-14(D24B110358).camcfg");
+            m_currentDev.FeatureLoad(configPath);
         }
 
 

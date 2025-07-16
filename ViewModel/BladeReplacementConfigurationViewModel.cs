@@ -143,12 +143,21 @@ namespace 精密切割系统.ViewModel
             if (sharpenParamsEnt != null)
             {
                 SharpenParams = MapperConfig.Mapper.Map<SharpenParamsModel>(sharpenParamsEnt);
-                SharpenParams.IsExecuteSharpen = true;
+                SharpenParams.IsExecuteLastSharpen = true;
             }
             CutParamsEntity? cutParamsEnt = await SqlHelper.TableAsync<CutParamsEntity>().Where(p => p.Id == selectedConfigId).FirstOrDefaultAsync();
             if (cutParamsEnt != null)
             {
                 CutParams = MapperConfig.Mapper.Map<CutParamsModel>(cutParamsEnt);
+            }
+            CommonResult<List<float>> cutListResult = await AutoCutUtils.GetCutListAsync(CutParams);
+            if (cutListResult.IsSuccess)
+            {
+                CutParams.CutNum = cutListResult.Data is null ? 0 : cutListResult.Data.Count;
+            }
+            else
+            {
+                MaterialSnackUtils.MaterialSnack($"切割序列获取失败，请检查切割参数配置！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
             }
         }
 
@@ -275,7 +284,7 @@ namespace 精密切割系统.ViewModel
 
         private async void ReplaceWafer()
         {
-            var res = await DialogHost.Show(new SelectionDialog());
+            var res = await DialogHost.Show(new SelectionDialog("移动并重置数据", default, "仅移动位置"));
             if (res is string dialogResult)
             {
                 if (dialogResult == SelectionDialog.YES)
@@ -292,7 +301,7 @@ namespace 精密切割系统.ViewModel
 
         private async void ReplaceSharpeningBoard()
         {
-            var res = await DialogHost.Show(new SelectionDialog());
+            var res = await DialogHost.Show(new SelectionDialog("移动并重置数据", default, "仅移动位置"));
             if (res is string dialogResult)
             {
                 if (dialogResult == SelectionDialog.YES)

@@ -75,12 +75,12 @@ namespace 精密切割系统.Model.cut
             set { _hightestCutSpeed = value; RaisePropertyChanged(); }
         }
 
-        private bool _isExecuteSharpen;
+        private bool _isExecuteLastSharpen;
 
-        public bool IsExecuteSharpen
+        public bool IsExecuteLastSharpen
         {
-            get { return _isExecuteSharpen; }
-            set { _isExecuteSharpen = value; RaisePropertyChanged(); }
+            get { return _isExecuteLastSharpen; }
+            set { _isExecuteLastSharpen = value; RaisePropertyChanged(); }
         }
     }
 }
