@@ -235,7 +235,7 @@ namespace 精密切割系统.ViewModel
             //非接触测高位置到工作台的z1轴高度
             float nonContactHeightMeasurementToWorkbenchZ1 = GlobalParams.NonContactHeightMeasurementToWorkbenchZ1;
             //开始监控报警
-            Task monitorTask = StartMonitoringAlarmAsync(_monitoringAlarmCts.Token);
+            _ = StartMonitoringAlarmAsync(_monitoringAlarmCts.Token);
             Stopwatch stopwatch = Stopwatch.StartNew();
             try
             {
@@ -296,7 +296,6 @@ namespace 精密切割系统.ViewModel
                 PdaUtils.AddStandardSharpenSpeed(SharpenParams.HightestCutSpeed);
                 // 切割校准
                 float cutCalibratTheta = await AutoCutUtils.CalibratCutAsync(new DataPoint<float>(cameraCenterPoint.X, cameraCenterPoint.Y + GlobalParams.CenterDistance), workpieceRadius, _pauseCts.Token);
-
                 // 开始磨刀
                 int sharpenTimes = SharpenParams.CutNum; // 默认磨刀次数
                 if (sharpenTimes > 0)

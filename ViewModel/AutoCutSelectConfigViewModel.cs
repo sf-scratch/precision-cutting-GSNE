@@ -75,7 +75,7 @@ namespace 精密切割系统.ViewModel
 
         private async void CopyConfig()
         {
-            if ((await DialogHost.Show(new SelectionDialog("确认拷贝"))) is not string dialogResult || dialogResult != SelectionDialog.YES)
+            if ((await DialogHost.Show(SelectionDialog.NewInstance("确认拷贝"))) is not string dialogResult || dialogResult != SelectionDialog.YES)
             {
                 return;
             }
@@ -125,7 +125,7 @@ namespace 精密切割系统.ViewModel
 
         private async void DeleteSelectConfig()
         {
-            if ((await DialogHost.Show(new SelectionDialog("确认删除"))) is not string dialogResult || dialogResult != SelectionDialog.YES)
+            if ((await DialogHost.Show(SelectionDialog.NewInstance("确认删除"))) is not string dialogResult || dialogResult != SelectionDialog.YES)
             {
                 return;
             }

@@ -243,19 +243,24 @@ namespace 精密切割系统.ViewModel
                 _regionManager.RequestNavigate(RegionName.MainRegion, nameof(AutoCut), new NavigationParameters { { "SharpenParams", SharpenParams }, { "CutParams", CutParams }, { "LunguSksj", LunguSksj } });
                 return;
             }
+            if (!await PlcControl.tagControl.wholeDevice.IsCompletedSystemInitAsync())
+            {
+                MaterialSnackUtils.MaterialSnack("请完成系统初始化！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                return;
+            }
             if (!await PlcControl.tagControl.wholeDevice.IsOpenVacuumSwitchAsync())
             {
-                MaterialSnackUtils.MaterialSnack("未打开工作盘真空！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                MaterialSnackUtils.MaterialSnack("请打开工作盘真空！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
                 return;
             }
             if (await PlcControl.tagControl.wholeDevice.IsOpenCutSecurityDoorAsync())
             {
-                MaterialSnackUtils.MaterialSnack("切割安全门未关闭！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                MaterialSnackUtils.MaterialSnack("请关闭切割安全门！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
                 return;
             }
             if (await PlcControl.tagControl.wholeDevice.IsOpenCameraSecurityDoorAsync())
             {
-                MaterialSnackUtils.MaterialSnack("相机安全门未关闭！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                MaterialSnackUtils.MaterialSnack("请关闭相机安全门！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
                 return;
             }
             if (Appsettings.SharpenY is not null && Appsettings.SharpenY.Value != SharpenY)
@@ -284,7 +289,7 @@ namespace 精密切割系统.ViewModel
 
         private async void ReplaceWafer()
         {
-            var res = await DialogHost.Show(new SelectionDialog("移动并重置数据", default, "仅移动位置"));
+            var res = await DialogHost.Show(SelectionDialog.NewInstance("移动并重置数据", default, "仅移动位置"));
             if (res is string dialogResult)
             {
                 if (dialogResult == SelectionDialog.YES)
@@ -301,7 +306,7 @@ namespace 精密切割系统.ViewModel
 
         private async void ReplaceSharpeningBoard()
         {
-            var res = await DialogHost.Show(new SelectionDialog("移动并重置数据", default, "仅移动位置"));
+            var res = await DialogHost.Show(SelectionDialog.NewInstance("移动并重置数据", default, "仅移动位置"));
             if (res is string dialogResult)
             {
                 if (dialogResult == SelectionDialog.YES)

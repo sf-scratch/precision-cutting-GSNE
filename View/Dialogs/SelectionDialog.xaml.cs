@@ -24,23 +24,26 @@ namespace 精密切割系统.View.Dialogs
         public const string YES = "YES";
         public const string NO = "NO";
 
+        public static SelectionDialog NewInstance(string yesBtnContent, string? cancelBtnContent = null, string? noBtnContent = null)
+        {
+            SelectionDialog selectionDialog = new()
+            {
+                DataContext = new SelectionDialogViewModel
+                {
+                    YesButtonContent = yesBtnContent,
+                    YesButtonVisibility = Visibility.Visible,
+                    CancelButtonContent = cancelBtnContent ?? "取消",
+                    CancelButtonVisibility = Visibility.Visible,
+                    NoButtonContent = noBtnContent ?? string.Empty,
+                    NoButtonVisibility = noBtnContent is null ? Visibility.Collapsed : Visibility.Visible
+                }
+            };
+            return selectionDialog;
+        }
+
         public SelectionDialog()
         {
             InitializeComponent();
-        }
-
-        public SelectionDialog(string yesBtnContent, string? cancelBtnContent = null, string? noBtnContent = null)
-        {
-            InitializeComponent();
-            DataContext = new SelectionDialogViewModel 
-            { 
-                YesButtonContent = yesBtnContent,
-                YesButtonVisibility = Visibility.Visible,
-                CancelButtonContent = cancelBtnContent ?? "取消",
-                CancelButtonVisibility = Visibility.Visible,
-                NoButtonContent = noBtnContent ?? string.Empty,
-                NoButtonVisibility = noBtnContent is null ? Visibility.Collapsed : Visibility,
-            };
         }
     }
 }
