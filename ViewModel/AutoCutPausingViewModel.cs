@@ -25,8 +25,8 @@ namespace 精密切割系统.ViewModel
 {
     public class AutoCutPausingViewModel : CustomBindableBase
     {
-        public RelayCommand ContinueCommand { get; set; }
-        public RelayCommand StopCommand { get; set; }
+        public DelegateCommand ContinueCommand { get; set; }
+        public DelegateCommand StopCommand { get; set; }
         private readonly IRegionManager _regionManager;
         private CameraCommon? _cameraCommon;
         private AutoCutRuningViewModel _autoCutRuningViewModel;
@@ -152,8 +152,8 @@ namespace 精密切割系统.ViewModel
             _regionManager = regionManager;
             RightPageButtonCollection = WindowLayout.RightPageButtons;
             OperatePageButtonCollection = WindowLayout.OperatePageButtons;
-            ContinueCommand = new RelayCommand(ContinueCommandExecute);
-            StopCommand = new RelayCommand(StopCommandExecute);
+            ContinueCommand = new DelegateCommand(ContinueCommandExecute);
+            StopCommand = new DelegateCommand(StopCommandExecute);
             //Task monitorTask = StartMonitoringAlarmAsync(default);
         }
 

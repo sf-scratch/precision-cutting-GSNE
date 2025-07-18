@@ -43,7 +43,7 @@ namespace 精密切割系统.ViewModel
 {
     public class AutoCutRuningViewModel : CustomBindableBase
     {
-        public RelayCommand RunAutoCutCommand { get; set; }
+        public DelegateCommand RunAutoCutCommand { get; set; }
         private readonly IRegionManager _regionManager;
         private readonly IEventAggregator _eventAggregator;
         private readonly IDialogService _dialogService;
@@ -191,7 +191,7 @@ namespace 精密切割系统.ViewModel
             _cutService = CutService.Instance;
             _pauseCts = new CancellationTokenSource();
             _monitoringAlarmCts = new CancellationTokenSource();
-            RunAutoCutCommand = new RelayCommand(RunAutoCut);
+            RunAutoCutCommand = new DelegateCommand(RunAutoCut);
         }
 
         public AutoCutRuningViewModel()

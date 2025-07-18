@@ -309,7 +309,7 @@ namespace 精密切割系统.Model.cut
                                         PdaUtils.AddToolMarkWidth(bladeWidthMax);
                                         PdaUtils.AddToolMarkActualWidth(bladeWidthMax);
                                         PdaUtils.AddSecondToolMarkImage(bladeWidthMaxMat);
-                                        AutoCutHistoryUtils.SetFirstCutImage(bladeWidthMaxMat);
+                                        AutoCutHistoryUtils.SetSecondCutImage(bladeWidthMaxMat);
                                         _secondToolMarkWidth = bladeWidthMax;
                                         break;
                                     default:
@@ -322,7 +322,7 @@ namespace 精密切割系统.Model.cut
                                     PdaUtils.AddSingleCollapseAngle(singleCollapseAngle);
                                     PdaUtils.AddMaximumCollapseAngle(collapseWidthMax);
                                     PdaUtils.AddMaximumCollapseAngleImage(collapseWidthMaxMat);
-                                    AutoCutHistoryUtils.SetFirstCutImage(collapseWidthMaxMat);
+                                    AutoCutHistoryUtils.SetLastCutImage(collapseWidthMaxMat);
                                     string bladeEdgeBreakageGrade = await GetDpbbdjAsync(lunguSksj.LunguId, (float)Math.Round(singleCollapseAngle * 1000, 1));
                                     PdaUtils.AddBladeEdgeBreakageGrade(bladeEdgeBreakageGrade);
                                 }

@@ -29,6 +29,7 @@ using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
 using 精密切割系统.HttpClients;
 using 精密切割系统.Model.common;
+using 精密切割系统.Model.cut;
 using 精密切割系统.Model.MeasureHeight;
 using 精密切割系统.Model.plc;
 using 精密切割系统.Model.sqlite;
@@ -38,9 +39,11 @@ using 精密切割系统.View.Dialogs;
 using 精密切割系统.View.Pages.common;
 using 精密切割系统.ViewModel;
 using static SQLite.SQLite3;
+using ImageData = 精密切割系统.Model.cut.ImageData;
+using LineSegment = 精密切割系统.Model.cut.LineSegment;
 using Point = OpenCvSharp.Point;
 
-namespace 精密切割系统.Model.cut
+namespace 精密切割系统.Helpers
 {
     public class AutoCutUtils
     {

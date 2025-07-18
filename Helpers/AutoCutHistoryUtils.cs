@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using 精密切割系统.Entities;
 using 精密切割系统.ViewModel;
 
-namespace 精密切割系统.Model.cut
+namespace 精密切割系统.Helpers
 {
     public class AutoCutHistoryUtils
     {

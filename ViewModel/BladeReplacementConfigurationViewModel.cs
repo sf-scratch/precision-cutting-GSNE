@@ -40,9 +40,9 @@ namespace 精密切割系统.ViewModel
     public class BladeReplacementConfigurationViewModel : CustomBindableBase
     {
         private static readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
-        public RelayCommand AutoRunCommand { get; set; }
-        public RelayCommand InitCommand { get; set; }
-        public RelayCommand<string> CheckLunguCommand { get; set; }
+        public DelegateCommand AutoRunCommand { get; set; }
+        public DelegateCommand InitCommand { get; set; }
+        public DelegateCommand<string> CheckLunguCommand { get; set; }
         private readonly IRegionManager _regionManager;
         private readonly IEventAggregator _eventAggregator;
         // 控制右侧按钮
@@ -127,9 +127,9 @@ namespace 精密切割系统.ViewModel
             LunguId = string.Empty;
             _rightButtonParams = WindowLayout.RightPageButtons;
             _operatePageButtonCollection = WindowLayout.OperatePageButtons;
-            AutoRunCommand = new RelayCommand(AutoRunAsync);
-            CheckLunguCommand = new RelayCommand<string>(CheckLungu);
-            InitCommand = new RelayCommand(Init);
+            AutoRunCommand = new DelegateCommand(AutoRunAsync);
+            CheckLunguCommand = new DelegateCommand<string>(CheckLungu);
+            InitCommand = new DelegateCommand(Init);
         }
 
         public BladeReplacementConfigurationViewModel()

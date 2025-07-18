@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,7 +6,7 @@ using 精密切割系统.Assets.config.buttom;
 using 精密切割系统.Driver;
 using 精密切割系统.FrmWindow.common;
 
-namespace 精密切割系统.Utils
+namespace 精密切割系统.Helpers
 {
     internal class CutUtils
     {
