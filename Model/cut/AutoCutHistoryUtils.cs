@@ -72,7 +72,7 @@ namespace 精密切割系统.Model.cut
             string fileName = $"{DateTime.Now.Ticks}_{Guid.NewGuid()}.jpg";
             Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, ImageFolder));
             string filePath = Path.Combine(AppContext.BaseDirectory, ImageFolder, fileName);
-            Cv2.ImWrite(fileName, mat);
+            Cv2.ImWrite(filePath, mat);
             return Path.Combine(ImageFolder, fileName);
         }
     }

@@ -29,7 +29,7 @@ namespace 精密切割系统.ViewModel
         // 控制底部侧按钮
         public ObservableCollection<RightButtonParams> _operatePageButtonCollection;
 
-        public ObservableCollection<ParamsConfigEntity> AutoCutConfigIdList { get; set; }
+        public ObservableCollection<ParamsConfigEntity> AutoCutConfigIdList { get; }
 
         private ParamsConfigEntity _selectedConfigId;
         public ParamsConfigEntity SelectedParamsConfig

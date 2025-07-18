@@ -31,7 +31,7 @@
     </UserControl.Resources>
     <Grid>
         <Grid.Resources>
-            <ResourceDictionary Source="/Themes/MaterialDesignResources.xaml"/>
+            <ResourceDictionary Source="pack://application:,,,/精密切割系统;component/Themes/MaterialDesignResources.xaml"/>
         </Grid.Resources>
         <Grid>
             <Grid.RowDefinitions>
@@ -75,47 +75,7 @@
                 <Controls:InputTextBox Text="{Binding AfterReplaceBladeCutTimes}" IsEnabled="False"/>
                 <TextBlock HorizontalAlignment="Left" Text="刀"/>
             </auto:AutoGrid>
-            <GroupBox Grid.Row="1" Grid.Column="1" materialDesign:ColorZoneAssist.Mode="SecondaryMid" Margin="0,0,10,0">
-                <GroupBox.Resources>
-                    <ResourceDictionary>
-                        <ResourceDictionary.MergedDictionaries>
-                            <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml"/>
-                        </ResourceDictionary.MergedDictionaries>
-                    </ResourceDictionary>
-                </GroupBox.Resources>
-                <GroupBox.HeaderTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <materialDesign:PackIcon Width="32" Height="32" VerticalAlignment="Center" Kind="InformationSlabBox" />
-                            <TextBlock Margin="8,0,0,0" VerticalAlignment="Center" Style="{StaticResource MaterialDesignSubtitle1TextBlock}" FontSize="18" Text="实时信息" FontWeight="Bold"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </GroupBox.HeaderTemplate>
-                <custom:ShowLastListBox ItemsSource="{Binding MessageList}" d:ItemsSource="{d:SampleData ItemCount=20}" Style="{StaticResource MaterialDesignListBox}" Height="300">
-                    <custom:ShowLastListBox.ItemContainerStyle>
-                        <Style TargetType="ListBoxItem" BasedOn="{StaticResource MaterialDesignListBoxItem}">
-                            <Setter Property="Margin" Value="0,0,0,1"/>
-                            <Setter Property="Padding" Value="0"/>
-                            <Setter Property="materialDesign:ListBoxItemAssist.ShowSelection" Value="False"/>
-                        </Style>
-                    </custom:ShowLastListBox.ItemContainerStyle>
-                    <custom:ShowLastListBox.ItemTemplate>
-                        <DataTemplate>
-                            <Border>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition/>
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel>
-                                        <TextBlock FontSize="10" Text="{Binding Time}" />
-                                        <TextBlock FontSize="12" TextWrapping="Wrap" FontWeight="Bold" Text="{Binding Message}" d:Text="999999999999999999999999999999999999999999999"/>
-                                    </StackPanel>
-                                </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </custom:ShowLastListBox.ItemTemplate>
-                </custom:ShowLastListBox>
-            </GroupBox>
+            <Controls:RealTimeInfoBox Grid.Row="1" Grid.Column="1" Margin="0,10,0,0" Style="{StaticResource MaterialDesignGroupBox}" Messages="{Binding MessageList}" Height="400" VerticalAlignment="Top"/>
         </Grid>
     </Grid>
 </UserControl>

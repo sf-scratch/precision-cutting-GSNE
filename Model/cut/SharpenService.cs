@@ -178,7 +178,7 @@ namespace 精密切割系统.Model.cut
                             CancellationToken? token = await WaitContinueAsync(line);
                             if (token == null)
                             {
-                                return RunResult.Fail("停止切割");
+                                return RunResult.Fail("停止磨刀");
                             }
                             await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
                             usingPauseToken = token.Value;

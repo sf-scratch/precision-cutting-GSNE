@@ -39,7 +39,7 @@
     </Window.Resources>
     <materialDesign:DialogHost>
         <materialDesign:DialogHost.Resources>
-            <ResourceDictionary Source="/Themes/MaterialDesignResources.xaml"/>
+            <ResourceDictionary Source="pack://application:,,,/精密切割系统;component/Themes/MaterialDesignResources.xaml"/>
         </materialDesign:DialogHost.Resources>
         <Grid>
             <Grid.RowDefinitions>

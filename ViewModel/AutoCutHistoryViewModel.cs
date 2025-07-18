@@ -51,9 +51,9 @@ namespace 精密切割系统.ViewModel
             foreach (KnifeWearEntity entity in knifeWears)
             {
                 KnifeWearModel model = MapperConfig.Mapper.Map<KnifeWearModel>(entity);
-                model.FirstCutImage = Path.Combine(AppContext.BaseDirectory, model.FirstCutImage);
-                model.SecondCutImage = Path.Combine(AppContext.BaseDirectory, model.SecondCutImage);
-                model.LastCutImage = Path.Combine(AppContext.BaseDirectory, model.LastCutImage);
+                model.FirstCutImage = Path.Combine(AppContext.BaseDirectory, model.FirstCutImage ?? string.Empty);
+                model.SecondCutImage = Path.Combine(AppContext.BaseDirectory, model.SecondCutImage ?? string.Empty);
+                model.LastCutImage = Path.Combine(AppContext.BaseDirectory, model.LastCutImage ?? string.Empty);
                 KnifeWearList.Add(model);
             }
             InitRightButton();

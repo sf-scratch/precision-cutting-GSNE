@@ -10,9 +10,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="676" d:DesignWidth="1448">
     <Grid>
-        <Grid.Resources>
-            <ResourceDictionary Source="/Themes/MaterialDesignResources.xaml"/>
-        </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="*" />

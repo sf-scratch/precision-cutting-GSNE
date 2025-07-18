@@ -31,7 +31,7 @@
     </Control.Resources>
     <Grid Margin="30,30,0,0">
         <Grid.Resources>
-            <ResourceDictionary Source="/Themes/MaterialDesignResources.xaml"/>
+            <ResourceDictionary Source="pack://application:,,,/精密切割系统;component/Themes/MaterialDesignResources.xaml"/>
         </Grid.Resources>
         <Grid.RowDefinitions >
             <RowDefinition Height="60"/>

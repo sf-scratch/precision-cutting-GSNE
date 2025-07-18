@@ -14,7 +14,7 @@
              d:DataContext="{d:DesignInstance viewModel:AutoCutSelectConfigViewModel, IsDesignTimeCreatable=True}">
     <Grid >
         <Grid.Resources>
-            <ResourceDictionary Source="/Themes/MaterialDesignResources.xaml"/>
+            <ResourceDictionary Source="pack://application:,,,/精密切割系统;component/Themes/MaterialDesignResources.xaml"/>
         </Grid.Resources>
         <Grid.RowDefinitions >
             <RowDefinition Height="80"/>

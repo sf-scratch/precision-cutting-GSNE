@@ -12,7 +12,7 @@
              d:DataContext="{d:DesignInstance viewModel:SelectionDialogViewModel, IsDesignTimeCreatable=True}">
     <Grid>
         <Grid.Resources>
-            <ResourceDictionary Source="/Themes/MaterialDesignResources.xaml"/>
+            <ResourceDictionary Source="pack://application:,,,/精密切割系统;component/Themes/MaterialDesignResources.xaml"/>
         </Grid.Resources>
         <StackPanel Margin="16">
             <TextBlock Text="请确认操作" FontWeight="Bold" FontSize="22" Margin="0,0,0,10"/>
