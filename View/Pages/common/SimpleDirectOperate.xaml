@@ -1,0 +1,163 @@
+﻿<UserControl x:Class="精密切割系统.View.Pages.common.SimpleDirectOperate"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:local="clr-namespace:精密切割系统.View.Pages.common"
+             xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
+             xmlns:behav="clr-namespace:精密切割系统.Behaviors"
+             xmlns:convert="clr-namespace:精密切割系统.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="250" d:DesignWidth="750">
+    <UserControl.Resources>
+        <convert:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <Style x:Key="ArrowButton" TargetType="Button" BasedOn="{StaticResource MaterialDesignFloatingActionLightButton}">
+            <Setter Property="Height" Value="70"/>
+            <Setter Property="Width" Value="70"/>
+            <Setter Property="Background" Value="#5087Cb"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="BorderBrush" Value="#5087Cb"/>
+        </Style>
+        <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatLightBgButton}">
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Background" Value="#5087Cb"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="BorderBrush" Value="#5087Cb"/>
+        </Style>
+    </UserControl.Resources>
+    <UserControl.DataContext>
+        <viewModel:DirectOperateViewModel/>
+    </UserControl.DataContext>
+    <Grid>
+        <Border Grid.Column="1" CornerRadius="10"  Margin="10,0,5,0" Visibility="{Binding IsShowKeyboard, Converter={StaticResource BoolToVisibilityConverter}}">
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20*"></ColumnDefinition>
+                    <ColumnDefinition Width="80*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <Grid Width="100" Height="100">
+                            <StackPanel Orientation="Vertical">
+                                <Border CornerRadius="33,33,33,33" Width="70" Height="70">
+                                    <Image Source="/Assets/picture/SCAN_icon.png" Width="52" Height="52"></Image>
+                                </Border>
+                                <TextBlock  Text="Scan" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"></TextBlock>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                    <Grid Grid.Row="1">
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                            <ToggleButton Width="70" Height="70" Content="{materialDesign:PackIcon Kind=Speedometer, Size=50}" Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}" 
+                                              IsChecked="{Binding IsHighSpeed}" Foreground="Black"/>
+                            <TextBlock  Text="高速" FontSize="18" Margin="0 10 0 0" FontWeight="Bold" HorizontalAlignment="Center"></TextBlock>
+                        </StackPanel>
+                    </Grid>
+
+                </Grid>
+                <Grid Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="20*"></ColumnDefinition>
+                        <ColumnDefinition Width="60*"></ColumnDefinition>
+                        <ColumnDefinition Width="20*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0" Margin="0,10,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Button Style="{StaticResource ArrowButton}" VerticalAlignment="Center" x:Name="scanLeftBottomBtn"  Content="{materialDesign:PackIcon ArrowDownLeftBold,Size=40}">
+                            <behaviors:Interaction.Behaviors>
+                                <behav:DualInputBehavior StartCommand="{Binding StartThetaReversalCommand}" StopCommand="{Binding StopJogThetaCommand}"/>
+                            </behaviors:Interaction.Behaviors>
+                        </Button>
+                        <Button Grid.Row="1" Content="Z1抬起">
+                            <behaviors:Interaction.Behaviors>
+                                <behav:DualInputBehavior PromptCommand="{Binding Z1RelativeNegativeCommand}" StartCommand="{Binding StartRaiseZ1Command}" StopCommand="{Binding StopJogZ1Command}"/>
+                            </behaviors:Interaction.Behaviors>
+                        </Button>
+                        <Button Grid.Row="2" Content="Z1下降">
+                            <behaviors:Interaction.Behaviors>
+                                <behav:DualInputBehavior PromptCommand="{Binding Z1RelativePositiveCommand}" StartCommand="{Binding StartDropZ1Command}" StopCommand="{Binding StopJogZ1Command}"/>
+                            </behaviors:Interaction.Behaviors>
+                        </Button>
+                    </Grid>
+                    <Grid Grid.Column="1" >
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Button Style="{StaticResource ArrowButton}" VerticalAlignment="Top" x:Name="scanTopBtn"  Content="{materialDesign:PackIcon ArrowTopThick,Size=40}">
+                                <behaviors:Interaction.Behaviors>
+                                    <behav:DualInputBehavior PromptCommand="{Binding YRelativeNegativeCommand}" StartCommand="{Binding StartYReversalCommand}" StopCommand="{Binding StopJogYCommand}"/>
+                                </behaviors:Interaction.Behaviors>
+                            </Button>
+                        </Grid>
+                        <Grid Grid.Row="1" >
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Button Style="{StaticResource ArrowButton}" VerticalAlignment="Top" x:Name="scanLeftBtn"  Content="{materialDesign:PackIcon ArrowLeftThick,Size=40}">
+                                    <behaviors:Interaction.Behaviors>
+                                        <behav:DualInputBehavior PromptCommand="{Binding XRelativePositiveCommand}" StartCommand="{Binding StartXCorotationCommand}" StopCommand="{Binding StopJogXCommand}"/>
+                                    </behaviors:Interaction.Behaviors>
+                                </Button>
+                            </Grid>
+                            <Grid Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Button Style="{StaticResource ArrowButton}" VerticalAlignment="Center" x:Name="scanRightBtn"  Content="{materialDesign:PackIcon ArrowRightThick,Size=40}">
+                                    <behaviors:Interaction.Behaviors>
+                                        <behav:DualInputBehavior PromptCommand="{Binding XRelativeNegativeCommand}" StartCommand="{Binding StartXReversalCommand}" StopCommand="{Binding StopJogXCommand}"/>
+                                    </behaviors:Interaction.Behaviors>
+                                </Button>
+                            </Grid>
+                        </Grid>
+                        <Grid Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Button Style="{StaticResource ArrowButton}" VerticalAlignment="Top" x:Name="scanBottomBtn"  Content="{materialDesign:PackIcon ArrowBottomThick,Size=40}">
+                                <behaviors:Interaction.Behaviors>
+                                    <behav:DualInputBehavior PromptCommand="{Binding YRelativePositiveCommand}" StartCommand="{Binding StartYCorotationCommand}" StopCommand="{Binding StopJogYCommand}"/>
+                                </behaviors:Interaction.Behaviors>
+                            </Button>
+                        </Grid>
+                    </Grid>
+                    <Grid Grid.Column="2" Margin="0,10,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Button Style="{StaticResource ArrowButton}" VerticalAlignment="Center" x:Name="scanRightBottomBtn"  Content="{materialDesign:PackIcon ArrowDownRightBold,Size=40}">
+                            <behaviors:Interaction.Behaviors>
+                                <behav:DualInputBehavior StartCommand="{Binding StartThetaCorotationCommand}" StopCommand="{Binding StopJogThetaCommand}"/>
+                            </behaviors:Interaction.Behaviors>
+                        </Button>
+                        <Button Grid.Row="1" Content="Z2抬起">
+                            <behaviors:Interaction.Behaviors>
+                                <behav:DualInputBehavior PromptCommand="{Binding Z2RelativeNegativeCommand}" StartCommand="{Binding StartRaiseZ2Command}" StopCommand="{Binding StopJogZ2Command}"/>
+                            </behaviors:Interaction.Behaviors>
+                        </Button>
+                        <Button Grid.Row="2" Content="Z2下降">
+                            <behaviors:Interaction.Behaviors>
+                                <behav:DualInputBehavior PromptCommand="{Binding Z2RelativePositiveCommand}" StartCommand="{Binding StartDropZ2Command}" StopCommand="{Binding StopJogZ2Command}"/>
+                            </behaviors:Interaction.Behaviors>
+                        </Button>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

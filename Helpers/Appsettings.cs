@@ -25,7 +25,7 @@ namespace 精密切割系统.Helpers
         /// <summary>
         /// 记录切割硅片theta角度
         /// </summary>
-        public static List<float>? CutThetaDegQueue
+        public static List<float>? CutThetaDegList
         {
             get { return GetList<float>(); }
             set
@@ -64,7 +64,7 @@ namespace 精密切割系统.Helpers
         /// <summary>
         /// 记录磨刀板theta角度
         /// </summary>
-        public static List<float>? SharpenThetaDegQueue
+        public static List<float>? SharpenThetaDegList
         {
             get { return GetList<float>(); }
             set

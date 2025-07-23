@@ -1049,8 +1049,6 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
 
         private void lvDataView_Loaded(object sender, RoutedEventArgs e)
         {
-            //ListViewItem listViewItem = (ListViewItem)lvDataView.ItemContainerGenerator.ContainerFromIndex(0);
-            //Debug.WriteLine(listViewItem);
         }
         
         public void initTbNumber()

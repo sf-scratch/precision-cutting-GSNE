@@ -10,7 +10,13 @@
     d:DesignHeight="676"
     d:DesignWidth="1448"
     mc:Ignorable="d">
-
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
     <Grid Margin="30">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
@@ -207,7 +213,7 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="110" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="60" />
                         </Grid.ColumnDefinitions>
@@ -423,24 +429,23 @@
                         <StackPanel
                             Grid.Row="0"
                             Grid.Column="0"
-                            Margin="0,0,0,8"
-                            VerticalAlignment="Bottom">
+                            VerticalAlignment="Top">
                             <Grid>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="45" />
-                                    <RowDefinition Height="45" />
-                                    <RowDefinition Height="45" />
-                                    <RowDefinition Height="45" />
-                                    <RowDefinition Height="45" />
-                                    <RowDefinition Height="45" />
-                                    <RowDefinition Height="45" />
+                                    <RowDefinition Height="110" />
+                                    <RowDefinition Height="56" />
+                                    <RowDefinition Height="56" />
+                                    <RowDefinition Height="56" />
+                                    <RowDefinition Height="56" />
+                                    <RowDefinition Height="56" />
+                                    <RowDefinition Height="56" />
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="150" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
                                 <Label
-                                    Grid.Row="0"
+                                    Grid.Row="1"
                                     Grid.Column="0"
                                     Margin="0,0,10,10"
                                     HorizontalContentAlignment="Right"
@@ -448,7 +453,7 @@
                                     Content="刀片高度"
                                     FontSize="16" />
                                 <Label
-                                    Grid.Row="1"
+                                    Grid.Row="2"
                                     Grid.Column="0"
                                     Margin="0,0,10,10"
                                     HorizontalContentAlignment="Right"
@@ -456,7 +461,7 @@
                                     Content="进刀速度"
                                     FontSize="16" />
                                 <Label
-                                    Grid.Row="2"
+                                    Grid.Row="3"
                                     Grid.Column="0"
                                     Margin="0,0,10,10"
                                     HorizontalContentAlignment="Right"
@@ -464,7 +469,7 @@
                                     Content="Y轴移动量"
                                     FontSize="16" />
                                 <Label
-                                    Grid.Row="3"
+                                    Grid.Row="4"
                                     Grid.Column="0"
                                     Margin="0,0,10,10"
                                     HorizontalContentAlignment="Right"
@@ -473,7 +478,7 @@
                                     FontSize="16" />
                                 <Label
                                     x:Name="deptSetLabel"
-                                    Grid.Row="4"
+                                    Grid.Row="5"
                                     Grid.Column="0"
                                     Margin="0,0,10,10"
                                     HorizontalContentAlignment="Right"
@@ -482,7 +487,7 @@
                                     FontSize="16" />
                                 <Label
                                     x:Name="loopLabel"
-                                    Grid.Row="5"
+                                    Grid.Row="6"
                                     Grid.Column="0"
                                     Margin="0,0,10,10"
                                     HorizontalContentAlignment="Right"
@@ -490,7 +495,7 @@
                                     Content="循环"
                                     FontSize="16" />
                                 <Label
-                                    Grid.Row="6"
+                                    Grid.Row="7"
                                     Grid.Column="0"
                                     Margin="0,0,10,10"
                                     HorizontalContentAlignment="Right"
@@ -522,8 +527,7 @@
                                     FontWeight="Bold" />
                                 <StackPanel
                                     Grid.Row="1"
-                                    Grid.Column="0"
-                                    Height="362.88">
+                                    Grid.Column="0">
                                     <ListView
                                         Name="lvDataView"
                                         Background="Transparent"

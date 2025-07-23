@@ -8,7 +8,7 @@
              d:DesignHeight="224" d:DesignWidth="302">
     <Grid>
         <Border x:Name="menuBorder" CornerRadius="10">
-            <Button x:Name="menuBtn"  Grid.Column="2"  HorizontalAlignment="Center" VerticalAlignment="Center" Background="Transparent" BorderThickness="0,0,0,0" Padding="0,0,0,3" IsHitTestVisible="False">
+            <Button x:Name="menuBtn"  Grid.Column="2"  HorizontalAlignment="Center" VerticalAlignment="Center" Background="Transparent" BorderThickness="0,0,0,0" Padding="0,0,0,3" IsHitTestVisible="False" Height="Auto" MinHeight="180">
                 <StackPanel Orientation="Vertical">
                     <Image x:Name="menuIcon" HorizontalAlignment="Center" VerticalAlignment="Top" Source="/Assets/picture/main_btn_sd.png" Width="80" Height="80" Margin="0,0,0,0"/>
                     <TextBlock x:Name="menuText" HorizontalAlignment="Center" Text="相机操作" VerticalAlignment="Bottom" Margin="0,30,0,0" FontSize="24" FontWeight="Bold"/>

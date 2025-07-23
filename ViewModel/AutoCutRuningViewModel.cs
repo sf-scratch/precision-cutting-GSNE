@@ -47,8 +47,8 @@ namespace 精密切割系统.ViewModel
         private readonly IRegionManager _regionManager;
         private readonly IEventAggregator _eventAggregator;
         private readonly IDialogService _dialogService;
-        private readonly SharpenService _sharpenService;
-        private readonly CutService _cutService;
+        private readonly FullyAutoSharpenService _sharpenService;
+        private readonly FullyAutoCutService _cutService;
         private CancellationTokenSource _pauseCts;
         private CancellationTokenSource _monitoringAlarmCts;
         // 控制右侧按钮
@@ -187,8 +187,8 @@ namespace 精密切割系统.ViewModel
             _dialogService = dialogService;
             RightButtonParamsCollection = WindowLayout.RightPageButtons;
             MessageList = new ObservableCollection<MessageModel>();
-            _sharpenService = SharpenService.Instance;
-            _cutService = CutService.Instance;
+            _sharpenService = FullyAutoSharpenService.Instance;
+            _cutService = FullyAutoCutService.Instance;
             _pauseCts = new CancellationTokenSource();
             _monitoringAlarmCts = new CancellationTokenSource();
             RunAutoCutCommand = new DelegateCommand(RunAutoCut);
@@ -312,7 +312,6 @@ namespace 精密切割系统.ViewModel
                         MaterialSnackUtils.MaterialSnack($"磨刀失败：{sharpenResult.Message}", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
                         return;
                     }
-
                     RunStatus = AutoRunStatus.HeightMeasurementInProgress;
                     CommonResult<float>? curHeightZ = null;
                     float wearAmount = 0;
@@ -344,7 +343,7 @@ namespace 精密切割系统.ViewModel
                     AfterHeightMeasurementZ = curHeightZ.Data;
                     singleBladeWear = TotalWearAmount / sharpenTimes;
                     _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"单刀磨损量: {singleBladeWear}"));
-                    string drsmdj = await CutService.GetDrsmdjAsync(LunguSksj.LunguId, (float)Math.Round(singleBladeWear * 1000, 1));
+                    string drsmdj = await FullyAutoCutService.GetDrsmdjAsync(LunguSksj.LunguId, (float)Math.Round(singleBladeWear * 1000, 1));
                     PdaUtils.AddBladeLifeGrade(drsmdj);
                     PdaUtils.AddSharpen(wearAmount, sharpenTimes);
                     PdaUtils.AddResidueSharpenTimes(0);
@@ -721,45 +720,9 @@ namespace 精密切割系统.ViewModel
                             await AutoCutUtils.WorkpieceBlowingAsync(_eventAggregator, cts.Token);
                             await PlcControl.tagControl.cutting.RunMotionAsync((line.StartPoint.X + line.EndPoint.X) / 2 + offsetPos.X, line.StartPoint.Y + offsetPos.Y, cts.Token);
                         }
-                        await Application.Current.Dispatcher.InvokeAsync(async () =>
-                        {
-                            WriteableBitmap? localBitmap = AutoCutUtils.GrabWriteableBitmap();
-                            if (localBitmap != null)
-                            {
-                                Mat mat = new Mat();
-                                Cv2.Flip(localBitmap.ToMat(), mat, FlipMode.XY);  // 同时水平和垂直翻转
-                                Mat matJpg = AutoCutUtils.JpegStreamToMat(AutoCutUtils.MatToJpegStream(AutoCutUtils.CropHorizontalCenter(mat, AutoCutUtils.HeightRange)));
-                                int? imageY = null;
-                                try
-                                {
-                                    CameraCommon? cameraCommon = AutoCutUtils.GetCameraCommon();
-                                    if (cameraCommon is not null)
-                                    {
-                                        Mat cropMatJpg = AutoCutUtils.JpegStreamToMat(AutoCutUtils.MatToJpegStream(AutoCutUtils.CropHorizontalCenter(matJpg, AutoCutUtils.HeightRange)));
-                                        var (bladeWidthMm, collapseWidthMm, bladeTop, bladeBottom, collapseTop, collapseBottom) = VisionAnalyzer.ProcessImage(cropMatJpg);
-                                        bladeWidthMm = Math.Round(bladeWidthMm, 4);
-                                        collapseWidthMm = Math.Round(collapseWidthMm, 4);
-                                        cameraCommon.UpdateLine((float)bladeWidthMm * 1000, (float)collapseWidthMm * 1000);
-                                    }
-                                    imageY = VisionAnalyzer.DetectFirstHorizontalStripeCenter(matJpg);
-                                }
-                                catch (Exception ex)
-                                {
-                                    MaterialSnackUtils.MaterialSnack($"未检测到水平条纹，{ex.Message}", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
-                                }
-                                if (imageY != null)
-                                {
-                                    float offsetY = (float)Math.Round((imageY.Value - (matJpg.Height / 2)) * VisionAnalyzer.PixelToMmRatio, 4);
-                                    if (MathF.Abs(offsetY) >= GlobalParams.NormalStepDistance) offsetY = 0;
-                                    MaterialSnackUtils.MaterialSnack($"{message ?? "暂停中..."}   Y轴自动偏移{offsetY}mm", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
-                                    await PlcControl.tagControl.Yaxis.StartRelativeAsync(offsetY);
-                                }
-                                else
-                                {
-                                    MaterialSnackUtils.MaterialSnack(message ?? "暂停中...", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
-                                }
-                            }
-                        });
+                        await AutoCutUtils.FineTuneAxisYAsync();
+                        await AutoCutUtils.UpdateCameraCommonLineAsync();
+                        MaterialSnackUtils.MaterialSnack(message ?? "暂停中...", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
                         break;
                 }
             }
@@ -773,7 +736,7 @@ namespace 精密切割系统.ViewModel
             }
             finally
             {
-                NavigationParameters parameters = new NavigationParameters { { "AutoCutRuningViewModel", this } };
+                NavigationParameters parameters = new NavigationParameters { { nameof(AutoCutRuningViewModel), this } };
                 _regionManager.RequestNavigate(RegionName.AutoCutStateRegion, nameof(AutoCutPausing), parameters);
             }
         }

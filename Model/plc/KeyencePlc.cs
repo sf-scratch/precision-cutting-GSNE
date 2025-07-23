@@ -3173,7 +3173,7 @@ namespace 精密切割系统.Driver
         /// <param name="yCutLocation">Y轴切割位置</param>
         /// <param name="spindleRev">主轴转速</param>
         public async Task SetCutParamsAsync(float feedSpeedValue, float zEndLocation, float zStartLocation, float xStartLoaction
-            , float xEndLocation, float yCutLocation, string checkStatus, float thetaDeg, int spindleRevValue, CutDirection cutDirection)
+            , float xEndLocation, float yCutLocation, string checkStatus, float thetaDeg, int spindleRevValue)
         {
             float xSoftUpperLimit = float.Parse(PlcControl.tagControl.Xaxis.softUpperLimit.defaultValue);
             if (xEndLocation > xSoftUpperLimit) xEndLocation = xSoftUpperLimit;
@@ -3193,7 +3193,6 @@ namespace 精密切割系统.Driver
                 $"状态检查: {checkStatus}\r\n" +
                 $"theta角度: {thetaDeg}\r\n" +
                 $"主轴转速: {spindleRevValue}\r\n" +
-                $"切割方向: {cutDirection}\r\n" +
                 $""
                 );
             // 切割速度
@@ -3222,24 +3221,6 @@ namespace 精密切割系统.Driver
             // 主轴转速
             spindleRev.writeValue = spindleRevValue.ToString();
             await keyencePlc.WriteTagAsync(spindleRev);
-            // 切割方向
-            if (cutDirection == CutDirection.Forward)
-            {
-                cutDirectionAfter.writeValue = "0";
-                await keyencePlc.WriteTagAsync(cutDirectionAfter);
-                await Task.Delay(10);
-                cutDirectionAgo.writeValue = "1";
-                await keyencePlc.WriteTagAsync(cutDirectionAgo);
-            }
-            else if (cutDirection == CutDirection.Backward)
-            {
-                cutDirectionAgo.writeValue = "0";
-                await keyencePlc.WriteTagAsync(cutDirectionAgo);
-                await Task.Delay(10);
-                cutDirectionAfter.writeValue = "1";
-                await keyencePlc.WriteTagAsync(cutDirectionAfter);
-            }
-            await Task.Delay(50); 
             //确认切割参数
             confirmParams.writeValue = "1";
             await keyencePlc.WriteTagAsync(confirmParams);

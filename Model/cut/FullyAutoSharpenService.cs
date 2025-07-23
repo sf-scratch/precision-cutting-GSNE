@@ -16,10 +16,10 @@ using 精密切割系统.ViewModel;
 
 namespace 精密切割系统.Model.cut
 {
-    public class SharpenService
-    {
-        private static Lazy<SharpenService> _lazy = new(() => new SharpenService());
-        public static SharpenService Instance
+    public class FullyAutoSharpenService
+	{
+        private static readonly Lazy<FullyAutoSharpenService> _lazy = new(() => new FullyAutoSharpenService());
+        public static FullyAutoSharpenService Instance
         {
             get { return _lazy.Value; }
         }
@@ -89,7 +89,7 @@ namespace 精密切割系统.Model.cut
         /// </summary>
         private float _recordSharpenY;
 
-        private SharpenService()
+        private FullyAutoSharpenService()
         {
             Init();
         }
@@ -111,7 +111,7 @@ namespace 精密切割系统.Model.cut
             {
                 InitThetaDegQueue(sharpenCalibratTheta);
                 //保存磨刀参数
-                Appsettings.SharpenThetaDegQueue = _thetaDegQueue.ToList();
+                Appsettings.SharpenThetaDegList = _thetaDegQueue.ToList();
             }
             CancellationToken usingPauseToken = pauseToken;
             int currentSharpenTimes = 0;
@@ -122,7 +122,6 @@ namespace 精密切割系统.Model.cut
                 //进入全自动切割模式
                 await PlcControl.tagControl.cutting.EnterCuttingModeAsync(usingPauseToken);
                 float abAverageThickness = lunguSksj.ABAverageThickness / 1000;
-                float cutDeep = sharpenParams.SharpenThickness + sharpenParams.TapeThickness - sharpenParams.CutHeight;
                 int curSharpenTimes = 0;
                 //开始磨刀，磨指定刀数
                 while (curSharpenTimes < sharpenTimes)
@@ -153,7 +152,7 @@ namespace 精密切割系统.Model.cut
                                 InitThetaDegQueue(sharpenCalibratTheta);
                             }
                             //保存磨刀参数
-                            Appsettings.SharpenThetaDegQueue = _thetaDegQueue.ToList();
+                            Appsettings.SharpenThetaDegList = _thetaDegQueue.ToList();
                             Appsettings.SharpenDistance = 0;
                             _isRotateTheta = true;
                             _isNewestSharpen = true;
@@ -169,7 +168,7 @@ namespace 精密切割系统.Model.cut
                             return RunResult.Fail("获取磨刀线失败！");
                         }
                         float bladeWaer = singleBladeWear * curSharpenTimes <= 0.1f ? singleBladeWear * curSharpenTimes : 0.1f;
-                        float endZ = bladeContactWorkingDiscZ1 - sharpenParams.SharpenThickness - sharpenParams.TapeThickness + cutDeep + bladeWaer;
+                        float endZ = bladeContactWorkingDiscZ1 - sharpenParams.CutHeight + bladeWaer;
                         float startZ = endZ - bladeLiftingHeight;
                         float sharpenSpeed = GetCutSpeed(sharpenParams.HightestCutSpeed);
                         //检查是否暂停
@@ -193,7 +192,7 @@ namespace 精密切割系统.Model.cut
                         SharpenServiceProcessChanged?.Invoke(new SharpenServiceProcess(endZ, sharpenSpeed, sharpenTimes + _finishedSharpenTimes, currentSharpenTimes + _finishedSharpenTimes));
                         await PlcControl.tagControl.ThetaAxis.SetAbsoluteSpeedAsync(GlobalParams.ThetaDefaultSpeed);
                         //设置磨刀参数
-                        await PlcControl.tagControl.cutting.SetCutParamsAsync(sharpenSpeed, endZ, startZ, line.StartPoint.X, line.EndPoint.X, line.StartPoint.Y, "0", _thetaDegQueue.Peek(), sharpenParams.SpindleRev, _cutDirection);
+                        await PlcControl.tagControl.cutting.SetCutParamsAsync(sharpenSpeed, endZ, startZ, line.StartPoint.X, line.EndPoint.X, line.StartPoint.Y, "0", _thetaDegQueue.Peek(), sharpenParams.SpindleRev);
                         //开始磨刀
                         await PlcControl.tagControl.cutting.StartCutAsync();
                         try
@@ -263,7 +262,7 @@ namespace 精密切割系统.Model.cut
             Init();
             //清空记录
             Appsettings.SharpenY = null;
-            Appsettings.SharpenThetaDegQueue = null;
+            Appsettings.SharpenThetaDegList = null;
         }
 
         private void InitThetaDegQueue(float sharpenCalibratTheta)
@@ -275,7 +274,7 @@ namespace 精密切割系统.Model.cut
         private void InitFromAppsettings()
         {
             float? recordSharpenY = Appsettings.SharpenY;
-            List<float>? thetaDegList = Appsettings.SharpenThetaDegQueue;
+            List<float>? thetaDegList = Appsettings.SharpenThetaDegList;
             if (recordSharpenY != null && thetaDegList != null && thetaDegList.Count != 0)
             {
                 _recordSharpenY = recordSharpenY.Value;

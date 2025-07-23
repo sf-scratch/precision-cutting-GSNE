@@ -8,7 +8,7 @@ namespace 精密切割系统.Model.cut
 {
     public enum CutDirection
     {
-        Forward,
-        Backward
+        Backward,
+        Forward
     }
 }

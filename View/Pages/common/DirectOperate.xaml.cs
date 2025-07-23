@@ -267,11 +267,6 @@ namespace 精密切割系统.View.Controls
                 semiAutomaticCuttingConfs[0].SetChannelNo(newChannelNum);
             }
         }
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
-        {
-            
-            // scrHighSpeedBtn_TouchDown(null, null);
-        }
 
         private async void UserControl_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {

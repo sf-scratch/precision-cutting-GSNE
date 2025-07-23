@@ -177,13 +177,14 @@ namespace 精密切割系统.ViewModel
         private void InitBottomButton()
         {
             OperatePageButtonCollection.Clear();
-            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("工件吹气", "/Assets/icon/tab_1/03/tab_08.png", WorkpieceBlowing, null, 8));
-            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线校准", "/Assets/icon/tab_1/03/tab_08.png", BaselineCalibration, null, 8));
-            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调窄", "/Assets/icon/tab_1/03/tab_02.png", BaselineNarrowing, null, 8));
-            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调宽", "/Assets/icon/tab_1/03/tab_05.png", BaselineWidening, null, 8));
-            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("崩边调窄", "/Assets/icon/tab_1/03/tab_02.png", BrokenEdgeNarrowing, null, 8));
-            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("崩边调宽", "/Assets/icon/tab_1/03/tab_05.png", BrokenEdgeWidening, null, 8));
-            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("报废", "/Assets/icon/tab_1/03/tab_08.png", BladeScrap, null, 8));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("工件吹气", "WeatherWindy", WorkpieceBlowing, null, 8));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("自动识别", "TextRecognition", AutomaticRecognition, null, 8));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线校准", "CrosshairsGps", BaselineCalibration, null, 8));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调窄", "UnfoldLessHorizontal", BaselineNarrowing, null, 8));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调宽", "UnfoldMoreHorizontal", BaselineWidening, null, 8));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("崩边调窄", "UnfoldLessHorizontal", BrokenEdgeNarrowing, null, 8));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("崩边调宽", "UnfoldMoreHorizontal", BrokenEdgeWidening, null, 8));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("报废", "DeleteEmpty", BladeScrap, null, 8));
         }
 
         private bool _isSureBladeScrap = false;
@@ -248,7 +249,17 @@ namespace 精密切割系统.ViewModel
 
         private async void WorkpieceBlowing()
         {
+            float curX = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0;
             await AutoCutUtils.WorkpieceBlowingAsync();
+            await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(curX);
+            await AutoCutUtils.FineTuneAxisYAsync();
+            await AutoCutUtils.UpdateCameraCommonLineAsync();
+        }
+
+        private async void AutomaticRecognition()
+        {
+            await AutoCutUtils.FineTuneAxisYAsync();
+            await AutoCutUtils.UpdateCameraCommonLineAsync();
         }
 
         private void UpdateBaselineWidth()
@@ -327,7 +338,7 @@ namespace 精密切割系统.ViewModel
             {
                 _cameraCommon.LineChanged += CameraCommon_LineChanged;
             }
-            _autoCutRuningViewModel = navigationContext.Parameters.GetValue<AutoCutRuningViewModel>("AutoCutRuningViewModel");
+            _autoCutRuningViewModel = navigationContext.Parameters.GetValue<AutoCutRuningViewModel>(nameof(AutoCutRuningViewModel));
             AfterHeightMeasurementZ = _autoCutRuningViewModel.AfterHeightMeasurementZ;
             SharpenBladeHeight = _autoCutRuningViewModel.SharpenBladeHeight;
             SharpenSpeed = _autoCutRuningViewModel.SharpenSpeed;

@@ -16,7 +16,7 @@ namespace 精密切割系统.FrmWindow.common
     internal class GlobalParams
     {
         // true 在线版本 false 离线版本
-        public static bool onlineFlag = true;
+        public static bool onlineFlag = false;
         // 是否上传MES
         public static bool OnlineMES = true;
         // 当前页面是否是首页
@@ -140,21 +140,6 @@ namespace 精密切割系统.FrmWindow.common
         public static readonly float BladeLiftingHeight = 1f;
 
         /// <summary>
-        /// 胶片厚度
-        /// </summary>
-        public static readonly float FilmThickness = 0.07f;
-
-        /// <summary>
-        /// 硅片厚度
-        /// </summary>
-        public static readonly float WaferThickness = 0.63f;
-
-        /// <summary>
-        /// 磨刀板厚度
-        /// </summary>
-        public static readonly float SharpeningBoardThickness = 1.029f;
-
-        /// <summary>
         /// 工件半径
         /// </summary>
         public static readonly float WorkpieceRadius  = 75;
@@ -169,8 +154,6 @@ namespace 精密切割系统.FrmWindow.common
         /// </summary>
         //public static DataPoint<float> ThetaCenterPoint = new DataPoint<float>(146.48f, 81.86f);
         public static DataPoint<float> ThetaCenterPoint = new DataPoint<float>(140.485f, 81.86f);
-
-        public static readonly float ZAxisZeroToWorkingDiscDistance = 49.7f;
 
         /// <summary>
         /// 相机中心点位置
@@ -189,23 +172,8 @@ namespace 精密切割系统.FrmWindow.common
         public static DataRectangleF SharpenRect = new DataRectangleF(ThetaCenterPoint.X - 33, ThetaCenterPoint.Y - 73, 70, 70);
 
         /// <summary>
-        /// 切割多少刀后开始磨刀
-        /// </summary>
-        public static readonly int CutThenSharpenStepNum = 10;
-
-        /// <summary>
-        /// 磨刀步数
-        /// </summary>
-        public static readonly int SharpenStepNum = 5;
-
-        /// <summary>
         /// 非接触测高位置到工作台的z1轴高度
         /// </summary>
-        //public static readonly float NonContactHeightMeasurementToWorkbenchZ1 = 19.029453f;
-        //public static readonly float NonContactHeightMeasurementToWorkbenchZ1 = 19f;
-        //public static readonly float NonContactHeightMeasurementToWorkbenchZ1 = 7.53f;
-        //public static readonly float NonContactHeightMeasurementToWorkbenchZ1 = 7.5f;
-        //public static readonly float NonContactHeightMeasurementToWorkbenchZ1 = 9.98f;
         public static readonly float NonContactHeightMeasurementToWorkbenchZ1 = 8.8f;
 
         // x轴默认速度

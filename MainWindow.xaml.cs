@@ -107,14 +107,15 @@ namespace 精密切割系统
         OperatePage operatePage;
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            Appsettings.CutThetaDegList = null;
+            Appsettings.AfterReplaceBladeCutTimes = null;
+            Appsettings.CutDistance = null;
+
             // 禁用触摸到鼠标事件的转换
             Touch.FrameReported += (s, e) => { /* 防止触摸触发鼠标事件 */ };
             AlarmConfig alarmConfig = AlarmConfig.Instance;
             Dispatcher.BeginInvoke(new Action(() =>
             {
-                //Mat mat = Cv2.ImRead("C:\\MySpace\\Dev\\ProjectXiHua\\precision-cutting-321\\bin\\x64\\Debug\\net8.0-windows\\image\\Temp\\ec869cd1-84b7-485b-bc0c-5d37af48c781_7_原图_7(1).jpg");
-                //int? aaaa = VisionAnalyzer.DetectFirstHorizontalStripeCenter(mat);
-
                 string logDirectory = "logs";
                 int daysThreshold = 30; // 清理超过 30 天的日志
                 TimeSpan interval = TimeSpan.FromDays(1); // 每天触发一次

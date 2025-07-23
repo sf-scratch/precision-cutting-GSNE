@@ -25,6 +25,7 @@
                 Background="Transparent"
                 BorderThickness="0,0,0,0"
                 IsHitTestVisible="False"
+                Height="auto"
                 IsTabStop="False">
                 <Viewbox>
                     <StackPanel

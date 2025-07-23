@@ -95,7 +95,7 @@ namespace 精密切割系统.Helpers
         {
             //清空记录
             Appsettings.SharpenY = null;
-            Appsettings.SharpenThetaDegQueue = null;
+            Appsettings.SharpenThetaDegList = null;
             Appsettings.SharpenDistance = null;
             await ReplaceSharpeningBoardAsync(eventAggregator);
         }
@@ -126,7 +126,7 @@ namespace 精密切割系统.Helpers
         {
             //清空记录
             Appsettings.CutY = null;
-            Appsettings.CutThetaDegQueue = null;
+            Appsettings.CutThetaDegList = null;
             Appsettings.CutDistance = null;
             await ReplaceWaferAsync(eventAggregator);
         }
@@ -136,7 +136,7 @@ namespace 精密切割系统.Helpers
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        public static async Task<CommonResult<float>> ProcessMeasureHeightAsync(HeightMeasurementMode mode, IDialogService dialogService, IEventAggregator? eventAggregator = null, CancellationToken token = default)
+        public static async Task<CommonResult<float>> ProcessMeasureHeightAsync(HeightMeasurementMode mode, IDialogService? dialogService, IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
             InitialPositionModel? initPos = await GetInitialPositionAsync();
             if (initPos is null) return CommonResult<float>.Failure("获取初始化位置信息失败！");
@@ -251,7 +251,7 @@ namespace 精密切割系统.Helpers
                 if (maxDeviation >= 0.01)
                 {
                     eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高偏差过大，重新测高"));
-                    if (times % 3 == 0)
+                    if (times % 3 == 0 && dialogService is not null)
                     {
                         await WaitManualBlowing(dialogService, token);
                     }
@@ -617,7 +617,7 @@ namespace 精密切割系统.Helpers
         {
             DataPoint<float> cameraCenterPoint = GlobalParams.CameraCenterPoint;
             DataPoint<float> cameraRelativeBladePosition = Appsettings.CameraRelativeBladePosition;
-            float thetaDeg = Appsettings.CutThetaDegQueue is not null && Appsettings.CutThetaDegQueue.Count > 0 ? Appsettings.CutThetaDegQueue.First() : 0;
+            float thetaDeg = Appsettings.CutThetaDegList?.FirstOrDefault() ?? 0f;
             Task focusxyTask = PlcControl.tagControl.cutting.RunMotionAsync(cameraCenterPoint.X - 10, cameraRelativeBladePosition.Y + Appsettings.CutY ?? cameraCenterPoint.Y + 30, token);
             Task focusThetaTask = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(thetaDeg);
             await Task.WhenAll(focusxyTask, focusThetaTask);
@@ -872,14 +872,11 @@ namespace 精密切割系统.Helpers
                         using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(300));
                         while (await timer.WaitForNextTickAsync(linkedToken))
                         {
-                            await Application.Current.Dispatcher.InvokeAsync(() =>
+                            Mat? localMat = await GetCurrentMatAsync();
+                            if (localMat != null)
                             {
-                                WriteableBitmap? localBitmap = GrabWriteableBitmap();
-                                if (localBitmap != null)
-                                {
-                                    matQueue.Enqueue(localBitmap.ToMat());
-                                }
-                            });
+                                matQueue.Enqueue(localMat);
+                            }
                         }
                     }
                     catch (OperationCanceledException)
@@ -1427,6 +1424,15 @@ namespace 精密切割系统.Helpers
             return groups;
         }
 
+        public static async Task<Mat?> GetCurrentMatAsync()
+        {
+            return await Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                WriteableBitmap? localBitmap = GrabWriteableBitmap();
+                return localBitmap?.ToMat();
+            });
+        }
+
         public static WriteableBitmap? GrabWriteableBitmap()
         {
             SciCam m_currentDev = CameraUtils.m_currentDev;
@@ -1470,6 +1476,73 @@ namespace 精密切割系统.Helpers
             }
         }
 
+        public static async Task<CommonResult> UpdateCameraCommonLineAsync()
+        {
+            Mat? localMat = await GetCurrentMatAsync();
+            if (localMat != null)
+            {
+                Mat cropMatJpg = JpegStreamToMat(MatToJpegStream(CropHorizontalCenter(localMat, HeightRange)));
+                return await UpdateCameraCommonLineAsync(cropMatJpg);
+            }
+            return CommonResult.Failure("获取相机图片失败");
+        }
+
+        public static async Task<CommonResult> UpdateCameraCommonLineAsync(Mat cropMatJpg)
+        {
+            CameraCommon? cameraCommon = GetCameraCommon();
+            if (cameraCommon is not null)
+            {
+                return await Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    try
+                    {
+                        var (bladeWidthMm, collapseWidthMm, bladeTop, bladeBottom, collapseTop, collapseBottom) = VisionAnalyzer.ProcessImage(cropMatJpg);
+                        bladeWidthMm = Math.Round(bladeWidthMm, 4);
+                        collapseWidthMm = Math.Round(collapseWidthMm, 4);
+                        cameraCommon.UpdateLine((float)bladeWidthMm * 1000, (float)collapseWidthMm * 1000);
+                        return CommonResult.Success();
+                    }
+                    catch (Exception e)
+                    {
+                        return CommonResult.Failure(e.Message);
+                    }
+                });
+            }
+            return CommonResult.Failure("获取相机失败");
+        }
+
+        public static async Task<CommonResult> FineTuneAxisYAsync()
+        {
+            Mat? localMat = await GetCurrentMatAsync();
+            if (localMat != null)
+            {
+                Mat mat = new Mat();
+                Cv2.Flip(localMat, mat, FlipMode.XY);  // 同时水平和垂直翻转
+                Mat cropMatJpg = JpegStreamToMat(MatToJpegStream(CropHorizontalCenter(mat, HeightRange)));
+                return await FineTuneAxisYAsync(cropMatJpg);
+            }
+            return CommonResult.Failure("获取相机图片失败");
+        }
+
+        public static async Task<CommonResult> FineTuneAxisYAsync(Mat cropMatJpg)
+        {
+            try
+            {
+                int? imageY = VisionAnalyzer.DetectFirstHorizontalStripeCenter(cropMatJpg);
+                if (imageY == null)
+                {
+                    return CommonResult.Failure("未检测到水平条纹");
+                }
+                float offsetY = (float)Math.Round((imageY.Value - (cropMatJpg.Height / 2)) * VisionAnalyzer.PixelToMmRatio, 4);
+                if (MathF.Abs(offsetY) >= GlobalParams.NormalStepDistance) offsetY = 0;
+                await PlcControl.tagControl.Yaxis.StartRelativeAsync(offsetY);
+                return CommonResult.Success();
+            }
+            catch (Exception ex)
+            {
+                return CommonResult.Failure($"未检测到水平条纹，{ex.Message}");
+            }
+        }
 
         public static Mat CropHorizontalCenter(Mat sourceImage, int heightRange)
         {

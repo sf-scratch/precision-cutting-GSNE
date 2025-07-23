@@ -26,10 +26,10 @@ using static 精密切割系统.Model.cut.ServicePauseResult;
 
 namespace 精密切割系统.Model.cut
 {
-    public class CutService
+    public class FullyAutoCutService
     {
-        private static readonly Lazy<CutService> _lazy = new(() => new CutService());
-        public static CutService Instance
+        private static readonly Lazy<FullyAutoCutService> _lazy = new(() => new FullyAutoCutService());
+        public static FullyAutoCutService Instance
         {
             get { return _lazy.Value; }
         }
@@ -110,7 +110,7 @@ namespace 精密切割系统.Model.cut
         /// </summary>
         private float _recordCutY;
 
-        private CutService()
+        private FullyAutoCutService()
         {
             Init();
         }
@@ -133,7 +133,7 @@ namespace 精密切割系统.Model.cut
             {
                 InitThetaDegQueue(cutCalibratTheta);
                 //保存切割参数
-                Appsettings.CutThetaDegQueue = _thetaDegQueue.ToList();
+                Appsettings.CutThetaDegList = _thetaDegQueue.ToList();
             }
             _usingPauseToken = pauseToken;
             int needCutTimes = cutSpeedList.Count;
@@ -179,7 +179,7 @@ namespace 精密切割系统.Model.cut
                                 InitThetaDegQueue(cutCalibratTheta);
                             }
                             //保存切割参数
-                            Appsettings.CutThetaDegQueue = _thetaDegQueue.ToList();
+                            Appsettings.CutThetaDegList = _thetaDegQueue.ToList();
                             Appsettings.CutDistance = 0;
                             _isRotateTheta = true;
                             _isNewestCut = true;
@@ -218,7 +218,7 @@ namespace 精密切割系统.Model.cut
                         var (startX, endX) = CalculateCuttingX(line, _thetaDegQueue.Peek(), cutParams.OffsetX);
                         await PlcControl.tagControl.ThetaAxis.SetAbsoluteSpeedAsync(GlobalParams.ThetaDefaultSpeed);
                         //设置切割参数
-                        await PlcControl.tagControl.cutting.SetCutParamsAsync(cutSpeed, endZ, startZ, startX, endX, line.StartPoint.Y, "0", _thetaDegQueue.Peek() + cutCalibratTheta, cutParams.SpindleRev, _cutDirection);
+                        await PlcControl.tagControl.cutting.SetCutParamsAsync(cutSpeed, endZ, startZ, startX, endX, line.StartPoint.Y, "0", _thetaDegQueue.Peek() + cutCalibratTheta, cutParams.SpindleRev);
                         //开始切割信号
                         await PlcControl.tagControl.cutting.StartCutAsync();
                         //等待切割次数变化
@@ -371,7 +371,7 @@ namespace 精密切割系统.Model.cut
         //    {
         //        InitThetaDegQueue(cutCalibratTheta);
         //        //保存切割参数
-        //        Appsettings.CutThetaDegQueue = _thetaDegQueue.ToList();
+        //        Appsettings.CutThetaDegList = _thetaDegQueue.ToList();
         //    }
         //    CancellationToken usingPauseToken = pauseToken;
         //    int currentCutTimes = 0;
@@ -412,7 +412,7 @@ namespace 精密切割系统.Model.cut
         //                        InitThetaDegQueue(cutCalibratTheta);
         //                    }
         //                    //保存切割参数
-        //                    Appsettings.CutThetaDegQueue = _thetaDegQueue.ToList();
+        //                    Appsettings.CutThetaDegList = _thetaDegQueue.ToList();
         //                    Appsettings.CutDistance = 0;
         //                    _isRotateTheta = true;
         //                    _isNewestCut = true;
@@ -606,7 +606,7 @@ namespace 精密切割系统.Model.cut
         private void InitFromAppsettings()
         {
             float? recordCutY = Appsettings.CutY;
-            List<float>? thetaDegList = Appsettings.CutThetaDegQueue;
+            List<float>? thetaDegList = Appsettings.CutThetaDegList;
             if (recordCutY != null && thetaDegList != null && thetaDegList.Count != 0)
             {
                 _recordCutY = recordCutY.Value;

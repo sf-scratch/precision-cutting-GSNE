@@ -12,7 +12,6 @@
     d:DesignHeight="655"
     d:DesignWidth="1570"
     Loaded="Page_Loaded"
-    Unloaded="Page_Unloaded"
     mc:Ignorable="d">
     <Page.DataContext>
         <viewModel:MQSemiAutomaticCuttingConfViewModel />
