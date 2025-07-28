@@ -1,4 +1,6 @@
-﻿using NPOI.SS.Formula.Functions;
+﻿using Newtonsoft.Json;
+using NPOI.SS.Formula.Functions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using 精密切割系统.Assets.config.buttom;
@@ -6,6 +8,7 @@ using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
 using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
+using 精密切割系统.Model.cut;
 using 精密切割系统.Model.plc;
 using 精密切割系统.Utils;
 using 精密切割系统.View.page.right;
@@ -19,157 +22,115 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
     /// </summary>
     public partial class MQSemiAutomaticCuttingStop : Page
     {
-        private MainWindow? mainWindow;
-        private RightPage? rightPage;
-        bool runFlag = false;
-        bool stopCheckFlag = false;
-        bool cameraOffsetStatus = false;
-        float cameraCutOffset = 0;
+        private readonly SemiAutoCutService _semiAutoCutService;
+        private static CameraCommon? _cameraCommon;
+        private MQSemiAutomaticCuttingStopViewModel _viewModel;
+        private MainWindow _mainWindow;
+        private RightPage _rightPage;
         // 手动调整基准线标识
-        bool adjustDatumLineFlag = false;
+        bool _adjustDatumLineFlag = false;
         // 创建一个定时器
-        System.Timers.Timer timer = null;
+        System.Timers.Timer? _timer = null;
 
         public MQSemiAutomaticCuttingStop()
         {
             InitializeComponent();
-            mainWindow = Application.Current.MainWindow as MainWindow;
+            _mainWindow = Application.Current.MainWindow as MainWindow ?? new MainWindow();
+            _semiAutoCutService = SemiAutoCutService.Instance;
+            _viewModel = new MQSemiAutomaticCuttingStopViewModel();
+            DataContext = _viewModel;
         }
-        static CameraCommon cameraCommon;
-        MQSemiAutomaticCuttingStopViewModel viewModel;
+
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            rightPage = mainWindow.rightFrame.Content as RightPage;
-
-            rightPage.PanelAction.Visibility = Visibility.Visible;
-            rightPage.btnCutReStart.Visibility = Visibility.Visible;
-            rightPage.btnCutReStart.SetRightClickedHandler(ReCutStart);
+            _rightPage = _mainWindow.rightFrame.Content as RightPage ?? new RightPage();
+            _rightPage.PanelAction.Visibility = Visibility.Visible;
+            _rightPage.btnCutReStart.Visibility = Visibility.Visible;
+            _rightPage.btnCutReStart.SetRightClickedHandler(ReCutStart);
+            _rightPage.btnCutStop.Visibility = Visibility.Visible;
+            _rightPage.btnCutStop.SetRightClickedHandler(CutStop);
             GlobalParams.cutStatusInfo = 2;
             // 加载参数
-            FileTableItemModel _model = CurrentUtils.GetFileTableItemModel();
-            BladeHeightModel bladeHeightModel = CurrentUtils.GetBladeHeightModel();
-            // 获取当前channel
-            FileTableItemChModel chModel = CurrentUtils.GetFileTableItemChModel();
-            // 获取刀片高度、进刀速度
-            string bladeHeightStr = chModel.BladeHeight;
-            string feedSpeedStr = chModel.FeedSpeed;
-            string bladeHeight = bladeHeightStr.Split(",")[0];
-            viewModel = new MQSemiAutomaticCuttingStopViewModel();
-            viewModel.DeviceDataNo = _model.DeviceDataNo + "";
-            viewModel.DeviceDataId = _model.DeviceDataId;
-            viewModel.ChannelNum = CurrentUtils.GetCurrentConfiguration().ChannelNum;
-            viewModel.FeedSpeed = CutOperateUtils.currentFeedSpeed.ToString();
-            viewModel.DepthCompensation = GlobalParams.depthComp.ToString("F3");
-            viewModel.ChangeFeedSpeed = CutOperateUtils.feedSpeedComp + "";
-            viewModel.AllCutLine = GlobalParams.cutAllNum;
-            viewModel.AllCutLineLength = Tools.FormatDecimalString(GlobalParams.cutAllDistance.ToString(), 4);
-            // 设置刀片高度 = 刀片高度 + 高度补偿
-            viewModel.BladeHeight = (Tools.GetFloatStringValue(bladeHeight) + GlobalParams.depthComp).ToString("F4");
-            repeatedCheckbox.IsChecked = CutOperateUtils.repeatedFlag;
-            DataContext = viewModel;
-            cameraCutOffset = GlobalParams.cameraOffsetY;
-            updateDefineDataModel();
-            // 获取相机页面
-            List<CameraCommon> cameraCommons = Tools.GetChildrenOfType<CameraCommon>(mainWindow.mainFrame);
-            if (cameraCommons.Count == 0)
+            string[] query = Uri.UnescapeDataString(NavigationService.CurrentSource.OriginalString).Split("?");
+            if (query.Length == 2 )
+            {
+                var runViewModel = JsonConvert.DeserializeObject<MQSemiAutomaticCuttingRunViewModel>(query[1]);
+                if (runViewModel is not null )
+                {
+                    _viewModel.DeviceDataNo = runViewModel.DeviceDataNo;
+                    _viewModel.DeviceDataId = runViewModel.DeviceDataId;
+                    _viewModel.RunCutLine = runViewModel.RunCutLine;
+                    _viewModel.AllRunCutLine = runViewModel.AllRunCutLine;
+                    _viewModel.ChannelNum = runViewModel.ChannelNum;
+                    _viewModel.BladeHeight = runViewModel.BladeHeight.ToString();
+                    _viewModel.FeedSpeed = runViewModel.FeedSpeed.ToString();
+                    _viewModel.DepthCompensation = runViewModel.DepthCompensation;
+                    _viewModel.ChangeFeedSpeed = runViewModel.ChangeFeedSpeed;
+                    _viewModel.ExpectedProcessingEndTime = runViewModel.ExpectedProcessingEndTime;
+                    _viewModel.AllCutLine = runViewModel.AllCutLine;
+                    _viewModel.AllCutLineLength = runViewModel.AllCutLineLength.ToString();
+                }
+            }
+            _cameraCommon = AutoCutUtils.GetCameraCommon();
+            if (_cameraCommon is null)
             {
                 MaterialSnackUtils.MaterialSnack("相机获取失败！", MaterialSnackUtils.SnackType.WARNING);
                 return;
             }
-            cameraCommon = cameraCommons[0];
-            viewModel.CutWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((cameraCommon._cutMarkWidth / 1000).ToString(), 4));
-            viewModel.DdgesWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((cameraCommon._edgeChipWidth / 1000).ToString(), 4));
-            runFlag = true;
-            Thread _thread = new Thread(() => {
-                Thread.Sleep(500);
-
-                /*PlcControl.tagControl.wholeDevice.SetYellowLightFlash(1);
-                PlcControl.tagControl.wholeDevice.SetBuzzerStatus(1);*/
-
-                viewModel.AllCutLine = GlobalParams.cutAllNum;
-                viewModel.AllCutLineLength = Tools.FormatDecimalString(GlobalParams.cutAllDistance.ToString(), 4);
-                // 停止后 吹气4秒 开始测量
-                /*Thread.Sleep(3000);
-                if (CommonCheck.GetParamsStatus(DeviceKey.workpieceBlowingStatusKey))
-                {
-                    PlcControl.tagControl.wholeDevice.SetWorkpieceBlowing();
-                }*/
-                /*if (CutOperateUtils.cutType == 0)
-                {
-                    // 执行校准检查
-                    double[] widthInfo = PerformAlignmentCheck();
-                    // 如果校验失败则停止，如果超过3次，则报警
-                    if (!CutOperateUtils.IsCuttingDepthValid(widthInfo, 60, CutOperateUtils._cutDepth))
-                    {
-                        // 根据需求调整是否停止切割或处理其他逻辑
-
-                    }
-                    MaterialSnackUtils.MaterialSnack("校准完成！", MaterialSnackUtils.SnackType.SUCCESS);
-                }
-                else
-                {
-                    // 自动识别刀痕
-                    MaterialSnackUtils.MaterialSnack("刀痕识别中....", MaterialSnackUtils.SnackType.SUCCESS, 0);
-                    double[] widthInfo = PerformAlignmentCheck();
-                    if (widthInfo != null && widthInfo[0] != 0 && widthInfo[1] != 0)
-                    {
-                        MaterialSnackUtils.MaterialSnack("刀痕识别完成！", MaterialSnackUtils.SnackType.SUCCESS);
-                    }
-                    else
-                    {
-                        MaterialSnackUtils.MaterialSnack("刀痕自动识别失败，请手动操作！.", MaterialSnackUtils.SnackType.SUCCESS);
-                    }
-                }*/
-                runFlag = false;
-                GlobalParams.globalRunFlag = false;
-            });
-            _thread.IsBackground = true;
-            _thread.Start();
+            _viewModel.CutWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((_cameraCommon._cutMarkWidth / 1000).ToString(), 4));
+            _viewModel.DdgesWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((_cameraCommon._edgeChipWidth / 1000).ToString(), 4));
+            UpdateDefineDataModel();
         }
 
         //根据默认配置控制对应显示和隐藏
-        private void updateDefineDataModel()
+        private void UpdateDefineDataModel()
         {
             UserDefineDataModel userDefineModel = CurrentUtils.getUserDefineDataModel();
             bool isSpeedChange = "NO".Equals(userDefineModel.SpeedChange);
             bool isHeightChange = "NO".Equals(userDefineModel.HeightChange);
             if (isSpeedChange)//速度变更
             {
-                SpeedChangePanel.Visibility = Visibility.Collapsed;
+                ChangeFeedSpeed1.Visibility = Visibility.Hidden;
+                ChangeFeedSpeed2.Visibility = Visibility.Hidden;
+                ChangeFeedSpeed3.Visibility = Visibility.Hidden;
             }
             if (isHeightChange)//高度补偿
             {
-                HeightChangePanel.Visibility = Visibility.Collapsed;
+                HeightChange1.Visibility = Visibility.Hidden;
+                HeightChange2.Visibility = Visibility.Hidden;
+                HeightChange3.Visibility = Visibility.Hidden;
             }
-            mainWindow.UpdateOperatePage(OperateData.GetSemiAutoCuttingStopOperate(!isSpeedChange, !isHeightChange)
+            _mainWindow.UpdateOperatePage(OperateData.GetSemiAutoCuttingStopOperate(!isSpeedChange, !isHeightChange)
                 , OperateClickHandler, OperateTouchLeaveHandler, OperateTouchDownHandler);
         }
+
         private void UpdateMenu2()
         {
-            mainWindow.UpdateOperatePage(OperateData.GetSemiAutoCuttingStopTwoOperate(), OperateClickHandler);
+            _mainWindow.UpdateOperatePage(OperateData.GetSemiAutoCuttingStopTwoOperate(), OperateClickHandler);
         }
+
         private void DisposeDatumLine(int code)
         {
             if (code == 23040)
             {
-                cameraCommon?.SetEdgeWidth(-1, 2);
+                _cameraCommon?.SetEdgeWidth(-1, 2);
             }
             else if (code == 23041)
             {
-                cameraCommon?.SetEdgeWidth(1, 2);
+                _cameraCommon?.SetEdgeWidth(1, 2);
             }
             else if (code == 23407)
             {
-                cameraCommon?.SetCutMarkWidth(-1, 2);
+                _cameraCommon?.SetCutMarkWidth(-1, 2);
 
             }
             else if (code == 23408)
             {
-                cameraCommon?.SetCutMarkWidth(1, 2);
+                _cameraCommon?.SetCutMarkWidth(1, 2);
             }
 
-            viewModel.CutWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((cameraCommon._cutMarkWidth / 1000).ToString(), 4));
-            viewModel.DdgesWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((cameraCommon._edgeChipWidth / 1000).ToString(), 4));
+            _viewModel.CutWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((_cameraCommon._cutMarkWidth / 1000).ToString(), 4));
+            _viewModel.DdgesWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((_cameraCommon._edgeChipWidth / 1000).ToString(), 4));
         }
         public void OperateTouchDownHandler(object sender, int code)
         {
@@ -183,25 +144,25 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 // 崩边调窄
                 case 23041:
                     DisposeDatumLine(code); // 初始调用 DisposeDatumLine
-                    adjustDatumLineFlag = true;
-                    if (timer != null)
+                    _adjustDatumLineFlag = true;
+                    if (_timer != null)
                     {
-                        timer.Stop();
+                        _timer.Stop();
                     }
                     // 创建定时器
-                    timer = new System.Timers.Timer
+                    _timer = new System.Timers.Timer
                     {
                         Interval = 500, // 初始延迟 500 毫秒
                         AutoReset = false // 每次触发后需要手动重新启动
                     };
-                    timer.Elapsed += (sender, e) =>
+                    _timer.Elapsed += (sender, e) =>
                     {
-                        if (timer != null)
+                        if (_timer != null)
                         {
-                            if (!adjustDatumLineFlag)
+                            if (!_adjustDatumLineFlag)
                             {
-                                timer.Stop();
-                                timer.Dispose(); // 释放资源
+                                _timer.Stop();
+                                _timer.Dispose(); // 释放资源
                                 return;
                             }
 
@@ -211,12 +172,11 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                             });
 
                             // 重新设置间隔为 100 毫秒并重新启动定时器
-                            timer.Interval = 100;
-                            timer.Start();
+                            _timer.Interval = 100;
+                            _timer.Start();
                         }
                     };
-
-                    timer.Start(); // 启动定时器
+                    _timer.Start(); // 启动定时器
                     break;
                 default:
                     break;
@@ -233,12 +193,12 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 case 23040:
                 // 崩边调窄
                 case 23041:
-                    adjustDatumLineFlag = false;
-                    if (timer != null)
+                    _adjustDatumLineFlag = false;
+                    if (_timer != null)
                     {
-                        timer.Stop();
-                        timer.Dispose();
-                        timer = null;
+                        _timer.Stop();
+                        _timer.Dispose();
+                        _timer = null;
                     }
                     break;
                 default:
@@ -252,22 +212,19 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                     // 确认基准线
                     string yCurrentPosition = PlcControl.plc.GetPlcValueString(DeviceKey.yCurLocationKey);
                     float offset = CutOperateUtils.yStopLocation - float.Parse(yCurrentPosition);
-                    GlobalParams.cameraOffsetY = cameraCutOffset + offset;
                     MaterialSnackUtils.MaterialSnack("基准线已确认！", MaterialSnackUtils.SnackType.SUCCESS);
                     Tools.LogInfo($"最新基准线：{GlobalParams.cameraOffsetY}");
-                    cameraOffsetStatus = true;
                     break;
                 case 2401:
-                    float tempDepthCompensation = Tools.GetFloatStringValue(viewModel.DepthCompensation);
+                    float tempDepthCompensation = Tools.GetFloatStringValue(_viewModel.DepthCompensation);
                     // 高度补偿
-                    GlobalParams.depthComp = tempDepthCompensation;
-                    // CutOperateUtils.SetBladeHeightComp(tempDepthCompensation);
+                    _semiAutoCutService.DepthCompensationValue = tempDepthCompensation;
                     MaterialSnackUtils.MaterialSnack("刀片高度补偿设置成功！", MaterialSnackUtils.SnackType.SUCCESS);
                     break;
                 case 2403:
-                    float tempChangeFeedSpeed = Tools.GetFloatStringValue(viewModel.ChangeFeedSpeed);
+                    float tempChangeFeedSpeed = Tools.GetFloatStringValue(_viewModel.ChangeFeedSpeed);
                     // 速度更改
-                    CutOperateUtils.SetFeedSpeedComp(tempChangeFeedSpeed);
+                    _semiAutoCutService.FeedSpeedCompCompensationValue = tempChangeFeedSpeed;
                     MaterialSnackUtils.MaterialSnack("变更进刀速度成功！", MaterialSnackUtils.SnackType.SUCCESS);
                     break;
                 case 2442:
@@ -276,7 +233,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                     {
                         break;
                     }
-                    CommonOperate.GetInstance().AutoFocus(2, mainWindow, null);
+                    CommonOperate.GetInstance().AutoFocus(2, _mainWindow, null);
                     break;
                 case 2412:
                     UpdateMenu2();
@@ -284,16 +241,16 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                     ShowDimming(1);
                     break;
                 case 2411:
-                    updateDefineDataModel();
+                    UpdateDefineDataModel();
                     // 调光
                     ShowDimming(0);
                     break;
                 case 2422:
                     // 刀片状态信息
-                    mainWindow.NavigateToPage("Pages/F4_BladeMaintenance/BladeInfo", "pageName=Pages/F2_ManualOperation/MQSemiAutomaticCuttingStop");
+                    _mainWindow.NavigateToPage("Pages/F4_BladeMaintenance/BladeInfo", "pageName=Pages/F2_ManualOperation/MQSemiAutomaticCuttingStop");
                     break;
                 case 2405:
-                    mainWindow.NavigateToPage("Pages/F3_ModelCatalog/MCDeviceDataListConf");
+                    _mainWindow.NavigateToPage("Pages/F3_ModelCatalog/MCDeviceDataListConf");
                     break;
                 default:
                     break;
@@ -307,83 +264,29 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         {
             if (status == 0)
             {
-                dimmingGrid.Visibility = Visibility.Collapsed;
-                cutLineWidthGrid.Visibility = Visibility.Visible;
-                linesRecordGrid.Visibility = Visibility.Visible;
-                compGrid.Visibility = Visibility.Visible;
+                //dimmingGrid.Visibility = Visibility.Collapsed;
+                //cutLineWidthGrid.Visibility = Visibility.Visible;
+                //linesRecordGrid.Visibility = Visibility.Visible;
+                //compGrid.Visibility = Visibility.Visible;
             } else
             {
-                dimmingGrid.Visibility = Visibility.Visible;
-                cutLineWidthGrid.Visibility = Visibility.Collapsed;
-                linesRecordGrid.Visibility = Visibility.Collapsed;
-                compGrid.Visibility = Visibility.Collapsed;
+                //dimmingGrid.Visibility = Visibility.Visible;
+                //cutLineWidthGrid.Visibility = Visibility.Collapsed;
+                //linesRecordGrid.Visibility = Visibility.Collapsed;
+                //compGrid.Visibility = Visibility.Collapsed;
             }
         }
 
         // 继续切割
-        private void ReCutStart(object sender, bool e)
+        private async void ReCutStart(object? sender, bool e)
         {
-            if (runFlag)
-            {
-                // MaterialSnackUtils.showOperateLimitMsg();
-                return;
-            }
-            if (!cameraOffsetStatus)
-            {
-                MaterialSnackUtils.MaterialSnack("请先进行基准线校准！", MaterialSnackUtils.SnackType.WARNING, 0);
-                return;
-            }
-            cameraOffsetStatus = false;
-            runFlag = true;
-            // 设置是否交换位置
-            CutOperateUtils.exchangeXPosition = false;
-            GlobalParams.globalRunFlag = true;
-            CutOperateUtils.stopCheckFlag = stopCheckFlag;
-            CutOperateUtils.pauseFlag = false;
-            Thread.Sleep(10);
-            runFlag = false;
-            CutOperateUtils.checkStatus = false;
+            await MQSemiAutomaticCuttingRun.ContinueAsync();
+            _mainWindow.mainFrame.GoBack();
         }
 
-        // 执行校准检查
-        private double[] PerformAlignmentCheck()
+        private async void CutStop(object? sender, bool e)
         {
-            // 调用刀痕和崩边识别，获取刀痕宽度、角度等信息
-            Tools.WaitForValue(PlcControl.allTags[DeviceKey.z2CurSpeedKey], "0");
-            // 对焦完成后，测量刀痕宽度
-            double[] widthInfo = [0, 0];
-            try
-            {
-                string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss_fff");
-                string fileName = $"check_{timestamp}.png";
-                bool flag = cameraCommon.SaveWriteableBitmap(fileName);
-                if (flag)
-                {
-                    Thread.Sleep(500);
-                    widthInfo = CommonOperate.GetCutEdgeWidth(fileName);
-                    Task.Run(() => {
-                        Thread.Sleep(2000);
-                        // 删除照片
-                        Tools.DeleteFile(fileName);
-                    });
-                }
-            }
-            catch (Exception e)
-            {
-                Tools.LogError("识别失败！原因：" + e.Message);
-            }
-            if (widthInfo == null || widthInfo[0] == 0 || widthInfo[1] == 0)
-            {
-                return widthInfo;
-            }
-            Thread.Sleep(100);
-            // 设置识别出来的刀痕线
-            double cutWidth = CameraOperateUtils.ConvertToPictureBoxSize(widthInfo[0]);
-            double edgesWidth = CameraOperateUtils.ConvertToPictureBoxSize(widthInfo[1]);
-            cameraCommon.DrawLineForWidth((float)cutWidth, (float)edgesWidth);
-            viewModel.CutWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((cameraCommon._cutMarkWidth / 1000).ToString(), 4));
-            viewModel.DdgesWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((cameraCommon._edgeChipWidth / 1000).ToString(), 4));
-            return widthInfo;
+            await MQSemiAutomaticCuttingRun.StopAsync(ServicePauseResult.Stop);
         }
 
         private void cutRecognition_Click(object sender, RoutedEventArgs e)
@@ -391,7 +294,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             MaterialSnackUtils.MaterialSnack("识别中...", MaterialSnackUtils.SnackType.WARNING, 0);
             string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss_fff");
             string fileName = $"check_{timestamp}.png";
-            cameraCommon.SaveWriteableBitmap(fileName);
+            _cameraCommon.SaveWriteableBitmap(fileName);
             Thread.Sleep(1000);
             double[] widthInfo = CommonOperate.GetCutEdgeWidth(fileName);
             if (widthInfo == null || widthInfo[0] == 0 || widthInfo[1] == 0)
@@ -400,20 +303,19 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             }
             double cutWidthValue = CameraOperateUtils.ConvertToPictureBoxSize(widthInfo[0]);
             double edgesWidthValue = CameraOperateUtils.ConvertToPictureBoxSize(widthInfo[1]);
-            cameraCommon.DrawLineForWidth((float)cutWidthValue, (float)edgesWidthValue);
-            viewModel.CutWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((cameraCommon._cutMarkWidth / 1000).ToString(), 4));
-            viewModel.DdgesWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((cameraCommon._edgeChipWidth / 1000).ToString(), 4));
+            _cameraCommon.DrawLineForWidth((float)cutWidthValue, (float)edgesWidthValue);
+            _viewModel.CutWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((_cameraCommon._cutMarkWidth / 1000).ToString(), 4));
+            _viewModel.DdgesWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((_cameraCommon._edgeChipWidth / 1000).ToString(), 4));
             MaterialSnackUtils.MaterialSnack("识别完成！", MaterialSnackUtils.SnackType.SUCCESS);
         }
 
         private void stopCheckCheckbox_Click(object sender, RoutedEventArgs e)
         {
-            stopCheckFlag = stopCheckCheckbox.IsChecked == true;
         }
 
         private void repeatedCheckbox_Click(object sender, RoutedEventArgs e)
         {
-            CutOperateUtils.repeatedFlag = repeatedCheckbox.IsChecked == true;
+
         }
     }
 }

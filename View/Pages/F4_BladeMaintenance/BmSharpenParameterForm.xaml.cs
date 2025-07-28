@@ -18,6 +18,7 @@ using 精密切割系统.Assets.config.buttom;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
 using 精密切割系统.Helpers;
+using 精密切割系统.Model.cut;
 using 精密切割系统.Model.sqlite;
 using 精密切割系统.Utils;
 using 精密切割系统.View.Controls;
@@ -32,16 +33,16 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
     /// </summary>
     public partial class BmSharpenParameterForm : Page
     {
-        private MainWindow? mainWindow;
-        private RightPage? rightPage;
-
+        private readonly SemiAutoCutService _semiAutoCutService;
+        private MainWindow _mainWindow;
+        private RightPage _rightPage;
         private BmSharpenParameterModel? _model;
         private List<BmSharpenParameterModel> list;
-        // 切割方向 0 前切 1 后切
-        public static int cutDirection = -1;
         public BmSharpenParameterForm()
         {
-            InitializeComponent();            
+            InitializeComponent();
+            _mainWindow = Application.Current.MainWindow as MainWindow ?? new MainWindow();
+            _semiAutoCutService = SemiAutoCutService.Instance;
         }
         //获取参数
         string IdStr;
@@ -50,31 +51,29 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            mainWindow = Application.Current.MainWindow as MainWindow;
-            rightPage = mainWindow.rightFrame.Content as RightPage;
-
+            _rightPage = _mainWindow.rightFrame.Content as RightPage ?? new RightPage();
             //右侧显示
-            rightPage.PanelAction.Visibility = Visibility.Visible;
-            rightPage.btnSure.Visibility = Visibility.Visible; //右侧显示 - 确定按钮显示
-            rightPage.btnBack.Visibility = Visibility.Visible; //右侧显示 - 返回按钮显示
-            rightPage.btnSure.BackFlag = false; //确定按钮不执行返回，执行自己的代理事件。
-            rightPage.btnSure.SetRightClickedHandler(BtnSure_RightClicked); 
-            rightPage.btnBack.BackFlag = false;
-            rightPage.btnBack.SetRightClickedHandler(BtnBack_RightClicked);
-            rightPage.btnCutStart.Visibility = Visibility.Visible;
-            rightPage.btnCutStart.BackFlag = false;
-            rightPage.btnCutStart.SetRightClickedHandler(BtnCutStart_RightClicked);
+            _rightPage.PanelAction.Visibility = Visibility.Visible;
+            _rightPage.btnSure.Visibility = Visibility.Visible; //右侧显示 - 确定按钮显示
+            _rightPage.btnBack.Visibility = Visibility.Visible; //右侧显示 - 返回按钮显示
+            _rightPage.btnSure.BackFlag = false; //确定按钮不执行返回，执行自己的代理事件。
+            _rightPage.btnSure.SetRightClickedHandler(BtnSure_RightClicked); 
+            _rightPage.btnBack.BackFlag = false;
+            _rightPage.btnBack.SetRightClickedHandler(BtnBack_RightClicked);
+            _rightPage.btnCutStart.Visibility = Visibility.Visible;
+            _rightPage.btnCutStart.BackFlag = false;
+            _rightPage.btnCutStart.SetRightClickedHandler(BtnCutStart_RightClicked);
             // 向后切
-            rightPage.btnCutBackward.Visibility = Visibility.Visible;
-            rightPage.btnCutBackward.BackFlag = false;
-            rightPage.btnCutBackward.SetRightClickedHandler(BtnCutBackward_RightClicked);
+            _rightPage.btnCutBackward.Visibility = Visibility.Visible;
+            _rightPage.btnCutBackward.BackFlag = false;
+            _rightPage.btnCutBackward.SetRightClickedHandler(BtnCutBackward_RightClicked);
             // 向前切
-            rightPage.btnCutFront.Visibility = Visibility.Visible;
-            rightPage.btnCutFront.BackFlag = false;
-            rightPage.btnCutFront.SetRightClickedHandler(BtnCutFront_RightClicked);
+            _rightPage.btnCutFront.Visibility = Visibility.Visible;
+            _rightPage.btnCutFront.BackFlag = false;
+            _rightPage.btnCutFront.SetRightClickedHandler(BtnCutFront_RightClicked);
 
             //底部操作按钮
-            mainWindow.UpdateOperatePage(OperateData.GetTab4401Operate(), OperatePage_onClicked);
+            _mainWindow.UpdateOperatePage(OperateData.GetTab4401Operate(), OperatePage_onClicked);
             //获取参数
             IdStr = QueryUtils.GetValueFromQueryParams(this, "Id");
             Flag = QueryUtils.GetValueFromQueryParams(this, "Flag");
@@ -90,29 +89,19 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         {
             // 向前切
             tbCoCutDirection.Text = "向前切";
-            cutDirection = 0;
+            _semiAutoCutService.CutDirection = CutDirection.Forward;
         }
 
         private void BtnCutBackward_RightClicked(object? sender, bool e)
         {
             // 向后切
             tbCoCutDirection.Text = "向后切";
-            cutDirection = 1;
+            _semiAutoCutService.CutDirection = CutDirection.Backward;
         }
 
         private void BtnCutStart_RightClicked(object? sender, bool e)
         {
-            // 检查切割条件
-            if (!CommonCheck.CutStatusCheck())
-            {
-                return;
-            }
-            if (cutDirection == -1)
-            {
-                MaterialSnackUtils.MaterialSnack("请设置切割方向！", MaterialSnackUtils.SnackType.WARNING);
-                return;
-            }
-            mainWindow.NavigateToPage("Pages/F4_BladeMaintenance/BmSharpenParameterRun", "Id=" + IdStr + "&Flag=" + Flag + "&BladeLotID=" + BladeLotID + "&cutDirection=" + cutDirection);
+            _mainWindow.NavigateToPage("Pages/F4_BladeMaintenance/BmSharpenParameterRun", "Id=" + IdStr + "&Flag=" + Flag + "&BladeLotID=" + BladeLotID);
         }
 
         private void OperatePage_onClicked(object? sender, int e)
@@ -123,7 +112,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         //返回到列表页面
         private void BtnBack_RightClicked(object? sender, bool e)
         {
-            mainWindow.NavigateToPage("Pages/F4_BladeMaintenance/BmSharpenParameter");
+            _mainWindow.NavigateToPage("Pages/F4_BladeMaintenance/BmSharpenParameter");
         }
 
         private void BtnSure_RightClicked(object? sender, bool e)
@@ -133,8 +122,8 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             if (success)
             {
                 saveData();
-                //mainWindow.NavigateToPage("Pages/F4_BladeMaintenance/BmSharpenParameter");
-                //mainWindow.mainFrame.Source = new Uri("View/Pages/F4_BladeMaintenance/BmSharpenParameter.xaml", UriKind.Relative);
+                //_mainWindow.NavigateToPage("Pages/F4_BladeMaintenance/BmSharpenParameter");
+                //_mainWindow.mainFrame.Source = new Uri("View/Pages/F4_BladeMaintenance/BmSharpenParameter.xaml", UriKind.Relative);
             }
             else
             {
@@ -185,11 +174,11 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             //手动校准
             if (code == 44011)
             {
-                mainWindow.NavigateToPage("Pages/F2_ManualOperation/MQManualAlignmentConf", "type=4");
+                _mainWindow.NavigateToPage("Pages/F2_ManualOperation/MQManualAlignmentConf", "type=4");
             }
             if (code == 2023)
             {
-                mainWindow.NavigateToPage("Pages/F2_ManualOperation/MQManualAlignmentConf", "type=2&Id=" + IdStr + "&Flag=" + Flag + "&BladeLotID=" + BladeLotID);
+                _mainWindow.NavigateToPage("Pages/F2_ManualOperation/MQManualAlignmentConf", "type=2&Id=" + IdStr + "&Flag=" + Flag + "&BladeLotID=" + BladeLotID);
             }
         }
             //校准参数（6.5）
@@ -217,7 +206,6 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         //数据显示
         private void initView()
         {
-            cutDirection = -1;
             lbBladeLotID.Content = _model.BladeLotID;
             rbMm.IsChecked = true;
             //if (_model.Unit == "inch")

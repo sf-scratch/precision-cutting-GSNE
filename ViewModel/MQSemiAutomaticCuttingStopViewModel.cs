@@ -161,6 +161,50 @@ namespace 精密切割系统.ViewModel
                 }
             }
         }
+
+        private int _runCutLine;
+        public int RunCutLine
+        {
+            get { return _runCutLine; }
+            set
+            {
+                if (_runCutLine != value)
+                {
+                    _runCutLine = value;
+                    OnPropertyChanged("RunCutLine");
+                }
+            }
+        }
+
+        private int _allRunCutLine;
+        public int AllRunCutLine
+        {
+            get { return _allRunCutLine; }
+            set
+            {
+                if (_allRunCutLine != value)
+                {
+                    _allRunCutLine = value;
+                    OnPropertyChanged("AllRunCutLine");
+                }
+            }
+        }
+
+        private string _expectedProcessingEndTime;
+
+        public string ExpectedProcessingEndTime
+        {
+            get { return _expectedProcessingEndTime; }
+            set
+            {
+                if (_expectedProcessingEndTime != value)
+                {
+                    _expectedProcessingEndTime = value;
+                    OnPropertyChanged("ExpectedProcessingEndTime");
+                }
+            }
+        }
+
         public int AllCutLine
         {
             get { return _allCutLine; }

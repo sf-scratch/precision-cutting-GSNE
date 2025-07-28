@@ -180,6 +180,29 @@ namespace 精密切割系统.Helpers
                 {
                     UpdateAppSettings(value.Value);
                 }
+                else
+                {
+                    UpdateAppSettingsToNull();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 自更换刀片起刀片切了多长
+        /// </summary>
+        public static float? AfterReplaceBladeCutLength
+        {
+            get { return GetValue<float>(); }
+            set
+            {
+                if (value is not null)
+                {
+                    UpdateAppSettings(value.Value);
+                }
+                else
+                {
+                    UpdateAppSettingsToNull();
+                }
             }
         }
 

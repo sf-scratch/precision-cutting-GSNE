@@ -153,7 +153,7 @@ namespace 精密切割系统.Assets.config.buttom
         public static List<OperateBean> GetSemiAutoCuttingStopOperate(bool SpeedChange, bool HeightChange)
         {
             var list = new List<OperateBean>();
-            list.Add(new OperateBean(2406, "自动停止", "/Assets/icon/tab_1/03/tab_07.png"));
+            list.Add(new OperateBean(-1, "", "/Assets/icon/tab_1/03/tab_07.png"));
             if (HeightChange) {
                 list.Add(new OperateBean(2401, "高度补偿", "/Assets/icon/tab_1/02/tab_20.png"));
             } else
@@ -269,19 +269,12 @@ namespace 精密切割系统.Assets.config.buttom
             list.Add(new OperateBean(3, "C/T真空", "/Assets/icon/tab_1/02/tab_27.png"));
             return list;
         }
-        
-        // 4.4.1 磨刀中的底部按钮
-        public static List<OperateBean> GetTab4402Operate()
-        {
-            var list = new List<OperateBean>();
-            // list.Add(new OperateBean(4406, "停止", "/Assets/icon/tab_1/02/tab_27.png"));
-            return list;
-        }
+
         // 4.4.1 磨刀暂停的底部按钮
         public static List<OperateBean> GetTab4403Operate()
         {
             var list = new List<OperateBean>();
-            list.Add(new OperateBean(4406, "停止", "/Assets/icon/tab_8/tab_84.png"));
+            //list.Add(new OperateBean(4406, "停止", "/Assets/icon/tab_8/tab_84.png"));
             list.Add(new OperateBean(2442, "对焦", "/Assets/icon/tab_1/03/tab_01.png"));
             /*list.Add(new OperateBean(2407, "基准线调窄", "/Assets/icon/tab_1/03/tab_02.png"));
             list.Add(new OperateBean(2408, "基准线调宽", "/Assets/icon/tab_1/03/tab_05.png"));

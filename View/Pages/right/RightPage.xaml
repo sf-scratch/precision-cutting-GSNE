@@ -152,7 +152,7 @@
                 BackFlag="False"
                 BackgroundDefColor="#39D11A"
                 BackgroundDownColor="#39B41A"
-                ContentText="开始"
+                ContentText="继续"
                 ImagePath="/Assets/icon/right/enter.png"
                 Visibility="Collapsed" />
             <Controls:RightButton
@@ -160,7 +160,15 @@
                 BackFlag="False"
                 BackgroundDefColor="#FFAD00"
                 BackgroundDownColor="#C8AD00"
-                ContentText="暂停/停止"
+                ContentText="暂停"
+                ImagePath="/Assets/icon/right/enter.png"
+                Visibility="Collapsed" />
+            <Controls:RightButton
+                x:Name="btnCutStop"
+                BackFlag="False"
+                BackgroundDefColor="Red"
+                BackgroundDownColor="PaleVioletRed"
+                ContentText="停止"
                 ImagePath="/Assets/icon/right/enter.png"
                 Visibility="Collapsed" />
             <Controls:RightButton

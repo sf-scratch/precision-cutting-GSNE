@@ -96,7 +96,6 @@ namespace 精密切割系统.Driver
             exchangeXPosition = false;
             precutFlag = false;
             _cutLineNum = 0;
-            feedSpeedComp = 0;
             currentFeedSpeed = 0;
             repeatedCount = 0;
             cutMethod = 0;
@@ -109,7 +108,6 @@ namespace 精密切割系统.Driver
             defaultCheckCutNum = 0;
             currentCutLine = 0;
             allRunCutLine = 0;
-            feedSpeedComp = 0;
             zStartLocation = 0;
             cutDirection = errorFlag ? cutDirection : - 1;
             cutType = _cutType;

@@ -225,7 +225,7 @@ namespace 精密切割系统.Model.cut
                         await PlcControl.tagControl.cutting.WaitCutNumUdatedAsync(curCutNum.Value + 1, _usingPauseToken);
                         cutTime++;
                         //触发切割进度更新事件
-                        CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, needCutTimes + _finishedCutTimes, cutTime + _finishedCutTimes, true));
+                        CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, needCutTimes + _finishedCutTimes, cutTime + _finishedCutTimes, 0, 1, 0, true));
                         //停止切割前
                         int beforeStopCutTimes = cutTime + _finishedCutTimes;
                         int checkMarksCutTimes = cutParams.CheckMarksCutTimes > 0 ? cutParams.CheckMarksCutTimes : _checkMarksCutTimes;
@@ -723,7 +723,7 @@ namespace 精密切割系统.Model.cut
         }
     }
 
-    public struct CutServiceProcess(float cutBladeHeight, float cutSpeed, int totalCutTimes, int curCutTimes, bool isCompleted = false)
+    public struct CutServiceProcess(float cutBladeHeight, float cutSpeed, int totalCutTimes, int cutTimes, float cutLength = 0f, int channelNum = 1, float remainingTime = 0, bool isCompleted = false)
     {
         /// <summary>
         /// 切割刀片高度
@@ -736,14 +736,29 @@ namespace 精密切割系统.Model.cut
         public float CutSpeed { get; set; } = cutSpeed;
 
         /// <summary>
-        /// 磨刀总次数
+        /// 切割总次数
         /// </summary>
         public int TotalCutTimes { get; set; } = totalCutTimes;
 
         /// <summary>
-        /// 当前磨刀数
+        /// 当前切割数
         /// </summary>
-        public int CurCutTimes { get; set; } = curCutTimes;
+        public int CutTimes { get; set; } = cutTimes;
+
+        /// <summary>
+        /// 当前切割长度
+        /// </summary>
+        public float CutLength { get; set; } = cutLength;
+
+        /// <summary>
+        /// 切割面
+        /// </summary>
+        public int ChannelNum { get; set; } = channelNum;
+
+        /// <summary>
+        /// 剩余时间
+        /// </summary>
+        public float RemainingTime { get; set; } = remainingTime;
 
         /// <summary>
         /// 当前这刀切割是否完成

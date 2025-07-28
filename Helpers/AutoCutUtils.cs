@@ -66,6 +66,7 @@ namespace 精密切割系统.Helpers
             Task speedZero = PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync();
             await Task.WhenAll(taskXY, taskTheta, speedZero);
             Appsettings.AfterReplaceBladeCutTimes = 0;
+            Appsettings.AfterReplaceBladeCutLength = 0;
             MaterialSnackUtils.MaterialSnack("请打开切割安全门，更换刀片！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
         }
 
@@ -395,7 +396,7 @@ namespace 精密切割系统.Helpers
             // 获取
             float[] feedSpds = Tools.StringToFloatArray(preCutModel.FeedSpd); // 获取进刀速度
             float[] ofLinesList = Tools.StringToFloatArray(preCutModel.OfLines); // 获取切割刀数
-            List<float> cutSpeedList = new List<float>();
+            List<float> cutSpeedList = [];
             // 从预切割开始编号开始
             for (int i = preCutModel.NewBladeNo; i <= feedSpds.Length; i++)
             {
@@ -448,7 +449,6 @@ namespace 精密切割系统.Helpers
                     }
                 }
             }
-
             if (cutParams.CutNum == 0)
             {
                 return CommonResult<List<float>>.Success(cutSpeedList);
@@ -768,18 +768,6 @@ namespace 精密切割系统.Helpers
             line.StartPoint.Y = cutY;
             line.EndPoint.Y = cutY;
             return line;
-        }
-
-        public static List<int> GenerateNumberList(int number)
-        {
-            List<int> list = new List<int>();
-
-            for (int i = 0; i <= number; i++)
-            {
-                list.Add(i);
-            }
-
-            return list;
         }
 
         public static float GetBladeExposedMax(float abAverageThickness)

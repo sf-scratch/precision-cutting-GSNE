@@ -3,6 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:auto="clr-namespace:WpfAutoGrid;assembly=WpfAutoGrid.Core"
       xmlns:local="clr-namespace:精密切割系统.View.Pages.F2_ManualOperation" xmlns:Controls="clr-namespace:精密切割系统.View.Controls" xmlns:common="clr-namespace:精密切割系统.View.Pages.common"
       xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
       mc:Ignorable="d" 
@@ -11,6 +12,11 @@
     <Page.DataContext>
         <viewModel:MQSemiAutomaticCuttingStopViewModel></viewModel:MQSemiAutomaticCuttingStopViewModel>
     </Page.DataContext>
+    <Page.Resources>
+        <Style TargetType="Label">
+            <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+        </Style>
+    </Page.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="50*"/>
@@ -25,100 +31,56 @@
                     <Label Margin="30,30,0,0" Content="暂停 / 修整画面" FontSize="22" FontWeight="Bold"/>
                 </Grid>
                 <Grid>
-                    <StackPanel Margin="30,30,0,0" VerticalAlignment="Center">
-                        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                            <StackPanel Orientation="Horizontal" >
-                                <Label Content="型号参数 No" FontSize="18" FontWeight="Bold" Width="170"/>
-                                <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=DeviceDataNo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="160" IsEnabled="False"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="35,0,0,0">
-                                <Label Content="ID" FontSize="18" FontWeight="Bold" Width="150"/>
-                                <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=DeviceDataId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="160"  IsEnabled="False"/>
-                            </StackPanel>
+                    <auto:AutoGrid Margin="10" Columns="4*,5*,2*,4*,5*,2*" RowCount="7" ChildMargin="5">
+                        <Label Content="型号参数 No" FontSize="18" FontWeight="Bold"/>
+                        <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=DeviceDataNo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
+                        <Label Content="" FontSize="16"></Label>
+                        <Label Content="ID" FontSize="18" FontWeight="Bold"/>
+                        <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=DeviceDataId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
+                        <Label Content="" FontSize="16"></Label>
+                        <Label Content="切割刀数" FontSize="18" FontWeight="Bold"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=RunCutLine, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
+                            <Label Content=" / " FontSize="18"></Label>
+                            <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=AllRunCutLine, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                            <StackPanel Orientation="Horizontal" >
-                                <Label Content="切割面" FontSize="18" FontWeight="Bold" Width="170"/>
-                                <Controls:InputTextBox TextWrapping="Wrap" IsEnabled="False" Text="{Binding Path=ChannelNum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="160"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="35,0,0,0" >
-                                <Label Content="刀片高度" FontSize="18" FontWeight="Bold" Width="150"/>
-                                <Controls:InputTextBox TextWrapping="Wrap" IsEnabled="False" Text="{Binding Path=BladeHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="160"/>
-                                <Label Content="mm" VerticalAlignment="Center" FontSize="16"></Label>
-                            </StackPanel>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                            <StackPanel Orientation="Horizontal">
-                                <Label Content="进刀速度" FontSize="18" FontWeight="Bold" Width="170"/>
-                                <Controls:InputTextBox TextWrapping="Wrap" IsEnabled="False" Text="{Binding Path=FeedSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="160"/>
-                                <Label Content="mm/s" VerticalAlignment="Center" FontSize="16"></Label>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="50 0 0 0" Visibility="Collapsed">
-                                <CheckBox Content="停机检查" FontSize="16" x:Name="stopCheckCheckbox" Height="35" Width="120" VerticalContentAlignment="Center" IsChecked="False" Click="stopCheckCheckbox_Click" >
-                                    <CheckBox.LayoutTransform>
-                                        <TransformGroup>
-                                            <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
-                                            <SkewTransform/>
-                                            <RotateTransform/>
-                                            <TranslateTransform/>
-                                        </TransformGroup>
-                                    </CheckBox.LayoutTransform>
-                                </CheckBox>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Visibility="Collapsed">
-                                <CheckBox Content="循环" x:Name="repeatedCheckbox" Height="35" Width="50" VerticalContentAlignment="Center" 
-              FontSize="16" IsChecked="False" Click="repeatedCheckbox_Click" >
-                                    <CheckBox.LayoutTransform>
-                                        <TransformGroup>
-                                            <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
-                                            <SkewTransform/>
-                                            <RotateTransform/>
-                                            <TranslateTransform/>
-                                        </TransformGroup>
-                                    </CheckBox.LayoutTransform>
-                                </CheckBox>
-                            </StackPanel>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,10,0,0" x:Name="compGrid">
-                            <StackPanel x:Name="HeightChangePanel" Orientation="Horizontal">
-                                <Label Content="刀片高度补偿" FontSize="18" FontWeight="Bold" Width="170"/>
-                                <Controls:InputTextBox TextWrapping="Wrap" InputType="Decimal" XPrecision="3" Text="{Binding Path=DepthCompensation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="160"/>
-                                <Label Content="mm" VerticalAlignment="Center" FontSize="16"></Label>
-                            </StackPanel>
-                            <StackPanel x:Name="SpeedChangePanel" Orientation="Horizontal" >
-                                <Label Content="变更进刀速度" FontSize="18" FontWeight="Bold" Width="150" Margin="3,0,0,0"/>
-                                <Controls:InputTextBox TextWrapping="Wrap" InputType="Decimal" XPrecision="3" Text="{Binding Path=ChangeFeedSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="160"/>
-                                <Label Content="mm/s" VerticalAlignment="Center" FontSize="16"></Label>
-                            </StackPanel>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,10,0,0" x:Name="linesRecordGrid">
-                            <Label Content="自刀片更换算起" FontSize="18" FontWeight="Bold" Width="170"/>
-                            <Controls:InputTextBox TextWrapping="Wrap" IsEnabled="False" Text="{Binding Path=AllCutLine, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="160"/>
-                            <Label Content="lines" VerticalAlignment="Center" FontSize="16"></Label>
-                            <Controls:InputTextBox TextWrapping="Wrap" IsEnabled="False" Text="{Binding Path=AllCutLineLength, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150" Margin="20,0,0,0"/>
-                            <Label Content="m" VerticalAlignment="Center" FontSize="16"></Label>
+                        <Label Content="" FontSize="16"></Label>
+                        <Label Content="切割面" FontSize="18" FontWeight="Bold"/>
+                        <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=ChannelNum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
+                        <Label Content="" FontSize="16"></Label>
+                        <Label Content="刀片高度" FontSize="18" FontWeight="Bold"/>
+                        <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=BladeHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
+                        <Label Content="mm" FontSize="16"></Label>
+                        <Label x:Name="HeightChange1" Content="刀片高度补偿" FontSize="18" FontWeight="Bold"/>
+                        <Controls:InputTextBox x:Name="HeightChange2" TextWrapping="Wrap" InputType="Decimal" XPrecision="3" XMax="0.3" XMin="-0.3" 
+                                               Text="{Binding Path=DepthCompensation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Label x:Name="HeightChange3" Content="mm" FontSize="16"></Label>
+                        <Label Content="进刀速度" FontSize="18" FontWeight="Bold"/>
+                        <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=FeedSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
+                        <Label Content="mm/s" FontSize="16"></Label>
+                        <Label x:Name="ChangeFeedSpeed1" Content="变更进刀速度" FontSize="18" FontWeight="Bold"/>
+                        <Controls:InputTextBox x:Name="ChangeFeedSpeed2" TextWrapping="Wrap" InputType="Decimal" XPrecision="3" XMax="100" XMin="0"
+                                               Text="{Binding Path=ChangeFeedSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Label x:Name="ChangeFeedSpeed3" Content="mm/s" FontSize="16"></Label>
+                        <Label Content="自更换刀片起" FontSize="18" FontWeight="Bold"/>
+                        <StackPanel Orientation="Horizontal" Grid.ColumnSpan="2">
+                            <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=AllCutLine, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
+                            <Label Content="lines" FontSize="16"></Label>
+                            <Label Content="" FontSize="16"></Label>
+                            <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=AllCutLineLength, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
+                            <Label Content="m" FontSize="16"></Label>
                             <Button x:Name="cutRecognition" Visibility="Collapsed" Content="刀痕识别" Width="100" Margin="30 0 0 0" Click="cutRecognition_Click"  FontSize="18" FontWeight="Bold" VerticalAlignment="Center"></Button>
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,10,0,0" x:Name="cutLineWidthGrid" Visibility="Collapsed">
-                            <StackPanel Orientation="Horizontal">
-                                <Label Content="基准线宽度" FontSize="18" FontWeight="Bold" Width="170"/>
-                                <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=CutWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="160" IsEnabled="False" />
-                                <Label Content="mm" VerticalAlignment="Center" FontSize="16"></Label>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <Label Content="崩边宽度" FontSize="18" FontWeight="Bold" Width="150" Margin="3,0,0,0"/>
-                                <Controls:InputTextBox TextWrapping="Wrap" IsEnabled="False" Text="{Binding Path=DdgesWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="160"/>
-                                <Label Content="mm" VerticalAlignment="Center" FontSize="16"></Label>
-                            </StackPanel>
-                        </StackPanel>
-                        <Grid Height="83" Width="750" x:Name="dimmingGrid" Visibility="Collapsed" Margin="0,10,0,0">
-                            <common:CommonDimming></common:CommonDimming>
-                        </Grid>
-                        <Grid Margin="0 20" Height="225" Width="600">
-                            <common:CommonDirection></common:CommonDirection>
-                        </Grid>
-                    </StackPanel>
+                        <Label Content="预计结束时间" FontSize="18" FontWeight="Bold"/>
+                        <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=ExpectedProcessingEndTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
+                        <Label Content="" FontSize="16"></Label>
+                    </auto:AutoGrid>
                 </Grid>
+                <StackPanel Margin="30,30,0,0" VerticalAlignment="Center">
+                    <Grid Margin="0 20" Height="225" Width="600">
+                        <common:CommonDirection></common:CommonDirection>
+                    </Grid>
+                </StackPanel>
             </StackPanel>
         </Grid>
     </Grid>

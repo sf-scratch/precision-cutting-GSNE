@@ -907,7 +907,7 @@ namespace 精密切割系统.ViewModel
             Application.Current.Dispatcher.Invoke(() =>
             {
                 CutSpeed = process.CutSpeed;
-                CutProgress = string.Format("{0}/{1}", process.CurCutTimes, process.TotalCutTimes);
+                CutProgress = string.Format("{0}/{1}", process.CutTimes, process.TotalCutTimes);
                 if (process.IsCompleted)
                 {
                     AfterReplaceBladeCutTimes++;

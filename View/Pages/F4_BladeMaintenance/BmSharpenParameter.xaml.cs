@@ -33,7 +33,6 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
     {
         private MainWindow? mainWindow;
         private RightPage? rightPage;
-
         private BmSharpenParameterModel? _model;
         private List<BmSharpenParameterModel> list;
         //3列数据展示
@@ -72,11 +71,6 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             this.BtnOnClicked(code);
         }
         private async void BtnOnClicked(int code) {
-            //var item = pre_listView.SelectedItem as BmSharpenParameterModel;
-            //if (item == null)
-            //{
-            //    return;
-            //}
             _model = null;
             string BladeLotID = labParameterNo.Text.Trim();
             if (!string.IsNullOrEmpty(BladeLotID))
@@ -94,31 +88,12 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             //拷贝
             if (code == 4400)
             {
-                //List<BmSharpenParameterModel> list = await SqlHelper.QueryAsync<BmSharpenParameterModel>("select * from bm_sharpen_parameter order by id desc limit 1");
-                //string BladeLotID = "0";
-                //if (list.Count > 0) {
-                //    BladeLotID = list[0].Id.ToString();
-                //}
-                //mainWindow.mainFrame.Source = new Uri($"View/Pages/F4_BladeMaintenance/BmSharpenParameterForm.xaml?Id={item.Id}&Flag=copy&BladeLotID={BladeLotID}" , UriKind.Relative);
                 //页面 中输入参数号 按enter 确定执行拷贝
                 mainWindow.mainFrame.Source = new Uri($"View/Pages/F4_BladeMaintenance/FADressDataCopyConf.xaml?Id={_model.Id}", UriKind.Relative);
             }
             //删除
             if (code == 4401)
             {
-                //string message = "Are you sure you want to delete?";
-                //string title = "Delete Confirmation";
-                //MessageBoxResult result = MessageBox.Show(message, title, MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-                //if (result == MessageBoxResult.Yes)
-                //{
-                //    // 执行删除操作 
-                //    int delInt = await SqlHelper.DeleteAsync(_model);
-                //    if (delInt == 1)
-                //    {
-                //        Col0_99.RemoveAt(pre_listView.SelectedIndex);
-                //    }
-                //}
                 if (!string.Equals(_model.BladeLotID, "0")) {
                     mainWindow.mainFrame.Source = new Uri($"View/Pages/F4_BladeMaintenance/FADressDataDelConf.xaml?Id={_model.Id}", UriKind.Relative);
                 }
@@ -127,11 +102,6 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 
         private void BtnSure_RightClicked(object? sender, bool e)
         {
-            //var item = pre_listView.SelectedItem as BmSharpenParameterModel;
-            //if (item == null)
-            //{
-            //    return;
-            //}
             _ = loadToParameter();
         }
 
@@ -149,7 +119,6 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             }
 
         }
-
 
         private async Task initData()
         {

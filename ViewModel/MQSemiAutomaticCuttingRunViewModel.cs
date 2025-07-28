@@ -13,14 +13,14 @@ namespace 精密切割系统.ViewModel
         private string _deviceDataNo;
         private string _deviceDataId;
         private string _channelNum;
-        private string _bladeHeight;
-        private string _feedSpeed;
+        private float _bladeHeight;
+        private float _feedSpeed;
         private string _depthCompensation;
         private string _changeFeedSpeed;
         private int _runCutLine;
         private int _allRunCutLine;
         private int _allCutLine; 
-        private string _allCutLineLength; 
+        private float _allCutLineLength; 
 
 
         public string DirectoryId
@@ -92,8 +92,24 @@ namespace 精密切割系统.ViewModel
             }
         }
 
+
+        private string _expectedProcessingEndTime;
+
+        public string ExpectedProcessingEndTime
+        {
+            get { return _expectedProcessingEndTime; }
+            set
+            {
+                if (_expectedProcessingEndTime != value)
+                {
+                    _expectedProcessingEndTime = value;
+                    OnPropertyChanged("ExpectedProcessingEndTime");
+                }
+            }
+        }
+
         // BladeHeight
-        public string BladeHeight
+        public float BladeHeight
         {
             get { return _bladeHeight; }
             set
@@ -107,7 +123,7 @@ namespace 精密切割系统.ViewModel
         }
 
         // FeedSpeed
-        public string FeedSpeed
+        public float FeedSpeed
         {
             get { return _feedSpeed; }
             set
@@ -173,7 +189,7 @@ namespace 精密切割系统.ViewModel
                 }
             }
         }
-        public string AllCutLineLength
+        public float AllCutLineLength
         {
             get { return _allCutLineLength; }
             set
