@@ -346,12 +346,10 @@ namespace 精密切割系统
             CommonEvent.BtnScaleDown(shortcutDirectBtn, 0);
         }
 
-        public void UpdateOperatePage(List<OperateBean> operateBeans, EventHandler<int> _onClicked
-            , EventHandler<int> _touchLeave=null, EventHandler<int> _touchDown=null)
+        public void UpdateOperatePage(List<OperateBean> operateBeans, EventHandler<int> _onClicked, EventHandler<int> _touchLeave = null, EventHandler<int> _touchDown = null)
         {
             operatePage.SetOperateShowType(0);
             shortcutTopBtnSel = false;
-
             operatePage.UpdateOperate(operateBeans);
             operatePage.SetOnClickedHandler(_onClicked, _touchLeave, _touchDown);
         }

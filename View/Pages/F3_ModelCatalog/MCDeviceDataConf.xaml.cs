@@ -798,7 +798,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 FrameworkElementFactory inputFactory = new FrameworkElementFactory(typeof(InputTextBox));
                 inputFactory.SetValue(InputTextBox.WidthProperty, 135.0);
                 inputFactory.SetValue(InputTextBox.HeightProperty, 30.0);
-                inputFactory.SetValue(InputTextBox.MarginProperty, new Thickness(0, 10, 0, 0));
+                inputFactory.SetValue(InputTextBox.MarginProperty, new Thickness(0, 0, 0, 0));
                 inputFactory.SetValue(InputTextBox.PaddingProperty, new Thickness(0));
                 inputFactory.SetBinding(InputTextBox.TextProperty, new Binding("Column" + i));
                 inputFactory.SetBinding(InputTextBox.InputTypeProperty, new Binding("intputType"));

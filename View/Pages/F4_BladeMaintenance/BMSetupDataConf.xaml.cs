@@ -1,6 +1,7 @@
 ﻿using Emgu.CV.Dnn;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -18,12 +19,16 @@ using 精密切割系统.Assets.config.buttom;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
+using 精密切割系统.Model.common;
+using 精密切割系统.Model.MeasureHeight;
 using 精密切割系统.Model.plc;
+using 精密切割系统.PubSubEvent;
 using 精密切割系统.Utils;
 using 精密切割系统.View.Controls;
 using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.operate;
 using 精密切割系统.ViewModel;
+using static 精密切割系统.Helpers.MaterialSnackUtils;
 
 namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 {
@@ -32,100 +37,110 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
     /// </summary>
     public partial class BMSetupDataConf : Page
     {
-        private MainWindow? mainWindow;
-        private RightPage? rightPage;
-        private OperatePage? operatePage;
+        private readonly IEventAggregator _eventAggregator;
+        private MainWindow _mainWindow;
+        private RightPage _rightPage;
+        private OperatePage _operatePage;
+        private BladeHeightViewModel _viewModel;
+        private BladeHeightModel _bladeHeightModel;
 
-        BladeHeightViewModel viewModel = new BladeHeightViewModel();
-        public BladeHeightModel _bladeHeightModel;
-        private string RePage = null;
-        private string RePageId = null;
         public BMSetupDataConf()
         {
             InitializeComponent();
+            _eventAggregator = ContainerLocator.Current.Resolve<IEventAggregator>();
+            _viewModel = new BladeHeightViewModel();
+            RealTimeInfo.Messages = [];
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            RePage = QueryUtils.GetValueFromQueryParams(this, "RePage");
-            RePageId = QueryUtils.GetValueFromQueryParams(this, "RePageId");
-            mainWindow = Application.Current.MainWindow as MainWindow;
-            rightPage = mainWindow.rightFrame.Content as RightPage;
-            operatePage = mainWindow.operateFrame.Content as OperatePage;
+            _mainWindow = Application.Current.MainWindow as MainWindow ?? new MainWindow();
+            _rightPage = _mainWindow.rightFrame.Content as RightPage ?? new RightPage(); ;
+            _operatePage = _mainWindow.operateFrame.Content as OperatePage ?? new OperatePage();
             //底部操作按钮
-            operatePage.UpdateOperate([]);
-            //operatePage.SetOnClickedHandler(OperatePage_onClicked);
-            rightPage.PanelAction.Visibility = Visibility.Visible;
-            rightPage.btnBack.Visibility = Visibility.Visible;
-            rightPage.btnBack.BackFlag = false;
-            rightPage.btnBack.SetRightClickedHandler(BtnBack_RightClicked);
-            rightPage.btnSure.Visibility = Visibility.Visible;
-            rightPage.btnSure.BackFlag = false;
-            rightPage.btnSure.SetRightClickedHandler(BtnSure_RightClicked);
-
-            loadDBData();
+            _operatePage.UpdateOperate([]);
+            _rightPage.PanelAction.Visibility = Visibility.Visible;
+            _rightPage.btnBack.Visibility = Visibility.Visible;
+            _rightPage.btnBack.BackFlag = false;
+            _rightPage.btnBack.SetRightClickedHandler(BtnBack_RightClicked);
+            _rightPage.btnSure.Visibility = Visibility.Visible;
+            _rightPage.btnSure.BackFlag = false;
+            _rightPage.btnSure.SetRightClickedHandler(BtnSure_RightClicked);
+            _rightPage.btnStartSetup.Visibility = Visibility.Visible;
+            _rightPage.btnStartSetup.BackFlag = false;
+            _rightPage.btnStartSetup.SetRightClickedHandler(StartMeasureHeight);
+            LoadDBData();
+            RealTimeInfo.Messages.Add(MessageModel.Create("进入测高界面..."));
         }
 
-        public async void loadDBData()
+        private async void StartMeasureHeight(object? sender, bool e)
+        {
+            try
+            {
+                _eventAggregator.GetEvent<AutoRuningMessageEvent>().Subscribe(OnMessageReceived, ThreadOption.UIThread);
+                await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
+                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(55.5f / 2 - 10.2f);
+                CommonResult<float> curHeightZ = await AutoCutUtils.ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, _eventAggregator, default);
+                if (!curHeightZ.IsSuccess)
+                {
+                    MaterialSnack(curHeightZ.Message, SnackType.WARNING, 0);
+                    return;
+                }
+            }
+            finally
+            {
+                _eventAggregator.GetEvent<AutoRuningMessageEvent>().Unsubscribe(OnMessageReceived);
+            }
+        }
+
+        private void OnMessageReceived(MessageModel model)
+        {
+            RealTimeInfo.Messages.Add(model);
+        }
+
+        public async void LoadDBData()
         {
             List<BladeHeightModel> list = await SqlHelper.TableAsync<BladeHeightModel>().Where(t => t.Id == 1).ToListAsync();
             if (list.Count > 0)
             {
-                viewModel._bladeHeightModel = list[0];
-                //Debug.WriteLine("list[0].BladeUnit==" + list[0].Unit);
-                //if (list[0].Unit.Equals("mm"))
-                //{
-                //    viewModel.IsBladeUnitMm = true;
-                //}
-                //else if (list[0].Unit.Equals("inch"))
-                //{
-                //    viewModel.IsBladeUnitInch = true;
-                //}                
-                DataContext = viewModel;
+                _viewModel._bladeHeightModel = list[0];           
             }
             else
             {
-                await SqlHelper.AddAsync(viewModel._bladeHeightModel);
-                
+                await SqlHelper.AddAsync(_viewModel._bladeHeightModel);
             }
-            DataContext = viewModel;
-
-            viewModel.SetupDefault = "CONTACT";
-            viewModel.CallOperatorWhenAutoSetup = "NO";
-            viewModel.PrecutAfterNonContactSetup = "NO";
+            DataContext = _viewModel;
+            _viewModel.SetupDefault = "CONTACT";
+            _viewModel.CallOperatorWhenAutoSetup = "NO";
+            _viewModel.PrecutAfterNonContactSetup = "NO";
             
 
         }
         private void BtnBack_RightClicked(object? sender, bool e)
         {
-            //GlobalParams.globalRunFlag = true;
-            //Tools.AwaitForStatusFinishAsync(DeviceKey.bladeMantanceStatusKey, (bool flag) =>
-            //{
-            //    PlcControl.tagControl.bladeMantance.RunBladeReplace(0);
-            //    mainWindow.NavigateToPage("MainMenu");
-            //    GlobalParams.globalRunFlag = false;
-            //}, timeoutSeconds: 15);
-            if (!string.IsNullOrEmpty(RePage))
+            string rePapg = QueryUtils.GetValueFromQueryParams(this, "RePage");
+            string rePageId = QueryUtils.GetValueFromQueryParams(this, "RePageId");
+            if (!string.IsNullOrEmpty(rePapg))
             {
-                mainWindow.NavigateToPage(RePage, $"id={RePageId}");
+                _mainWindow.NavigateToPage(rePapg, $"id={rePageId}");
                 return;
             }
-            mainWindow.NavigateToPage("MainMenu");
+            _mainWindow.NavigateToPage("MainMenu");
         }
 
-        private async void BtnSure_RightClicked(object sender, bool e)
+        private async void BtnSure_RightClicked(object? sender, bool e)
         {
-            if (string.IsNullOrEmpty(viewModel.ChuckTableSize))
+            if (string.IsNullOrEmpty(_viewModel.ChuckTableSize))
             {
                 MaterialSnackUtils.MaterialSnack("请选择工作盘尺寸", MaterialSnackUtils.SnackType.ERROR);
                 return;
             }
-            if (string.IsNullOrEmpty(viewModel.ChuckTableShape))
+            if (string.IsNullOrEmpty(_viewModel.ChuckTableShape))
             {
                 MaterialSnackUtils.MaterialSnack("请选择工作盘形状", MaterialSnackUtils.SnackType.ERROR);
                 return;
             }
-            if (string.IsNullOrEmpty(viewModel.TableType))
+            if (string.IsNullOrEmpty(_viewModel.TableType))
             {
                 MaterialSnackUtils.MaterialSnack("请选择工作盘种类", MaterialSnackUtils.SnackType.ERROR);
                 return;
@@ -134,11 +149,9 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             var success = this.FormSuccess();
             if (success)
             {
-                await saveData();
+                await SaveData();
                 MaterialSnackUtils.MaterialSnack("操作成功", MaterialSnackUtils.SnackType.SUCCESS);
-                PlcControl.tagControl.bladeMantance.SetSetupParams(viewModel._bladeHeightModel);
-                //mainWindow.NavigateToPage("MainMenu");
-                //mainWindow.mainFrame.Source = new Uri("View/Pages/F4_BladeMaintenance/BmSharpenParameter.xaml", UriKind.Relative);
+                PlcControl.tagControl.bladeMantance.SetSetupParams(_viewModel._bladeHeightModel);
             }
             else
             {
@@ -146,14 +159,14 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             }
         }
 
-        public async Task saveData()
+        public async Task SaveData()
         {
-            _bladeHeightModel = viewModel._bladeHeightModel;
-            if (viewModel.IsBladeUnitInch)
+            _bladeHeightModel = _viewModel._bladeHeightModel;
+            if (_viewModel.IsBladeUnitInch)
             {
                 _bladeHeightModel.Unit = "inch";
             }
-            else if (viewModel.IsBladeUnitMm)
+            else if (_viewModel.IsBladeUnitMm)
             {
                 _bladeHeightModel.Unit = "mm";
             }
@@ -192,9 +205,5 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         {
             return !FormError();
         }
-
-
-
-
     }
 }

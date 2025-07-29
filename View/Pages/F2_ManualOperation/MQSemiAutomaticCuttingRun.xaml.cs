@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using NPOI.POIFS.Crypt.Dsig;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
@@ -30,7 +31,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
     /// </summary>
     public partial class MQSemiAutomaticCuttingRun : Page
     {
-        MQSemiAutomaticCuttingRunViewModel _viewModel;
+        private MQSemiAutomaticCuttingRunViewModel _viewModel;
         private readonly SemiAutoCutService _semiAutoCutService;
         private readonly MainWindow _mainWindow;
         private RightPage _rightPage;
@@ -44,6 +45,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             _pauseCts = new CancellationTokenSource();
             _monitoringCts = new CancellationTokenSource();
             _mainWindow = Application.Current.MainWindow as MainWindow ?? new MainWindow();
+            _mainWindow.UpdateOperatePage([], null);
 
         }
 
@@ -160,7 +162,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 MaterialSnack(checkResult.Message, SnackType.WARNING);
                 return;
             }
-            CommonResult<List<CutStep>> cutStepResult = await GenerateCutStepListAsync();
+            CommonResult<List<CutStep>> cutStepResult = await GenerateCutStepListAsync(_semiAutoCutService.IsOpenPrecut);
             if (!cutStepResult.IsSuccess || cutStepResult.Data is null)
             {
                 MaterialSnack(cutStepResult.Message, SnackType.WARNING);
@@ -189,6 +191,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 CircularWorkpiece workpiece = new(GlobalParams.ThetaCenterPoint, GlobalParams.WorkpieceRadius, await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0);
                 _semiAutoCutService.CutServiceProcessChanged += CutService_CutServiceProcessChanged;
                 _semiAutoCutService.CutServicePaused += CutService_CutServicePaused;
+                MaterialSnack($"切割中...", SnackType.SUCCESS, 0);
                 RunResult cutResult = await _semiAutoCutService.RunAsync(cutStepResult.Data, workpiece, 30, spindleRev, curHeightZ.Data, GlobalParams.BladeLiftingHeight);
                 if (!cutResult.IsSuccess)
                 {
@@ -329,7 +332,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             });
         }
 
-        private async Task<CommonResult<List<CutStep>>> GenerateCutStepListAsync()
+        private async Task<CommonResult<List<CutStep>>> GenerateCutStepListAsync(bool isOpenPrecut)
         {
             //获取功能选择数据
             var selectionModels = await SqlHelper.TableAsync<FunctionSelectionModel>().Where(t => t.Id == 1).ToListAsync();
@@ -399,6 +402,26 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 else
                 {
                     cutSteps.AddRange(tempCutSteps.GetRange(0, chCutLines));
+                }
+            }
+            if (isOpenPrecut)
+            {
+                CommonResult<List<float>> preCutSpeedResult = AutoCutUtils.GetPreCutSpeedList();
+                if (!preCutSpeedResult.IsSuccess || preCutSpeedResult.Data is null)
+                {
+                    return CommonResult<List<CutStep>>.Failure(preCutSpeedResult.Message);
+                }
+                List<float> speeds = preCutSpeedResult.Data;
+                if (speeds.Count > cutSteps.Count)
+                {
+                    speeds = speeds.GetRange(0, cutSteps.Count);
+                }
+                for (int i = 0; i < speeds.Count; i++)
+                {
+                    if (speeds[i] < cutSteps[i].Speed)
+                    {
+                        cutSteps[i] = cutSteps[i] with { Speed = speeds[i] };
+                    }
                 }
             }
             return CommonResult<List<CutStep>>.Success(cutSteps);

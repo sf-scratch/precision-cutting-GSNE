@@ -21,18 +21,10 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <Label x:Name="labCgcsHeader" Content="测高参数(3.4)" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"  FontWeight="Bold" FontSize="22"/>
         <StackPanel Grid.Row="1" Grid.Column="0" x:Name="sp1" HorizontalAlignment="Left" >
-            
-            <!-- <StackPanel >
-                <Label x:Name="labUnit" Height="35" Content="单位" FontWeight="Bold" FontSize="16" />
-            </StackPanel>
-            <StackPanel  Margin="0,0,0,0" Orientation="Horizontal" >
-                <RadioButton IsChecked="{Binding Path=IsBladeUnitMm,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" x:Name="rbMm" Content="mm" FontWeight="Bold" FontSize="18" Height="35" Width="70"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="5,0,0,0"/>
-                <RadioButton IsChecked="{Binding Path=IsBladeUnitInch,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" x:Name="rbInch" Content="inch" FontWeight="Bold" FontSize="18" Height="35"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"  Width="70" Margin="30,0,0,0" />
-            </StackPanel>
-            -->
             <StackPanel Margin="0,10,0,0" >
                 <Label x:Name="labSpindleRev"  Height="35" Content="旋转轴转速" FontWeight="Bold" FontSize="16" />
                 <StackPanel Orientation="Horizontal" >
@@ -81,57 +73,7 @@
                     <Label Height="35" Content="次" FontWeight="Bold" FontSize="16" />
                 </StackPanel>
             </StackPanel>
-            <!-- 
-            <StackPanel Margin="0,10,0,0" >
-                <Label x:Name="labBladeWearCheck"  Height="35" Content="测高时刀片消耗量检查" FontWeight="Bold" FontSize="16" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" >
-                <StackPanel>
-                    <Label x:Name="labExcessiveWear"  Height="35" Content="最大消耗量" FontWeight="Bold" FontSize="16" />
-                    <StackPanel Width="200" Orientation="Horizontal" >
-                        <Controls:InputTextBox x:Name="tbExcessiveWear" Text="{Binding Path=ExcessiveWear,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Width="160"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XPrecision="3" />
-                        <Label Height="35" Content="mm" FontWeight="Bold" FontSize="14" />
-                    </StackPanel>
-                </StackPanel>
-                <StackPanel>
-                    <Label x:Name="labInsufficientWear"  Height="35" Content="不足消耗量" FontWeight="Bold" FontSize="16" />
-                    <StackPanel Width="200" Orientation="Horizontal" >
-                        <Controls:InputTextBox x:Name="tbInsufficientWear" Text="{Binding Path=InsufficientWear,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Width="160"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XPrecision="3" />
-                        <Label Height="35" Content="mm" FontWeight="Bold" FontSize="14" />
-                    </StackPanel>
-                </StackPanel>
-            </StackPanel>
-            <StackPanel Width="600" Margin="0,10,0,0" Orientation="Horizontal">
-                <Label Width="200"  Height="35" Content="" FontWeight="Bold" FontSize="16" />
-                <Label x:Name="labNonContact" Width="200"  Height="35" Content="非接触" FontWeight="Bold" FontSize="16" />
-                <Label x:Name="labCT" Width="200"   Height="35" Content="C/T" FontWeight="Bold" FontSize="16" />
-            </StackPanel>
-            <StackPanel Width="600" Orientation="Horizontal">
-                <Label x:Name="labPermissbleAmount" Width="200"  Height="35" Content="测高时的容许值" FontWeight="Bold" FontSize="16" />
-                <StackPanel Width="200" Orientation="Horizontal" >
-                    <Controls:InputTextBox x:Name="tbPermissibleAmountNonContact" Text="{Binding Path=PermissibleAmountNonContact,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Width="160"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XPrecision="3" />
-                    <Label Height="35" Content="mm" FontWeight="Bold" FontSize="14" />
-                </StackPanel>
-                <StackPanel Width="200" Orientation="Horizontal" >
-                    <Controls:InputTextBox x:Name="tbPermissibleAmountCt" Text="{Binding Path=PermissibleAmountCt,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Width="160"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XPrecision="3" />
-                    <Label Height="35" Content="mm" FontWeight="Bold" FontSize="14" />
-                </StackPanel>
-            </StackPanel>
-            <StackPanel Width="600" Margin="0,10,0,0" Orientation="Horizontal">
-                <Label x:Name="labBladeBlowTime" Width="200"  Height="35" Content="刀片吹气时间" FontWeight="Bold" FontSize="16" />
-                <StackPanel Width="200" Orientation="Horizontal" >
-                    <Controls:InputTextBox x:Name="tbBladeBlowTimeNonContact" Text="{Binding Path=BladeBlowTimeNonContact,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Width="160"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XPrecision="3" />
-                    <Label Height="35" Content="s" FontWeight="Bold" FontSize="14" />
-                </StackPanel>
-                <StackPanel Width="200" Orientation="Horizontal" >
-                    <Controls:InputTextBox x:Name="tbBladeBlowTimeCt" Text="{Binding Path=BladeBlowTimeCt,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Width="160"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XPrecision="3" />
-                    <Label Height="35" Content="s" FontWeight="Bold" FontSize="14" />
-                </StackPanel>
-            </StackPanel>
-            -->
-            
         </StackPanel>
-
         <StackPanel Grid.Row="1" Grid.Column="1" x:Name="sp2"  Margin="60,00,0,0" HorizontalAlignment="Left">
             <StackPanel Margin="0,10,0,0" >
                 <Label x:Name="labChuckTableSize"  Height="35" Content="工作盘尺寸" FontWeight="Bold" FontSize="16" />
@@ -243,52 +185,17 @@
             </StackPanel>
             -->
         </StackPanel>
-        
         <StackPanel Grid.Row="1" Grid.Column="2" x:Name="sp3" Margin="20,00,0,0" HorizontalAlignment="Left">
-            <!--
-            <StackPanel Width="550" Margin="0,10,0,0" Orientation="Horizontal">
-                <Label Width="150"  Height="35" Content="" FontWeight="Bold" FontSize="16" />
-                <Label Width="200"  Height="35" Content="非接触" FontWeight="Bold" FontSize="16" />
-                <Label Width="200"   Height="35" Content="C/T" FontWeight="Bold" FontSize="16" />
-            </StackPanel>
-            <StackPanel Width="550" Margin="0,10,0,0" Orientation="Horizontal">
-                <Label x:Name="labSetupHighSpeed" Width="150"  Height="35" Content="测高高速移动速度" FontWeight="Bold" FontSize="16" />
-                <StackPanel Width="200" Orientation="Horizontal" >
-                    <Controls:InputTextBox x:Name="tbHighSpeedNonContact" Text="{Binding Path=HighSpeedNonContact,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Width="160"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XPrecision="3" />
-                    <Label Height="35" Content="mm" FontWeight="Bold" FontSize="14" />
-                </StackPanel>
-                <StackPanel Width="200" Orientation="Horizontal" >
-                    <Controls:InputTextBox x:Name="tbHighSpeedCt" Text="{Binding Path=HighSpeedCt,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Width="160"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XPrecision="3" />
-                    <Label Height="35" Content="mm" FontWeight="Bold" FontSize="14" />
-                </StackPanel>
-            </StackPanel>
-            <StackPanel Width="550" Margin="0,10,0,0" Orientation="Horizontal">
-                <Label x:Name="labSetupLowSpeed" Width="150"  Height="35" Content="测高低速移动速度" FontWeight="Bold" FontSize="16" />
-                <StackPanel Width="200" Orientation="Horizontal" >
-                    <Controls:InputTextBox x:Name="tbLowSpeedNonContact" Text="{Binding Path=LowSpeedNonContact,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Width="160"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XPrecision="3" />
-                    <Label Height="35" Content="mm" FontWeight="Bold" FontSize="14" />
-                </StackPanel>
-                <StackPanel Width="200" Orientation="Horizontal" >
-                    <Controls:InputTextBox x:Name="tbLowSpeedCt" Text="{Binding Path=LowSpeedCt,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Width="160"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XPrecision="3" />
-                    <Label Height="35" Content="mm" FontWeight="Bold" FontSize="14" />
-                </StackPanel>
-            </StackPanel>
-            <StackPanel Width="550" Margin="0,10,0,0" Orientation="Horizontal">
-                <Label x:Name="labSetupLowSpeedStroke" Width="150"  Height="35" Content="测高低速移动范围" FontWeight="Bold" FontSize="16" />
-                <StackPanel Width="200" Orientation="Horizontal" >
-                    <Controls:InputTextBox x:Name="tbLowSpeedStrokeNonContact" Text="{Binding Path=LowSpeedStrokeNonContact,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Width="160"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XPrecision="3" />
-                    <Label Height="35" Content="mm" FontWeight="Bold" FontSize="14" />
-                </StackPanel>
-                <StackPanel Width="200" Orientation="Horizontal" >
-                    <Controls:InputTextBox x:Name="tbLowSpeedStrokeCt" Text="{Binding Path=LowSpeedStrokeCt,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Width="160"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XPrecision="3" />
-                    <Label Height="35" Content="mm" FontWeight="Bold" FontSize="14" />
-                </StackPanel>
-            </StackPanel>
-            
             <StackPanel Margin="0,10,0,0" >
                 <Label x:Name="labRotationForContactSetup"  Height="35" Content="测高时θ轴移动角度" FontWeight="Bold" FontSize="16" />
                 <StackPanel Orientation="Horizontal" >
                     <Controls:InputTextBox x:Name="tbThetaRotationForContactSetup" Width="250" Text="{Binding Path=ThetaRotationForContactSetup,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XPrecision="3" />
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Margin="0,10,0,0" >
+                <Label x:Name="labRotationForStartPosition"  Height="35" Content="测高时θ轴开始移动位置" FontWeight="Bold" FontSize="16" />
+                <StackPanel Orientation="Horizontal" >
+                    <Controls:InputTextBox x:Name="tbThetaRotationForStartPosition" Width="250" Text="{Binding Path=ThetaRotationForStartPosition,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XPrecision="3" />
                 </StackPanel>
             </StackPanel>
             <StackPanel Margin="0,10,0,0" >
@@ -303,21 +210,7 @@
                     <Controls:InputTextBox x:Name="tbThetaRotationForNowPosition" Width="250" Text="{Binding Path=ThetaRotationForNowPosition,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XPrecision="3" />
                 </StackPanel>
             </StackPanel>
-            <StackPanel Margin="0,10,0,0" >
-                <Label x:Name="labRotationForStartPosition"  Height="35" Content="测高时θ轴开始移动位置" FontWeight="Bold" FontSize="16" />
-                <StackPanel Orientation="Horizontal" >
-                    <Controls:InputTextBox x:Name="tbThetaRotationForStartPosition" Width="250" Text="{Binding Path=ThetaRotationForStartPosition,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XPrecision="3" />
-                </StackPanel>
-            </StackPanel>
-            <StackPanel Margin="0,10,0,0" >
-                <Label x:Name="labChuckTableRotationComoleted"  Height="35" Content="现在测高θ轴的位置返回次数" FontWeight="Bold" FontSize="16" />
-                <StackPanel Orientation="Horizontal" >
-                    <Controls:InputTextBox x:Name="tbChuckTableRotationCompleted" Width="250" Text="{Binding Path=ChuckTableRotationCompleted,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  TextWrapping="Wrap"  Height="35" InputType="Numeral" XMin="0" XMax="1000"/>
-                    <Label Height="35" Content="times" FontWeight="Bold" FontSize="14" />
-                </StackPanel>
-            </StackPanel>
-            -->
-
         </StackPanel>
+        <Controls:RealTimeInfoBox x:Name="RealTimeInfo" Grid.Row="1" Grid.Column="3" Margin="50,0,0,0" Width="400"/>
     </Grid>
 </Page>

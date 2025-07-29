@@ -414,6 +414,35 @@ namespace 精密切割系统.Helpers
             return cutSpeedList;
         }
 
+        public static CommonResult<List<float>> GetPreCutSpeedList()
+        {
+            PreCutModel preCutModel = CurrentUtils.GetPreCutModel();
+            //起始为0，直接返回空集合
+            if (preCutModel.NewBladeNo == 0)
+            {
+                return CommonResult<List<float>>.Success([]);
+            }
+            // 获取
+            float[] feedSpds = Tools.StringToFloatArray(preCutModel.FeedSpd); // 获取进刀速度
+            float[] ofLinesList = Tools.StringToFloatArray(preCutModel.OfLines); // 获取切割刀数
+            List<float> cutSpeed = [];
+            // 从预切割开始编号开始
+            for (int i = preCutModel.NewBladeNo; i <= feedSpds.Length; i++)
+            {
+                // 获取进刀速度
+                float feedspeed = feedSpds[i - 1];
+                float cutLine = ofLinesList[i - 1];
+                if (feedspeed != 0 && cutLine != 0)
+                {
+                    for (int j = 0; j < cutLine; j++)
+                    {
+                        cutSpeed.Add(feedspeed);
+                    }
+                }
+            }
+            return CommonResult<List<float>>.Success(cutSpeed);
+        }
+
         /// <summary>
         /// 预切割序列
         /// </summary>
@@ -621,6 +650,30 @@ namespace 精密切割系统.Helpers
             Task focusxyTask = PlcControl.tagControl.cutting.RunMotionAsync(cameraCenterPoint.X - 10, cameraRelativeBladePosition.Y + Appsettings.CutY ?? cameraCenterPoint.Y + 30, token);
             Task focusThetaTask = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(thetaDeg);
             await Task.WhenAll(focusxyTask, focusThetaTask);
+        }
+
+        public static async Task<CommonResult<float>> AutoCoarseFocusAsync(IEventAggregator? eventAggregator = null, CancellationToken token = default)
+        {
+            eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始相机对焦..."));
+            CameraCommon? cameraCommon = GetCameraCommon();
+            if (cameraCommon is null)
+            {
+                return CommonResult<float>.Failure("相机获取失败！");
+            }
+            float focusClearZ = Appsettings.FocusClearZ ?? 0;
+            await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(focusClearZ, 2, token);
+            // 模糊度大于200时，直接返回清晰位置
+            if (cameraCommon.localBitmap != null)
+            {
+                double tenengradBlurriness = VisualUtils.CalculateTenengrad2(cameraCommon.localBitmap);
+                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"当前位置：{focusClearZ} 当前模糊度：{tenengradBlurriness}"));
+                if (tenengradBlurriness > 200)
+                {
+                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"图像已清晰无需再次聚焦"));
+                    return CommonResult<float>.Success(focusClearZ);
+                }
+            }
+            return await AutoFocusAsync(cameraCommon, focusClearZ, 1f, 0.1f, token, eventAggregator);
         }
 
         public static async Task<CommonResult<float>> AutoFocusAsync(IEventAggregator? eventAggregator = null, CancellationToken token = default)

@@ -989,8 +989,8 @@ namespace 精密切割系统.ViewModel
 
         private void ReceivedAutoRuningMessage(MessageModel message)
         {
-            Tools.LogDebug(message.Message);
-            Application.Current.Dispatcher.Invoke(() => MessageList.Add(message));
+            Tools.LogDebug(message.Message); 
+            MessageList.Add(message);
         }
 
         public override void OnNavigatedTo(NavigationContext navigationContext)
@@ -1002,7 +1002,7 @@ namespace 精密切割系统.ViewModel
             SharpenBladeHeight = MathF.Round(SharpenParams.CutHeight, 3);
             CutParams = navigationContext.Parameters.GetValue<CutParamsModel>("CutParams");
             CutBladeHeight = MathF.Round(CutParams.CutHeight, 3);
-            _eventAggregator.GetEvent<AutoRuningMessageEvent>().Subscribe(ReceivedAutoRuningMessage);
+            _eventAggregator.GetEvent<AutoRuningMessageEvent>().Subscribe(ReceivedAutoRuningMessage, ThreadOption.UIThread);
         }
 
         public override void OnNavigatedFrom(NavigationContext navigationContext)

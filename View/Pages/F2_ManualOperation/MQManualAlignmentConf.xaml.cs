@@ -30,7 +30,6 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         }
         private MainWindow? mainWindow;
         private RightPage? rightPage;
-        private OperatePage? operatePage;
         // 操作类型 0 菜单进入 1 半自动进入 2 磨刀进入
         private int _operateType = 0;
         // 相机操作对象
@@ -163,6 +162,12 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 case 2442:
                     await AutoCutUtils.AutoFocusAsync();
                     break;
+                case 2441:
+                    await AutoCutUtils.AutoCoarseFocusAsync();
+                    break;
+                case 2445:
+                    Appsettings.FocusClearZ = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync();
+                    break;
                 case 2443:
                     await ThetaAlignService.Instance.ThetaVerticalAlignAsync();
                     break;
@@ -210,13 +215,14 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             {
                 while (axisRealTimeFlag)
                 {
-                    Application.Current.Dispatcher.Invoke(() =>
+                    Application.Current.Dispatcher.Invoke(async () =>
                     {
                         // 显示实时位置
-                        xAbsolutePosition.Text = (Tools.GetDoubleStringValue(PlcControl.plc.GetPlcValueString(DeviceKey.curLocationKey))).ToString("F4");
-                        yAbsolutePosition.Text = (Tools.GetDoubleStringValue(PlcControl.plc.GetPlcValueString(DeviceKey.yCurLocationKey))).ToString("F4");
-                        zAbsolutePosition.Text = (Tools.GetDoubleStringValue(PlcControl.plc.GetPlcValueString(DeviceKey.z1CurLocationKey))).ToString("F4");
-                        thetaAbsolutePosition.Text = (Tools.GetDoubleStringValue(PlcControl.plc.GetPlcValueString(DeviceKey.thetaCurLocationKey))).ToString("F4");
+                        xAbsolutePosition.Text = (await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync())?.ToString("F4");
+                        yAbsolutePosition.Text = (await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync())?.ToString("F4");
+                        zAbsolutePosition.Text = (await PlcControl.tagControl.Z1axis.GetCurrentLocationAsync())?.ToString("F4");
+                        z2AbsolutePosition.Text = (await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync())?.ToString("F4");
+                        thetaAbsolutePosition.Text = (await PlcControl.tagControl.ThetaAxis.GetCurrentLocationAsync())?.ToString("F4");
                         // 显示清零后位置
                         xCleanPosition.Text = (Tools.GetDoubleStringValue(xAbsolutePosition.Text)
                             - Tools.GetDoubleStringValue(cleanXPosition)).ToString("F4");
@@ -342,17 +348,6 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         public void SetChannelNo(string channelNoValue)
         {
             channelNo.Text = channelNoValue;
-        }
-
-        private async void cutRecognition_Click(object sender, RoutedEventArgs e)
-        {
-            if (!GlobalParams.onlineFlag)
-            {
-                return;
-            }
-            MaterialSnack("识别中...", SnackType.WARNING, 0);
-            await AutoCutUtils.UpdateCameraCommonLineAsync();
-            MaterialSnack("识别完成！", SnackType.SUCCESS);
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)

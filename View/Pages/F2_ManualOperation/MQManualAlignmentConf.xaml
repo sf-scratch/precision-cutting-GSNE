@@ -53,18 +53,16 @@
                     <Label Content="轴绝对位置" FontSize="18" FontWeight="Bold" 
                                    Margin="0 0 0 10" Width="200" HorizontalAlignment="Left"/>
                     <StackPanel Orientation="Horizontal" >
-                        <Label Content="X" FontSize="16" FontWeight="Bold" VerticalAlignment="Center"></Label>
-                        <Controls:InputTextBox x:Name="xAbsolutePosition" Width="100" Margin="5 0 0 0"></Controls:InputTextBox>
-                        <Label Content="mm" FontSize="16" FontWeight="Bold" VerticalAlignment="Center"></Label>
-                        <Label Content="Y" FontSize="16" FontWeight="Bold" Margin="15 0 0 0" VerticalAlignment="Center"></Label>
-                        <Controls:InputTextBox x:Name="yAbsolutePosition" Width="100" Margin="5 0 0 0"></Controls:InputTextBox>
-                        <Label Content="mm" FontSize="16" FontWeight="Bold" VerticalAlignment="Center"></Label>
-                        <Label Content="Z" FontSize="16" FontWeight="Bold" Margin="15 0 0 0" VerticalAlignment="Center"></Label>
-                        <Controls:InputTextBox x:Name="zAbsolutePosition" Width="100" Margin="5 0 0 0"></Controls:InputTextBox>
-                        <Label Content="mm" FontSize="16" FontWeight="Bold" VerticalAlignment="Center"></Label>
-                        <Label Content="θ" FontSize="16" FontWeight="Bold" Margin="15 0 0 0" VerticalAlignment="Center"></Label>
-                        <Controls:InputTextBox x:Name="thetaAbsolutePosition" Width="100" Margin="5 0 0 0"></Controls:InputTextBox>
-                        <Label Content="°" FontSize="16" FontWeight="Bold" VerticalAlignment="Center"></Label>
+                        <Label Content="X" FontSize="16" FontWeight="Bold" VerticalAlignment="Center"/>
+                        <Controls:InputTextBox x:Name="xAbsolutePosition" Width="100" Margin="5 0 0 0" IsEnabled="False"/>
+                        <Label Content="Y" FontSize="16" FontWeight="Bold" Margin="15 0 0 0" VerticalAlignment="Center"/>
+                        <Controls:InputTextBox x:Name="yAbsolutePosition" Width="100" Margin="5 0 0 0" IsEnabled="False"/>
+                        <Label Content="Z" FontSize="16" FontWeight="Bold" Margin="15 0 0 0" VerticalAlignment="Center"/>
+                        <Controls:InputTextBox x:Name="zAbsolutePosition" Width="100" Margin="5 0 0 0" IsEnabled="False"/>
+                        <Label Content="Z2" FontSize="16" FontWeight="Bold" Margin="15 0 0 0" VerticalAlignment="Center"/>
+                        <Controls:InputTextBox x:Name="z2AbsolutePosition" Width="100" Margin="5 0 0 0" IsEnabled="False"/>
+                        <Label Content="θ" FontSize="16" FontWeight="Bold" Margin="15 0 0 0" VerticalAlignment="Center"/>
+                        <Controls:InputTextBox x:Name="thetaAbsolutePosition" Width="100" Margin="5 0 0 0" IsEnabled="False"/>
                     </StackPanel>
                 </StackPanel>
                 <StackPanel HorizontalAlignment="Left" Margin="0 10 0 10" x:Name="cleanPositonPanel" Visibility="Collapsed">
@@ -87,10 +85,9 @@
                     <Label Content="崩边宽度" FontSize="18" FontWeight="Bold" Margin="40,0,10,0"/>
                     <Controls:InputTextBox x:Name="edgesWidth" IsEnabled="False" Width="100" FontWeight="Bold" Padding="8,0,0,0"></Controls:InputTextBox>
                     <Label Content="mm" VerticalAlignment="Center" FontSize="16"></Label>
-                    <Button x:Name="cutRecognition" Content="刀痕识别" Width="100" Margin="30 0 0 0" Click="cutRecognition_Click"  FontSize="18" FontWeight="Bold"></Button>
                 </StackPanel>
             </StackPanel>
-            <common:SimpleDirectOperate Grid.Row="2" Margin="0,30,30,30"/>
+            <common:SimpleDirectOperate Grid.Row="2" Margin="50"/>
         </Grid>
     </Grid>
 </Page>

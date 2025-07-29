@@ -63,7 +63,6 @@
                             <TextBlock  Text="高速" FontSize="18" Margin="0 10 0 0" FontWeight="Bold" HorizontalAlignment="Center"></TextBlock>
                         </StackPanel>
                     </Grid>
-
                 </Grid>
                 <Grid Grid.Column="1">
                     <Grid.ColumnDefinitions>

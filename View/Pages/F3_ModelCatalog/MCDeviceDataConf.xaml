@@ -432,13 +432,13 @@
                             VerticalAlignment="Top">
                             <Grid>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="110" />
-                                    <RowDefinition Height="56" />
-                                    <RowDefinition Height="56" />
-                                    <RowDefinition Height="56" />
-                                    <RowDefinition Height="56" />
-                                    <RowDefinition Height="56" />
-                                    <RowDefinition Height="56" />
+                                    <RowDefinition Height="105" />
+                                    <RowDefinition Height="47" />
+                                    <RowDefinition Height="47" />
+                                    <RowDefinition Height="47" />
+                                    <RowDefinition Height="47" />
+                                    <RowDefinition Height="47" />
+                                    <RowDefinition Height="47" />
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="150" />

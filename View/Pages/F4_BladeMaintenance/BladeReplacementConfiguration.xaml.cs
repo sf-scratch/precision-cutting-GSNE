@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Prism.Events;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -32,17 +33,27 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
     /// </summary>
     public partial class BladeReplacementConfiguration : UserControl
     {
+        private readonly IEventAggregator _eventAggregator;
         private MainWindow? _mainWindow;
 
         public BladeReplacementConfiguration(IEventAggregator eventAggregator)
         {
             InitializeComponent();
-            eventAggregator.GetEvent<SetFocusEvent>().Subscribe(target =>
-            {
-                if (target == "lunguTextBox")
-                    lunguTextBox.Focus();
-            });
+            _eventAggregator = eventAggregator;
+            _eventAggregator.GetEvent<SetFocusEvent>().Subscribe(LunguFocus, ThreadOption.UIThread);
             _mainWindow = Application.Current.MainWindow as MainWindow;
+            this.Unloaded += BladeReplacementConfiguration_Unloaded;
+        }
+
+        private void LunguFocus(string target)
+        {
+            if (target == "lunguTextBox")
+                lunguTextBox.Focus();
+        }
+
+        private void BladeReplacementConfiguration_Unloaded(object sender, RoutedEventArgs e)
+        {
+            _eventAggregator.GetEvent<SetFocusEvent>().Unsubscribe(LunguFocus);
         }
 
         private void lunguTextBox_PreviewMouseDown(object sender, MouseButtonEventArgs e)

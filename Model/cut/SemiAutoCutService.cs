@@ -62,6 +62,18 @@ namespace 精密切割系统.Model.cut
         }
 
 
+        private bool _isOpenPrecut;
+        /// <summary>
+        /// 是否打开预切割
+        /// </summary>
+        public bool IsOpenPrecut
+        {
+            get { return _isOpenPrecut; }
+            set { _isOpenPrecut = value; }
+        }
+
+
+
         private float _cutThetaAlignDeg;
 
         private SemiAutoCutService()
@@ -70,6 +82,7 @@ namespace 精密切割系统.Model.cut
             _depthCompensationValue = 0;
             _feedSpeedCompCompensationValue = 0;
             _isReady = true;
+            _isOpenPrecut = false;
         }
 
         public static async Task<CommonResult> CheckCutAsync()

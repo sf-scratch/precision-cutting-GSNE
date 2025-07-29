@@ -100,7 +100,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                     mainWindow.NavigateToPage("Pages/F2_ManualOperation/MQManualAlignmentConf", "type=1");
                     break;
                 case 2404:
-                    if (CutOperateUtils.precutFlag)
+                    if (_semiAutoCutService.IsOpenPrecut)
                     {
                         MaterialSnack("关闭预切割！", SnackType.SUCCESS);
                     } 
@@ -109,7 +109,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                         MaterialSnack("开启预切割！", SnackType.SUCCESS);
                     }
                     // 预切启动
-                    CutOperateUtils.precutFlag = !CutOperateUtils.precutFlag;
+                    _semiAutoCutService.IsOpenPrecut = !_semiAutoCutService.IsOpenPrecut;
                     break;
                 case 2405:
                     // 进入型号参数
