@@ -51,13 +51,31 @@ namespace 精密切割系统.View.Pages.common
 
         private Point centerLocation;
         private float scalingRatio; // 缩放比例
-        public float _cutMarkWidth = 0; // 刀痕宽度
-        public float _edgeChipWidth = 0; // 崩边
         private Point[] triangle1, triangle2, triangle3, triangle4;
         private static List<CustomLine> _lines = new List<CustomLine>();
         private TextBlock cutWidthTextBlock;
         private TextBlock edgeWidthTextBlock;
         public event Action LineChanged;
+
+        private float _cutMarkWidth;
+        /// <summary>
+        /// 刀痕宽度
+        /// </summary>
+        public float CutMarkWidth
+        {
+            get { return _cutMarkWidth; }
+            set { _cutMarkWidth = value; }
+        }
+
+        private float _edgeChipWidth;
+        /// <summary>
+        /// 崩边
+        /// </summary>
+        public float EdgeChipWidth
+        {
+            get { return _edgeChipWidth; }
+            set { _edgeChipWidth = value; }
+        }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {

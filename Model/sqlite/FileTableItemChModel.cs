@@ -31,6 +31,12 @@ namespace 精密切割系统.database.db.modle
         [Column("cut_dir")]//切割方向 
         public string CutDir { get; set; } = "FRONT";
 
+        [Column("com_box_cut_method")]//切割方法
+        public string ComBoxCutMethod { get; set; } = "相对";
+
+        [Column("cut_relative_first_offset")]// 第一刀是否偏移
+        public string CutRelativeFirstOffset { get; set; } = "否";
+
         [Column("cut_line")]//切割刀数 
         public string CutLine { get; set; } = "0";
 
@@ -54,6 +60,12 @@ namespace 精密切割系统.database.db.modle
 
         [Column("offset_theta")]//θ轴偏移量 
         public string OffsetTheta { get; set; } = "0";
+
+        [Column("align_x")] // 校准时X轴位置
+        public string AlignX { get; set; }
+
+        [Column("align_y")] // 校准时Y轴位置
+        public string AlignY { get; set; }
 
         [Column("blade_height")]//SEQ1-刀片高度
         public string BladeHeight { get; set; } = getDefault("BladeHeight").ToString();
@@ -87,11 +99,12 @@ namespace 精密切割系统.database.db.modle
                 if (name.Equals("Loop"))
                 {
                     defData[i] = "0";
-                }else if (name.Equals("YIndex"))
+                }
+                else if (name.Equals("YIndex"))
                 {
                     defData[i] = "0.0000";
                 }
-                else if (name.Equals("RepeatTimes")|| name.Equals("FeedSpeed"))
+                else if (name.Equals("RepeatTimes") || name.Equals("FeedSpeed"))
                 {
                     defData[i] = "0";
                 }

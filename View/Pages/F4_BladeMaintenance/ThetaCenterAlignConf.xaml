@@ -7,6 +7,8 @@
       mc:Ignorable="d" 
       d:DesignHeight="655"
       d:DesignWidth="1570"
+      xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
+      d:DataContext="{d:DesignInstance viewModel:ThetaCenterAlignConfViewModel, IsDesignTimeCreatable=True}"
       Title="ThetaCenterAlignConf" Loaded="Page_Loaded">
 
     <Grid>
@@ -34,11 +36,7 @@
                                 Content="工件尺寸"
                                 FontSize="18"
                                 FontWeight="Bold" />
-                             <Controls:InputTextBox
-                                Width="200"
-                                 InputType="Decimal"
-                                 x:Name="workSize"
-                                TextWrapping="Wrap" />
+                            <Controls:InputTextBox Width="200" InputType="Decimal" TextWrapping="Wrap" Text="{Binding WorkSize, UpdateSourceTrigger=PropertyChanged}"/>
                         </StackPanel>
                         <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
                             <Label
@@ -49,8 +47,7 @@
                             <Controls:InputTextBox
                                 Width="200"
                                 InputType="Decimal"
-                                x:Name="workThickness"
-                                TextWrapping="Wrap" />
+                                TextWrapping="Wrap" Text="{Binding WorkThickness, UpdateSourceTrigger=PropertyChanged}"/>
                         </StackPanel>
                         <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
                             <Label
@@ -61,8 +58,7 @@
                             <Controls:InputTextBox
                                 Width="200"
                                 InputType="Decimal"
-                                x:Name="tapeThickness"
-                                TextWrapping="Wrap" />
+                                TextWrapping="Wrap" Text="{Binding TapeThickness, UpdateSourceTrigger=PropertyChanged}"/>
                         </StackPanel>
                         <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
                             <Label
@@ -73,8 +69,7 @@
                             <Controls:InputTextBox
                                 Width="200"
                                 InputType="Decimal"
-                                x:Name="bladeHeight"
-                                TextWrapping="Wrap" />
+                                TextWrapping="Wrap" Text="{Binding BladeHeight, UpdateSourceTrigger=PropertyChanged}"/>
                         </StackPanel>
                         <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
                             <Label
@@ -85,8 +80,7 @@
                             <Controls:InputTextBox
                                 Width="200"
                                 InputType="Decimal"
-                                x:Name="cutSpeed"
-                                TextWrapping="Wrap" />
+                                TextWrapping="Wrap" Text="{Binding CutSpeed, UpdateSourceTrigger=PropertyChanged}"/>
                         </StackPanel>
                         <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
                             <Label
@@ -99,8 +93,7 @@
                                 InputType="Numeral"
                                 XMax="30000"
                                 XMin="0"
-                                x:Name="spindleSpeed"
-                                TextWrapping="Wrap" />
+                                TextWrapping="Wrap" Text="{Binding SpindleSpeed, UpdateSourceTrigger=PropertyChanged}"/>
                         </StackPanel>
                     </StackPanel>
                 </Grid>

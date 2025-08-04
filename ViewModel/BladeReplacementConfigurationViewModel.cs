@@ -164,7 +164,7 @@ namespace 精密切割系统.ViewModel
         private void InitRightButtonOnlyBack()
         {
             _rightButtonParams.Clear();
-            _rightButtonParams.Add(RightButtonParams.YelloRightButton("检查轮毂", "/Assets/icon/menu_0/menu_0_2_white.png", () => CheckLungu(LunguId)));
+            _rightButtonParams.Add(RightButtonParams.YelloRightButton("检查轮毂", "FormatListChecks", () => CheckLungu(LunguId)));
             _rightButtonParams.Add(RightButtonParams.YelloRightButton("操作记录", "ClipboardTextClockOutline", GoToHistory));
             _rightButtonParams.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }
@@ -172,8 +172,8 @@ namespace 精密切割系统.ViewModel
         private void InitRightButton()
         {
             _rightButtonParams.Clear();
-            _rightButtonParams.Add(RightButtonParams.GreenRightButton("自动执行", "/Assets/icon/right/enter.png", AutoRunAsync));
-            _rightButtonParams.Add(RightButtonParams.YelloRightButton("检查轮毂", "/Assets/icon/menu_0/menu_0_2_white.png", () => CheckLungu(LunguId)));
+            _rightButtonParams.Add(RightButtonParams.GreenRightButton("自动执行", "LocationEnter", AutoRunAsync));
+            _rightButtonParams.Add(RightButtonParams.YelloRightButton("检查轮毂", "FormatListChecks", () => CheckLungu(LunguId)));
             _rightButtonParams.Add(RightButtonParams.YelloRightButton("操作记录", "ClipboardTextClockOutline", GoToHistory));
             _rightButtonParams.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }

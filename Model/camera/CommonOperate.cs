@@ -281,14 +281,6 @@ namespace 精密切割系统.FrmWindow.common
         }
     }
 
-    public enum ThetaAlignStatus
-    {
-        None,
-        Horizontal,
-        Vertical,
-        Completed
-    }
-
     class ImageDataComparer : IEqualityComparer<ImageData>
     {
         public bool Equals(ImageData x, ImageData y)

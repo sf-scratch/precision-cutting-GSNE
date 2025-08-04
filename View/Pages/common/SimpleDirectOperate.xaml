@@ -34,12 +34,11 @@
         <viewModel:DirectOperateViewModel/>
     </UserControl.DataContext>
     <Grid>
-        <Border Grid.Column="1" CornerRadius="10"  Margin="10,0,5,0" Visibility="{Binding IsShowKeyboard, Converter={StaticResource BoolToVisibilityConverter}}">
-
+        <Border Grid.Column="1" CornerRadius="10"  Margin="0" Visibility="{Binding IsShowKeyboard, Converter={StaticResource BoolToVisibilityConverter}}">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="20*"></ColumnDefinition>
-                    <ColumnDefinition Width="80*"></ColumnDefinition>
+                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                    <ColumnDefinition Width="6*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <Grid Grid.Column="0" >
                     <Grid.RowDefinitions>

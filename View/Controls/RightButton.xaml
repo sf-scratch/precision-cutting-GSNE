@@ -32,38 +32,19 @@
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         Orientation="Horizontal">
-                        <Image
-                            Width="10"
-                            Height="10"
-                            Margin="0,0,2,0"
-                            RenderTransformOrigin="0.964,1.2"
-                            d:Source="/Assets/icon/tab_1/03/tab_02.png"
-                            Source="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=ImagePath}">
-                            <Image.Style>
-                                <Style TargetType="Image">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                    <Style.Triggers>
-                                        <!-- 当 ImagePath 以 / 开头时显示 -->
-                                        <DataTrigger Binding="{Binding ImagePath, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource StartsWithSlashConverter}}" Value="True">
-                                            <Setter Property="Visibility" Value="Visible" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Image.Style>
-                        </Image>
-                        <materialDesign:PackIcon VerticalAlignment="Center" Kind="{Binding ImagePath, RelativeSource={RelativeSource AncestorType=UserControl}}" Foreground="White">
-                            <materialDesign:PackIcon.Style>
-                                <Style TargetType="materialDesign:PackIcon">
-                                    <Setter Property="Visibility" Value="Visible" />
-                                    <Style.Triggers>
-                                        <!-- 当 ImagePath 以 / 开头时隐藏 -->
-                                        <DataTrigger Binding="{Binding ImagePath, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource StartsWithSlashConverter}}" Value="True">
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </materialDesign:PackIcon.Style>
-                        </materialDesign:PackIcon>
+                        <ContentControl Content="{Binding ImagePath, RelativeSource={RelativeSource AncestorType=UserControl}}" d:Content="">
+                            <ContentControl.Resources>
+                                <DataTemplate x:Key="IconTemplate">
+                                    <materialDesign:PackIcon VerticalAlignment="Center" Kind="{Binding}" Foreground="White"/>
+                                </DataTemplate>
+                                <DataTemplate x:Key="ImageTemplate">
+                                    <Image Width="10" Height="10" Margin="0,0,2,0" RenderTransformOrigin="0.964,1.2" d:Source="/Assets/icon/tab_1/03/tab_02.png" Source="{Binding}"/>
+                                </DataTemplate>
+                            </ContentControl.Resources>
+                            <ContentControl.ContentTemplateSelector>
+                                <cvert:ImageOrIconTemplateSelector ImageTemplate="{StaticResource ImageTemplate}" IconTemplate="{StaticResource IconTemplate}"/>
+                            </ContentControl.ContentTemplateSelector>
+                        </ContentControl>
                         <Label
                             d:Content="基准线调窄"
                             Content="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=ContentText}"

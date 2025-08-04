@@ -190,11 +190,9 @@ namespace 精密切割系统.Helpers
         {
             // 最终生成的序列组合
             List<int> finalSequence = new List<int>();
-
             // 用于临时存储需要重复的序列
             List<int> tempSequence = new List<int>();
             bool isRepeating = false;  // 标记是否处于重复区间
-
             for (int i = 0; i < sequences.Count; i++)
             {
                 // 判断是否是"S"，开始记录重复组合

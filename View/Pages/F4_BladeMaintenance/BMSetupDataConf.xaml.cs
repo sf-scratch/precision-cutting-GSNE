@@ -43,6 +43,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         private OperatePage _operatePage;
         private BladeHeightViewModel _viewModel;
         private BladeHeightModel _bladeHeightModel;
+        private CancellationTokenSource _measureHeightCts;
 
         public BMSetupDataConf()
         {
@@ -69,26 +70,41 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             _rightPage.btnStartSetup.Visibility = Visibility.Visible;
             _rightPage.btnStartSetup.BackFlag = false;
             _rightPage.btnStartSetup.SetRightClickedHandler(StartMeasureHeight);
+            _rightPage.btnCutStop.SetRightClickedHandler(StopMeasureHeight);
             LoadDBData();
             RealTimeInfo.Messages.Add(MessageModel.Create("进入测高界面..."));
+        }
+
+        private void StopMeasureHeight(object? sender, bool e)
+        {
+            _measureHeightCts.Cancel();
         }
 
         private async void StartMeasureHeight(object? sender, bool e)
         {
             try
             {
+                _rightPage.btnStartSetup.Visibility = Visibility.Collapsed;
+                _rightPage.btnCutStop.Visibility = Visibility.Visible;
+                _measureHeightCts = new CancellationTokenSource();
                 _eventAggregator.GetEvent<AutoRuningMessageEvent>().Subscribe(OnMessageReceived, ThreadOption.UIThread);
                 await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
-                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(55.5f / 2 - 10.2f);
-                CommonResult<float> curHeightZ = await AutoCutUtils.ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, _eventAggregator, default);
+                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(56.5f));
+                CommonResult<float> curHeightZ = await AutoCutUtils.ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, _eventAggregator, _measureHeightCts.Token);
                 if (!curHeightZ.IsSuccess)
                 {
                     MaterialSnack(curHeightZ.Message, SnackType.WARNING, 0);
                     return;
                 }
             }
+            catch (OperationCanceledException)
+            {
+                MaterialSnack("测高停止！", SnackType.WARNING, 0);
+            }
             finally
             {
+                _rightPage.btnStartSetup.Visibility = Visibility.Visible;
+                _rightPage.btnCutStop.Visibility = Visibility.Collapsed;
                 _eventAggregator.GetEvent<AutoRuningMessageEvent>().Unsubscribe(OnMessageReceived);
             }
         }

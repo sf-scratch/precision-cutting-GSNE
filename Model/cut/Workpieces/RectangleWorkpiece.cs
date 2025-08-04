@@ -12,6 +12,10 @@ namespace 精密切割系统.Model.cut.Workpieces
         private DataRectangleF _rectangle;
         private float _currentY;
 
+        public float WorkThickness { get; set; }
+
+        public float TapeThickness { get; set; }
+
         public RectangleWorkpiece(DataRectangleF rectangle, float currentY)
         {
             _rectangle = rectangle;

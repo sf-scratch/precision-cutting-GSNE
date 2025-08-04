@@ -267,7 +267,7 @@ namespace 精密切割系统.ViewModel
                 HeightMeasurementMode heightMeasurementMode = HeightMeasurementMode.Contact;
                 // 设置测高参数
                 await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
-                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(LunguSksj.BladeOuterDiameter / 2 - 10.2f);
+                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(LunguSksj.BladeOuterDiameter));
                 Task zAxisTask = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(Appsettings.FocusClearZ ?? 0, 1, _pauseCts.Token);
                 Task<CommonResult<float>> measureHeightTask = AutoCutUtils.ProcessMeasureHeightAsync(heightMeasurementMode, _dialogService, _eventAggregator, _pauseCts.Token);
                 await Task.WhenAll(zAxisTask, measureHeightTask);

@@ -65,7 +65,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
         private int id;
         private bool lookState = false;
         private FunctionSelectionModel _functionModel;
-
+        string cutWay = "高度";
         public MCDeviceDataConf()
         {
             InitializeComponent();
@@ -83,14 +83,28 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             rightPage.btnSure.GlobalRunOperateFlag = true;
             rightPage.btnBack.GlobalRunOperateFlag = true;
             operatePage = mainWindow.operateFrame.Content as OperatePage;
+
+            // 查询当前用户配置为深度还是高度
+            List<UserDefineDataModel> userDefineList = SqlHelper.Table<UserDefineDataModel>().ToList();
+
+            if (userDefineList != null && userDefineList.Count() > 0)
+            {
+                UserDefineDataModel userDefine = userDefineList[0];
+                cutWay = userDefine.ZAxisCutModel;
+                if (cutWay.Equals("深度"))
+                {
+                    cutHeightLabel.Content = "切割深度";
+                }
+            }
+
             initFunctionSelection();
 
             _ = initView();
-            rightPage.btnSure.Visibility = lookState?Visibility.Collapsed: Visibility.Visible;
+            rightPage.btnSure.Visibility = lookState ? Visibility.Collapsed : Visibility.Visible;
             if (lookState)
             {
                 mainWindow.UpdateOperatePage(OperateData.GetMCDeviceDataOperate02(), Operate_Click);
-                CutUtils.UpdateGlobalRunFlag(OperateData.GetMCDeviceDataOperate02()); 
+                CutUtils.UpdateGlobalRunFlag(OperateData.GetMCDeviceDataOperate02());
             }
             else
             {
@@ -113,7 +127,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
 
                 if (!_functionModel.DepthStepsFunction && _functionModel.LoopFunction)
                 {
-                    Grid.SetRow(loopLabel, 4);
+                    Grid.SetRow(loopLabel, 5);
                 }
             }
         }
@@ -126,8 +140,9 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                     if (chName.Equals(GlobalParams.CH1))
                     {
                         chName = GlobalParams.CH2;
-                        
-                    }else if (chName.Equals(GlobalParams.CH2))
+
+                    }
+                    else if (chName.Equals(GlobalParams.CH2))
                     {
                         chName = GlobalParams.CH3;
                     }
@@ -153,12 +168,13 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                     break;
                 case 3002:
                     string PrecutNo = inputPrecutProcessNo.Text;
-                    if (string.IsNullOrEmpty(PrecutNo)) {
+                    if (string.IsNullOrEmpty(PrecutNo))
+                    {
                         break;
                     }
-                    List<PreCutModel>  precutList = SqlHelper.Table<PreCutModel>()
+                    List<PreCutModel> precutList = SqlHelper.Table<PreCutModel>()
                         .Where(t => t.PrecutNo == inputPrecutProcessNo.Text).ToList();
-                    if (precutList.Count>0)
+                    if (precutList.Count > 0)
                     {
                         string RePage = "Pages/F3_ModelCatalog/MCDeviceDataConf";
                         string RePageId = id.ToString();
@@ -182,7 +198,9 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 case 3005://导入数据
                     exportExcle();
                     break;
-                    
+                case 5002://校准参数
+                    mainWindow.NavigateToPage("Pages/F3_ModelCatalog/MCCalibrationParameters", Uri.UnescapeDataString($"id={id}&look={lookState}"));
+                    break;
             }
         }
 
@@ -232,9 +250,9 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
 
 
         //填充表格
-        private  void updateSheet(ISheet sheetCh1, FileTableItemChModel model, ICellStyle style)
+        private void updateSheet(ISheet sheetCh1, FileTableItemChModel model, ICellStyle style)
         {
-            
+
             IRow row1 = sheetCh1.CreateRow(0);
             NPOI.SS.UserModel.ICell cell01 = row1.CreateCell(0);
             cell01.CellStyle = style; // 将样式应用到单元格
@@ -325,7 +343,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             if (_functionModel.LoopFunction)
             {
                 //循环
-                IRow row9 = sheetCh1.CreateRow(_functionModel.DepthStepsFunction?8:7);
+                IRow row9 = sheetCh1.CreateRow(_functionModel.DepthStepsFunction ? 8 : 7);
                 row9.CreateCell(0).SetCellValue("循环");
                 string[] LoopStr = model.Loop.Split(",");
                 for (int i = 0; i < LoopStr.Length; i++)
@@ -347,9 +365,10 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 {
                     HSSFWorkbook workbook = new HSSFWorkbook(file);
                     //定义四组数据
-                    for (int i=0;i<4;i++) {
+                    for (int i = 0; i < 4; i++)
+                    {
                         //获取对应Model
-                        FileTableItemChModel chModelData =await getChModel(i);
+                        FileTableItemChModel chModelData = await getChModel(i);
                         //基础信息
                         ISheet sheet = workbook.GetSheetAt(i);
                         if (sheet == null) return;
@@ -357,19 +376,20 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                         for (int row = 0; row <= sheet.LastRowNum; row++)
                         {
                             IRow currentRow = sheet.GetRow(row);
-                            if (row==1)//基础信息
+                            if (row == 1)//基础信息
                             {
-                                if (currentRow.LastCellNum > 0) {
+                                if (currentRow.LastCellNum > 0)
+                                {
                                     for (int cellRow = 0; cellRow <= currentRow.LastCellNum - 1; cellRow++)
                                     {
                                         NPOI.SS.UserModel.ICell icell = currentRow.GetCell(cellRow);
                                         addBaseChModel(chModelData, cellRow, icell.ToString());
                                     }
 
-                                    
+
                                 }
                             }
-                            if (row>2)//具体数据
+                            if (row > 2)//具体数据
                             {
                                 if (currentRow.LastCellNum > 0)
                                 {
@@ -384,7 +404,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                                         }
                                     }
                                     mapDictionary.Add(currentRow.GetCell(0).ToString(), itemStrs);
-                                    
+
                                     //addChModel(chModelData, row, string.Join(",", itemStrs));
 
                                 }
@@ -398,10 +418,11 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                     _ = updataChData();
                 }
             }
-            catch (Exception){
+            catch (Exception)
+            {
                 MaterialSnackUtils.MaterialSnack("文件异常或被占用，请重新选择文件！", MaterialSnackUtils.SnackType.ERROR);
             }
-            
+
         }
 
         private async Task<FileTableItemChModel> getChModel(int sheetRow)
@@ -441,8 +462,9 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             return null;
         }
 
-        private  void addBaseChModel(FileTableItemChModel chModel, int cell, string data) {
-            if (cell==0)
+        private void addBaseChModel(FileTableItemChModel chModel, int cell, string data)
+        {
+            if (cell == 0)
             {
                 chModel.ThetaDeg = data;
             }
@@ -472,7 +494,8 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             }
         }
 
-        private async void addChModel(FileTableItemChModel chModel, Dictionary<string, string[]> mapDictionary) {
+        private async void addChModel(FileTableItemChModel chModel, Dictionary<string, string[]> mapDictionary)
+        {
             foreach (KeyValuePair<string, string[]> map in mapDictionary)
             {
                 if (map.Key.Equals("刀片高度"))
@@ -491,7 +514,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 {
                     chModel.RepeatTimes = string.Join(",", map.Value);
                 }
-                if (map.Key.Equals("刀片深度")&&_functionModel.DepthStepsFunction)
+                if (map.Key.Equals("刀片深度") && _functionModel.DepthStepsFunction)
                 {
                     chModel.DepthSteps = string.Join(",", map.Value);
                 }
@@ -533,7 +556,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
 
         private void BackFrom(object sender, bool v)
         {
-          string url =  QueryUtils.GetValueFromQueryParams(this, "url");
+            string url = QueryUtils.GetValueFromQueryParams(this, "url");
             if (string.IsNullOrEmpty(url))
             {
                 mainWindow.NavigateToPage("Pages/F3_ModelCatalog/MCDeviceDataListConf");
@@ -541,7 +564,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             else
             {
                 mainWindow.NavigateToPage(url);
-            }           
+            }
         }
 
 
@@ -562,7 +585,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             {
                 MaterialSnackUtils.MaterialSnack("数据异常", MaterialSnackUtils.SnackType.ERROR);
             }
-            
+
         }
 
         private async Task initView()
@@ -596,8 +619,8 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                     rabRound.IsChecked = true;
                     inputSquareCh1.IsEnabled = false;
                     inputSquareCh2.IsEnabled = false;
-                    inputSquareCh1.Background = new SolidColorBrush(Color.FromRgb(240,242,245));
-                    inputSquareCh2.Background = new SolidColorBrush(Color.FromRgb(240,242,245));
+                    inputSquareCh1.Background = new SolidColorBrush(Color.FromRgb(240, 242, 245));
+                    inputSquareCh2.Background = new SolidColorBrush(Color.FromRgb(240, 242, 245));
                     inputRound.IsEnabled = true;
                 }
                 else
@@ -606,7 +629,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                     inputSquareCh1.IsEnabled = true;
                     inputSquareCh2.IsEnabled = true;
                     inputRound.IsEnabled = false;
-                    inputRound.Background = new SolidColorBrush(Color.FromRgb(240,242,245));
+                    inputRound.Background = new SolidColorBrush(Color.FromRgb(240, 242, 245));
                 }
                 //查询目录
                 var listFile = await SqlHelper.TableAsync<FileTableModel>().Where(t => t.Id == currentModel.DirectoryId).ToListAsync();
@@ -642,18 +665,24 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 inputThetaDeg.IsEnabled = false;
                 ComBoxCutMode.IsEnabled = false;
                 ComBoxCutDir.IsEnabled = false;
+                ComBoxCutMethod.IsEnabled = false;
+                CutRelativeFirstOffset.IsEnabled = false;
                 inputCutLine.IsEnabled = false;
                 absoluteCutPosition.IsEnabled = false;
                 inputBladeAngle.IsEnabled = false;
                 inputOffsetX.IsEnabled = false;
+                alignX.IsEnabled = false;
+                alignY.IsEnabled = false;
             }
         }
 
         //刷新附表单数据
-        private async Task updataChData() {
+        private async Task updataChData()
+        {
             //获取配置Ch目录库
             var listCh = await SqlHelper.TableAsync<FileTableItemChModel>().Where(t => t.ItemId == currentModel.Id).Where(t => t.ChName == chName).ToListAsync();
-            if (listCh != null && listCh.Count() > 0) {
+            if (listCh != null && listCh.Count() > 0)
+            {
                 _chModel = listCh[0];
                 //子项左侧数据
                 labChName.Content = _chModel.ChName;
@@ -661,16 +690,20 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 inputThetaDeg.Text = _chModel.ThetaDeg;
                 ComBoxCutMode.Text = _chModel.CutMode;
                 ComBoxCutDir.Text = _chModel.CutDir;
+                ComBoxCutMethod.Text = _chModel.ComBoxCutMethod;
+                CutRelativeFirstOffset.Text = _chModel.CutRelativeFirstOffset;
                 inputCutLine.Text = _chModel.CutLine;
                 absoluteCutPosition.Text = _chModel.AbsoluteCutPosition;
                 inputBladeAngle.Text = _chModel.BladeAngle;
                 //inputMoncutF.Text = _chModel.MoncutF;
                 //inputMoncutR.Text = _chModel.MoncutR;
                 inputOffsetX.Text = _chModel.OffsetX;
-                inputOffsetTheta.Text = _chModel.OffsetTheta;
+                alignX.Text = _chModel.AlignX;
+                alignY.Text = _chModel.AlignY;
+                ChangeCutMethod(_chModel.ComBoxCutMethod.Equals("相对") ? "绝对" : "相对");
                 updateOperateLabel();
                 //列表数据
-                uodateGridData();
+                UpdateGridDataAsync();
             }
         }
 
@@ -703,10 +736,11 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
 
             }));
         }
-       
+
         //初始化右侧元素
-        private void uodateGridData()
+        private void UpdateGridDataAsync()
         {
+
             ColList.Clear();
             //绑定数据
             List<ChBean> list = new List<ChBean>();
@@ -714,7 +748,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             list.Add(new ChBean() { type = 2, data = _chModel.FeedSpeed });
             list.Add(new ChBean() { type = 3, data = _chModel.YIndex });
             list.Add(new ChBean() { type = 4, data = _chModel.RepeatTimes });
-            if (_functionModel!=null&&_functionModel.DepthStepsFunction)
+            if (_functionModel != null && _functionModel.DepthStepsFunction)
             {
                 list.Add(new ChBean() { type = 5, data = _chModel.DepthSteps });
             }
@@ -732,37 +766,49 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 string[] strs = list[i].data.Split(",");
                 DataBean bean = new DataBean();
                 bean.type = list[i].type;
-                if (list[i].type==2|| list[i].type == 4)
+                if (list[i].type == 2 || list[i].type == 4)
                 {
                     bean.intputType = "Numeral";
                 }
                 else if (list[i].type == 6)
                 {
                     bean.intputType = "Default";
-                }else
+                }
+                else
                 {
                     bean.intputType = "Decimal";
                 }
 
-                if (list[i].type == 2) {
+                if (list[i].type == 2)
+                {
                     bean.XPrecision = 4;
                 }
                 else
                 {
-                    bean.XPrecision = 3;
+                    bean.XPrecision = 5;
                 }
                 for (int n = 0; n < strs.Length; n++)
                 {
                     // 格式化文本 
                     string formattedValue = strs[n];
-                    if (bean.intputType.Equals("Numeral") || bean.intputType.Equals("Decimal") ){
-                        formattedValue = Tools.FormatDecimalString(strs[n], bean.intputType.Equals("Decimal") ? bean.XPrecision : 0);
+                    // 如果cutWay为深度模式，且是刀片高度，则要换算值
+                    if (cutWay.Equals("深度") && bean.type == 1 && Tools.GetDoubleStringValue(formattedValue) != 0)
+                    {
+                        // 把高度换算为深度 = 工件1.5 + 膜0.7 - 刀片高度1.415 = 0.155
+                        double tempValue = Tools.GetDoubleStringValue(currentModel.WorkThickness)
+                            + Tools.GetDoubleStringValue(currentModel.TapeThickness) - Tools.GetDoubleStringValue(formattedValue);
+                        formattedValue = tempValue.ToString("F3");
+                        // Debug.WriteLine(tempValue.ToString("F3"));
+                    }
+                    if (bean.intputType.Equals("Numeral") || bean.intputType.Equals("Decimal"))
+                    {
+                        formattedValue = Tools.FormatDecimalString(formattedValue, bean.intputType.Equals("Decimal") ? bean.XPrecision : 0);
                     }
                     SetPropertyValue(bean, "Column" + n, formattedValue);
                 }
                 ColList.Add(bean);
             }
-           
+
             lvDataView.ItemsSource = ColList;
 
             //如果是空或者小数位数不足-小数初始化为0
@@ -770,7 +816,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
         }
 
         //初始化布局
-        private  void initGridView()
+        private void initGridView()
         {
             lvDataView.ItemsSource = ColList;
             //绑定数据结束
@@ -781,11 +827,9 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 //头部布局
                 DataTemplate headerTemplate = new DataTemplate();
                 FrameworkElementFactory factory = new FrameworkElementFactory(typeof(Label));
-                factory.SetValue(Label.WidthProperty, 150.0);
-                factory.SetValue(Label.HeightProperty, 30.0);
                 factory.SetValue(Label.FontWeightProperty, FontWeights.Bold);
-                //factory.SetValue(Label.VerticalContentAlignmentProperty, VerticalAlignment.Center);
-                //factory.SetValue(Label.HorizontalContentAlignmentProperty, HorizontalAlignment.Center);
+                factory.SetValue(Label.VerticalContentAlignmentProperty, System.Windows.VerticalAlignment.Center);
+                factory.SetValue(Label.HorizontalContentAlignmentProperty, System.Windows.HorizontalAlignment.Center);
                 // 创建一个SolidColorBrush，并设置TextBlock的背景颜色
                 Color color = (Color)ColorConverter.ConvertFromString("#CAEAFE");
                 factory.SetValue(Label.BackgroundProperty, new SolidColorBrush(color));
@@ -934,21 +978,21 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             public string Column99 { get; set; }
         }
 
-  
+
 
         private void RabSquare_Checked(object sender, RoutedEventArgs e)
         {
             inputSquareCh1.IsEnabled = true;
             inputSquareCh2.IsEnabled = true;
             inputRound.IsEnabled = false;
-            inputRound.Background = new SolidColorBrush(Color.FromRgb(240,242,245));
+            inputRound.Background = new SolidColorBrush(Color.FromRgb(240, 242, 245));
             inputSquareCh1.Background = null;
             inputSquareCh2.Background = null;
-            if (currentModel!=null)
+            if (currentModel != null)
             {
                 currentModel.WorkShape = 2;
             }
-            
+
 
 
         }
@@ -957,14 +1001,15 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
         {
             inputSquareCh1.IsEnabled = false;
             inputSquareCh2.IsEnabled = false;
-            inputSquareCh1.Background = new SolidColorBrush(Color.FromRgb(240,242,245));
-            inputSquareCh2.Background = new SolidColorBrush(Color.FromRgb(240,242,245));
+            inputSquareCh1.Background = new SolidColorBrush(Color.FromRgb(240, 242, 245));
+            inputSquareCh2.Background = new SolidColorBrush(Color.FromRgb(240, 242, 245));
             inputRound.Background = null;
             inputRound.IsEnabled = true;
-            if (currentModel != null) {
+            if (currentModel != null)
+            {
                 currentModel.WorkShape = 1;
             }
-               
+
         }
 
 
@@ -974,27 +1019,38 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             updateOperateLabel();
             //tableItem信息
             currentModel.DeviceDataId = inputDeviceDataId.Text;
-            currentModel.DeviceDataNo=labDeviceDataNo.Text;
+            currentModel.DeviceDataNo = labDeviceDataNo.Text;
             currentModel.SpindleRev = int.Parse(inputSpindleRev.Text.ToString());
             currentModel.PrecutProcessNo = inputPrecutProcessNo.Text;
             currentModel.CuttingChSeq = inputCuttingChSeq.Text;
-            currentModel.Round= inputRound.Text;
+            currentModel.Round = inputRound.Text;
             currentModel.WorkThickness = inputWorkThickness.Text;
             currentModel.TapeThickness = inputTapeThickness.Text;
             currentModel.SquareCh1 = inputSquareCh1.Text;
-            currentModel.SquareCh2 =inputSquareCh2.Text;
-           
+            currentModel.SquareCh2 = inputSquareCh2.Text;
+
             //currentModel.WorkShape
             //ChItem信息
             _chModel.ThetaDeg = inputThetaDeg.Text;
             _chModel.CutMode = ComBoxCutMode.Text;
             _chModel.CutDir = ComBoxCutDir.Text;
+            _chModel.ComBoxCutMethod = ComBoxCutMethod.Text;
+            _chModel.CutRelativeFirstOffset = CutRelativeFirstOffset.Text;
             _chModel.CutLine = inputCutLine.Text;
             _chModel.AbsoluteCutPosition = absoluteCutPosition.Text;
             _chModel.BladeAngle = inputBladeAngle.Text;
             //_chModel.MoncutR = inputMoncutR.Text;
             _chModel.OffsetX = inputOffsetX.Text;
-            _chModel.OffsetTheta = inputOffsetTheta.Text;
+            _chModel.AlignX = alignX.Text;
+            _chModel.AlignY = alignY.Text;
+            if (ComBoxCutMethod.Text.Equals("相对"))
+            {
+                _chModel.AbsoluteCutPosition = "";
+            }
+            else
+            {
+                _chModel.CutRelativeFirstOffset = "否";
+            }
             //ChItem中表单信息
             for (int i = 0; i < ColList.Count; i++)
             {
@@ -1004,9 +1060,21 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 List<string> strs = new List<string>();
                 for (int k = 0; k < properties.Length; k++)
                 {
-                    if (properties[k].GetValue(bean) != null&&properties[k].Name.StartsWith("Column"))
+                    if (properties[k].GetValue(bean) != null && properties[k].Name.StartsWith("Column"))
                     {
-                        strs.Add(properties[k].GetValue(bean).ToString());
+                        string value = properties[k].GetValue(bean).ToString();
+                        if (bean.type == 1)
+                        {
+                            if (cutWay.Equals("深度") && bean.type == 1 && Tools.GetDoubleStringValue(value) != 0)
+                            {
+                                // 把深度换算为高度 = 工件1.5 + 膜0.7 - 切割深度0.155 = 1.415
+                                double tempValue = Tools.GetDoubleStringValue(currentModel.WorkThickness)
+                                    + Tools.GetDoubleStringValue(currentModel.TapeThickness) - Tools.GetDoubleStringValue(value);
+                                value = tempValue.ToString("F3");
+                                Debug.WriteLine(tempValue.ToString("F3"));
+                            }
+                        }
+                        strs.Add(value);
                     }
                     else
                     {
@@ -1014,7 +1082,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                     }
                 }
                 string[] itemStrs = strs.ToArray();
-                if (bean.type==1)
+                if (bean.type == 1)
                 {
                     _chModel.BladeHeight = string.Join(",", itemStrs);
                 }
@@ -1049,8 +1117,10 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
 
         private void lvDataView_Loaded(object sender, RoutedEventArgs e)
         {
+            //ListViewItem listViewItem = (ListViewItem)lvDataView.ItemContainerGenerator.ContainerFromIndex(0);
+            //Debug.WriteLine(listViewItem);
         }
-        
+
         public void initTbNumber()
         {
             List<InputTextBox> tbs = Tools.GetChildrenOfType<InputTextBox>(this);
@@ -1095,6 +1165,36 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
         {
             public int type { get; set; } = 0;
             public string data { get; set; } = "0";
+        }
+
+        private void ComBoxCutMethod_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+            ChangeCutMethod(ComBoxCutMethod.Text);
+        }
+
+        private void ChangeCutMethod(string value)
+        {
+            if (value.Equals("相对"))
+            {
+                // 选择了绝对
+                CutRelativeFirstOffsetLabel.Visibility = Visibility.Collapsed;
+                CutRelativeFirstOffset.Visibility = Visibility.Collapsed;
+
+                absoluteCutPosition.Visibility = Visibility.Visible;
+                absoluteCutPositionLabel.Visibility = Visibility.Visible;
+                absoluteCutPositionUnit.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                // 选择了相对
+                CutRelativeFirstOffsetLabel.Visibility = Visibility.Visible;
+                CutRelativeFirstOffset.Visibility = Visibility.Visible;
+
+                absoluteCutPosition.Visibility = Visibility.Collapsed;
+                absoluteCutPositionLabel.Visibility = Visibility.Collapsed;
+                absoluteCutPositionUnit.Visibility = Visibility.Collapsed;
+            }
         }
     }
 

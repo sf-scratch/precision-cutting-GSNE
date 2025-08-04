@@ -19,7 +19,7 @@
             <ColumnDefinition Width="50*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Grid Grid.Column="0">
-            <common:CameraCommon Width="765" Height="640"></common:CameraCommon>
+            <Image Source="/Assets/picture/大背景.png" Width="765" Height="640"/>
         </Grid>
         <Grid Grid.Column="1">
             <StackPanel>

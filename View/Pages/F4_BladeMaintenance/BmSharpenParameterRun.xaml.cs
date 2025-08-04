@@ -109,14 +109,18 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             {
                 int spindleRev = int.Parse(bmSharpenParameter.RotateSpeed);
                 await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
-                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(55.5f / 2 - 10.2f);
+                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(56.5f));
                 CommonResult<float> firstHeightZ = await AutoCutUtils.ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, default, _pauseCts.Token);
                 if (!firstHeightZ.IsSuccess)
                 {
                     MaterialSnack(firstHeightZ.Message, SnackType.WARNING, 0);
                     return;
                 }
-                RectangleWorkpiece workpiece = new(GlobalParams.SharpenRect, await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0);
+                RectangleWorkpiece workpiece = new(GlobalParams.SharpenRect, await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0)
+                {
+                    WorkThickness = float.Parse(bmSharpenParameter.CutThickness),
+                    TapeThickness = bmSharpenParameter.CoJiaoHeight
+                };
                 _semiAutoCutService.CutServiceProcessChanged += CutService_CutServiceProcessChanged;
                 _semiAutoCutService.CutServicePaused += CutService_CutServicePaused;
                 RunResult cutResult = await _semiAutoCutService.RunAsync(cutStepResult.Data, workpiece, 30, spindleRev, firstHeightZ.Data, GlobalParams.BladeLiftingHeight);

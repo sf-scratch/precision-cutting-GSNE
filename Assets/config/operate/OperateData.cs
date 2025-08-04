@@ -180,12 +180,7 @@ namespace 精密切割系统.Assets.config.buttom
 
         public static List<OperateBean> GetThetaCenterAlignConfOperate() {
             var list = new List<OperateBean>();
-            list.Add(new OperateBean(-1, "", ""));
-            list.Add(new OperateBean(44001, "不切割", "/Assets/icon/tab_0/tab_02.png"));
             list.Add(new OperateBean(44002, "对焦", "/Assets/icon/tab_0/tab_02.png"));
-            list.Add(new OperateBean(-1, "", ""));
-            list.Add(new OperateBean(44003, "测量", "/Assets/icon/tab_0/tab_02.png"));
-
             return list;
         }
 
@@ -391,6 +386,7 @@ namespace 精密切割系统.Assets.config.buttom
             list.Add(new OperateBean(3003, "功能选择", "/Assets/icon/tab_3/tab_32.png"));
             list.Add(new OperateBean(3004, "导入数据", "/Assets/icon/tab_3/tab_32.png"));
             list.Add(new OperateBean(3005, "导出数据", "/Assets/icon/tab_3/tab_32.png"));
+            list.Add(new OperateBean(5002, "校准参数", "/Assets/icon/tab_3/tab_32.png"));
             return list;
         }
         // 3.1.2 目录详情

@@ -270,6 +270,15 @@ namespace 精密切割系统.Utils
             return _model.ChannelNum;
         }
 
+        /// <summary>
+        /// 获取功能参数设定参数
+        /// </summary>
+        /// <returns></returns>
+        public static UserDefineDataModel GetCurrentUserDefineDataModel()
+        {
+            return SqlHelper.Table<UserDefineDataModel>().Where(t => t.Id == 1).First();
+        }
+
         public static FileTableItemChModel GetFileTableItemChModel()
         {
             var currentConfig = GetCurrentConfiguration();

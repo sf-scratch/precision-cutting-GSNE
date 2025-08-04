@@ -15,16 +15,16 @@ namespace 精密切割系统.Model.sqlite
         public long Id { get; set; }
 
         [Column("work_size")]
-        public string workSize { get; set; }
+        public string WorkSize { get; set; }
         [Column("work_thickness")]
-        public string workThickness { get; set; }
+        public string WorkThickness { get; set; }
         [Column("tape_thickness")]
-        public string tapeThickness { get; set; }
+        public string TapeThickness { get; set; }
         [Column("blade_height")]
-        public string bladeHeight { get; set; }
+        public string BladeHeight { get; set; }
         [Column("cut_speed")]
-        public string cutSpeed { get; set; }
+        public string CutSpeed { get; set; }
         [Column("spindle_speed")]
-        public string spindleSpeed { get; set; }
+        public string SpindleSpeed { get; set; }
     }
 }

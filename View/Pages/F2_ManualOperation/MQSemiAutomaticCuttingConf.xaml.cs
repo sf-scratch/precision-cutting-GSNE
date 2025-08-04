@@ -134,9 +134,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         private void CutBack(object? sender, bool e)
         {
             // 回复切割面到Ch 1
-            CurrentUtils.InitCutCh();
-            // 退出切割模式
-            PlcControl.tagControl.cutting.EnterFullAutoInit(0);
+            //CurrentUtils.InitCutCh();
             mainWindow.NavigateToPage("MainMenu");
         }
 

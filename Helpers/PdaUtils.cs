@@ -44,7 +44,7 @@ namespace 精密切割系统.Helpers
             {
                 //下机
                 fieldValues.List.RemoveAt(1); // 移除轮毂
-                fieldValues.Status = "3";
+                fieldValues.Status = "2";
                 await HttpUtils.InsertFlowValuesAsync(fieldValues);
                 fieldValues = GetFieldValuesDTO(flowsDic, "QG-03", lunguId);
                 groupOperateIdRes = await HttpUtils.InsertFlowValuesAsync(fieldValues);
@@ -510,7 +510,7 @@ namespace 精密切割系统.Helpers
         {
             if (!GlobalParams.OnlineMES || _tuple is null) return;
             FieldValuesDTO fieldValues = _tuple.Item1;
-            fieldValues.Status = "3";
+            fieldValues.Status = "2";
             await HttpUtils.InsertFlowValuesAsync(fieldValues);
         }
 

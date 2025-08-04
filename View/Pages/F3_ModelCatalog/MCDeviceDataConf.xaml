@@ -11,13 +11,13 @@
     d:DesignWidth="1448"
     mc:Ignorable="d">
     <Page.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
+        <!-- 横向滚动条样式 -->
+        <Style TargetType="ScrollBar" x:Key="HorizontalScrollBarStyle">
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="Orientation" Value="Horizontal"/>
+        </Style>
     </Page.Resources>
-    <Grid Margin="30">
+    <Grid Margin="30 30 30 10">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
@@ -271,6 +271,7 @@
                         </ComboBox>
                         <!--  列数据  -->
                         <Label
+                            Visibility="Collapsed"
                             Grid.Row="3"
                             Grid.Column="0"
                             Margin="0,0,0,10"
@@ -279,6 +280,7 @@
                             Content="切割方向"
                             FontSize="16" />
                         <ComboBox
+                            Visibility="Collapsed"
                             x:Name="ComBoxCutDir"
                             Grid.Row="3"
                             Grid.Column="1"
@@ -289,7 +291,25 @@
                         </ComboBox>
                         <!--  列数据  -->
                         <Label
-                            Grid.Row="4"
+                            Grid.Row="3"
+                            Grid.Column="0"
+                            Margin="0,0,0,10"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Content="切割方法"
+                            FontSize="16" />
+                        <ComboBox
+                            x:Name="ComBoxCutMethod"
+                            Grid.Row="3"
+                            Grid.Column="1"
+                            Margin="0,0,0,10"
+                            VerticalContentAlignment="Center" SelectionChanged="ComBoxCutMethod_SelectionChanged">
+                            <ComboBoxItem Height="35" Content="相对" />
+                            <ComboBoxItem Height="35" Content="绝对" />
+                        </ComboBox>
+                        <!--  列数据  -->
+                        <Label
+                            Grid.Row="5"
                             Grid.Column="0"
                             Margin="0,0,0,8"
                             HorizontalContentAlignment="Center"
@@ -298,7 +318,7 @@
                             FontSize="16" />
                         <Controls:InputTextBox
                             x:Name="inputCutLine"
-                            Grid.Row="4"
+                            Grid.Row="5"
                             Grid.Column="1"
                             Margin="0,0,0,8"
                             InputType="Numeral"
@@ -306,7 +326,7 @@
                             XMin="0"
                             XPrecision="0" />
                         <Label
-                            Grid.Row="4"
+                            Grid.Row="5"
                             Grid.Column="3"
                             Margin="0,0,0,8"
                             HorizontalContentAlignment="Center"
@@ -315,28 +335,52 @@
                             FontSize="16" />
                         <!--  列数据  -->
                         <Label
-                            Grid.Row="5"
+                            Grid.Row="4"
                             Grid.Column="0"
                             Margin="0,0,0,8"
+                            x:Name="absoluteCutPositionLabel"
+                            Visibility="Collapsed"
                             HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center"
                             Content="绝对切割位置"
                             FontSize="16" />
                         <Controls:InputTextBox
                             x:Name="absoluteCutPosition"
-                            Grid.Row="5"
+                            Grid.Row="4"
                             Grid.Column="1"
+                            Visibility="Collapsed"
                             Margin="0,0,0,8"
                             XAllowNull="true"
                             InputType="Decimal" />
                         <Label
-                            Grid.Row="5"
+                            Grid.Row="4"
                             Grid.Column="3"
                             Margin="0,0,0,8"
+                            x:Name="absoluteCutPositionUnit"
+                            Visibility="Collapsed"
                             HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center"
                             Content="mm"
                             FontSize="16" />
+                        <!--  列数据  -->
+                        <Label
+                            Grid.Row="4"
+                            Grid.Column="0"
+                            x:Name="CutRelativeFirstOffsetLabel"
+                            Margin="0,0,0,10"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Content="第一刀偏移"
+                            FontSize="16" />
+                        <ComboBox
+                            x:Name="CutRelativeFirstOffset"
+                            Grid.Row="4"
+                            Grid.Column="1"
+                            Margin="0,0,0,10"
+                            VerticalContentAlignment="Center">
+                            <ComboBoxItem Height="35" Content="否" />
+                            <ComboBoxItem Height="35" Content="是" />
+                        </ComboBox>
                         <!--  列数据  -->
                         <Label
                             Grid.Row="6"
@@ -395,25 +439,45 @@
                             Margin="0,0,0,8"
                             HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center"
-                            Content="θ偏移"
-                            FontSize="16"
-                            Visibility="Collapsed" />
+                            Content="校准位置X"
+                            FontSize="16" />
                         <Controls:InputTextBox
-                            x:Name="inputOffsetTheta"
+                            x:Name="alignX"
                             Grid.Row="8"
                             Grid.Column="1"
                             Margin="0,0,0,8"
-                            InputType="Decimal"
-                            Visibility="Collapsed" />
+                            InputType="Decimal" />
                         <Label
                             Grid.Row="8"
                             Grid.Column="3"
                             Margin="0,0,0,8"
                             HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center"
-                            Content="°"
-                            FontSize="16"
-                            Visibility="Collapsed" />
+                            Content="mm"
+                            FontSize="16" />
+                        <!--  列数据  -->
+                        <Label
+                            Grid.Row="9"
+                            Grid.Column="0"
+                            Margin="0,0,0,8"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Content="校准位置Y"
+                            FontSize="16" />
+                        <Controls:InputTextBox
+                            x:Name="alignY"
+                            Grid.Row="9"
+                            Grid.Column="1"
+                            Margin="0,0,0,8"
+                            InputType="Decimal" />
+                        <Label
+                            Grid.Row="9"
+                            Grid.Column="3"
+                            Margin="0,0,0,8"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Content="mm"
+                            FontSize="16" />
                     </Grid>
                 </StackPanel>
                 <StackPanel Grid.Row="0" Grid.Column="1">
@@ -429,16 +493,18 @@
                         <StackPanel
                             Grid.Row="0"
                             Grid.Column="0"
+                            Margin="0,0,0,8"
                             VerticalAlignment="Top">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="105" />
-                                    <RowDefinition Height="47" />
-                                    <RowDefinition Height="47" />
-                                    <RowDefinition Height="47" />
-                                    <RowDefinition Height="47" />
-                                    <RowDefinition Height="47" />
-                                    <RowDefinition Height="47" />
+                                    <RowDefinition Height="45" />
+                                    <RowDefinition Height="45" />
+                                    <RowDefinition Height="45" />
+                                    <RowDefinition Height="45" />
+                                    <RowDefinition Height="45" />
+                                    <RowDefinition Height="45" />
+                                    <RowDefinition Height="45" />
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="150" />
@@ -448,6 +514,7 @@
                                     Grid.Row="1"
                                     Grid.Column="0"
                                     Margin="0,0,10,10"
+                                    x:Name="cutHeightLabel"
                                     HorizontalContentAlignment="Right"
                                     VerticalContentAlignment="Center"
                                     Content="刀片高度"
@@ -466,7 +533,7 @@
                                     Margin="0,0,10,10"
                                     HorizontalContentAlignment="Right"
                                     VerticalContentAlignment="Center"
-                                    Content="Y轴移动量"
+                                    Content="Y移动量"
                                     FontSize="16" />
                                 <Label
                                     Grid.Row="4"
@@ -483,7 +550,7 @@
                                     Margin="0,0,10,10"
                                     HorizontalContentAlignment="Right"
                                     VerticalContentAlignment="Center"
-                                    Content="刀片深度"
+                                    Content="第一次切割深度"
                                     FontSize="16" />
                                 <Label
                                     x:Name="loopLabel"
@@ -527,13 +594,18 @@
                                     FontWeight="Bold" />
                                 <StackPanel
                                     Grid.Row="1"
-                                    Grid.Column="0">
+                                    Grid.Column="0"
+                                    Height="372.88">
                                     <ListView
                                         Name="lvDataView"
                                         Background="Transparent"
                                         BorderThickness="0"
                                         ItemsSource="{Binding ColList}"
                                         Loaded="lvDataView_Loaded">
+                                        <ListView.Resources>
+                                            <!-- 应用到所有横向滚动条 -->
+                                            <Style TargetType="ScrollBar" BasedOn="{StaticResource HorizontalScrollBarStyle}" />
+                                        </ListView.Resources>
                                         <ListView.View>
                                             <GridView x:Name="dataGridView" />
                                         </ListView.View>

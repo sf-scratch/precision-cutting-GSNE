@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using 精密切割系统.DTOs;
 using 精密切割系统.Entities;
 using 精密切割系统.Model.cut;
+using 精密切割系统.Model.sqlite;
+using 精密切割系统.ViewModel;
 
 namespace 精密切割系统.Helpers
 {
@@ -23,6 +25,7 @@ namespace 精密切割系统.Helpers
                 cfg.CreateMap<CutParamsEntity, CutParamsModel>().ReverseMap();
                 cfg.CreateMap<KnifeWearEntity, KnifeWearModel>().ReverseMap();
                 cfg.CreateMap<ParamsConfigEntity, ParamsConfigModel>().ReverseMap();
+                cfg.CreateMap<ThetaCenterAlignModel, ThetaCenterAlignConfViewModel>().ReverseMap();
             });
             return config.CreateMapper();
         });

@@ -77,8 +77,8 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 MaterialSnackUtils.MaterialSnack("相机获取失败！", MaterialSnackUtils.SnackType.WARNING);
                 return;
             }
-            _viewModel.CutWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((_cameraCommon._cutMarkWidth / 1000).ToString(), 4));
-            _viewModel.DdgesWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((_cameraCommon._edgeChipWidth / 1000).ToString(), 4));
+            _viewModel.CutWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((_cameraCommon.CutMarkWidth / 1000).ToString(), 4));
+            _viewModel.DdgesWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((_cameraCommon.EdgeChipWidth / 1000).ToString(), 4));
             UpdateDefineDataModel();
         }
 
@@ -129,8 +129,8 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 _cameraCommon?.SetCutMarkWidth(1, 2);
             }
 
-            _viewModel.CutWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((_cameraCommon._cutMarkWidth / 1000).ToString(), 4));
-            _viewModel.DdgesWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((_cameraCommon._edgeChipWidth / 1000).ToString(), 4));
+            _viewModel.CutWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((_cameraCommon.CutMarkWidth / 1000).ToString(), 4));
+            _viewModel.DdgesWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((_cameraCommon.EdgeChipWidth / 1000).ToString(), 4));
         }
         public void OperateTouchDownHandler(object sender, int code)
         {
@@ -304,8 +304,8 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             double cutWidthValue = CameraOperateUtils.ConvertToPictureBoxSize(widthInfo[0]);
             double edgesWidthValue = CameraOperateUtils.ConvertToPictureBoxSize(widthInfo[1]);
             _cameraCommon.DrawLineForWidth((float)cutWidthValue, (float)edgesWidthValue);
-            _viewModel.CutWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((_cameraCommon._cutMarkWidth / 1000).ToString(), 4));
-            _viewModel.DdgesWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((_cameraCommon._edgeChipWidth / 1000).ToString(), 4));
+            _viewModel.CutWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((_cameraCommon.CutMarkWidth / 1000).ToString(), 4));
+            _viewModel.DdgesWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((_cameraCommon.EdgeChipWidth / 1000).ToString(), 4));
             MaterialSnackUtils.MaterialSnack("识别完成！", MaterialSnackUtils.SnackType.SUCCESS);
         }
 

@@ -134,7 +134,7 @@ namespace 精密切割系统.View.page.right
             btnSee.Visibility = Visibility.Collapsed;
             btnSure.Visibility = Visibility.Collapsed;
             btnStartSetup.Visibility = Visibility.Collapsed;
-
+            btnSave.Visibility = Visibility.Collapsed;
             //告警提示
             // ShowTemplate.Visibility = Visibility.Collapsed;
             MachinePanel.Visibility = Visibility.Collapsed;

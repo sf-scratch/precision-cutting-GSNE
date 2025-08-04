@@ -167,6 +167,7 @@ namespace 精密切割系统.Helpers
             {
                 if (mode is HeightMeasurementMode.Contact)
                 {
+                    await PlcControl.tagControl.wholeDevice.StartSpindleAsync();
                     // 工作盘吹气
                     await WorkpieceBlowingAsync(eventAggregator, token);
                 }
@@ -266,6 +267,11 @@ namespace 精密切割系统.Helpers
                 return CommonResult<float>.Success(measureHeightAve);
             }
             return CommonResult<float>.Failure("测高失败次数过多！");
+        }
+
+        public static float CaculateZAxisMaxDistance(float bladeOuterDiameter)
+        {
+            return (55.6f - bladeOuterDiameter) / 2 + 17.6f;
         }
 
         //public static async Task<CommonResult<float>> ProcessMeasureWearAmountAsync(HeightMeasurementMode mode, bool isFirst, IDialogService dialogService, IEventAggregator? eventAggregator = null, CancellationToken token = default)

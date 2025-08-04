@@ -244,6 +244,14 @@
                 ImagePath="/Assets/icon/right/enter.png"
                 Visibility="Collapsed" />
             <Controls:RightButton
+                x:Name="btnSave"
+                BackFlag="False"
+                BackgroundDefColor="#39D11A"
+                BackgroundDownColor="#39B41A"
+                ContentText="保存"
+                ImagePath="/Assets/icon/tab_1/01/tab_12.png"
+                Visibility="Collapsed" />
+            <Controls:RightButton
                 x:Name="btnBack"
                 BackFlag="True"
                 BackgroundDefColor="#FFAD00"

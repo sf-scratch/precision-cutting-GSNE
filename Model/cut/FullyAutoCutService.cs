@@ -195,7 +195,7 @@ namespace 精密切割系统.Model.cut
                             return RunResult.Fail("获取切割线失败！");
                         }
                         float endZ = bladeContactWorkingDiscZ1 - cutParams.WorkThickness - cutParams.TapeThickness + cutDeep;
-                        float startZ = endZ - bladeLiftingHeight;
+                        float startZ = bladeContactWorkingDiscZ1 - cutParams.WorkThickness - cutParams.TapeThickness - bladeLiftingHeight;
                         //检查是否暂停
                         if (_usingPauseToken.IsCancellationRequested)
                         {
@@ -248,8 +248,8 @@ namespace 精密切割系统.Model.cut
                                     }
                                     CameraCommon? cameraCommon = AutoCutUtils.GetCameraCommon();
                                     if (cameraCommon is null) continue;
-                                    bladeWidthMax = cameraCommon._cutMarkWidth / 1000;
-                                    collapseWidthMax = cameraCommon._edgeChipWidth / 1000;
+                                    bladeWidthMax = cameraCommon.CutMarkWidth / 1000;
+                                    collapseWidthMax = cameraCommon.EdgeChipWidth / 1000;
                                     bladeWidthMaxMat = cameraCommon.CaptureControl();
                                     collapseWidthMaxMat = bladeWidthMaxMat;
                                 }
@@ -277,8 +277,8 @@ namespace 精密切割系统.Model.cut
                                         }
                                         CameraCommon? cameraCommon = AutoCutUtils.GetCameraCommon();
                                         if (cameraCommon is null) continue;
-                                        bladeWidthMax = cameraCommon._cutMarkWidth / 1000;
-                                        collapseWidthMax = cameraCommon._edgeChipWidth / 1000;
+                                        bladeWidthMax = cameraCommon.CutMarkWidth / 1000;
+                                        collapseWidthMax = cameraCommon.EdgeChipWidth / 1000;
                                         bladeWidthMaxMat = cameraCommon.CaptureControl();
                                         collapseWidthMaxMat = bladeWidthMaxMat;
                                     }

@@ -264,12 +264,12 @@ namespace 精密切割系统.ViewModel
 
         private void UpdateBaselineWidth()
         {
-            BaselineWidth = MathF.Round(_cameraCommon?._cutMarkWidth / 1000 ?? 0, 4);
+            BaselineWidth = MathF.Round(_cameraCommon?.CutMarkWidth / 1000 ?? 0, 4);
         }
 
         private void UpdateBrokenEdgeWidth()
         {
-            BrokenEdgeWidth = MathF.Round(_cameraCommon?._edgeChipWidth / 1000 ?? 0, 4);
+            BrokenEdgeWidth = MathF.Round(_cameraCommon?.EdgeChipWidth / 1000 ?? 0, 4);
         }
 
         public async Task StartMonitoringAlarmAsync(CancellationToken token)

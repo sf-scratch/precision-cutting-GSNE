@@ -87,7 +87,7 @@
                     <Label Content="mm" VerticalAlignment="Center" FontSize="16"></Label>
                 </StackPanel>
             </StackPanel>
-            <common:SimpleDirectOperate Grid.Row="2" Margin="50"/>
+            <common:SimpleDirectOperate Grid.Row="2" Margin="60"/>
         </Grid>
     </Grid>
 </Page>

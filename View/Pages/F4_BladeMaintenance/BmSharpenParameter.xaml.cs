@@ -70,6 +70,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         {
             this.BtnOnClicked(code);
         }
+
         private async void BtnOnClicked(int code) {
             _model = null;
             string BladeLotID = labParameterNo.Text.Trim();
@@ -117,7 +118,6 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                     mainWindow.mainFrame.Source = new Uri($"View/Pages/F4_BladeMaintenance/BmSharpenParameterForm.xaml?Id={_model.Id}&Flag=edit&BladeLotID={_model.BladeLotID}", UriKind.Relative);
                 }
             }
-
         }
 
         private async Task initData()

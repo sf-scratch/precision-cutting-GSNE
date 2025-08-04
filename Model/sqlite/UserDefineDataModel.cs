@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace 精密切割系统.database.db.modle
 {
     [Table("table_user_define_data")]
-    internal class UserDefineDataModel
+    public class UserDefineDataModel
     {
         [PrimaryKey, AutoIncrement]
         [Column("id")]
@@ -34,8 +34,47 @@ namespace 精密切割系统.database.db.modle
         [Column("hairline_adjust_limit")]//基准线调整极限
         public string HairlineAdjustLimit { get; set; } = "0";
 
-        [Column("blow_time")]//吹气时间（C/T）s
+        [Column("blow_time")]//吹气时间
         public string BlowTime { get; set; } = "0";
+
+        [Column("baseline_width_ch1")]
+        public string BaselineWidthCh1 { get; set; } = "0";
+
+        [Column("baseline_width_ch2")]
+        public string BaselineWidthCh2 { get; set; } = "0";
+
+        [Column("baseline_width_ch3")]
+        public string BaselineWidthCh3 { get; set; } = "0";
+
+        [Column("baseline_width_ch4")]
+        public string BaselineWidthCh4 { get; set; } = "0";
+
+        [Column("light_source_brightness_ch1")]
+        public string LightSourceBrightnessCh1 { get; set; } = "0";
+
+        [Column("light_source_brightness_ch2")]
+        public string LightSourceBrightnessCh2 { get; set; } = "0";
+
+        [Column("light_source_brightness_ch3")]
+        public string LightSourceBrightnessCh3 { get; set; } = "0";
+
+        [Column("light_source_brightness_ch4")]
+        public string LightSourceBrightnessCh4 { get; set; } = "0";
+
+        [Column("warm_up_time")]//暖机时间
+        public string WarmUpTime { get; set; }
+
+        [Column("warm_up_start_x")]//暖机x开始
+        public string WarmUpStartX { get; set; }
+
+        [Column("warm_up_end_x")]//暖机x结束
+        public string WarmUpEndX { get; set; }
+
+        [Column("warm_up_start_y")]//暖机y开始
+        public string WarmUpStartY { get; set; }
+
+        [Column("warm_up_end_y")]//暖机y结束
+        public string WarmUpEndY { get; set; }
 
         [Column("work_vacuum_check_time")]//工作真空检查时间
         public string WorkVacuumCheckTime { get; set; } = "0";
@@ -54,6 +93,9 @@ namespace 精密切割系统.database.db.modle
 
         [Column("height_change")]//高度补偿
         public string HeightChange { get; set; } = "YES";
+
+        [Column("z_axis_cut_model")]// Z轴切割模式 高度 深度
+        public string ZAxisCutModel { get; set; } = "高度";
 
         //校准时是否进行过切割的检查
         [Column("cut_work_check_when_alignment")]

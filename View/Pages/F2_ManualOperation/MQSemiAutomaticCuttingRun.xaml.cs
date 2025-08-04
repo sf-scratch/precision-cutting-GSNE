@@ -152,43 +152,47 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             {
                 return;
             }
-            if (!_semiAutoCutService.IsReady)
-            {
-                return;
-            }
-            CommonResult checkResult = await SemiAutoCutService.CheckCutAsync();
-            if (!checkResult.IsSuccess)
-            {
-                MaterialSnack(checkResult.Message, SnackType.WARNING);
-                return;
-            }
-            CommonResult<List<CutStep>> cutStepResult = await GenerateCutStepListAsync(_semiAutoCutService.IsOpenPrecut);
-            if (!cutStepResult.IsSuccess || cutStepResult.Data is null)
-            {
-                MaterialSnack(cutStepResult.Message, SnackType.WARNING);
-                return;
-            }
-            CommonResult<FileTableItemModel> fileTableItemResult = await GetFileTableItemModelAsync();
-            if (!fileTableItemResult.IsSuccess || fileTableItemResult.Data is null)
-            {
-                MaterialSnack(fileTableItemResult.Message, SnackType.WARNING);
-                return;
-            }
-            _ = MonitoringAlarmAsync(_monitoringCts.Token);
-            _ = MonitoringCutProgressAsync(_monitoringCts.Token);
             Stopwatch stopwatch = Stopwatch.StartNew();
             try
             {
+                if (!_semiAutoCutService.IsReady)
+                {
+                    return;
+                }
+                CommonResult checkResult = await SemiAutoCutService.CheckCutAsync();
+                if (!checkResult.IsSuccess)
+                {
+                    MaterialSnack(checkResult.Message, SnackType.WARNING);
+                    return;
+                }
+                CommonResult<List<CutStep>> cutStepResult = await GenerateCutStepListAsync(_semiAutoCutService.IsOpenPrecut);
+                if (!cutStepResult.IsSuccess || cutStepResult.Data is null)
+                {
+                    MaterialSnack(cutStepResult.Message, SnackType.WARNING);
+                    return;
+                }
+                CommonResult<FileTableItemModel> fileTableItemResult = await GetFileTableItemModelAsync();
+                if (!fileTableItemResult.IsSuccess || fileTableItemResult.Data is null)
+                {
+                    MaterialSnack(fileTableItemResult.Message, SnackType.WARNING);
+                    return;
+                }
+                _ = MonitoringAlarmAsync(_monitoringCts.Token);
+                _ = MonitoringCutProgressAsync(_monitoringCts.Token);
                 int spindleRev = fileTableItemResult.Data.SpindleRev;
                 await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
-                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(55.5f / 2 - 10.2f);
+                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(56.5f));
                 CommonResult<float> curHeightZ = await AutoCutUtils.ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, default, _pauseCts.Token);
                 if (!curHeightZ.IsSuccess)
                 {
                     MaterialSnack(curHeightZ.Message, SnackType.WARNING, 0);
                     return;
                 }
-                CircularWorkpiece workpiece = new(GlobalParams.ThetaCenterPoint, GlobalParams.WorkpieceRadius, await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0);
+                CircularWorkpiece workpiece = new(GlobalParams.ThetaCenterPoint, GlobalParams.WorkpieceRadius, await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0)
+                {
+                    WorkThickness = float.Parse(fileTableItemResult.Data.WorkThickness),
+                    TapeThickness = float.Parse(fileTableItemResult.Data.TapeThickness)
+                };
                 _semiAutoCutService.CutServiceProcessChanged += CutService_CutServiceProcessChanged;
                 _semiAutoCutService.CutServicePaused += CutService_CutServicePaused;
                 MaterialSnack($"切割中...", SnackType.SUCCESS, 0);
@@ -214,6 +218,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 stopwatch.Stop();
                 _monitoringCts.Cancel();
                 _pauseCts.Cancel();
+                await StopAsync(ServicePauseResult.Stop);
             }
         }
 
@@ -387,7 +392,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 {
                     for (int i = 0; i < repeatTimes[index]; i++)
                     {
-                        tempCutSteps.Add(new CutStep(setBladeHeight[index], feedSpeeds[index], yIndexs[index], float.Parse(ch.ThetaDeg), chSeq, isDeep ? cutDepths[index] : default));
+                        tempCutSteps.Add(new CutStep(setBladeHeight[index], feedSpeeds[index], yIndexs[index], float.Parse(ch.ThetaDeg), ch.CutMode == CutOperateUtils.B_ZKEEP, chSeq, isDeep ? cutDepths[index] : default));
                     }
                 }
                 int chCutLines = Tools.GetIntStringValue(ch.CutLine);
@@ -450,7 +455,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             // 获取满足条件的索引
             var validIndexes = setBladeHeight
                 .Select((value, index) => new { Value = value, Index = index })
-                .Where(x => x.Value > 0 && feedSpeeds[x.Index] > 0 && yIndexs[x.Index] > 0 && repeatTimes[x.Index] > 0)
+                .Where(x => x.Value > 0 && feedSpeeds[x.Index] > 0 && yIndexs[x.Index] != 0 && repeatTimes[x.Index] > 0)
                 .Select(x => x.Index)
                 .OrderBy(x => x)
                 .ToList();

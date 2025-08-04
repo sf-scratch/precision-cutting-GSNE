@@ -9,7 +9,7 @@ namespace 精密切割系统.Helpers
 {
     public static class FloatExtensions
     {
-        public static bool NearlyEquals(this float a, float b, float epsilon = 1e-6f)
+        public static bool NearlyEquals(this float a, float b, float epsilon = 1e-3f)
         {
             return Math.Abs(a - b) < epsilon;
         }

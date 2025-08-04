@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using 精密切割系统.Driver;
 using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.cut.Workpieces;
@@ -15,6 +16,7 @@ namespace 精密切割系统.Model.cut
             get { return _lazy.Value; }
         }
 
+        private readonly ThetaAlignService _alignService;
         public event Action<CutServiceProcess>? CutServiceProcessChanged;
         public event Action<LineSegment?, string?>? CutServicePaused;
         public event Action? RemindReplaceWafer;
@@ -61,7 +63,6 @@ namespace 精密切割系统.Model.cut
             set { _feedSpeedCompCompensationValue = value; }
         }
 
-
         private bool _isOpenPrecut;
         /// <summary>
         /// 是否打开预切割
@@ -72,12 +73,11 @@ namespace 精密切割系统.Model.cut
             set { _isOpenPrecut = value; }
         }
 
-
-
         private float _cutThetaAlignDeg;
 
         private SemiAutoCutService()
         {
+            _alignService = ThetaAlignService.Instance;
             _cutDirection = CutDirection.Backward;
             _depthCompensationValue = 0;
             _feedSpeedCompCompensationValue = 0;
@@ -120,9 +120,9 @@ namespace 精密切割系统.Model.cut
                 await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
                 //进入全自动切割模式
                 await PlcControl.tagControl.cutting.EnterCuttingModeAsync(_usingPauseToken);
+                bool isExchangeX = false;
                 int cutTime = 0;
-                int needCutTimes = cutStepList.Count;
-                while (cutTime < needCutTimes)
+                while (cutTime < cutStepList.Count)
                 {
                     LineSegment? line = null;
                     CutStep cutStep = cutStepList[cutTime];
@@ -161,7 +161,21 @@ namespace 精密切割系统.Model.cut
                             return RunResult.Fail("获取当前切割次数失败！");
                         }
                         float targetEndZ = bladeContactWorkingDiscZ1 - cutStep.CutHeight - _depthCompensationValue;
-                        float startZ = targetEndZ - bladeLiftingHeight;
+                        float startZ = bladeContactWorkingDiscZ1 - workpiece.WorkThickness - workpiece.TapeThickness - bladeLiftingHeight;
+                        float cutLength = MathF.Abs(line.EndPoint.X - line.StartPoint.X);
+                        float cutSpeed = cutStep.Speed + _feedSpeedCompCompensationValue;
+                        //加上边距
+                        float startX = line.StartPoint.X - margin;
+                        float endX = line.EndPoint.X + margin;
+                        //x方向交替切割
+                        if (cutStep.IsAlternatingCuttingStroke)
+                        {
+                            if (isExchangeX)
+                            {
+                                (startX, endX) = (endX, startX);
+                            }
+                            isExchangeX = !isExchangeX;
+                        }
                         List<float> endZList = [];
                         if (cutStep.SingleCutDeep is not null)
                         {
@@ -171,16 +185,11 @@ namespace 精密切割系统.Model.cut
                             }
                         }
                         endZList.Add(targetEndZ);
-                        float cutLength = MathF.Abs(line.EndPoint.X - line.StartPoint.X);
-                        float cutSpeed = cutStep.Speed + _feedSpeedCompCompensationValue;
                         foreach (float endZ in endZList)
                         {
                             //触发切割进度更新事件
-                            CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, needCutTimes, cutTime));
+                            CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, cutStepList.Count, cutTime));
                             stopwatch.Restart();
-                            //加上边距
-                            float startX = line.StartPoint.X - margin;
-                            float endX = line.EndPoint.X + margin;
                             await PlcControl.tagControl.ThetaAxis.SetAbsoluteSpeedAsync(GlobalParams.ThetaDefaultSpeed);
                             //设置切割参数
                             await PlcControl.tagControl.cutting.SetCutParamsAsync(cutSpeed, endZ, startZ, startX, endX, line.StartPoint.Y, "0", _cutThetaAlignDeg + cutStep.ThetaDeg, spindleRev);
@@ -193,7 +202,7 @@ namespace 精密切割系统.Model.cut
                         }
                         cutTime++;
                         //触发切割进度更新事件
-                        CutServiceProcessChanged?.Invoke(new CutServiceProcess(targetEndZ, cutSpeed, needCutTimes, cutTime, cutLength, cutStep.ChannelNum, pathCalculator.EstimateRemainingTime(), true));
+                        CutServiceProcessChanged?.Invoke(new CutServiceProcess(targetEndZ, cutSpeed, cutStepList.Count, cutTime, cutLength, cutStep.ChannelNum, pathCalculator.EstimateRemainingTime(), true));
                     }
                     catch (OperationCanceledException)
                     {
@@ -256,9 +265,9 @@ namespace 精密切割系统.Model.cut
 
         private async Task<float> GetCutThetaAlignDegAsync(CancellationToken token)
         {
-            return ThetaAlignService.Instance.ThetaAlignCompletedDeg ?? await PlcControl.tagControl.ThetaAxis.GetCurrentLocationAsync(token) ?? 0;
+            return _alignService.ThetaAlignCompletedDeg ?? await PlcControl.tagControl.ThetaAxis.GetCurrentLocationAsync(token) ?? 0;
         }
     }
 
-    public record CutStep(float CutHeight, float Speed, float OffsetY, float ThetaDeg, int ChannelNum = 1, float? SingleCutDeep = null);
+    public record CutStep(float CutHeight, float Speed, float OffsetY, float ThetaDeg, bool IsAlternatingCuttingStroke = false, int ChannelNum = 1, float? SingleCutDeep = null);
 }

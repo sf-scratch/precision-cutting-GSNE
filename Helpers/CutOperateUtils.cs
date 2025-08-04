@@ -802,12 +802,16 @@ namespace 精密切割系统.Driver
             GlobalParams.heightCutAllDistance += cutDistance;
             SetClearedCutInfo(cutDistance);
         }
+
+        public const string A = "A";
+        public const string B_ZKEEP = "B_ZKEEP";
+
         public static int GetCutMethod(string cutMethod)
         {
             return cutMethod switch
             {
-                "A" => 0,
-                "B_ZKEEP" => 1,
+                A => 0,
+                B_ZKEEP => 1,
                 _ => 0 // 默认值
             };
         }

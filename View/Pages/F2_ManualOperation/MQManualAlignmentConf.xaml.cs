@@ -23,11 +23,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
     /// </summary>
     public partial class MQManualAlignmentConf : Page
     {
-        public MQManualAlignmentConf()
-        {
-            InitializeComponent();
-            mainWindow = Application.Current.MainWindow as MainWindow;
-        }
+        private readonly ThetaAlignService _alignService;
         private MainWindow? mainWindow;
         private RightPage? rightPage;
         // 操作类型 0 菜单进入 1 半自动进入 2 磨刀进入
@@ -51,7 +47,12 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         // 清零后Y位置
         string cleanYPosition = "";
 
-
+        public MQManualAlignmentConf()
+        {
+            InitializeComponent();
+            mainWindow = Application.Current.MainWindow as MainWindow;
+            _alignService = ThetaAlignService.Instance;
+        }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
@@ -89,8 +90,8 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             {
                 MaterialSnack("进入校准模式成功！", SnackType.WARNING);
             }
-            cutWidth.Text = Tools.FormatDecimalString((cameraCommon._cutMarkWidth / 1000).ToString(), 4);
-            edgesWidth.Text = Tools.FormatDecimalString((cameraCommon._edgeChipWidth / 1000).ToString(), 4);
+            cutWidth.Text = Tools.FormatDecimalString((cameraCommon.CutMarkWidth / 1000).ToString(), 4);
+            edgesWidth.Text = Tools.FormatDecimalString((cameraCommon.EdgeChipWidth / 1000).ToString(), 4);
             LoadPosition();
         }
 
@@ -98,13 +99,13 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         private void SureHandler(object? sender, bool e)
         {
             // 判断是否Theta轴拉直 等于0 说明没有做Theta轴校准
-            if (ThetaAlignService.Instance.CurrentThetaAlignStatus != ThetaAlignStatus.Completed && !confirmFlag)
+            if (_alignService.CurrentThetaAlignStatus != ThetaAlignStatus.Completed && !confirmFlag)
             {
                 MaterialSnack("请先进行校准，再次按下开始将强制切割！", SnackType.WARNING);
                 confirmFlag = true;
                 return;
             }
-            if (ThetaAlignService.Instance.CurrentThetaAlignStatus == ThetaAlignStatus.Horizontal || ThetaAlignService.Instance.CurrentThetaAlignStatus == ThetaAlignStatus.Vertical)
+            if (_alignService.CurrentThetaAlignStatus == ThetaAlignStatus.Horizontal || _alignService.CurrentThetaAlignStatus == ThetaAlignStatus.Vertical)
             {
                 MaterialSnack("请再次点击Theta轴校准，完成校准！", SnackType.WARNING);
                 return;
@@ -169,10 +170,10 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                     Appsettings.FocusClearZ = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync();
                     break;
                 case 2443:
-                    await ThetaAlignService.Instance.ThetaVerticalAlignAsync();
+                    await _alignService.ThetaVerticalAlignAsync();
                     break;
                 case 2453:
-                    await ThetaAlignService.Instance.ThetaHorizontalAlignAsync();
+                    await _alignService.ThetaHorizontalAlignAsync();
                     break;
                 case 2479:
                     // 倍率变更
@@ -233,6 +234,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 }
             });
         }
+
         private void DisposeDatumLine(int code)
         {
             if (code == 2040)
@@ -251,8 +253,8 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             {
                 _cameraCommon?.SetCutMarkWidth(1, 2);
             }
-            cutWidth.Text = Tools.FormatDecimalString((_cameraCommon._cutMarkWidth / 1000).ToString(), 4);
-            edgesWidth.Text = Tools.FormatDecimalString((_cameraCommon._edgeChipWidth / 1000).ToString(), 4);
+            cutWidth.Text = Tools.FormatDecimalString((_cameraCommon.CutMarkWidth / 1000).ToString(), 4);
+            edgesWidth.Text = Tools.FormatDecimalString((_cameraCommon.EdgeChipWidth / 1000).ToString(), 4);
         }
 
         private void TouchLeaveHandler(object? sender, int code)

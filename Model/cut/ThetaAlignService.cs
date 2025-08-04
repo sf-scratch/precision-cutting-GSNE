@@ -22,7 +22,7 @@ namespace 精密切割系统.Model.cut
         }
 
         private const int AlignOutTime = 40;
-        private const int AlignDefaultMoveDistance = 50;
+        private const int AlignDefaultMoveDistance = 40;
 
         private ThetaAlignStatus _currentThetaAlignStatus;
 
@@ -58,9 +58,9 @@ namespace 精密切割系统.Model.cut
                 using CancellationTokenSource cts = new CancellationTokenSource();
                 cts.CancelAfter(TimeSpan.FromSeconds(AlignOutTime));
                 CancellationToken token = cts.Token;
-                PointF center = new PointF(GlobalParams.thetaCameraLocationX, GlobalParams.thetaCameraLocationY);
+                PointF center = new PointF(GlobalParams.CameraCenterPoint.X, GlobalParams.CameraCenterPoint.Y);
                 float xLocation, yLocation;
-                switch (CurrentThetaAlignStatus)
+                switch (_currentThetaAlignStatus)
                 {
                     case ThetaAlignStatus.Horizontal:
                         MaterialSnackUtils.MaterialSnack("横向拉直中！", MaterialSnackUtils.SnackType.SUCCESS, 0);
@@ -76,7 +76,7 @@ namespace 精密切割系统.Model.cut
                         Tools.LogInfo($"校正角度:{angle}");
                         Tools.LogInfo($"返回A位置:{rotatePointA.X}  {center.Y + distance}");
                         Task thetaTask = PlcControl.tagControl.ThetaAxis.StartRelativeAsync(angle, default, token);
-                        Task xTask = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(rotatePointA.X, default, token);
+                        Task xTask = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(rotatePointA.X, 80, token);
                         Task yTask = PlcControl.tagControl.Yaxis.StartAbsoluteAsync(center.Y + distance, default, token);
                         await Task.WhenAll(thetaTask, xTask, yTask);
                         _currentThetaAlignStatus = ThetaAlignStatus.Completed;
@@ -120,9 +120,9 @@ namespace 精密切割系统.Model.cut
                 using CancellationTokenSource cts = new CancellationTokenSource();
                 cts.CancelAfter(TimeSpan.FromSeconds(AlignOutTime));
                 CancellationToken token = cts.Token;
-                PointF center = new PointF(GlobalParams.thetaCameraLocationX, GlobalParams.thetaCameraLocationY);
+                PointF center = new PointF(GlobalParams.CameraCenterPoint.X, GlobalParams.CameraCenterPoint.Y);
                 float xLocation, yLocation;
-                switch (CurrentThetaAlignStatus)
+                switch (_currentThetaAlignStatus)
                 {
                     case ThetaAlignStatus.Horizontal:
                         _currentThetaAlignStatus = ThetaAlignStatus.None;
@@ -143,7 +143,7 @@ namespace 精密切割系统.Model.cut
                         Tools.LogInfo($"返回A位置:{center.X + distance}  {rotatePointA.Y}");
                         Task thetaTask = PlcControl.tagControl.ThetaAxis.StartRelativeAsync(angle, default, token);
                         Task xTask = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(center.X + distance, default, token);
-                        Task yTask = PlcControl.tagControl.Yaxis.StartAbsoluteAsync(rotatePointA.Y, default, token);
+                        Task yTask = PlcControl.tagControl.Yaxis.StartAbsoluteAsync(rotatePointA.Y, 60, token);
                         await Task.WhenAll(thetaTask, xTask, yTask);
                         _currentThetaAlignStatus = ThetaAlignStatus.Completed;
                         //SetCalibrationAngle();
@@ -282,5 +282,14 @@ namespace 精密切割系统.Model.cut
             Tools.LogInfo($"thetaCurrentDeg:{thetaCurrentDeg}");
             Tools.LogInfo($"tempCh:{tempCh}");
         }
+    }
+
+
+    public enum ThetaAlignStatus
+    {
+        None,
+        Horizontal,
+        Vertical,
+        Completed
     }
 }

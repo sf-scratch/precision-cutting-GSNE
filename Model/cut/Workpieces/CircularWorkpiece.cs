@@ -15,6 +15,11 @@ namespace 精密切割系统.Model.cut.Workpieces
         private readonly float WorkpieceRadius;
         private float _currentY;
 
+        public float WorkThickness { get; set; }
+
+        public float TapeThickness { get; set; }
+
+
         public CircularWorkpiece(DataPoint<float> thetaCenterPoint, float workpieceRadius, float currentY)
         {
             ThetaCenterPoint = thetaCenterPoint;

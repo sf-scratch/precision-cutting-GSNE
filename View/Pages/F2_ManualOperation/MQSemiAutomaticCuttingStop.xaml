@@ -19,69 +19,65 @@
     </Page.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="50*"/>
-            <ColumnDefinition Width="50*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <Grid Grid.Column="0">
-            <common:CameraCommon Width="765" Height="640"></common:CameraCommon>
-        </Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <common:CameraCommon Grid.RowSpan="2" Width="765" Height="640"/>
         <Grid Grid.Column="1">
             <StackPanel>
                 <Grid>
                     <Label Margin="30,30,0,0" Content="暂停 / 修整画面" FontSize="22" FontWeight="Bold"/>
                 </Grid>
-                <Grid>
-                    <auto:AutoGrid Margin="10" Columns="4*,5*,2*,4*,5*,2*" RowCount="7" ChildMargin="5">
-                        <Label Content="型号参数 No" FontSize="18" FontWeight="Bold"/>
-                        <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=DeviceDataNo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
-                        <Label Content="" FontSize="16"></Label>
-                        <Label Content="ID" FontSize="18" FontWeight="Bold"/>
-                        <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=DeviceDataId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
-                        <Label Content="" FontSize="16"></Label>
-                        <Label Content="切割刀数" FontSize="18" FontWeight="Bold"/>
-                        <StackPanel Orientation="Horizontal">
-                            <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=RunCutLine, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
-                            <Label Content=" / " FontSize="18"></Label>
-                            <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=AllRunCutLine, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
-                        </StackPanel>
-                        <Label Content="" FontSize="16"></Label>
-                        <Label Content="切割面" FontSize="18" FontWeight="Bold"/>
-                        <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=ChannelNum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
-                        <Label Content="" FontSize="16"></Label>
-                        <Label Content="刀片高度" FontSize="18" FontWeight="Bold"/>
-                        <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=BladeHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
-                        <Label Content="mm" FontSize="16"></Label>
-                        <Label x:Name="HeightChange1" Content="刀片高度补偿" FontSize="18" FontWeight="Bold"/>
-                        <Controls:InputTextBox x:Name="HeightChange2" TextWrapping="Wrap" InputType="Decimal" XPrecision="3" XMax="0.3" XMin="-0.3" 
+                <auto:AutoGrid Margin="10" Columns="4*,5*,2*,4*,5*,2*" RowCount="7" ChildMargin="5">
+                    <Label Content="型号参数 No" FontSize="18" FontWeight="Bold"/>
+                    <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=DeviceDataNo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
+                    <Label Content="" FontSize="16"></Label>
+                    <Label Content="ID" FontSize="18" FontWeight="Bold"/>
+                    <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=DeviceDataId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
+                    <Label Content="" FontSize="16"></Label>
+                    <Label Content="切割刀数" FontSize="18" FontWeight="Bold"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=RunCutLine, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
+                        <Label Content=" / " FontSize="18"></Label>
+                        <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=AllRunCutLine, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
+                    </StackPanel>
+                    <Label Content="" FontSize="16"></Label>
+                    <Label Content="切割面" FontSize="18" FontWeight="Bold"/>
+                    <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=ChannelNum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
+                    <Label Content="" FontSize="16"></Label>
+                    <Label Content="刀片高度" FontSize="18" FontWeight="Bold"/>
+                    <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=BladeHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
+                    <Label Content="mm" FontSize="16"></Label>
+                    <Label x:Name="HeightChange1" Content="刀片高度补偿" FontSize="18" FontWeight="Bold"/>
+                    <Controls:InputTextBox x:Name="HeightChange2" TextWrapping="Wrap" InputType="Decimal" XPrecision="3" XMax="0.3" XMin="-0.3" 
                                                Text="{Binding Path=DepthCompensation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        <Label x:Name="HeightChange3" Content="mm" FontSize="16"></Label>
-                        <Label Content="进刀速度" FontSize="18" FontWeight="Bold"/>
-                        <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=FeedSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
-                        <Label Content="mm/s" FontSize="16"></Label>
-                        <Label x:Name="ChangeFeedSpeed1" Content="变更进刀速度" FontSize="18" FontWeight="Bold"/>
-                        <Controls:InputTextBox x:Name="ChangeFeedSpeed2" TextWrapping="Wrap" InputType="Decimal" XPrecision="3" XMax="100" XMin="0"
+                    <Label x:Name="HeightChange3" Content="mm" FontSize="16"></Label>
+                    <Label Content="进刀速度" FontSize="18" FontWeight="Bold"/>
+                    <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=FeedSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
+                    <Label Content="mm/s" FontSize="16"></Label>
+                    <Label x:Name="ChangeFeedSpeed1" Content="变更进刀速度" FontSize="18" FontWeight="Bold"/>
+                    <Controls:InputTextBox x:Name="ChangeFeedSpeed2" TextWrapping="Wrap" InputType="Decimal" XPrecision="3" XMax="100" XMin="0"
                                                Text="{Binding Path=ChangeFeedSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        <Label x:Name="ChangeFeedSpeed3" Content="mm/s" FontSize="16"></Label>
-                        <Label Content="自更换刀片起" FontSize="18" FontWeight="Bold"/>
-                        <StackPanel Orientation="Horizontal" Grid.ColumnSpan="2">
-                            <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=AllCutLine, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
-                            <Label Content="lines" FontSize="16"></Label>
-                            <Label Content="" FontSize="16"></Label>
-                            <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=AllCutLineLength, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
-                            <Label Content="m" FontSize="16"></Label>
-                            <Button x:Name="cutRecognition" Visibility="Collapsed" Content="刀痕识别" Width="100" Margin="30 0 0 0" Click="cutRecognition_Click"  FontSize="18" FontWeight="Bold" VerticalAlignment="Center"></Button>
-                        </StackPanel>
-                        <Label Content="预计结束时间" FontSize="18" FontWeight="Bold"/>
-                        <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=ExpectedProcessingEndTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
+                    <Label x:Name="ChangeFeedSpeed3" Content="mm/s" FontSize="16"></Label>
+                    <Label Content="自更换刀片起" FontSize="18" FontWeight="Bold"/>
+                    <StackPanel Orientation="Horizontal" Grid.ColumnSpan="2">
+                        <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=AllCutLine, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
+                        <Label Content="lines" FontSize="16"></Label>
                         <Label Content="" FontSize="16"></Label>
-                    </auto:AutoGrid>
-                </Grid>
-                <StackPanel Margin="30,30,0,0" VerticalAlignment="Center">
-                    <Grid Margin="0 20" Height="225" Width="600">
-                        <common:CommonDirection></common:CommonDirection>
-                    </Grid>
-                </StackPanel>
+                        <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=AllCutLineLength, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
+                        <Label Content="m" FontSize="16"></Label>
+                        <Button x:Name="cutRecognition" Visibility="Collapsed" Content="刀痕识别" Width="100" Margin="30 0 0 0" Click="cutRecognition_Click"  FontSize="18" FontWeight="Bold" VerticalAlignment="Center"></Button>
+                    </StackPanel>
+                    <Label Content="预计结束时间" FontSize="18" FontWeight="Bold"/>
+                    <Controls:InputTextBox TextWrapping="Wrap" Text="{Binding Path=ExpectedProcessingEndTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
+                    <Label Content="" FontSize="16"></Label>
+                </auto:AutoGrid>
             </StackPanel>
         </Grid>
+        <common:SimpleDirectOperate Grid.Column="1" Grid.Row="1" Margin="60"/>
     </Grid>
 </Page>
