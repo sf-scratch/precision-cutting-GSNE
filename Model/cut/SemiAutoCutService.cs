@@ -107,7 +107,7 @@ namespace 精密切割系统.Model.cut
             return CommonResult.Success();
         }
 
-        public async Task<RunResult> RunAsync(List<CutStep> cutStepList, IWorkpieces workpiece, float margin, int spindleRev, float bladeContactWorkingDiscZ1, float bladeLiftingHeight, CancellationToken pauseToken = default)
+        public async Task<RunResult> RunAsync(List<CutStep> cutStepList, IWorkpieces workpiece, float margin, int spindleRev, float bladeContactWorkingDiscZ1, float bladeLiftingHeight, CancellationToken pauseToken)
         {
             _usingPauseToken = pauseToken;
             _cutThetaAlignDeg = await GetCutThetaAlignDegAsync(_usingPauseToken);
@@ -177,7 +177,7 @@ namespace 精密切割系统.Model.cut
                             isExchangeX = !isExchangeX;
                         }
                         List<float> endZList = [];
-                        if (cutStep.SingleCutDeep is not null)
+                        if (cutStep.SingleCutDeep is not null && cutStep.SingleCutDeep > 0)
                         {
                             for (float z = startZ + cutStep.SingleCutDeep.Value; z < targetEndZ; z += cutStep.SingleCutDeep.Value)
                             {

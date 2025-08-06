@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using 精密切割系统.database.db.modle;
+using 精密切割系统.Utils;
 
 namespace 精密切割系统.ViewModel
 {
@@ -29,6 +30,9 @@ namespace 精密切割系统.ViewModel
 
         // 校准时是否进行过切割的检查选项
         public ObservableCollection<string> CutWorkCheckWhenAlignments { get; private set; }
+
+        // Z轴切割模式 默认高度模式，深度模式
+        public ObservableCollection<string> ZAxisCutModels { get; private set; }
 
         // 继续使用超过刀片使用限制错误选项
         public ObservableCollection<string> ContinueAfterBladeUserLimitErrors { get; private set; }
@@ -55,12 +59,13 @@ namespace 精密切割系统.ViewModel
         public ObservableCollection<string> AlignSelectionsWhenSemiAutoCutting { get; private set; }
         public UserDefineDataViewModel()
         {
-            _model = new UserDefineDataModel();
+            _model = CurrentUtils.GetCurrentUserDefineDataModel();
             Languages = new ObservableCollection<string> { "Chinese", "English", "Japanese" };
             DeviceChangeCutSpeeds = new ObservableCollection<string> { "clear", "keep" };
             SpeedChanges = new ObservableCollection<string> { "YES", "NO", "PAUSE", "SPEED" };
             HeightChanges = new ObservableCollection<string> { "YES", "NO", "PAUSE" };
             CutWorkCheckWhenAlignments = new ObservableCollection<string> { "YES", "NO" };
+            ZAxisCutModels = new ObservableCollection<string> { "高度", "深度" };
             ContinueAfterBladeUserLimitErrors = new ObservableCollection<string> { "YES", "NO" };
             ProcessingAfterBladeUserLimitErrors = new ObservableCollection<string> { "WORK", "LINE" };
             BBDTimings = new ObservableCollection<string> { "Z-EM", "RECHECK" };
@@ -175,6 +180,123 @@ namespace 精密切割系统.ViewModel
             }
         }
 
+        public string BaselineWidthCh1
+        {
+            get { return _model.BaselineWidthCh1; }
+            set
+            {
+                if (_model.BaselineWidthCh1 != value)
+                {
+                    _model.BaselineWidthCh1 = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string BaselineWidthCh2
+        {
+            get { return _model.BaselineWidthCh2; }
+            set
+            {
+                if (_model.BaselineWidthCh2 != value)
+                {
+                    _model.BaselineWidthCh2 = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string BaselineWidthCh3
+        {
+            get { return _model.BaselineWidthCh3; }
+            set
+            {
+                if (_model.BaselineWidthCh3 != value)
+                {
+                    _model.BaselineWidthCh3 = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string BaselineWidthCh4
+        {
+            get { return _model.BaselineWidthCh4; }
+            set
+            {
+                if (_model.BaselineWidthCh4 != value)
+                {
+                    _model.BaselineWidthCh4 = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string WarmUpTime
+        {
+            get { return _model.WarmUpTime; }
+            set
+            {
+                if (_model.WarmUpTime != value)
+                {
+                    _model.WarmUpTime = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string WarmUpStartX
+        {
+            get { return _model.WarmUpStartX; }
+            set
+            {
+                if (_model.WarmUpStartX != value)
+                {
+                    _model.WarmUpStartX = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string WarmUpEndX
+        {
+            get { return _model.WarmUpEndX; }
+            set
+            {
+                if (_model.WarmUpEndX != value)
+                {
+                    _model.WarmUpEndX = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string WarmUpStartY
+        {
+            get { return _model.WarmUpStartY; }
+            set
+            {
+                if (_model.WarmUpStartY != value)
+                {
+                    _model.WarmUpStartY = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string WarmUpEndY
+        {
+            get { return _model.WarmUpEndY; }
+            set
+            {
+                if (_model.WarmUpEndY != value)
+                {
+                    _model.WarmUpEndY = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public string WorkVacuumCheckTime
         {
             get { return _model.WorkVacuumCheckTime; }
@@ -250,6 +372,18 @@ namespace 精密切割系统.ViewModel
                 if (_model.HeightChange != value)
                 {
                     _model.HeightChange = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        public string ZAxisCutModel
+        {
+            get { return _model.ZAxisCutModel; }
+            set
+            {
+                if (_model.ZAxisCutModel != value)
+                {
+                    _model.ZAxisCutModel = value;
                     OnPropertyChanged();
                 }
             }

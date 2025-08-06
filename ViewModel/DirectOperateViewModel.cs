@@ -473,8 +473,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                var cts = new CancellationTokenSource();
-                cts.CancelAfter(TimeSpan.FromSeconds(RelativeTime));
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(RelativeTime));
                 await PlcControl.tagControl.Xaxis.StartRelativeAsync(-RelativeDistance, RelativeSpeed, cts.Token);
             }
             catch (OperationCanceledException)
@@ -490,8 +489,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                var cts = new CancellationTokenSource();
-                cts.CancelAfter(TimeSpan.FromSeconds(RelativeTime));
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(RelativeTime));
                 await PlcControl.tagControl.Xaxis.StartRelativeAsync(RelativeDistance, RelativeSpeed, cts.Token);
             }
             catch (OperationCanceledException)
@@ -534,8 +532,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                var cts = new CancellationTokenSource();
-                cts.CancelAfter(TimeSpan.FromSeconds(RelativeTime));
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(RelativeTime));
                 await PlcControl.tagControl.Yaxis.StartRelativeAsync(-RelativeDistance, RelativeSpeed, cts.Token);
             }
             catch (OperationCanceledException)
@@ -551,8 +548,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                var cts = new CancellationTokenSource();
-                cts.CancelAfter(TimeSpan.FromSeconds(RelativeTime));
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(RelativeTime));
                 await PlcControl.tagControl.Yaxis.StartRelativeAsync(RelativeDistance, RelativeSpeed, cts.Token);
             }
             catch (OperationCanceledException)
@@ -676,8 +672,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                var cts = new CancellationTokenSource();
-                cts.CancelAfter(TimeSpan.FromSeconds(RelativeTime));
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(RelativeTime));
                 await PlcControl.tagControl.Z1axis.StartRelativeAsync(RelativeDistance, RelativeSpeed, cts.Token);
             }
             catch (OperationCanceledException)
@@ -693,8 +688,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                var cts = new CancellationTokenSource();
-                cts.CancelAfter(TimeSpan.FromSeconds(RelativeTime));
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(RelativeTime));
                 await PlcControl.tagControl.Z1axis.StartRelativeAsync(-RelativeDistance, RelativeSpeed, cts.Token);
             }
             catch (OperationCanceledException)
@@ -710,8 +704,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                var cts = new CancellationTokenSource();
-                cts.CancelAfter(TimeSpan.FromSeconds(RelativeTime));
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(RelativeTime));
                 await PlcControl.tagControl.Z2axis.StartRelativeAsync(RelativeDistance, RelativeSpeed, cts.Token);
             }
             catch (OperationCanceledException)
@@ -727,8 +720,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                var cts = new CancellationTokenSource();
-                cts.CancelAfter(TimeSpan.FromSeconds(RelativeTime));
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(RelativeTime));
                 await PlcControl.tagControl.Z2axis.StartRelativeAsync(-RelativeDistance, RelativeSpeed, cts.Token);
             }
             catch (OperationCanceledException)

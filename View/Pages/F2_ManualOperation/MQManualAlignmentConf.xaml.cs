@@ -1,6 +1,7 @@
 ﻿using OpenCvSharp;
 using OpenCvSharp.WpfExtensions;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using 精密切割系统.Assets.config.buttom;
@@ -96,7 +97,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         }
 
         bool confirmFlag = false;
-        private void SureHandler(object? sender, bool e)
+        private async void SureHandler(object? sender, bool e)
         {
             // 判断是否Theta轴拉直 等于0 说明没有做Theta轴校准
             if (_alignService.CurrentThetaAlignStatus != ThetaAlignStatus.Completed && !confirmFlag)
@@ -112,12 +113,24 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             }
             // 根据当前的切割面，设置开始切割位置
             _operateType = 1;
+            await SetLowSpeedAsync();
             ToNextPage();
         }
 
-        private void BackClickHandle(object? sender, bool e)
+        private async void BackClickHandle(object? sender, bool e)
         {
+            await SetLowSpeedAsync();
             ToNextPage();
+        }
+
+        private async Task SetLowSpeedAsync()
+        {
+            // 设置为低速
+            await PlcControl.tagControl.Xaxis.SetHighSpeedAsync(0);
+            await PlcControl.tagControl.Yaxis.SetHighSpeedAsync(0);
+            await PlcControl.tagControl.Z1axis.SetHighSpeedAsync(0);
+            await PlcControl.tagControl.Z2axis.SetHighSpeedAsync(0);
+            await PlcControl.tagControl.ThetaAxis.SetHighSpeedAsync(0);
         }
 
         private void ToNextPage()

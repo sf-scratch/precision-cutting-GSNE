@@ -179,16 +179,17 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 }
                 _ = MonitoringAlarmAsync(_monitoringCts.Token);
                 _ = MonitoringCutProgressAsync(_monitoringCts.Token);
+                float cutY = (await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0) - Appsettings.CameraRelativeBladePosition.Y;
                 int spindleRev = fileTableItemResult.Data.SpindleRev;
                 await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
-                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(56.5f));
+                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(55.1f));
                 CommonResult<float> curHeightZ = await AutoCutUtils.ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, default, _pauseCts.Token);
                 if (!curHeightZ.IsSuccess)
                 {
                     MaterialSnack(curHeightZ.Message, SnackType.WARNING, 0);
                     return;
                 }
-                CircularWorkpiece workpiece = new(GlobalParams.ThetaCenterPoint, GlobalParams.WorkpieceRadius, await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0)
+                CircularWorkpiece workpiece = new(GlobalParams.ThetaCenterPoint, GlobalParams.WorkpieceRadius, cutY)
                 {
                     WorkThickness = float.Parse(fileTableItemResult.Data.WorkThickness),
                     TapeThickness = float.Parse(fileTableItemResult.Data.TapeThickness)
@@ -196,7 +197,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 _semiAutoCutService.CutServiceProcessChanged += CutService_CutServiceProcessChanged;
                 _semiAutoCutService.CutServicePaused += CutService_CutServicePaused;
                 MaterialSnack($"切割中...", SnackType.SUCCESS, 0);
-                RunResult cutResult = await _semiAutoCutService.RunAsync(cutStepResult.Data, workpiece, 30, spindleRev, curHeightZ.Data, GlobalParams.BladeLiftingHeight);
+                RunResult cutResult = await _semiAutoCutService.RunAsync(cutStepResult.Data, workpiece, 30, spindleRev, curHeightZ.Data, GlobalParams.BladeLiftingHeight, _pauseCts.Token);
                 if (!cutResult.IsSuccess)
                 {
                     MaterialSnack($"切割失败：{cutResult.Message}", SnackType.WARNING, 0);
@@ -284,8 +285,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             int runTime = 40;
             try
             {
-                using var cts = new CancellationTokenSource();
-                cts.CancelAfter(TimeSpan.FromSeconds(runTime)); // 超时自动取消
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(runTime));// 超时自动取消
                 await PlcControl.tagControl.cutting.ExitCuttingModeAsync(cts.Token);
                 // 轴不报警时移动到指定位置
                 if (line != null)

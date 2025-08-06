@@ -697,8 +697,7 @@ namespace 精密切割系统.ViewModel
             _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"暂停超时时间：{runTime}"));
             try
             {
-                using var cts = new CancellationTokenSource();
-                cts.CancelAfter(TimeSpan.FromSeconds(runTime)); // 超时自动取消
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(runTime)); // 超时自动取消
                 await PlcControl.tagControl.cutting.ExitCuttingModeAsync(cts.Token);
                 switch (RunStatus)
                 {
@@ -755,7 +754,24 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await MonitoringAlarmAsync(token);
+                using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
+                while (await timer.WaitForNextTickAsync(token))
+                {
+                    try
+                    {
+                        if (AlarmConfig.Instance.HasActiveErrorAlarm("MR60408", "MR61000", "MR61100", "MR61200", "MR61300", "MR61400"))
+                        {
+                            if (!_pauseCts.IsCancellationRequested)
+                            {
+                                Pause();
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"监控任务内异常: {ex.Message}"));
+                    }
+                }
             }
             catch (OperationCanceledException)
             {
@@ -764,28 +780,6 @@ namespace 精密切割系统.ViewModel
             catch (Exception ex)
             {
                 _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"监控异常: {ex.Message}"));
-            }
-        }
-
-        private async Task MonitoringAlarmAsync(CancellationToken token)
-        {
-            using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
-            while (await timer.WaitForNextTickAsync(token))
-            {
-                try
-                {
-                    if (AlarmConfig.Instance.HasActiveErrorAlarm("MR60408", "MR61000", "MR61100", "MR61200", "MR61300", "MR61400"))
-                    {
-                        if (!_pauseCts.IsCancellationRequested)
-                        {
-                            Pause();
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"监控任务内异常: {ex.Message}"));
-                }
             }
         }
 

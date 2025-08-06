@@ -31,7 +31,7 @@ namespace 精密切割系统.Helpers
                 return _newtestCancelAfterCts.Token;
             }
         }
-        public static async Task WaitExpectedResultAsync<T>(Func<Task<T>> func, T expectedResult, CancellationToken cancellationToken = default, TimeSpan? checkInterval = null)
+        public static async Task WaitExpectedResultAsync<T>(Func<Task<T>> func, T expectedResult, TimeSpan? checkInterval = null, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(func);
             var tcs = new TaskCompletionSource<bool>();
@@ -87,7 +87,7 @@ namespace 精密切割系统.Helpers
             }
         }
 
-        public static async Task WaitExpectedResultAsync(Func<Task<bool>> func, CancellationToken cancellationToken = default, TimeSpan? checkInterval = null)
+        public static async Task WaitExpectedResultAsync(Func<Task<bool>> func, TimeSpan? checkInterval = null, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(func);
             var tcs = new TaskCompletionSource<bool>();

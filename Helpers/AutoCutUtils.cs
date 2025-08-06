@@ -163,115 +163,139 @@ namespace 精密切割系统.Helpers
                 default:
                     break;
             }
-            for (int times = 1; times <= 10; times++)
+            CancellationTokenSource repeatMeasureCts = new CancellationTokenSource();
+            CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(repeatMeasureCts.Token, token);
+            CancellationToken useToken = linkedCts.Token;
+            _ = MonitoringAlarmAsync(repeatMeasureCts.Cancel, AlarmConfig.Instance.HasConductivityAlarm, eventAggregator, repeatMeasureCts.Token);
+            try
             {
-                if (mode is HeightMeasurementMode.Contact)
+                for (int times = 1; times <= 3; times++)
                 {
-                    await PlcControl.tagControl.wholeDevice.StartSpindleAsync();
-                    // 工作盘吹气
-                    await WorkpieceBlowingAsync(eventAggregator, token);
-                }
-                if (mode is HeightMeasurementMode.NoContact)
-                {
-                    //主轴旋转
-                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("主轴开始旋转"));
-                    await PlcControl.tagControl.wholeDevice.StartSpindleAsync();
-                    //eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹水"));
-                    //await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingWaterAsync(2);
-                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹气"));
-                    //await PlcControl.tagControl.cutting.RunMotionAsync(128f, 50, token);
-                    //await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingAsync(15);
-                    float startBlowX = 127f, endBlowX = 135f;
-                    //测高前移动到初始位置，主轴旋转，开始吹水吹气
-                    await PlcControl.tagControl.cutting.RunMotionAsync(startBlowX, 50, token);
-                    await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingAsync();
-                    for (int count = 0; count < 5; count++)
+                    try
                     {
-                        await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(endBlowX, 5);
-                        await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(startBlowX, 5);
+                        if (mode is HeightMeasurementMode.Contact)
+                        {
+                            await PlcControl.tagControl.wholeDevice.StartSpindleAsync();
+                            // 工作盘吹气
+                            await WorkpieceBlowingAsync(eventAggregator, useToken);
+                        }
+                        else if (mode is HeightMeasurementMode.NoContact)
+                        {
+                            //主轴旋转
+                            eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("主轴开始旋转"));
+                            await PlcControl.tagControl.wholeDevice.StartSpindleAsync();
+                            //eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹水"));
+                            //await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingWaterAsync(2);
+                            eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹气"));
+                            float startBlowX = 127f, endBlowX = 135f;
+                            //测高前移动到初始位置，主轴旋转，开始吹水吹气
+                            await PlcControl.tagControl.cutting.RunMotionAsync(startBlowX, 50, useToken);
+                            await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingAsync();
+                            for (int count = 0; count < 5; count++)
+                            {
+                                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(endBlowX, 5, useToken);
+                                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(startBlowX, 5, useToken);
+                            }
+                            await PlcControl.tagControl.bladeMantance.CloseOpticalFiberSensorBlowingAsync();
+                            // 初始化
+                            await PlcControl.tagControl.Xaxis.StartHomingAsync();
+                            await PlcControl.tagControl.Xaxis.WaitAxisReadyAsync(useToken);
+                        }
+                        //等待测高准备完成信号
+                        await PlcControl.tagControl.bladeMantance.WaitReadyToMeasureHeightAsync(useToken);
+                        //进入测高模式
+                        await PlcControl.tagControl.bladeMantance.StartBladeSetupAsync();
+                        eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始测高！"));
+                        BladeHeightModel bladeHeightModel;
+                        //测高参数的数据
+                        List<BladeHeightModel> list = await SqlHelper.TableAsync<BladeHeightModel>().Where(t => t.Id == 1).ToListAsync();
+                        //数据不存在，则初始化数据
+                        if (list == null || list.Count == 0)
+                        {
+                            return CommonResult<float>.Failure("获取测高参数失败！");
+                        }
+                        bladeHeightModel = list[0];
+                        if (!int.TryParse(bladeHeightModel.Retry, out int retry))
+                        {
+                            return CommonResult<float>.Failure("测高参数异常！");
+                        }
+                        // 发送测高开始信号到PLC
+                        await PlcControl.tagControl.bladeMantance.StartSetupAsync();
+                        List<float> setupValueList = [];
+                        int? measureHeightTimes = await PlcControl.tagControl.bladeMantance.GetHeightMeasureSetupNumberAsync();
+                        if (measureHeightTimes == null)
+                        {
+                            return CommonResult<float>.Failure("测高次数获取失败！");
+                        }
+                        int curMeasureHeightTimes = measureHeightTimes.Value;
+                        while (curMeasureHeightTimes < retry)
+                        {
+                            curMeasureHeightTimes++;
+                            await PlcControl.tagControl.bladeMantance.WaitHeightMeasureSetupNumberUdatedAsync(curMeasureHeightTimes, useToken);
+                            float? setupValue = await PlcControl.tagControl.bladeMantance.GetHeightMeasurementSetupValue();
+                            if (setupValue == null)
+                            {
+                                return CommonResult<float>.Failure("测高值获取失败！");
+                            }
+                            eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"第{curMeasureHeightTimes}次测高：{setupValue.Value}"));
+                            setupValueList.Add(setupValue.Value);
+                            // 设置下次测高最大距离，优化流程时间
+                            await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(setupValue.Value - 0.15f);
+                        }
+                        if (setupValueList.Count == 0)
+                        {
+                            return CommonResult<float>.Failure("没有测高数据！");
+                        }
+                        // 计算平均值，为测高值
+                        float measureHeightAve = setupValueList.Average();
+                        //等待完成测高信号
+                        await PlcControl.tagControl.bladeMantance.WaitHeightMeasurementCompletedAsync(useToken);
+                        eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高平均值：{setupValueList.Average()}"));
+                        float maxDeviation = setupValueList.Max() - setupValueList.Min();
+                        eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高最大偏差：{Math.Round(maxDeviation * 1000, 1)} um"));
+                        // 测高数据异常处理
+                        if (maxDeviation >= 0.01)
+                        {
+                            eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高偏差过大，重新测高"));
+                            if (times % 3 == 0 && dialogService is not null)
+                            {
+                                await WaitManualBlowing(dialogService, useToken);
+                            }
+                            continue;
+                        }
+                        return CommonResult<float>.Success(measureHeightAve);
                     }
-                    await PlcControl.tagControl.bladeMantance.CloseOpticalFiberSensorBlowingAsync();
-                    // 初始化
-                    await PlcControl.tagControl.Xaxis.StartHomingAsync();
-                    await PlcControl.tagControl.Xaxis.WaitAxisReadyAsync(token);
-                }
-
-                //等待测高准备完成信号
-                await PlcControl.tagControl.bladeMantance.WaitReadyToMeasureHeightAsync(token);
-                //进入测高模式
-                await PlcControl.tagControl.bladeMantance.StartBladeSetupAsync();
-                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始测高！"));
-                BladeHeightModel bladeHeightModel;
-                //测高参数的数据
-                List<BladeHeightModel> list = await SqlHelper.TableAsync<BladeHeightModel>()
-                        .Where(t => t.Id == 1).ToListAsync();
-                //数据不存在，则初始化数据
-                if (list == null || list.Count == 0)
-                {
-                    return CommonResult<float>.Failure("获取测高参数失败！");
-                }
-                bladeHeightModel = list[0];
-                if (!int.TryParse(bladeHeightModel.Retry, out int retry))
-                {
-                    return CommonResult<float>.Failure("测高参数异常！");
-                }
-                // 发送测高开始信号到PLC
-                await PlcControl.tagControl.bladeMantance.StartSetupAsync();
-                List<float> setupValueList = new List<float>();
-                int? measureHeightTimes = await PlcControl.tagControl.bladeMantance.GetHeightMeasureSetupNumberAsync();
-                if (measureHeightTimes == null)
-                {
-                    return CommonResult<float>.Failure("测高次数获取失败！");
-                }
-                int curMeasureHeightTimes = measureHeightTimes.Value;
-                while (curMeasureHeightTimes < retry)
-                {
-                    curMeasureHeightTimes++;
-                    await PlcControl.tagControl.bladeMantance.WaitHeightMeasureSetupNumberUdatedAsync(curMeasureHeightTimes, token);
-                    float? setupValue = await PlcControl.tagControl.bladeMantance.GetHeightMeasurementSetupValue();
-                    if (setupValue == null)
+                    catch (OperationCanceledException)
                     {
-                        return CommonResult<float>.Failure("测高值获取失败！");
+                        if (token.IsCancellationRequested)
+                        {
+                            return CommonResult<float>.Failure("测高操作取消！");
+                        }
+                        await PlcControl.tagControl.wholeDevice.AlarmResetAsync();
+                        if (AlarmConfig.Instance.HasConductivityAlarm())
+                        {
+                            return CommonResult<float>.Failure("测高导电异常！");
+                        }
+                        repeatMeasureCts = new CancellationTokenSource();
+                        linkedCts = CancellationTokenSource.CreateLinkedTokenSource(repeatMeasureCts.Token, token);
+                        useToken = linkedCts.Token;
+                        _ = MonitoringAlarmAsync(repeatMeasureCts.Cancel, AlarmConfig.Instance.HasConductivityAlarm, eventAggregator, repeatMeasureCts.Token);
                     }
-                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"第{curMeasureHeightTimes}次测高：{setupValue.Value}"));
-                    setupValueList.Add(setupValue.Value);
-                    // 设置下次测高最大距离，优化流程时间
-                    await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(setupValue.Value - 0.15f);
                 }
-                if (setupValueList.Count == 0)
-                {
-                    return CommonResult<float>.Failure("没有测高数据！");
-                }
-                // 计算平均值，为测高值
-                float measureHeightAve = setupValueList.Average();
-                //等待完成测高信号
-                await PlcControl.tagControl.bladeMantance.WaitHeightMeasurementCompletedAsync(token);
-                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高平均值：{setupValueList.Average()}"));
-                float maxDeviation = setupValueList.Max() - setupValueList.Min();
-                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高最大偏差：{Math.Round(maxDeviation * 1000, 1)} um"));
-                // 测高数据异常处理
-                if (maxDeviation >= 0.01)
-                {
-                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高偏差过大，重新测高"));
-                    if (times % 3 == 0 && dialogService is not null)
-                    {
-                        await WaitManualBlowing(dialogService, token);
-                    }
-                    continue;
-                }
-                if (mode == HeightMeasurementMode.Contact && measureHeightAve < 17)
-                {
-                    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("测高数据异常，重新测高"));
-                    continue;
-                }
-                return CommonResult<float>.Success(measureHeightAve);
+            }
+            finally
+            {
+                repeatMeasureCts.Cancel();
+                repeatMeasureCts.Dispose();
+                linkedCts.Cancel();
+                linkedCts.Dispose();
             }
             return CommonResult<float>.Failure("测高失败次数过多！");
         }
 
         public static float CaculateZAxisMaxDistance(float bladeOuterDiameter)
         {
-            return (55.6f - bladeOuterDiameter) / 2 + 17.6f;
+            return (55.5f - bladeOuterDiameter) / 2 + 17.55f;
         }
 
         //public static async Task<CommonResult<float>> ProcessMeasureWearAmountAsync(HeightMeasurementMode mode, bool isFirst, IDialogService dialogService, IEventAggregator? eventAggregator = null, CancellationToken token = default)
@@ -653,7 +677,7 @@ namespace 精密切割系统.Helpers
             DataPoint<float> cameraCenterPoint = GlobalParams.CameraCenterPoint;
             DataPoint<float> cameraRelativeBladePosition = Appsettings.CameraRelativeBladePosition;
             float thetaDeg = Appsettings.CutThetaDegList?.FirstOrDefault() ?? 0f;
-            Task focusxyTask = PlcControl.tagControl.cutting.RunMotionAsync(cameraCenterPoint.X - 10, cameraRelativeBladePosition.Y + Appsettings.CutY ?? cameraCenterPoint.Y + 30, token);
+            Task focusxyTask = PlcControl.tagControl.cutting.RunMotionAsync(cameraCenterPoint.X - 10, cameraRelativeBladePosition.Y + (Appsettings.CutY ?? (cameraCenterPoint.Y + 30)), token);
             Task focusThetaTask = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(thetaDeg);
             await Task.WhenAll(focusxyTask, focusThetaTask);
         }
@@ -1215,6 +1239,37 @@ namespace 精密切割系统.Helpers
             if (eventAggregator == null) return;
             var message = MessageModel.Create($"{operation}用时: {elapsed.TotalSeconds:F2}秒");
             eventAggregator.GetEvent<AutoRuningMessageEvent>().Publish(message);
+        }
+
+        public static async Task MonitoringAlarmAsync(Action hasAlarmDoAction, Func<bool>? hasActiveErrorAlarmFunc, IEventAggregator? eventAggregator, CancellationToken monitorToken)
+        {
+            try
+            {
+                hasActiveErrorAlarmFunc ??= () => { return AlarmConfig.Instance.HasActiveErrorAlarm("MR60408", "MR61000", "MR61100", "MR61200", "MR61300", "MR61400"); };
+                using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
+                while (await timer.WaitForNextTickAsync(monitorToken))
+                {
+                    try
+                    {
+                        if (hasActiveErrorAlarmFunc.Invoke())
+                        {
+                            hasAlarmDoAction.Invoke();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"监控任务内异常: {ex.Message}"));
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // 正常取消，无需处理
+            }
+            catch (Exception ex)
+            {
+                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"监控异常: {ex.Message}"));
+            }
         }
 
         //public static async Task<ImagesAnalysisResult> ProcessImagesAnalysis1Async(ConcurrentQueue<Mat> matQueue, IEventAggregator? eventAggregator = null, CancellationToken token = default)

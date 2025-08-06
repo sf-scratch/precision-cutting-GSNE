@@ -55,8 +55,7 @@ namespace 精密切割系统.Model.cut
             }
             try
             {
-                using CancellationTokenSource cts = new CancellationTokenSource();
-                cts.CancelAfter(TimeSpan.FromSeconds(AlignOutTime));
+                using CancellationTokenSource cts = new(TimeSpan.FromSeconds(AlignOutTime));
                 CancellationToken token = cts.Token;
                 PointF center = new PointF(GlobalParams.CameraCenterPoint.X, GlobalParams.CameraCenterPoint.Y);
                 float xLocation, yLocation;
@@ -117,8 +116,7 @@ namespace 精密切割系统.Model.cut
             }
             try
             {
-                using CancellationTokenSource cts = new CancellationTokenSource();
-                cts.CancelAfter(TimeSpan.FromSeconds(AlignOutTime));
+                using CancellationTokenSource cts = new(TimeSpan.FromSeconds(AlignOutTime));
                 CancellationToken token = cts.Token;
                 PointF center = new PointF(GlobalParams.CameraCenterPoint.X, GlobalParams.CameraCenterPoint.Y);
                 float xLocation, yLocation;

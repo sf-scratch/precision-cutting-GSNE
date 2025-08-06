@@ -14,13 +14,17 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using 精密切割系统.Assets.config.buttom;
 using 精密切割系统.database.db.modle;
+using 精密切割系统.Driver;
+using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
 using 精密切割系统.Utils;
 using 精密切割系统.View.Controls;
 using 精密切割系统.View.page.right;
 using 精密切割系统.ViewModel;
+using static 精密切割系统.Helpers.MaterialSnackUtils;
 
 namespace 精密切割系统.View.F7_ElectricSpark
 {
@@ -56,12 +60,17 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 viewModel.BladeExchangeYPos = list[0].BladeExchangeYPos;
                 viewModel.HairlineAdjustLimit = list[0].HairlineAdjustLimit;
                 viewModel.BlowTime = list[0].BlowTime;
+                viewModel.BaselineWidthCh1 = list[0].BaselineWidthCh1;
+                viewModel.BaselineWidthCh2 = list[0].BaselineWidthCh2;
+                viewModel.BaselineWidthCh3 = list[0].BaselineWidthCh3;
+                viewModel.BaselineWidthCh4 = list[0].BaselineWidthCh4;
                 viewModel.WorkVacuumCheckTime = list[0].WorkVacuumCheckTime;
                 viewModel.WaitTimeUntilEnergySavingMode = list[0].WaitTimeUntilEnergySavingMode;
                 viewModel.Language = list[0].Language;
                 viewModel.DeviceChangeCutSpeed = list[0].DeviceChangeCutSpeed;
                 viewModel.SpeedChange = list[0].SpeedChange;
                 viewModel.HeightChange = list[0].HeightChange;
+                viewModel.ZAxisCutModel = list[0].ZAxisCutModel;
                 viewModel.CutWorkCheckWhenAlignment = list[0].CutWorkCheckWhenAlignment;
                 viewModel.ContinueAfterBladeUserLimitError = list[0].ContinueAfterBladeUserLimitError;
                 viewModel.ProcessingAfterBladeUserLimitError = list[0].ProcessingAfterBladeUserLimitError;
@@ -76,7 +85,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 viewModel.WaterPumpOnTimer = list[0].WaterPumpOnTimer;
                 viewModel.AtomizingNozzlePositionX = list[0].AtomizingNozzlePositionX;
                 viewModel.AtomizingNozzlePositionY = list[0].AtomizingNozzlePositionY;
-                Debug.WriteLine("语言："+ viewModel.Language);
+                Debug.WriteLine("语言：" + viewModel.Language);
                 DataContext = viewModel;
             }
             else
@@ -115,17 +124,15 @@ namespace 精密切割系统.View.F7_ElectricSpark
             if (code == 5300)
             {
                 mainWindow.NavigateToPage("Pages\\F7_ElectricSpark\\ESUserDefineSysTime");
-            } 
+            }
             else if (code == 5301)
             {
-                if (await PlcControl.tagControl.wholeDevice.IsOpenWorkVacuumSwitchAsync())
-                {
-                    await PlcControl.tagControl.wholeDevice.CloseWorkVacuumSwitchAsync();
-                }
-                else
-                {
-                    await PlcControl.tagControl.wholeDevice.OpenWorkVacuumSwitchAsync();
-                }
+                PlcControl.tagControl.wholeDevice.SetWorkVacuumSwitch();
+            }
+            else if (code == 2407)
+            {
+                // 暖机
+                _ = WarmUpHelper.TriggerWarmUpAsync();
             }
             else if (code == 5302)
             {
@@ -143,11 +150,14 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 }
             }
         }
+
         private void BtnBack_RightClicked(object? sender, bool e)
         {
+            WarmUpHelper.StopWarmUp();
             mainWindow.NavigateToPage("MainMenu");
         }
-        private void save(object sender, bool e) {
+        private void save(object sender, bool e)
+        {
             var success = this.FormSuccess();
             if (!success)
             {
@@ -165,12 +175,17 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 BladeExchangeYPos = viewModel.BladeExchangeYPos,
                 HairlineAdjustLimit = viewModel.HairlineAdjustLimit,
                 BlowTime = viewModel.BlowTime,
+                BaselineWidthCh1 = viewModel.BaselineWidthCh1,
+                BaselineWidthCh2 = viewModel.BaselineWidthCh2,
+                BaselineWidthCh3 = viewModel.BaselineWidthCh3,
+                BaselineWidthCh4 = viewModel.BaselineWidthCh4,
                 WorkVacuumCheckTime = viewModel.WorkVacuumCheckTime,
                 WaitTimeUntilEnergySavingMode = viewModel.WaitTimeUntilEnergySavingMode,
                 Language = viewModel.Language,
                 DeviceChangeCutSpeed = viewModel.DeviceChangeCutSpeed,
                 SpeedChange = viewModel.SpeedChange,
                 HeightChange = viewModel.HeightChange, // 注意这里属性名是HeightCange，不是HeightChange
+                ZAxisCutModel = viewModel.ZAxisCutModel,
                 CutWorkCheckWhenAlignment = viewModel.CutWorkCheckWhenAlignment,
                 ContinueAfterBladeUserLimitError = viewModel.ContinueAfterBladeUserLimitError,
                 ProcessingAfterBladeUserLimitError = viewModel.ProcessingAfterBladeUserLimitError,
@@ -184,7 +199,12 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 SpindleCenterPositionOffset = viewModel.SpindleCenterPositionOffset,
                 WaterPumpOnTimer = viewModel.WaterPumpOnTimer,
                 AtomizingNozzlePositionX = viewModel.AtomizingNozzlePositionX,
-                AtomizingNozzlePositionY = viewModel.AtomizingNozzlePositionY
+                AtomizingNozzlePositionY = viewModel.AtomizingNozzlePositionY,
+                WarmUpTime = viewModel.WarmUpTime,
+                WarmUpEndX = viewModel.WarmUpEndX,
+                WarmUpStartX = viewModel.WarmUpStartX,
+                WarmUpEndY = viewModel.WarmUpEndY,
+                WarmUpStartY = viewModel.WarmUpStartY,
             };
             if (list.Count > 0)
             {
@@ -200,11 +220,11 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 {
                     SqlHelper.Update(model);
                     Debug.WriteLine("修改");
-                    MaterialSnackUtils.MaterialSnack("保存成功",MaterialSnackUtils.SnackType.SUCCESS);
+                    MaterialSnackUtils.MaterialSnack("保存成功", MaterialSnackUtils.SnackType.SUCCESS);
                 }
                 catch
                 {
-                    MaterialSnackUtils.MaterialSnack("保存失败",MaterialSnackUtils.SnackType.ERROR);
+                    MaterialSnackUtils.MaterialSnack("保存失败", MaterialSnackUtils.SnackType.ERROR);
                 }
             }
             else

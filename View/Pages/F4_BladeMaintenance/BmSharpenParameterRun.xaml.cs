@@ -109,7 +109,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             {
                 int spindleRev = int.Parse(bmSharpenParameter.RotateSpeed);
                 await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
-                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(56.5f));
+                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(56f));
                 CommonResult<float> firstHeightZ = await AutoCutUtils.ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, default, _pauseCts.Token);
                 if (!firstHeightZ.IsSuccess)
                 {
@@ -123,7 +123,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 };
                 _semiAutoCutService.CutServiceProcessChanged += CutService_CutServiceProcessChanged;
                 _semiAutoCutService.CutServicePaused += CutService_CutServicePaused;
-                RunResult cutResult = await _semiAutoCutService.RunAsync(cutStepResult.Data, workpiece, 30, spindleRev, firstHeightZ.Data, GlobalParams.BladeLiftingHeight);
+                RunResult cutResult = await _semiAutoCutService.RunAsync(cutStepResult.Data, workpiece, 30, spindleRev, firstHeightZ.Data, GlobalParams.BladeLiftingHeight, _pauseCts.Token);
                 if (!cutResult.IsSuccess)
                 {
                     MaterialSnack($"磨刀失败：{cutResult.Message}", SnackType.WARNING, 0);
@@ -240,8 +240,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             int runTime = 40;
             try
             {
-                using var cts = new CancellationTokenSource();
-                cts.CancelAfter(TimeSpan.FromSeconds(runTime)); // 超时自动取消
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(runTime)); // 超时自动取消
                 await PlcControl.tagControl.cutting.ExitCuttingModeAsync(cts.Token);
                 // 轴不报警时移动到指定位置
                 if (line != null)
@@ -285,22 +284,24 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 
         private async Task MonitoringAlarmAsync(CancellationToken token)
         {
-            using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
-            while (await timer.WaitForNextTickAsync(token))
+            try
             {
-                try
+                using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
+                while (await timer.WaitForNextTickAsync(token))
                 {
-                    if (AlarmConfig.Instance.HasActiveErrorAlarm("MR60408", "MR61000", "MR61100", "MR61200", "MR61300", "MR61400"))
+                    try
                     {
-                        if (!_pauseCts.IsCancellationRequested)
+                        if (AlarmConfig.Instance.HasActiveErrorAlarm("MR60408", "MR61000", "MR61100", "MR61200", "MR61300", "MR61400"))
                         {
+                            if (!_pauseCts.IsCancellationRequested)
+                            {
+                            }
                         }
                     }
-                }
-                catch (Exception ex)
-                {
+                    catch (Exception) { }
                 }
             }
+            catch (OperationCanceledException) { }
         }
 
         private async Task<CommonResult<List<CutStep>>> GenerateCutStepListAsync()

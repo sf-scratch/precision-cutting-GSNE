@@ -44,6 +44,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         private BladeHeightViewModel _viewModel;
         private BladeHeightModel _bladeHeightModel;
         private CancellationTokenSource _measureHeightCts;
+        private CancellationTokenSource? _monitorCts;
 
         public BMSetupDataConf()
         {
@@ -89,7 +90,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 _measureHeightCts = new CancellationTokenSource();
                 _eventAggregator.GetEvent<AutoRuningMessageEvent>().Subscribe(OnMessageReceived, ThreadOption.UIThread);
                 await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
-                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(56.5f));
+                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(55.1f));
                 CommonResult<float> curHeightZ = await AutoCutUtils.ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, _eventAggregator, _measureHeightCts.Token);
                 if (!curHeightZ.IsSuccess)
                 {

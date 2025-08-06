@@ -331,7 +331,8 @@ namespace 精密切割系统
             {
                 // 显示方向界面
                 operatePage.SetOperateShowType(1);
-            } else
+            } 
+            else
             {
                 if (WindowLayout.OperatePageButtons.Count != 0)
                 {
@@ -481,14 +482,12 @@ namespace 精密切割系统
 
         private void shortcutTopBtn_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            AlarmConfig alarmConfig = AlarmConfig.Instance;
             shortcutTopBtnSel = !shortcutTopBtnSel;
             shortcutBottomBtnSel = false;
             ShortcutBtnClick();
             if (shortcutTopBtnSel)
             {
                 // 显示方向界面
-                // operateFrame.Source = new Uri("View/Pages/common/DirectOperate.xaml", UriKind.Relative);
                 operatePage.SetOperateShowType(1);
             }
             else

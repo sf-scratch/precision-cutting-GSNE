@@ -1,5 +1,7 @@
-﻿using NPOI.SS.Formula.Functions;
+﻿using Newtonsoft.Json.Linq;
+using NPOI.SS.Formula.Functions;
 using Osklib.Interop;
+using Prism.Events;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -50,14 +52,18 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         private RightPage _rightPage;
         private OperatePage _operatePage;
         private ThetaCenterAlignConfViewModel _viewModel;
-        private CancellationTokenSource _pauseCts;
+        private CancellationTokenSource? _stopCts;
+        private CancellationTokenSource? _monitorCts;
         private ThetaCenterAlignStep _step;
         private PointF? _firstIntersection;
+        private float _startX;
+        private float _endX;
+        private float _startY;
 
         public ThetaCenterAlignConf()
         {
             InitializeComponent();
-            _pauseCts = new CancellationTokenSource();
+            _stopCts = new CancellationTokenSource();
             _mainWindow = Application.Current.MainWindow as MainWindow ?? new MainWindow();
         }
 
@@ -83,25 +89,42 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             DataContext = _viewModel;
         }
 
+        private void Stop()
+        {
+            _stopCts?.Cancel();
+            _monitorCts?.Cancel();
+        }
+
         private async void BtnCutStart_RightClicked(object? sender, bool e)
         {
-            thetaCenterParamsGrid.IsEnabled = false;
-            await RunCutLineByThetaDegAsync([FirstCutThetaDeg, SecondCutThetaDeg]);
-            _rightPage.btnCutStart.Visibility = Visibility.Collapsed;
-            _rightPage.btnSure.Visibility = Visibility.Visible;
-            _step = ThetaCenterAlignStep.FindFirstIntersection;
+            try
+            {
+                _startX = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0;
+                _endX = _startX + _viewModel.WorkSize.ToFloat();
+                _startY = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0;
+                await RunCutLineByThetaDegAsync([FirstCutThetaDeg, SecondCutThetaDeg]);
+                thetaCenterParamsGrid.IsEnabled = false;
+                _rightPage.btnCutStart.Visibility = Visibility.Collapsed;
+                _rightPage.btnSure.Visibility = Visibility.Visible;
+                _step = ThetaCenterAlignStep.FindFirstIntersection;
+            }
+            catch (OperationCanceledException) { }
         }
 
         private async void BtnSure_RightClicked(object? sender, bool e)
         {
-            float x = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0;
-            float y = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0;
+            float x = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0 - Appsettings.CameraRelativeBladePosition.X;
+            float y = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0 - Appsettings.CameraRelativeBladePosition.Y;
             switch ( _step)
             {
                 case ThetaCenterAlignStep.FindFirstIntersection:
-                    _firstIntersection = new PointF(x, y);
-                    await RunCutLineByThetaDegAsync([ThirdCutThetaDeg]);
-                    _step = ThetaCenterAlignStep.FindSecondIntersection;
+                    try
+                    {
+                        _firstIntersection = new PointF(x, y);
+                        await RunCutLineByThetaDegAsync([ThirdCutThetaDeg]);
+                        _step = ThetaCenterAlignStep.FindSecondIntersection;
+                    }
+                    catch (OperationCanceledException) { }
                     break;
                 case ThetaCenterAlignStep.FindSecondIntersection:
                     if (_firstIntersection is null)
@@ -140,9 +163,14 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 
         private async Task RunCutLineByThetaDegAsync(List<float> thetaDegs)
         {
+            if (_monitorCts is null || _monitorCts.IsCancellationRequested)
+            {
+                _monitorCts = new CancellationTokenSource();
+                _ = AutoCutUtils.MonitoringAlarmAsync(Stop, default, default, _monitorCts.Token);
+            }
             await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
-            await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(56.5f));
-            CommonResult<float> curHeightResult = await AutoCutUtils.ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, default, _pauseCts.Token);
+            await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(56f));
+            CommonResult<float> curHeightResult = await AutoCutUtils.ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, default, _stopCts.Token);
             // 开始测高
             if (!curHeightResult.IsSuccess)
             {
@@ -152,12 +180,9 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             //打开切割水
             await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
             //进入全自动切割模式
-            await PlcControl.tagControl.cutting.EnterCuttingModeAsync(_pauseCts.Token);
+            await PlcControl.tagControl.cutting.EnterCuttingModeAsync(_stopCts.Token);
             float endZ = curHeightResult.Data - _viewModel.BladeHeight.ToFloat();
             float startZ = curHeightResult.Data - _viewModel.WorkThickness.ToFloat() - _viewModel.TapeThickness.ToFloat() - GlobalParams.BladeLiftingHeight;
-            float startX = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0;
-            float endX = startX + _viewModel.WorkSize.ToFloat();
-            float startY = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0;
             try
             {
                 foreach (float thetaDeg in thetaDegs)
@@ -171,18 +196,21 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                     }
                     await PlcControl.tagControl.ThetaAxis.SetAbsoluteSpeedAsync(GlobalParams.ThetaDefaultSpeed);
                     //设置切割参数
-                    await PlcControl.tagControl.cutting.SetCutParamsAsync(_viewModel.CutSpeed.ToFloat(), endZ, startZ, startX, startX + _viewModel.WorkSize.ToFloat(), startY, "0", thetaDeg, _viewModel.SpindleSpeed.ToInt());
+                    await PlcControl.tagControl.cutting.SetCutParamsAsync(_viewModel.CutSpeed.ToFloat(), endZ, startZ, _startX, _startX + _viewModel.WorkSize.ToFloat(), _startY, "0", thetaDeg, _viewModel.SpindleSpeed.ToInt());
                     //开始切割信号
                     await PlcControl.tagControl.cutting.StartCutAsync();
                     //等待切割次数变化
-                    await PlcControl.tagControl.cutting.WaitCutNumUdatedAsync(curCutNum.Value + 1, _pauseCts.Token);
+                    await PlcControl.tagControl.cutting.WaitCutNumUdatedAsync(curCutNum.Value + 1, _stopCts.Token);
                 }
             }
             finally
             {
-                await PlcControl.tagControl.cutting.ExitCuttingModeAsync(_pauseCts.Token);
+                await PlcControl.tagControl.cutting.ExitCuttingModeAsync(_stopCts.Token);
                 await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
-                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync((startX + endX) / 2);
+                // 工作盘吹气
+                await AutoCutUtils.WorkpieceBlowingAsync(default, _stopCts.Token);
+                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(Appsettings.CameraRelativeBladePosition.X + (_startX + _endX) / 2);
+                await PlcControl.tagControl.Yaxis.StartRelativeAsync(Appsettings.CameraRelativeBladePosition.Y);
             }
         }
 
@@ -203,6 +231,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 
         private void BtnBack_RightClicked(object? sender, bool e)
         {
+            Stop();
             _mainWindow.NavigateToPage("MainMenu");
         }
 

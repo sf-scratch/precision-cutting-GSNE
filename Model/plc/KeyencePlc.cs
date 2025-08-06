@@ -1,17 +1,21 @@
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Numerics;
 using Emgu.CV.Dnn;
 using HslCommunication;
 using HslCommunication.Profinet.Keyence;
 using Newtonsoft.Json.Linq;
 using NPOI.SS.Formula.Functions;
+using Prism.Events;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Numerics;
 using 精密切割系统.database.db.modle;
+using 精密切割系统.Extensions;
 using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
+using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut;
 using 精密切割系统.Model.plc;
 using 精密切割系统.Model.sqlite;
+using 精密切割系统.PubSubEvent;
 using 精密切割系统.Utils;
 using 精密切割系统.ViewModel;
 
@@ -1337,7 +1341,7 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task WaitAxisReadyAsync(CancellationToken token)
         {
-            await TaskUtils.WaitExpectedResultAsync(IsReadyAsync, token);
+            await TaskUtils.WaitExpectedResultAsync(IsReadyAsync, default, token);
         }
 
         /// <summary>
@@ -1356,7 +1360,7 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task WaitAxisStopAsync(CancellationToken token)
         {
-            await TaskUtils.WaitExpectedResultAsync(IsStopedAxisAsync, token);
+            await TaskUtils.WaitExpectedResultAsync(IsStopedAxisAsync, default, token);
         }
 
         public async Task<bool> IsCompleteAbsoluteMotionAsync()
@@ -1477,7 +1481,7 @@ namespace 精密切割系统.Driver
             catch (OperationCanceledException)
             {
                 // 等待轴准备好超时,发停止jog信号
-                await StopJogAsync();
+                await StopJogAsync(token);
             }
             catch (Exception)
             {
@@ -1501,14 +1505,15 @@ namespace 精密切割系统.Driver
         /// 点动结束
         /// </summary>
         /// <param name="jogDirection">方向 0 正 1 负</param>
-        public async Task StopJogAsync()
+        public async Task StopJogAsync(CancellationToken token = default)
         {
             jogStart.writeValue = "0";
             await keyencePlc.WriteTagAsync(jogStart);
             jogAntiStart.writeValue = "0";
             await keyencePlc.WriteTagAsync(jogAntiStart);
-
-            while (await PlcControl.plc.ReadDataAsync(jogStart.addr) != false || await PlcControl.plc.ReadDataAsync(jogAntiStart.addr) != false)
+            CancellationToken useToken = token.WithDefaultTimeout();
+            using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
+            while (await timer.WaitForNextTickAsync(useToken) && (await PlcControl.plc.ReadDataAsync(jogStart.addr) != false || await PlcControl.plc.ReadDataAsync(jogAntiStart.addr) != false))
             {
                 jogStart.writeValue = "0";
                 await keyencePlc.WriteTagAsync(jogStart);
@@ -1628,23 +1633,21 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task StartAbsoluteAsync(float location, float? speed = default, CancellationToken token = default)
         {
-            await StopJogAsync();
-            CancellationToken useToken = token;
-            if (useToken == CancellationToken.None)
-            {
-                using var cts = new CancellationTokenSource();
-                cts.CancelAfter(TimeSpan.FromSeconds(1)); // 设置超时时间
-                useToken = cts.Token;
-            }
-            //等待轴准备好
+            CancellationToken useToken = token.WithDefaultTimeout();
+            await StopJogAsync(useToken);
+            // 等待轴准备好
             await WaitAxisReadyAsync(useToken);
             // 设置绝对运动位置
             absoluteLocation.writeValue = location.ToString();
             await keyencePlc.WriteTagAsync(absoluteLocation);
+            // 最大移动距离
+            int maxDistance = 200;
+            int waitTime;
             if (speed != null)
             {
                 // 设置绝对运动速度
                 await SetAbsoluteSpeedAsync(speed.Value);
+                waitTime = (int)MathF.Round(maxDistance / speed.Value);
             }
             else
             {
@@ -1658,6 +1661,7 @@ namespace 精密切割系统.Driver
                     _ => 1f // 默认值
                 };
                 await SetAbsoluteSpeedAsync(defaultSpeed);
+                waitTime = (int)MathF.Round(maxDistance / defaultSpeed);
             }
             absoluteStart.writeValue = "0";
             await keyencePlc.WriteTagAsync(absoluteStart);
@@ -1665,7 +1669,7 @@ namespace 精密切割系统.Driver
             absoluteStart.writeValue = "1";
             await keyencePlc.WriteTagAsync(absoluteStart);
             // 等待绝对运动完成
-            await WaitAxisStopAsync(token);
+            await WaitAxisStopAsync(token.WithDefaultTimeout(TimeSpan.FromSeconds(waitTime)));
         }
 
         public void RunJog(int jogDirection)
@@ -1899,7 +1903,7 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task WaitReadyToMeasureHeightAsync(CancellationToken token)
         {
-            await TaskUtils.WaitExpectedResultAsync(IsReadyToMeasureHeightAsync, token);
+            await TaskUtils.WaitExpectedResultAsync(IsReadyToMeasureHeightAsync, default, token);
         }
 
         /// <summary>
@@ -1919,7 +1923,7 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task WaitHeightMeasureSetupNumberUdatedAsync(int preNum, CancellationToken token)
         {
-            await TaskUtils.WaitExpectedResultAsync(GetHeightMeasureSetupNumberAsync, preNum, token);
+            await TaskUtils.WaitExpectedResultAsync(GetHeightMeasureSetupNumberAsync, preNum, default, token);
         }
 
         /// <summary>
@@ -1947,7 +1951,7 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task WaitHeightMeasurementCompletedAsync(CancellationToken token)
         {
-            await TaskUtils.WaitExpectedResultAsync(IsCompletedHeightMeasurementAsync, token);
+            await TaskUtils.WaitExpectedResultAsync(IsCompletedHeightMeasurementAsync, default, token);
         }
 
         /// <summary>
@@ -2286,7 +2290,7 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task WaitSystemInitCompletedAsync(CancellationToken token)
         {
-            await TaskUtils.WaitExpectedResultAsync(IsCompletedSystemInitAsync, token);
+            await TaskUtils.WaitExpectedResultAsync(IsCompletedSystemInitAsync, default, token);
         }
 
         public async Task AlarmResetAsync()
@@ -2313,7 +2317,7 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task WaitSpindleSpeedToZeroAsync(CancellationToken token = default)
         {
-            await TaskUtils.WaitExpectedResultAsync(GetSpindleSpeedAsync, 0, token);
+            await TaskUtils.WaitExpectedResultAsync(GetSpindleSpeedAsync, 0, default, token);
         }
 
         /// <summary>
@@ -2814,8 +2818,10 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task RunMotionAsync(float xInterpolationMotionValue, float yInterpolationMotionValue, CancellationToken token = default)
         {
-            await PlcControl.tagControl.Xaxis.WaitAxisStopAsync(token);
-            await PlcControl.tagControl.Yaxis.WaitAxisStopAsync(token);
+            CancellationToken useToken = token.WithDefaultTimeout();
+            Task waitX = PlcControl.tagControl.Xaxis.WaitAxisStopAsync(useToken);
+            Task waitY = PlcControl.tagControl.Yaxis.WaitAxisStopAsync(useToken);
+            await Task.WhenAll(waitX,  waitY);
             xInterpolationMotion.writeValue = xInterpolationMotionValue.ToString();
             await keyencePlc.WriteTagAsync(xInterpolationMotion);
             yInterpolationMotion.writeValue = yInterpolationMotionValue.ToString();
@@ -2824,7 +2830,7 @@ namespace 精密切割系统.Driver
             await keyencePlc.WriteTagAsync(startInterpolationMotion);
             startInterpolationMotion.writeValue = "1";
             await keyencePlc.WriteTagAsync(startInterpolationMotion);
-            await WaitInterpolationMotionCompletedAsync(token);
+            await WaitInterpolationMotionCompletedAsync(token.WithDefaultTimeout(TimeSpan.FromSeconds(5)));
         }
 
         public async Task RunMotionNoWaitAsync(float xInterpolationMotionValue, float yInterpolationMotionValue)
@@ -2855,7 +2861,7 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task WaitInterpolationMotionCompletedAsync(CancellationToken token)
         {
-            await TaskUtils.WaitExpectedResultAsync(IsCompleteInterpolationMotionAsync, token);
+            await TaskUtils.WaitExpectedResultAsync(IsCompleteInterpolationMotionAsync, default, token);
         }
 
         /// <summary>
@@ -2868,7 +2874,7 @@ namespace 精密切割系统.Driver
 
         public async Task WaitReadyToCuttingAsync(CancellationToken token)
         {
-            await TaskUtils.WaitExpectedResultAsync(IsReadyToCuttingAsync, token);
+            await TaskUtils.WaitExpectedResultAsync(IsReadyToCuttingAsync, default, token);
         }
 
         /// <summary>
@@ -2923,7 +2929,7 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task WaitExitCuttingModeAsync(CancellationToken token)
         {
-            await TaskUtils.WaitExpectedResultAsync(IsExitCuttingModeAsync, token);
+            await TaskUtils.WaitExpectedResultAsync(IsExitCuttingModeAsync, default, token);
         }
 
         /// <summary>
@@ -2942,7 +2948,7 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task WaitEnterCuttingModeAsync(CancellationToken token)
         {
-            await TaskUtils.WaitExpectedResultAsync(IsEnterCuttingModeAsync, token);
+            await TaskUtils.WaitExpectedResultAsync(IsEnterCuttingModeAsync, default, token);
         }
 
         /// <summary>
@@ -2978,12 +2984,12 @@ namespace 精密切割系统.Driver
         /// <summary>
         /// 等待切割次数更新
         /// </summary>
-        /// <param name="curCutNum"></param>
+        /// <param name="preCutNum"></param>
         /// <param name="token"></param>
         /// <returns></returns>
         public async Task WaitCutNumUdatedAsync(int preCutNum, CancellationToken token)
         {
-            await TaskUtils.WaitExpectedResultAsync(GetCutNumAsync, preCutNum, token);
+            await TaskUtils.WaitExpectedResultAsync(GetCutNumAsync, preCutNum, default, token);
         }
 
         //public async Task WaitCutNumUdatedAsync(int preCutNum, int timeoutSeconds = 30)

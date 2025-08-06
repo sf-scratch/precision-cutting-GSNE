@@ -102,18 +102,20 @@ namespace 精密切割系统.Assets.config.buttom
             list.Add(new OperateBean(-1, "", ""));
             if (HeightChange) {
                 list.Add(new OperateBean(2401, "高度补偿", "/Assets/icon/tab_1/02/tab_20.png"));
-            } else
+            } 
+            else
             {
                 list.Add(new OperateBean(-1, "", ""));
             }
             list.Add(new OperateBean(2405, "型号参数", "/Assets/icon/tab_0/tab_02.png"));
             list.Add(new OperateBean(2023, "手动校准", "/Assets/icon/tab_1/02/tab_21.png"));
-            list.Add(new OperateBean(-1, "", ""));
-            list.Add(new OperateBean(-1, "", ""));
+            list.Add(new OperateBean(5, "切割水", "/Assets/icon/tab_0/tab_05.png"));
+            list.Add(new OperateBean(5001, "暖机", "/Assets/icon/menu_2/menu_2_3_white.png"));
             if (SpeedChange)
             {
                 list.Add(new OperateBean(2403, "速度更改", "/Assets/icon/tab_1/02/tab_25.png"));
-            } else
+            } 
+            else
             {
                 list.Add(new OperateBean(-1, "", ""));
             }
@@ -405,6 +407,7 @@ namespace 精密切割系统.Assets.config.buttom
             var list = new List<OperateBean>();
             list.Add(new OperateBean(5300, "设置时日", "/Assets/icon/tab_5/tab_04.png"));
             list.Add(new OperateBean(5301, "工作盘真空", "/Assets/icon/tab_5/tab_04.png"));
+            list.Add(new OperateBean(2407, "暖机", "/Assets/icon/menu_2/menu_2_3_white.png"));
             return list;
         }
 

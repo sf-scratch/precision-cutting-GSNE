@@ -612,7 +612,7 @@ namespace 精密切割系统.View.Pages.operate
         {
             if (await PlcControl.tagControl.wholeDevice.IsSystemInitingAsync())
             {
-                MaterialSnackUtils.MaterialSnack("初始化中，请稍后再试！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnackUtils.MaterialSnack("初始化中，请等待初始化完成！", MaterialSnackUtils.SnackType.WARNING);
                 return;
             }
             if (!await PlcControl.tagControl.wholeDevice.CanSystemInitAsync())
@@ -626,8 +626,7 @@ namespace 精密切割系统.View.Pages.operate
             MaterialSnackUtils.MaterialSnack("系统初始化中...", MaterialSnackUtils.SnackType.SUCCESS, 0);
             try
             {
-                using var cts = new CancellationTokenSource();
-                cts.CancelAfter(TimeSpan.FromSeconds(90));
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(90));
                 await PlcControl.tagControl.wholeDevice.WaitSystemInitCompletedAsync(cts.Token);
                 GlobalParams.systemInitFlag = true;
                 MaterialSnackUtils.MaterialSnack("系统初始化完成！", MaterialSnackUtils.SnackType.SUCCESS);

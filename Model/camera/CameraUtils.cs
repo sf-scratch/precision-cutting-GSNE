@@ -210,7 +210,7 @@ namespace 精密切割系统.Driver
             m_bDeviceOpened = true;
         }
 
-        private static void SetDeviceParams()
+        public static void SetDeviceParams()
         {
             string configPath = Path.Combine(AppContext.BaseDirectory, "Assets\\config\\OPT-CC1-M050-GG3-14(D24B110358).camcfg");
             m_currentDev.FeatureLoad(configPath);

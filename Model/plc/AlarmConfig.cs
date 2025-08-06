@@ -136,6 +136,27 @@ namespace 精密切割系统.Model.plc
             }
         }
 
+        public bool HasTargetActiveErrorAlarm(params string[] targetAddres)
+        {
+            if (!GlobalParams.onlineFlag) return false; // 如果不在线，则不检查报警
+            lock (_lock)
+            {
+                if (_newestAlarms == null || _newestAlarms.Length == 0 || _newestAlarms.Length != _alarmInfos.Length) return true;
+
+                // 将排除地址转换为HashSet提高查找性能
+                var excludeAddresses = targetAddres?.Length > 0 ? new HashSet<string>(targetAddres) : null;
+
+                for (int i = 0; i < _newestAlarms.Length; i++)
+                {
+                    if (_newestAlarms[i] && _alarmInfos[i].Level == AlarmLevel.Error && (excludeAddresses == null || excludeAddresses.Contains(_alarmInfos[i].Address)))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
         /// <summary>
         /// 是否有轴报警
         /// </summary>
@@ -182,6 +203,14 @@ namespace 精密切割系统.Model.plc
                 }
             }
             return alarmInfos.Count != 0;
+        }
+
+        /// <summary>
+        /// 测高导电异常
+        /// </summary>
+        public bool HasConductivityAlarm()
+        {
+            return AlarmConfig.Instance.HasTargetActiveErrorAlarm("MR60408");
         }
     }
 }

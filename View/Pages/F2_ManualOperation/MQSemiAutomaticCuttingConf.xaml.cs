@@ -57,13 +57,13 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             rightPage.btnCutFront.Visibility = Visibility.Visible;
             rightPage.btnCutFront.SetRightClickedHandler(CutFront);
             GlobalParams.cutStatusInfo = 0;
-            updateDefineDataModel();
+            UpdateDefineDataModel();
             // 初始化配置
             LoadConfigInfo();
         }
         
         //根据默认配置控制对应显示和隐藏
-        private void updateDefineDataModel()
+        private void UpdateDefineDataModel()
         {
             UserDefineDataModel userDefineModel = CurrentUtils.getUserDefineDataModel();
             bool isSpeedChange = "NO".Equals(userDefineModel.SpeedChange);
@@ -79,7 +79,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             mainWindow.UpdateOperatePage(OperateData.GetSemiAutoCuttingOperate(!isSpeedChange, !isHeightChange), OperateClickHandler);
         }
 
-        private void OperateClickHandler(object sender, int code)
+        private async void OperateClickHandler(object? sender, int code)
         {
             switch (code)
             {
@@ -120,6 +120,10 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                     // 刀片状态信息
                     mainWindow.NavigateToPage("Pages/F4_BladeMaintenance/BladeInfo", "pageName=Pages/F2_ManualOperation/MQSemiAutomaticCuttingConf");
                     break;
+                case 5001:
+                    // 暖机
+                    _ = WarmUpHelper.TriggerWarmUpAsync();
+                    break;
                 default:
                     break;
             }
@@ -128,6 +132,11 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         // 开始切割
         private void StartCut(object? sender, bool e)
         {
+            if (WarmUpHelper.IsRuning)
+            {
+                MaterialSnack("请先结束暖机再开始切割！", SnackType.WARNING);
+                return;
+            }
             mainWindow.NavigateToPage("Pages/F2_ManualOperation/MQSemiAutomaticCuttingRun");
         }
 
@@ -135,6 +144,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         {
             // 回复切割面到Ch 1
             //CurrentUtils.InitCutCh();
+            WarmUpHelper.StopWarmUp();
             mainWindow.NavigateToPage("MainMenu");
         }
 
