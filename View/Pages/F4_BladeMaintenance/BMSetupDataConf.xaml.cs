@@ -44,7 +44,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         private BladeHeightViewModel _viewModel;
         private BladeHeightModel _bladeHeightModel;
         private CancellationTokenSource _measureHeightCts;
-        private CancellationTokenSource? _monitorCts;
+        private CancellationTokenSource _monitorCts;
 
         public BMSetupDataConf()
         {
@@ -70,23 +70,31 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             _rightPage.btnSure.SetRightClickedHandler(BtnSure_RightClicked);
             _rightPage.btnStartSetup.Visibility = Visibility.Visible;
             _rightPage.btnStartSetup.BackFlag = false;
-            _rightPage.btnStartSetup.SetRightClickedHandler(StartMeasureHeight);
-            _rightPage.btnCutStop.SetRightClickedHandler(StopMeasureHeight);
+            _rightPage.btnStartSetup.SetRightClickedHandler(BtnStartSetup_RightClicked);
+            _rightPage.btnCutStop.SetRightClickedHandler(BtnCutStop_RightClicked);
             LoadDBData();
             RealTimeInfo.Messages.Add(MessageModel.Create("进入测高界面..."));
         }
 
-        private void StopMeasureHeight(object? sender, bool e)
+        private void BtnCutStop_RightClicked(object? sender, bool e)
         {
-            _measureHeightCts.Cancel();
+            StopMeasureHeight();
         }
 
-        private async void StartMeasureHeight(object? sender, bool e)
+        private void StopMeasureHeight()
+        {
+            _measureHeightCts.Cancel();
+            _monitorCts.Cancel();
+        }
+
+        private async void BtnStartSetup_RightClicked(object? sender, bool e)
         {
             try
             {
                 _rightPage.btnStartSetup.Visibility = Visibility.Collapsed;
                 _rightPage.btnCutStop.Visibility = Visibility.Visible;
+                _monitorCts = new CancellationTokenSource();
+                _ = AutoCutUtils.MonitoringAlarmAsync(StopMeasureHeight, AlarmConfig.Instance.HasAnyExceptConductivityAlarm, _eventAggregator, _monitorCts.Token);
                 _measureHeightCts = new CancellationTokenSource();
                 _eventAggregator.GetEvent<AutoRuningMessageEvent>().Subscribe(OnMessageReceived, ThreadOption.UIThread);
                 await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());

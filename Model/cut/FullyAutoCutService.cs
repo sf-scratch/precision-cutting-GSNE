@@ -71,11 +71,6 @@ namespace 精密切割系统.Model.cut
         private readonly int _checkMarksCutTimes = GlobalParams.CheckMarksCutTimes;
 
         /// <summary>
-        /// 相机相对刀片中心点位置
-        /// </summary>
-        public static DataPoint<float> _cameraRelativeBladePosition = Appsettings.CameraRelativeBladePosition;
-
-        /// <summary>
         /// 切割方向
         /// </summary>
         private CutDirection _cutDirection = CutDirection.Backward;

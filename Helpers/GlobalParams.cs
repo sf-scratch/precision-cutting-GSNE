@@ -162,7 +162,7 @@ namespace 精密切割系统.FrmWindow.common
         {
             get
             {
-                return new DataPoint<float>(ThetaCenterPoint.X + Appsettings.CameraRelativeBladePosition.X, ThetaCenterPoint.Y + Appsettings.CameraRelativeBladePosition.Y);
+                return new DataPoint<float>(ThetaCenterPoint.X.ToCameraX(), ThetaCenterPoint.Y.ToCameraY());
             }
         }
 

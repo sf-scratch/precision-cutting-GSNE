@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Model.cut;
 using 精密切割系统.Utils;
@@ -206,11 +207,28 @@ namespace 精密切割系统.Model.plc
         }
 
         /// <summary>
+        /// 自动运行预料外的报警
+        /// </summary>
+        /// <returns></returns>
+        public bool HasAutoRunUnexpectedAlarms()
+        {
+            return Instance.HasActiveErrorAlarm("MR60408", "MR61000", "MR61100", "MR61200", "MR61300", "MR61400");
+        }
+
+        /// <summary>
         /// 测高导电异常
         /// </summary>
         public bool HasConductivityAlarm()
         {
-            return AlarmConfig.Instance.HasTargetActiveErrorAlarm("MR60408");
+            return Instance.HasTargetActiveErrorAlarm("MR60408");
+        }
+
+        /// <summary>
+        /// 测高导电异常以外的任何异常
+        /// </summary>
+        public bool HasAnyExceptConductivityAlarm()
+        {
+            return Instance.HasActiveErrorAlarm("MR60408");
         }
     }
 }

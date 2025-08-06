@@ -27,31 +27,35 @@ namespace 精密切割系统.View.Pages.passowrd
     /// </summary>
     public partial class PasswordPage : Page
     {
-        private MainWindow? mainWindow;
-        private RightPage? rightPage;
-        private OperatePage? operatePage;
-        private UserDefineDataModel userDefineDataModel = null;
-        private String menuId="";
-        private String urlParams = "";
-        private String pageName = "";
+        private MainWindow? _mainWindow;
+        private RightPage? _rightPage;
+        private OperatePage? _operatePage;
+        private UserDefineDataModel _userDefineDataModel;
+        private string menuId = "";
+        private string urlParams = "";
+        private string pageName = "";
+
         public PasswordPage()
         {
             InitializeComponent();
-            mainWindow = System.Windows.Application.Current.MainWindow as MainWindow;
+            _mainWindow = Application.Current.MainWindow as MainWindow;
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            rightPage = mainWindow.rightFrame.Content as RightPage;
-            rightPage.PanelAction.Visibility = Visibility.Visible;
-            rightPage.btnBack.Visibility = Visibility.Visible;
-            rightPage.btnSure.Visibility = Visibility.Visible;
-            rightPage.btnBack.BackFlag = true;
-            rightPage.btnBack.SetRightClickedHandler(BtnBack_RightClicked);
-            rightPage.btnSure.GlobalRunOperateFlag = true;
-            rightPage.btnSure.SetRightClickedHandler(BtnSure_RightClicked);
-            operatePage = mainWindow.operateFrame.Content as OperatePage;
-            operatePage.UpdateOperate([]);
+            if (_mainWindow is not null)
+            {
+                _rightPage = _mainWindow.rightFrame.Content as RightPage ?? new RightPage();
+                _rightPage.PanelAction.Visibility = Visibility.Visible;
+                _rightPage.btnBack.Visibility = Visibility.Visible;
+                _rightPage.btnBack.BackFlag = true;
+                _rightPage.btnBack.SetRightClickedHandler(BtnBack_RightClicked);
+                _rightPage.btnSure.Visibility = Visibility.Visible;
+                _rightPage.btnSure.GlobalRunOperateFlag = true;
+                _rightPage.btnSure.SetRightClickedHandler(BtnSure_RightClicked);
+                _operatePage = _mainWindow.operateFrame.Content as OperatePage ?? new OperatePage();
+                _operatePage.UpdateOperate([]);
+            }
             menuId = QueryUtils.GetValueFromQueryParams(this, "menuId");
             string urlParamsTemp = QueryUtils.GetValueFromQueryParams(this, "urlParams");
             if (!string.IsNullOrEmpty(urlParamsTemp))
@@ -59,39 +63,42 @@ namespace 精密切割系统.View.Pages.passowrd
                 urlParams = Uri.UnescapeDataString(urlParamsTemp);
             }
             pageName = QueryUtils.GetValueFromQueryParams(this, "pageName");
-            _ = initUserDefine();
+            _ = InitUserDefine();
+            inputText.Focus();
+            _mainWindow?.ShowKeyboardPage(1);
         }
 
         //初始化数据
-        private async Task initUserDefine()
+        private async Task InitUserDefine()
         {
             //查询用不基础配置信息
-            var list = await SqlHelper.TableAsync<UserDefineDataModel>()
-                   .Where(t => t.Id == 1).ToListAsync();
+            var list = await SqlHelper.TableAsync<UserDefineDataModel>().Where(t => t.Id == 1).ToListAsync();
             //数据不存在，则初始化数据
-            if (list.Count() > 0)
+            if (list.Count > 0)
             {
-                userDefineDataModel = list[0];
+                _userDefineDataModel = list[0];
             }
         }
 
-        private void BtnBack_RightClicked(object? sender, bool e) 
+        private void BtnBack_RightClicked(object? sender, bool e)
         {
-            mainWindow.NavigateToPage("MainMenu");
+            _mainWindow?.NavigateToPage("MainMenu");
         }
 
-        private void BtnSure_RightClicked(object? sender, bool e) {
+        private async void BtnSure_RightClicked(object? sender, bool e)
+        {
             if (!string.IsNullOrEmpty(inputText.Password))
             {
-                if (userDefineDataModel.SystemPassword.Equals(inputText.Password))
+                if (_userDefineDataModel.SystemPassword.Equals(inputText.Password))
                 {
-                    _ = updatePassWordTime();
+                    await UpdatePassWordTime();
                     if (!string.IsNullOrEmpty(pageName))
                     {
-                        mainWindow.NavigateToPage(pageName, urlParams);
-                    } else
+                        _mainWindow?.NavigateToPage(pageName, urlParams);
+                    }
+                    else
                     {
-                        mainWindow.NavigateToPage("MainMenu", $"menuId={menuId}");
+                        _mainWindow?.NavigateToPage("MainMenu", $"menuId={menuId}");
                     }
                 }
                 else
@@ -100,23 +107,23 @@ namespace 精密切割系统.View.Pages.passowrd
                 }
             }
         }
+
         //刷新当前时间戳
-        private async Task updatePassWordTime()
+        private async Task UpdatePassWordTime()
         {
             long currentTimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            userDefineDataModel.SystemPasswordTime = currentTimestamp;
-            SqlHelper.UpdateAsync(userDefineDataModel);
-
+            _userDefineDataModel.SystemPasswordTime = currentTimestamp;
+            await SqlHelper.UpdateAsync(_userDefineDataModel);
         }
 
         private void inputText_TouchDown(object sender, TouchEventArgs e)
         {
-            mainWindow.ShowKeyboardPage(1);
+            _mainWindow?.ShowKeyboardPage(1);
         }
 
         private void inputText_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            mainWindow.ShowKeyboardPage(1);
+            _mainWindow?.ShowKeyboardPage(1);
         }
     }
 }

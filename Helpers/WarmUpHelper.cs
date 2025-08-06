@@ -48,7 +48,7 @@ namespace 精密切割系统.Helpers
                     _timer.Start();
                     _warmUpTcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
                     _warmUpCts = new CancellationTokenSource();
-                    _ = AutoCutUtils.MonitoringAlarmAsync(StopWarmUp, default, default, _warmUpCts.Token);
+                    _ = AutoCutUtils.MonitoringAlarmAsync(StopWarmUp, AlarmConfig.Instance.HasAutoRunUnexpectedAlarms, default, _warmUpCts.Token);
                     try
                     {
                         await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();

@@ -102,7 +102,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             FeedSpeed.Text = bmSharpenParameter.MoCutOneSpeed;
             currentCutNum.Text = "0";
             totalCutNum.Text = cutStepResult.Data.Count.ToString();
-            dirLightRatio.Text = (Math.Round(GlobalParams.intensityRatio * 100, 2)).ToString(); 
+            dirLightRatio.Text = Math.Round(GlobalParams.intensityRatio * 100, 2).ToString(); 
             _ = MonitoringAlarmAsync(_monitoringAlarmCts.Token);
             Stopwatch stopwatch = Stopwatch.StartNew();
             try
@@ -246,12 +246,11 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 if (line != null)
                 {
                     // 执行默认动作
-                    var offsetPos = Appsettings.CameraRelativeBladePosition;
                     Task z1Task = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, cts.Token);
                     Task z2Task = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(Appsettings.FocusClearZ ?? 0, default, cts.Token);
                     await Task.WhenAll(z1Task, z2Task);
                     await AutoCutUtils.WorkpieceBlowingAsync(default, cts.Token);
-                    await PlcControl.tagControl.cutting.RunMotionAsync((line.StartPoint.X + line.EndPoint.X) / 2 + offsetPos.X, line.StartPoint.Y + offsetPos.Y, cts.Token);
+                    await PlcControl.tagControl.cutting.RunMotionAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), line.StartPoint.Y.ToCameraY(), cts.Token);
                 }
                 await AutoCutUtils.FineTuneAxisYAsync();
                 await AutoCutUtils.UpdateCameraCommonLineAsync();
@@ -291,10 +290,11 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 {
                     try
                     {
-                        if (AlarmConfig.Instance.HasActiveErrorAlarm("MR60408", "MR61000", "MR61100", "MR61200", "MR61300", "MR61400"))
+                        if (AlarmConfig.Instance.HasAutoRunUnexpectedAlarms())
                         {
                             if (!_pauseCts.IsCancellationRequested)
                             {
+                                await StopAsync();
                             }
                         }
                     }

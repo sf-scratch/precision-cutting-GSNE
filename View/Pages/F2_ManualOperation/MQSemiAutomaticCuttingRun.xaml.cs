@@ -100,7 +100,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 {
                     try
                     {
-                        if (AlarmConfig.Instance.HasActiveErrorAlarm("MR60408", "MR61000", "MR61100", "MR61200", "MR61300", "MR61400"))
+                        if (AlarmConfig.Instance.HasAutoRunUnexpectedAlarms())
                         {
                             if (!_pauseCts.IsCancellationRequested)
                             {
@@ -179,7 +179,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 }
                 _ = MonitoringAlarmAsync(_monitoringCts.Token);
                 _ = MonitoringCutProgressAsync(_monitoringCts.Token);
-                float cutY = (await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0) - Appsettings.CameraRelativeBladePosition.Y;
+                float cutY = (await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0).ToActualY();
                 int spindleRev = fileTableItemResult.Data.SpindleRev;
                 await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
                 await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(55.1f));
@@ -291,12 +291,11 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 if (line != null)
                 {
                     // 执行默认动作
-                    var offsetPos = Appsettings.CameraRelativeBladePosition;
                     Task z1Task = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, cts.Token);
                     Task z2Task = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(Appsettings.FocusClearZ ?? 0, default, cts.Token);
                     await Task.WhenAll(z1Task, z2Task);
                     await AutoCutUtils.WorkpieceBlowingAsync(default, cts.Token);
-                    await PlcControl.tagControl.cutting.RunMotionAsync((line.StartPoint.X + line.EndPoint.X) / 2 + offsetPos.X, line.StartPoint.Y + offsetPos.Y, cts.Token);
+                    await PlcControl.tagControl.cutting.RunMotionAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), line.StartPoint.Y.ToCameraY(), cts.Token);
                 }
                 await AutoCutUtils.FineTuneAxisYAsync();
                 await AutoCutUtils.UpdateCameraCommonLineAsync();
@@ -331,7 +330,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                     Appsettings.AfterReplaceBladeCutTimes++;
                     Appsettings.AfterReplaceBladeCutLength += process.CutLength;
                     _viewModel.AllCutLine = Appsettings.AfterReplaceBladeCutTimes ?? 0;
-                    _viewModel.AllCutLineLength = MathF.Round(Appsettings.AfterReplaceBladeCutLength / 100 ?? 0, 3);
+                    _viewModel.AllCutLineLength = MathF.Round(Appsettings.AfterReplaceBladeCutLength / 100 ?? 0, 2);
                     _viewModel.ExpectedProcessingEndTime = DateTime.Now.AddSeconds(process.RemainingTime).ToString("HH:mm:ss");
                 }
             });

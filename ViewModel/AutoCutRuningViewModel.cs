@@ -222,8 +222,6 @@ namespace 精密切割系统.ViewModel
             DataPoint<float> thetaCenterPoint = GlobalParams.ThetaCenterPoint;
             //相机中心点位置
             DataPoint<float> cameraCenterPoint = GlobalParams.CameraCenterPoint;
-            //相机相对theta轴中心点位置
-            DataPoint<float> cameraRelativeBladePosition = Appsettings.CameraRelativeBladePosition;
             //工件半径
             float workpieceRadius = GlobalParams.WorkpieceRadius;
             //工件中心点到theta轴中心点距离
@@ -291,7 +289,7 @@ namespace 精密切割系统.ViewModel
                 Appsettings.FocusClearZ = focusClearZ.Data;
                 RunStatus = AutoRunStatus.SharpenCalibrat;
                 // 磨刀校准
-                float sharpenCalibratTheta = await AutoCutUtils.CalibratSharpenAsync(sharpenRect.Clone().Translate(cameraRelativeBladePosition.X, cameraRelativeBladePosition.Y), _pauseCts.Token);
+                float sharpenCalibratTheta = await AutoCutUtils.CalibratSharpenAsync(sharpenRect.Clone(), _pauseCts.Token);
                 RunStatus = AutoRunStatus.CutingCalibrat;
                 PdaUtils.AddStandardSharpenSpeed(SharpenParams.HightestCutSpeed);
                 // 切割校准
@@ -712,12 +710,11 @@ namespace 精密切割系统.ViewModel
                         if (line != null)
                         {
                             // 执行默认动作
-                            var offsetPos = Appsettings.CameraRelativeBladePosition;
                             Task z1Task = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, cts.Token);
                             Task z2Task = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(Appsettings.FocusClearZ ?? 0, default, cts.Token);
                             await Task.WhenAll(z1Task, z2Task);
                             await AutoCutUtils.WorkpieceBlowingAsync(_eventAggregator, cts.Token);
-                            await PlcControl.tagControl.cutting.RunMotionAsync((line.StartPoint.X + line.EndPoint.X) / 2 + offsetPos.X, line.StartPoint.Y + offsetPos.Y, cts.Token);
+                            await PlcControl.tagControl.cutting.RunMotionAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), line.StartPoint.Y.ToCameraY(), cts.Token);
                         }
                         await AutoCutUtils.FineTuneAxisYAsync();
                         await AutoCutUtils.UpdateCameraCommonLineAsync();
@@ -759,7 +756,7 @@ namespace 精密切割系统.ViewModel
                 {
                     try
                     {
-                        if (AlarmConfig.Instance.HasActiveErrorAlarm("MR60408", "MR61000", "MR61100", "MR61200", "MR61300", "MR61400"))
+                        if (AlarmConfig.Instance.HasAutoRunUnexpectedAlarms())
                         {
                             if (!_pauseCts.IsCancellationRequested)
                             {

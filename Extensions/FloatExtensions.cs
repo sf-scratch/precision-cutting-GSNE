@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Media3D;
 
 namespace 精密切割系统.Helpers
 {
@@ -63,6 +64,26 @@ namespace 精密切割系统.Helpers
                 out int result
             );
             return success ? result : defaultValue;
+        }
+
+        public static float ToActualX(this float cameraX)
+        {
+            return cameraX - Appsettings.CameraRelativeBladePosition.X;
+        }
+
+        public static float ToActualY(this float cameraY)
+        {
+            return cameraY - Appsettings.CameraRelativeBladePosition.Y;
+        }
+
+        public static float ToCameraX(this float actualX)
+        {
+            return actualX + Appsettings.CameraRelativeBladePosition.X;
+        }
+
+        public static float ToCameraY(this float actualY)
+        {
+            return actualY + Appsettings.CameraRelativeBladePosition.Y;
         }
     }
 }

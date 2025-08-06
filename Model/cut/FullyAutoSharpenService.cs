@@ -45,11 +45,6 @@ namespace 精密切割系统.Model.cut
         private readonly int _checkMarksSharpenTimes = GlobalParams.CheckMarksCutTimes;
 
         /// <summary>
-        /// 相机相对刀片中心点位置
-        /// </summary>
-        public static DataPoint<float> _cameraRelativeBladePosition = Appsettings.CameraRelativeBladePosition;
-
-        /// <summary>
         /// 单刀磨损量
         /// </summary>
         private readonly float _singleBladeWear = GlobalParams.SingleBladeWear;

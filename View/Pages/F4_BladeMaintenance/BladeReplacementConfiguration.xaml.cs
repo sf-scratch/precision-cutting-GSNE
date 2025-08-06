@@ -40,8 +40,8 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         {
             InitializeComponent();
             _eventAggregator = eventAggregator;
-            _eventAggregator.GetEvent<SetFocusEvent>().Subscribe(LunguFocus, ThreadOption.UIThread);
             _mainWindow = Application.Current.MainWindow as MainWindow;
+            this.Loaded += BladeReplacementConfiguration_Loaded;
             this.Unloaded += BladeReplacementConfiguration_Unloaded;
         }
 
@@ -49,6 +49,11 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         {
             if (target == "lunguTextBox")
                 lunguTextBox.Focus();
+        }
+
+        private void BladeReplacementConfiguration_Loaded(object sender, RoutedEventArgs e)
+        {
+            _eventAggregator.GetEvent<SetFocusEvent>().Subscribe(LunguFocus, ThreadOption.UIThread);
         }
 
         private void BladeReplacementConfiguration_Unloaded(object sender, RoutedEventArgs e)

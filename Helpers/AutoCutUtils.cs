@@ -675,10 +675,9 @@ namespace 精密切割系统.Helpers
         public static async Task GoPreCutLineAsync(CancellationToken token)
         {
             DataPoint<float> cameraCenterPoint = GlobalParams.CameraCenterPoint;
-            DataPoint<float> cameraRelativeBladePosition = Appsettings.CameraRelativeBladePosition;
             float thetaDeg = Appsettings.CutThetaDegList?.FirstOrDefault() ?? 0f;
-            Task focusxyTask = PlcControl.tagControl.cutting.RunMotionAsync(cameraCenterPoint.X - 10, cameraRelativeBladePosition.Y + (Appsettings.CutY ?? (cameraCenterPoint.Y + 30)), token);
-            Task focusThetaTask = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(thetaDeg);
+            Task focusxyTask = PlcControl.tagControl.cutting.RunMotionAsync(cameraCenterPoint.X - 10, Appsettings.CutY?.ToCameraY() ?? (cameraCenterPoint.Y + 30), token);
+            Task focusThetaTask = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(thetaDeg, default, token);
             await Task.WhenAll(focusxyTask, focusThetaTask);
         }
 
@@ -922,12 +921,11 @@ namespace 精密切割系统.Helpers
             ConcurrentQueue<Mat> matQueue = new ConcurrentQueue<Mat>();
             try
             {
-                DataPoint<float> relativePos = Appsettings.CameraRelativeBladePosition;
                 //工件吹气
                 eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始工件吹气..."));
-                float rightCheckX = line.EndPoint.X + relativePos.X - 20;
-                float leftCheckX = line.StartPoint.X + relativePos.X + 20;
-                float checkY = line.EndPoint.Y + relativePos.Y;
+                float rightCheckX = line.EndPoint.X.ToCameraX() - 20;
+                float leftCheckX = line.StartPoint.X.ToCameraX() + 20;
+                float checkY = line.EndPoint.Y.ToCameraY();
                 await PlcControl.tagControl.wholeDevice.OpenWorkpieceBlowingAsync();
                 await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(190, 80, token);
                 await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(rightCheckX, 7f, token);
@@ -1241,11 +1239,10 @@ namespace 精密切割系统.Helpers
             eventAggregator.GetEvent<AutoRuningMessageEvent>().Publish(message);
         }
 
-        public static async Task MonitoringAlarmAsync(Action hasAlarmDoAction, Func<bool>? hasActiveErrorAlarmFunc, IEventAggregator? eventAggregator, CancellationToken monitorToken)
+        public static async Task MonitoringAlarmAsync(Action hasAlarmDoAction, Func<bool> hasActiveErrorAlarmFunc, IEventAggregator? eventAggregator, CancellationToken monitorToken)
         {
             try
             {
-                hasActiveErrorAlarmFunc ??= () => { return AlarmConfig.Instance.HasActiveErrorAlarm("MR60408", "MR61000", "MR61100", "MR61200", "MR61300", "MR61400"); };
                 using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
                 while (await timer.WaitForNextTickAsync(monitorToken))
                 {
