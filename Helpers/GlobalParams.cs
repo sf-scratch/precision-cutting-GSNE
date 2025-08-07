@@ -153,18 +153,7 @@ namespace 精密切割系统.FrmWindow.common
         /// theta轴中心点位置
         /// </summary>
         //public static DataPoint<float> ThetaCenterPoint = new DataPoint<float>(146.48f, 81.86f);
-        public static DataPoint<float> ThetaCenterPoint = new DataPoint<float>(140.485f, 81.86f);
-
-        /// <summary>
-        /// 相机中心点位置
-        /// </summary>
-        public static DataPoint<float> CameraCenterPoint
-        {
-            get
-            {
-                return new DataPoint<float>(ThetaCenterPoint.X.ToCameraX(), ThetaCenterPoint.Y.ToCameraY());
-            }
-        }
+        public static DataPoint<float> ThetaCenterPoint = new DataPoint<float>(Appsettings.CameraThetaCenterPoint.X.ToActualX(), Appsettings.CameraThetaCenterPoint.Y.ToActualY());
 
         /// <summary>
         /// 磨刀板尺寸

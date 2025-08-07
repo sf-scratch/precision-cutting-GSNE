@@ -1455,37 +1455,17 @@ namespace 精密切割系统.Driver
         /// <param name="jogDirection">方向 0 正 1 负</param>
         public async Task StartJogAsync(int jogDirection, CancellationToken token = default)
         {
-            try
+            if (jogDirection == 0)
             {
-                //await StopJogAsync();
-                //CancellationToken useToken = token;
-                //if (useToken == CancellationToken.None)
-                //{
-                //    using var cts = new CancellationTokenSource();
-                //    cts.CancelAfter(TimeSpan.FromSeconds(1)); // 设置超时时间
-                //    useToken = cts.Token;
-                //}
-                if (jogDirection == 0)
-                {
-                    // 开启正转
-                    jogStart.writeValue = "1";
-                    await keyencePlc.WriteTagAsync(jogStart);
-                }
-                else
-                {
-                    // 开启反转
-                    jogAntiStart.writeValue = "1";
-                    await keyencePlc.WriteTagAsync(jogAntiStart);
-                }
+                // 开启正转
+                jogStart.writeValue = "1";
+                await keyencePlc.WriteTagAsync(jogStart);
             }
-            catch (OperationCanceledException)
+            else
             {
-                // 等待轴准备好超时,发停止jog信号
-                await StopJogAsync(token);
-            }
-            catch (Exception)
-            {
-
+                // 开启反转
+                jogAntiStart.writeValue = "1";
+                await keyencePlc.WriteTagAsync(jogAntiStart);
             }
         }
 
@@ -1545,7 +1525,7 @@ namespace 精密切割系统.Driver
         /// <param name="token"></param>
         /// <param name="highSpeed"></param>
         /// <returns></returns>
-        public async Task StartRelativeAsync(float distance, float? speed = null, CancellationToken token = default)
+        public async Task StartRelativeAsync(float distance, float? speed, CancellationToken token)
         {
             float? curLocation = await GetCurrentLocationAsync();
             if (curLocation != null)
@@ -1631,12 +1611,11 @@ namespace 精密切割系统.Driver
         /// <param name="token"></param>
         /// <param name="speed"></param>
         /// <returns></returns>
-        public async Task StartAbsoluteAsync(float location, float? speed = default, CancellationToken token = default)
+        public async Task StartAbsoluteAsync(float location, float? speed, CancellationToken token)
         {
-            CancellationToken useToken = token.WithDefaultTimeout();
-            await StopJogAsync(useToken);
+            await StopJogAsync(token.WithDefaultTimeout());
             // 等待轴准备好
-            await WaitAxisReadyAsync(useToken);
+            await WaitAxisReadyAsync(token.WithDefaultTimeout());
             // 设置绝对运动位置
             absoluteLocation.writeValue = location.ToString();
             await keyencePlc.WriteTagAsync(absoluteLocation);
@@ -2816,7 +2795,7 @@ namespace 精密切割系统.Driver
         /// <param name="xInterpolationMotionValue"></param>
         /// <param name="yInterpolationMotionValue"></param>
         /// <returns></returns>
-        public async Task RunMotionAsync(float xInterpolationMotionValue, float yInterpolationMotionValue, CancellationToken token = default)
+        public async Task RunMotionAsync(float xInterpolationMotionValue, float yInterpolationMotionValue, CancellationToken token)
         {
             CancellationToken useToken = token.WithDefaultTimeout();
             Task waitX = PlcControl.tagControl.Xaxis.WaitAxisStopAsync(useToken);

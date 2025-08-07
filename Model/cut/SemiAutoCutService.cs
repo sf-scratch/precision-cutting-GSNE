@@ -165,8 +165,8 @@ namespace 精密切割系统.Model.cut
                         float cutLength = MathF.Abs(line.EndPoint.X - line.StartPoint.X);
                         float cutSpeed = cutStep.Speed + _feedSpeedCompCompensationValue;
                         //加上边距
-                        float startX = line.StartPoint.X - margin;
-                        float endX = line.EndPoint.X + margin;
+                        float startX = line.StartPoint.X + cutStep.OffsetX - margin;
+                        float endX = line.EndPoint.X + cutStep.OffsetX + margin;
                         //x方向交替切割
                         if (cutStep.IsAlternatingCuttingStroke)
                         {
@@ -269,5 +269,5 @@ namespace 精密切割系统.Model.cut
         }
     }
 
-    public record CutStep(float CutHeight, float Speed, float OffsetY, float ThetaDeg, bool IsAlternatingCuttingStroke = false, int ChannelNum = 1, float? SingleCutDeep = null);
+    public record CutStep(float CutHeight, float Speed, float OffsetY, float ThetaDeg, float OffsetX = 0, bool IsAlternatingCuttingStroke = false, int ChannelNum = 1, float? SingleCutDeep = null);
 }

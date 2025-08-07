@@ -267,6 +267,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
         {
             positionLoadFlag = false;
             PlcControl.tagControl.flange.JoinTrimming(0);
+            mainWindow.NavigateToPage("MainMenu");
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)

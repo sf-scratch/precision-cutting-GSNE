@@ -56,18 +56,25 @@ namespace 精密切割系统.Helpers
         /// <returns></returns>
         public static async Task ReplaceBladeAsync(IEventAggregator? eventAggregator = null)
         {
-            MaterialSnackUtils.MaterialSnack("请准备更换刀片,轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
-            await PlcControl.tagControl.wholeDevice.StopSpindleAsync();
-            Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0);
-            Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0);
-            await Task.WhenAll(taskZ1, taskZ2);
-            Task taskXY = PlcControl.tagControl.cutting.RunMotionAsync(0, 150);
-            Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0);
-            Task speedZero = PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync();
-            await Task.WhenAll(taskXY, taskTheta, speedZero);
-            Appsettings.AfterReplaceBladeCutTimes = 0;
-            Appsettings.AfterReplaceBladeCutLength = 0;
-            MaterialSnackUtils.MaterialSnack("请打开切割安全门，更换刀片！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
+            try
+            {
+                MaterialSnackUtils.MaterialSnack("请准备更换刀片,轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+                await PlcControl.tagControl.wholeDevice.StopSpindleAsync();
+                Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, default);
+                Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, default, default);
+                await Task.WhenAll(taskZ1, taskZ2);
+                Task taskXY = PlcControl.tagControl.cutting.RunMotionAsync(0, 150, default);
+                Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0, default, default);
+                Task speedZero = PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync();
+                await Task.WhenAll(taskXY, taskTheta, speedZero);
+                Appsettings.AfterReplaceBladeCutTimes = 0;
+                Appsettings.AfterReplaceBladeCutLength = 0;
+                MaterialSnackUtils.MaterialSnack("请打开切割安全门，更换刀片！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
+            }
+            catch (OperationCanceledException)
+            {
+                MaterialSnackUtils.MaterialSnack("更换刀片操作失败！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
+            }
         }
 
         /// <summary>
@@ -76,16 +83,23 @@ namespace 精密切割系统.Helpers
         /// <returns></returns>
         public static async Task ReplaceSharpeningBoardAsync(IEventAggregator? eventAggregator = null)
         {
-            MaterialSnackUtils.MaterialSnack("请准备更换磨刀板,轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
-            await PlcControl.tagControl.wholeDevice.StopSpindleAsync();
-            Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0);
-            Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0);
-            await Task.WhenAll(taskZ1, taskZ2);
-            Task taskXY = PlcControl.tagControl.cutting.RunMotionAsync(0, 0);
-            Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0);
-            Task speedZero = PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync();
-            await Task.WhenAll(taskXY, taskTheta, speedZero);
-            MaterialSnackUtils.MaterialSnack("请打开相机安全门，更换磨刀板！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
+            try
+            {
+                MaterialSnackUtils.MaterialSnack("请准备更换磨刀板,轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+                await PlcControl.tagControl.wholeDevice.StopSpindleAsync();
+                Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, default);
+                Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, default, default);
+                await Task.WhenAll(taskZ1, taskZ2);
+                Task taskXY = PlcControl.tagControl.cutting.RunMotionAsync(0, 0, default);
+                Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0, default, default);
+                Task speedZero = PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync();
+                await Task.WhenAll(taskXY, taskTheta, speedZero);
+                MaterialSnackUtils.MaterialSnack("请打开相机安全门，更换磨刀板！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
+            }
+            catch (OperationCanceledException)
+            {
+                MaterialSnackUtils.MaterialSnack("更换磨刀板操作失败！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
+            }
         }
 
         /// <summary>
@@ -107,16 +121,23 @@ namespace 精密切割系统.Helpers
         /// <returns></returns>
         public static async Task ReplaceWaferAsync(IEventAggregator? eventAggregator = null)
         {
-            MaterialSnackUtils.MaterialSnack("请准备更换硅片,轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
-            await PlcControl.tagControl.wholeDevice.StopSpindleAsync();
-            Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0);
-            Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0);
-            await Task.WhenAll(taskZ1, taskZ2);
-            Task taskXY = PlcControl.tagControl.cutting.RunMotionAsync(0, 0);
-            Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0);
-            Task speedZero = PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync();
-            await Task.WhenAll(taskXY, taskTheta, speedZero);
-            MaterialSnackUtils.MaterialSnack("请打开相机安全门，更换硅片！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
+            try
+            {
+                MaterialSnackUtils.MaterialSnack("请准备更换硅片,轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+                await PlcControl.tagControl.wholeDevice.StopSpindleAsync();
+                Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, default);
+                Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, default, default);
+                await Task.WhenAll(taskZ1, taskZ2);
+                Task taskXY = PlcControl.tagControl.cutting.RunMotionAsync(0, 0, default);
+                Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0, default, default);
+                Task speedZero = PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync();
+                await Task.WhenAll(taskXY, taskTheta, speedZero);
+                MaterialSnackUtils.MaterialSnack("请打开相机安全门，更换硅片！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
+            }
+            catch (OperationCanceledException)
+            {
+                MaterialSnackUtils.MaterialSnack("更换硅片操作失败！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
+            }
         }
 
         /// <summary>
@@ -674,9 +695,9 @@ namespace 精密切割系统.Helpers
 
         public static async Task GoPreCutLineAsync(CancellationToken token)
         {
-            DataPoint<float> cameraCenterPoint = GlobalParams.CameraCenterPoint;
+            DataPoint<float> cameraThetaCenterPoint = Appsettings.CameraThetaCenterPoint;
             float thetaDeg = Appsettings.CutThetaDegList?.FirstOrDefault() ?? 0f;
-            Task focusxyTask = PlcControl.tagControl.cutting.RunMotionAsync(cameraCenterPoint.X - 10, Appsettings.CutY?.ToCameraY() ?? (cameraCenterPoint.Y + 30), token);
+            Task focusxyTask = PlcControl.tagControl.cutting.RunMotionAsync(cameraThetaCenterPoint.X - 10, Appsettings.CutY?.ToCameraY() ?? (cameraThetaCenterPoint.Y + 30), token);
             Task focusThetaTask = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(thetaDeg, default, token);
             await Task.WhenAll(focusxyTask, focusThetaTask);
         }
@@ -1634,7 +1655,7 @@ namespace 精密切割系统.Helpers
                 }
                 float offsetY = (float)Math.Round((imageY.Value - (cropMatJpg.Height / 2)) * VisionAnalyzer.PixelToMmRatio, 4);
                 if (MathF.Abs(offsetY) >= GlobalParams.NormalStepDistance) offsetY = 0;
-                await PlcControl.tagControl.Yaxis.StartRelativeAsync(offsetY);
+                await PlcControl.tagControl.Yaxis.StartRelativeAsync(offsetY, default, default);
                 return CommonResult.Success();
             }
             catch (Exception ex)

@@ -77,7 +77,7 @@
                         </Grid.RowDefinitions>
                         <Button Style="{StaticResource ArrowButton}" VerticalAlignment="Center" x:Name="scanLeftBottomBtn"  Content="{materialDesign:PackIcon ArrowDownLeftBold,Size=40}">
                             <behaviors:Interaction.Behaviors>
-                                <behav:DualInputBehavior StartCommand="{Binding StartThetaReversalCommand}" StopCommand="{Binding StopJogThetaCommand}"/>
+                                <behav:DualInputBehavior PromptCommand="{Binding ThetaRelativeNegativeCommand}" StartCommand="{Binding StartThetaReversalCommand}" StopCommand="{Binding StopJogThetaCommand}"/>
                             </behaviors:Interaction.Behaviors>
                         </Button>
                         <Button Grid.Row="1" Content="Z1抬起">
@@ -140,7 +140,7 @@
                         </Grid.RowDefinitions>
                         <Button Style="{StaticResource ArrowButton}" VerticalAlignment="Center" x:Name="scanRightBottomBtn"  Content="{materialDesign:PackIcon ArrowDownRightBold,Size=40}">
                             <behaviors:Interaction.Behaviors>
-                                <behav:DualInputBehavior StartCommand="{Binding StartThetaCorotationCommand}" StopCommand="{Binding StopJogThetaCommand}"/>
+                                <behav:DualInputBehavior PromptCommand="{Binding ThetaRelativePositiveCommand}" StartCommand="{Binding StartThetaCorotationCommand}" StopCommand="{Binding StopJogThetaCommand}"/>
                             </behaviors:Interaction.Behaviors>
                         </Button>
                         <Button Grid.Row="1" Content="Z2抬起">

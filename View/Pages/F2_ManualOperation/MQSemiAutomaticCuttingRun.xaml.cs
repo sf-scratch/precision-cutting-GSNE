@@ -177,27 +177,23 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                     MaterialSnack(fileTableItemResult.Message, SnackType.WARNING);
                     return;
                 }
+                FileTableItemModel fileTableItem = fileTableItemResult.Data;
                 _ = MonitoringAlarmAsync(_monitoringCts.Token);
                 _ = MonitoringCutProgressAsync(_monitoringCts.Token);
                 float cutY = (await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0).ToActualY();
-                int spindleRev = fileTableItemResult.Data.SpindleRev;
                 await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
-                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(55.1f));
+                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(56));
                 CommonResult<float> curHeightZ = await AutoCutUtils.ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, default, _pauseCts.Token);
                 if (!curHeightZ.IsSuccess)
                 {
                     MaterialSnack(curHeightZ.Message, SnackType.WARNING, 0);
                     return;
                 }
-                CircularWorkpiece workpiece = new(GlobalParams.ThetaCenterPoint, GlobalParams.WorkpieceRadius, cutY)
-                {
-                    WorkThickness = float.Parse(fileTableItemResult.Data.WorkThickness),
-                    TapeThickness = float.Parse(fileTableItemResult.Data.TapeThickness)
-                };
+                IWorkpieces workpiece = GenerateWorkpieces(fileTableItem, cutY);
                 _semiAutoCutService.CutServiceProcessChanged += CutService_CutServiceProcessChanged;
                 _semiAutoCutService.CutServicePaused += CutService_CutServicePaused;
                 MaterialSnack($"切割中...", SnackType.SUCCESS, 0);
-                RunResult cutResult = await _semiAutoCutService.RunAsync(cutStepResult.Data, workpiece, 30, spindleRev, curHeightZ.Data, GlobalParams.BladeLiftingHeight, _pauseCts.Token);
+                RunResult cutResult = await _semiAutoCutService.RunAsync(cutStepResult.Data, workpiece, 30, fileTableItem.SpindleRev, curHeightZ.Data, GlobalParams.BladeLiftingHeight, _pauseCts.Token);
                 if (!cutResult.IsSuccess)
                 {
                     MaterialSnack($"切割失败：{cutResult.Message}", SnackType.WARNING, 0);
@@ -221,6 +217,28 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 _pauseCts.Cancel();
                 await StopAsync(ServicePauseResult.Stop);
             }
+        }
+
+        private IWorkpieces GenerateWorkpieces(FileTableItemModel fileTableItem, float cutY)
+        {
+            IWorkpieces workpiece;
+            if (fileTableItem.WorkShape == 1)
+            {
+                workpiece = new CircularWorkpiece(GlobalParams.ThetaCenterPoint, fileTableItem.Round.ToFloat() / 2, cutY);
+            }
+            else if (fileTableItem.WorkShape == 2)
+            {
+                float width = fileTableItem.WorkbenchCh1;
+                float height = fileTableItem.WorkbenchCh2;
+                workpiece = new RectangleWorkpiece(new DataRectangleF(GlobalParams.ThetaCenterPoint.X - (width / 2), GlobalParams.ThetaCenterPoint.Y - (height / 2), width, height), cutY);
+            }
+            else
+            {
+                workpiece = new CircularWorkpiece(GlobalParams.ThetaCenterPoint, fileTableItem.Round.ToFloat() / 2, cutY);
+            }
+            workpiece.WorkThickness = float.Parse(fileTableItem.WorkThickness);
+            workpiece.TapeThickness = float.Parse(fileTableItem.TapeThickness);
+            return workpiece;
         }
 
         private void PauseHandler(object? sender, bool e)
@@ -391,7 +409,15 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 {
                     for (int i = 0; i < repeatTimes[index]; i++)
                     {
-                        tempCutSteps.Add(new CutStep(setBladeHeight[index], feedSpeeds[index], yIndexs[index], float.Parse(ch.ThetaDeg), ch.CutMode == CutOperateUtils.B_ZKEEP, chSeq, isDeep ? cutDepths[index] : default));
+                        float cutHeight = setBladeHeight[index]; 
+                        float speed = feedSpeeds[index];
+                        float offsetY = yIndexs[index];
+                        float thetaDeg = float.Parse(ch.ThetaDeg);
+                        float offsetX = ch.OffsetX.ToFloat();
+                        bool isAlternatingCuttingStroke = ch.CutMode == CutOperateUtils.B_ZKEEP;
+                        int channelNum = chSeq;
+                        float? singleCutDeep = isDeep ? cutDepths[index] : null;
+                        tempCutSteps.Add(new CutStep(cutHeight, speed, offsetY, thetaDeg, offsetX, isAlternatingCuttingStroke, channelNum, singleCutDeep));
                     }
                 }
                 int chCutLines = Tools.GetIntStringValue(ch.CutLine);

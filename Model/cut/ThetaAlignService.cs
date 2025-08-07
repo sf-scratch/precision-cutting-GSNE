@@ -57,7 +57,8 @@ namespace 精密切割系统.Model.cut
             {
                 using CancellationTokenSource cts = new(TimeSpan.FromSeconds(AlignOutTime));
                 CancellationToken token = cts.Token;
-                PointF center = new PointF(GlobalParams.CameraCenterPoint.X, GlobalParams.CameraCenterPoint.Y);
+                DataPoint<float> cameraThetaCenterPoint = Appsettings.CameraThetaCenterPoint;
+                PointF center = new PointF(cameraThetaCenterPoint.X, cameraThetaCenterPoint.Y);
                 float xLocation, yLocation;
                 switch (_currentThetaAlignStatus)
                 {
@@ -91,7 +92,7 @@ namespace 精密切割系统.Model.cut
                         xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync(token) ?? 0;
                         yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync(token) ?? 0;
                         _pointA = new PointF(xLocation, yLocation);
-                        await PlcControl.tagControl.Xaxis.StartRelativeAsync(AlignDefaultMoveDistance, 80);
+                        await PlcControl.tagControl.Xaxis.StartRelativeAsync(AlignDefaultMoveDistance, 80, default);
                         _currentThetaAlignStatus = ThetaAlignStatus.Horizontal;
                         MaterialSnackUtils.MaterialSnack("请继续横向拉直第二点", MaterialSnackUtils.SnackType.SUCCESS);
                         break;
@@ -118,7 +119,8 @@ namespace 精密切割系统.Model.cut
             {
                 using CancellationTokenSource cts = new(TimeSpan.FromSeconds(AlignOutTime));
                 CancellationToken token = cts.Token;
-                PointF center = new PointF(GlobalParams.CameraCenterPoint.X, GlobalParams.CameraCenterPoint.Y);
+                DataPoint<float> cameraThetaCenterPoint = Appsettings.CameraThetaCenterPoint;
+                PointF center = new PointF(cameraThetaCenterPoint.X, cameraThetaCenterPoint.Y);
                 float xLocation, yLocation;
                 switch (_currentThetaAlignStatus)
                 {
@@ -152,7 +154,7 @@ namespace 精密切割系统.Model.cut
                         xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync(token) ?? 0;
                         yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync(token) ?? 0;
                         _pointA = new PointF(xLocation, yLocation);
-                        await PlcControl.tagControl.Yaxis.StartRelativeAsync(-AlignDefaultMoveDistance, 60);
+                        await PlcControl.tagControl.Yaxis.StartRelativeAsync(-AlignDefaultMoveDistance, 60, default);
                         _currentThetaAlignStatus = ThetaAlignStatus.Vertical;
                         MaterialSnackUtils.MaterialSnack("请继续竖向拉直第二点", MaterialSnackUtils.SnackType.SUCCESS);
                         break;

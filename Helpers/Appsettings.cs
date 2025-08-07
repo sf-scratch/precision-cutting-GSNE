@@ -12,8 +12,6 @@ namespace 精密切割系统.Helpers
     public static class Appsettings
     {
         private static readonly string _configPath = Path.Combine(AppContext.BaseDirectory, "Assets\\config\\appsettings.json");
-        public static readonly string CameraRelativeBladePositionX = "CameraRelativeBladePosition:X";
-        public static readonly string CameraRelativeBladePositionY = "CameraRelativeBladePosition:Y";
 
         public static IConfigurationRoot Configuration { get; }
 
@@ -30,14 +28,10 @@ namespace 精密切割系统.Helpers
             get { return GetList<float>(); }
             set
             {
+                UpdateAppSettingsToNull();
                 if (value is not null)
                 {
-                    UpdateAppSettingsToNull();
                     UpdateAppSettings(value);
-                }
-                else
-                {
-                    UpdateAppSettingsToNull();
                 }
             }
         }
@@ -50,13 +44,10 @@ namespace 精密切割系统.Helpers
             get { return GetValue<float>(); }
             set
             {
+                UpdateAppSettingsToNull();
                 if (value is not null)
                 {
                     UpdateAppSettings(value.Value);
-                }
-                else
-                {
-                    UpdateAppSettingsToNull();
                 }
             }
         }
@@ -69,14 +60,10 @@ namespace 精密切割系统.Helpers
             get { return GetList<float>(); }
             set
             {
+                UpdateAppSettingsToNull();
                 if (value is not null)
                 {
-                    UpdateAppSettingsToNull();
                     UpdateAppSettings(value);
-                }
-                else
-                {
-                    UpdateAppSettingsToNull();
                 }
             }
         }
@@ -89,13 +76,10 @@ namespace 精密切割系统.Helpers
             get { return GetValue<float>(); }
             set
             {
+                UpdateAppSettingsToNull();
                 if (value is not null)
                 {
                     UpdateAppSettings(value.Value);
-                }
-                else
-                {
-                    UpdateAppSettingsToNull();
                 }
             }
         }
@@ -108,13 +92,10 @@ namespace 精密切割系统.Helpers
             get { return GetValue<float>(); }
             set
             {
+                UpdateAppSettingsToNull();
                 if (value is not null)
                 {
                     UpdateAppSettings(value.Value);
-                }
-                else
-                {
-                    UpdateAppSettingsToNull();
                 }
             }
         }
@@ -127,13 +108,10 @@ namespace 精密切割系统.Helpers
             get { return GetValue<float>(); }
             set
             {
+                UpdateAppSettingsToNull();
                 if (value is not null)
                 {
                     UpdateAppSettings(value.Value);
-                }
-                else
-                {
-                    UpdateAppSettingsToNull();
                 }
             }
         }
@@ -146,6 +124,7 @@ namespace 精密切割系统.Helpers
             get { return GetValue<int>(); }
             set
             {
+                UpdateAppSettingsToNull();
                 if (value is not null)
                 {
                     UpdateAppSettings(value.Value);
@@ -161,6 +140,7 @@ namespace 精密切割系统.Helpers
             get { return GetValue<float>(); }
             set
             {
+                UpdateAppSettingsToNull();
                 if (value is not null)
                 {
                     UpdateAppSettings(value.Value);
@@ -176,13 +156,10 @@ namespace 精密切割系统.Helpers
             get { return GetValue<int>(); }
             set
             {
+                UpdateAppSettingsToNull();
                 if (value is not null)
                 {
                     UpdateAppSettings(value.Value);
-                }
-                else
-                {
-                    UpdateAppSettingsToNull();
                 }
             }
         }
@@ -195,13 +172,10 @@ namespace 精密切割系统.Helpers
             get { return GetValue<float>(); }
             set
             {
+                UpdateAppSettingsToNull();
                 if (value is not null)
                 {
                     UpdateAppSettings(value.Value);
-                }
-                else
-                {
-                    UpdateAppSettingsToNull();
                 }
             }
         }
@@ -214,6 +188,7 @@ namespace 精密切割系统.Helpers
             get { return GetValue(); }
             set
             {
+                UpdateAppSettingsToNull();
                 if (value is not null)
                 {
                     UpdateAppSettings(value.Value);
@@ -226,22 +201,35 @@ namespace 精密切割系统.Helpers
         /// </summary>
         public static DataPoint<float> CameraRelativeBladePosition
         {
-            get
+            get => TryGetPoint(nameof(CameraRelativeBladePosition), out var point) ? point : new DataPoint<float>(0, 0);
+            set => UpdatePoint(nameof(CameraRelativeBladePosition), value);
+        }
+
+        /// <summary>
+        /// 相机视野theta中心点位置
+        /// </summary>
+        public static DataPoint<float> CameraThetaCenterPoint
+        {
+            get => TryGetPoint(nameof(CameraThetaCenterPoint), out var point) ? point : new DataPoint<float>(0, 0);
+            set => UpdatePoint(nameof(CameraThetaCenterPoint), value);
+        }
+
+        private static bool TryGetPoint(string prefix, out DataPoint<float> point)
+        {
+            if (TryGetValue($"{prefix}:X", out float x) &&
+                TryGetValue($"{prefix}:Y", out float y))
             {
-                if (TryGetValue(CameraRelativeBladePositionX, out float x) && TryGetValue(CameraRelativeBladePositionY, out float y))
-                {
-                    return new DataPoint<float>(x, y);
-                }
-                else
-                {
-                    return new DataPoint<float>(0, 0);
-                }
+                point = new(x, y);
+                return true;
             }
-            set
-            {
-                UpdateAppSettings(value.X, CameraRelativeBladePositionX);
-                UpdateAppSettings(value.Y, CameraRelativeBladePositionY);
-            }
+            point = new DataPoint<float>(0, 0);
+            return false;
+        }
+
+        private static void UpdatePoint(string prefix, DataPoint<float> point)
+        {
+            UpdateAppSettings(point.X, $"{prefix}:X");
+            UpdateAppSettings(point.Y, $"{prefix}:Y");
         }
 
         public static void UpdateAppSettings<T>(T value, [CallerMemberName] string? key = null) where T : struct, INumber<T>

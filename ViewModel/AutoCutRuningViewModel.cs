@@ -221,7 +221,7 @@ namespace 精密切割系统.ViewModel
             //theta轴中心点位置
             DataPoint<float> thetaCenterPoint = GlobalParams.ThetaCenterPoint;
             //相机中心点位置
-            DataPoint<float> cameraCenterPoint = GlobalParams.CameraCenterPoint;
+            DataPoint<float> cameraThetaCenterPoint = Appsettings.CameraThetaCenterPoint;
             //工件半径
             float workpieceRadius = GlobalParams.WorkpieceRadius;
             //工件中心点到theta轴中心点距离
@@ -293,7 +293,7 @@ namespace 精密切割系统.ViewModel
                 RunStatus = AutoRunStatus.CutingCalibrat;
                 PdaUtils.AddStandardSharpenSpeed(SharpenParams.HightestCutSpeed);
                 // 切割校准
-                float cutCalibratTheta = await AutoCutUtils.CalibratCutAsync(new DataPoint<float>(cameraCenterPoint.X, cameraCenterPoint.Y + GlobalParams.CenterDistance), workpieceRadius, _pauseCts.Token);
+                float cutCalibratTheta = await AutoCutUtils.CalibratCutAsync(new DataPoint<float>(cameraThetaCenterPoint.X, cameraThetaCenterPoint.Y + GlobalParams.CenterDistance), workpieceRadius, _pauseCts.Token);
                 // 开始磨刀
                 int sharpenTimes = SharpenParams.CutNum; // 默认磨刀次数
                 if (sharpenTimes > 0)

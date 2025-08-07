@@ -14,10 +14,8 @@ namespace 精密切割系统.Behaviors
 {
     public class DualInputBehavior : Behavior<UIElement>
     {
-        public const float TouchDelaySeconds = 0.5f; // 触摸延迟时间，单位为秒
-
         public static readonly DependencyProperty PromptCommandProperty =
-            DependencyProperty.Register("PromptCommand", typeof(ICommand), typeof(DualInputBehavior));
+            DependencyProperty.Register("PromptCommand", typeof(AsyncDelegateCommand), typeof(DualInputBehavior));
 
         public static readonly DependencyProperty StartCommandProperty =
             DependencyProperty.Register("StartCommand", typeof(ICommand), typeof(DualInputBehavior));
@@ -37,13 +35,13 @@ namespace 精密切割系统.Behaviors
             set => SetValue(StopCommandProperty, value);
         }
 
-        public ICommand PromptCommand
+        public AsyncDelegateCommand PromptCommand
         {
-            get => (ICommand)GetValue(PromptCommandProperty);
+            get => (AsyncDelegateCommand)GetValue(PromptCommandProperty);
             set => SetValue(PromptCommandProperty, value);
         }
 
-        // 是否已触发命令
+        private readonly object _ctsLock = new();
         private int _isRaiseCommand = 0; // 0表示未触发，1表示已触发
         private CancellationTokenSource? _delayCts;
 
@@ -75,12 +73,17 @@ namespace 精密切割系统.Behaviors
 
         private async void AssociatedObject_TouchDown(object? sender, TouchEventArgs e)
         {
-            if (_delayCts is not null && !_delayCts.IsCancellationRequested) return;
-            //_delayCts = new CancellationTokenSource();
+            lock (_ctsLock)
+            {
+                if (_delayCts is not null && !_delayCts.IsCancellationRequested)
+                    return;
+                _delayCts?.Dispose();
+                _delayCts = new CancellationTokenSource();
+            }
             try
             {
-                //ExecutePrompt(sender, e);
-                //await Task.Delay(TimeSpan.FromSeconds(TouchDelaySeconds), _delayCts.Token);
+                await ExecutePrompt(_delayCts.Token);
+                if (_delayCts.IsCancellationRequested) return;
                 ExecuteStart(sender, e);
             }
             catch (TaskCanceledException) { }
@@ -88,12 +91,17 @@ namespace 精密切割系统.Behaviors
 
         private async void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (_delayCts is not null && !_delayCts.IsCancellationRequested) return;
-            //_delayCts = new CancellationTokenSource();
+            lock (_ctsLock)
+            {
+                if (_delayCts is not null && !_delayCts.IsCancellationRequested)
+                    return;
+                _delayCts?.Dispose();
+                _delayCts = new CancellationTokenSource();
+            }
             try
             {
-                //ExecutePrompt(sender, e);
-                //await Task.Delay(TimeSpan.FromSeconds(TouchDelaySeconds), _delayCts.Token);
+                await ExecutePrompt(_delayCts.Token);
+                if (_delayCts.IsCancellationRequested) return;
                 ExecuteStart(sender, e);
             }
             catch (TaskCanceledException) { }
@@ -119,11 +127,11 @@ namespace 精密切割系统.Behaviors
             ExecuteStop(sender, e);
         }
 
-        private void ExecutePrompt(object? sender, object e)
+        private async Task ExecutePrompt(CancellationToken token)
         {
-            if (Volatile.Read(ref _isRaiseCommand) == 0 && PromptCommand?.CanExecute(e) == true)
+            if (Volatile.Read(ref _isRaiseCommand) == 0 && PromptCommand?.CanExecute() == true)
             {
-                PromptCommand.Execute(e);
+                await PromptCommand.Execute(token);
             }
         }
 
@@ -137,7 +145,14 @@ namespace 精密切割系统.Behaviors
 
         private void ExecuteStop(object? sender, object e)
         {
-            _delayCts?.Cancel();
+            CancellationTokenSource? ctsToCancel;
+            lock (_ctsLock)
+            {
+                ctsToCancel = _delayCts;
+                _delayCts = null;
+            }
+            ctsToCancel?.Cancel();
+            ctsToCancel?.Dispose();
             if (Interlocked.CompareExchange(ref _isRaiseCommand, 0, 1) == 1 && StopCommand?.CanExecute(e) == true)
             {
                 StopCommand.Execute(e);

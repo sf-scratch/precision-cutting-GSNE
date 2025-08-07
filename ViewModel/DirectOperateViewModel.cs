@@ -13,8 +13,8 @@ namespace 精密切割系统.ViewModel
     public class DirectOperateViewModel : BindableBase
     {
         private static readonly float RelativeDistance = 0.001f; // 相对移动距离
+        private static readonly float RelativeDeg = 0.1f; // 相对角度
         private static readonly float RelativeSpeed = 0.2f; // 相对移动速度
-        private static readonly float RelativeTime = DualInputBehavior.TouchDelaySeconds * 2; // 相对移动最长时间，超过取消
         private CancellationTokenSource _cancelGetAxisInfoCts;
 
         private DelegateCommand _startXCommand;
@@ -25,11 +25,11 @@ namespace 精密切割系统.ViewModel
         {
             if (IsAbsMoveX)
             {
-                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(TargetPositionX, SpeedX);
+                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(TargetPositionX, SpeedX, default);
             }
             else
             {
-                await PlcControl.tagControl.Xaxis.StartRelativeAsync(TargetPositionX, SpeedX);
+                await PlcControl.tagControl.Xaxis.StartRelativeAsync(TargetPositionX, SpeedX, default);
             }
         }
 
@@ -113,11 +113,11 @@ namespace 精密切割系统.ViewModel
         {
             if (IsAbsMoveY)
             {
-                await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(TargetPositionY, SpeedY);
+                await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(TargetPositionY, SpeedY, default);
             }
             else
             {
-                await PlcControl.tagControl.Yaxis.StartRelativeAsync(TargetPositionY, SpeedY);
+                await PlcControl.tagControl.Yaxis.StartRelativeAsync(TargetPositionY, SpeedY, default);
             }
         }
 
@@ -201,11 +201,11 @@ namespace 精密切割系统.ViewModel
         {
             if (IsAbsMoveZ1)
             {
-                await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(TargetPositionZ1, SpeedZ1);
+                await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(TargetPositionZ1, SpeedZ1, default);
             }
             else
             {
-                await PlcControl.tagControl.Z1axis.StartRelativeAsync(TargetPositionZ1, SpeedZ1);
+                await PlcControl.tagControl.Z1axis.StartRelativeAsync(TargetPositionZ1, SpeedZ1, default);
             }
         }
 
@@ -290,11 +290,11 @@ namespace 精密切割系统.ViewModel
             if (IsAbsMoveZ2)
             {
 
-                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(TargetPositionZ2, SpeedZ2);
+                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(TargetPositionZ2, SpeedZ2, default);
             }
             else
             {
-                await PlcControl.tagControl.Z2axis.StartRelativeAsync(TargetPositionZ2, SpeedZ2);
+                await PlcControl.tagControl.Z2axis.StartRelativeAsync(TargetPositionZ2, SpeedZ2, default);
             }
         }
 
@@ -376,7 +376,7 @@ namespace 精密切割系统.ViewModel
 
         async void ExecuteStartThetaCommand()
         {
-            await PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(TargetPositionTheta, SpeedTheta);
+            await PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(TargetPositionTheta, SpeedTheta, default);
         }
 
         private DelegateCommand _startHomingThetaCommand;
@@ -387,11 +387,11 @@ namespace 精密切割系统.ViewModel
         {
             if (IsAbsMoveTheta)
             {
-                await PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(TargetPositionTheta, SpeedTheta);
+                await PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(TargetPositionTheta, SpeedTheta, default);
             }
             else
             {
-                await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(TargetPositionTheta, SpeedTheta);
+                await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(TargetPositionTheta, SpeedTheta, default);
             }
         }
 
@@ -465,32 +465,30 @@ namespace 精密切割系统.ViewModel
             set { SetProperty(ref _isShowKeyboard, value); }
         }
 
-        private DelegateCommand _xRelativeNegativeCommand;
-        public DelegateCommand XRelativeNegativeCommand =>
-            _xRelativeNegativeCommand ?? (_xRelativeNegativeCommand = new DelegateCommand(ExecuteXRelativeNegativeCommand));
+        private AsyncDelegateCommand _xRelativeNegativeCommand;
+        public AsyncDelegateCommand XRelativeNegativeCommand =>
+            _xRelativeNegativeCommand ?? (_xRelativeNegativeCommand = new AsyncDelegateCommand(ExecuteXRelativeNegativeCommand));
 
-        async void ExecuteXRelativeNegativeCommand()
+        async Task ExecuteXRelativeNegativeCommand(CancellationToken token)
         {
             try
             {
-                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(RelativeTime));
-                await PlcControl.tagControl.Xaxis.StartRelativeAsync(-RelativeDistance, RelativeSpeed, cts.Token);
+                await PlcControl.tagControl.Xaxis.StartRelativeAsync(-RelativeDistance, RelativeSpeed, token);
             }
             catch (OperationCanceledException)
             {
             }
         }
 
-        private DelegateCommand _xRelativePositiveCommand;
-        public DelegateCommand XRelativePositiveCommand =>
-            _xRelativePositiveCommand ?? (_xRelativePositiveCommand = new DelegateCommand(ExecuteXRelativePositiveCommand));
+        private AsyncDelegateCommand _xRelativePositiveCommand;
+        public AsyncDelegateCommand XRelativePositiveCommand =>
+            _xRelativePositiveCommand ?? (_xRelativePositiveCommand = new AsyncDelegateCommand(ExecuteXRelativePositiveCommand));
 
-        async void ExecuteXRelativePositiveCommand()
+        async Task ExecuteXRelativePositiveCommand(CancellationToken token)
         {
             try
             {
-                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(RelativeTime));
-                await PlcControl.tagControl.Xaxis.StartRelativeAsync(RelativeDistance, RelativeSpeed, cts.Token);
+                await PlcControl.tagControl.Xaxis.StartRelativeAsync(RelativeDistance, RelativeSpeed, token);
             }
             catch (OperationCanceledException)
             {
@@ -521,35 +519,37 @@ namespace 精密切割系统.ViewModel
 
         async void ExecuteStopJogXCommand()
         {
-            await PlcControl.tagControl.Xaxis.StopJogAsync();
+            try
+            {
+                await PlcControl.tagControl.Xaxis.StopJogAsync();
+            }
+            catch (OperationCanceledException) { }
         }
 
-        private DelegateCommand _yRelativeNegativeCommand;
-        public DelegateCommand YRelativeNegativeCommand =>
-            _yRelativeNegativeCommand ?? (_yRelativeNegativeCommand = new DelegateCommand(ExecuteYRelativeNegativeCommand));
+        private AsyncDelegateCommand _yRelativeNegativeCommand;
+        public AsyncDelegateCommand YRelativeNegativeCommand =>
+            _yRelativeNegativeCommand ?? (_yRelativeNegativeCommand = new AsyncDelegateCommand(ExecuteYRelativeNegativeCommand));
 
-        async void ExecuteYRelativeNegativeCommand()
+        async Task ExecuteYRelativeNegativeCommand(CancellationToken token)
         {
             try
             {
-                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(RelativeTime));
-                await PlcControl.tagControl.Yaxis.StartRelativeAsync(-RelativeDistance, RelativeSpeed, cts.Token);
+                await PlcControl.tagControl.Yaxis.StartRelativeAsync(-RelativeDistance, RelativeSpeed, token);
             }
             catch (OperationCanceledException)
             {
             }
         }
 
-        private DelegateCommand _yRelativePositiveCommand;
-        public DelegateCommand YRelativePositiveCommand =>
-            _yRelativePositiveCommand ?? (_yRelativePositiveCommand = new DelegateCommand(ExecuteYRelativePositiveCommand));
+        private AsyncDelegateCommand _yRelativePositiveCommand;
+        public AsyncDelegateCommand YRelativePositiveCommand =>
+            _yRelativePositiveCommand ?? (_yRelativePositiveCommand = new AsyncDelegateCommand(ExecuteYRelativePositiveCommand));
 
-        async void ExecuteYRelativePositiveCommand()
+        async Task ExecuteYRelativePositiveCommand(CancellationToken token)
         {
             try
             {
-                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(RelativeTime));
-                await PlcControl.tagControl.Yaxis.StartRelativeAsync(RelativeDistance, RelativeSpeed, cts.Token);
+                await PlcControl.tagControl.Yaxis.StartRelativeAsync(RelativeDistance, RelativeSpeed, token);
             }
             catch (OperationCanceledException)
             {
@@ -580,7 +580,11 @@ namespace 精密切割系统.ViewModel
 
         async void ExecuteStopJogYCommand()
         {
-            await PlcControl.tagControl.Yaxis.StopJogAsync();
+            try
+            {
+                await PlcControl.tagControl.Yaxis.StopJogAsync();
+            }
+            catch (OperationCanceledException) { }
         }
 
         private DelegateCommand _startThetaCorotationCommand;
@@ -607,7 +611,11 @@ namespace 精密切割系统.ViewModel
 
         async void ExecuteStopJogThetaCommand()
         {
-            await PlcControl.tagControl.ThetaAxis.StopJogAsync();
+            try
+            {
+                await PlcControl.tagControl.ThetaAxis.StopJogAsync();
+            }
+            catch (OperationCanceledException) { }
         }
 
         private DelegateCommand _startRaiseZ1Command;
@@ -634,7 +642,11 @@ namespace 精密切割系统.ViewModel
 
         async void ExecuteStopJogZ1Command()
         {
-            await PlcControl.tagControl.Z1axis.StopJogAsync();
+            try
+            {
+                await PlcControl.tagControl.Z1axis.StopJogAsync();
+            }
+            catch (OperationCanceledException) { }
         }
 
         private DelegateCommand _startRaiseZ2Command;
@@ -661,67 +673,97 @@ namespace 精密切割系统.ViewModel
 
         async void ExecuteStopJogZ2Command()
         {
-            await PlcControl.tagControl.Z2axis.StopJogAsync();
+            try
+            {
+                await PlcControl.tagControl.Z2axis.StopJogAsync();
+            }
+            catch (OperationCanceledException) { }
         }
 
-        private DelegateCommand _z1RelativePositiveCommand;
-        public DelegateCommand Z1RelativePositiveCommand =>
-            _z1RelativePositiveCommand ?? (_z1RelativePositiveCommand = new DelegateCommand(ExecuteZ1RelativePositiveCommand));
+        private AsyncDelegateCommand _z1RelativePositiveCommand;
+        public AsyncDelegateCommand Z1RelativePositiveCommand =>
+            _z1RelativePositiveCommand ?? (_z1RelativePositiveCommand = new AsyncDelegateCommand(ExecuteZ1RelativePositiveCommand));
 
-        async void ExecuteZ1RelativePositiveCommand()
+        async Task ExecuteZ1RelativePositiveCommand(CancellationToken token)
         {
             try
             {
-                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(RelativeTime));
-                await PlcControl.tagControl.Z1axis.StartRelativeAsync(RelativeDistance, RelativeSpeed, cts.Token);
+                await PlcControl.tagControl.Z1axis.StartRelativeAsync(RelativeDistance, RelativeSpeed, token);
             }
             catch (OperationCanceledException)
             {
             }
         }
 
-        private DelegateCommand _z1RelativeNegativeCommand;
-        public DelegateCommand Z1RelativeNegativeCommand =>
-            _z1RelativeNegativeCommand ?? (_z1RelativeNegativeCommand = new DelegateCommand(ExecuteZ1RelativeNegativeCommand));
+        private AsyncDelegateCommand _z1RelativeNegativeCommand;
+        public AsyncDelegateCommand Z1RelativeNegativeCommand =>
+            _z1RelativeNegativeCommand ?? (_z1RelativeNegativeCommand = new AsyncDelegateCommand(ExecuteZ1RelativeNegativeCommand));
 
-        async void ExecuteZ1RelativeNegativeCommand()
+        async Task ExecuteZ1RelativeNegativeCommand(CancellationToken token)
         {
             try
             {
-                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(RelativeTime));
-                await PlcControl.tagControl.Z1axis.StartRelativeAsync(-RelativeDistance, RelativeSpeed, cts.Token);
+                await PlcControl.tagControl.Z1axis.StartRelativeAsync(-RelativeDistance, RelativeSpeed, token);
             }
             catch (OperationCanceledException)
             {
             }
         }
 
-        private DelegateCommand _z2RelativePositiveCommand;
-        public DelegateCommand Z2RelativePositiveCommand =>
-            _z2RelativePositiveCommand ?? (_z2RelativePositiveCommand = new DelegateCommand(ExecuteZ2RelativePositiveCommand));
+        private AsyncDelegateCommand _z2RelativePositiveCommand;
+        public AsyncDelegateCommand Z2RelativePositiveCommand =>
+            _z2RelativePositiveCommand ?? (_z2RelativePositiveCommand = new AsyncDelegateCommand(ExecuteZ2RelativePositiveCommand));
 
-        async void ExecuteZ2RelativePositiveCommand()
+        async Task ExecuteZ2RelativePositiveCommand(CancellationToken token)
         {
             try
             {
-                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(RelativeTime));
-                await PlcControl.tagControl.Z2axis.StartRelativeAsync(RelativeDistance, RelativeSpeed, cts.Token);
+                await PlcControl.tagControl.Z2axis.StartRelativeAsync(RelativeDistance, RelativeSpeed, token);
             }
             catch (OperationCanceledException)
             {
             }
         }
 
-        private DelegateCommand _z2RelativeNegativeCommand;
-        public DelegateCommand Z2RelativeNegativeCommand =>
-            _z2RelativeNegativeCommand ?? (_z2RelativeNegativeCommand = new DelegateCommand(ExecuteZ2RelativeNegativeCommand));
+        private AsyncDelegateCommand _z2RelativeNegativeCommand;
+        public AsyncDelegateCommand Z2RelativeNegativeCommand =>
+            _z2RelativeNegativeCommand ?? (_z2RelativeNegativeCommand = new AsyncDelegateCommand(ExecuteZ2RelativeNegativeCommand));
 
-        async void ExecuteZ2RelativeNegativeCommand()
+        async Task ExecuteZ2RelativeNegativeCommand(CancellationToken token)
         {
             try
             {
-                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(RelativeTime));
-                await PlcControl.tagControl.Z2axis.StartRelativeAsync(-RelativeDistance, RelativeSpeed, cts.Token);
+                await PlcControl.tagControl.Z2axis.StartRelativeAsync(-RelativeDistance, RelativeSpeed, token);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+        }
+
+        private AsyncDelegateCommand _thetaRelativePositiveCommand;
+        public AsyncDelegateCommand ThetaRelativePositiveCommand =>
+            _thetaRelativePositiveCommand ?? (_thetaRelativePositiveCommand = new AsyncDelegateCommand(ExecuteThetaRelativePositiveCommand));
+
+        async Task ExecuteThetaRelativePositiveCommand(CancellationToken token)
+        {
+            try
+            {
+                await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(RelativeDeg, RelativeSpeed, token);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+        }
+
+        private AsyncDelegateCommand _thetaRelativeNegativeCommand;
+        public AsyncDelegateCommand ThetaRelativeNegativeCommand =>
+            _thetaRelativeNegativeCommand ??= new AsyncDelegateCommand(ExecuteThetaRelativeNegativeCommand);
+
+        async Task ExecuteThetaRelativeNegativeCommand(CancellationToken token)
+        {
+            try
+            {
+                await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(-RelativeDeg, RelativeSpeed, token);
             }
             catch (OperationCanceledException)
             {

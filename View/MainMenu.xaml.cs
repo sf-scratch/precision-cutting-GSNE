@@ -354,6 +354,7 @@ namespace 精密切割系统.View
                 case 440:
                 case 204:
                 case 607:
+                case 520:
                     mainWindow.NavigateToPage(bean.PageUrl);
                     break;
                 case 709:
