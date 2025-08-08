@@ -9,15 +9,13 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using 精密切割系统.Helpers;
+using 精密切割系统.View.Controls;
 
 namespace 精密切割系统.Model.common
 {
     public class RightButtonParams : BindableBase
     {
         public DelegateCommand RightClickCommand { get; set; }
-        public DelegateCommand StartCommand { get; }
-        public DelegateCommand StopCommand { get; }
-        private CancellationTokenSource _cts;
 
         private bool _backFlag;
         public bool BackFlag
@@ -68,57 +66,52 @@ namespace 精密切割系统.Model.common
             set { _visibility = value; RaisePropertyChanged(); }
         }
 
-        public RightButtonParams(Brush backgroundDefColor, Brush backgroundDownColor, string contentText, double fontSize, string imagePath, Action? action = null, Action? continuousAction = null, bool backFlag = false, Visibility visibility = Visibility.Visible)
+        private Visibility _openOrCloseVisibility;
+        public Visibility OpenOrCloseVisibility
+        {
+            get { return _openOrCloseVisibility; }
+            set { _openOrCloseVisibility = value; RaisePropertyChanged(); }
+        }
+
+        private bool _isOpen;
+        public bool IsOpen
+        {
+            get { return _isOpen; }
+            set { _isOpen = value; RaisePropertyChanged(); }
+        }
+
+        public RightButtonParams(Brush backgroundDefColor, Brush backgroundDownColor, string contentText, double fontSize, string imagePath, Action action, Visibility openOrCloseVisibility)
         {
             _backgroundDefColor = backgroundDefColor;
             _backgroundDownColor = backgroundDownColor;
             _contentText = contentText;
             _imagePath = imagePath;
-            _backFlag = backFlag;
-            _visibility = visibility;
+            _backFlag = false;
+            _visibility = Visibility.Visible;
             _contentTextFontSize = fontSize;
+            _openOrCloseVisibility = openOrCloseVisibility;
+            _isOpen = false;
             RightClickCommand = new DelegateCommand(() => action?.Invoke()); 
-            StartCommand = new DelegateCommand(() => StartContinuousAction(continuousAction));
-            StopCommand = new DelegateCommand(StopContinuousAction);
         }
 
-        private async void StartContinuousAction(Action? action)
+        public static RightButtonParams GreenRightButton(string contentText, string imagePath, Action action, double fontSize = 12)
         {
-            _cts = new CancellationTokenSource();
-            try
-            {
-                while (!_cts.Token.IsCancellationRequested)
-                {
-                    action?.Invoke();
-                    await Task.Delay(100, _cts.Token); // 控制触发频率
-                }
-            }
-            catch (OperationCanceledException) { /* 正常停止 */ }
+            return new RightButtonParams(new SolidColorBrush(Color.FromRgb(0x39, 0xD1, 0x1A)), new SolidColorBrush(Color.FromRgb(0x39, 0xB4, 0x1A)), contentText, fontSize, imagePath, action, Visibility.Collapsed);
         }
 
-        private void StopContinuousAction()
+        public static RightButtonParams YelloRightButton(string contentText, string imagePath, Action action, double fontSize = 12)
         {
-            _cts?.Cancel();
+            return new RightButtonParams(new SolidColorBrush(Color.FromRgb(0xFF, 0xAD, 0x00)), new SolidColorBrush(Color.FromRgb(0xC8, 0xAD, 0x00)), contentText, fontSize, imagePath, action, Visibility.Collapsed);
         }
 
-        public static RightButtonParams GreenRightButton(string contentText, string imagePath, Action? action, Action? continuousAction = null, double fontSize = 10)
+        public static RightButtonParams BlueButton(string contentText, string imagePath, Action action, Visibility openOrCloseVisibility = Visibility.Collapsed, double fontSize = 22)
         {
-            return new RightButtonParams(new SolidColorBrush(Color.FromRgb(0x39, 0xD1, 0x1A)), new SolidColorBrush(Color.FromRgb(0x39, 0xB4, 0x1A)), contentText, fontSize, imagePath, action, continuousAction);
+            return new RightButtonParams(new SolidColorBrush(Color.FromRgb(0x50, 0x87, 0xcb)), new SolidColorBrush(Color.FromRgb(0x17, 0x7C, 0xfa)), contentText, fontSize, imagePath, action, openOrCloseVisibility);
         }
 
-        public static RightButtonParams YelloRightButton(string contentText, string imagePath, Action? action, Action? continuousAction = null, double fontSize = 10)
+        public static RightButtonParams RedRightButton(string contentText, string imagePath, Action action, double fontSize = 12)
         {
-            return new RightButtonParams(new SolidColorBrush(Color.FromRgb(0xFF, 0xAD, 0x00)), new SolidColorBrush(Color.FromRgb(0xC8, 0xAD, 0x00)), contentText, fontSize, imagePath, action, continuousAction);
-        }
-
-        public static RightButtonParams BlueRightButton(string contentText, string imagePath, Action? action, Action? continuousAction = null, double fontSize = 10)
-        {
-            return new RightButtonParams(new SolidColorBrush(Color.FromRgb(0x50, 0x87, 0xcb)), new SolidColorBrush(Color.FromRgb(0x17, 0x7C, 0xfa)), contentText, fontSize, imagePath, action, continuousAction);
-        }
-
-        public static RightButtonParams RedRightButton(string contentText, string imagePath, Action? action, Action? continuousAction = null, double fontSize = 10)
-        {
-            return new RightButtonParams(Brushes.Red, Brushes.DarkRed, contentText, fontSize, imagePath, action, continuousAction);
+            return new RightButtonParams(Brushes.Red, Brushes.DarkRed, contentText, fontSize, imagePath, action, Visibility.Collapsed);
         }
     }
 }

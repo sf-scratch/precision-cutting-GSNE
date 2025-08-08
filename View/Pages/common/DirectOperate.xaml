@@ -44,7 +44,7 @@
                     Color="#4DC9EBF7" 
                     Direction="315" />
                 </Border.Effect>
-                <auto:AutoGrid Margin="10" Columns="auto,auto,auto,auto,auto" RowCount="5" ChildMargin="5">
+                <auto:AutoGrid Margin="10" Columns="auto,*,*,*,*" RowCount="5" ChildMargin="5">
                     <auto:AutoGrid.Resources>
                         <ResourceDictionary>
                             <ResourceDictionary.MergedDictionaries>

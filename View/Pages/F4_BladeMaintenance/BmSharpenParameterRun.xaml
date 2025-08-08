@@ -4,7 +4,8 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:精密切割系统.View.Pages.F4_BladeMaintenance"
-      xmlns:controls="clr-namespace:精密切割系统.View.Controls" xmlns:common="clr-namespace:精密切割系统.View.Pages.common"
+      xmlns:controls="clr-namespace:精密切割系统.View.Controls" 
+      xmlns:common="clr-namespace:精密切割系统.View.Pages.common"
       mc:Ignorable="d"
       d:DesignHeight="655" d:DesignWidth="1570"
       Title="BmSharpenParameterRun">

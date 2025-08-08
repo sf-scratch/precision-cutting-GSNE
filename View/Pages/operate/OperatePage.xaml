@@ -21,9 +21,6 @@
             <Setter Property="Height" Value="62"></Setter>
             <Setter Property="Margin" Value="5"></Setter>
         </Style>
-        <Style TargetType="Controls:RightButton">
-            <Setter Property="Margin" Value="10,20,0,0" />
-        </Style>
         <Style TargetType="ListBoxItem">
             <Setter Property="Margin" Value="0"/>
             <Setter Property="Padding" Value="0"/>
@@ -169,8 +166,46 @@
                 </Grid>
             </Border>
         </Grid>
-
-        <ListBox Margin="15,0,0,0" Width="1450" Height="250" x:Name="OperateButtonListBox"
+        <ItemsControl Margin="15,0,0,0" Width="1450" Height="250" x:Name="OperateButtonListBox"
+                 HorizontalAlignment="Stretch"
+                 VerticalAlignment="Stretch"
+                 Visibility="Visible"
+                 Background="Transparent"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 ScrollViewer.CanContentScroll="True"
+                 VirtualizingPanel.ScrollUnit="Pixel"
+                 BorderThickness="0"
+                 BorderBrush="Transparent"
+                 ItemsSource="{Binding RightButtonParams}" d:ItemsSource="{d:SampleData ItemCount=13}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <!-- 每行3个元素 -->
+                    <UniformGrid Columns="5" Rows="2"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Controls:BottomButton
+                        BackFlag="{Binding BackFlag}"
+                        BackgroundDefColor="{Binding BackgroundDefColor}"
+                        BackgroundDownColor="{Binding BackgroundDownColor}"
+                        ContentText="{Binding ContentText}"
+                        ContentTextFontSize="{Binding ContentTextFontSize}"
+                        ImagePath="{Binding ImagePath}"
+                        Visibility="{Binding Visibility}"
+                        OpenOrCloseVisibility="{Binding OpenOrCloseVisibility}"
+                        IsOpen="{Binding IsOpen}"
+                        ButtonWidth="268"
+                        ButtonHeight="100"
+                        Margin="8">
+                        <behaviors:Interaction.Behaviors>
+                            <behav:TouchAndClickBehavior TouchAndClickCommand="{Binding RightClickCommand}"/>
+                        </behaviors:Interaction.Behaviors>
+                    </Controls:BottomButton>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <!--<ListBox Margin="15,0,0,0" Width="1450" Height="250" x:Name="OperateButtonListBox"
                  HorizontalAlignment="Stretch"
                  VerticalAlignment="Stretch"
                  Visibility="Visible"
@@ -181,7 +216,7 @@
                  SelectionMode="Extended"
                  BorderThickness="0"
                  BorderBrush="Transparent"
-                 ItemsSource="{Binding RightButtonParams}" d:ItemsSource="{d:SampleData}">
+                 ItemsSource="{Binding RightButtonParams}" d:ItemsSource="{d:SampleData ItemCount=13}">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel/>
@@ -213,14 +248,17 @@
                         ContentText="{Binding ContentText}"
                         ContentTextFontSize="{Binding ContentTextFontSize}"
                         ImagePath="{Binding ImagePath}"
-                        Visibility="{Binding Visibility}">
+                        Visibility="{Binding Visibility}"
+                        ButtonWidth="268"
+                        ButtonHeight="100"
+                        Margin="8">
                         <behaviors:Interaction.Behaviors>
                             <behav:TouchAndClickBehavior TouchAndClickCommand="{Binding RightClickCommand}"/>
                         </behaviors:Interaction.Behaviors>
                     </Controls:RightButton>
                 </DataTemplate>
             </ListBox.ItemTemplate>
-        </ListBox>
+        </ListBox>-->
 
         <!--<ListBox Margin="15,0,0,0" Width="1450" Height="250" x:Name="OperateuttonListBox"
          HorizontalAlignment="Stretch"

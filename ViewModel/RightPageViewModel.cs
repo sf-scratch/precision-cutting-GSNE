@@ -76,7 +76,6 @@ namespace 精密切割系统.ViewModel
                                 ActiveAlarms.Clear();
                                 AlarmVisibility = Visibility.Hidden;
                             });
-                            
                         }
                         Application.Current.Dispatcher.Invoke(() =>
                         {

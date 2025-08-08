@@ -101,6 +101,29 @@ namespace 精密切割系统.View.Controls
             set { SetValue(BackgroundDownColorProperty, value); }
         }
 
+        public double ButtonWidth
+        {
+            get { return (double)GetValue(ButtonWidthProperty); }
+            set { SetValue(ButtonWidthProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for ButtonWidth.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ButtonWidthProperty =
+            DependencyProperty.Register("ButtonWidth", typeof(double), typeof(RightButton), new PropertyMetadata(226d));
+
+
+
+        public double ButtonHeight
+        {
+            get { return (double)GetValue(ButtonHeightProperty); }
+            set { SetValue(ButtonHeightProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for ButtonHeight.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ButtonHeightProperty =
+            DependencyProperty.Register("ButtonHeight", typeof(double), typeof(RightButton), new PropertyMetadata(72d));
+
+
         public RightButton()
         {
             InitializeComponent();

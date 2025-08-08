@@ -172,6 +172,9 @@ namespace 精密切割系统.ViewModel
                 case 7:
                     ImageSource07 = new BitmapImage(new Uri(imagePath, UriKind.Relative));
                     break;
+                case 8:
+                    ImageSource08 = new BitmapImage(new Uri(imagePath, UriKind.Relative));
+                    break;
                 case 9:
                     ImageSource09 = new BitmapImage(new Uri(imagePath, UriKind.Relative));
                     break;

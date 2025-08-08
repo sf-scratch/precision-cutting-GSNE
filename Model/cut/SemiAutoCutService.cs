@@ -21,7 +21,6 @@ namespace 精密切割系统.Model.cut
         public event Action<LineSegment?, string?>? CutServicePaused;
         public event Action? RemindReplaceWafer;
         private TaskCompletionSource<ServicePauseResult>? _continueTcs;
-        private CancellationToken _usingPauseToken;
 
         private CutDirection _cutDirection;
         /// <summary>
@@ -109,8 +108,8 @@ namespace 精密切割系统.Model.cut
 
         public async Task<RunResult> RunAsync(List<CutStep> cutStepList, IWorkpieces workpiece, float margin, int spindleRev, float bladeContactWorkingDiscZ1, float bladeLiftingHeight, CancellationToken pauseToken)
         {
-            _usingPauseToken = pauseToken;
-            _cutThetaAlignDeg = await GetCutThetaAlignDegAsync(_usingPauseToken);
+            CancellationToken usingPauseToken = pauseToken;
+            _cutThetaAlignDeg = await GetCutThetaAlignDegAsync(usingPauseToken);
             Stopwatch stopwatch = new();
             try
             {
@@ -119,7 +118,7 @@ namespace 精密切割系统.Model.cut
                 //打开切割水
                 await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
                 //进入全自动切割模式
-                await PlcControl.tagControl.cutting.EnterCuttingModeAsync(_usingPauseToken);
+                await PlcControl.tagControl.cutting.EnterCuttingModeAsync(usingPauseToken);
                 bool isExchangeX = false;
                 int cutTime = 0;
                 while (cutTime < cutStepList.Count)
@@ -129,9 +128,9 @@ namespace 精密切割系统.Model.cut
                     try
                     {
                         //检查是否暂停
-                        if (_usingPauseToken.IsCancellationRequested)
+                        if (usingPauseToken.IsCancellationRequested)
                         {
-                            RunResult runResult = await WaitContinueAsync(line);
+                            (RunResult runResult, usingPauseToken)  = await WaitContinueAsync(line);
                             if (!runResult.IsSuccess)
                             {
                                 return runResult;
@@ -141,7 +140,7 @@ namespace 精密切割系统.Model.cut
                         if (!workpiece.CheckCutDistance(_cutDirection, cutStep.OffsetY))
                         {
                             RemindReplaceWafer?.Invoke();
-                            RunResult runResult = await WaitContinueAsync(line);
+                            (RunResult runResult, usingPauseToken) = await WaitContinueAsync(line);
                             if (!runResult.IsSuccess)
                             {
                                 return runResult;
@@ -196,7 +195,7 @@ namespace 精密切割系统.Model.cut
                             //开始切割信号
                             await PlcControl.tagControl.cutting.StartCutAsync();
                             //等待切割次数变化
-                            await PlcControl.tagControl.cutting.WaitCutNumUdatedAsync(curCutNum.Value + 1, _usingPauseToken);
+                            await PlcControl.tagControl.cutting.WaitCutNumUdatedAsync(curCutNum.Value + 1, usingPauseToken);
                             stopwatch.Stop();
                             pathCalculator.ReportPass(cutTime, cutLength, (float)stopwatch.Elapsed.TotalSeconds);
                         }
@@ -206,7 +205,7 @@ namespace 精密切割系统.Model.cut
                     }
                     catch (OperationCanceledException)
                     {
-                        RunResult runResult = await WaitContinueAsync(line);
+                        (RunResult runResult, usingPauseToken) = await WaitContinueAsync(line);
                         if (!runResult.IsSuccess)
                         {
                             return runResult;
@@ -240,7 +239,7 @@ namespace 精密切割系统.Model.cut
             _continueTcs = null;
         }
 
-        private async Task<RunResult> WaitContinueAsync(LineSegment? line, string? message = null)
+        private async Task<(RunResult, CancellationToken)> WaitContinueAsync(LineSegment? line, string? message = null)
         {
             CutServicePaused?.Invoke(line, message);
             _continueTcs = new TaskCompletionSource<ServicePauseResult>();
@@ -249,18 +248,17 @@ namespace 精密切割系统.Model.cut
             {
                 case ServicePauseResultType.Continue:
                     // 更新使用的暂停令牌
-                    _usingPauseToken = result.Token ?? default; 
-                    _cutThetaAlignDeg = await GetCutThetaAlignDegAsync(_usingPauseToken);
+                    CancellationToken usingPauseToken = result.Token ?? default; 
+                    _cutThetaAlignDeg = await GetCutThetaAlignDegAsync(usingPauseToken);
                     await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
-                    break;
+                    return (RunResult.Success(), usingPauseToken);
                 case ServicePauseResultType.BladeScrap:
-                    return RunResult.Fail("刀片已报废！");
+                    return (RunResult.Fail("刀片已报废！"), default);
                 case ServicePauseResultType.Stop: 
-                    return RunResult.Fail("停止切割！");
+                    return (RunResult.Fail("停止切割！"), default);
                 default: 
-                    return RunResult.Fail("切割异常！");
+                    return (RunResult.Fail("切割异常！"), default);
             }
-            return RunResult.Success();
         }
 
         private async Task<float> GetCutThetaAlignDegAsync(CancellationToken token)

@@ -177,14 +177,14 @@ namespace 精密切割系统.ViewModel
         private void InitBottomButton()
         {
             OperatePageButtonCollection.Clear();
-            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("工件吹气", "WeatherWindy", WorkpieceBlowing, null, 8));
-            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("自动识别", "TextRecognition", AutomaticRecognition, null, 8));
-            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线校准", "CrosshairsGps", BaselineCalibration, null, 8));
-            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调窄", "UnfoldLessHorizontal", BaselineNarrowing, null, 8));
-            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("基准线调宽", "UnfoldMoreHorizontal", BaselineWidening, null, 8));
-            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("崩边调窄", "UnfoldLessHorizontal", BrokenEdgeNarrowing, null, 8));
-            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("崩边调宽", "UnfoldMoreHorizontal", BrokenEdgeWidening, null, 8));
-            OperatePageButtonCollection.Add(RightButtonParams.BlueRightButton("报废", "DeleteEmpty", BladeScrap, null, 8));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueButton("工件吹气", "WeatherWindy", WorkpieceBlowing));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueButton("自动识别", "TextRecognition", AutomaticRecognition));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueButton("基准线校准", "CrosshairsGps", BaselineCalibration));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueButton("基准线调窄", "UnfoldLessHorizontal", BaselineNarrowing));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueButton("基准线调宽", "UnfoldMoreHorizontal", BaselineWidening));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueButton("崩边调窄", "UnfoldLessHorizontal", BrokenEdgeNarrowing));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueButton("崩边调宽", "UnfoldMoreHorizontal", BrokenEdgeWidening));
+            OperatePageButtonCollection.Add(RightButtonParams.BlueButton("报废", "DeleteEmpty", BladeScrap));
         }
 
         private bool _isSureBladeScrap = false;

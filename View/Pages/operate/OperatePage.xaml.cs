@@ -91,6 +91,7 @@ namespace 精密切割系统.View.Pages.operate
             bool cameraSecurityDoor = false;
             bool isOpenOpticalFiberSensorBlowing = false;
             bool isOpenOpticalFiberSensorBlowingWater = false;
+            bool isRuningSpindle = false;
             bool firstJoin = true;
             while (true)
             {
@@ -103,6 +104,7 @@ namespace 精密切割系统.View.Pages.operate
                 bool tempWorkpieceBlowingStatus = await PlcControl.tagControl.wholeDevice.IsOpenWorkpieceBlowingAsync();
                 bool tempSystemInitFlagStatus = await PlcControl.tagControl.wholeDevice.IsCompletedSystemInitAsync();
                 bool tempIsOpenWorkVacuumSwitchStatus = await PlcControl.tagControl.wholeDevice.IsOpenWorkVacuumSwitchAsync();
+                bool tempIsRuningSpindle = await PlcControl.tagControl.wholeDevice.GetSpindleSpeedAsync() != 0;
                 bool tempPanelStatus = CommonCheck.GetParamsStatus(DeviceKey.panelStatusKey);
                 Application.Current.Dispatcher.Invoke(() => {
                     if (tempIsOpenOpticalFiberSensorBlowing != isOpenOpticalFiberSensorBlowing || firstJoin)
@@ -140,6 +142,11 @@ namespace 精密切割系统.View.Pages.operate
                     {
                         cutSecurityDoor = tempCutSecurityDoor;
                         isSwitchOpen(cutSecurityDoor, 7);
+                    }
+                    if (tempIsRuningSpindle != isRuningSpindle || firstJoin)
+                    {
+                        isRuningSpindle = tempIsRuningSpindle;
+                        isSwitchOpen(isRuningSpindle, 8);
                     }
                     if (tempWorkpieceBlowingStatus != workpieceBlowingStatus || firstJoin)
                     {

@@ -85,7 +85,7 @@
             </ListBox>
         </StackPanel>
 
-        <ListBox Margin="0,0,0,125"
+        <ListBox Margin="0,0,0,115"
                  HorizontalAlignment="Center"
                  VerticalAlignment="Bottom"
                  Visibility="Visible"
@@ -123,7 +123,7 @@
                         ContentText="{Binding ContentText}"
                         ContentTextFontSize="{Binding ContentTextFontSize}"
                         ImagePath="{Binding ImagePath}"
-                        Visibility="{Binding Visibility}">
+                        Visibility="{Binding Visibility}" Margin="10">
                         <behaviors:Interaction.Behaviors>
                             <behav:TouchAndClickBehavior TouchAndClickCommand="{Binding RightClickCommand}"/>
                         </behaviors:Interaction.Behaviors>

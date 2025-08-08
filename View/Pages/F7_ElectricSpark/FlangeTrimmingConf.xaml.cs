@@ -228,7 +228,8 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
             if (model == null || model.Count == 0)
             {
                 flangeTrimmingModel.Id = 1;
-            } else
+            } 
+            else
             {
                 flangeTrimmingModel = model.FirstOrDefault();
             }

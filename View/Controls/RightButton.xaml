@@ -15,7 +15,7 @@
     <UserControl.Resources>
         <cvert:StartsWithSlashConverter x:Key="StartsWithSlashConverter" />
     </UserControl.Resources>
-    <Grid Width="226" Height="72">
+    <Grid Width="{Binding ButtonWidth, RelativeSource={RelativeSource AncestorType=UserControl}}" Height="{Binding ButtonHeight, RelativeSource={RelativeSource AncestorType=UserControl}}">
         <Border x:Name="btnBorder" CornerRadius="10">
             <Button
                 Grid.Column="2"
@@ -110,6 +110,82 @@
                 </EventTrigger>
                 <!--  松开时恢复原位  -->
                 <EventTrigger RoutedEvent="Border.TouchLeave">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)"
+                                To="0"
+                                Duration="0:0:0.1" />
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)"
+                                To="0"
+                                Duration="0:0:0.1" />
+                            <!--  发光恢复  -->
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="(Effect).(DropShadowEffect.Opacity)"
+                                To="0.5"
+                                Duration="0:0:0.1" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+                <EventTrigger RoutedEvent="Border.MouseDown">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)"
+                                To="2"
+                                Duration="0:0:0.1" />
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)"
+                                To="2"
+                                Duration="0:0:0.1" />
+                            <!--  发光减弱  -->
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="(Effect).(DropShadowEffect.Opacity)"
+                                To="0.16"
+                                Duration="0:0:0.1" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+                <EventTrigger RoutedEvent="Border.PreviewMouseDown">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)"
+                                To="2"
+                                Duration="0:0:0.1" />
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)"
+                                To="2"
+                                Duration="0:0:0.1" />
+                            <!--  发光减弱  -->
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="(Effect).(DropShadowEffect.Opacity)"
+                                To="0.16"
+                                Duration="0:0:0.1" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+                <EventTrigger RoutedEvent="Border.MouseUp">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)"
+                                To="0"
+                                Duration="0:0:0.1" />
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)"
+                                To="0"
+                                Duration="0:0:0.1" />
+                            <!--  发光恢复  -->
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="(Effect).(DropShadowEffect.Opacity)"
+                                To="0.5"
+                                Duration="0:0:0.1" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+                <EventTrigger RoutedEvent="Border.MouseLeave">
                     <BeginStoryboard>
                         <Storyboard>
                             <DoubleAnimation

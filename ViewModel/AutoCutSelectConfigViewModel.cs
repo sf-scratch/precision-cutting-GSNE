@@ -68,9 +68,9 @@ namespace 精密切割系统.ViewModel
 
         private void InitBottomButton()
         {
-            _operatePageButtonCollection.Add(RightButtonParams.BlueRightButton("新增", "FormatListGroupPlus", AddConfig, null, 8));
-            _operatePageButtonCollection.Add(RightButtonParams.BlueRightButton("删除", "DeleteOutline", DeleteSelectConfig, null, 8));
-            _operatePageButtonCollection.Add(RightButtonParams.BlueRightButton("拷贝", "ContentCopy", CopyConfig, null, 8));
+            _operatePageButtonCollection.Add(RightButtonParams.BlueButton("新增", "FormatListGroupPlus", AddConfig));
+            _operatePageButtonCollection.Add(RightButtonParams.BlueButton("删除", "DeleteOutline", DeleteSelectConfig));
+            _operatePageButtonCollection.Add(RightButtonParams.BlueButton("拷贝", "ContentCopy", CopyConfig));
         }
 
         private async void CopyConfig()
