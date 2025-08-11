@@ -91,7 +91,7 @@ namespace 精密切割系统.Assets.config.menu
         {
             var list = new List<MenuBean>();
             //list.Add(new MenuBean(502, "测量维护", "/Assets/icon/menu_5/menu_5_2.png", "/Assets/icon/menu_5/menu_5_2_white.png"));
-            list.Add(new MenuBean(520, "轴空运行", "/Assets/icon/menu_5/menu_5_2.png", "/Assets/icon/menu_5/menu_5_2_white.png", 2, ""));
+            list.Add(new MenuBean(520, "轴空运行", "/Assets/icon/menu_5/menu_5_2.png", "/Assets/icon/menu_5/menu_5_2_white.png", 3, ""));
             list.Add(new MenuBean(503, "功能参数维护", "/Assets/icon/menu_5/menu_5_3.png", "/Assets/icon/menu_5/menu_5_3_white.png", 2, "Pages/F5_GeneralEfficiency/F5_3_1_OperationData"));
             //list.Add(new MenuBean(601, "轴空转", "/Assets/icon/menu_6/menu_6_1.png", "/Assets/icon/menu_6/menu_6_1_white.png", 2, "Pages/F6_EngineeringTechnology/ETAxisIdlingMaintenanceConf"));
             list.Add(new MenuBean(605, "位置校准", "/Assets/icon/menu_6/menu_6_5.png", "/Assets/icon/menu_6/menu_6_5_white.png", 2, "Pages/F6_EngineeringTechnology/ETPositionAlignmentConf"));

@@ -32,11 +32,6 @@ namespace 精密切割系统.ViewModel
         private AutoCutRuningViewModel _autoCutRuningViewModel;
         private DataPoint<float>? _originPoint;
 
-        // 控制右侧按钮
-        public ObservableCollection<RightButtonParams> RightPageButtonCollection;
-        // 控制底部侧按钮
-        public ObservableCollection<RightButtonParams> OperatePageButtonCollection;
-
         private static int _afterReplaceBladeCutTimes;
         /// <summary>
         /// 自更换刀片起刀片切了几道
@@ -150,8 +145,6 @@ namespace 精密切割系统.ViewModel
         public AutoCutPausingViewModel(IRegionManager regionManager)
         {
             _regionManager = regionManager;
-            RightPageButtonCollection = WindowLayout.RightPageButtons;
-            OperatePageButtonCollection = WindowLayout.OperatePageButtons;
             ContinueCommand = new DelegateCommand(ContinueCommandExecute);
             StopCommand = new DelegateCommand(StopCommandExecute);
             //Task monitorTask = StartMonitoringAlarmAsync(default);
@@ -163,28 +156,28 @@ namespace 精密切割系统.ViewModel
 
         private void InitRightButton()
         {
-            RightPageButtonCollection.Clear();
-            RightPageButtonCollection.Add(RightButtonParams.GreenRightButton("继续", "/Assets/icon/right/enter.png", ContinueCommandExecute));
-            RightPageButtonCollection.Add(RightButtonParams.RedRightButton("停止", "/Assets/icon/right/stop.png", StopCommandExecute));
+            RightButtonCollection.Clear();
+            RightButtonCollection.Add(RightButtonParams.GreenRightButton("继续", "/Assets/icon/right/enter.png", ContinueCommandExecute));
+            RightButtonCollection.Add(RightButtonParams.RedRightButton("停止", "/Assets/icon/right/stop.png", StopCommandExecute));
         }
 
         private void InitRightButtonOnlyStop()
         {
-            RightPageButtonCollection.Clear();
-            RightPageButtonCollection.Add(RightButtonParams.RedRightButton("停止", "/Assets/icon/right/stop.png", StopCommandExecute));
+            RightButtonCollection.Clear();
+            RightButtonCollection.Add(RightButtonParams.RedRightButton("停止", "/Assets/icon/right/stop.png", StopCommandExecute));
         }
 
         private void InitBottomButton()
         {
-            OperatePageButtonCollection.Clear();
-            OperatePageButtonCollection.Add(RightButtonParams.BlueButton("工件吹气", "WeatherWindy", WorkpieceBlowing));
-            OperatePageButtonCollection.Add(RightButtonParams.BlueButton("自动识别", "TextRecognition", AutomaticRecognition));
-            OperatePageButtonCollection.Add(RightButtonParams.BlueButton("基准线校准", "CrosshairsGps", BaselineCalibration));
-            OperatePageButtonCollection.Add(RightButtonParams.BlueButton("基准线调窄", "UnfoldLessHorizontal", BaselineNarrowing));
-            OperatePageButtonCollection.Add(RightButtonParams.BlueButton("基准线调宽", "UnfoldMoreHorizontal", BaselineWidening));
-            OperatePageButtonCollection.Add(RightButtonParams.BlueButton("崩边调窄", "UnfoldLessHorizontal", BrokenEdgeNarrowing));
-            OperatePageButtonCollection.Add(RightButtonParams.BlueButton("崩边调宽", "UnfoldMoreHorizontal", BrokenEdgeWidening));
-            OperatePageButtonCollection.Add(RightButtonParams.BlueButton("报废", "DeleteEmpty", BladeScrap));
+            BottomButtonCollection.Clear();
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("工件吹气", "WeatherWindy", WorkpieceBlowing));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("自动识别", "TextRecognition", AutomaticRecognition));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("基准线校准", "CrosshairsGps", BaselineCalibration));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("基准线调窄", "UnfoldLessHorizontal", BaselineNarrowing));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("基准线调宽", "UnfoldMoreHorizontal", BaselineWidening));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("崩边调窄", "UnfoldLessHorizontal", BrokenEdgeNarrowing));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("崩边调宽", "UnfoldMoreHorizontal", BrokenEdgeWidening));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("报废", "DeleteEmpty", BladeScrap));
         }
 
         private bool _isSureBladeScrap = false;
@@ -299,7 +292,7 @@ namespace 精密切割系统.ViewModel
             {
                 try
                 {
-                    if (AlarmConfig.Instance.HasActiveErrorAlarm() && RightPageButtonCollection.Any(button => button.ContentText == "继续"))
+                    if (AlarmConfig.Instance.HasActiveErrorAlarm() && RightButtonCollection.Any(button => button.ContentText == "继续"))
                     {
                         InitRightButtonOnlyStop();
                     }

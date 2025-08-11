@@ -33,8 +33,8 @@ namespace 精密切割系统.ViewModel
         }
         private void InitRightButton()
         {
-            WindowLayout.RightPageButtons.Clear();
-            WindowLayout.RightPageButtons.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
+            RightButtonCollection.Clear();
+            RightButtonCollection.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }
 
         private void Back()

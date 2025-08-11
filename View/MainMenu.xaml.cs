@@ -354,8 +354,10 @@ namespace 精密切割系统.View
                 case 440:
                 case 204:
                 case 607:
-                case 520:
                     mainWindow.NavigateToPage(bean.PageUrl);
+                    break;
+                case 520:
+                    ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(EmptyRun));
                     break;
                 case 709:
                     PlcControl.tagControl.flange.JoinTrimming(1);

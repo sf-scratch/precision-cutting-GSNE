@@ -45,10 +45,6 @@ namespace 精密切割系统.ViewModel
         public DelegateCommand<string> CheckLunguCommand { get; set; }
         private readonly IRegionManager _regionManager;
         private readonly IEventAggregator _eventAggregator;
-        // 控制右侧按钮
-        private ObservableCollection<RightButtonParams> _rightButtonParams;
-        // 控制底部侧按钮
-        public ObservableCollection<RightButtonParams> _operatePageButtonCollection;
 
         private string _lunguId;
         public string LunguId
@@ -125,8 +121,6 @@ namespace 精密切割系统.ViewModel
             _regionManager = regionManager;
             _eventAggregator = eventAggregator;
             LunguId = string.Empty;
-            _rightButtonParams = WindowLayout.RightPageButtons;
-            _operatePageButtonCollection = WindowLayout.OperatePageButtons;
             AutoRunCommand = new DelegateCommand(AutoRunAsync);
             CheckLunguCommand = new DelegateCommand<string>(CheckLungu);
             InitCommand = new DelegateCommand(Init);
@@ -163,26 +157,26 @@ namespace 精密切割系统.ViewModel
 
         private void InitRightButtonOnlyBack()
         {
-            _rightButtonParams.Clear();
-            _rightButtonParams.Add(RightButtonParams.YelloRightButton("检查轮毂", "FormatListChecks", () => CheckLungu(LunguId)));
-            _rightButtonParams.Add(RightButtonParams.YelloRightButton("操作记录", "ClipboardTextClockOutline", GoToHistory));
-            _rightButtonParams.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
+            RightButtonCollection.Clear();
+            RightButtonCollection.Add(RightButtonParams.YelloRightButton("检查轮毂", "FormatListChecks", () => CheckLungu(LunguId)));
+            RightButtonCollection.Add(RightButtonParams.YelloRightButton("操作记录", "ClipboardTextClockOutline", GoToHistory));
+            RightButtonCollection.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }
 
         private void InitRightButton()
         {
-            _rightButtonParams.Clear();
-            _rightButtonParams.Add(RightButtonParams.GreenRightButton("自动执行", "LocationEnter", AutoRunAsync));
-            _rightButtonParams.Add(RightButtonParams.YelloRightButton("检查轮毂", "FormatListChecks", () => CheckLungu(LunguId)));
-            _rightButtonParams.Add(RightButtonParams.YelloRightButton("操作记录", "ClipboardTextClockOutline", GoToHistory));
-            _rightButtonParams.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
+            RightButtonCollection.Clear();
+            RightButtonCollection.Add(RightButtonParams.GreenRightButton("自动执行", "LocationEnter", AutoRunAsync));
+            RightButtonCollection.Add(RightButtonParams.YelloRightButton("检查轮毂", "FormatListChecks", () => CheckLungu(LunguId)));
+            RightButtonCollection.Add(RightButtonParams.YelloRightButton("操作记录", "ClipboardTextClockOutline", GoToHistory));
+            RightButtonCollection.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }
 
         private void InitBottomButton()
         {
-            _operatePageButtonCollection.Add(RightButtonParams.BlueButton("换刀片", "SawBlade", ReplaceBlade));
-            _operatePageButtonCollection.Add(RightButtonParams.BlueButton("换磨刀板", "Square", ReplaceSharpeningBoard));
-            _operatePageButtonCollection.Add(RightButtonParams.BlueButton("换硅片", "CircleOpacity", ReplaceWafer));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("换刀片", "SawBlade", ReplaceBlade));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("换磨刀板", "Square", ReplaceSharpeningBoard));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("换硅片", "CircleOpacity", ReplaceWafer));
         }
 
         private void GoToHistory()

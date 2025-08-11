@@ -51,8 +51,6 @@ namespace 精密切割系统.ViewModel
         private readonly FullyAutoCutService _cutService;
         private CancellationTokenSource _pauseCts;
         private CancellationTokenSource _monitoringAlarmCts;
-        // 控制右侧按钮
-        public ObservableCollection<RightButtonParams> RightButtonParamsCollection { get; set; }
         public ObservableCollection<MessageModel> MessageList { get; set; }
 
         /// <summary>
@@ -185,7 +183,6 @@ namespace 精密切割系统.ViewModel
             _regionManager = regionManager;
             _eventAggregator = eventAggregator;
             _dialogService = dialogService;
-            RightButtonParamsCollection = WindowLayout.RightPageButtons;
             MessageList = new ObservableCollection<MessageModel>();
             _sharpenService = FullyAutoSharpenService.Instance;
             _cutService = FullyAutoCutService.Instance;
@@ -200,7 +197,7 @@ namespace 精密切割系统.ViewModel
 
         private void InitRightButton()
         {
-            RightButtonParamsCollection.Add(RightButtonParams.YelloRightButton("暂停", "/Assets/icon/right/stop.png", () => Pause()));
+            RightButtonCollection.Add(RightButtonParams.YelloRightButton("暂停", "/Assets/icon/right/stop.png", () => Pause()));
         }
 
         private async void RunAutoCut()

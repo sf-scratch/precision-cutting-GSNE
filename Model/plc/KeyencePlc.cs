@@ -1626,7 +1626,7 @@ namespace 精密切割系统.Driver
             {
                 // 设置绝对运动速度
                 await SetAbsoluteSpeedAsync(speed.Value);
-                waitTime = (int)MathF.Round(maxDistance / speed.Value);
+                waitTime = (int)MathF.Ceiling(maxDistance / speed.Value);
             }
             else
             {
@@ -1640,7 +1640,7 @@ namespace 精密切割系统.Driver
                     _ => 1f // 默认值
                 };
                 await SetAbsoluteSpeedAsync(defaultSpeed);
-                waitTime = (int)MathF.Round(maxDistance / defaultSpeed);
+                waitTime = (int)MathF.Ceiling(maxDistance / defaultSpeed);
             }
             absoluteStart.writeValue = "0";
             await keyencePlc.WriteTagAsync(absoluteStart);
