@@ -30,11 +30,6 @@ namespace 精密切割系统.Model.cut
         private TaskCompletionSource<CancellationToken?>? _continueTcs;
 
         /// <summary>
-        /// theta轴中心点位置
-        /// </summary>
-        public readonly static DataPoint<float> _thetaCenterPoint = GlobalParams.ThetaCenterPoint;
-
-        /// <summary>
         /// 磨刀板尺寸
         /// </summary>
         public readonly static DataRectangleF _sharpenRect = GlobalParams.SharpenRect;
@@ -101,6 +96,7 @@ namespace 精密切割系统.Model.cut
 
         public async Task<RunResult> Run(LunguSksjModel lunguSksj, SharpenParamsModel sharpenParams, float bladeContactWorkingDiscZ1, float bladeLiftingHeight, float sharpenCalibratTheta, int sharpenTimes, float singleBladeWear, CancellationToken pauseToken)
         {
+            DataPoint<float> thetaCenterPoint = Appsettings.ThetaCenterPoint;
             InitFromAppsettings();
             if (_thetaDegQueue.Count == 0)
             {
@@ -127,7 +123,7 @@ namespace 精密切割系统.Model.cut
                         if (_isRotateTheta)
                         {
                             // 该theta角度第一次切割，切割矩形最下边切为起始位置
-                            _recordSharpenY = GeometryUtils.FindBottomTangentY(_thetaCenterPoint, _sharpenRect, _thetaDegQueue.Peek());
+                            _recordSharpenY = GeometryUtils.FindBottomTangentY(thetaCenterPoint, _sharpenRect, _thetaDegQueue.Peek());
                             _isRotateTheta = false;
                         }
                         float cutSize = GetCutSize(sharpenParams.CutSize);
@@ -157,7 +153,7 @@ namespace 精密切割系统.Model.cut
                         _recordSharpenY = AutoCutUtils.CalculateCutY(_recordSharpenY, cutSize, _cutDirection);
                         //保存磨刀参数
                         Appsettings.SharpenY = _recordSharpenY;
-                        line = AutoCutUtils.CalculateRectangleCuttingLine(_thetaCenterPoint, _sharpenRect, _thetaDegQueue.Peek(), _recordSharpenY, sharpenParams.OffsetX);
+                        line = AutoCutUtils.CalculateRectangleCuttingLine(thetaCenterPoint, _sharpenRect, _thetaDegQueue.Peek(), _recordSharpenY, sharpenParams.OffsetX);
                         if (line == null)
                         {
                             return RunResult.Fail("获取磨刀线失败！");

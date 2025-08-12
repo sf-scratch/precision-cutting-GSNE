@@ -82,8 +82,8 @@ namespace 精密切割系统.Behaviors
             }
             try
             {
-                await ExecutePrompt(_delayCts.Token);
-                if (_delayCts.IsCancellationRequested) return;
+                //await ExecutePrompt(_delayCts.Token);
+                if (_delayCts?.IsCancellationRequested ?? true) return;
                 ExecuteStart(sender, e);
             }
             catch (TaskCanceledException) { }
@@ -100,8 +100,8 @@ namespace 精密切割系统.Behaviors
             }
             try
             {
-                await ExecutePrompt(_delayCts.Token);
-                if (_delayCts.IsCancellationRequested) return;
+                //await ExecutePrompt(_delayCts.Token);
+                if (_delayCts?.IsCancellationRequested ?? true) return;
                 ExecuteStart(sender, e);
             }
             catch (TaskCanceledException) { }

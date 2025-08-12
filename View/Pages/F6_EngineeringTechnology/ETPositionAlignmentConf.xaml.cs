@@ -16,6 +16,7 @@ using 精密切割系统.database;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
+using 精密切割系统.Model.cut;
 using 精密切割系统.Utils;
 using 精密切割系统.View.common;
 using 精密切割系统.View.Controls;
@@ -110,24 +111,24 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
         //数据显示
         private void initView()
         {
-            inputThetaCenterLocationX.Text = _model.ThetaCenterLocationX;
-            inputThetaCenterLocationY.Text = _model.ThetaCenterLocationY;
-            inputThetaCameraLocationX.Text = _model.ThetaCameraLocationX;
-            inputThetaCameraLocationY.Text = _model.ThetaCameraLocationY;
-            inputCameraToCutXOffset.Text = _model.CameraToCutXOffset;
-            inputCameraToCutYOffset.Text = _model.CameraToCutYOffset;
+            inputThetaCenterLocationX.Text = Appsettings.ThetaCenterPoint.X.ToString();
+            inputThetaCenterLocationY.Text = Appsettings.ThetaCenterPoint.Y.ToString();
+            inputThetaCameraLocationX.Text = Appsettings.CameraThetaCenterPoint.X.ToString();
+            inputThetaCameraLocationY.Text = Appsettings.CameraThetaCenterPoint.Y.ToString();
+            inputCameraToCutXOffset.Text = Appsettings.CameraRelativeBladePosition.X.ToString();
+            inputCameraToCutYOffset.Text = Appsettings.CameraRelativeBladePosition.Y.ToString();
             inputCutZ1MaxLocation.Text = _model.CutZ1MaxLocation;
-            inputCameraOffsetX.Text = _model.CameraOffsetX;
-            inputCameraOffsetY.Text = _model.CameraOffsetY;
-            inputHighMagToLowMagCameraXOffset.Text = _model.HighMagToLowMagCameraXOffset;
-            inputHighMagToLowMagCameraYOffset.Text = _model.HighMagToLowMagCameraYOffset;
+            //inputCameraOffsetX.Text = _model.CameraOffsetX;
+            //inputCameraOffsetY.Text = _model.CameraOffsetY;
+            //inputHighMagToLowMagCameraXOffset.Text = _model.HighMagToLowMagCameraXOffset;
+            //inputHighMagToLowMagCameraYOffset.Text = _model.HighMagToLowMagCameraYOffset;
             // inputInitPosition.Text = _model.InitPosition;
             //inputFocusRatio.Text = _model.FocusRatio;
             // inputMultipleNum.Text = _model.MultipleNum;
             inputLightIntensityChannel.Text = _model.LightIntensityChannel + "";
             inputLowLightIntensityChannel.Text = _model.LowLightIntensityChannel + "";
             inputRingLightIntensityChannel.Text = _model.RingLightIntensityChannel + "";
-            inputWorkDiscFocusPosition.Text = _model.WorkDiscFocusPosition + "";
+            inputWorkDiscFocusPosition.Text = (Appsettings.FocusClearZ ?? 0).ToString();
 
             //如果是空或者小数位数不足-小数初始化为0
             initTbNumber();
@@ -152,14 +153,17 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
                 _model.CameraToCutXOffset = inputCameraToCutXOffset.Text;
                 _model.CameraToCutYOffset = inputCameraToCutYOffset.Text;
                 _model.CutZ1MaxLocation = inputCutZ1MaxLocation.Text;
-                _model.CameraOffsetX = inputCameraOffsetX.Text;
-                _model.CameraOffsetY = inputCameraOffsetY.Text;
-                _model.HighMagToLowMagCameraXOffset = inputHighMagToLowMagCameraXOffset.Text;
-                _model.HighMagToLowMagCameraYOffset = inputHighMagToLowMagCameraYOffset.Text;
+                //_model.CameraOffsetX = inputCameraOffsetX.Text;
+                //_model.CameraOffsetY = inputCameraOffsetY.Text;
+                //_model.HighMagToLowMagCameraXOffset = inputHighMagToLowMagCameraXOffset.Text;
+                //_model.HighMagToLowMagCameraYOffset = inputHighMagToLowMagCameraYOffset.Text;
                 _model.LightIntensityChannel = Tools.GetIntStringValue(inputLightIntensityChannel.Text);
                 _model.LowLightIntensityChannel = Tools.GetIntStringValue(inputLowLightIntensityChannel.Text);
                 _model.RingLightIntensityChannel = Tools.GetIntStringValue(inputRingLightIntensityChannel.Text);
                 _model.WorkDiscFocusPosition = Tools.GetFloatStringValue(inputWorkDiscFocusPosition.Text);
+                Appsettings.FocusClearZ = inputWorkDiscFocusPosition.Text.ToFloat();
+                Appsettings.CameraThetaCenterPoint = new DataPoint<float>(inputThetaCameraLocationX.Text.ToFloat(), inputThetaCameraLocationY.Text.ToFloat());
+                Appsettings.CameraRelativeBladePosition = new DataPoint<float>(inputCameraToCutXOffset.Text.ToFloat(), inputCameraToCutYOffset.Text.ToFloat());
                 await SqlHelper.UpdateAsync(_model);
                 CurrentUtils.InitPositionAlignment(_model);
             }

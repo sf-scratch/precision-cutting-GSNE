@@ -115,6 +115,16 @@ namespace 精密切割系统.ViewModel
             }
         }
 
+        public string DeviceCode
+        {
+            get { return Appsettings.DeviceCode ?? string.Empty; }
+            set
+            {
+                Appsettings.DeviceCode = value;
+                RaisePropertyChanged();
+            }
+        }
+
 
         public BladeReplacementConfigurationViewModel(IRegionManager regionManager, IEventAggregator eventAggregator)
         {
@@ -193,6 +203,12 @@ namespace 精密切割系统.ViewModel
             bool isInitSuccess = false;
             try
             {
+                if (!GlobalParams.onlineFlag)
+                {
+                    isInitSuccess = true;
+                    MaterialSnackUtils.MaterialSnack("检查轮毂信息完成，可开始执行自动切割！", MaterialSnackUtils.SnackType.SUCCESS, 0, _eventAggregator);
+                    return;
+                }
                 MaterialSnackUtils.MaterialSnack("检查轮毂信息中...", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
                 HttpUtilsResult<LunguInfoDTO> lunguResult = await HttpUtils.GetLunguInfoAsync(LunguId);
                 if (lunguResult.Data is null)

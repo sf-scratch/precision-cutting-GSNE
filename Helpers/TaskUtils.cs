@@ -140,5 +140,31 @@ namespace 精密切割系统.Helpers
                 CurrentWaitingFuncDict.TryRemove(uuid, out _);
             }
         }
+
+        //public static (CancellationToken Token, IDisposable Cts) GetTimeoutCancellationToken(TimeSpan timeout = default, CancellationToken linkedToken = default)
+        //{
+        //    timeout = timeout == default ? TimeSpan.FromSeconds(1) : timeout;
+
+        //    // 如果不需要链接Token
+        //    if (linkedToken == default || !linkedToken.CanBeCanceled)
+        //    {
+        //        var cts = new CancellationTokenSource(timeout);
+        //        return (cts.Token, cts);
+        //    }
+
+        //    // 需要链接外部Token的情况
+        //    var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(
+        //        linkedToken,
+        //        new CancellationTokenSource(timeout).Token
+        //    );
+        //    return (linkedCts.Token, linkedCts);
+        //}
+        public static TimeoutToken GetTimeoutCancellationToken(
+            TimeSpan timeout = default,
+            CancellationToken linkedToken = default)
+        {
+            timeout = timeout == default ? TimeSpan.FromSeconds(1) : timeout;
+            return new TimeoutToken(timeout, linkedToken);
+        }
     }
 }

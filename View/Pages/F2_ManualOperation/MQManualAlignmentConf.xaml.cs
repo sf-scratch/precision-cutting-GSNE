@@ -177,7 +177,23 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                     await AutoCutUtils.AutoFocusAsync();
                     break;
                 case 2441:
-                    await AutoCutUtils.AutoCoarseFocusAsync();
+                    {
+                        try
+                        {
+                            await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(40));
+                            var result = await AutoCutUtils.GlobalFocusAsync(token: timeoutToken.Token);
+                            if (!result.IsSuccess)
+                            {
+                                MaterialSnack(result.Message, SnackType.WARNING);
+                                return;
+                            }
+                            await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(result.Data, default, timeoutToken.Token);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            MaterialSnack("对焦超时！", SnackType.WARNING);
+                        }
+                    }
                     break;
                 case 2445:
                     Appsettings.FocusClearZ = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync();

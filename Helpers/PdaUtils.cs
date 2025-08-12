@@ -38,7 +38,7 @@ namespace 精密切割系统.Helpers
                 return CommonResult.Failure("QueryFlowSettingByIdAsync失败");
             }
             Dictionary<string, FlowsValuesDTO> flowsDic = allFieldValues.Select(x => x.ToFlowsValuesDTO()).ToDictionary(x => x.FieldLabel);
-            FieldValuesDTO fieldValues = GetFieldValuesDTO(flowsDic, "QG-03", lunguId);
+            FieldValuesDTO fieldValues = GetFieldValuesDTO(flowsDic, Appsettings.DeviceCode ?? string.Empty, lunguId);
             HttpUtilsResult<string> groupOperateIdRes = await HttpUtils.InsertFlowValuesAsync(fieldValues);
             if (groupOperateIdRes.Data == null)
             {
@@ -46,7 +46,7 @@ namespace 精密切割系统.Helpers
                 fieldValues.List.RemoveAt(1); // 移除轮毂
                 fieldValues.Status = "2";
                 await HttpUtils.InsertFlowValuesAsync(fieldValues);
-                fieldValues = GetFieldValuesDTO(flowsDic, "QG-03", lunguId);
+                fieldValues = GetFieldValuesDTO(flowsDic, Appsettings.DeviceCode ?? string.Empty, lunguId);
                 groupOperateIdRes = await HttpUtils.InsertFlowValuesAsync(fieldValues);
             }
             if (groupOperateIdRes.Data == null)

@@ -30,5 +30,11 @@ namespace 精密切割系统.Extensions
 
             return token;
         }
+
+        public static async Task CancelAfterAsync(this CancellationTokenSource cts, TimeSpan delay)
+        {
+            await Task.Delay(delay);
+            cts.Cancel();
+        }
     }
 }

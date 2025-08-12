@@ -13,7 +13,8 @@ using 精密切割系统.View.Controls;
 namespace 精密切割系统.Behaviors
 {
     public class TouchAndClickBehavior : Behavior<UIElement>
-    {// 依赖属性，可用于绑定命令
+    {
+        // 依赖属性，可用于绑定命令
         public static readonly DependencyProperty TouchAndClickCommandProperty =
             DependencyProperty.Register("TouchAndClickCommand", typeof(ICommand), typeof(TouchAndClickBehavior));
 

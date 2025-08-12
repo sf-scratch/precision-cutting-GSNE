@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using 精密切割系统.Assets.config.buttom;
 using 精密切割系统.Driver;
+using 精密切割系统.Extensions;
 using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.common;
@@ -25,12 +26,14 @@ namespace 精密切割系统.ViewModel
 {
     public class AutoCutPausingViewModel : CustomBindableBase
     {
-        public DelegateCommand ContinueCommand { get; set; }
-        public DelegateCommand StopCommand { get; set; }
+        public AsyncDelegateCommand ContinueCommand { get; set; }
+        public AsyncDelegateCommand StopCommand { get; set; }
         private readonly IRegionManager _regionManager;
         private CameraCommon? _cameraCommon;
         private AutoCutRuningViewModel _autoCutRuningViewModel;
         private DataPoint<float>? _originPoint;
+        private SemaphoreSlim _semaph = new SemaphoreSlim(1, 1);
+        private CancellationTokenSource _operatCts = new CancellationTokenSource();
 
         private static int _afterReplaceBladeCutTimes;
         /// <summary>
@@ -145,8 +148,8 @@ namespace 精密切割系统.ViewModel
         public AutoCutPausingViewModel(IRegionManager regionManager)
         {
             _regionManager = regionManager;
-            ContinueCommand = new DelegateCommand(ContinueCommandExecute);
-            StopCommand = new DelegateCommand(StopCommandExecute);
+            ContinueCommand = new AsyncDelegateCommand(ContinueCommandExecute);
+            StopCommand = new AsyncDelegateCommand(StopCommandExecute);
             //Task monitorTask = StartMonitoringAlarmAsync(default);
         }
 
@@ -170,19 +173,51 @@ namespace 精密切割系统.ViewModel
         private void InitBottomButton()
         {
             BottomButtonCollection.Clear();
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("工件吹气", "WeatherWindy", WorkpieceBlowing));
             BottomButtonCollection.Add(RightButtonParams.BlueButton("自动识别", "TextRecognition", AutomaticRecognition));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("基准线校准", "CrosshairsGps", BaselineCalibration));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("工件吹气", "WeatherWindy", async () => await _semaph.ExecuteAsync(WorkpieceBlowing, "工件吹气")));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("精细对焦", "FocusAuto", async () => await _semaph.ExecuteAsync(FocusAuto, "精细对焦")));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("全局对焦", "FocusAuto", async () => await _semaph.ExecuteAsync(GlobalFocus, "全局对焦")));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("报废", "DeleteEmpty", async () => await _semaph.ExecuteAsync(BladeScrap, "报废")));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("基准线校准", "CrosshairsGps", async () => await _semaph.ExecuteAsync(BaselineCalibration, "基准线校准") ));
             BottomButtonCollection.Add(RightButtonParams.BlueButton("基准线调窄", "UnfoldLessHorizontal", BaselineNarrowing));
             BottomButtonCollection.Add(RightButtonParams.BlueButton("基准线调宽", "UnfoldMoreHorizontal", BaselineWidening));
             BottomButtonCollection.Add(RightButtonParams.BlueButton("崩边调窄", "UnfoldLessHorizontal", BrokenEdgeNarrowing));
             BottomButtonCollection.Add(RightButtonParams.BlueButton("崩边调宽", "UnfoldMoreHorizontal", BrokenEdgeWidening));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("报废", "DeleteEmpty", BladeScrap));
+        }
+
+        private async Task GlobalFocus()
+        {
+            try
+            {
+                CommonResult<float> focusRusult = await AutoCutUtils.GlobalFocusAsync(token: _operatCts.Token);
+                if (!focusRusult.IsSuccess)
+                {
+                    MaterialSnackUtils.MaterialSnack(focusRusult.Message, MaterialSnackUtils.SnackType.WARNING);
+                    return;
+                }
+                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(focusRusult.Data, default, default);
+            }
+            catch (OperationCanceledException) { }
+        }
+
+        private async Task FocusAuto()
+        {
+            try
+            {
+                CommonResult<float> focusRusult = await AutoCutUtils.AutoFocusAsync(token: _operatCts.Token);
+                if (!focusRusult.IsSuccess)
+                {
+                    MaterialSnackUtils.MaterialSnack(focusRusult.Message, MaterialSnackUtils.SnackType.WARNING);
+                    return;
+                }
+                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(focusRusult.Data, default, default);
+            }
+            catch (OperationCanceledException) { }
         }
 
         private bool _isSureBladeScrap = false;
 
-        private async void BladeScrap()
+        private async Task BladeScrap()
         {
             if (!_isSureBladeScrap)
             {
@@ -219,7 +254,7 @@ namespace 精密切割系统.ViewModel
             UpdateBrokenEdgeWidth();
         }
 
-        private async void BaselineCalibration()
+        private async Task BaselineCalibration()
         {
             if (_originPoint == null)
             {
@@ -240,12 +275,12 @@ namespace 精密切割系统.ViewModel
             MaterialSnackUtils.MaterialSnack($"基准线校准完成", MaterialSnackUtils.SnackType.SUCCESS, 0);
         }
 
-        private async void WorkpieceBlowing()
+        private async Task WorkpieceBlowing()
         {
             try
             {
                 float curX = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0;
-                await AutoCutUtils.WorkpieceBlowingAsync();
+                await AutoCutUtils.WorkpieceBlowingAsync(token: _operatCts.Token);
                 await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(curX, default, default);
                 await AutoCutUtils.FineTuneAxisYAsync();
                 await AutoCutUtils.UpdateCameraCommonLineAsync();
@@ -304,13 +339,14 @@ namespace 精密切割系统.ViewModel
             }
         }
 
-        private void ContinueCommandExecute()
+        private async Task ContinueCommandExecute()
         {
             if (AlarmConfig.Instance.HasActiveErrorAlarm())
             {
                 MaterialSnackUtils.MaterialSnack("请先处理错误报警！", MaterialSnackUtils.SnackType.WARNING);
                 return;
             }
+            await _operatCts.CancelAsync();
             NavigationParameters parameters = new NavigationParameters
             {
                 { "SharpenParams", _autoCutRuningViewModel.SharpenParams },
@@ -320,8 +356,9 @@ namespace 精密切割系统.ViewModel
             _regionManager.RequestNavigate(RegionName.AutoCutStateRegion, nameof(AutoCutRuning), parameters);
         }
 
-        private async void StopCommandExecute()
+        private async Task StopCommandExecute()
         {
+            await _operatCts.CancelAsync();
             await _autoCutRuningViewModel.StopAsync(ServicePauseResult.Stop);
         }
 

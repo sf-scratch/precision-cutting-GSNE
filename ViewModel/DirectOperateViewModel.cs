@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using 精密切割系统.Behaviors;
 using 精密切割系统.FrmWindow.common;
+using 精密切割系统.Helpers;
 using 精密切割系统.Utils;
 
 namespace 精密切割系统.ViewModel
@@ -521,7 +523,8 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await PlcControl.tagControl.Xaxis.StopJogAsync();
+                await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken();
+                await PlcControl.tagControl.Xaxis.WaitStopJogAsync(timeoutToken.Token);
             }
             catch (OperationCanceledException) { }
         }
@@ -582,7 +585,8 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await PlcControl.tagControl.Yaxis.StopJogAsync();
+                await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken();
+                await PlcControl.tagControl.Yaxis.WaitStopJogAsync(timeoutToken.Token);
             }
             catch (OperationCanceledException) { }
         }
@@ -613,7 +617,8 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await PlcControl.tagControl.ThetaAxis.StopJogAsync();
+                await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken();
+                await PlcControl.tagControl.ThetaAxis.WaitStopJogAsync(timeoutToken.Token);
             }
             catch (OperationCanceledException) { }
         }
@@ -644,7 +649,8 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await PlcControl.tagControl.Z1axis.StopJogAsync();
+                await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken();
+                await PlcControl.tagControl.Z1axis.WaitStopJogAsync(timeoutToken.Token);
             }
             catch (OperationCanceledException) { }
         }
@@ -675,7 +681,8 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await PlcControl.tagControl.Z2axis.StopJogAsync();
+                await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken();
+                await PlcControl.tagControl.Z2axis.WaitStopJogAsync(timeoutToken.Token);
             }
             catch (OperationCanceledException) { }
         }

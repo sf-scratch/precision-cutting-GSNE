@@ -221,20 +221,21 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
 
         private IWorkpieces GenerateWorkpieces(FileTableItemModel fileTableItem, float cutY)
         {
+            DataPoint<float> thetaCenterPoint = Appsettings.ThetaCenterPoint;
             IWorkpieces workpiece;
             if (fileTableItem.WorkShape == 1)
             {
-                workpiece = new CircularWorkpiece(GlobalParams.ThetaCenterPoint, fileTableItem.Round.ToFloat() / 2, cutY);
+                workpiece = new CircularWorkpiece(thetaCenterPoint, fileTableItem.Round.ToFloat() / 2, cutY);
             }
             else if (fileTableItem.WorkShape == 2)
             {
                 float width = fileTableItem.WorkbenchCh1;
                 float height = fileTableItem.WorkbenchCh2;
-                workpiece = new RectangleWorkpiece(new DataRectangleF(GlobalParams.ThetaCenterPoint.X - (width / 2), GlobalParams.ThetaCenterPoint.Y - (height / 2), width, height), cutY);
+                workpiece = new RectangleWorkpiece(new DataRectangleF(thetaCenterPoint.X - (width / 2), thetaCenterPoint.Y - (height / 2), width, height), cutY);
             }
             else
             {
-                workpiece = new CircularWorkpiece(GlobalParams.ThetaCenterPoint, fileTableItem.Round.ToFloat() / 2, cutY);
+                workpiece = new CircularWorkpiece(thetaCenterPoint, fileTableItem.Round.ToFloat() / 2, cutY);
             }
             workpiece.WorkThickness = float.Parse(fileTableItem.WorkThickness);
             workpiece.TapeThickness = float.Parse(fileTableItem.TapeThickness);

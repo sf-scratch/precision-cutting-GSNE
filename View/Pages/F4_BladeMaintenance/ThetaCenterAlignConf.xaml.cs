@@ -109,9 +109,9 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             try
             {
                 _stopCts = new CancellationTokenSource();
-                _startX = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync(_stopCts.Token) ?? 0;
+                _startX = await PlcControl.tagControl.Xaxis.GetCurrentLocationWaitAsync(_stopCts.Token) ?? 0;
                 _endX = _startX + _viewModel.WorkSize.ToFloat();
-                _startY = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync(_stopCts.Token) ?? 0;
+                _startY = await PlcControl.tagControl.Yaxis.GetCurrentLocationWaitAsync(_stopCts.Token) ?? 0;
                 await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
                 await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(56f));
                 CommonResult<float> curHeightResult = await AutoCutUtils.ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, default, _stopCts.Token);

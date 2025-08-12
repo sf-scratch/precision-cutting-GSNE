@@ -44,6 +44,7 @@ using System.Windows.Threading;
 using 精密切割系统.View.common;
 using OpenCvSharp;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace 精密切割系统
 {
@@ -105,12 +106,12 @@ namespace 精密切割系统
             NavigateToPage("main");
         }
         OperatePage operatePage;
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             // 禁用触摸到鼠标事件的转换
             Touch.FrameReported += (s, e) => { /* 防止触摸触发鼠标事件 */ };
             AlarmConfig alarmConfig = AlarmConfig.Instance;
-            Dispatcher.BeginInvoke(new Action(() =>
+            await Dispatcher.BeginInvoke(new Action(() =>
             {
                 string logDirectory = "logs";
                 int daysThreshold = 30; // 清理超过 30 天的日志

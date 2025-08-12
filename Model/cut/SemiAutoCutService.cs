@@ -263,7 +263,7 @@ namespace 精密切割系统.Model.cut
 
         private async Task<float> GetCutThetaAlignDegAsync(CancellationToken token)
         {
-            return _alignService.ThetaAlignCompletedDeg ?? await PlcControl.tagControl.ThetaAxis.GetCurrentLocationAsync(token) ?? 0;
+            return _alignService.ThetaAlignCompletedDeg ?? await PlcControl.tagControl.ThetaAxis.GetCurrentLocationWaitAsync(token) ?? 0;
         }
     }
 

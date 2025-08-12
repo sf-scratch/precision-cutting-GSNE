@@ -16,7 +16,7 @@ namespace 精密切割系统.FrmWindow.common
     internal class GlobalParams
     {
         // true 在线版本 false 离线版本
-        public static bool onlineFlag = false;
+        public static bool onlineFlag = true;
         // 是否上传MES
         public static bool OnlineMES = true;
         // 当前页面是否是首页
@@ -150,15 +150,9 @@ namespace 精密切割系统.FrmWindow.common
         public static readonly float CenterDistance = 2f;
 
         /// <summary>
-        /// theta轴中心点位置
-        /// </summary>
-        //public static DataPoint<float> ThetaCenterPoint = new DataPoint<float>(146.48f, 81.86f);
-        public static DataPoint<float> ThetaCenterPoint = new DataPoint<float>(Appsettings.CameraThetaCenterPoint.X.ToActualX(), Appsettings.CameraThetaCenterPoint.Y.ToActualY());
-
-        /// <summary>
         /// 磨刀板尺寸
         /// </summary>
-        public static DataRectangleF SharpenRect = new DataRectangleF(ThetaCenterPoint.X - 33, ThetaCenterPoint.Y - 73, 70, 70);
+        public static DataRectangleF SharpenRect = new DataRectangleF(Appsettings.ThetaCenterPoint.X - 33, Appsettings.ThetaCenterPoint.Y - 73, 70, 70);
 
         /// <summary>
         /// 非接触测高位置到工作台的z1轴高度

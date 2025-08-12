@@ -1385,7 +1385,7 @@ namespace 精密切割系统.Driver
             return await keyencePlc.ReadDataAsync<float>(curLocation.addr);
         }
 
-        public async Task<float?> GetCurrentLocationAsync(CancellationToken token)
+        public async Task<float?> GetCurrentLocationWaitAsync(CancellationToken token)
         {
             await WaitAxisStopAsync(token);
             return await GetCurrentLocationAsync();
@@ -1453,7 +1453,7 @@ namespace 精密切割系统.Driver
         /// </summary>
         /// <param name="speed">速度</param>
         /// <param name="jogDirection">方向 0 正 1 负</param>
-        public async Task StartJogAsync(int jogDirection, CancellationToken token = default)
+        public async Task StartJogAsync(int jogDirection)
         {
             if (jogDirection == 0)
             {
@@ -1485,13 +1485,13 @@ namespace 精密切割系统.Driver
         /// 点动结束
         /// </summary>
         /// <param name="jogDirection">方向 0 正 1 负</param>
-        public async Task StopJogAsync(CancellationToken token = default)
+        public async Task WaitStopJogAsync(CancellationToken token)
         {
             jogStart.writeValue = "0";
             await keyencePlc.WriteTagAsync(jogStart);
             jogAntiStart.writeValue = "0";
             await keyencePlc.WriteTagAsync(jogAntiStart);
-            CancellationToken useToken = token.WithDefaultTimeout();
+            CancellationToken useToken = token;
             using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
             while (await timer.WaitForNextTickAsync(useToken) && (await PlcControl.plc.ReadDataAsync(jogStart.addr) != false || await PlcControl.plc.ReadDataAsync(jogAntiStart.addr) != false))
             {
@@ -1500,6 +1500,18 @@ namespace 精密切割系统.Driver
                 jogAntiStart.writeValue = "0";
                 await keyencePlc.WriteTagAsync(jogAntiStart);
             }
+        }
+
+        /// <summary>
+        /// 点动结束
+        /// </summary>
+        /// <param name="jogDirection">方向 0 正 1 负</param>
+        public async Task StopJogAsync()
+        {
+            jogStart.writeValue = "0";
+            await keyencePlc.WriteTagAsync(jogStart);
+            jogAntiStart.writeValue = "0";
+            await keyencePlc.WriteTagAsync(jogAntiStart);
         }
 
         public void StartRelative(string speed, string distance, int jogDirection)
@@ -1613,7 +1625,7 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task StartAbsoluteAsync(float location, float? speed, CancellationToken token)
         {
-            await StopJogAsync(token.WithDefaultTimeout());
+            await WaitStopJogAsync(token.WithDefaultTimeout());
             // 等待轴准备好
             await WaitAxisReadyAsync(token.WithDefaultTimeout());
             // 设置绝对运动位置

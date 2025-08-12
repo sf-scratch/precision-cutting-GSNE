@@ -215,8 +215,6 @@ namespace 精密切割系统.ViewModel
                 Continue();
                 return;
             }
-            //theta轴中心点位置
-            DataPoint<float> thetaCenterPoint = GlobalParams.ThetaCenterPoint;
             //相机中心点位置
             DataPoint<float> cameraThetaCenterPoint = Appsettings.CameraThetaCenterPoint;
             //工件半径
@@ -276,14 +274,14 @@ namespace 精密切割系统.ViewModel
                 AfterHeightMeasurementZ = firstHeightMeasurementZ.Data;
                 RunStatus = AutoRunStatus.AutoFocus;
                 //对焦
-                await AutoCutUtils.GoPreCutLineAsync(_pauseCts.Token);
-                CommonResult<float> focusClearZ = await AutoCutUtils.AutoFocusAsync(default, _pauseCts.Token);
-                if (!focusClearZ.IsSuccess)
-                {
-                    MaterialSnackUtils.MaterialSnack(focusClearZ.Message, MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
-                    return;
-                }
-                Appsettings.FocusClearZ = focusClearZ.Data;
+                //await AutoCutUtils.GoPreCutLineAsync(_pauseCts.Token);
+                //CommonResult<float> focusClearZ = await AutoCutUtils.AutoFocusAsync(default, _pauseCts.Token);
+                //if (!focusClearZ.IsSuccess)
+                //{
+                //    MaterialSnackUtils.MaterialSnack(focusClearZ.Message, MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                //    return;
+                //}
+                //Appsettings.FocusClearZ = focusClearZ.Data;
                 RunStatus = AutoRunStatus.SharpenCalibrat;
                 // 磨刀校准
                 float sharpenCalibratTheta = await AutoCutUtils.CalibratSharpenAsync(sharpenRect.Clone(), _pauseCts.Token);
@@ -713,6 +711,7 @@ namespace 精密切割系统.ViewModel
                             await AutoCutUtils.WorkpieceBlowingAsync(_eventAggregator, cts.Token);
                             await PlcControl.tagControl.cutting.RunMotionAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), line.StartPoint.Y.ToCameraY(), cts.Token);
                         }
+                        await AutoCutUtils.AutoFocusAsync();
                         await AutoCutUtils.FineTuneAxisYAsync();
                         await AutoCutUtils.UpdateCameraCommonLineAsync();
                         MaterialSnackUtils.MaterialSnack(message ?? "暂停中...", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);

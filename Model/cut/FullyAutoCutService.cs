@@ -51,11 +51,6 @@ namespace 精密切割系统.Model.cut
         public readonly float _centerDistance = GlobalParams.CenterDistance;
 
         /// <summary>
-        /// theta轴中心点位置
-        /// </summary>
-        public readonly DataPoint<float> _thetaCenterPoint = GlobalParams.ThetaCenterPoint;
-
-        /// <summary>
         /// 正常步进距离
         /// </summary>
         private readonly float _normalStepDistance = GlobalParams.NormalStepDistance;
@@ -123,6 +118,7 @@ namespace 精密切割系统.Model.cut
 
         public async Task<RunResult> Run(LunguSksjModel lunguSksj, List<float> cutSpeedList, CutParamsModel cutParams, float bladeContactWorkingDiscZ1, float bladeLiftingHeight, float cutCalibratTheta, IEventAggregator? eventAggregator, CancellationToken pauseToken = default)
         {
+            DataPoint<float> thetaCenterPoint = Appsettings.ThetaCenterPoint;
             InitFromAppsettings();
             if (_thetaDegQueue.Count == 0)
             {
@@ -151,11 +147,11 @@ namespace 精密切割系统.Model.cut
                         if (_isRotateTheta)
                         {
                             //计算工件圆心坐标
-                            DataPoint<float> workpieceCenterPoint = new DataPoint<float>(_thetaCenterPoint.X, _thetaCenterPoint.Y + _centerDistance);
+                            DataPoint<float> workpieceCenterPoint = new DataPoint<float>(thetaCenterPoint.X, thetaCenterPoint.Y + _centerDistance);
                             // 该theta角度第一次切割，切割半圆最下边切为起始位置
                             //_recordCutY = GeometryUtils.FindBottomTangentY(_thetaCenterPoint, workpieceCenterPoint, _workpieceRadius, _thetaDegQueue.Peek() + cutCalibratTheta);
                             _recordCutY = 150;
-                            Appsettings.CutDistance = GlobalParams.ThetaCenterPoint.Y + GlobalParams.WorkpieceRadius + GlobalParams.CenterDistance - _recordCutY + 2;
+                            Appsettings.CutDistance = thetaCenterPoint.Y + GlobalParams.WorkpieceRadius + GlobalParams.CenterDistance - _recordCutY + 2;
                             _isRotateTheta = false;
                         }
                         float cutSize = GetCutSize();
@@ -184,7 +180,7 @@ namespace 精密切割系统.Model.cut
                         _recordCutY = AutoCutUtils.CalculateCutY(_recordCutY, cutSize, _cutDirection);
                         //保存切割参数
                         Appsettings.CutY = _recordCutY;
-                        line = AutoCutUtils.CalculateSemicircleCuttingLine(_thetaCenterPoint, _thetaDegQueue.Peek() + cutCalibratTheta, _workpieceRadius, _centerDistance, _recordCutY);
+                        line = AutoCutUtils.CalculateSemicircleCuttingLine(thetaCenterPoint, _thetaDegQueue.Peek() + cutCalibratTheta, _workpieceRadius, _centerDistance, _recordCutY);
                         if (line == null)
                         {
                             return RunResult.Fail("获取切割线失败！");

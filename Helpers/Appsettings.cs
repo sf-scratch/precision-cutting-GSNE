@@ -25,31 +25,8 @@ namespace 精密切割系统.Helpers
         /// </summary>
         public static List<float>? CutThetaDegList
         {
-            get { return GetList<float>(); }
-            set
-            {
-                UpdateAppSettingsToNull();
-                if (value is not null)
-                {
-                    UpdateAppSettings(value);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 记录切割硅片Y轴位置
-        /// </summary>
-        public static float? CutY
-        {
-            get { return GetValue<float>(); }
-            set
-            {
-                UpdateAppSettingsToNull();
-                if (value is not null)
-                {
-                    UpdateAppSettings(value.Value);
-                }
-            }
+            get => GetList<float>();
+            set => UpdateAppSettings(value);
         }
 
         /// <summary>
@@ -57,15 +34,17 @@ namespace 精密切割系统.Helpers
         /// </summary>
         public static List<float>? SharpenThetaDegList
         {
-            get { return GetList<float>(); }
-            set
-            {
-                UpdateAppSettingsToNull();
-                if (value is not null)
-                {
-                    UpdateAppSettings(value);
-                }
-            }
+            get => GetList<float>();
+            set => UpdateAppSettings(value);
+        }
+
+        /// <summary>
+        /// 记录切割硅片Y轴位置
+        /// </summary>
+        public static float? CutY
+        {
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
         }
 
         /// <summary>
@@ -73,15 +52,8 @@ namespace 精密切割系统.Helpers
         /// </summary>
         public static float? SharpenY
         {
-            get { return GetValue<float>(); }
-            set
-            {
-                UpdateAppSettingsToNull();
-                if (value is not null)
-                {
-                    UpdateAppSettings(value.Value);
-                }
-            }
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
         }
 
         /// <summary>
@@ -89,15 +61,8 @@ namespace 精密切割系统.Helpers
         /// </summary>
         public static float? SharpenDistance
         {
-            get { return GetValue<float>(); }
-            set
-            {
-                UpdateAppSettingsToNull();
-                if (value is not null)
-                {
-                    UpdateAppSettings(value.Value);
-                }
-            }
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
         }
 
         /// <summary>
@@ -105,31 +70,8 @@ namespace 精密切割系统.Helpers
         /// </summary>
         public static float? CutDistance
         {
-            get { return GetValue<float>(); }
-            set
-            {
-                UpdateAppSettingsToNull();
-                if (value is not null)
-                {
-                    UpdateAppSettings(value.Value);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 测高位置theta角度
-        /// </summary>
-        public static int? ContactHeightMeasurementThetaDeg
-        {
-            get { return GetValue<int>(); }
-            set
-            {
-                UpdateAppSettingsToNull();
-                if (value is not null)
-                {
-                    UpdateAppSettings(value.Value);
-                }
-            }
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
         }
 
         /// <summary>
@@ -137,31 +79,8 @@ namespace 精密切割系统.Helpers
         /// </summary>
         public static float? FocusClearZ
         {
-            get { return GetValue<float>(); }
-            set
-            {
-                UpdateAppSettingsToNull();
-                if (value is not null)
-                {
-                    UpdateAppSettings(value.Value);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 自更换刀片起刀片切了几道
-        /// </summary>
-        public static int? AfterReplaceBladeCutTimes
-        {
-            get { return GetValue<int>(); }
-            set
-            {
-                UpdateAppSettingsToNull();
-                if (value is not null)
-                {
-                    UpdateAppSettings(value.Value);
-                }
-            }
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
         }
 
         /// <summary>
@@ -169,15 +88,26 @@ namespace 精密切割系统.Helpers
         /// </summary>
         public static float? AfterReplaceBladeCutLength
         {
-            get { return GetValue<float>(); }
-            set
-            {
-                UpdateAppSettingsToNull();
-                if (value is not null)
-                {
-                    UpdateAppSettings(value.Value);
-                }
-            }
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
+        }
+
+        /// <summary>
+        /// 测高位置theta角度
+        /// </summary>
+        public static int? ContactHeightMeasurementThetaDeg
+        {
+            get => GetValue<int>();
+            set => UpdateAppSettings(value);
+        }
+
+        /// <summary>
+        /// 自更换刀片起刀片切了几道
+        /// </summary>
+        public static int? AfterReplaceBladeCutTimes
+        {
+            get => GetValue<int>();
+            set => UpdateAppSettings(value);
         }
 
         /// <summary>
@@ -185,15 +115,8 @@ namespace 精密切割系统.Helpers
         /// </summary>
         public static bool? IsNeedCheckBaseLine
         {
-            get { return GetValue(); }
-            set
-            {
-                UpdateAppSettingsToNull();
-                if (value is not null)
-                {
-                    UpdateAppSettings(value.Value);
-                }
-            }
+            get => GetValue();
+            set => UpdateAppSettings(value);
         }
 
         /// <summary>
@@ -201,8 +124,8 @@ namespace 精密切割系统.Helpers
         /// </summary>
         public static DataPoint<float> CameraRelativeBladePosition
         {
-            get => TryGetPoint(nameof(CameraRelativeBladePosition), out var point) ? point : new DataPoint<float>(0, 0);
-            set => UpdatePoint(nameof(CameraRelativeBladePosition), value);
+            get => TryGetPoint(out var point) ? point : new DataPoint<float>(0, 0);
+            set => UpdatePoint(value);
         }
 
         /// <summary>
@@ -210,11 +133,29 @@ namespace 精密切割系统.Helpers
         /// </summary>
         public static DataPoint<float> CameraThetaCenterPoint
         {
-            get => TryGetPoint(nameof(CameraThetaCenterPoint), out var point) ? point : new DataPoint<float>(0, 0);
-            set => UpdatePoint(nameof(CameraThetaCenterPoint), value);
+            get => TryGetPoint(out var point) ? point : new DataPoint<float>(0, 0);
+            set => UpdatePoint(value);
         }
 
-        private static bool TryGetPoint(string prefix, out DataPoint<float> point)
+        /// <summary>
+        /// 设备号
+        /// </summary>
+        public static string? DeviceCode
+        {
+            get => GetString();
+            set => UpdateAppSettings(value);
+        }
+
+        /// <summary>
+        /// 切割theta中心点位置
+        /// </summary>
+        public static DataPoint<float> ThetaCenterPoint { get => new(CameraThetaCenterPoint.X.ToActualX(), CameraThetaCenterPoint.Y.ToActualY());  }
+
+
+
+
+
+        private static bool TryGetPoint(out DataPoint<float> point, [CallerMemberName] string? prefix = null)
         {
             if (TryGetValue($"{prefix}:X", out float x) &&
                 TryGetValue($"{prefix}:Y", out float y))
@@ -226,37 +167,70 @@ namespace 精密切割系统.Helpers
             return false;
         }
 
-        private static void UpdatePoint(string prefix, DataPoint<float> point)
+        private static void UpdatePoint(DataPoint<float> point, [CallerMemberName] string? prefix = null)
         {
-            UpdateAppSettings(point.X, $"{prefix}:X");
-            UpdateAppSettings(point.Y, $"{prefix}:Y");
+            UpdateAppSettings<float>(point.X, $"{prefix}:X");
+            UpdateAppSettings<float>(point.Y, $"{prefix}:Y");
         }
 
-        public static void UpdateAppSettings<T>(T value, [CallerMemberName] string? key = null) where T : struct, INumber<T>
+        public static void UpdateAppSettings(bool? value, [CallerMemberName] string? key = null)
         {
             if (key is null) return;
-            Configuration.GetSection(key).Value = value.ToString();
-            string jsonView = Configuration.ToJson();
-            File.WriteAllText(_configPath, jsonView);
-        }
-
-        public static void UpdateAppSettings(bool value, [CallerMemberName] string? key = null)
-        {
-            if (key is null) return;
-            Configuration.GetSection(key).Value = value.ToString();
-            string jsonView = Configuration.ToJson();
-            File.WriteAllText(_configPath, jsonView);
-        }
-
-        public static void UpdateAppSettings<T>(List<T> list, [CallerMemberName] string? key = null) where T : struct, INumber<T>
-        {
-            if (key is null) return;
-            for (int i = 0; i < list.Count; i++)
+            UpdateAppSettingsToNull(key);
+            if (value is not null)
             {
-                Configuration.GetSection($"{key}:{i}").Value = list[i].ToString();
+                Configuration.GetSection(key).Value = value.ToString();
+                string jsonView = Configuration.ToJson();
+                File.WriteAllText(_configPath, jsonView);
             }
-            string jsonView = Configuration.ToJson();
-            File.WriteAllText(_configPath, jsonView);
+        }
+
+        public static void UpdateAppSettings(string? value, [CallerMemberName] string? key = null)
+        {
+            if (key is null) return;
+            UpdateAppSettingsToNull(key);
+            if (value is not null)
+            {
+                Configuration.GetSection(key).Value = value;
+                string jsonView = Configuration.ToJson();
+                File.WriteAllText(_configPath, jsonView);
+            }
+        }
+
+        public static void UpdateAppSettings<T>(T? value, [CallerMemberName] string? key = null) where T : struct, INumber<T>
+        {
+            if (key is null) return;
+            UpdateAppSettingsToNull(key);
+            if (value is not null)
+            {
+                Configuration.GetSection(key).Value = ToString(value.Value);
+                string jsonView = Configuration.ToJson();
+                File.WriteAllText(_configPath, jsonView);
+            }
+        }
+
+        public static void UpdateAppSettings<T>(List<T>? list, [CallerMemberName] string? key = null) where T : struct, INumber<T>
+        {
+            if (key is null) return;
+            UpdateAppSettingsToNull(key);
+            if (list is not null && list.Count != 0)
+            {
+                for (int i = 0; i < list.Count; i++)
+                {
+                    Configuration.GetSection($"{key}:{i}").Value = ToString(list[i]);
+                }
+                string jsonView = Configuration.ToJson();
+                File.WriteAllText(_configPath, jsonView);
+            }
+        }
+
+        private static string? ToString<T>(T value) where T : struct, INumber<T>
+        {
+            if (typeof(T) == typeof(float) || typeof(T) == typeof(double) || typeof(T) == typeof(decimal))
+            {
+                return string.Format(CultureInfo.InvariantCulture, "{0:F3}", value);
+            }
+            return value.ToString();
         }
 
         public static void UpdateAppSettingsToNull([CallerMemberName] string? key = null)
@@ -270,6 +244,12 @@ namespace 精密切割系统.Helpers
             }
             string jsonView = Configuration.ToJson();
             File.WriteAllText(_configPath, jsonView);
+        }
+
+        public static string? GetString([CallerMemberName] string? key = null)
+        {
+            if (key is null) return null;
+            return Configuration.GetSection(key).Value;
         }
 
         public static bool? GetValue([CallerMemberName] string? key = null)
