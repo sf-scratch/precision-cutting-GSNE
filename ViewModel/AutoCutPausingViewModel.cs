@@ -173,12 +173,12 @@ namespace 精密切割系统.ViewModel
         private void InitBottomButton()
         {
             BottomButtonCollection.Clear();
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("自动识别", "TextRecognition", AutomaticRecognition));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("工件吹气", "WeatherWindy", async () => await _semaph.ExecuteAsync(WorkpieceBlowing, "工件吹气")));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("精细对焦", "FocusAuto", async () => await _semaph.ExecuteAsync(FocusAuto, "精细对焦")));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("全局对焦", "FocusAuto", async () => await _semaph.ExecuteAsync(GlobalFocus, "全局对焦")));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("报废", "DeleteEmpty", async () => await _semaph.ExecuteAsync(BladeScrap, "报废")));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("基准线校准", "CrosshairsGps", async () => await _semaph.ExecuteAsync(BaselineCalibration, "基准线校准") ));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("刀痕识别", "TextRecognition", AutomaticRecognition));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("工件吹气", "WeatherWindy", () => _semaph.ExecuteAsync(WorkpieceBlowing, "工件吹气")));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("精细对焦", "FocusAuto", () => _semaph.ExecuteAsync(FocusAuto, "精细对焦")));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("全局对焦", "FocusAuto", () => _semaph.ExecuteAsync(GlobalFocus, "全局对焦")));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("报废", "DeleteEmpty", () => _semaph.ExecuteAsync(BladeScrap, "报废")));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("基准线校准", "CrosshairsGps", () => _semaph.ExecuteAsync(BaselineCalibration, "基准线校准")));
             BottomButtonCollection.Add(RightButtonParams.BlueButton("基准线调窄", "UnfoldLessHorizontal", BaselineNarrowing));
             BottomButtonCollection.Add(RightButtonParams.BlueButton("基准线调宽", "UnfoldMoreHorizontal", BaselineWidening));
             BottomButtonCollection.Add(RightButtonParams.BlueButton("崩边调窄", "UnfoldLessHorizontal", BrokenEdgeNarrowing));
@@ -189,7 +189,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                CommonResult<float> focusRusult = await AutoCutUtils.GlobalFocusAsync(token: _operatCts.Token);
+                CommonResult<float> focusRusult = await AutoFocusService.GlobalFocusAsync(default, _operatCts.Token);
                 if (!focusRusult.IsSuccess)
                 {
                     MaterialSnackUtils.MaterialSnack(focusRusult.Message, MaterialSnackUtils.SnackType.WARNING);

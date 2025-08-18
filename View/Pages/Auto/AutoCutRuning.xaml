@@ -1,81 +1,96 @@
-﻿<UserControl x:Class="精密切割系统.View.Pages.Auto.AutoCutRuning"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:local="clr-namespace:精密切割系统.View.Pages.Auto"
-      xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
-      xmlns:custom="clr-namespace:精密切割系统.CustomControls"
-      xmlns:auto="clr-namespace:WpfAutoGrid;assembly=WpfAutoGrid.Core" 
-      xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
-      xmlns:common="clr-namespace:精密切割系统.View.Pages.common"
-      xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
-      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-      mc:Ignorable="d"
-      d:DesignHeight="676" d:DesignWidth="724"
-      d:DataContext="{d:DesignInstance viewModel:AutoCutRuningViewModel, IsDesignTimeCreatable=True}">
+﻿<UserControl
+    x:Class="精密切割系统.View.Pages.Auto.AutoCutRuning"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
+    xmlns:auto="clr-namespace:WpfAutoGrid;assembly=WpfAutoGrid.Core"
+    xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:common="clr-namespace:精密切割系统.View.Pages.common"
+    xmlns:custom="clr-namespace:精密切割系统.CustomControls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:精密切割系统.View.Pages.Auto"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
+    d:DataContext="{d:DesignInstance viewModel:AutoCutRuningViewModel,
+                                     IsDesignTimeCreatable=True}"
+    d:DesignHeight="676"
+    d:DesignWidth="724"
+    mc:Ignorable="d">
     <behaviors:Interaction.Triggers>
         <behaviors:EventTrigger EventName="Loaded">
-            <behaviors:InvokeCommandAction
-                Command="{Binding RunAutoCutCommand}"
-                CommandParameter="可选参数"/>
+            <behaviors:InvokeCommandAction Command="{Binding RunAutoCutCommand}" CommandParameter="可选参数" />
         </behaviors:EventTrigger>
     </behaviors:Interaction.Triggers>
     <UserControl.Resources>
         <Style TargetType="TextBlock">
-            <Setter Property="FontSize" Value="18"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="HorizontalAlignment" Value="Right"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
     </UserControl.Resources>
     <Grid>
-        <Grid.Resources>
-            <ResourceDictionary Source="pack://application:,,,/精密切割系统;component/Themes/MaterialDesignResources.xaml"/>
-        </Grid.Resources>
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="3*"/>
-                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="2*" />
             </Grid.ColumnDefinitions>
-            <Label Grid.ColumnSpan="2" Margin="30,30,0,0" Content="自动执行状态" FontSize="25" FontWeight="Bold" />
-            <auto:AutoGrid Grid.Row="1" Margin="10" Columns="4*,4*,2*" RowCount="10" ChildMargin="5">
-                <TextBlock Text="测高位置"/>
-                <Controls:InputTextBox Text="{Binding AfterHeightMeasurementZ}" IsEnabled="False"/>
-                <TextBlock HorizontalAlignment="Left" Text="mm"/>
-                <TextBlock Text="磨刀刀片高度"/>
-                <Controls:InputTextBox Text="{Binding SharpenBladeHeight}" IsEnabled="False"/>
-                <TextBlock HorizontalAlignment="Left" Text="mm"/>
-                <TextBlock Text="磨刀速度"/>
-                <Controls:InputTextBox Text="{Binding SharpenSpeed}" IsEnabled="False"/>
-                <TextBlock HorizontalAlignment="Left" Text="mm/s"/>
-                <TextBlock Text="磨刀进度"/>
-                <Controls:InputTextBox Text="{Binding SharpenProgress}" IsEnabled="False"/>
-                <TextBlock HorizontalAlignment="Left" Text=""/>
-                <TextBlock Text="总磨损量"/>
-                <Controls:InputTextBox Text="{Binding TotalWearAmount}" IsEnabled="False"/>
-                <TextBlock HorizontalAlignment="Left" Text="mm"/>
-                <TextBlock Text="型号参数No"/>
-                <Controls:InputTextBox Text="{Binding DeviceDataNo}" IsEnabled="False"/>
-                <TextBlock HorizontalAlignment="Left" Text=""/>
-                <TextBlock Text="切割刀片高度"/>
-                <Controls:InputTextBox Text="{Binding CutBladeHeight}" IsEnabled="False"/>
-                <TextBlock HorizontalAlignment="Left" Text="mm"/>
-                <TextBlock Text="切割速度"/>
-                <Controls:InputTextBox Text="{Binding CutSpeed}" IsEnabled="False"/>
-                <TextBlock HorizontalAlignment="Left" Text="mm/s"/>
-                <TextBlock Text="切割进度"/>
-                <Controls:InputTextBox Text="{Binding CutProgress}" IsEnabled="False"/>
-                <TextBlock HorizontalAlignment="Left" Text=""/>
-                <TextBlock Text="自更换刀片起"/>
-                <Controls:InputTextBox Text="{Binding AfterReplaceBladeCutTimes}" IsEnabled="False"/>
-                <TextBlock HorizontalAlignment="Left" Text="刀"/>
+            <Label
+                Grid.ColumnSpan="2"
+                Margin="30,30,0,0"
+                Content="自动执行状态"
+                FontSize="25"
+                FontWeight="Bold" />
+            <auto:AutoGrid
+                Grid.Row="1"
+                Margin="10"
+                ChildMargin="5"
+                Columns="4*,4*,2*"
+                RowCount="10">
+                <TextBlock Text="测高位置" />
+                <Controls:InputTextBox IsEnabled="False" Text="{Binding AfterHeightMeasurementZ}" />
+                <TextBlock HorizontalAlignment="Left" Text="mm" />
+                <TextBlock Text="磨刀刀片高度" />
+                <Controls:InputTextBox IsEnabled="False" Text="{Binding SharpenBladeHeight}" />
+                <TextBlock HorizontalAlignment="Left" Text="mm" />
+                <TextBlock Text="磨刀速度" />
+                <Controls:InputTextBox IsEnabled="False" Text="{Binding SharpenSpeed}" />
+                <TextBlock HorizontalAlignment="Left" Text="mm/s" />
+                <TextBlock Text="磨刀进度" />
+                <Controls:InputTextBox IsEnabled="False" Text="{Binding SharpenProgress}" />
+                <TextBlock HorizontalAlignment="Left" Text="" />
+                <TextBlock Text="总磨损量" />
+                <Controls:InputTextBox IsEnabled="False" Text="{Binding TotalWearAmount}" />
+                <TextBlock HorizontalAlignment="Left" Text="mm" />
+                <TextBlock Text="型号参数No" />
+                <Controls:InputTextBox IsEnabled="False" Text="{Binding DeviceDataNo}" />
+                <TextBlock HorizontalAlignment="Left" Text="" />
+                <TextBlock Text="切割刀片高度" />
+                <Controls:InputTextBox IsEnabled="False" Text="{Binding CutBladeHeight}" />
+                <TextBlock HorizontalAlignment="Left" Text="mm" />
+                <TextBlock Text="切割速度" />
+                <Controls:InputTextBox IsEnabled="False" Text="{Binding CutSpeed}" />
+                <TextBlock HorizontalAlignment="Left" Text="mm/s" />
+                <TextBlock Text="切割进度" />
+                <Controls:InputTextBox IsEnabled="False" Text="{Binding CutProgress}" />
+                <TextBlock HorizontalAlignment="Left" Text="" />
+                <TextBlock Text="自更换刀片起" />
+                <Controls:InputTextBox IsEnabled="False" Text="{Binding AfterReplaceBladeCutTimes}" />
+                <TextBlock HorizontalAlignment="Left" Text="刀" />
             </auto:AutoGrid>
-            <Controls:RealTimeInfoBox Grid.Row="1" Grid.Column="1" Margin="0,10,0,0" Style="{StaticResource MaterialDesignGroupBox}" Messages="{Binding MessageList}" Height="400" VerticalAlignment="Top"/>
+            <Controls:RealTimeInfoBox
+                Grid.Row="1"
+                Grid.Column="1"
+                Height="400"
+                Margin="0,10,0,0"
+                VerticalAlignment="Top"
+                Messages="{Binding MessageList}"
+                Style="{StaticResource MaterialDesignGroupBox}" />
         </Grid>
     </Grid>
 </UserControl>

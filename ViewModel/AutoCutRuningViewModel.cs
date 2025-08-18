@@ -272,7 +272,7 @@ namespace 精密切割系统.ViewModel
                     return;
                 }
                 AfterHeightMeasurementZ = firstHeightMeasurementZ.Data;
-                RunStatus = AutoRunStatus.AutoFocus;
+                //RunStatus = AutoRunStatus.AutoFocus;
                 //对焦
                 //await AutoCutUtils.GoPreCutLineAsync(_pauseCts.Token);
                 //CommonResult<float> focusClearZ = await AutoCutUtils.AutoFocusAsync(default, _pauseCts.Token);
@@ -686,7 +686,7 @@ namespace 精密切割系统.ViewModel
         private async Task AfterPauseThenMoveToPosition(LineSegment? line, string? message)
         {
             MaterialSnackUtils.MaterialSnack("正在暂停切割...", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
-            int runTime = 40;
+            int runTime = 60;
             _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"暂停超时时间：{runTime}"));
             try
             {
@@ -695,10 +695,10 @@ namespace 精密切割系统.ViewModel
                 switch (RunStatus)
                 {
                     case AutoRunStatus.ReplaceWafer:
-                        await AutoCutUtils.ReplaceWaferAsync();
+                        await AutoCutUtils.ReplaceWaferAsync(_eventAggregator, cts.Token);
                         break;
                     case AutoRunStatus.ReplaceSharpenBoard:
-                        await AutoCutUtils.ReplaceSharpeningBoardAsync();
+                        await AutoCutUtils.ReplaceSharpeningBoardAsync(_eventAggregator, cts.Token);
                         break;
                     default:
                         // 轴不报警时移动到指定位置
@@ -711,7 +711,7 @@ namespace 精密切割系统.ViewModel
                             await AutoCutUtils.WorkpieceBlowingAsync(_eventAggregator, cts.Token);
                             await PlcControl.tagControl.cutting.RunMotionAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), line.StartPoint.Y.ToCameraY(), cts.Token);
                         }
-                        await AutoCutUtils.AutoFocusAsync();
+                        await AutoCutUtils.AutoFocusAsync(_eventAggregator, cts.Token);
                         await AutoCutUtils.FineTuneAxisYAsync();
                         await AutoCutUtils.UpdateCameraCommonLineAsync();
                         MaterialSnackUtils.MaterialSnack(message ?? "暂停中...", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);

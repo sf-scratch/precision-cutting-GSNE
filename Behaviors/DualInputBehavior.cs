@@ -82,7 +82,7 @@ namespace 精密切割系统.Behaviors
             }
             try
             {
-                //await ExecutePrompt(_delayCts.Token);
+                await ExecutePrompt(_delayCts.Token);
                 if (_delayCts?.IsCancellationRequested ?? true) return;
                 ExecuteStart(sender, e);
             }
@@ -100,7 +100,7 @@ namespace 精密切割系统.Behaviors
             }
             try
             {
-                //await ExecutePrompt(_delayCts.Token);
+                await ExecutePrompt(_delayCts.Token);
                 if (_delayCts?.IsCancellationRequested ?? true) return;
                 ExecuteStart(sender, e);
             }

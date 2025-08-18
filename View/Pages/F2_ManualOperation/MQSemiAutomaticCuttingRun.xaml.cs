@@ -122,19 +122,15 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 try
                 {
                     _viewModel.ChannelNum = CurrentUtils.GetCurrentConfiguration().ChannelNum;
-                    float curX = MathF.Round(await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0, 3);
-                    float curY = MathF.Round(await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0, 3);
-                    float curZ1 = MathF.Round(await PlcControl.tagControl.Z1axis.GetCurrentLocationAsync() ?? 0, 3);
-                    float curZ2 = MathF.Round(await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync() ?? 0, 3);
-                    float curTheta = MathF.Round(await PlcControl.tagControl.ThetaAxis.GetCurrentLocationAsync() ?? 0, 3);
+                    var axisPostion = await AutoCutUtils.GetAxisPositionAsync();
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         yAxisCutPosition.Text = CutOperateUtils.globalYCutPosition.ToString();
-                        xAxisCurrentPosition.Text = curX.ToString();
-                        yAxisCurrentPosition.Text = curY.ToString();
-                        zAxisCurrentPosition.Text = curZ1.ToString();
-                        z2AxisCurrentPosition.Text = curZ2.ToString();
-                        thetaAxisCurrentPosition.Text = curTheta.ToString();
+                        xAxisCurrentPosition.Text = MathF.Round(axisPostion.X ?? 0, 3).ToString();
+                        yAxisCurrentPosition.Text = MathF.Round(axisPostion.Y ?? 0, 3).ToString();
+                        zAxisCurrentPosition.Text = MathF.Round(axisPostion.Z1 ?? 0, 3).ToString();
+                        z2AxisCurrentPosition.Text = MathF.Round(axisPostion.Z2 ?? 0, 3).ToString();
+                        thetaAxisCurrentPosition.Text = MathF.Round(axisPostion.Theta ?? 0, 3).ToString();
                     });
                 }
                 catch (Exception)

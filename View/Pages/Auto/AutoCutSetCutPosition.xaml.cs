@@ -16,13 +16,11 @@ using System.Windows.Shapes;
 namespace 精密切割系统.View.Pages.Auto
 {
     /// <summary>
-    /// AutoCut.xaml 的交互逻辑
+    /// AutoCutSetCutPosition.xaml 的交互逻辑
     /// </summary>
-    public partial class AutoCut : UserControl
+    public partial class AutoCutSetCutPosition : UserControl
     {
-        public const string RedirectTarget = "RedirectTarget";
-
-        public AutoCut()
+        public AutoCutSetCutPosition()
         {
             InitializeComponent();
         }

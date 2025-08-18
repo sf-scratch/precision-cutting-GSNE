@@ -111,12 +111,6 @@
                         <TextBlock Text="设备号" />
                         <Controls:InputTextBox Text="{Binding DeviceCode}" />
                         <TextBlock HorizontalAlignment="Left" Text="" />
-                        <TextBlock Text="磨刀开始位置" />
-                        <Controls:InputTextBox Text="{Binding SharpenY}" />
-                        <TextBlock HorizontalAlignment="Left" Text="mm" />
-                        <TextBlock Text="切割开始位置" />
-                        <Controls:InputTextBox Text="{Binding CutY}" />
-                        <TextBlock HorizontalAlignment="Left" Text="mm" />
                         <TextBlock Text="最后磨10刀" />
                         <ToggleButton IsChecked="{Binding SharpenParams.IsExecuteLastSharpen, Mode=TwoWay}">
                             <ToggleButton.Resources>
@@ -128,6 +122,12 @@
                             </ToggleButton.Resources>
                         </ToggleButton>
                         <TextBlock HorizontalAlignment="Left" Text="" />
+                        <TextBlock Text="磨刀开始位置" />
+                        <Controls:InputTextBox Text="{Binding SharpenY}" />
+                        <Button Command="{Binding SetSharpenYCommand}" Content="{materialDesign:PackIcon CogBox, Size=25}" />
+                        <TextBlock Text="切割开始位置" />
+                        <Controls:InputTextBox Text="{Binding CutY}" />
+                        <Button Command="{Binding SetCutYCommand}" Content="{materialDesign:PackIcon CogBox, Size=25}" />
                         <TextBlock Text="运行环境" />
                         <StackPanel Orientation="Horizontal">
                             <StackPanel.Resources>

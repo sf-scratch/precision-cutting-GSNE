@@ -111,8 +111,6 @@ namespace 精密切割系统.View.Controls
         public static readonly DependencyProperty ButtonWidthProperty =
             DependencyProperty.Register("ButtonWidth", typeof(double), typeof(RightButton), new PropertyMetadata(226d));
 
-
-
         public double ButtonHeight
         {
             get { return (double)GetValue(ButtonHeightProperty); }

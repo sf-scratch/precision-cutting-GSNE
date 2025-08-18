@@ -24,6 +24,20 @@ namespace 精密切割系统.Driver
     //基恩士PLC各个点位和变量的读取及写入
     public class KeyencePlc
     {
+        public static string plcIP = "192.168.10.10";
+        private static KeyencePlc? plc = null;
+        private static readonly object _Object = new object();
+        private volatile static KeyenceMcNet keyence_net = new KeyenceMcNet(plcIP, 5000);
+        private static KeyenceMcNet _keyence_async_net = new KeyenceMcNet(plcIP, 5000);
+        public static OperateResult connect;
+        public Dictionary<string, PlcDataType> typeMap = new Dictionary<string, PlcDataType>();
+
+        static KeyencePlc()
+        {
+            _keyence_async_net.ConnectTimeOut = 1000;
+            _keyence_async_net.ReceiveTimeOut = 1000;
+        }
+
         private KeyencePlc(string ip)
         {
             plcIP = ip;
@@ -37,14 +51,6 @@ namespace 精密切割系统.Driver
             typeMap.Add("float", PlcDataType.Float);
             typeMap.Add("double", PlcDataType.Double);
         }
-
-        public static string plcIP = "192.168.10.10";
-        private static KeyencePlc? plc = null;
-        private static readonly object _Object = new object();
-        private volatile static KeyenceMcNet keyence_net = new KeyenceMcNet(plcIP, 5000);
-        private static KeyenceMcNet _keyence_async_net = new KeyenceMcNet(plcIP, 5000);
-        public static OperateResult connect;
-        public Dictionary<string, PlcDataType> typeMap = new Dictionary<string, PlcDataType>();
 
         /// <summary>
         /// 全局访问点, 获取唯一系统操作类实例
@@ -215,7 +221,6 @@ namespace 精密切割系统.Driver
             return false;
         }
 
-
         public string readData(string plcAddr, PlcDataType dataType = PlcDataType.Int32, ushort dataNumber = 1)
         {
             if (!GlobalParams.onlineFlag) return "";
@@ -367,152 +372,6 @@ namespace 精密切割系统.Driver
             return null;
         }
 
-        public async Task<string> ReadDataAsync(string plcAddr, PlcDataType dataType, ushort dataNumber = 1)
-        {
-            if (!GlobalParams.onlineFlag) return string.Empty;
-            const int maxRetries = 3;
-            const int retryDelayMs = 100;
-            for (int attempt = 1; attempt <= maxRetries; attempt++)
-            {
-                try
-                {
-                    if (!await EnsurePlcConnectedAsync())
-                    {
-                        Tools.LogError($"读取PLC失败：PLC未连接（尝试 {attempt}/{maxRetries}）");
-                        continue;
-                    }
-                    OperateResult<object[]>? read = null;
-                    switch (dataType)
-                    {
-                        case PlcDataType.Bool:
-                            var boolResult = await _keyence_async_net.ReadBoolAsync(plcAddr, dataNumber);
-                            read = boolResult.IsSuccess ?
-                                OperateResult.CreateSuccessResult(boolResult.Content.Cast<object>().ToArray()) :
-                                OperateResult.CreateFailedResult<object[]>(boolResult);
-                            break;
-                        case PlcDataType.Int16:
-                            var int16Result = await _keyence_async_net.ReadInt16Async(plcAddr, dataNumber);
-                            if (int16Result.IsSuccess)
-                            {
-                                var convertedContent = int16Result.Content.Select(x => (object)((int)x)).ToArray();
-                                read = OperateResult.CreateSuccessResult(convertedContent);
-                            }
-                            else
-                            {
-                                read = OperateResult.CreateFailedResult<object[]>(int16Result);
-                            }
-                            break;
-                        case PlcDataType.UInt16:
-                            var uint16Result = await _keyence_async_net.ReadUInt16Async(plcAddr, dataNumber);
-                            if (uint16Result.IsSuccess)
-                            {
-                                var convertedContent = uint16Result.Content.Select(x => (object)((uint)x)).ToArray();
-                                read = OperateResult.CreateSuccessResult(convertedContent);
-                            }
-                            else
-                            {
-                                read = OperateResult.CreateFailedResult<object[]>(uint16Result);
-                            }
-                            break;
-                        case PlcDataType.Int32:
-                            var int32Result = await _keyence_async_net.ReadInt32Async(plcAddr, dataNumber);
-                            if (int32Result.IsSuccess)
-                            {
-                                var convertedContent = int32Result.Content.Select(x => (object)((int)x)).ToArray();
-                                read = OperateResult.CreateSuccessResult(convertedContent);
-                            }
-                            else
-                            {
-                                read = OperateResult.CreateFailedResult<object[]>(int32Result);
-                            }
-                            break;
-                        case PlcDataType.UInt32:
-                            var uint32Result = await _keyence_async_net.ReadUInt32Async(plcAddr, dataNumber);
-                            if (uint32Result.IsSuccess)
-                            {
-                                var convertedContent = uint32Result.Content.Select(x => (object)((uint)x)).ToArray();
-                                read = OperateResult.CreateSuccessResult(convertedContent);
-                            }
-                            else
-                            {
-                                read = OperateResult.CreateFailedResult<object[]>(uint32Result);
-                            }
-                            break;
-                        case PlcDataType.Int64:
-                            var int64Result = await _keyence_async_net.ReadInt64Async(plcAddr, dataNumber);
-                            if (int64Result.IsSuccess)
-                            {
-                                var convertedContent = int64Result.Content.Select(x => (object)((long)x)).ToArray();
-                                read = OperateResult.CreateSuccessResult(convertedContent);
-                            }
-                            else
-                            {
-                                read = OperateResult.CreateFailedResult<object[]>(int64Result);
-                            }
-                            break;
-                        case PlcDataType.UInt64:
-                            var uint64Result = await _keyence_async_net.ReadUInt64Async(plcAddr, dataNumber);
-                            if (uint64Result.IsSuccess)
-                            {
-                                var convertedContent = uint64Result.Content.Select(x => (object)((ulong)x)).ToArray();
-                                read = OperateResult.CreateSuccessResult(convertedContent);
-                            }
-                            else
-                            {
-                                read = OperateResult.CreateFailedResult<object[]>(uint64Result);
-                            }
-                            break;
-                        case PlcDataType.Float:
-                            var floatResult = await _keyence_async_net.ReadFloatAsync(plcAddr, dataNumber);
-                            if (floatResult.IsSuccess)
-                            {
-                                var convertedContent = floatResult.Content.Select(x => (object)((float)x)).ToArray();
-                                read = OperateResult.CreateSuccessResult(convertedContent);
-                            }
-                            else
-                            {
-                                read = OperateResult.CreateFailedResult<object[]>(floatResult);
-                            }
-                            break;
-                        case PlcDataType.Double:
-                            var doubleResult = await _keyence_async_net.ReadDoubleAsync(plcAddr, dataNumber);
-                            if (doubleResult.IsSuccess)
-                            {
-                                var convertedContent = doubleResult.Content.Select(x => (object)((double)x)).ToArray();
-                                read = OperateResult.CreateSuccessResult(convertedContent);
-                            }
-                            else
-                            {
-                                read = OperateResult.CreateFailedResult<object[]>(doubleResult);
-                            }
-                            break;
-                        default:
-                            throw new ArgumentException($"不支持的数据类型：{dataType}");
-                    }
-                    if (read != null && read.IsSuccess && read.Content != null && read.Content.Length > 0)
-                    {
-                        return read.Content[0].ToString()??string.Empty;
-                    }
-                    if (attempt < maxRetries)
-                    {
-                        Tools.LogWarning($"读取PLC数据失败，地址：{plcAddr}，类型：{dataType}，尝试第{attempt}次重试");
-                        await Task.Delay(retryDelayMs);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Tools.LogError($"读取PLC异常：地址 {plcAddr}，类型 {dataType}，尝试 {attempt}/{maxRetries}，异常：{ex.Message}");
-                    if (attempt < maxRetries)
-                    {
-                        await Task.Delay(retryDelayMs);
-                    }
-                }
-            }
-
-            Tools.LogError($"读取PLC失败：地址 {plcAddr}，类型 {dataType}，所有尝试均失败");
-            return string.Empty;
-        }
-
         public async Task<bool?> ReadDataAsync(string plcAddr)
         {
             bool[]? bools = await ReadDataAsync(plcAddr, 1);
@@ -532,11 +391,11 @@ namespace 精密切割系统.Driver
             {
                 try
                 {
-                    if (!await EnsurePlcConnectedAsync())
-                    {
-                        Tools.LogError($"读取PLC失败：PLC未连接（尝试 {attempt}/{maxRetries}）");
-                        continue;
-                    }
+                    //if (!await EnsurePlcConnectedAsync())
+                    //{
+                    //    Tools.LogError($"读取PLC失败：PLC未连接（尝试 {attempt}/{maxRetries}）");
+                    //    continue;
+                    //}
                     var int16Result = await _keyence_async_net.ReadBoolAsync(plcAddr, dataNumber);
                     if (int16Result.IsSuccess)
                     {
@@ -581,11 +440,11 @@ namespace 精密切割系统.Driver
             {
                 try
                 {
-                    if (!await EnsurePlcConnectedAsync())
-                    {
-                        Tools.LogError($"读取PLC失败：PLC未连接（尝试 {attempt}/{maxRetries}）");
-                        continue;
-                    }
+                    //if (!await EnsurePlcConnectedAsync())
+                    //{
+                    //    Tools.LogError($"读取PLC失败：PLC未连接（尝试 {attempt}/{maxRetries}）");
+                    //    continue;
+                    //}
                     if (type == typeof(short))
                     {
                         var int16Result = await _keyence_async_net.ReadInt16Async(plcAddr, dataNumber);
@@ -674,76 +533,6 @@ namespace 精密切割系统.Driver
             return null;
         }
 
-        public List<string> readMultiData(List<string> plcAddrList, PlcDataType dataType = PlcDataType.Int32)
-        {
-            List<string> res = new List<string>();
-            for (int i = 0; i < plcAddrList.Count; i++)
-            {
-                try
-                {
-                    string tmpRes = readData(plcAddrList[i], dataType);
-                    res.Add(tmpRes);
-                }
-                catch
-                {
-                    res.Add(string.Format("read {} data error", plcAddrList[i]));
-                }
-            }
-            return res;
-        }
-
-        public OperateResult? WriteData1(string plcAddr, object pData, PlcDataType dataType = PlcDataType.Int32)
-        {
-            // OperateResult<bool[]> read = keyence_net.ReadBool("M100", 10);
-            OperateResult write = new OperateResult();
-            if (dataType == PlcDataType.Bool)
-            {
-                bool res = "1".Equals(pData.ToString());
-                write = keyence_net.Write(plcAddr, res);
-            }
-            else if (dataType == PlcDataType.Int16)
-            {
-                int res = Convert.ToInt16(pData);
-                write = keyence_net.Write(plcAddr, res);
-            }
-            else if (dataType == PlcDataType.UInt16)
-            {
-                uint res = Convert.ToUInt16(pData);
-                write = keyence_net.Write(plcAddr, res);
-            }
-            else if (dataType == PlcDataType.Int32)
-            {
-                int res = Convert.ToInt32(pData);
-                write = keyence_net.Write(plcAddr, res);
-            }
-            else if (dataType == PlcDataType.UInt32)
-            {
-                uint res = Convert.ToUInt32(pData);
-                write = keyence_net.Write(plcAddr, res);
-            }
-            else if (dataType == PlcDataType.Int64)
-            {
-                long res = Convert.ToInt64(pData);
-                write = keyence_net.Write(plcAddr, res);
-            }
-            else if (dataType == PlcDataType.UInt64)
-            {
-                ulong res = Convert.ToUInt64(pData);
-                write = keyence_net.Write(plcAddr, res);
-            }
-            else if (dataType == PlcDataType.Float)
-            {
-                float res = Convert.ToSingle(pData);
-                write = keyence_net.Write(plcAddr, res);
-            }
-            else if (dataType == PlcDataType.Double)
-            {
-                double res = Convert.ToDouble(pData);
-                write = keyence_net.Write(plcAddr, res);
-            }
-            return write;
-        }
-
         public OperateResult? WriteData(string plcAddr, object pData, PlcDataType dataType = PlcDataType.Int32)
         {
             OperateResult write = new OperateResult();
@@ -825,70 +614,73 @@ namespace 精密切割系统.Driver
             return write;
         }
 
-
         public async Task<OperateResult?> WriteDataAsync(string plcAddr, object pData, PlcDataType dataType = PlcDataType.Int32)
         {
             OperateResult write;
             try
             {
+                if (pData is not string data)
+                {
+                    throw new ArgumentException("不是string类型", nameof(pData));
+                }
                 switch (dataType)
                 {
                     case PlcDataType.Bool:
-                        bool boolRes = pData.ToString().Equals("1") || pData.ToString().Equals("true", StringComparison.OrdinalIgnoreCase);
+                        bool boolRes = data.Equals("1") || data.Equals("true", StringComparison.OrdinalIgnoreCase);
                         write = await _keyence_async_net.WriteAsync(plcAddr, boolRes);
                         break;
 
                     case PlcDataType.Int16:
-                        if (short.TryParse(pData.ToString(), out short int16Res))
+                        if (short.TryParse(data, out short int16Res))
                             write = await _keyence_async_net.WriteAsync(plcAddr, int16Res);
                         else
                             throw new ArgumentException("Invalid Int16 value.");
                         break;
 
                     case PlcDataType.UInt16:
-                        if (ushort.TryParse(pData.ToString(), out ushort uint16Res))
+                        if (ushort.TryParse(data, out ushort uint16Res))
                             write = await _keyence_async_net.WriteAsync(plcAddr, uint16Res);
                         else
                             throw new ArgumentException("Invalid UInt16 value.");
                         break;
 
                     case PlcDataType.Int32:
-                        if (int.TryParse(pData.ToString(), out int int32Res))
+                        if (int.TryParse(data, out int int32Res))
                             write = await _keyence_async_net.WriteAsync(plcAddr, int32Res);
                         else
                             throw new ArgumentException("Invalid Int32 value.");
                         break;
 
                     case PlcDataType.UInt32:
-                        if (uint.TryParse(pData.ToString(), out uint uint32Res))
+                        if (uint.TryParse(data, out uint uint32Res))
                             write = await _keyence_async_net.WriteAsync(plcAddr, uint32Res);
                         else
                             throw new ArgumentException("Invalid UInt32 value.");
                         break;
 
                     case PlcDataType.Int64:
-                        if (long.TryParse(pData.ToString(), out long int64Res))
+                        if (long.TryParse(data, out long int64Res))
                             write = await _keyence_async_net.WriteAsync(plcAddr, int64Res);
                         else
                             throw new ArgumentException("Invalid Int64 value.");
                         break;
 
                     case PlcDataType.UInt64:
-                        if (ulong.TryParse(pData.ToString(), out ulong uint64Res))
+                        if (ulong.TryParse(data, out ulong uint64Res))
                             write = await _keyence_async_net.WriteAsync(plcAddr, uint64Res);
                         else
                             throw new ArgumentException("Invalid UInt64 value.");
                         break;
 
                     case PlcDataType.Float:
-                        if (float.TryParse(pData.ToString(), out float floatRes))
+                        if (float.TryParse(data, out float floatRes))
                             write = await _keyence_async_net.WriteAsync(plcAddr, floatRes);
                         else
                             throw new ArgumentException("Invalid Float value.");
                         break;
 
                     case PlcDataType.Double:
-                        if (double.TryParse(pData.ToString(), out double doubleRes))
+                        if (double.TryParse(data, out double doubleRes))
                             write = await _keyence_async_net.WriteAsync(plcAddr, doubleRes);
                         else
                             throw new ArgumentException("Invalid Double value.");
@@ -937,28 +729,6 @@ namespace 精密切割系统.Driver
             if ("read data error".Equals(value))
             {
                 value = readData(tmpTag.addr, typeMap[tmpTag.valueType]);
-            }
-            return value;
-        }
-
-        public async Task<string> GetPlcValueStringAsync(string tKey)
-        {
-            if (!GlobalParams.onlineFlag || !PlcControl.connectionStatus)
-            {
-                return "0";
-            }
-            if (PlcControl.allTags == null || PlcControl.allTags.Count == 0)
-            {
-                return string.Empty;
-            }
-            if (!PlcControl.allTags.TryGetValue(tKey, out Tag? tmpTag))
-            {
-                return string.Empty;
-            }
-            string value = await ReadDataAsync(tmpTag.addr, typeMap[tmpTag.valueType]);
-            if ("read data error".Equals(value))
-            {
-                value = await ReadDataAsync(tmpTag.addr, typeMap[tmpTag.valueType]);
             }
             return value;
         }
@@ -1491,9 +1261,8 @@ namespace 精密切割系统.Driver
             await keyencePlc.WriteTagAsync(jogStart);
             jogAntiStart.writeValue = "0";
             await keyencePlc.WriteTagAsync(jogAntiStart);
-            CancellationToken useToken = token;
             using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
-            while (await timer.WaitForNextTickAsync(useToken) && (await PlcControl.plc.ReadDataAsync(jogStart.addr) != false || await PlcControl.plc.ReadDataAsync(jogAntiStart.addr) != false))
+            while (await timer.WaitForNextTickAsync(token) && (await PlcControl.plc.ReadDataAsync(jogStart.addr) != false || await PlcControl.plc.ReadDataAsync(jogAntiStart.addr) != false))
             {
                 jogStart.writeValue = "0";
                 await keyencePlc.WriteTagAsync(jogStart);
@@ -1527,23 +1296,6 @@ namespace 精密切割系统.Driver
             Thread.Sleep(5);
             // 执行电动或者相对运动
             RunJog(jogDirection);
-        }
-
-        /// <summary>
-        /// 开始相对运动
-        /// </summary>
-        /// <param name="distance"></param>
-        /// <param name="jogDirection"></param>
-        /// <param name="token"></param>
-        /// <param name="highSpeed"></param>
-        /// <returns></returns>
-        public async Task StartRelativeAsync(float distance, float? speed, CancellationToken token)
-        {
-            float? curLocation = await GetCurrentLocationAsync();
-            if (curLocation != null)
-            {
-                await StartAbsoluteAsync(curLocation.Value + distance, speed, token);
-            }
         }
 
         /// <summary>
@@ -1661,6 +1413,70 @@ namespace 精密切割系统.Driver
             await keyencePlc.WriteTagAsync(absoluteStart);
             // 等待绝对运动完成
             await WaitAxisStopAsync(token.WithDefaultTimeout(TimeSpan.FromSeconds(waitTime)));
+        }
+
+        public async Task StartAbsoluteUseToJogAsync(float location, float? speed, CancellationToken token)
+        {
+            // 设置绝对运动位置
+            absoluteLocation.writeValue = location.ToString();
+            await keyencePlc.WriteTagAsync(absoluteLocation);
+            if (speed != null)
+            {
+                // 设置绝对运动速度
+                await SetAbsoluteSpeedAsync(speed.Value);
+            }
+            else
+            {
+                float defaultSpeed = axisName switch
+                {
+                    AxisName.X => GlobalParams.XDefaultSpeed,
+                    AxisName.Y => GlobalParams.YDefaultSpeed,
+                    AxisName.Z1 => GlobalParams.Z1DefaultSpeed,
+                    AxisName.Z2 => GlobalParams.Z2DefaultSpeed,
+                    AxisName.Theta => GlobalParams.ThetaDefaultSpeed,
+                    _ => 1f // 默认值
+                };
+                await SetAbsoluteSpeedAsync(defaultSpeed);
+            }
+            absoluteStart.writeValue = "0";
+            await keyencePlc.WriteTagAsync(absoluteStart);
+            // 设置绝对运功开始
+            absoluteStart.writeValue = "1";
+            await keyencePlc.WriteTagAsync(absoluteStart);
+            // 等待绝对运动完成
+            await WaitStopJogAsync(token);
+            await WaitAxisStopAsync(token);
+        }
+
+        /// <summary>
+        /// 开始相对运动
+        /// </summary>
+        /// <param name="distance"></param>
+        /// <param name="speed"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public async Task StartRelativeAsync(float distance, float? speed, CancellationToken token)
+        {
+            float? curLocation = await GetCurrentLocationAsync();
+            if (curLocation != null)
+            {
+                await StartAbsoluteAsync(curLocation.Value + distance, speed, token);
+            }
+        }
+
+        /// <summary>
+        /// 开始相对运动
+        /// </summary>
+        /// <param name="distance"></param>
+        /// <param name="speed"></param>
+        /// <returns></returns>
+        public async Task StartRelativeUseToJogAsync(float distance, float? speed, CancellationToken token)
+        {
+            float? curLocation = await GetCurrentLocationAsync();
+            if (curLocation != null)
+            {
+                await StartAbsoluteUseToJogAsync(curLocation.Value + distance, speed, token);
+            }
         }
 
         public void RunJog(int jogDirection)

@@ -22,7 +22,11 @@ namespace 精密切割系统.ViewModel
         public override void OnNavigatedTo(NavigationContext navigationContext)
         {
             base.OnNavigatedTo(navigationContext);
-            _regionManager.RequestNavigate(RegionName.AutoCutStateRegion, nameof(AutoCutRuning), navigationContext.Parameters);
+            string? redirectTarget = navigationContext.Parameters.GetValue<string>(AutoCut.RedirectTarget);
+            if (redirectTarget != null )
+            {
+                _regionManager.RequestNavigate(RegionName.AutoCutStateRegion, redirectTarget, navigationContext.Parameters);
+            }
         }
     }
 }

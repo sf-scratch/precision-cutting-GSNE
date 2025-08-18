@@ -138,6 +138,13 @@ namespace 精密切割系统.Helpers
         }
 
         /// <summary>
+        /// 切割theta中心点位置
+        /// </summary>
+        public static DataPoint<float> ThetaCenterPoint { get => new(CameraThetaCenterPoint.X.ToActualX(), CameraThetaCenterPoint.Y.ToActualY());  }
+
+
+
+        /// <summary>
         /// 设备号
         /// </summary>
         public static string? DeviceCode
@@ -145,13 +152,6 @@ namespace 精密切割系统.Helpers
             get => GetString();
             set => UpdateAppSettings(value);
         }
-
-        /// <summary>
-        /// 切割theta中心点位置
-        /// </summary>
-        public static DataPoint<float> ThetaCenterPoint { get => new(CameraThetaCenterPoint.X.ToActualX(), CameraThetaCenterPoint.Y.ToActualY());  }
-
-
 
 
 

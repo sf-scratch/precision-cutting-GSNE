@@ -475,7 +475,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await PlcControl.tagControl.Xaxis.StartRelativeAsync(-RelativeDistance, RelativeSpeed, token);
+                await PlcControl.tagControl.Xaxis.StartRelativeUseToJogAsync(-RelativeDistance, RelativeSpeed, token);
             }
             catch (OperationCanceledException)
             {
@@ -490,7 +490,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await PlcControl.tagControl.Xaxis.StartRelativeAsync(RelativeDistance, RelativeSpeed, token);
+                await PlcControl.tagControl.Xaxis.StartRelativeUseToJogAsync(RelativeDistance, RelativeSpeed, token);
             }
             catch (OperationCanceledException)
             {
@@ -537,7 +537,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await PlcControl.tagControl.Yaxis.StartRelativeAsync(-RelativeDistance, RelativeSpeed, token);
+                await PlcControl.tagControl.Yaxis.StartRelativeUseToJogAsync(-RelativeDistance, RelativeSpeed, token);
             }
             catch (OperationCanceledException)
             {
@@ -552,7 +552,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await PlcControl.tagControl.Yaxis.StartRelativeAsync(RelativeDistance, RelativeSpeed, token);
+                await PlcControl.tagControl.Yaxis.StartRelativeUseToJogAsync(RelativeDistance, RelativeSpeed, token);
             }
             catch (OperationCanceledException)
             {
@@ -695,7 +695,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await PlcControl.tagControl.Z1axis.StartRelativeAsync(RelativeDistance, RelativeSpeed, token);
+                await PlcControl.tagControl.Z1axis.StartRelativeUseToJogAsync(RelativeDistance, RelativeSpeed, token);
             }
             catch (OperationCanceledException)
             {
@@ -710,7 +710,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await PlcControl.tagControl.Z1axis.StartRelativeAsync(-RelativeDistance, RelativeSpeed, token);
+                await PlcControl.tagControl.Z1axis.StartRelativeUseToJogAsync(-RelativeDistance, RelativeSpeed, token);
             }
             catch (OperationCanceledException)
             {
@@ -725,7 +725,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await PlcControl.tagControl.Z2axis.StartRelativeAsync(RelativeDistance, RelativeSpeed, token);
+                await PlcControl.tagControl.Z2axis.StartRelativeUseToJogAsync(RelativeDistance, RelativeSpeed, token);
             }
             catch (OperationCanceledException)
             {
@@ -740,7 +740,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await PlcControl.tagControl.Z2axis.StartRelativeAsync(-RelativeDistance, RelativeSpeed, token);
+                await PlcControl.tagControl.Z2axis.StartRelativeUseToJogAsync(-RelativeDistance, RelativeSpeed, token);
             }
             catch (OperationCanceledException)
             {
@@ -755,7 +755,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(RelativeDeg, RelativeSpeed, token);
+                await PlcControl.tagControl.ThetaAxis.StartRelativeUseToJogAsync(RelativeDeg, RelativeSpeed, token);
             }
             catch (OperationCanceledException)
             {
@@ -770,7 +770,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(-RelativeDeg, RelativeSpeed, token);
+                await PlcControl.tagControl.ThetaAxis.StartRelativeUseToJogAsync(-RelativeDeg, RelativeSpeed, token);
             }
             catch (OperationCanceledException)
             {
@@ -837,11 +837,12 @@ namespace 精密切割系统.ViewModel
                 {
                     try
                     {
-                        CurrentPositionX = MathF.Round(await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? float.NaN, 3);
-                        CurrentPositionY = MathF.Round(await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? float.NaN, 3);
-                        CurrentPositionZ1 = MathF.Round(await PlcControl.tagControl.Z1axis.GetCurrentLocationAsync() ?? float.NaN, 3);
-                        CurrentPositionZ2 = MathF.Round(await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync() ?? float.NaN, 3);
-                        CurrentPositionTheta = MathF.Round(await PlcControl.tagControl.ThetaAxis.GetCurrentLocationAsync() ?? float.NaN, 3);
+                        var axisPostion = await AutoCutUtils.GetAxisPositionAsync();
+                        CurrentPositionX = MathF.Round(axisPostion.X ?? float.NaN, 3);
+                        CurrentPositionY = MathF.Round(axisPostion.Y ?? float.NaN, 3);
+                        CurrentPositionZ1 = MathF.Round(axisPostion.Z1 ?? float.NaN, 3);
+                        CurrentPositionZ2 = MathF.Round(axisPostion.Z2 ?? float.NaN, 3);
+                        CurrentPositionTheta = MathF.Round(axisPostion.Theta ?? float.NaN, 3);
                         //CurrentSpeedX = await PlcControl.tagControl.Xaxis.GetAbsoluteSpeedAsync() ?? float.NaN;
                         //CurrentSpeedY = await PlcControl.tagControl.Yaxis.GetAbsoluteSpeedAsync() ?? float.NaN;
                         //CurrentSpeedZ1 = await PlcControl.tagControl.Z1axis.GetAbsoluteSpeedAsync() ?? float.NaN;

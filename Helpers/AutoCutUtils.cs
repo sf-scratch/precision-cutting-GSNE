@@ -50,22 +50,33 @@ namespace 精密切割系统.Helpers
         public const int HeightRange = 240;
         public const int VisionSnakeHeightRange = 100;
 
+        public static async Task<AxisPosition> GetAxisPositionAsync()
+        {
+            var positions = await Task.WhenAll(
+                        PlcControl.tagControl.Xaxis.GetCurrentLocationAsync(),
+                        PlcControl.tagControl.Yaxis.GetCurrentLocationAsync(),
+                        PlcControl.tagControl.Z1axis.GetCurrentLocationAsync(),
+                        PlcControl.tagControl.Z2axis.GetCurrentLocationAsync(),
+                        PlcControl.tagControl.ThetaAxis.GetCurrentLocationAsync());
+            return new AxisPosition(positions[0], positions[1], positions[2], positions[3], positions[4]);
+        }
+
         /// <summary>
         /// 换刀片
         /// </summary>
         /// <returns></returns>
-        public static async Task ReplaceBladeAsync(IEventAggregator? eventAggregator = null)
+        public static async Task ReplaceBladeAsync(IEventAggregator? eventAggregator, CancellationToken token)
         {
             try
             {
                 MaterialSnackUtils.MaterialSnack("请准备更换刀片,轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
                 await PlcControl.tagControl.wholeDevice.StopSpindleAsync();
-                Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, default);
-                Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, default, default);
+                Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, token);
+                Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, default, token);
                 await Task.WhenAll(taskZ1, taskZ2);
-                Task taskXY = PlcControl.tagControl.cutting.RunMotionAsync(0, 150, default);
-                Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0, default, default);
-                Task speedZero = PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync();
+                Task taskXY = PlcControl.tagControl.cutting.RunMotionAsync(0, 150, token);
+                Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0, default, token);
+                Task speedZero = PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync(token);
                 await Task.WhenAll(taskXY, taskTheta, speedZero);
                 Appsettings.AfterReplaceBladeCutTimes = 0;
                 Appsettings.AfterReplaceBladeCutLength = 0;
@@ -73,7 +84,7 @@ namespace 精密切割系统.Helpers
             }
             catch (OperationCanceledException)
             {
-                MaterialSnackUtils.MaterialSnack("更换刀片操作失败！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
+                MaterialSnackUtils.MaterialSnack("更换刀片操作失败！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
             }
         }
 
@@ -81,24 +92,24 @@ namespace 精密切割系统.Helpers
         /// 换磨刀板
         /// </summary>
         /// <returns></returns>
-        public static async Task ReplaceSharpeningBoardAsync(IEventAggregator? eventAggregator = null)
+        public static async Task ReplaceSharpeningBoardAsync(IEventAggregator? eventAggregator, CancellationToken token)
         {
             try
             {
                 MaterialSnackUtils.MaterialSnack("请准备更换磨刀板,轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
                 await PlcControl.tagControl.wholeDevice.StopSpindleAsync();
-                Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, default);
-                Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, default, default);
+                Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, token);
+                Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, default, token);
                 await Task.WhenAll(taskZ1, taskZ2);
-                Task taskXY = PlcControl.tagControl.cutting.RunMotionAsync(0, 0, default);
-                Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0, default, default);
-                Task speedZero = PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync();
+                Task taskXY = PlcControl.tagControl.cutting.RunMotionAsync(0, 0, token);
+                Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0, default, token);
+                Task speedZero = PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync(token);
                 await Task.WhenAll(taskXY, taskTheta, speedZero);
                 MaterialSnackUtils.MaterialSnack("请打开相机安全门，更换磨刀板！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
             }
             catch (OperationCanceledException)
             {
-                MaterialSnackUtils.MaterialSnack("更换磨刀板操作失败！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
+                MaterialSnackUtils.MaterialSnack("更换磨刀板操作失败！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
             }
         }
 
@@ -106,37 +117,37 @@ namespace 精密切割系统.Helpers
         /// 换磨刀板
         /// </summary>
         /// <returns></returns>
-        public static async Task ReplaceSharpeningBoardAndResetAsync(IEventAggregator? eventAggregator = null)
+        public static async Task ReplaceSharpeningBoardAndResetAsync(IEventAggregator? eventAggregator, CancellationToken token)
         {
             //清空记录
             Appsettings.SharpenY = null;
             Appsettings.SharpenThetaDegList = null;
             Appsettings.SharpenDistance = null;
-            await ReplaceSharpeningBoardAsync(eventAggregator);
+            await ReplaceSharpeningBoardAsync(eventAggregator, token);
         }
 
         /// <summary>
         /// 换硅片
         /// </summary>
         /// <returns></returns>
-        public static async Task ReplaceWaferAsync(IEventAggregator? eventAggregator = null)
+        public static async Task ReplaceWaferAsync(IEventAggregator? eventAggregator, CancellationToken token)
         {
             try
             {
                 MaterialSnackUtils.MaterialSnack("请准备更换硅片,轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
                 await PlcControl.tagControl.wholeDevice.StopSpindleAsync();
-                Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, default);
-                Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, default, default);
+                Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, token);
+                Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, default, token);
                 await Task.WhenAll(taskZ1, taskZ2);
-                Task taskXY = PlcControl.tagControl.cutting.RunMotionAsync(0, 0, default);
-                Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0, default, default);
-                Task speedZero = PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync();
+                Task taskXY = PlcControl.tagControl.cutting.RunMotionAsync(0, 0, token);
+                Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0, default, token);
+                Task speedZero = PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync(token);
                 await Task.WhenAll(taskXY, taskTheta, speedZero);
                 MaterialSnackUtils.MaterialSnack("请打开相机安全门，更换硅片！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
             }
             catch (OperationCanceledException)
             {
-                MaterialSnackUtils.MaterialSnack("更换硅片操作失败！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
+                MaterialSnackUtils.MaterialSnack("更换硅片操作失败！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
             }
         }
 
@@ -144,13 +155,13 @@ namespace 精密切割系统.Helpers
         /// 换硅片
         /// </summary>
         /// <returns></returns>
-        public static async Task ReplaceWaferAndResetAsync(IEventAggregator? eventAggregator = null)
+        public static async Task ReplaceWaferAndResetAsync(IEventAggregator? eventAggregator, CancellationToken token)
         {
             //清空记录
             Appsettings.CutY = null;
             Appsettings.CutThetaDegList = null;
             Appsettings.CutDistance = null;
-            await ReplaceWaferAsync(eventAggregator);
+            await ReplaceWaferAsync(eventAggregator, token);
         }
 
         /// <summary>
@@ -702,6 +713,15 @@ namespace 精密切割系统.Helpers
             await Task.WhenAll(focusxyTask, focusThetaTask);
         }
 
+        public static async Task GoPreSharpenLineAsync(CancellationToken token)
+        {
+            DataPoint<float> cameraThetaCenterPoint = Appsettings.CameraThetaCenterPoint;
+            float thetaDeg = Appsettings.SharpenThetaDegList?.FirstOrDefault() ?? 0f;
+            Task focusxyTask = PlcControl.tagControl.cutting.RunMotionAsync(cameraThetaCenterPoint.X - 10, Appsettings.SharpenY?.ToCameraY() ?? (cameraThetaCenterPoint.Y - 10), token);
+            Task focusThetaTask = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(thetaDeg, default, token);
+            await Task.WhenAll(focusxyTask, focusThetaTask);
+        }
+
         public static async Task<CommonResult<float>> GlobalFocusAsync(IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
             try
@@ -713,9 +733,9 @@ namespace 精密切割系统.Helpers
                     return CommonResult<float>.Failure("相机获取失败！");
                 }
                 await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, 2, token);
-                float lastBlurriness = 0;
+                double lastBlurriness = 0;
                 float lastPosition = 0;
-                await PlcControl.tagControl.Z2axis.SetJogRelativeSpeedAsync(GlobalParams.Z2DefaultSpeed);
+                await PlcControl.tagControl.Z2axis.SetJogRelativeSpeedAsync(1);
                 await PlcControl.tagControl.Z2axis.SetHighSpeedAsync(1);
                 await PlcControl.tagControl.Z2axis.StartJogAsync(0);
                 using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(100));
@@ -728,13 +748,13 @@ namespace 精密切割系统.Helpers
                         {
                             return CommonResult<float>.Failure("全局对焦失败, 超过限位！");
                         }
-                        float tenengradBlurriness = (float)VisualUtils.CalculateTenengrad2(cameraCommon.localBitmap);
+                        double tenengradBlurriness = VisionAnalyzer.GetBlurrinessScore(cameraCommon.localBitmap.ToMat());
                         eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"当前位置：{newPosition} 当前模糊度：{tenengradBlurriness}"));
                         if (lastBlurriness > 0 && lastBlurriness - tenengradBlurriness > 0.5)
                         {
                             // 找到最清晰的位置，停止循环并移动到上一个位置
                             eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"最清晰的图片已找到，Z2位置{lastPosition}"));
-                            await PlcControl.tagControl.Z2axis.StopJogAsync();
+                            await PlcControl.tagControl.Z2axis.WaitStopJogAsync(token);
                             break;
                         }
                         lastBlurriness = tenengradBlurriness;
@@ -746,7 +766,6 @@ namespace 精密切割系统.Helpers
                     }
                 }
 
-                await Task.Delay(500, token);
                 lastBlurriness = 0;
                 lastPosition = 0;
                 await PlcControl.tagControl.Z2axis.SetJogRelativeSpeedAsync(0.05f);
@@ -760,7 +779,7 @@ namespace 精密切割系统.Helpers
                         {
                             return CommonResult<float>.Failure("全局对焦失败, 超过限位！");
                         }
-                        float tenengradBlurriness = (float)VisualUtils.CalculateTenengrad2(cameraCommon.localBitmap);
+                        double tenengradBlurriness = VisionAnalyzer.GetBlurrinessScore(cameraCommon.localBitmap.ToMat());
                         eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"当前位置：{newPosition} 当前模糊度：{tenengradBlurriness}"));
                         if (lastBlurriness > 0 && lastBlurriness - tenengradBlurriness > 0.5)
                         {
@@ -781,7 +800,7 @@ namespace 精密切割系统.Helpers
             }
             finally
             {
-                await PlcControl.tagControl.Z2axis.StopJogAsync();
+                await PlcControl.tagControl.Z2axis.WaitStopJogAsync(token);
                 await PlcControl.tagControl.Z2axis.SetHighSpeedAsync(0);
             }
             return CommonResult<float>.Failure("全局对焦失败！");
@@ -790,7 +809,7 @@ namespace 精密切割系统.Helpers
         public static async Task<CommonResult<float>> AutoFocusAsync(IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
 
-            eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始相机对焦..."));
+            eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始相机精细对焦..."));
             CameraCommon? cameraCommon = GetCameraCommon();
             if (cameraCommon is null)
             {
@@ -814,7 +833,7 @@ namespace 精密切割系统.Helpers
             CommonResult<float> roughFocusPosition = await AutoFocusAsync(cameraCommon, focusClearZ, 0.5f, 0.05f, token, eventAggregator);
             if (!roughFocusPosition.IsSuccess)
             {
-                roughFocusPosition = await GlobalFocusAsync(eventAggregator, token);
+                roughFocusPosition = await AutoFocusService.GlobalFocusAsync(eventAggregator, token);
                 if (!roughFocusPosition.IsSuccess)
                 {
                     return CommonResult<float>.Failure("聚焦失败，请检查硅片位置！");
@@ -833,7 +852,7 @@ namespace 精密切割系统.Helpers
                 await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(newPosition, default, token);
                 if (cameraCommon.localBitmap != null)
                 {
-                    float tenengradBlurriness = (float)VisualUtils.CalculateTenengrad2(cameraCommon.localBitmap);
+                    float tenengradBlurriness = (float)VisionAnalyzer.GetBlurrinessScore(cameraCommon.localBitmap.ToMat());
                     eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"当前位置：{newPosition} 当前模糊度：{tenengradBlurriness}"));
                     if (lastBlurriness > 0 && lastBlurriness - tenengradBlurriness > 0.5)
                     {
@@ -1882,4 +1901,5 @@ namespace 精密切割系统.Helpers
     }
 
 
+    public record class AxisPosition(float? X, float? Y, float? Z1, float? Z2, float? Theta);
 }

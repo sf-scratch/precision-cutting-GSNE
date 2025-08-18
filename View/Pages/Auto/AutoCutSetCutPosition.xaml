@@ -1,0 +1,59 @@
+﻿<UserControl
+    x:Class="精密切割系统.View.Pages.Auto.AutoCutSetCutPosition"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
+    xmlns:auto="clr-namespace:WpfAutoGrid;assembly=WpfAutoGrid.Core"
+    xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:common="clr-namespace:精密切割系统.View.Pages.common"
+    xmlns:custom="clr-namespace:精密切割系统.CustomControls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:精密切割系统.View.Pages.Auto"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
+    d:DataContext="{d:DesignInstance viewModel:AutoCutSetCutPositionViewModel,
+                                     IsDesignTimeCreatable=True}"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*" />
+            </Grid.ColumnDefinitions>
+            <Label
+                Grid.ColumnSpan="2"
+                Margin="30,30,0,0"
+                d:Content="设置切割位置"
+                Content="{Binding Title}"
+                FontSize="25"
+                FontWeight="Bold" />
+            <auto:AutoGrid
+                Grid.Row="1"
+                Margin="10"
+                ChildMargin="5"
+                Columns="*,*,*"
+                RowCount="10">
+                <TextBlock Text="原位置" />
+                <Controls:InputTextBox IsEnabled="False" Text="{Binding OriginPositionY}" />
+                <TextBlock HorizontalAlignment="Left" Text="mm" />
+                <TextBlock Text="当前位置" />
+                <Controls:InputTextBox IsEnabled="False" Text="{Binding CurrentPosition}" />
+                <TextBlock HorizontalAlignment="Left" Text="mm" />
+            </auto:AutoGrid>
+        </Grid>
+    </Grid>
+</UserControl>

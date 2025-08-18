@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Printing;
+using System.Windows.Media.Imaging;
 using 精密切割系统.FrmWindow.common;
 using static 精密切割系统.Model.cut.EdgeAnalyzer;
 
@@ -892,6 +893,37 @@ namespace 精密切割系统.Model.cut
             {
                 return null;
             }
+        }
+
+        /// <summary>
+        /// 获取模糊度评分
+        /// > 100：较清晰 < 50：较模糊
+        /// </summary>
+        /// <param name="image"></param>
+        /// <returns></returns>
+        public static double GetBlurrinessScore(Mat image)
+        {
+            // 转换为灰度图（如果输入是彩色图）
+            Mat gray = new Mat();
+            if (image.Channels() == 3)
+            {
+                Cv2.CvtColor(image, gray, ColorConversionCodes.BGR2GRAY);
+            }
+            else
+            {
+                gray = image.Clone();
+            }
+
+            // 计算拉普拉斯算子
+            Mat laplacian = new Mat();
+            Cv2.Laplacian(gray, laplacian, MatType.CV_64F);
+
+            // 计算方差（方差越高，图像越清晰）
+            Scalar mean, stddev;
+            Cv2.MeanStdDev(laplacian, out mean, out stddev);
+            double variance = stddev.Val0 * stddev.Val0;
+
+            return variance;
         }
     }
 }

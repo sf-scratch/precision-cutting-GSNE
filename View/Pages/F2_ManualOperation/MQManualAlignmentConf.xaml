@@ -225,6 +225,10 @@
                 </StackPanel>
             </StackPanel>
             <!--<common:SimpleDirectOperate Grid.Row="2" Margin="60"/>-->
+            <Controls:RealTimeInfoBox
+                x:Name="RealTimeInfo"
+                Grid.Row="2"
+                Margin="30" />
         </Grid>
     </Grid>
 </Page>

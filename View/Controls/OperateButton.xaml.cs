@@ -29,15 +29,20 @@ namespace 精密切割系统.View.Controls
     /// </summary>
     public partial class OperateButton : UserControl
     {
+        public string IconSource
+        {
+            get { return (string)GetValue(IconSourceProperty); }
+            set { SetValue(IconSourceProperty, value); }
+        }
 
-        private SolidColorBrush LeaveBackground = new SolidColorBrush(Color.FromRgb(23, 124, 250));
-        private SolidColorBrush DownBackground = new SolidColorBrush(Color.FromRgb(80, 135, 203));
+        // Using a DependencyProperty as the backing store for IconSource.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty IconSourceProperty =
+            DependencyProperty.Register("IconSource", typeof(string), typeof(OperateButton), new PropertyMetadata(default(string)));
 
-        
         public OperateButton(OperateBean bean)
         {
             InitializeComponent();
-            operateIcon.Source = bean.Icon;
+            IconSource = bean.Icon;
             operateText.Name = "operateTxt" + bean.Code.ToString();
             operateText.Text = bean.Title;  
             updataSwitchState(bean);//开关按钮

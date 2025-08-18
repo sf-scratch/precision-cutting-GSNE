@@ -1,15 +1,19 @@
 ﻿using OpenCvSharp;
 using OpenCvSharp.WpfExtensions;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using 精密切割系统.Assets.config.buttom;
 using 精密切割系统.Driver;
+using 精密切割系统.Extensions;
 using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
+using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut;
 using 精密切割系统.Model.plc;
+using 精密切割系统.PubSubEvent;
 using 精密切割系统.Utils;
 using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.common;
@@ -24,21 +28,16 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
     /// </summary>
     public partial class MQManualAlignmentConf : Page
     {
-        private readonly ThetaAlignService _alignService;
-        private MainWindow? mainWindow;
-        private RightPage? rightPage;
+        private readonly IEventAggregator? _eventAggregator = PrismUtils.GetEventAggregator();
+        private readonly ThetaAlignService _alignService = ThetaAlignService.Instance;
+        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1); // 确保线程安全
+        private readonly DynamicIntervalTimer _intervalTimer = new DynamicIntervalTimer(TimeSpan.FromMilliseconds(500), TimeSpan.FromMilliseconds(100));
+        private MainWindow _mainWindow;
+        private RightPage _rightPage;
         // 操作类型 0 菜单进入 1 半自动进入 2 磨刀进入
         private int _operateType = 0;
         // 相机操作对象
         CameraCommon _cameraCommon;
-        // 手动调整基准线标识
-        bool adjustDatumLineFlag = false;
-        // 创建一个定时器
-        System.Timers.Timer? _timer = null;
-        //获取参数
-        string IdStr;
-        string Flag;
-        string BladeLotID;
         // 当前页面状态 0 校准 1 对焦 2 测量 根据状态不同，退出的操作不同
         int pageStatus = 0;
         // 读取轴实时位置标识
@@ -51,32 +50,26 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         public MQManualAlignmentConf()
         {
             InitializeComponent();
-            mainWindow = Application.Current.MainWindow as MainWindow;
-            _alignService = ThetaAlignService.Instance;
+            _mainWindow = Application.Current.MainWindow as MainWindow ?? new MainWindow(); 
+            RealTimeInfo.Messages = [];
         }
 
-        private async void Page_Loaded(object sender, RoutedEventArgs e)
+        private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Subscribe(ReceivedMessage, ThreadOption.UIThread);
             // 加载右边和底部按钮
-            rightPage = mainWindow.rightFrame.Content as RightPage;
-            rightPage.PanelAction.Visibility = Visibility.Visible;
-            rightPage.btnBack.Visibility = Visibility.Visible;
-            rightPage.btnBack.BackFlag = false;
-            rightPage.btnBack.SetRightClickedHandler(BackClickHandle);
-            rightPage.btnSure.Visibility = Visibility.Visible;
-            rightPage.btnSure.SetRightClickedHandler(SureHandler);
-            mainWindow.UpdateOperatePage(OperateData.GetManualAlignmentOperate(), ClickHandler, TouchLeaveHandler, TouchDownHandler);
+            _rightPage = _mainWindow.rightFrame.Content as RightPage ?? new RightPage();
+            _rightPage.PanelAction.Visibility = Visibility.Visible;
+            _rightPage.btnBack.Visibility = Visibility.Visible;
+            _rightPage.btnBack.BackFlag = false;
+            _rightPage.btnBack.SetRightClickedHandler(BackClickHandle);
+            _rightPage.btnSure.Visibility = Visibility.Visible;
+            _rightPage.btnSure.SetRightClickedHandler(SureHandler);
+            _mainWindow.UpdateOperatePage(OperateData.GetManualAlignmentOperate(), ClickHandler, TouchLeaveHandler, TouchDownHandler);
             string type = QueryUtils.GetValueFromQueryParams(this, "type");
             if (!string.IsNullOrEmpty(type))
             {
                 _operateType = int.Parse(type);
-            }
-            if (_operateType == 2)
-            {
-                //获取参数
-                IdStr = QueryUtils.GetValueFromQueryParams(this, "Id");
-                Flag = QueryUtils.GetValueFromQueryParams(this, "Flag");
-                BladeLotID = QueryUtils.GetValueFromQueryParams(this, "BladeLotID");
             }
             // 设置相关参数
             channelNo.Text = CurrentUtils.GetCurrentConfiguration().ChannelNum;
@@ -94,6 +87,18 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             cutWidth.Text = Tools.FormatDecimalString((cameraCommon.CutMarkWidth / 1000).ToString(), 4);
             edgesWidth.Text = Tools.FormatDecimalString((cameraCommon.EdgeChipWidth / 1000).ToString(), 4);
             LoadPosition();
+        }
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Unsubscribe(ReceivedMessage);
+            axisRealTimeFlag = false;
+            _intervalTimer.Dispose();
+        }
+
+        private void ReceivedMessage(MessageModel model)
+        {
+            RealTimeInfo.Messages.Add(model);
         }
 
         bool confirmFlag = false;
@@ -140,19 +145,22 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 // 等于0 则跳回菜单 等于1 则跳回切割
                 if (_operateType == 0)
                 {
-                    mainWindow?.NavigateToPage("MainMenu");
+                    _mainWindow?.NavigateToPage("MainMenu");
                 }
                 else if (_operateType == 1)
                 {
-                    mainWindow?.NavigateToPage("Pages/F2_ManualOperation/MQSemiAutomaticCuttingConf", "type=1"); // type = 1 校准跳转
+                    _mainWindow?.NavigateToPage("Pages/F2_ManualOperation/MQSemiAutomaticCuttingConf", "type=1"); // type = 1 校准跳转
                 }
                 else if (_operateType == 2)
                 {
-                    mainWindow?.NavigateToPage("Pages/F4_BladeMaintenance/BmSharpenParameterForm", "Id=" + IdStr + "&Flag=" + Flag + "&BladeLotID=" + BladeLotID);
+                    string id = QueryUtils.GetValueFromQueryParams(this, "Id");
+                    string flag = QueryUtils.GetValueFromQueryParams(this, "Flag");
+                    string bladeLotID = QueryUtils.GetValueFromQueryParams(this, "BladeLotID");
+                    _mainWindow?.NavigateToPage("Pages/F4_BladeMaintenance/BmSharpenParameterForm", "Id=" + id + "&Flag=" + flag + "&BladeLotID=" + bladeLotID);
                 }
                 else if (_operateType == 3)
                 {
-                    mainWindow?.NavigateToPage("Pages/F7_ElectricSpark/AutoAlignPosition");
+                    _mainWindow?.NavigateToPage("Pages/F7_ElectricSpark/AutoAlignPosition");
                 }
             }
             else if (pageStatus == 2)
@@ -161,10 +169,10 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 cleanPositonPanel.Visibility = Visibility.Collapsed;
                 channelPanel.Visibility = Visibility.Visible;
                 channelTipsPanel.Visibility = Visibility.Visible;
-                mainWindow?.UpdateOperatePage(OperateData.GetManualAlignmentOperate(), ClickHandler, TouchLeaveHandler, TouchDownHandler);
+                _mainWindow?.UpdateOperatePage(OperateData.GetManualAlignmentOperate(), ClickHandler, TouchLeaveHandler, TouchDownHandler);
                 pageStatus = 0;
                 titleName.Content = "单一切割面校准 (1.1)";
-                rightPage.btnSure.Visibility = Visibility.Visible;
+                _rightPage.btnSure.Visibility = Visibility.Visible;
             }
 
         }
@@ -174,25 +182,45 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             switch (code)
             {
                 case 2442:
-                    await AutoCutUtils.AutoFocusAsync();
+                    {
+                        await _semaphore.ExecuteAsync(async () =>
+                        {
+                            try
+                            {
+                                await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(40));
+                                var result = await AutoCutUtils.AutoFocusAsync(_eventAggregator, timeoutToken.Token);
+                                if (!result.IsSuccess)
+                                {
+                                    MaterialSnack(result.Message, SnackType.WARNING, default, _eventAggregator);
+                                    return;
+                                }
+                            }
+                            catch (OperationCanceledException)
+                            {
+                                MaterialSnack("精细对焦超时！", SnackType.WARNING, default, _eventAggregator);
+                            }
+                        }, "精细对焦");
+                    }
                     break;
                 case 2441:
                     {
-                        try
+                        await _semaphore.ExecuteAsync(async () =>
                         {
-                            await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(40));
-                            var result = await AutoCutUtils.GlobalFocusAsync(token: timeoutToken.Token);
-                            if (!result.IsSuccess)
+                            try
                             {
-                                MaterialSnack(result.Message, SnackType.WARNING);
-                                return;
+                                await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(40));
+                                var result = await AutoFocusService.GlobalFocusAsync(_eventAggregator, timeoutToken.Token);
+                                if (!result.IsSuccess)
+                                {
+                                    MaterialSnack(result.Message, SnackType.WARNING, default, _eventAggregator);
+                                    return;
+                                }
                             }
-                            await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(result.Data, default, timeoutToken.Token);
-                        }
-                        catch (OperationCanceledException)
-                        {
-                            MaterialSnack("对焦超时！", SnackType.WARNING);
-                        }
+                            catch (OperationCanceledException)
+                            {
+                                MaterialSnack("全局对焦超时！", SnackType.WARNING, default, _eventAggregator);
+                            }
+                        }, "全局对焦");
                     }
                     break;
                 case 2445:
@@ -216,12 +244,12 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                     cleanPositonPanel.Visibility = Visibility.Visible;
                     channelPanel.Visibility = Visibility.Collapsed;
                     channelTipsPanel.Visibility = Visibility.Collapsed;
-                    mainWindow.UpdateOperatePage(OperateData.GetMeasurementOperate(), ClickHandler, TouchLeaveHandler, TouchDownHandler);
+                    _mainWindow.UpdateOperatePage(OperateData.GetMeasurementOperate(), ClickHandler, TouchLeaveHandler, TouchDownHandler);
                     pageStatus = 2;
                     cleanXPosition = PlcControl.plc.GetPlcValueString(DeviceKey.curLocationKey);
                     cleanYPosition = PlcControl.plc.GetPlcValueString(DeviceKey.yCurLocationKey);
                     titleName.Content = "测量";
-                    rightPage.btnSure.Visibility = Visibility.Collapsed;
+                    _rightPage.btnSure.Visibility = Visibility.Collapsed;
                     break;
                 case 2570:
                     // 位置清零
@@ -241,25 +269,23 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
 
         private void LoadPosition()
         {
-            Task.Run(() =>
+            Task.Run(async () =>
             {
                 while (axisRealTimeFlag)
                 {
-                    Application.Current.Dispatcher.Invoke(async () =>
+                    var axisPostion = await AutoCutUtils.GetAxisPositionAsync();
+                    Application.Current.Dispatcher.Invoke(() =>
                     {
-                        // 显示实时位置
-                        xAbsolutePosition.Text = (await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync())?.ToString("F4");
-                        yAbsolutePosition.Text = (await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync())?.ToString("F4");
-                        zAbsolutePosition.Text = (await PlcControl.tagControl.Z1axis.GetCurrentLocationAsync())?.ToString("F4");
-                        z2AbsolutePosition.Text = (await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync())?.ToString("F4");
-                        thetaAbsolutePosition.Text = (await PlcControl.tagControl.ThetaAxis.GetCurrentLocationAsync())?.ToString("F4");
+                        xAbsolutePosition.Text = axisPostion.X?.ToString("F4");
+                        yAbsolutePosition.Text = axisPostion.Y?.ToString("F4");
+                        zAbsolutePosition.Text = axisPostion.Z1?.ToString("F4");
+                        z2AbsolutePosition.Text = axisPostion.Z2?.ToString("F4");
+                        thetaAbsolutePosition.Text = axisPostion.Theta?.ToString("F4");
                         // 显示清零后位置
-                        xCleanPosition.Text = (Tools.GetDoubleStringValue(xAbsolutePosition.Text)
-                            - Tools.GetDoubleStringValue(cleanXPosition)).ToString("F4");
-                        yCleanPosition.Text = (Tools.GetDoubleStringValue(yAbsolutePosition.Text)
-                            - Tools.GetDoubleStringValue(cleanYPosition)).ToString("F4");
+                        xCleanPosition.Text = (Tools.GetDoubleStringValue(xAbsolutePosition.Text) - Tools.GetDoubleStringValue(cleanXPosition)).ToString("F4");
+                        yCleanPosition.Text = (Tools.GetDoubleStringValue(yAbsolutePosition.Text) - Tools.GetDoubleStringValue(cleanYPosition)).ToString("F4");
                     });
-                    Thread.Sleep(100);
+                    await Task.Delay(100);
                 }
             });
         }
@@ -282,8 +308,11 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             {
                 _cameraCommon?.SetCutMarkWidth(1, 2);
             }
-            cutWidth.Text = Tools.FormatDecimalString((_cameraCommon.CutMarkWidth / 1000).ToString(), 4);
-            edgesWidth.Text = Tools.FormatDecimalString((_cameraCommon.EdgeChipWidth / 1000).ToString(), 4);
+            if (_cameraCommon is not null)
+            {
+                cutWidth.Text = Tools.FormatDecimalString((_cameraCommon.CutMarkWidth / 1000).ToString(), 4);
+                edgesWidth.Text = Tools.FormatDecimalString((_cameraCommon.EdgeChipWidth / 1000).ToString(), 4);
+            }
         }
 
         private void TouchLeaveHandler(object? sender, int code)
@@ -297,13 +326,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 case 2040:
                 // 崩边调窄
                 case 2041:
-                    adjustDatumLineFlag = false;
-                    if (_timer != null)
-                    {
-                        _timer.Stop();
-                        _timer.Dispose();
-                        _timer = null;
-                    }
+                    _intervalTimer.Stop();
                     break;
                 case 2466:
                 case 2477:
@@ -322,41 +345,9 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 case 2040:
                 // 崩边调窄
                 case 2041:
-                    DisposeDatumLine(code); // 初始调用 DisposeDatumLine
-                    adjustDatumLineFlag = true;
-                    if (_timer != null)
-                    {
-                        _timer.Stop();
-                    }
-                    // 创建定时器
-                    _timer = new System.Timers.Timer
-                    {
-                        Interval = 500, // 初始延迟 500 毫秒
-                        AutoReset = false // 每次触发后需要手动重新启动
-                    };
-                    _timer.Elapsed += (sender, e) =>
-                    {
-                        if (_timer != null)
-                        {
-                            if (!adjustDatumLineFlag)
-                            {
-                                _timer.Stop();
-                                _timer.Dispose(); // 释放资源
-                                return;
-                            }
-
-                            Application.Current.Dispatcher.Invoke(() =>
-                            {
-                                DisposeDatumLine(code);
-                            });
-
-                            // 重新设置间隔为 100 毫秒并重新启动定时器
-                            _timer.Interval = 100;
-                            _timer.Start();
-                        }
-                    };
-
-                    _timer.Start(); // 启动定时器
+                    DisposeDatumLine(code);
+                    _intervalTimer.RegisterAction(() => DisposeDatumLine(code));
+                    _intervalTimer.Start();
                     break;
                 case 2466:
                 case 2477:
@@ -379,11 +370,6 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         public void SetChannelNo(string channelNoValue)
         {
             channelNo.Text = channelNoValue;
-        }
-
-        private void Page_Unloaded(object sender, RoutedEventArgs e)
-        {
-            axisRealTimeFlag = false;
         }
     }
 }
