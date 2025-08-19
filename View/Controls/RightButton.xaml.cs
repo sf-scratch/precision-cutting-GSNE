@@ -50,7 +50,7 @@ namespace 精密切割系统.View.Controls
 
         // 文字大小
         public static readonly DependencyProperty ContentTextFontSizeProperty =
-            DependencyProperty.Register("ContentTextFontSize", typeof(double), typeof(RightButton), new PropertyMetadata(0d));
+            DependencyProperty.Register("ContentTextFontSize", typeof(double), typeof(RightButton), new PropertyMetadata(12d));
 
         // 是否返回 false不返回 true 返回上一级
         public static readonly DependencyProperty BackFlagProperty =

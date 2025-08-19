@@ -711,7 +711,7 @@ namespace 精密切割系统.ViewModel
                             await AutoCutUtils.WorkpieceBlowingAsync(_eventAggregator, cts.Token);
                             await PlcControl.tagControl.cutting.RunMotionAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), line.StartPoint.Y.ToCameraY(), cts.Token);
                         }
-                        await AutoCutUtils.AutoFocusAsync(_eventAggregator, cts.Token);
+                        await AutoFocusService.GlobalFocusAsync(_eventAggregator, cts.Token);
                         await AutoCutUtils.FineTuneAxisYAsync();
                         await AutoCutUtils.UpdateCameraCommonLineAsync();
                         MaterialSnackUtils.MaterialSnack(message ?? "暂停中...", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);

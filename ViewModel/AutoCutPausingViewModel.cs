@@ -33,7 +33,7 @@ namespace 精密切割系统.ViewModel
         private AutoCutRuningViewModel _autoCutRuningViewModel;
         private DataPoint<float>? _originPoint;
         private SemaphoreSlim _semaph = new SemaphoreSlim(1, 1);
-        private CancellationTokenSource _operatCts = new CancellationTokenSource();
+        private CancellationTokenSource _operatCts;
 
         private static int _afterReplaceBladeCutTimes;
         /// <summary>
@@ -364,7 +364,8 @@ namespace 精密切割系统.ViewModel
 
         public override async void OnNavigatedTo(NavigationContext navigationContext)
         {
-            base.OnNavigatedTo(navigationContext);
+            base.OnNavigatedTo(navigationContext); 
+            _operatCts = new CancellationTokenSource();
             InitBottomButton();
             InitRightButton();
             _cameraCommon = AutoCutUtils.GetCameraCommon();
@@ -406,6 +407,7 @@ namespace 精密切割系统.ViewModel
             {
                 _cameraCommon.LineChanged -= CameraCommon_LineChanged;
             }
+            _operatCts.Cancel();
         }
     }
 }

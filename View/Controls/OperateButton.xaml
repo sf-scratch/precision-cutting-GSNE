@@ -151,7 +151,7 @@
             Margin="0,12,20,0"
             HorizontalAlignment="Right"
             VerticalAlignment="Top"
-            Source="{Binding ImageSource010}"
+            Source="{Binding ImageSource10}"
             Visibility="Collapsed" />
         <Image
             x:Name="operate8004"

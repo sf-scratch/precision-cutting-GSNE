@@ -854,7 +854,7 @@ namespace 精密切割系统.Helpers
                 {
                     float tenengradBlurriness = (float)VisionAnalyzer.GetBlurrinessScore(cameraCommon.localBitmap.ToMat());
                     eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"当前位置：{newPosition} 当前模糊度：{tenengradBlurriness}"));
-                    if (lastBlurriness > 0 && lastBlurriness - tenengradBlurriness > 0.5)
+                    if (lastBlurriness > 0 && lastBlurriness - tenengradBlurriness > 0.1)
                     {
                         // 找到最清晰的位置，停止循环并移动到上一个位置
                         eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"最清晰的图片已找到，Z2位置{lastPosition}"));
@@ -1031,7 +1031,7 @@ namespace 精密切割系统.Helpers
                 await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(190, 80, token);
                 await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(rightCheckX, 7f, token);
                 await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(checkY, 50, token);
-                await AutoFocusAsync(eventAggregator, token);
+                await AutoFocusService.GlobalFocusAsync(eventAggregator, token);
                 await FineTuneAxisYAsync();
                 CancellationTokenSource cts = new CancellationTokenSource();
                 CancellationToken linkedToken = CancellationTokenSource.CreateLinkedTokenSource(token, cts.Token).Token;

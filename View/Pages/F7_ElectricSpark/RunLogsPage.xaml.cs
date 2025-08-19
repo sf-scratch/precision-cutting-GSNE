@@ -30,13 +30,17 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
     {
         private MainWindow? mainWindow;
         private RightPage? rightPage;
+
         ObservableCollection<RunLogsModel> runLogsModels { get; set; } = new ObservableCollection<RunLogsModel>();
+
         ObservableCollection<RunLogsViewModel> eventDataRows { get; set; } = new ObservableCollection<RunLogsViewModel>();
+
         public RunLogsPage()
         {
             mainWindow = Application.Current.MainWindow as MainWindow;
             InitializeComponent();
         }
+
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             rightPage = mainWindow.rightFrame.Content as RightPage;
@@ -46,6 +50,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
             rightPage.btnBack.SetRightClickedHandler(BtnBack_RightClicked);
             InitData();
         }
+
         public void InitData()
         {
             List<RunLogsModel> models = SqlHelper.Table<RunLogsModel>().ToList();
@@ -58,7 +63,6 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
                 index++;
             });
             pre_listView.ItemsSource = runLogsModels;
-            
         }
 
         private void BtnBack_RightClicked(object? sender, bool e)
