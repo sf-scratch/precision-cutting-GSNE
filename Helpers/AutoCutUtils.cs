@@ -722,90 +722,6 @@ namespace 精密切割系统.Helpers
             await Task.WhenAll(focusxyTask, focusThetaTask);
         }
 
-        public static async Task<CommonResult<float>> GlobalFocusAsync(IEventAggregator? eventAggregator = null, CancellationToken token = default)
-        {
-            try
-            {
-                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始相机对焦..."));
-                CameraCommon? cameraCommon = GetCameraCommon();
-                if (cameraCommon is null)
-                {
-                    return CommonResult<float>.Failure("相机获取失败！");
-                }
-                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, 2, token);
-                double lastBlurriness = 0;
-                float lastPosition = 0;
-                await PlcControl.tagControl.Z2axis.SetJogRelativeSpeedAsync(1);
-                await PlcControl.tagControl.Z2axis.SetHighSpeedAsync(1);
-                await PlcControl.tagControl.Z2axis.StartJogAsync(0);
-                using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(100));
-                while (await timer.WaitForNextTickAsync(token))
-                {
-                    if (cameraCommon.localBitmap != null)
-                    {
-                        float newPosition = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync() ?? 0;
-                        if (newPosition > 12)
-                        {
-                            return CommonResult<float>.Failure("全局对焦失败, 超过限位！");
-                        }
-                        double tenengradBlurriness = VisionAnalyzer.GetBlurrinessScore(cameraCommon.localBitmap.ToMat());
-                        eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"当前位置：{newPosition} 当前模糊度：{tenengradBlurriness}"));
-                        if (lastBlurriness > 0 && lastBlurriness - tenengradBlurriness > 0.5)
-                        {
-                            // 找到最清晰的位置，停止循环并移动到上一个位置
-                            eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"最清晰的图片已找到，Z2位置{lastPosition}"));
-                            await PlcControl.tagControl.Z2axis.WaitStopJogAsync(token);
-                            break;
-                        }
-                        lastBlurriness = tenengradBlurriness;
-                        lastPosition = newPosition;
-                    }
-                    else
-                    {
-                        eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("聚焦获取当前帧失败！"));
-                    }
-                }
-
-                lastBlurriness = 0;
-                lastPosition = 0;
-                await PlcControl.tagControl.Z2axis.SetJogRelativeSpeedAsync(0.05f);
-                await PlcControl.tagControl.Z2axis.StartJogAsync(1);
-                while (await timer.WaitForNextTickAsync(token))
-                {
-                    if (cameraCommon.localBitmap != null)
-                    {
-                        float newPosition = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync() ?? 0;
-                        if (newPosition > 12)
-                        {
-                            return CommonResult<float>.Failure("全局对焦失败, 超过限位！");
-                        }
-                        double tenengradBlurriness = VisionAnalyzer.GetBlurrinessScore(cameraCommon.localBitmap.ToMat());
-                        eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"当前位置：{newPosition} 当前模糊度：{tenengradBlurriness}"));
-                        if (lastBlurriness > 0 && lastBlurriness - tenengradBlurriness > 0.5)
-                        {
-                            // 找到最清晰的位置，停止循环并移动到上一个位置
-                            eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"最清晰的图片已找到，Z2位置{lastPosition}"));
-                            await PlcControl.tagControl.Z2axis.StopJogAsync();
-                            Appsettings.FocusClearZ = lastPosition;
-                            return CommonResult<float>.Success(lastPosition);
-                        }
-                        lastBlurriness = tenengradBlurriness;
-                        lastPosition = newPosition;
-                    }
-                    else
-                    {
-                        eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("聚焦获取当前帧失败！"));
-                    }
-                }
-            }
-            finally
-            {
-                await PlcControl.tagControl.Z2axis.WaitStopJogAsync(token);
-                await PlcControl.tagControl.Z2axis.SetHighSpeedAsync(0);
-            }
-            return CommonResult<float>.Failure("全局对焦失败！");
-        }
-
         public static async Task<CommonResult<float>> AutoFocusAsync(IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
 
@@ -830,7 +746,7 @@ namespace 精密切割系统.Helpers
             //    }
             //}
             //Appsettings.IsNeedCheckBaseLine = true;
-            CommonResult<float> roughFocusPosition = await AutoFocusAsync(cameraCommon, focusClearZ, 0.5f, 0.05f, token, eventAggregator);
+            CommonResult<float> roughFocusPosition = await AutoFocusAsync(cameraCommon, focusClearZ, 0.2f, 0.02f, token, eventAggregator);
             if (!roughFocusPosition.IsSuccess)
             {
                 roughFocusPosition = await AutoFocusService.GlobalFocusAsync(eventAggregator, token);
@@ -840,7 +756,12 @@ namespace 精密切割系统.Helpers
                 }
             }
             // 进行精调聚焦
-            return await AutoFocusAsync(cameraCommon, roughFocusPosition.Data, 0.04f, 0.01f, token, eventAggregator);
+            CommonResult<float> result = await AutoFocusAsync(cameraCommon, roughFocusPosition.Data, 0.018f, 0.002f, token, eventAggregator);
+            if (result.IsSuccess)
+            {
+                Appsettings.FocusClearZ = result.Data;
+            }
+            return result;
         }
 
         private static async Task<CommonResult<float>> AutoFocusAsync(CameraCommon cameraCommon, float startPositionZ2, float margin, float singleMoveDistance, CancellationToken token, IEventAggregator? eventAggregator = null)
@@ -852,9 +773,9 @@ namespace 精密切割系统.Helpers
                 await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(newPosition, default, token);
                 if (cameraCommon.localBitmap != null)
                 {
-                    float tenengradBlurriness = (float)VisionAnalyzer.GetBlurrinessScore(cameraCommon.localBitmap.ToMat());
+                    float tenengradBlurriness = (float)VisionAnalyzer.CalculateTenengrad2(cameraCommon.localBitmap.ToMat());
                     eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"当前位置：{newPosition} 当前模糊度：{tenengradBlurriness}"));
-                    if (lastBlurriness > 0 && lastBlurriness - tenengradBlurriness > 0.1)
+                    if (lastBlurriness > 0 && lastBlurriness - tenengradBlurriness > 0.5)
                     {
                         // 找到最清晰的位置，停止循环并移动到上一个位置
                         eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"最清晰的图片已找到，Z2位置{lastPosition}"));

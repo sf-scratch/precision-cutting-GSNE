@@ -925,5 +925,52 @@ namespace 精密切割系统.Model.cut
 
             return variance;
         }
+
+
+        public static double CalculateTenengrad2(Mat image)
+        {
+            if (image == null || image.Empty())
+            {
+                return 0;
+            }
+
+            Mat grayImage = image.Clone();
+            //Cv2.CvtColor(image, grayImage, ColorConversionCodes.BGR2GRAY);
+
+            // 下采样图像以加速处理
+            Cv2.Resize(grayImage, grayImage, new Size(grayImage.Width / 2, grayImage.Height / 2), 0, 0, InterpolationFlags.Linear);
+
+            Mat sobelX = new Mat();
+            Mat sobelY = new Mat();
+
+            // 使用较低精度的数据类型
+            Cv2.Sobel(grayImage, sobelX, MatType.CV_32F, 1, 0, 3);
+            Cv2.Sobel(grayImage, sobelY, MatType.CV_32F, 0, 1, 3);
+
+            // 手动计算梯度幅值
+            Mat sobelXSquare = new Mat();
+            Mat sobelYSquare = new Mat();
+            Cv2.Multiply(sobelX, sobelX, sobelXSquare); // sobelX^2
+            Cv2.Multiply(sobelY, sobelY, sobelYSquare); // sobelY^2
+
+            Mat sobelMagnitude = new Mat();
+            Cv2.Add(sobelXSquare, sobelYSquare, sobelMagnitude); // sobelX^2 + sobelY^2
+            Cv2.Sqrt(sobelMagnitude, sobelMagnitude); // sqrt(sobelX^2 + sobelY^2)
+
+            // 计算标准差
+            Cv2.MeanStdDev(sobelMagnitude, out Scalar mean, out Scalar stddev);
+
+            double tenengradVar = stddev.Val0 * stddev.Val0;
+
+            // 释放资源
+            grayImage.Dispose();
+            sobelX.Dispose();
+            sobelY.Dispose();
+            sobelXSquare.Dispose();
+            sobelYSquare.Dispose();
+            sobelMagnitude.Dispose();
+
+            return tenengradVar;
+        }
     }
 }

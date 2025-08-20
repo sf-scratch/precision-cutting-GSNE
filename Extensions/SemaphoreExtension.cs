@@ -48,6 +48,9 @@ namespace 精密切割系统.Extensions
                 }
 
                 await asyncAction().ConfigureAwait(false);
+                MaterialSnackUtils.MaterialSnack(
+                    $"{busyTaskName}已完成！",
+                    MaterialSnackUtils.SnackType.SUCCESS);
             }
             finally
             {
