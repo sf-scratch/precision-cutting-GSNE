@@ -27,8 +27,6 @@ namespace 精密切割系统.View.Pages.system
             InitializeComponent();
         }
 
-   
-
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             if (DevicesUtis.IsTouchSupported()) {
@@ -42,7 +40,6 @@ namespace 精密切割系统.View.Pages.system
                 btnExit.MouseDown += BtnExit_MouseDown;
                 btnMinimized.MouseDown += BtnMinimized_MouseDown;
             }
-  
         }
 
         private void BtnMinimized_MouseDown(object sender, MouseButtonEventArgs e)

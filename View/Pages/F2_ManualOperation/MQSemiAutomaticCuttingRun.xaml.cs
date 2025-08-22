@@ -287,6 +287,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             //结束切割
             await PlcControl.tagControl.cutting.ExitCuttingModeAsync(default);
             mainWindow?.NavigateToPage("Pages/F2_ManualOperation/MQSemiAutomaticCuttingConf");
+            ShowMessage();
         }
 
         private async void CutService_CutServicePaused(LineSegment? line, string? message)
@@ -345,7 +346,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                     Appsettings.AfterReplaceBladeCutTimes++;
                     Appsettings.AfterReplaceBladeCutLength += process.CutLength;
                     _viewModel.AllCutLine = Appsettings.AfterReplaceBladeCutTimes ?? 0;
-                    _viewModel.AllCutLineLength = MathF.Round(Appsettings.AfterReplaceBladeCutLength / 100 ?? 0, 2);
+                    _viewModel.AllCutLineLength = MathF.Round(Appsettings.AfterReplaceBladeCutLength / 1000 ?? 0, 2);
                     _viewModel.ExpectedProcessingEndTime = DateTime.Now.AddSeconds(process.RemainingTime).ToString("HH:mm:ss");
                 }
             });

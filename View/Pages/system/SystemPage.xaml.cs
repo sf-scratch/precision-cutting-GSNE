@@ -42,13 +42,21 @@ namespace 精密切割系统.View.Pages.system
             rightPage.PanelAction.Visibility = Visibility.Visible;
             rightPage.btnBack.Visibility = Visibility.Visible;
             rightPage.btnBack.GlobalRunOperateFlag = true;
+            rightPage.btnBack.BackFlag = true;
+            rightPage.btnBack.SetRightClickedHandler(BtnBack_RightClicked);
             rightPage.btnSure.Visibility = Visibility.Visible;
             rightPage.btnSure.GlobalRunOperateFlag = true;
-            rightPage.btnBack.BackFlag = true;
             rightPage.btnSure.SetRightClickedHandler(BtnSure_RightClicked);
             operatePage = mainWindow.operateFrame.Content as OperatePage;
             operatePage.UpdateOperate([]);
             _ = initUserDefine();
+            inputText.Focus();
+            mainWindow?.ShowKeyboardPage(1);
+        }
+
+        private void BtnBack_RightClicked(object? sender, bool e)
+        {
+            mainWindow?.NavigateToPage("MainMenu");
         }
 
         //初始化数据
@@ -66,19 +74,28 @@ namespace 精密切割系统.View.Pages.system
 
         private void BtnSure_RightClicked(object? sender, bool e)
         {
-            if (!string.IsNullOrEmpty(inputText.Text))
+            if (!string.IsNullOrEmpty(inputText.Password))
             {
-                if (userDefineDataModel.SystemPassword.Equals(inputText.Text))
+                if (userDefineDataModel.SystemPassword.Equals(inputText.Password))
                 {
                     SystemDialog dialog = new SystemDialog();
                     dialog.ShowDialog();
-                    //mainWindow.NavigateToPage("MainMenu", $"menuId={menuId}");
                 }
                 else
                 {
                     MaterialSnackUtils.MaterialSnack("密码错误", MaterialSnackUtils.SnackType.ERROR);
                 }
             }
+        }
+
+        private void inputText_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            mainWindow?.ShowKeyboardPage(1);
+        }
+
+        private void inputText_TouchDown(object sender, TouchEventArgs e)
+        {
+            mainWindow?.ShowKeyboardPage(1);
         }
     }
 }

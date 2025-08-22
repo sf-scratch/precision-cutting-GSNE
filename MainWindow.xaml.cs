@@ -476,8 +476,9 @@ namespace 精密切割系统
         }
 
         // 当Frame的Source属性变化时调用
-        private void OnFrameSourceChanged(object sender, EventArgs e) {
-            HeaderPage headerPage  = headerFrame.Content as HeaderPage;
+        private void OnFrameSourceChanged(object sender, EventArgs e)
+        {
+            HeaderPage headerPage = headerFrame.Content as HeaderPage;
             headerPage.messgePanel.Visibility = Visibility.Hidden;
         }
 

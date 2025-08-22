@@ -106,10 +106,14 @@ namespace 精密切割系统.Helpers
             }));
         }
 
-        public static void hideMessage()
+        public static void HideMessage()
         {
             headerPage.messgePanel.Visibility = Visibility.Hidden;
+        }
 
+        public static void ShowMessage()
+        {
+            headerPage.messgePanel.Visibility = Visibility.Visible;
         }
 
         public static void showOperateLimitMsg()

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using 精密切割系统.Converters;
 
 namespace 精密切割系统.DTOs
 {
@@ -61,7 +62,7 @@ namespace 精密切割系统.DTOs
         /// 用户名
         /// </summary>
         [JsonProperty("userName")]
-        public string UserName { get; set; } = "雷昊";
+        public string UserName { get; set; } = "戚太菊";
 
         /// <summary>
         /// 基础ID
@@ -73,7 +74,15 @@ namespace 精密切割系统.DTOs
         /// 开始时间
         /// </summary>
         [JsonProperty("startTime")]
+        [JsonConverter(typeof(UnixTimestampConverter))]
         public DateTime? StartTime { get; set; }
+
+        /// <summary>
+        /// 开始时间
+        /// </summary>
+        [JsonProperty("endTime")]
+        [JsonConverter(typeof(UnixTimestampConverter))]
+        public DateTime? EndTime { get; set; }
 
         /// <summary>
         /// 组操作ID

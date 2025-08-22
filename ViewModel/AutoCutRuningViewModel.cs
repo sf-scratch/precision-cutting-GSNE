@@ -430,10 +430,13 @@ namespace 精密切割系统.ViewModel
                 _monitoringAlarmCts.Cancel();
                 await StopAsync(ServicePauseResult.Stop);
                 await PdaUtils.UpdateFlowValuesAsync();
-                await PdaUtils.SetCompletedAsync();
                 if (!stopwatch.IsRunning)
                 {
                     await PdaUtils.QualifiedAsync();
+                }
+                else
+                {
+                    await PdaUtils.SetCompletedAsync();
                 }
                 stopwatch.Stop();
                 AutoCutHistoryUtils.SetEndTime();

@@ -174,7 +174,7 @@ namespace 精密切割系统.Model.plc
                     InitOriginPosition(axisName);
                 }
             }
-            MaterialSnackUtils.hideMessage();
+            MaterialSnackUtils.HideMessage();
             GlobalParams.globalRunFlag = false;
             return res;
         }
