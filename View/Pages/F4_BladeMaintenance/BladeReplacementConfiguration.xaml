@@ -112,7 +112,7 @@
                         <Controls:InputTextBox Text="{Binding DeviceCode}" />
                         <TextBlock HorizontalAlignment="Left" Text="" />
                         <TextBlock Text="最后磨10刀" />
-                        <ToggleButton IsChecked="{Binding SharpenParams.IsExecuteLastSharpen, Mode=TwoWay}">
+                        <ToggleButton Command="" IsChecked="{Binding SharpenParams.IsExecuteLastSharpen, Mode=TwoWay}">
                             <ToggleButton.Resources>
                                 <ResourceDictionary>
                                     <ResourceDictionary.MergedDictionaries>

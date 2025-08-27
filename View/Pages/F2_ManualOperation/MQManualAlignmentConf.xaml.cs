@@ -257,10 +257,11 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                     cleanYPosition = PlcControl.plc.GetPlcValueString(DeviceKey.yCurLocationKey);
                     break;
                 case 2433:
-                    MaterialSnack("识别中...", SnackType.WARNING, 0);
-                    await AutoCutUtils.FineTuneAxisYAsync();
-                    await AutoCutUtils.UpdateCameraCommonLineAsync();
-                    MaterialSnack("识别完成！", SnackType.SUCCESS);
+                    _cameraCommon.localBitmap.ToMat().SaveImage($"C:\\MySpace\\Dev\\ProjectXiHua\\precision-cutting-321\\bin\\x64\\Debug\\testImage\\{DateTime.Now.Ticks}.jpg");
+                    //MaterialSnack("识别中...", SnackType.WARNING, 0);
+                    //await AutoCutUtils.FineTuneAxisYAsync();
+                    //await AutoCutUtils.UpdateCameraCommonLineAsync();
+                    //MaterialSnack("识别完成！", SnackType.SUCCESS);
                     break;
                 default:
                     break;

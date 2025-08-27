@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using MaterialDesignThemes.Wpf;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NPOI.OpenXml4Net.OPC.Internal.Unmarshallers;
 using OpenCvSharp;
@@ -201,7 +202,7 @@ namespace 精密切割系统.Helpers
             _ = MonitoringAlarmAsync(repeatMeasureCts.Cancel, AlarmConfig.Instance.HasConductivityAlarm, eventAggregator, repeatMeasureCts.Token);
             try
             {
-                for (int times = 1; times <= 3; times++)
+                for (int times = 1; times <= 30; times++)
                 {
                     try
                     {
@@ -289,9 +290,16 @@ namespace 精密切割系统.Helpers
                         if (maxDeviation >= 0.01)
                         {
                             eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高偏差过大，重新测高"));
-                            if (times % 3 == 0 && dialogService is not null)
+                            if (times % 3 == 0)
                             {
-                                await WaitManualBlowing(dialogService, useToken);
+                                var res = await DialogHost.Show(SelectionDialog.NewInstance("继续测高", "结束切割", title:"测高多次失败，请确认操作"));
+                                if (res is string dialogResult)
+                                {
+                                    if (dialogResult == SelectionDialog.NO)
+                                    {
+                                        return CommonResult<float>.Failure("结束切割！");
+                                    }
+                                }
                             }
                             continue;
                         }
@@ -303,6 +311,7 @@ namespace 精密切割系统.Helpers
                         {
                             return CommonResult<float>.Failure("测高操作取消！");
                         }
+                        eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("测高导电异常！"));
                         await PlcControl.tagControl.wholeDevice.AlarmResetAsync();
                         if (AlarmConfig.Instance.HasConductivityAlarm())
                         {

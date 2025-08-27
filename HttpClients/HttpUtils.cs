@@ -27,7 +27,7 @@ namespace 精密切割系统.HttpClients
             ApiRequest request = new ApiRequest
             {
                 Method = RestSharp.Method.Post,
-                Route = $"{HttpRestClient.PreUrl}/http/interface/getHubInfoById?hubNumber={lunguId}"
+                Route = $"/http/interface/getHubInfoById?hubNumber={lunguId}"
             };
             ApiResponse? response = await HttpRestClient.Instance.ExecuteAsync(request);
             if (response == null)
@@ -59,7 +59,7 @@ namespace 精密切割系统.HttpClients
             ApiRequest request = new ApiRequest
             {
                 Method = RestSharp.Method.Get,
-                Route = $"{HttpRestClient.PreUrl}/http/interface/getLunguSksj?lungu={lunguId}"
+                Route = $"/http/interface/getLunguSksj?lungu={lunguId}"
             };
             ApiResponse? response = await HttpRestClient.Instance.ExecuteAsync(request);
             if (response == null)
@@ -86,7 +86,7 @@ namespace 精密切割系统.HttpClients
             ApiRequest request = new ApiRequest
             {
                 Method = RestSharp.Method.Post,
-                Route = $"{HttpRestClient.PreUrl}/http/interface/insertFlowValues",
+                Route = $"/http/interface/insertFlowValues",
                 Parameters = fieldValues
             };
             ApiResponse? response = await HttpRestClient.Instance.ExecuteAsync(request);
@@ -114,7 +114,7 @@ namespace 精密切割系统.HttpClients
             ApiRequest request = new ApiRequest
             {
                 Method = RestSharp.Method.Post,
-                Route = $"{HttpRestClient.PreUrl}/http/interface/pda/sop/updateGroupStatus",
+                Route = $"/http/interface/pda/sop/updateGroupStatus",
                 Parameters = updateOperateStatus
             };
             ApiResponse? response = await HttpRestClient.Instance.ExecuteAsync(request);
@@ -148,7 +148,7 @@ namespace 精密切割系统.HttpClients
             ApiRequest request = new ApiRequest
             {
                 Method = RestSharp.Method.Post,
-                Route = $"{HttpRestClient.PreUrl}/http/interface/queryFlowSettingById",
+                Route = $"/http/interface/queryFlowSettingById",
                 Parameters = data
             };
             ApiResponse? response = await HttpRestClient.Instance.ExecuteAsync(request);
@@ -184,7 +184,7 @@ namespace 精密切割系统.HttpClients
             ApiRequest request = new ApiRequest
             {
                 Method = RestSharp.Method.Post,
-                Route = $"{HttpRestClient.PreUrl}/http/interface/getQgParamsByHub",
+                Route = $"/http/interface/getQgParamsByHub",
                 Parameters = new JsonObject
                 {
                     [nameof(hubNumber)] = hubNumber,
@@ -276,6 +276,32 @@ namespace 精密切割系统.HttpClients
                 }
             }
             return null;
+        }
+
+        public static async Task<HttpUtilsResult> DeleteOperateValueByIdAsync(string groupOperateId)
+        {
+            ApiRequest request = new ApiRequest
+            {
+                Method = Method.Post,
+                Route = $"/http/interface/deleteOperateValueById?groupOperateId={groupOperateId}"
+            };
+            ApiResponse? response = await HttpRestClient.Instance.ExecuteAsync(request);
+            if (response == null)
+            {
+                return HttpUtilsResult.Fail("删除轮毂切割数据失败！");
+            }
+            if (response.IsSuccess())
+            {
+                try
+                {
+                    return HttpUtilsResult.Success();
+                }
+                catch (Exception ex)
+                {
+                    return HttpUtilsResult.Fail(ex.Message);
+                }
+            }
+            return HttpUtilsResult.Fail(response.Msg);
         }
     }
 }

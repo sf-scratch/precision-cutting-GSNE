@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using MaterialDesignThemes.Wpf;
+using Newtonsoft.Json.Linq;
 using OpenCvSharp;
 using OpenCvSharp.WpfExtensions;
 using Prism.Dialogs;
@@ -429,14 +430,25 @@ namespace 精密切割系统.ViewModel
                 _pauseCts.Cancel();
                 _monitoringAlarmCts.Cancel();
                 await StopAsync(ServicePauseResult.Stop);
-                await PdaUtils.UpdateFlowValuesAsync();
+                await PdaUtils.ComputerShutdownAsync();
                 if (!stopwatch.IsRunning)
                 {
                     await PdaUtils.QualifiedAsync();
                 }
                 else
                 {
-                    await PdaUtils.SetCompletedAsync();
+                    var res = await DialogHost.Show(SelectionDialog.NewInstance("清除记录", "只下机", title:"切割未完成，MES切割数据处理"));
+                    if (res is string dialogResult)
+                    {
+                        if (dialogResult == SelectionDialog.NO)
+                        {
+                            await PdaUtils.DeleteCurrentGroupOperateAsync();
+                        }
+                        else
+                        {
+                            await PdaUtils.ComputerShutdownAsync();
+                        }
+                    }
                 }
                 stopwatch.Stop();
                 AutoCutHistoryUtils.SetEndTime();

@@ -50,5 +50,12 @@ namespace 精密切割系统.ViewModel.Dialogs
             get { return _noButtonVisibility; }
             set { SetProperty(ref _noButtonVisibility, value); }
         }
+
+        private string _title;
+        public string Title
+        {
+            get { return _title; }
+            set { SetProperty(ref _title, value); }
+        }
     }
 }

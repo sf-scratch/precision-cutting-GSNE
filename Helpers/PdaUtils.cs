@@ -500,10 +500,12 @@ namespace 精密切割系统.Helpers
             }
         }
 
-        public static async Task UpdateFlowValuesAsync()
+        public static async Task ComputerShutdownAsync()
         {
             if (!GlobalParams.OnlineMES || _tuple is null) return;
             FieldValuesDTO fieldValues = _tuple.Item1;
+            fieldValues.Status = "3";
+            fieldValues.EndTime = DateTime.Now;
             await HttpUtils.InsertFlowValuesAsync(fieldValues);
         }
 
@@ -570,31 +572,40 @@ namespace 精密切割系统.Helpers
             await HttpUtils.UpdateGroupStatusAsync(updateOperateStatus);
         }
 
-        public static async Task Test()
+        public static async Task DeleteCurrentGroupOperateAsync()
         {
+            if (!GlobalParams.OnlineMES || _tuple is null) return;
+            FieldValuesDTO fieldValues = _tuple.Item1;
+            await HttpUtils.DeleteOperateValueByIdAsync(fieldValues.GroupOperateId);
+        }
 
-            await PdaUtils.ComputerPracticeAsync("T25051502B0014");
-            PdaUtils.AddStandardCutSpeed(10);
-            PdaUtils.AddStandardSharpenSpeed(20);
-            PdaUtils.AddResidueBlade(30);
-            PdaUtils.AddResidueSharpenTimes(40);
-            PdaUtils.AddTotalSharpenTimes(50);
-            PdaUtils.AddSharpen(11, 10);
-            PdaUtils.AddToolMarkWidth(60);
-            PdaUtils.AddToolMarkActualWidth(70);
-            PdaUtils.AddFirstToolMarkWidth(80);
-            PdaUtils.AddFirstToolMarkImage(new Mat("C:\\MySpace\\Dev\\ProjectXiHua\\precision-cutting-321\\bin\\x64\\Debug\\binary.jpg"));
-            PdaUtils.AddSecondToolMarkImage(new Mat("C:\\MySpace\\Dev\\ProjectXiHua\\precision-cutting-321\\bin\\x64\\Debug\\gray.jpg"));
-            PdaUtils.AddMaximumCollapseAngleImage(new Mat("C:\\MySpace\\Dev\\ProjectXiHua\\precision-cutting-321\\bin\\x64\\Debug\\gray.jpg"));
-            PdaUtils.AddMaximumCollapseAngle(90);
-            PdaUtils.AddMaxCutSpeed(100);
-            PdaUtils.AddSingleCollapseAngle(110);
-            PdaUtils.AddBladeEdgeBreakageGrade("120");
-            PdaUtils.AddWearAmountAfterCut(12, 11);
-            PdaUtils.AddBladeLifeGrade("130");
-            await PdaUtils.UpdateFlowValuesAsync();
-            await PdaUtils.QualifiedAsync();
-            await PdaUtils.SetCompletedAsync();
+        public static async Task TestAsync()
+        {
+            HttpRestClient.UpdateDev();
+            //await HttpUtils.DeleteOperateValueByIdAsync("5378767a268d48debe89112fcc21dcd5");
+            await ComputerPracticeAsync("T25051502B0014");
+            AddStandardCutSpeed(10);
+            AddStandardSharpenSpeed(20);
+            AddResidueBlade(30);
+            AddResidueSharpenTimes(40);
+            AddTotalSharpenTimes(50);
+            AddSharpen(11, 10);
+            AddToolMarkWidth(60);
+            AddToolMarkActualWidth(70);
+            AddFirstToolMarkWidth(80);
+            AddFirstToolMarkImage(new Mat("C:\\MySpace\\Dev\\ProjectXiHua\\precision-cutting-321\\bin\\x64\\Debug\\binary.jpg"));
+            AddSecondToolMarkImage(new Mat("C:\\MySpace\\Dev\\ProjectXiHua\\precision-cutting-321\\bin\\x64\\Debug\\gray.jpg"));
+            AddMaximumCollapseAngleImage(new Mat("C:\\MySpace\\Dev\\ProjectXiHua\\precision-cutting-321\\bin\\x64\\Debug\\gray.jpg"));
+            AddMaximumCollapseAngle(90);
+            AddMaxCutSpeed(100);
+            AddSingleCollapseAngle(110);
+            AddBladeEdgeBreakageGrade("120");
+            AddWearAmountAfterCut(12, 11);
+            AddBladeLifeGrade("130");
+            await ComputerShutdownAsync();
+            await DeleteCurrentGroupOperateAsync();
+            await QualifiedAsync();
+            await SetCompletedAsync();
         }
     }
 }

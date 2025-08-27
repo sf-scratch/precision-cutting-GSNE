@@ -38,4 +38,30 @@ namespace 精密切割系统.HttpClients
             };
         }
     }
+
+    public class HttpUtilsResult
+    {
+        public static readonly HttpUtilsResult<string> None = new HttpUtilsResult<string>();
+
+        /// <summary>
+        /// 结果信息
+        /// </summary>
+        public string Msg { get; set; }
+
+        public static HttpUtilsResult Fail(string msg)
+        {
+            return new HttpUtilsResult
+            {
+                Msg = msg
+            };
+        }
+
+        public static HttpUtilsResult Success()
+        {
+            return new HttpUtilsResult
+            {
+                Msg = "操作成功"
+            };
+        }
+    }
 }

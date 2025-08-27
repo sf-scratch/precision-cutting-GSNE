@@ -141,6 +141,7 @@ namespace 精密切割系统.ViewModel
                 }
                 else
                 {
+                    LunguId = "T25051502B0014";
                     HttpRestClient.UpdateDev();
                 }
                 RaisePropertyChanged();
@@ -320,7 +321,7 @@ namespace 精密切割系统.ViewModel
         private async Task ReplaceWafer()
         {
             await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(60), _cts.Token);
-            var res = await DialogHost.Show(SelectionDialog.NewInstance("移动并重置数据", default, "仅移动位置"));
+            var res = await DialogHost.Show(SelectionDialog.NewInstance("移动并重置数据", "仅移动位置", "取消"));
             if (res is string dialogResult)
             {
                 if (dialogResult == SelectionDialog.YES)
@@ -338,7 +339,7 @@ namespace 精密切割系统.ViewModel
         private async Task ReplaceSharpeningBoard()
         {
             await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(60), _cts.Token);
-            var res = await DialogHost.Show(SelectionDialog.NewInstance("移动并重置数据", default, "仅移动位置"));
+            var res = await DialogHost.Show(SelectionDialog.NewInstance("移动并重置数据", "仅移动位置", "取消"));
             if (res is string dialogResult)
             {
                 if (dialogResult == SelectionDialog.YES)
@@ -355,6 +356,14 @@ namespace 精密切割系统.ViewModel
 
         private async Task ReplaceBlade()
         {
+            var res = await DialogHost.Show(SelectionDialog.NewInstance("继续测高", "结束切割"));
+            if (res is string dialogResult)
+            {
+                if (dialogResult == SelectionDialog.NO)
+                {
+                    return ;
+                }
+            }
             await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(60), _cts.Token);
             await AutoCutUtils.ReplaceBladeAsync(default, timeoutToken.Token);
         }
