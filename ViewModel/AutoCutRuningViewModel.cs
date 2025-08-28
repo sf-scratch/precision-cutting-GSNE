@@ -690,11 +690,13 @@ namespace 精密切割系统.ViewModel
 
         private async void SharpenService_SharpenServicePaused(LineSegment? line)
         {
+            CameraUtils.SetCameraDeviceSharpenParams();
             await AfterPauseThenMoveToPosition(line, null);
         }
 
         private async void CutService_CutServicePaused(LineSegment? line, string? message)
         {
+            CameraUtils.SetCameraDeviceWaferParams();
             await AfterPauseThenMoveToPosition(line, message);
         }
 

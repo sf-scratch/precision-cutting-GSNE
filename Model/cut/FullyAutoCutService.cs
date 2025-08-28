@@ -228,6 +228,7 @@ namespace 精密切割系统.Model.cut
                             Mat bladeWidthMaxMat, collapseWidthMaxMat;
                             try
                             {
+                                CameraUtils.SetCameraDeviceWaferParams();
                                 // 如果是第一次检查刀痕，且需要检查基准线位置，则提示检查基准线位置
                                 if (chekcTimes == 1)
                                 {

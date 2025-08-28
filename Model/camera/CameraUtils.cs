@@ -70,7 +70,7 @@ namespace 精密切割系统.Driver
                 // 打开相机
                 OpenDevice();
             }
-            SetDeviceParams();
+            SetCameraDeviceWaferParams();
         }
         /// <summary>
         /// 连接光源控制器
@@ -210,13 +210,17 @@ namespace 精密切割系统.Driver
             m_bDeviceOpened = true;
         }
 
-        public static void SetDeviceParams()
+        public static void SetCameraDeviceWaferParams()
         {
             string configPath = Path.Combine(AppContext.BaseDirectory, "Assets\\config\\OPT-CC1-M050-GG3-14(D24B110358).camcfg");
             m_currentDev.FeatureLoad(configPath);
         }
 
-
+        public static void SetCameraDeviceSharpenParams()
+        {
+            string configPath = Path.Combine(AppContext.BaseDirectory, "Assets\\config\\OPT-CC1-M050-GG3-14(D24B110358)Sharpen.camcfg");
+            m_currentDev.FeatureLoad(configPath);
+        }
 
         private static void OpenDevice1()
         {

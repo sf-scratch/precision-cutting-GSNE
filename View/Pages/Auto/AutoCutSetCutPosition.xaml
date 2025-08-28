@@ -51,7 +51,7 @@
                 <Controls:InputTextBox IsEnabled="False" Text="{Binding OriginPositionY}" />
                 <TextBlock HorizontalAlignment="Left" Text="mm" />
                 <TextBlock Text="当前位置" />
-                <Controls:InputTextBox IsEnabled="False" Text="{Binding CurrentPosition}" />
+                <Controls:InputTextBox IsEnabled="False" Text="{Binding CurrentPositionY}" />
                 <TextBlock HorizontalAlignment="Left" Text="mm" />
             </auto:AutoGrid>
         </Grid>

@@ -356,14 +356,6 @@ namespace 精密切割系统.ViewModel
 
         private async Task ReplaceBlade()
         {
-            var res = await DialogHost.Show(SelectionDialog.NewInstance("继续测高", "结束切割"));
-            if (res is string dialogResult)
-            {
-                if (dialogResult == SelectionDialog.NO)
-                {
-                    return ;
-                }
-            }
             await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(60), _cts.Token);
             await AutoCutUtils.ReplaceBladeAsync(default, timeoutToken.Token);
         }

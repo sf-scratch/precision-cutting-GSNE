@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using 精密切割系统.Driver;
+using 精密切割系统.Extensions;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut;
@@ -18,7 +20,8 @@ namespace 精密切割系统.ViewModel
     {
         private readonly IRegionManager _regionManager;
         private AutoCutSetCutPositionType _setType;
-        private CancellationTokenSource? _axisInfoCts;
+        private CancellationTokenSource? _cts;
+        private SemaphoreSlim _semaph = new SemaphoreSlim(1, 1);
 
         private string _title;
         public string Title
@@ -57,6 +60,59 @@ namespace 精密切割系统.ViewModel
             RightButtonCollection.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }
 
+        private void InitBottomButton()
+        {
+            BottomButtonCollection.Clear();
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("磨刀板相机参数", "CameraFlipOutline", CameraUtils.SetCameraDeviceSharpenParams));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("硅片相机参数", "CameraFlipOutline", CameraUtils.SetCameraDeviceWaferParams));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("工件吹气", "WeatherWindy", () => _semaph.ExecuteAsync(WorkpieceBlowing, "工件吹气")));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("精细对焦", "FocusAuto", () => _semaph.ExecuteAsync(FocusAuto, "精细对焦")));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("全局对焦", "FocusAuto", () => _semaph.ExecuteAsync(GlobalFocus, "全局对焦")));
+        }
+
+        private async Task GlobalFocus()
+        {
+            try
+            {
+                CommonResult<float> focusRusult = await AutoFocusService.GlobalFocusAsync(default, _cts?.Token ?? default);
+                if (!focusRusult.IsSuccess)
+                {
+                    MaterialSnackUtils.MaterialSnack(focusRusult.Message, MaterialSnackUtils.SnackType.WARNING);
+                    return;
+                }
+                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(focusRusult.Data, default, default);
+            }
+            catch (OperationCanceledException) { }
+        }
+
+        private async Task FocusAuto()
+        {
+            try
+            {
+                CommonResult<float> focusRusult = await AutoCutUtils.AutoFocusAsync(token: _cts?.Token ?? default);
+                if (!focusRusult.IsSuccess)
+                {
+                    MaterialSnackUtils.MaterialSnack(focusRusult.Message, MaterialSnackUtils.SnackType.WARNING);
+                    return;
+                }
+                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(focusRusult.Data, default, default);
+            }
+            catch (OperationCanceledException) { }
+        }
+
+        private async Task WorkpieceBlowing()
+        {
+            try
+            {
+                float curX = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0;
+                await AutoCutUtils.WorkpieceBlowingAsync(token: _cts?.Token ?? default);
+                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(curX, default, default);
+                await AutoCutUtils.FineTuneAxisYAsync();
+                await AutoCutUtils.UpdateCameraCommonLineAsync();
+            }
+            catch (OperationCanceledException) { }
+        }
+
         private void Sure()
         {
             if (float.IsNaN(CurrentPositionY))
@@ -89,8 +145,8 @@ namespace 精密切割系统.ViewModel
         private void StartGetAxisInfo()
         {
             StopGetAxisInfo(); // 确保旧任务停止
-            _axisInfoCts = new CancellationTokenSource();
-            CancellationToken token = _axisInfoCts.Token;
+            _cts = new CancellationTokenSource();
+            CancellationToken token = _cts.Token;
             _ = Task.Run(async () =>
             {
                 try
@@ -108,14 +164,14 @@ namespace 精密切割系统.ViewModel
                 {
                     Tools.LogError($"轴位置监控任务异常: {ex.Message}");
                 }
-            }, _axisInfoCts.Token);
+            }, _cts.Token);
         }
 
         private void StopGetAxisInfo()
         {
-            _axisInfoCts?.Cancel();
-            _axisInfoCts?.Dispose();
-            _axisInfoCts = null;
+            _cts?.Cancel();
+            _cts?.Dispose();
+            _cts = null;
         }
 
         private async Task UpdateAxisPositionAsync()
@@ -143,6 +199,7 @@ namespace 精密切割系统.ViewModel
             base.OnNavigatedTo(navigationContext);
             StartGetAxisInfo();
             InitRightButton();
+            InitBottomButton();
             try
             {
                 _setType = navigationContext.Parameters.GetValue<AutoCutSetCutPositionType>(nameof(AutoCutSetCutPositionType));
@@ -151,12 +208,14 @@ namespace 精密切割系统.ViewModel
                     case AutoCutSetCutPositionType.SetCut:
                         Title = "设置切割位置";
                         OriginPositionY = Appsettings.CutY ?? 0;
-                        await AutoCutUtils.GoPreCutLineAsync(_axisInfoCts?.Token ?? default);
+                        await AutoCutUtils.GoPreCutLineAsync(_cts?.Token ?? default);
+                        CameraUtils.SetCameraDeviceWaferParams();
                         break;
                     case AutoCutSetCutPositionType.SetSharpen:
                         Title = "设置磨刀位置";
                         OriginPositionY = Appsettings.SharpenY ?? 0;
-                        await AutoCutUtils.GoPreSharpenLineAsync(_axisInfoCts?.Token ?? default);
+                        await AutoCutUtils.GoPreSharpenLineAsync(_cts?.Token ?? default);
+                        CameraUtils.SetCameraDeviceSharpenParams();
                         break;
                     default:
                         break;
