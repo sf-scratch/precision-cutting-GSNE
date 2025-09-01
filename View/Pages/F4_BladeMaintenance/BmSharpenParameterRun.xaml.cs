@@ -116,7 +116,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                     MaterialSnack(firstHeightZ.Message, SnackType.WARNING, 0);
                     return;
                 }
-                RectangleWorkpiece workpiece = new(GlobalParams.SharpenRect, await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0)
+                RectangleWorkpiece workpiece = new(Appsettings.ThetaCenterPoint, GlobalParams.SharpenRect.Width, GlobalParams.SharpenRect.Height, (await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0).ToActualY())
                 {
                     WorkThickness = float.Parse(bmSharpenParameter.CutThickness),
                     TapeThickness = bmSharpenParameter.CoJiaoHeight
@@ -237,13 +237,13 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         private async Task AfterPauseThenMoveToPosition(LineSegment? line, string? message)
         {
             MaterialSnack("正在暂停磨刀...", SnackType.WARNING, 0);
-            int runTime = 40;
+            int runTime = 60;
             try
             {
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(runTime)); // 超时自动取消
                 await PlcControl.tagControl.cutting.ExitCuttingModeAsync(cts.Token);
                 // 轴不报警时移动到指定位置
-                if (line != null)
+                if (line != null && !AlarmConfig.Instance.HasAxisErrorAlarms())
                 {
                     // 执行默认动作
                     Task z1Task = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, cts.Token);
@@ -251,9 +251,10 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                     await Task.WhenAll(z1Task, z2Task);
                     await AutoCutUtils.WorkpieceBlowingAsync(default, cts.Token);
                     await PlcControl.tagControl.cutting.RunMotionAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), line.StartPoint.Y.ToCameraY(), cts.Token);
+                    await AutoFocusService.GlobalFocusAsync(default, cts.Token);
+                    await AutoCutUtils.FineTuneAxisYAsync();
+                    await AutoCutUtils.UpdateCameraCommonLineAsync();
                 }
-                await AutoCutUtils.FineTuneAxisYAsync();
-                await AutoCutUtils.UpdateCameraCommonLineAsync();
                 MaterialSnack(message ?? "暂停中...", SnackType.WARNING, 0);
             }
             catch (OperationCanceledException)

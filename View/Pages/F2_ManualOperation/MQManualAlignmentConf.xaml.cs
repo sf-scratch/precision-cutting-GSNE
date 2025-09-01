@@ -46,16 +46,21 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         string cleanXPosition = "";
         // 清零后Y位置
         string cleanYPosition = "";
+        private CancellationTokenSource _cts;
 
         public MQManualAlignmentConf()
         {
             InitializeComponent();
             _mainWindow = Application.Current.MainWindow as MainWindow ?? new MainWindow(); 
-            RealTimeInfo.Messages = [];
+            _cts = new CancellationTokenSource();
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            if (_cts.IsCancellationRequested)
+            {
+                _cts = new CancellationTokenSource();
+            }
             _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Subscribe(ReceivedMessage, ThreadOption.UIThread);
             // 加载右边和底部按钮
             _rightPage = _mainWindow.rightFrame.Content as RightPage ?? new RightPage();
@@ -187,7 +192,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                         {
                             try
                             {
-                                await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(40));
+                                await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(40), _cts.Token);
                                 var result = await AutoCutUtils.AutoFocusAsync(_eventAggregator, timeoutToken.Token);
                                 if (!result.IsSuccess)
                                 {
@@ -208,7 +213,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                         {
                             try
                             {
-                                await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(40));
+                                await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(40), _cts.Token);
                                 var result = await AutoFocusService.GlobalFocusAsync(_eventAggregator, timeoutToken.Token);
                                 if (!result.IsSuccess)
                                 {

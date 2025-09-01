@@ -40,6 +40,7 @@ namespace 精密切割系统.View.Controls
         public RealTimeInfoBox()
         {
             InitializeComponent();
+            Messages = [];
         }
     }
 }

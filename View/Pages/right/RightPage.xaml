@@ -3,18 +3,19 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
+    xmlns:auto="clr-namespace:WpfAutoGrid;assembly=WpfAutoGrid.Core"
+    xmlns:behav="clr-namespace:精密切割系统.Behaviors"
+    xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:精密切割系统.View.page.right"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
-    xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
-    xmlns:behav="clr-namespace:精密切割系统.Behaviors"
-    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-    xmlns:auto="clr-namespace:WpfAutoGrid;assembly=WpfAutoGrid.Core"
     Title="RightPage"
+    d:DataContext="{d:DesignInstance viewModel:RightPageViewModel,
+                                     IsDesignTimeCreatable=True}"
     d:DesignHeight="905"
     d:DesignWidth="290"
-    d:DataContext="{d:DesignInstance viewModel:RightPageViewModel, IsDesignTimeCreatable=True}"
     Loaded="Page_Loaded"
     mc:Ignorable="d">
     <Page.Resources>
@@ -22,81 +23,100 @@
             <Setter Property="Margin" Value="0,20,0,0" />
         </Style>
         <Style TargetType="ListBoxItem">
-            <Setter Property="Margin" Value="0"/>
-            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Padding" Value="0" />
         </Style>
         <Style TargetType="Label">
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="HorizontalAlignment" Value="Left"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="FontWeight" Value="Bold" />
         </Style>
     </Page.Resources>
     <Page.DataContext>
-        <viewModel:RightPageViewModel></viewModel:RightPageViewModel>
+        <viewModel:RightPageViewModel />
     </Page.DataContext>
     <Grid>
         <StackPanel>
-            <!-- 转速、状态显示 -->
-            <auto:AutoGrid Margin="10" Columns="3*,*,3*,*" RowCount="10" ChildMargin="5" x:Name="ShowTemplate">
-                <Label Content="工作盘真空"/>
+            <!--  转速、状态显示  -->
+            <auto:AutoGrid
+                x:Name="ShowTemplate"
+                Margin="10"
+                ChildMargin="5"
+                Columns="3*,*,3*,*"
+                RowCount="10">
+                <Label Content="工作盘真空" />
                 <Image x:Name="vacuumStateStatusIcon" Source="/Assets/picture/lamp_normal.png" />
-                <Label Content="主轴气源"/>
+                <Label Content="主轴气源" />
                 <Image x:Name="spindleAirStatusIcon" Source="/Assets/picture/lamp_error.png" />
-                <Label Content="主轴冷却水"/>
+                <Label Content="主轴冷却水" />
                 <Image x:Name="spindleCoolingWaterStatusIcon" Source="/Assets/picture/lamp_normal.png" />
                 <Label Content="切割水" MouseDown="Label_MouseDown" />
                 <Image x:Name="spindleCuttingWaterStatusIcon" Source="/Assets/picture/lamp_normal.png" />
-                <Label Content="主轴转速"/>
-                <Label/>
-                <Label x:Name="spindleSpeedValue" Content="0"/>
+                <Label Content="主轴转速" />
+                <Label />
+                <Label x:Name="spindleSpeedValue" Content="0" />
             </auto:AutoGrid>
-            <DataGrid materialDesign:DataGridAssist.CellPadding="4 2 2 2" materialDesign:DataGridAssist.ColumnHeaderPadding="4 2 2 2" Visibility="{Binding AlarmVisibility}"
-                      CanUserAddRows="False" AutoGenerateColumns="False" ItemsSource="{Binding ActiveAlarms}" Background="Transparent" FontWeight="Bold">
+            <DataGrid
+                materialDesign:DataGridAssist.CellPadding="4 2 2 2"
+                materialDesign:DataGridAssist.ColumnHeaderPadding="4 2 2 2"
+                AutoGenerateColumns="False"
+                Background="Transparent"
+                CanUserAddRows="False"
+                FontWeight="Bold"
+                ItemsSource="{Binding ActiveAlarms}"
+                Visibility="{Binding AlarmVisibility}">
                 <DataGrid.Resources>
                     <ResourceDictionary>
                         <ResourceDictionary.MergedDictionaries>
-                            <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml"/>
+                            <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
                         </ResourceDictionary.MergedDictionaries>
-                        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}">
-                            <Setter Property="FontWeight" Value="Bold"/>
-                            <Setter Property="FontSize" Value="16"/>
+                        <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="DataGridColumnHeader">
+                            <Setter Property="FontWeight" Value="Bold" />
+                            <Setter Property="FontSize" Value="16" />
                         </Style>
                     </ResourceDictionary>
                 </DataGrid.Resources>
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="报警地址" Binding="{Binding Address}"/>
-                    <DataGridTextColumn Header="级别" Binding="{Binding Level}">
+                    <DataGridTextColumn Binding="{Binding Address}" Header="报警地址" />
+                    <DataGridTextColumn Binding="{Binding Level}" Header="级别">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
-                                <Setter Property="Foreground" Value="{Binding LevelBrush}"/>
+                                <Setter Property="Foreground" Value="{Binding LevelBrush}" />
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
-                    <DataGridTextColumn Header="消息" Binding="{Binding Message}"/>
+                    <DataGridTextColumn Binding="{Binding Message}" Header="消息" />
                 </DataGrid.Columns>
             </DataGrid>
-            <ListBox ItemsSource="{Binding WaitingFuncNames}" d:ItemsSource="{d:SampleData}" Visibility="{Binding WaitingFuncNamesVisibility}" Background="Transparent" FontWeight="Bold">
+            <ListBox
+                d:ItemsSource="{d:SampleData}"
+                Background="Transparent"
+                FontWeight="Bold"
+                ItemsSource="{Binding WaitingFuncNames}"
+                Visibility="{Binding WaitingFuncNamesVisibility}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding}"/>
+                        <TextBlock Text="{Binding}" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
         </StackPanel>
 
-        <ListBox Margin="0,0,0,115"
-                 HorizontalAlignment="Center"
-                 VerticalAlignment="Bottom"
-                 Visibility="Visible"
-                 Background="Transparent"
-                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                 ScrollViewer.CanContentScroll="True"
-                 VirtualizingPanel.ScrollUnit="Pixel"
-                 SelectionMode="Extended"
-                 BorderThickness="0"
-                 BorderBrush="Transparent"
-                 ItemsSource="{Binding RightButtonParams}" d:ItemsSource="{d:SampleData}">
+        <ListBox
+            Margin="0,0,0,115"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Bottom"
+            d:ItemsSource="{d:SampleData}"
+            Background="Transparent"
+            BorderBrush="Transparent"
+            BorderThickness="0"
+            ItemsSource="{Binding RightButtonParams}"
+            ScrollViewer.CanContentScroll="True"
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+            SelectionMode="Extended"
+            VirtualizingPanel.ScrollUnit="Pixel"
+            Visibility="Visible">
             <ListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">
                     <Setter Property="Template">
@@ -106,10 +126,10 @@
                             </ControlTemplate>
                         </Setter.Value>
                     </Setter>
-                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="Background" Value="Transparent" />
                     <Style.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="Background" Value="Transparent" />
                         </Trigger>
                     </Style.Triggers>
                 </Style>
@@ -117,15 +137,16 @@
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Controls:RightButton
+                        Margin="10"
                         BackFlag="{Binding BackFlag}"
                         BackgroundDefColor="{Binding BackgroundDefColor}"
                         BackgroundDownColor="{Binding BackgroundDownColor}"
                         ContentText="{Binding ContentText}"
                         ContentTextFontSize="{Binding ContentTextFontSize}"
                         ImagePath="{Binding ImagePath}"
-                        Visibility="{Binding Visibility}" Margin="10">
+                        Visibility="{Binding Visibility}">
                         <behaviors:Interaction.Behaviors>
-                            <behav:TouchAndClickBehavior TouchAndClickCommand="{Binding RightClickCommand}"/>
+                            <behav:TouchAndClickBehavior TouchAndClickCommand="{Binding RightClickCommand}" />
                         </behaviors:Interaction.Behaviors>
                     </Controls:RightButton>
                 </DataTemplate>
@@ -153,6 +174,14 @@
                 BackgroundDefColor="#39D11A"
                 BackgroundDownColor="#39B41A"
                 ContentText="继续"
+                ImagePath="/Assets/icon/right/enter.png"
+                Visibility="Collapsed" />
+            <Controls:RightButton
+                x:Name="btnCutReStartCurY"
+                BackFlag="False"
+                BackgroundDefColor="#39D11A"
+                BackgroundDownColor="#39B41A"
+                ContentText="从此续切"
                 ImagePath="/Assets/icon/right/enter.png"
                 Visibility="Collapsed" />
             <Controls:RightButton

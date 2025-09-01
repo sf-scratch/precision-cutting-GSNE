@@ -23,6 +23,11 @@ namespace 精密切割系统.Model.cut
             return new ServicePauseResult { Type = ServicePauseResultType.Continue, Token = token };
         }
 
+        public static ServicePauseResult ContinueAndResetCutY(CancellationToken token)
+        {
+            return new ServicePauseResult { Type = ServicePauseResultType.ContinueAndResetCutY, Token = token };
+        }
+
         public static ServicePauseResult Stop
         {
             get
@@ -43,6 +48,7 @@ namespace 精密切割系统.Model.cut
         {
             None,
             Continue,
+            ContinueAndResetCutY,
             Stop,
             BladeScrap
         }

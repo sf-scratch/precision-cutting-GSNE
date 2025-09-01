@@ -130,29 +130,14 @@ namespace 精密切割系统.Model.cut
                         //检查是否暂停
                         if (usingPauseToken.IsCancellationRequested)
                         {
-                            (RunResult runResult, usingPauseToken)  = await WaitContinueAsync(line);
+                            (RunResult runResult, usingPauseToken)  = await WaitContinueAsync(line, workpiece);
                             if (!runResult.IsSuccess)
                             {
                                 return runResult;
                             }
-                        }
-                        //检测工件是否切完
-                        if (!workpiece.CheckCutDistance(_cutDirection, cutStep.OffsetY))
-                        {
-                            RemindReplaceWafer?.Invoke();
-                            (RunResult runResult, usingPauseToken) = await WaitContinueAsync(line);
-                            if (!runResult.IsSuccess)
-                            {
-                                return runResult;
-                            }
-                            workpiece.Reset(await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0);
                         }
                         float cutY = workpiece.CalculateCutY();
                         line = workpiece.CalculateCuttingLine();
-                        if (line == null)
-                        {
-                            return RunResult.Fail("获取切割线失败！");
-                        }
                         //当前切割次数
                         int? curCutNum = await PlcControl.tagControl.cutting.GetCutNumAsync();
                         if (curCutNum == null)
@@ -202,10 +187,21 @@ namespace 精密切割系统.Model.cut
                         cutTime++;
                         //触发切割进度更新事件
                         CutServiceProcessChanged?.Invoke(new CutServiceProcess(targetEndZ, cutSpeed, cutStepList.Count, cutTime, cutLength, cutStep.ChannelNum, pathCalculator.EstimateRemainingTime(), true));
+                        //检测工件是否切完
+                        if (!workpiece.CheckCutDistance(_cutDirection, cutStep.OffsetY))
+                        {
+                            RemindReplaceWafer?.Invoke();
+                            (RunResult runResult, usingPauseToken) = await WaitContinueAsync(line, workpiece, "检测到工件当前面已切完");
+                            if (!runResult.IsSuccess)
+                            {
+                                return runResult;
+                            }
+                            workpiece.Reset(await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0);
+                        }
                     }
                     catch (OperationCanceledException)
                     {
-                        (RunResult runResult, usingPauseToken) = await WaitContinueAsync(line);
+                        (RunResult runResult, usingPauseToken) = await WaitContinueAsync(line, workpiece);
                         if (!runResult.IsSuccess)
                         {
                             return runResult;
@@ -233,19 +229,28 @@ namespace 精密切割系统.Model.cut
             _continueTcs = null;
         }
 
+        public void ContinueAndResetCutY(CancellationToken token)
+        {
+            _continueTcs?.TrySetResult(ServicePauseResult.ContinueAndResetCutY(token)); // 继续执行
+            _continueTcs = null;
+        }
+
         public void Stop(ServicePauseResult pauseResult)
         {
             _continueTcs?.TrySetResult(pauseResult); // 停止切割
             _continueTcs = null;
         }
 
-        private async Task<(RunResult, CancellationToken)> WaitContinueAsync(LineSegment? line, string? message = null)
+        private async Task<(RunResult, CancellationToken)> WaitContinueAsync(LineSegment? line, IWorkpieces workpieces, string? message = null)
         {
             CutServicePaused?.Invoke(line, message);
             _continueTcs = new TaskCompletionSource<ServicePauseResult>();
             ServicePauseResult result = await _continueTcs.Task;
             switch (result.Type)
             {
+                case ServicePauseResultType.ContinueAndResetCutY:
+                    workpieces.Reset(await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0);
+                    goto case ServicePauseResultType.Continue;
                 case ServicePauseResultType.Continue:
                     // 更新使用的暂停令牌
                     CancellationToken usingPauseToken = result.Token ?? default; 

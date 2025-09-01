@@ -8,7 +8,7 @@ namespace 精密切割系统.Model.cut.Workpieces
 {
     public interface IWorkpieces
     {
-        LineSegment? CalculateCuttingLine();
+        LineSegment CalculateCuttingLine();
 
         float CalculateCutY();
 

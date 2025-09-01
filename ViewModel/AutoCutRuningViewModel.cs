@@ -719,7 +719,7 @@ namespace 精密切割系统.ViewModel
                         break;
                     default:
                         // 轴不报警时移动到指定位置
-                        if (line != null)
+                        if (line != null && !AlarmConfig.Instance.HasAxisErrorAlarms())
                         {
                             // 执行默认动作
                             Task z1Task = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, cts.Token);
@@ -727,10 +727,10 @@ namespace 精密切割系统.ViewModel
                             await Task.WhenAll(z1Task, z2Task);
                             await AutoCutUtils.WorkpieceBlowingAsync(_eventAggregator, cts.Token);
                             await PlcControl.tagControl.cutting.RunMotionAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), line.StartPoint.Y.ToCameraY(), cts.Token);
+                            await AutoFocusService.GlobalFocusAsync(_eventAggregator, cts.Token);
+                            await AutoCutUtils.FineTuneAxisYAsync();
+                            await AutoCutUtils.UpdateCameraCommonLineAsync();
                         }
-                        await AutoFocusService.GlobalFocusAsync(_eventAggregator, cts.Token);
-                        await AutoCutUtils.FineTuneAxisYAsync();
-                        await AutoCutUtils.UpdateCameraCommonLineAsync();
                         MaterialSnackUtils.MaterialSnack(message ?? "暂停中...", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
                         break;
                 }

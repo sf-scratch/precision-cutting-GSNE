@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using NPOI.POIFS.Crypt.Dsig;
+using Prism.Events;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
@@ -31,7 +32,8 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
     /// </summary>
     public partial class MQSemiAutomaticCuttingRun : Page
     {
-        private MQSemiAutomaticCuttingRunViewModel _viewModel;
+        private MQSemiAutomaticCuttingRunViewModel _viewModel; 
+        private readonly IEventAggregator? _eventAggregator = PrismUtils.GetEventAggregator();
         private readonly SemiAutoCutService _semiAutoCutService;
         private readonly MainWindow _mainWindow;
         private RightPage _rightPage;
@@ -51,6 +53,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Subscribe(ReceivedMessage, ThreadOption.UIThread);
             _rightPage = _mainWindow.rightFrame.Content as RightPage ?? new RightPage();
             _rightPage.PanelAction.Visibility = Visibility.Visible;
             _rightPage.btnCutPause.Visibility = Visibility.Visible;
@@ -70,6 +73,16 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             UpdateDefineDataModel();
             // 调用开始切割
             StartCut();
+        }
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Unsubscribe(ReceivedMessage);
+        }
+
+        private void ReceivedMessage(MessageModel model)
+        {
+            RealTimeInfo.Messages.Add(model);
         }
 
         private void UpdateDefineDataModel()
@@ -146,6 +159,8 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         {
             if (!GlobalParams.onlineFlag)
             {
+                MaterialSnack($"切割中...", SnackType.SUCCESS, 0);
+                _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("切割中..."));
                 return;
             }
             Stopwatch stopwatch = Stopwatch.StartNew();
@@ -178,8 +193,9 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 _ = MonitoringCutProgressAsync(_monitoringCts.Token);
                 float cutY = (await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0).ToActualY();
                 await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
-                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(56));
-                CommonResult<float> curHeightZ = await AutoCutUtils.ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, default, _pauseCts.Token);
+                //await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(56.5F));
+                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(16.2f);
+                CommonResult<float> curHeightZ = await AutoCutUtils.ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, _eventAggregator, _pauseCts.Token);
                 if (!curHeightZ.IsSuccess)
                 {
                     MaterialSnack(curHeightZ.Message, SnackType.WARNING, 0);
@@ -227,7 +243,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             {
                 float width = fileTableItem.WorkbenchCh1;
                 float height = fileTableItem.WorkbenchCh2;
-                workpiece = new RectangleWorkpiece(new DataRectangleF(thetaCenterPoint.X - (width / 2), thetaCenterPoint.Y - (height / 2), width, height), cutY);
+                workpiece = new RectangleWorkpiece(thetaCenterPoint, width, height, cutY);
             }
             else
             {
@@ -275,6 +291,20 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             MaterialSnack("切割中...", SnackType.WARNING, 0);
         }
 
+        public static async Task ContinueAndResetCutYAsync()
+        {
+            if (!GlobalParams.onlineFlag)
+            {
+                SemiAutoCutService.Instance.ContinueAndResetCutY(_pauseCts.Token);
+                return;
+            }
+            MaterialSnack("正在继续切割...", SnackType.WARNING, 0);
+            _pauseCts = new CancellationTokenSource();
+            await PlcControl.tagControl.cutting.EnterCuttingModeAsync(_pauseCts.Token);
+            SemiAutoCutService.Instance.ContinueAndResetCutY(_pauseCts.Token);
+            MaterialSnack("切割中...", SnackType.WARNING, 0);
+        }
+
         public static async Task StopAsync(ServicePauseResult pauseResult)
         {
             MainWindow? mainWindow = Application.Current.MainWindow as MainWindow;
@@ -298,23 +328,24 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         private async Task AfterPauseThenMoveToPosition(LineSegment? line, string? message)
         {
             MaterialSnack("正在暂停切割...", SnackType.WARNING, 0);
-            int runTime = 40;
+            int runTime = 60;
             try
             {
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(runTime));// 超时自动取消
                 await PlcControl.tagControl.cutting.ExitCuttingModeAsync(cts.Token);
                 // 轴不报警时移动到指定位置
-                if (line != null)
+                if (line != null && !AlarmConfig.Instance.HasAxisErrorAlarms())
                 {
                     // 执行默认动作
                     Task z1Task = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, cts.Token);
                     Task z2Task = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(Appsettings.FocusClearZ ?? 0, default, cts.Token);
                     await Task.WhenAll(z1Task, z2Task);
-                    await AutoCutUtils.WorkpieceBlowingAsync(default, cts.Token);
-                    await PlcControl.tagControl.cutting.RunMotionAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), line.StartPoint.Y.ToCameraY(), cts.Token);
+                    await AutoCutUtils.WorkpieceBlowingAsync(_eventAggregator, cts.Token);
+                    await PlcControl.tagControl.cutting.RunMotionAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), line.StartPoint.Y.ToCameraY(), cts.Token); 
+                    await AutoFocusService.GlobalFocusAsync(_eventAggregator, cts.Token);
+                    await AutoCutUtils.FineTuneAxisYAsync();
+                    await AutoCutUtils.UpdateCameraCommonLineAsync();
                 }
-                await AutoCutUtils.FineTuneAxisYAsync();
-                await AutoCutUtils.UpdateCameraCommonLineAsync();
                 MaterialSnack(message ?? "暂停中...", SnackType.WARNING, 0);
             }
             catch (OperationCanceledException)

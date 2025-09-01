@@ -1,24 +1,26 @@
 ﻿using CSharp_OPTControllerAPI;
+using Emgu.CV;
+using Emgu.CV.Reg;
 using SciCamera.Net;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
-using System.Windows.Media.Imaging;
-using System.Windows.Media;
-using GdiPlus = System.Drawing.Imaging;
-using Emgu.CV;
-using System.Windows.Threading;
-using System.IO;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Interop;
-using Emgu.CV.Reg;
-using System.Diagnostics;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Utils;
+using static OpenCvSharp.ML.DTrees;
+using GdiPlus = System.Drawing.Imaging;
 
 namespace 精密切割系统.Driver
 {
@@ -210,6 +212,24 @@ namespace 精密切割系统.Driver
             m_bDeviceOpened = true;
         }
 
+        public static void SetCameraExposureTime(double exposureTime)
+        {
+            m_currentDev.SetEnumValueByStringEx(SciCam.SciCamDeviceXmlType.SciCam_DeviceXml_Camera, "ExposureAuto", "Off");
+            m_currentDev.SetFloatValueEx(SciCam.SciCamDeviceXmlType.SciCam_DeviceXml_Camera, "ExposureTime", exposureTime);
+        }
+
+        public static double GetCameraExposureTime()
+        {
+            SciCam.SCI_NODE_VAL_FLOAT pVal = new SciCam.SCI_NODE_VAL_FLOAT();
+            m_currentDev.GetFloatValueEx(SciCam.SciCamDeviceXmlType.SciCam_DeviceXml_Camera, "ExposureTime", ref pVal);
+            return pVal.dVal;
+        }
+
+        public static void SetCameraExposureAutoContinus()
+        {
+            m_currentDev.SetEnumValueByStringEx(SciCam.SciCamDeviceXmlType.SciCam_DeviceXml_Camera, "ExposureAuto", "Continuous");
+        }
+
         public static void SetCameraDeviceWaferParams()
         {
             string configPath = Path.Combine(AppContext.BaseDirectory, "Assets\\config\\OPT-CC1-M050-GG3-14(D24B110358).camcfg");
@@ -219,6 +239,18 @@ namespace 精密切割系统.Driver
         public static void SetCameraDeviceSharpenParams()
         {
             string configPath = Path.Combine(AppContext.BaseDirectory, "Assets\\config\\OPT-CC1-M050-GG3-14(D24B110358)Sharpen.camcfg");
+            m_currentDev.FeatureLoad(configPath);
+        }
+
+        public static void SetCameraDeviceVCaoParams()
+        {
+            string configPath = Path.Combine(AppContext.BaseDirectory, "Assets\\config\\OPT-CC1-M050-GG3-14(D24B110358)VCao.camcfg");
+            m_currentDev.FeatureLoad(configPath);
+        }
+
+        public static void SetCameraDeviceAutoParams()
+        {
+            string configPath = Path.Combine(AppContext.BaseDirectory, "Assets\\config\\OPT-CC1-M050-GG3-14(D24B110358)Auto.camcfg");
             m_currentDev.FeatureLoad(configPath);
         }
 

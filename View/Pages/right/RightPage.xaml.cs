@@ -117,6 +117,7 @@ namespace 精密切割系统.View.page.right
             // 切割相关======
             btnCutStart.Visibility = Visibility.Collapsed;
             btnCutReStart.Visibility = Visibility.Collapsed;
+            btnCutReStartCurY.Visibility = Visibility.Collapsed;
             btnCutPause.Visibility = Visibility.Collapsed;
             btnCutStop.Visibility = Visibility.Collapsed;
             btnCutBackward.Visibility = Visibility.Collapsed;

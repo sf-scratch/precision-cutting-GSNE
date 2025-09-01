@@ -238,6 +238,15 @@ namespace 精密切割系统.Model.plc
         }
 
         /// <summary>
+        /// 轴错误的报警
+        /// </summary>
+        /// <returns></returns>
+        public bool HasAxisErrorAlarms()
+        {
+            return Instance.HasActiveErrorAlarm("MR61000", "MR61100", "MR61200", "MR61300", "MR61400", "MR61006", "MR61106", "MR61206", "MR61306", "MR61406");
+        }
+
+        /// <summary>
         /// 测高导电异常
         /// </summary>
         public bool HasConductivityAlarm()

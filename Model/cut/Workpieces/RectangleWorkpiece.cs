@@ -4,31 +4,35 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Media3D;
 
 namespace 精密切割系统.Model.cut.Workpieces
 {
     public class RectangleWorkpiece : IWorkpieces
     {
-        private DataRectangleF _rectangle;
+        private readonly DataPoint<float> _center;
+        private DataRectangleF _rect;
         private float _currentY;
 
         public float WorkThickness { get; set; }
 
         public float TapeThickness { get; set; }
 
-        public RectangleWorkpiece(DataRectangleF rectangle, float currentY)
+        public RectangleWorkpiece(DataPoint<float> thetaCenterPoint, float width, float height, float currentY)
         {
-            _rectangle = rectangle;
+            _center = thetaCenterPoint;
+            _rect = new DataRectangleF(thetaCenterPoint.X - (width / 2), thetaCenterPoint.Y - (height / 2), width, height);
             _currentY = currentY;
         }
 
-        public LineSegment? CalculateCuttingLine()
+        public LineSegment CalculateCuttingLine()
         {
-            if (_currentY >= _rectangle.Top && _currentY <= _rectangle.Bottom)
+            if (_currentY >= _rect.Top && _currentY <= _rect.Bottom)
             {
-                return new LineSegment(_rectangle.X - _rectangle.Width, _currentY, _rectangle.X, _currentY);
+                return new LineSegment(_rect.X, _currentY, _rect.X + _rect.Width, _currentY);
             }
-            return null;
+            float halfDiagonal = MathF.Sqrt(_rect.Width * _rect.Width + _rect.Height * _rect.Height) / 2;
+            return new LineSegment(_center.X - halfDiagonal, _currentY, _center.X + halfDiagonal, _currentY);
         }
 
         public float CalculateCutY()
@@ -41,19 +45,19 @@ namespace 精密切割系统.Model.cut.Workpieces
             //切割距离达到最终位置
             if (cutDirection == CutDirection.Backward)
             {
-                if (_rectangle.Y - _currentY + cutSize >= - 5)
-                {
-                    return false;
-                }
-                _currentY += cutSize;
-            }
-            if (cutDirection == CutDirection.Forward)
-            {
-                if (_rectangle.Y + _rectangle.Height - _currentY - cutSize <= 5)
+                if (_rect.Y - _currentY + cutSize >= - 5)
                 {
                     return false;
                 }
                 _currentY -= cutSize;
+            }
+            if (cutDirection == CutDirection.Forward)
+            {
+                if (_rect.Y + _rect.Height - _currentY - cutSize <= 5)
+                {
+                    return false;
+                }
+                _currentY += cutSize;
             }
             return true;
         }

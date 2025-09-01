@@ -30,7 +30,8 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         // 手动调整基准线标识
         bool _adjustDatumLineFlag = false;
         // 创建一个定时器
-        System.Timers.Timer? _timer = null;
+        System.Timers.Timer? _timer = null; 
+        private DataPoint<float>? _originPoint;
 
         public MQSemiAutomaticCuttingStop()
         {
@@ -41,12 +42,14 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             DataContext = _viewModel;
         }
 
-        private void Page_Loaded(object sender, RoutedEventArgs e)
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             _rightPage = _mainWindow.rightFrame.Content as RightPage ?? new RightPage();
             _rightPage.PanelAction.Visibility = Visibility.Visible;
             _rightPage.btnCutReStart.Visibility = Visibility.Visible;
             _rightPage.btnCutReStart.SetRightClickedHandler(ReCutStart);
+            _rightPage.btnCutReStartCurY.Visibility = Visibility.Visible;
+            _rightPage.btnCutReStartCurY.SetRightClickedHandler(ReCutStartCurY);
             _rightPage.btnCutStop.Visibility = Visibility.Visible;
             _rightPage.btnCutStop.SetRightClickedHandler(CutStop);
             GlobalParams.cutStatusInfo = 2;
@@ -80,6 +83,13 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             _viewModel.CutWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((_cameraCommon.CutMarkWidth / 1000).ToString(), 4));
             _viewModel.DdgesWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((_cameraCommon.EdgeChipWidth / 1000).ToString(), 4));
             UpdateDefineDataModel();
+            float? xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync();
+            float? yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync();
+            // 初始化起始点位置
+            if (xLocation != null && yLocation != null)
+            {
+                _originPoint = new DataPoint<float>(xLocation.Value, yLocation.Value);
+            }
         }
 
         //根据默认配置控制对应显示和隐藏
@@ -205,15 +215,27 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                     break;
             }
         }
-        public void OperateClickHandler(object sender, int code)
+        public async void OperateClickHandler(object sender, int code)
         {
             switch (code) {
                 case 2409:
-                    // 确认基准线
-                    string yCurrentPosition = PlcControl.plc.GetPlcValueString(DeviceKey.yCurLocationKey);
-                    float offset = CutOperateUtils.yStopLocation - float.Parse(yCurrentPosition);
-                    MaterialSnackUtils.MaterialSnack("基准线已确认！", MaterialSnackUtils.SnackType.SUCCESS);
-                    Tools.LogInfo($"最新基准线：{GlobalParams.cameraOffsetY}");
+                    if (_originPoint == null)
+                    {
+                        MaterialSnackUtils.MaterialSnack($"基准线校准失败，请重试！", MaterialSnackUtils.SnackType.WARNING, 0);
+                        return;
+                    }
+                    MaterialSnackUtils.MaterialSnack($"基准线校准中", MaterialSnackUtils.SnackType.INFO, 0);
+                    DataPoint<float> relativePostion = Appsettings.CameraRelativeBladePosition;
+                    DataPoint<float> curPoint = new DataPoint<float>
+                    {
+                        X = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0,
+                        Y = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0
+                    };
+                    float offsetX = _originPoint.X - curPoint.X;
+                    float offsetY = _originPoint.Y - curPoint.Y;
+                    Appsettings.CameraRelativeBladePosition = new DataPoint<float>(relativePostion.X, relativePostion.Y - offsetY);
+                    _originPoint = curPoint;
+                    MaterialSnackUtils.MaterialSnack($"基准线校准完成", MaterialSnackUtils.SnackType.SUCCESS, 0);
                     break;
                 case 2401:
                     float tempDepthCompensation = Tools.GetFloatStringValue(_viewModel.DepthCompensation);
@@ -275,6 +297,12 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 //linesRecordGrid.Visibility = Visibility.Collapsed;
                 //compGrid.Visibility = Visibility.Collapsed;
             }
+        }
+
+        private async void ReCutStartCurY(object? sender, bool e)
+        {
+            await MQSemiAutomaticCuttingRun.ContinueAndResetCutYAsync();
+            _mainWindow.mainFrame.GoBack();
         }
 
         // 继续切割

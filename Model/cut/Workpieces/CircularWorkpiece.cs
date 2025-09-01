@@ -11,7 +11,7 @@ namespace 精密切割系统.Model.cut.Workpieces
 {
     public class CircularWorkpiece : IWorkpieces
     {
-        private readonly DataPoint<float> ThetaCenterPoint;
+        private readonly DataPoint<float> _center;
         private readonly float WorkpieceRadius;
         private float _currentY;
 
@@ -21,15 +21,15 @@ namespace 精密切割系统.Model.cut.Workpieces
 
         public CircularWorkpiece(DataPoint<float> thetaCenterPoint, float workpieceRadius, float currentY)
         {
-            ThetaCenterPoint = thetaCenterPoint;
+            _center = thetaCenterPoint;
             WorkpieceRadius = workpieceRadius;
             _currentY = currentY;
         }
 
-        public LineSegment? CalculateCuttingLine()
+        public LineSegment CalculateCuttingLine()
         {
-            float x0 = ThetaCenterPoint.X;
-            float y0 = ThetaCenterPoint.Y;
+            float x0 = _center.X;
+            float y0 = _center.Y;
             float r = WorkpieceRadius;
             float discriminant = r * r - (_currentY - y0) * (_currentY - y0);
             if (discriminant > 0)
@@ -45,8 +45,8 @@ namespace 精密切割系统.Model.cut.Workpieces
                 // 一个交点（相切）
                 return new LineSegment(x0, _currentY, x0, _currentY);
             }
-            // 无交点
-            return null;
+            // 无交点，返回最大可能的线段（直径线段）
+            return new LineSegment(x0 - r, _currentY, x0 + r, _currentY);
         }
 
         public float CalculateCutY()
@@ -59,19 +59,19 @@ namespace 精密切割系统.Model.cut.Workpieces
             //切割距离达到最终位置
             if (cutDirection == CutDirection.Backward)
             {
-                if (ThetaCenterPoint.Y - WorkpieceRadius - _currentY + cutSize >= - 5)
-                {
-                    return false;
-                }
-                _currentY += cutSize;
-            }
-            if (cutDirection == CutDirection.Forward)
-            {
-                if (ThetaCenterPoint.Y + WorkpieceRadius - _currentY - cutSize <= 5)
+                if (_center.Y - WorkpieceRadius - _currentY + cutSize >= - 5)
                 {
                     return false;
                 }
                 _currentY -= cutSize;
+            }
+            if (cutDirection == CutDirection.Forward)
+            {
+                if (_center.Y + WorkpieceRadius - _currentY - cutSize <= 5)
+                {
+                    return false;
+                }
+                _currentY += cutSize;
             }
             return true;
         }

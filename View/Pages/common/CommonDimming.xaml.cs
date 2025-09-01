@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -14,6 +15,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using 精密切割系统.Driver;
 using 精密切割系统.FrmWindow.common;
+using 精密切割系统.Helpers;
+using 精密切割系统.Utils;
 
 namespace 精密切割系统.View.Pages.common
 {
@@ -22,6 +25,16 @@ namespace 精密切割系统.View.Pages.common
     /// </summary>
     public partial class CommonDimming : UserControl
     {
+        private CancellationTokenSource _cts = new();
+
+        private DelegateCommand<string> _updateExposureTime;
+        public DelegateCommand<string> UpdateExposureTimeCommand => _updateExposureTime ??= new DelegateCommand<string>(ExecuteUpdateExposureTimeCommand);
+
+        void ExecuteUpdateExposureTimeCommand(string exposureTime)
+        {
+            CameraUtils.SetCameraExposureTime(exposureTime.ToFloat());
+        }
+
         public CommonDimming()
         {
             InitializeComponent();
@@ -30,7 +43,15 @@ namespace 精密切割系统.View.Pages.common
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             InitData();
+            StartMonitor();
         }
+
+        private void UserControl_Unloaded(object sender, RoutedEventArgs e)
+        {
+            _cts?.Cancel();
+            _cts?.Dispose();
+        }
+
         public void InitData()
         {
             if (CameraUtils.currentCameraIndex == 0)
@@ -51,6 +72,34 @@ namespace 精密切割系统.View.Pages.common
                 ringPanel.Visibility = Visibility.Visible;
             }
         }
+
+        public void StartMonitor()
+        {
+            if (_cts.IsCancellationRequested)
+            {
+                _cts = new CancellationTokenSource();
+            }
+            CancellationToken token = _cts.Token;
+            Task.Run(async () =>
+            {
+                using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
+                while (await timer.WaitForNextTickAsync(token))
+                {
+                    try
+                    {
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            ExposureTime.Text = CameraUtils.GetCameraExposureTime().ToString();
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        Tools.LogError($"{MethodBase.GetCurrentMethod()?.Name}监控异常: {ex.Message}");
+                    }
+                }
+            });
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -74,7 +123,6 @@ namespace 精密切割系统.View.Pages.common
                 default:
                     break;
             }
-            
         }
 
         public static int CalculateIntensity(double intensityRatio)
@@ -83,6 +131,7 @@ namespace 精密切割系统.View.Pages.common
             intensity = Math.Clamp(intensity, 1, 255);
             return intensity;
         }
+
         public static double NormalizeIntensityRatio(decimal input)
         {
             // 确保值在 0.01 到 1 的范围内
