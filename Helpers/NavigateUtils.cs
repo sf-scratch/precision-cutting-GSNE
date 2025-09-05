@@ -17,7 +17,7 @@ namespace 精密切割系统.Helpers
 {
     public static class NavigateUtils
     {
-        public static void NavigateToPage(string pageName)
+        public static void NavigateToPage(string pageName, bool isNavigateEmpty = true)
         {
             //跳转界面
             MainWindow? mainWindow = Application.Current.MainWindow as MainWindow;
@@ -26,27 +26,27 @@ namespace 精密切割系统.Helpers
                 MaterialSnackUtils.MaterialSnack("跳转界面失败", MaterialSnackUtils.SnackType.WARNING, 0);
                 return;
             }
-            mainWindow.NavigateToPage(pageName);
+            mainWindow.NavigateToPage(pageName, isNavigateEmpty: isNavigateEmpty);
         }
 
-        public static void NavigateToPage<T>(string pageName, T paramObj)
-        {
-            //跳转界面
-            MainWindow? mainWindow = Application.Current.MainWindow as MainWindow;
-            if (mainWindow == null)
-            {
-                MaterialSnackUtils.MaterialSnack("跳转界面失败", MaterialSnackUtils.SnackType.WARNING, 0);
-                return;
-            }
-            if (paramObj != null)
-            {
-                mainWindow.NavigateToPage(pageName, paramObj);
-            }
-            else
-            {
-                mainWindow.NavigateToPage(pageName);
-            }
-        }
+        //public static void NavigateToPage<T>(string pageName, T paramObj)
+        //{
+        //    //跳转界面
+        //    MainWindow? mainWindow = Application.Current.MainWindow as MainWindow;
+        //    if (mainWindow == null)
+        //    {
+        //        MaterialSnackUtils.MaterialSnack("跳转界面失败", MaterialSnackUtils.SnackType.WARNING, 0);
+        //        return;
+        //    }
+        //    if (paramObj != null)
+        //    {
+        //        mainWindow.NavigateToPage(pageName, paramObj);
+        //    }
+        //    else
+        //    {
+        //        mainWindow.NavigateToPage(pageName);
+        //    }
+        //}
 
         public static bool TryParse<View, Data>(this NavigationEventArgs e, out View view, out Data data)
         {

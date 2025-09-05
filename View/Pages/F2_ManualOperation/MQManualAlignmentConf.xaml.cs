@@ -129,6 +129,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
 
         private async void BackClickHandle(object? sender, bool e)
         {
+            _cts.Cancel();
             await SetLowSpeedAsync();
             ToNextPage();
         }
@@ -192,7 +193,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                         {
                             try
                             {
-                                await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(40), _cts.Token);
+                                await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(120), _cts.Token);
                                 var result = await AutoCutUtils.AutoFocusAsync(_eventAggregator, timeoutToken.Token);
                                 if (!result.IsSuccess)
                                 {
@@ -213,7 +214,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                         {
                             try
                             {
-                                await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(40), _cts.Token);
+                                await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(120), _cts.Token);
                                 var result = await AutoFocusService.GlobalFocusAsync(_eventAggregator, timeoutToken.Token);
                                 if (!result.IsSuccess)
                                 {

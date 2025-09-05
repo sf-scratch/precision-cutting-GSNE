@@ -7,6 +7,7 @@ using 精密切割系统.View.Controls;
 using 精密切割系统.View.Dialogs;
 using 精密切割系统.View.Pages.Auto;
 using 精密切割系统.View.Pages.common;
+using 精密切割系统.View.Pages.F2_ManualOperation;
 using 精密切割系统.View.Pages.F4_BladeMaintenance;
 using 精密切割系统.ViewModel;
 using 精密切割系统.ViewModel.Dialogs;
@@ -49,6 +50,8 @@ namespace 精密切割系统
             containerRegistry.RegisterForNavigation<AutoCutHistory, AutoCutHistoryViewModel>();
             containerRegistry.RegisterForNavigation<AutoCutSetCutPosition, AutoCutSetCutPositionViewModel>();
             containerRegistry.RegisterForNavigation<EmptyRun, EmptyRunViewModel>();
+            containerRegistry.RegisterForNavigation<MQSemiAutomaticCuttingRun, MQSemiAutomaticCuttingRunViewModel>();
+            containerRegistry.RegisterForNavigation<MQSemiAutomaticCuttingStop, MQSemiAutomaticCuttingStopViewModel>();
             containerRegistry.RegisterDialog<ConfirmDialog, ConfirmDialogViewModel>();
             containerRegistry.Register<IDialogWindow, ConfirmDialogWindow>(nameof(ConfirmDialogWindow));
         }

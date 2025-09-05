@@ -76,13 +76,35 @@ namespace 精密切割系统
             }
         }
 
-        public void NavigateToPage(string pageName, string paramsStr = "")
+        public void NavigateToPage(string pageName, string paramsStr = "", bool isNavigateEmpty = true)
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(EmptyView));
+                if (isNavigateEmpty)
+                {
+                    ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(EmptyView));
+                }
+                if (IsPageExist(pageName))
+                {
+                    return;
+                }
                 mainFrame.Navigate(new Uri($"View/{pageName}.xaml" + (string.IsNullOrEmpty(paramsStr) ? "" : "?" + paramsStr), UriKind.Relative));
             });
+        }
+
+        private bool IsPageExist(string pageName)
+        {
+            if (mainFrame.Content is null) return false;
+            string[] strings = pageName.Split("/");
+            string name = mainFrame.Content.GetType().Name;
+            foreach (var item in strings)
+            {
+                if (item == name)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public void NavigateToPage(string pageName, object paramsStr)

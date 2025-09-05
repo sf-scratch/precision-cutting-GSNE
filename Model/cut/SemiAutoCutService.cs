@@ -109,7 +109,7 @@ namespace 精密切割系统.Model.cut
         public async Task<RunResult> RunAsync(List<CutStep> cutStepList, IWorkpieces workpiece, float margin, int spindleRev, float bladeContactWorkingDiscZ1, float bladeLiftingHeight, CancellationToken pauseToken)
         {
             CancellationToken usingPauseToken = pauseToken;
-            _cutThetaAlignDeg = await GetCutThetaAlignDegAsync(usingPauseToken);
+            _cutThetaAlignDeg = await GetCutThetaAlignDegAsync();
             Stopwatch stopwatch = new();
             try
             {
@@ -120,6 +120,7 @@ namespace 精密切割系统.Model.cut
                 //进入全自动切割模式
                 await PlcControl.tagControl.cutting.EnterCuttingModeAsync(usingPauseToken);
                 bool isExchangeX = false;
+                LineSegment? preLine = null;
                 int cutTime = 0;
                 while (cutTime < cutStepList.Count)
                 {
@@ -130,7 +131,7 @@ namespace 精密切割系统.Model.cut
                         //检查是否暂停
                         if (usingPauseToken.IsCancellationRequested)
                         {
-                            (RunResult runResult, usingPauseToken)  = await WaitContinueAsync(line, workpiece);
+                            (RunResult runResult, usingPauseToken) = await WaitContinueAsync(preLine ?? line, workpiece);
                             if (!runResult.IsSuccess)
                             {
                                 return runResult;
@@ -138,12 +139,6 @@ namespace 精密切割系统.Model.cut
                         }
                         float cutY = workpiece.CalculateCutY();
                         line = workpiece.CalculateCuttingLine();
-                        //当前切割次数
-                        int? curCutNum = await PlcControl.tagControl.cutting.GetCutNumAsync();
-                        if (curCutNum == null)
-                        {
-                            return RunResult.Fail("获取当前切割次数失败！");
-                        }
                         float targetEndZ = bladeContactWorkingDiscZ1 - cutStep.CutHeight - _depthCompensationValue;
                         float startZ = bladeContactWorkingDiscZ1 - workpiece.WorkThickness - workpiece.TapeThickness - bladeLiftingHeight;
                         float cutLength = MathF.Abs(line.EndPoint.X - line.StartPoint.X);
@@ -177,12 +172,21 @@ namespace 精密切割系统.Model.cut
                             await PlcControl.tagControl.ThetaAxis.SetAbsoluteSpeedAsync(GlobalParams.ThetaDefaultSpeed);
                             //设置切割参数
                             await PlcControl.tagControl.cutting.SetCutParamsAsync(cutSpeed, endZ, startZ, startX, endX, line.StartPoint.Y, "0", _cutThetaAlignDeg + cutStep.ThetaDeg, spindleRev);
+                            //当前切割次数
+                            int? curCutNum = await PlcControl.tagControl.cutting.GetCutNumAsync();
+                            if (curCutNum == null)
+                            {
+                                return RunResult.Fail("获取当前切割次数失败！");
+                            }
                             //开始切割信号
                             await PlcControl.tagControl.cutting.StartCutAsync();
                             //等待切割次数变化
                             await PlcControl.tagControl.cutting.WaitCutNumUdatedAsync(curCutNum.Value + 1, usingPauseToken);
                             stopwatch.Stop();
-                            pathCalculator.ReportPass(cutTime, cutLength, (float)stopwatch.Elapsed.TotalSeconds);
+                            if (preLine is not null)
+                            {
+                                pathCalculator.ReportPass(cutTime, cutLength, (float)stopwatch.Elapsed.TotalSeconds);
+                            }
                         }
                         cutTime++;
                         //触发切割进度更新事件
@@ -191,17 +195,18 @@ namespace 精密切割系统.Model.cut
                         if (!workpiece.CheckCutDistance(_cutDirection, cutStep.OffsetY))
                         {
                             RemindReplaceWafer?.Invoke();
-                            (RunResult runResult, usingPauseToken) = await WaitContinueAsync(line, workpiece, "检测到工件当前面已切完");
+                            (RunResult runResult, usingPauseToken) = await WaitContinueAsync(preLine ?? line, workpiece, "检测到工件当前面已切完");
                             if (!runResult.IsSuccess)
                             {
                                 return runResult;
                             }
                             workpiece.Reset(await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0);
                         }
+                        preLine = line;
                     }
                     catch (OperationCanceledException)
                     {
-                        (RunResult runResult, usingPauseToken) = await WaitContinueAsync(line, workpiece);
+                        (RunResult runResult, usingPauseToken) = await WaitContinueAsync(preLine ?? line, workpiece);
                         if (!runResult.IsSuccess)
                         {
                             return runResult;
@@ -254,7 +259,7 @@ namespace 精密切割系统.Model.cut
                 case ServicePauseResultType.Continue:
                     // 更新使用的暂停令牌
                     CancellationToken usingPauseToken = result.Token ?? default; 
-                    _cutThetaAlignDeg = await GetCutThetaAlignDegAsync(usingPauseToken);
+                    _cutThetaAlignDeg = await GetCutThetaAlignDegAsync();
                     await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
                     return (RunResult.Success(), usingPauseToken);
                 case ServicePauseResultType.BladeScrap:
@@ -266,9 +271,9 @@ namespace 精密切割系统.Model.cut
             }
         }
 
-        private async Task<float> GetCutThetaAlignDegAsync(CancellationToken token)
+        private async Task<float> GetCutThetaAlignDegAsync()
         {
-            return _alignService.ThetaAlignCompletedDeg ?? await PlcControl.tagControl.ThetaAxis.GetCurrentLocationWaitAsync(token) ?? 0;
+            return _alignService.ThetaAlignCompletedDeg ?? await PlcControl.tagControl.ThetaAxis.GetCurrentLocationAsync() ?? 0;
         }
     }
 

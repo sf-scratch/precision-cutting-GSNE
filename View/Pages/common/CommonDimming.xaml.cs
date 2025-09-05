@@ -32,7 +32,7 @@ namespace 精密切割系统.View.Pages.common
 
         void ExecuteUpdateExposureTimeCommand(string exposureTime)
         {
-            CameraUtils.SetCameraExposureTime(exposureTime.ToFloat());
+            CameraUtils.SetCameraExposureTime(CameraUtils.GetCameraExposureTime() + exposureTime.ToFloat());
         }
 
         public CommonDimming()

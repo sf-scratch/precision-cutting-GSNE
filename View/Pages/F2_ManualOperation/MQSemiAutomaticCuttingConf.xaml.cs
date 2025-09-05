@@ -18,6 +18,7 @@ using 精密切割系统.PubSubEvent;
 using 精密切割系统.Utils;
 using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.Auto;
+using 精密切割系统.View.Pages.F4_BladeMaintenance;
 using 精密切割系统.View.Pages.operate;
 using 精密切割系统.ViewModel;
 using static 精密切割系统.Helpers.MaterialSnackUtils;
@@ -137,7 +138,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 MaterialSnack("请先结束暖机再开始切割！", SnackType.WARNING);
                 return;
             }
-            mainWindow.NavigateToPage("Pages/F2_ManualOperation/MQSemiAutomaticCuttingRun");
+            ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(MQSemiAutomaticCuttingRun));
         }
 
         private void CutBack(object? sender, bool e)
