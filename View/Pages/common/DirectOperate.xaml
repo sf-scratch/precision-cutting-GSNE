@@ -1,164 +1,278 @@
-﻿<UserControl x:Class="精密切割系统.View.Controls.DirectOperate"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:精密切割系统.View.Controls"
-             xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
-             xmlns:behav="clr-namespace:精密切割系统.Behaviors"
-             xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:convert="clr-namespace:精密切割系统.Converters"
-             xmlns:auto="clr-namespace:WpfAutoGrid;assembly=WpfAutoGrid.Core"
-             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             d:DataContext="{d:DesignInstance viewModel:DirectOperateViewModel, IsDesignTimeCreatable=True}"
-             mc:Ignorable="d" 
-             d:DesignHeight="250" d:DesignWidth="1500" IsVisibleChanged="UserControl_IsVisibleChanged">
+﻿<UserControl
+    x:Class="精密切割系统.View.Controls.DirectOperate"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:auto="clr-namespace:WpfAutoGrid;assembly=WpfAutoGrid.Core"
+    xmlns:behav="clr-namespace:精密切割系统.Behaviors"
+    xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:convert="clr-namespace:精密切割系统.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:精密切割系统.View.Controls"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
+    d:DataContext="{d:DesignInstance viewModel:DirectOperateViewModel,
+                                     IsDesignTimeCreatable=True}"
+    d:DesignHeight="250"
+    d:DesignWidth="1500"
+    IsVisibleChanged="UserControl_IsVisibleChanged"
+    mc:Ignorable="d">
     <UserControl.Resources>
-        <convert:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
-        <convert:BoolToMoveModeConverter x:Key="BoolToMoveModeConverter"/>
+        <convert:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <convert:BoolToMoveModeConverter x:Key="BoolToMoveModeConverter" />
         <Style TargetType="TextBlock">
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="FontSize" Value="18"/>
-            <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
-        <Style x:Key="ArrowButton" TargetType="Button" BasedOn="{StaticResource MaterialDesignFloatingActionLightButton}">
-            <Setter Property="Height" Value="70"/>
-            <Setter Property="Width" Value="70"/>
+        <Style
+            x:Key="ArrowButton"
+            BasedOn="{StaticResource MaterialDesignFloatingActionLightButton}"
+            TargetType="Button">
+            <Setter Property="Height" Value="70" />
+            <Setter Property="Width" Value="70" />
         </Style>
     </UserControl.Resources>
     <UserControl.DataContext>
-        <viewModel:DirectOperateViewModel/>
+        <viewModel:DirectOperateViewModel />
     </UserControl.DataContext>
     <Grid>
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition />
+                <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <Border CornerRadius="10" Background="#E9FDFF"  Margin="20,0,0,0">
+            <Border
+                Margin="20,0,0,0"
+                Background="#E9FDFF"
+                CornerRadius="10">
                 <Border.Effect>
-                    <DropShadowEffect 
-                    ShadowDepth="4" 
-                    BlurRadius="10" 
-                    Color="#4DC9EBF7" 
-                    Direction="315" />
+                    <DropShadowEffect
+                        BlurRadius="10"
+                        Direction="315"
+                        ShadowDepth="4"
+                        Color="#4DC9EBF7" />
                 </Border.Effect>
-                <auto:AutoGrid Margin="10" Columns="auto,*,*,*,*" RowCount="5" ChildMargin="5">
+                <auto:AutoGrid
+                    Margin="10"
+                    ChildMargin="5"
+                    Columns="auto,*,*,*,*,*,*,*"
+                    RowCount="5">
                     <auto:AutoGrid.Resources>
                         <ResourceDictionary>
                             <ResourceDictionary.MergedDictionaries>
-                                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml"/>
+                                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
                             </ResourceDictionary.MergedDictionaries>
                         </ResourceDictionary>
                     </auto:AutoGrid.Resources>
-                    <TextBlock Text="X" Style="{StaticResource MaterialDesignBody1TextBlock}"/>
+                    <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" Text="X" />
                     <!--<TextBox materialDesign:HintAssist.Hint="当前Jog速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedX}" />
                     <TextBox materialDesign:HintAssist.Hint="当前速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedX}" />-->
-                    <TextBox materialDesign:HintAssist.Hint="当前位置mm" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentPositionX}" />
-                    <!--<TextBox materialDesign:HintAssist.Hint="运动速度mm/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedX}" />
-                    <TextBox materialDesign:HintAssist.Hint="目标位置mm" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding TargetPositionX}" />
-                    <TextBlock Text="{Binding IsAbsMoveX, Converter={StaticResource BoolToMoveModeConverter}}"/>
-                    <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding IsAbsMoveX, Mode=TwoWay}">
+                    <TextBox
+                        materialDesign:HintAssist.Hint="当前位置mm"
+                        IsEnabled="False"
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                        Text="{Binding CurrentPositionX}" />
+                    <!--<TextBox materialDesign:HintAssist.Hint="运动速度mm/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedX}" />-->
+                    <TextBox
+                        materialDesign:HintAssist.Hint="目标位置mm"
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                        Text="{Binding TargetPositionX}" />
+                    <TextBlock Text="{Binding IsAbsMoveX, Converter={StaticResource BoolToMoveModeConverter}}" />
+                    <ToggleButton IsChecked="{Binding IsAbsMoveX, Mode=TwoWay}" Style="{StaticResource MaterialDesignSwitchToggleButton}">
                         <materialDesign:PackIcon Kind="MapMarkerDistance" />
                         <materialDesign:ToggleButtonAssist.OnContent>
                             <materialDesign:PackIcon Kind="MapMarker" />
                         </materialDesign:ToggleButtonAssist.OnContent>
-                    </ToggleButton>-->
-                    <Button Content="开始" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding StartXCommand}" IsEnabled="{Binding IsReadyX}"/>
-                    <Button Content="原点" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding StartHomingXCommand}"/>
-                    <Button Content="放松" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding RelaxXCommand}"/>
-                    <TextBlock Text="Y" Style="{StaticResource MaterialDesignBody1TextBlock}"/>
+                    </ToggleButton>
+                    <Button
+                        Command="{Binding StartXCommand}"
+                        Content="开始"
+                        IsEnabled="{Binding IsReadyX}"
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                    <Button
+                        Command="{Binding StartHomingXCommand}"
+                        Content="原点"
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                    <Button
+                        Command="{Binding RelaxXCommand}"
+                        Content="放松"
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                    <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" Text="Y" />
                     <!--<TextBox materialDesign:HintAssist.Hint="当前Jog速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedY}" />
                     <TextBox materialDesign:HintAssist.Hint="当前速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedY}" />-->
-                    <TextBox materialDesign:HintAssist.Hint="当前位置mm" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentPositionY}" />
-                    <!--<TextBox materialDesign:HintAssist.Hint="运动速度mm/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedY}" />
-                    <TextBox materialDesign:HintAssist.Hint="目标位置mm" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding TargetPositionY}" />
-                    <TextBlock Text="{Binding IsAbsMoveY, Converter={StaticResource BoolToMoveModeConverter}}"/>
-                    <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding IsAbsMoveY, Mode=TwoWay}">
+                    <TextBox
+                        materialDesign:HintAssist.Hint="当前位置mm"
+                        IsEnabled="False"
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                        Text="{Binding CurrentPositionY}" />
+                    <!--<TextBox materialDesign:HintAssist.Hint="运动速度mm/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedY}" />-->
+                    <TextBox
+                        materialDesign:HintAssist.Hint="目标位置mm"
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                        Text="{Binding TargetPositionY}" />
+                    <TextBlock Text="{Binding IsAbsMoveY, Converter={StaticResource BoolToMoveModeConverter}}" />
+                    <ToggleButton IsChecked="{Binding IsAbsMoveY, Mode=TwoWay}" Style="{StaticResource MaterialDesignSwitchToggleButton}">
                         <materialDesign:PackIcon Kind="MapMarkerDistance" />
                         <materialDesign:ToggleButtonAssist.OnContent>
                             <materialDesign:PackIcon Kind="MapMarker" />
                         </materialDesign:ToggleButtonAssist.OnContent>
-                    </ToggleButton>-->
-                    <Button Content="开始" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding StartYCommand}" IsEnabled="{Binding IsReadyY}"/>
-                    <Button Content="原点" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding StartHomingYCommand}"/>
-                    <Button Content="放松" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding RelaxYCommand}"/>
-                    <TextBlock Text="Z1" Style="{StaticResource MaterialDesignBody1TextBlock}"/>
+                    </ToggleButton>
+                    <Button
+                        Command="{Binding StartYCommand}"
+                        Content="开始"
+                        IsEnabled="{Binding IsReadyY}"
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                    <Button
+                        Command="{Binding StartHomingYCommand}"
+                        Content="原点"
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                    <Button
+                        Command="{Binding RelaxYCommand}"
+                        Content="放松"
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                    <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" Text="Z1" />
                     <!--<TextBox materialDesign:HintAssist.Hint="当前Jog速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedZ1}" />
                     <TextBox materialDesign:HintAssist.Hint="当前速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedZ1}" />-->
-                    <TextBox materialDesign:HintAssist.Hint="当前位置mm" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentPositionZ1}" />
-                    <!--<TextBox materialDesign:HintAssist.Hint="运动速度mm/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedZ1}" />
-                    <TextBox materialDesign:HintAssist.Hint="目标位置mm" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding TargetPositionZ1}" />
-                    <TextBlock Text="{Binding IsAbsMoveZ1, Converter={StaticResource BoolToMoveModeConverter}}"/>
-                    <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding IsAbsMoveZ1, Mode=TwoWay}">
+                    <TextBox
+                        materialDesign:HintAssist.Hint="当前位置mm"
+                        IsEnabled="False"
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                        Text="{Binding CurrentPositionZ1}" />
+                    <!--<TextBox materialDesign:HintAssist.Hint="运动速度mm/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedZ1}" />-->
+                    <TextBox
+                        materialDesign:HintAssist.Hint="目标位置mm"
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                        Text="{Binding TargetPositionZ1}" />
+                    <TextBlock Text="{Binding IsAbsMoveZ1, Converter={StaticResource BoolToMoveModeConverter}}" />
+                    <ToggleButton IsChecked="{Binding IsAbsMoveZ1, Mode=TwoWay}" Style="{StaticResource MaterialDesignSwitchToggleButton}">
                         <materialDesign:PackIcon Kind="MapMarkerDistance" />
                         <materialDesign:ToggleButtonAssist.OnContent>
                             <materialDesign:PackIcon Kind="MapMarker" />
                         </materialDesign:ToggleButtonAssist.OnContent>
-                    </ToggleButton>-->
-                    <Button Content="开始" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding StartZ1Command}" IsEnabled="{Binding IsReadyZ1}"/>
-                    <Button Content="原点" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding StartHomingZ1Command}"/>
-                    <Button Content="放松" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding RelaxZ1Command}"/>
-                    <TextBlock Text="Z2" Style="{StaticResource MaterialDesignBody1TextBlock}"/>
+                    </ToggleButton>
+                    <Button
+                        Command="{Binding StartZ1Command}"
+                        Content="开始"
+                        IsEnabled="{Binding IsReadyZ1}"
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                    <Button
+                        Command="{Binding StartHomingZ1Command}"
+                        Content="原点"
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                    <Button
+                        Command="{Binding RelaxZ1Command}"
+                        Content="放松"
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                    <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" Text="Z2" />
                     <!--<TextBox materialDesign:HintAssist.Hint="当前Jog速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedZ2}" />
                     <TextBox materialDesign:HintAssist.Hint="当前速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedZ2}" />-->
-                    <TextBox materialDesign:HintAssist.Hint="当前位置mm" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentPositionZ2}" />
-                    <!--<TextBox materialDesign:HintAssist.Hint="运动速度mm/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedZ2}" />
-                    <TextBox materialDesign:HintAssist.Hint="目标位置mm" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding TargetPositionZ2}" />
-                    <TextBlock Text="{Binding IsAbsMoveZ2, Converter={StaticResource BoolToMoveModeConverter}}"/>
-                    <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding IsAbsMoveZ2, Mode=TwoWay}">
+                    <TextBox
+                        materialDesign:HintAssist.Hint="当前位置mm"
+                        IsEnabled="False"
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                        Text="{Binding CurrentPositionZ2}" />
+                    <!--<TextBox materialDesign:HintAssist.Hint="运动速度mm/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedZ2}" />-->
+                    <TextBox
+                        materialDesign:HintAssist.Hint="目标位置mm"
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                        Text="{Binding TargetPositionZ2}" />
+                    <TextBlock Text="{Binding IsAbsMoveZ2, Converter={StaticResource BoolToMoveModeConverter}}" />
+                    <ToggleButton IsChecked="{Binding IsAbsMoveZ2, Mode=TwoWay}" Style="{StaticResource MaterialDesignSwitchToggleButton}">
                         <materialDesign:PackIcon Kind="MapMarkerDistance" />
                         <materialDesign:ToggleButtonAssist.OnContent>
                             <materialDesign:PackIcon Kind="MapMarker" />
                         </materialDesign:ToggleButtonAssist.OnContent>
-                    </ToggleButton>-->
-                    <Button Content="开始" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding StartZ2Command}" IsEnabled="{Binding IsReadyZ2}"/>
-                    <Button Content="原点" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding StartHomingZ2Command}"/>
-                    <Button Content="放松" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding RelaxZ2Command}"/>
-                    <TextBlock Text="θ" Style="{StaticResource MaterialDesignBody1TextBlock}"/>
+                    </ToggleButton>
+                    <Button
+                        Command="{Binding StartZ2Command}"
+                        Content="开始"
+                        IsEnabled="{Binding IsReadyZ2}"
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                    <Button
+                        Command="{Binding StartHomingZ2Command}"
+                        Content="原点"
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                    <Button
+                        Command="{Binding RelaxZ2Command}"
+                        Content="放松"
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                    <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" Text="θ" />
                     <!--<TextBox materialDesign:HintAssist.Hint="当前Jog速度deg/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedTheta}" />
                     <TextBox materialDesign:HintAssist.Hint="当前速度deg/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedTheta}" />-->
-                    <TextBox materialDesign:HintAssist.Hint="当前位置deg" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentPositionTheta}" />
-                    <!--<TextBox materialDesign:HintAssist.Hint="运动速度deg/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedTheta}" />
-                    <TextBox materialDesign:HintAssist.Hint="目标位置deg" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding TargetPositionTheta}" />
-                    <TextBlock Text="{Binding IsAbsMoveTheta, Converter={StaticResource BoolToMoveModeConverter}}"/>
-                    <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding IsAbsMoveTheta, Mode=TwoWay}">
+                    <TextBox
+                        materialDesign:HintAssist.Hint="当前位置deg"
+                        IsEnabled="False"
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                        Text="{Binding CurrentPositionTheta}" />
+                    <!--<TextBox materialDesign:HintAssist.Hint="运动速度deg/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedTheta}" />-->
+                    <TextBox
+                        materialDesign:HintAssist.Hint="目标位置deg"
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                        Text="{Binding TargetPositionTheta}" />
+                    <TextBlock Text="{Binding IsAbsMoveTheta, Converter={StaticResource BoolToMoveModeConverter}}" />
+                    <ToggleButton IsChecked="{Binding IsAbsMoveTheta, Mode=TwoWay}" Style="{StaticResource MaterialDesignSwitchToggleButton}">
                         <materialDesign:PackIcon Kind="MapMarkerDistance" />
                         <materialDesign:ToggleButtonAssist.OnContent>
                             <materialDesign:PackIcon Kind="MapMarker" />
                         </materialDesign:ToggleButtonAssist.OnContent>
-                    </ToggleButton>-->
-                    <Button Content="开始" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding StartThetaCommand}" IsEnabled="{Binding IsReadyTheta}"/>
-                    <Button Content="原点" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding StartHomingThetaCommand}"/>
-                    <Button Content="放松" Style="{StaticResource MaterialDesignOutlinedLightButton}" Command="{Binding RelaxThetaCommand}"/>
+                    </ToggleButton>
+                    <Button
+                        Command="{Binding StartThetaCommand}"
+                        Content="开始"
+                        IsEnabled="{Binding IsReadyTheta}"
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                    <Button
+                        Command="{Binding StartHomingThetaCommand}"
+                        Content="原点"
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                    <Button
+                        Command="{Binding RelaxThetaCommand}"
+                        Content="放松"
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
                 </auto:AutoGrid>
             </Border>
-            <Border Grid.Column="1" CornerRadius="10" Background="#E9FDFF"  Margin="10,0,5,0" Visibility="{Binding IsShowKeyboard, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Border
+                Grid.Column="1"
+                Margin="10,0,5,0"
+                Background="#E9FDFF"
+                CornerRadius="10"
+                Visibility="{Binding IsShowKeyboard, Converter={StaticResource BoolToVisibilityConverter}}">
                 <Border.Effect>
-                    <DropShadowEffect 
-                    ShadowDepth="5" 
-                    BlurRadius="10" 
-                    Color="#4DC9EBF7" 
-                    Direction="315" />
+                    <DropShadowEffect
+                        BlurRadius="10"
+                        Direction="315"
+                        ShadowDepth="5"
+                        Color="#4DC9EBF7" />
                 </Border.Effect>
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="20*"></ColumnDefinition>
-                        <ColumnDefinition Width="80*"></ColumnDefinition>
+                        <ColumnDefinition Width="20*" />
+                        <ColumnDefinition Width="80*" />
                     </Grid.ColumnDefinitions>
-                    <Grid Grid.Column="0" >
+                    <Grid Grid.Column="0">
                         <Grid.RowDefinitions>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
+                            <RowDefinition />
+                            <RowDefinition />
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
                             <Grid Width="100" Height="100">
                                 <StackPanel Orientation="Vertical">
-                                    <Border CornerRadius="33,33,33,33" Width="66" Height="66">
-                                        <Image Source="/Assets/picture/SCAN_icon.png" Width="52" Height="52"></Image>
+                                    <Border
+                                        Width="66"
+                                        Height="66"
+                                        CornerRadius="33,33,33,33">
+                                        <Image
+                                            Width="52"
+                                            Height="52"
+                                            Source="/Assets/picture/SCAN_icon.png" />
                                     </Border>
-                                    <TextBlock  Text="Scan" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"></TextBlock>
+                                    <TextBlock
+                                        HorizontalAlignment="Center"
+                                        FontSize="18"
+                                        FontWeight="Bold"
+                                        Text="Scan" />
                                 </StackPanel>
                             </Grid>
                         </Grid>
@@ -166,14 +280,26 @@
                             <Grid.Resources>
                                 <ResourceDictionary>
                                     <ResourceDictionary.MergedDictionaries>
-                                        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml"/>
+                                        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
                                     </ResourceDictionary.MergedDictionaries>
                                 </ResourceDictionary>
                             </Grid.Resources>
-                            <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-                                <ToggleButton Width="65" Height="65" Content="{materialDesign:PackIcon Kind=Speedometer, Size=50}" Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}" 
-                                              IsChecked="{Binding IsHighSpeed}" Background="#5087Cb" Foreground="Black"/>
-                                <TextBlock  Text="高速" FontSize="18" Margin="0 10 0 0" FontWeight="Bold" HorizontalAlignment="Center"></TextBlock>
+                            <StackPanel VerticalAlignment="Center" Orientation="Vertical">
+                                <ToggleButton
+                                    Width="65"
+                                    Height="65"
+                                    Background="#5087Cb"
+                                    Content="{materialDesign:PackIcon Kind=Speedometer,
+                                                                      Size=50}"
+                                    Foreground="Black"
+                                    IsChecked="{Binding IsHighSpeed}"
+                                    Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}" />
+                                <TextBlock
+                                    Margin="0,10,0,0"
+                                    HorizontalAlignment="Center"
+                                    FontSize="18"
+                                    FontWeight="Bold"
+                                    Text="高速" />
                             </StackPanel>
                         </Grid>
 
@@ -182,101 +308,209 @@
                         <Grid.Resources>
                             <ResourceDictionary>
                                 <ResourceDictionary.MergedDictionaries>
-                                    <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml"/>
+                                    <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
                                 </ResourceDictionary.MergedDictionaries>
                                 <Style TargetType="Button">
-                                    <Setter Property="FontSize" Value="18"/>
-                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Setter Property="FontSize" Value="18" />
+                                    <Setter Property="FontWeight" Value="Bold" />
                                 </Style>
                             </ResourceDictionary>
                         </Grid.Resources>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="20*"></ColumnDefinition>
-                            <ColumnDefinition Width="60*"></ColumnDefinition>
-                            <ColumnDefinition Width="20*"></ColumnDefinition>
+                            <ColumnDefinition Width="20*" />
+                            <ColumnDefinition Width="60*" />
+                            <ColumnDefinition Width="20*" />
                         </Grid.ColumnDefinitions>
                         <Grid Grid.Column="0" Margin="0,10,0,0">
                             <Grid.RowDefinitions>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
                             </Grid.RowDefinitions>
-                            <Button Style="{StaticResource ArrowButton}" VerticalAlignment="Center" x:Name="scanLeftBottomBtn" Background="#5087Cb" Foreground="White" Content="{materialDesign:PackIcon ArrowDownLeftBold,Size=40}">
+                            <Button
+                                x:Name="scanLeftBottomBtn"
+                                VerticalAlignment="Center"
+                                Background="#5087Cb"
+                                Content="{materialDesign:PackIcon ArrowDownLeftBold,
+                                                                  Size=40}"
+                                Foreground="White"
+                                Style="{StaticResource ArrowButton}">
                                 <behaviors:Interaction.Behaviors>
-                                    <behav:DualInputBehavior PromptCommand="{Binding ThetaRelativeNegativeCommand}" StartCommand="{Binding StartThetaReversalCommand}" StopCommand="{Binding StopJogThetaCommand}"/>
+                                    <behav:DualInputBehavior
+                                        PromptCommand="{Binding ThetaRelativeNegativeCommand}"
+                                        StartCommand="{Binding StartThetaReversalCommand}"
+                                        StopCommand="{Binding StopJogThetaCommand}" />
                                 </behaviors:Interaction.Behaviors>
                             </Button>
-                            <Button Height="40" Width="90" Grid.Row="1" Background="#5087Cb" Foreground="White" Content="Z1抬起">
+                            <Button
+                                Grid.Row="1"
+                                Width="90"
+                                Height="40"
+                                Background="#5087Cb"
+                                Content="Z1抬起"
+                                Foreground="White">
                                 <behaviors:Interaction.Behaviors>
-                                    <behav:DualInputBehavior PromptCommand="{Binding Z1RelativeNegativeCommand}" StartCommand="{Binding StartRaiseZ1Command}" StopCommand="{Binding StopJogZ1Command}"/>
+                                    <behav:DualInputBehavior
+                                        PromptCommand="{Binding Z1RelativeNegativeCommand}"
+                                        StartCommand="{Binding StartRaiseZ1Command}"
+                                        StopCommand="{Binding StopJogZ1Command}" />
                                 </behaviors:Interaction.Behaviors>
                             </Button>
-                            <Button Height="40" Width="90" Grid.Row="2" Background="#5087Cb" Foreground="White" Content="Z1下降">
+                            <Button
+                                Grid.Row="2"
+                                Width="90"
+                                Height="40"
+                                Background="#5087Cb"
+                                Content="Z1下降"
+                                Foreground="White">
                                 <behaviors:Interaction.Behaviors>
-                                    <behav:DualInputBehavior PromptCommand="{Binding Z1RelativePositiveCommand}" StartCommand="{Binding StartDropZ1Command}" StopCommand="{Binding StopJogZ1Command}"/>
+                                    <behav:DualInputBehavior
+                                        PromptCommand="{Binding Z1RelativePositiveCommand}"
+                                        StartCommand="{Binding StartDropZ1Command}"
+                                        StopCommand="{Binding StopJogZ1Command}" />
                                 </behaviors:Interaction.Behaviors>
                             </Button>
                         </Grid>
-                        <Grid Grid.Column="1" >
+                        <Grid Grid.Column="1">
                             <Grid.RowDefinitions>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
                             </Grid.RowDefinitions>
-                            <Grid Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <Button Style="{StaticResource ArrowButton}" VerticalAlignment="Top" x:Name="scanTopBtn" Background="#5087Cb" Foreground="White" Content="{materialDesign:PackIcon ArrowTopThick,Size=40}">
+                            <Grid
+                                Grid.Row="0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                                <Button
+                                    x:Name="scanTopBtn"
+                                    VerticalAlignment="Top"
+                                    Background="#5087Cb"
+                                    Content="{materialDesign:PackIcon ArrowTopThick,
+                                                                      Size=40}"
+                                    Foreground="White"
+                                    Style="{StaticResource ArrowButton}">
                                     <behaviors:Interaction.Behaviors>
-                                        <behav:DualInputBehavior PromptCommand="{Binding YRelativeNegativeCommand}" StartCommand="{Binding StartYReversalCommand}" StopCommand="{Binding StopJogYCommand}"/>
+                                        <behav:DualInputBehavior
+                                            PromptCommand="{Binding YRelativeNegativeCommand}"
+                                            StartCommand="{Binding StartYReversalCommand}"
+                                            StopCommand="{Binding StopJogYCommand}" />
                                     </behaviors:Interaction.Behaviors>
                                 </Button>
                             </Grid>
-                            <Grid Grid.Row="1" >
+                            <Grid Grid.Row="1">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition></ColumnDefinition>
-                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
                                 </Grid.ColumnDefinitions>
-                                <Grid Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                    <Button Style="{StaticResource ArrowButton}" VerticalAlignment="Top" x:Name="scanLeftBtn" Background="#5087Cb" Foreground="White" Content="{materialDesign:PackIcon ArrowLeftThick,Size=40}">
+                                <Grid
+                                    Grid.Column="0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center">
+                                    <Button
+                                        x:Name="scanLeftBtn"
+                                        VerticalAlignment="Top"
+                                        Background="#5087Cb"
+                                        Content="{materialDesign:PackIcon ArrowLeftThick,
+                                                                          Size=40}"
+                                        Foreground="White"
+                                        Style="{StaticResource ArrowButton}">
                                         <behaviors:Interaction.Behaviors>
-                                            <behav:DualInputBehavior PromptCommand="{Binding XRelativePositiveCommand}" StartCommand="{Binding StartXCorotationCommand}" StopCommand="{Binding StopJogXCommand}"/>
+                                            <behav:DualInputBehavior
+                                                PromptCommand="{Binding XRelativePositiveCommand}"
+                                                StartCommand="{Binding StartXCorotationCommand}"
+                                                StopCommand="{Binding StopJogXCommand}" />
                                         </behaviors:Interaction.Behaviors>
                                     </Button>
                                 </Grid>
-                                <Grid Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                    <Button Style="{StaticResource ArrowButton}" VerticalAlignment="Center" x:Name="scanRightBtn" Background="#5087Cb" Foreground="White" Content="{materialDesign:PackIcon ArrowRightThick,Size=40}">
+                                <Grid
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center">
+                                    <Button
+                                        x:Name="scanRightBtn"
+                                        VerticalAlignment="Center"
+                                        Background="#5087Cb"
+                                        Content="{materialDesign:PackIcon ArrowRightThick,
+                                                                          Size=40}"
+                                        Foreground="White"
+                                        Style="{StaticResource ArrowButton}">
                                         <behaviors:Interaction.Behaviors>
-                                            <behav:DualInputBehavior PromptCommand="{Binding XRelativeNegativeCommand}" StartCommand="{Binding StartXReversalCommand}" StopCommand="{Binding StopJogXCommand}"/>
+                                            <behav:DualInputBehavior
+                                                PromptCommand="{Binding XRelativeNegativeCommand}"
+                                                StartCommand="{Binding StartXReversalCommand}"
+                                                StopCommand="{Binding StopJogXCommand}" />
                                         </behaviors:Interaction.Behaviors>
                                     </Button>
                                 </Grid>
                             </Grid>
-                            <Grid Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <Button Style="{StaticResource ArrowButton}" VerticalAlignment="Top" x:Name="scanBottomBtn" Background="#5087Cb" Foreground="White" Content="{materialDesign:PackIcon ArrowBottomThick,Size=40}">
+                            <Grid
+                                Grid.Row="2"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                                <Button
+                                    x:Name="scanBottomBtn"
+                                    VerticalAlignment="Top"
+                                    Background="#5087Cb"
+                                    Content="{materialDesign:PackIcon ArrowBottomThick,
+                                                                      Size=40}"
+                                    Foreground="White"
+                                    Style="{StaticResource ArrowButton}">
                                     <behaviors:Interaction.Behaviors>
-                                        <behav:DualInputBehavior PromptCommand="{Binding YRelativePositiveCommand}" StartCommand="{Binding StartYCorotationCommand}" StopCommand="{Binding StopJogYCommand}"/>
+                                        <behav:DualInputBehavior
+                                            PromptCommand="{Binding YRelativePositiveCommand}"
+                                            StartCommand="{Binding StartYCorotationCommand}"
+                                            StopCommand="{Binding StopJogYCommand}" />
                                     </behaviors:Interaction.Behaviors>
                                 </Button>
                             </Grid>
                         </Grid>
                         <Grid Grid.Column="2" Margin="0,10,0,0">
                             <Grid.RowDefinitions>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
                             </Grid.RowDefinitions>
-                            <Button Style="{StaticResource ArrowButton}" VerticalAlignment="Center" x:Name="scanRightBottomBtn" Background="#5087Cb" Foreground="White" Content="{materialDesign:PackIcon ArrowDownRightBold,Size=40}">
+                            <Button
+                                x:Name="scanRightBottomBtn"
+                                VerticalAlignment="Center"
+                                Background="#5087Cb"
+                                Content="{materialDesign:PackIcon ArrowDownRightBold,
+                                                                  Size=40}"
+                                Foreground="White"
+                                Style="{StaticResource ArrowButton}">
                                 <behaviors:Interaction.Behaviors>
-                                    <behav:DualInputBehavior PromptCommand="{Binding ThetaRelativePositiveCommand}" StartCommand="{Binding StartThetaCorotationCommand}" StopCommand="{Binding StopJogThetaCommand}"/>
+                                    <behav:DualInputBehavior
+                                        PromptCommand="{Binding ThetaRelativePositiveCommand}"
+                                        StartCommand="{Binding StartThetaCorotationCommand}"
+                                        StopCommand="{Binding StopJogThetaCommand}" />
                                 </behaviors:Interaction.Behaviors>
                             </Button>
-                            <Button Height="40" Width="90" Grid.Row="1" Background="#5087Cb" Foreground="White" Content="Z2抬起">
+                            <Button
+                                Grid.Row="1"
+                                Width="90"
+                                Height="40"
+                                Background="#5087Cb"
+                                Content="Z2抬起"
+                                Foreground="White">
                                 <behaviors:Interaction.Behaviors>
-                                    <behav:DualInputBehavior PromptCommand="{Binding Z2RelativeNegativeCommand}" StartCommand="{Binding StartRaiseZ2Command}" StopCommand="{Binding StopJogZ2Command}"/>
+                                    <behav:DualInputBehavior
+                                        PromptCommand="{Binding Z2RelativeNegativeCommand}"
+                                        StartCommand="{Binding StartRaiseZ2Command}"
+                                        StopCommand="{Binding StopJogZ2Command}" />
                                 </behaviors:Interaction.Behaviors>
                             </Button>
-                            <Button Height="40" Width="90" Grid.Row="2" Background="#5087Cb" Foreground="White" Content="Z2下降">
+                            <Button
+                                Grid.Row="2"
+                                Width="90"
+                                Height="40"
+                                Background="#5087Cb"
+                                Content="Z2下降"
+                                Foreground="White">
                                 <behaviors:Interaction.Behaviors>
-                                    <behav:DualInputBehavior PromptCommand="{Binding Z2RelativePositiveCommand}" StartCommand="{Binding StartDropZ2Command}" StopCommand="{Binding StopJogZ2Command}"/>
+                                    <behav:DualInputBehavior
+                                        PromptCommand="{Binding Z2RelativePositiveCommand}"
+                                        StartCommand="{Binding StartDropZ2Command}"
+                                        StopCommand="{Binding StopJogZ2Command}" />
                                 </behaviors:Interaction.Behaviors>
                             </Button>
                         </Grid>

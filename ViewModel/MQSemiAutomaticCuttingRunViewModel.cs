@@ -30,112 +30,12 @@ namespace 精密切割系统.ViewModel
     {
         public DelegateCommand RunAutoCutCommand { get; set; }
         public ObservableCollection<MessageModel> MessageList { get; set; } = new ObservableCollection<MessageModel>();
+        public SemiAutomaticCutParamModel CutParam { get; set; } = new SemiAutomaticCutParamModel();
         private readonly IEventAggregator _eventAggregator;
         private readonly IRegionManager _regionManager;
         private readonly SemiAutoCutService _semiAutoCutService;
         private CancellationTokenSource _pauseCts;
         private CancellationTokenSource _monitoringCts;
-
-        private string _directoryId;
-        private string _deviceDataNo;
-        private string _deviceDataId;
-        private string _channelNum;
-        private float _bladeHeight;
-        private float _feedSpeed;
-        private string _depthCompensation;
-        private string _changeFeedSpeed;
-        private int _runCutLine;
-        private int _allRunCutLine;
-        private int _allCutLine;
-        private float _allCutLineLength;
-
-        public string DirectoryId
-        {
-            get => _directoryId;
-            set => SetProperty(ref _directoryId, value);
-        }
-
-        // DeviceDataNo
-        public string DeviceDataNo
-        {
-            get => _deviceDataNo;
-            set => SetProperty(ref _directoryId, value);
-        }
-
-        // DeviceDataId
-        public string DeviceDataId
-        {
-            get => _deviceDataId;
-            set => SetProperty(ref _deviceDataId, value);
-        }
-
-        // DepthCompensation
-        public string DepthCompensation
-        {
-            get => _depthCompensation;
-            set => SetProperty(ref _depthCompensation, value);
-        }
-
-        // ChannelNum
-        public string ChannelNum
-        {
-            get => _channelNum;
-            set => SetProperty(ref _channelNum, value);
-        }
-
-
-        private string _expectedProcessingEndTime;
-
-        public string ExpectedProcessingEndTime
-        {
-            get => _expectedProcessingEndTime;
-            set => SetProperty(ref _expectedProcessingEndTime, value);
-        }
-
-        // BladeHeight
-        public float BladeHeight
-        {
-            get => _bladeHeight;
-            set => SetProperty(ref _bladeHeight, value);
-        }
-
-        // FeedSpeed
-        public float FeedSpeed
-        {
-            get => _feedSpeed;
-            set => SetProperty(ref _feedSpeed, value);
-        }
-
-        // SpindleRev
-        public int RunCutLine
-        {
-            get => _runCutLine;
-            set => SetProperty(ref _runCutLine, value);
-        }
-
-        // AllRunCutLine
-        public int AllRunCutLine
-        {
-            get => _allRunCutLine;
-            set => SetProperty(ref _allRunCutLine, value);
-        }
-
-        // ChangeFeedSpeed
-        public string ChangeFeedSpeed
-        {
-            get => _changeFeedSpeed;
-            set => SetProperty(ref _changeFeedSpeed, value);
-        }
-        public int AllCutLine
-        {
-            get => _allCutLine;
-            set => SetProperty(ref _allCutLine, value);
-        }
-        public float AllCutLineLength
-        {
-            get => _allCutLineLength;
-            set => SetProperty(ref _allCutLineLength, value);
-        }
 
         private string _yAxisCutPosition;
         public string YAxisCutPosition
@@ -228,7 +128,7 @@ namespace 精密切割系统.ViewModel
             {
                 try
                 {
-                    ChannelNum = CurrentUtils.GetCurrentConfiguration().ChannelNum;
+                    CutParam.ChannelNum = CurrentUtils.GetCurrentConfiguration().ChannelNum;
                     var axisPostion = await AutoCutUtils.GetAxisPositionAsync();
                     Application.Current.Dispatcher.Invoke(() =>
                     {
@@ -250,7 +150,7 @@ namespace 精密切割系统.ViewModel
         {
             if (!GlobalParams.onlineFlag)
             {
-                MaterialSnack($"切割中...", SnackType.SUCCESS, 0);
+                MaterialSnack($"切割中...", SnackType.WARNING, 0);
                 _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("切割中..."));
                 return;
             }
@@ -296,7 +196,7 @@ namespace 精密切割系统.ViewModel
                 IWorkpieces workpiece = GenerateWorkpieces(fileTableItem, cutY);
                 _semiAutoCutService.CutServiceProcessChanged += CutService_CutServiceProcessChanged;
                 _semiAutoCutService.CutServicePaused += CutService_CutServicePaused;
-                MaterialSnack($"切割中...", SnackType.SUCCESS, 0);
+                MaterialSnack($"切割中...", SnackType.WARNING, 0);
                 RunResult cutResult = await _semiAutoCutService.RunAsync(cutStepResult.Data, workpiece, 30, fileTableItem.SpindleRev, curHeightZ.Data, GlobalParams.BladeLiftingHeight, _pauseCts.Token);
                 if (!cutResult.IsSuccess)
                 {
@@ -456,18 +356,21 @@ namespace 精密切割系统.ViewModel
             Application.Current.Dispatcher.Invoke(() =>
             {
                 // 设置切割进度
-                RunCutLine = process.CutTimes;
-                AllRunCutLine = process.TotalCutTimes;
-                FeedSpeed = process.CutSpeed;
-                BladeHeight = process.CutBladeHeight;
-                ChannelNum = $"CH{process.ChannelNum}";
+                CutParam.RunCutLine = process.CutTimes;
+                CutParam.AllRunCutLine = process.TotalCutTimes;
+                CutParam.FeedSpeed = process.CutSpeed.ToString("F0");
+                CutParam.BladeHeight = process.CutBladeHeight.ToString("F3");
+                CutParam.ChannelNum = $"CH{process.ChannelNum}";
                 if (process.IsCompleted)
                 {
                     Appsettings.AfterReplaceBladeCutTimes++;
                     Appsettings.AfterReplaceBladeCutLength += process.CutLength;
-                    AllCutLine = Appsettings.AfterReplaceBladeCutTimes ?? 0;
-                    AllCutLineLength = MathF.Round(Appsettings.AfterReplaceBladeCutLength / 1000 ?? 0, 2);
-                    ExpectedProcessingEndTime = DateTime.Now.AddSeconds(process.RemainingTime).ToString("HH:mm:ss");
+                    CutParam.AllCutLine = Appsettings.AfterReplaceBladeCutTimes ?? 0;
+                    CutParam.AllCutLineLength = (Appsettings.AfterReplaceBladeCutLength / 1000 ?? 0).ToString("F2");
+                    if (process.CutTimes > 1)
+                    {
+                        CutParam.ExpectedProcessingEndTime = DateTime.Now.AddSeconds(process.RemainingTime).ToString("HH:mm:ss");
+                    }
                 }
             });
         }
@@ -493,7 +396,7 @@ namespace 精密切割系统.ViewModel
             // 参数校验
             if (fileTableItem.SpindleRev == 0 || fileTableItem.SpindleRev > 30000)
             {
-                return CommonResult<List<CutStep>>.Failure("切割参数配置错误！");
+                return CommonResult<List<CutStep>>.Failure("切割转速配置错误！");
             }
             List<CutStep> cutSteps = [];
             // 查询通道信息
@@ -626,11 +529,11 @@ namespace 精密切割系统.ViewModel
             _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Subscribe(ReceivedMessage, ThreadOption.UIThread);
             // 加载参数
             FileTableItemModel fileTableItem = CurrentUtils.GetFileTableItemModel();
-            DeviceDataNo = fileTableItem.DeviceDataNo;
-            DeviceDataId = fileTableItem.DeviceDataId;
-            ChannelNum = CurrentUtils.GetCurrentConfiguration().ChannelNum;
-            ChangeFeedSpeed = _semiAutoCutService.FeedSpeedCompCompensationValue.ToString();
-            DepthCompensation = _semiAutoCutService.DepthCompensationValue.ToString();
+            CutParam.DeviceDataNo = fileTableItem.DeviceDataNo;
+            CutParam.DeviceDataId = fileTableItem.DeviceDataId;
+            CutParam.ChannelNum = CurrentUtils.GetCurrentConfiguration().ChannelNum;
+            CutParam.ChangeFeedSpeed = _semiAutoCutService.FeedSpeedCompCompensationValue.ToString();
+            CutParam.DepthCompensation = _semiAutoCutService.DepthCompensationValue.ToString();
             InitRightButton();
         }
 

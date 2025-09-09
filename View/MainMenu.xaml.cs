@@ -215,8 +215,7 @@ namespace 精密切割系统.View
             {
                 case 1:
                     {
-                        rightPage.PanelAction.Visibility = Visibility.Collapsed;
-                        rightPage.btnBack.Visibility = Visibility.Collapsed;
+                        ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(FullyAutomatic));
                         break;
                     }
                 case 2:
@@ -307,8 +306,11 @@ namespace 精密切割系统.View
                 case 202:
                     mainWindow.NavigateToPage(bean.PageUrl);
                     break;
-                case 401:
-                    ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(BladeReplacementConfiguration));
+                //case 401:
+                //    ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(FullyAutomatic));
+                //    break;
+                case 409:
+                    mainWindow.NavigateToPage(bean.PageUrl);
                     break;
                 case 439:
                     ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(AutoCutSelectConfig));

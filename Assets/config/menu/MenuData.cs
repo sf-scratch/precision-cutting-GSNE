@@ -48,7 +48,7 @@ namespace 精密切割系统.Assets.config.menu
         public static List<MenuBean> GetF1MenuList()
         {
             var list = new List<MenuBean>();
-            // list.Add(new MenuBean(1, "全自动", "/Assets/icon/menu_0/menu_0_1.png", "/Assets/icon/menu_0/menu_0_1_white.png"));
+            list.Add(new MenuBean(1, "全自动", "/Assets/icon/menu_0/menu_0_1.png", "/Assets/icon/menu_0/menu_0_1_white.png"));
             list.Add(new MenuBean(2, "手动操作", "/Assets/icon/menu_0/menu_0_2.png", "/Assets/icon/menu_0/menu_0_2_white.png"));
             list.Add(new MenuBean(3, "型号目录", "/Assets/icon/menu_0/menu_0_3.png", "/Assets/icon/menu_0/menu_0_3_white.png", 2, "Pages/F3_ModelCatalog/MCDeviceDataListConf"));
             list.Add(new MenuBean(4, "刀片参数维护", "/Assets/icon/menu_0/menu_0_4.png", "/Assets/icon/menu_0/menu_0_4_white.png"));
@@ -73,8 +73,8 @@ namespace 精密切割系统.Assets.config.menu
         public static List<MenuBean> GetF4MenuList()
         {
             var list = new List<MenuBean>();
-            list.Add(new MenuBean(401, "刀片更换", "/Assets/icon/menu_4/menu_4_1.png", "/Assets/icon/menu_4/menu_4_1_white.png",3, "Pages/F4_BladeMaintenance/BladeReplacementConfiguration"));
-            //list.Add(new MenuBean(402, "刀片测高", "/Assets/icon/menu_4/menu_4_2.png", "/Assets/icon/menu_4/menu_4_2_white.png",3, "Pages/F4_BladeMaintenance/BmContactSetupConf"));
+            //list.Add(new MenuBean(401, "刀片更换", "/Assets/icon/menu_4/menu_4_1.png", "/Assets/icon/menu_4/menu_4_1_white.png",3, "Pages/F4_BladeMaintenance/FullyAutomatic"));
+            list.Add(new MenuBean(409, "刀片更换", "/Assets/icon/menu_4/menu_4_2.png", "/Assets/icon/menu_4/menu_4_2_white.png", 3, "Pages/F4_BladeMaintenance/BMBladeReplacementConf"));
             // list.Add(new MenuBean(403, "刀片配置参数", "/Assets/icon/menu_4/menu_4_3.png", "/Assets/icon/menu_4/menu_4_3_white.png"));
             // list.Add(new MenuBean(404, "刀片对齐", "/Assets/icon/menu_4/menu_4_4.png", "/Assets/icon/menu_4/menu_4_4_white.png"));
             // list.Add(new MenuBean(405, "刀片状态信息", "/Assets/icon/menu_4/menu_4_5.png", "/Assets/icon/menu_4/menu_4_5_white.png"));

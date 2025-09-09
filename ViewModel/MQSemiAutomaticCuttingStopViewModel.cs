@@ -25,122 +25,7 @@ namespace 精密切割系统.ViewModel
         private DataPoint<float>? _originPoint;
         private SemaphoreSlim _semaph = new SemaphoreSlim(1, 1);
         private CancellationTokenSource _operatCts;
-
-        private string _directoryId;
-        private string _deviceDataNo;
-        private string _deviceDataId;
-        private string _channelNum;
-        private string _bladeHeight;
-        private string _feedSpeed;
-        private string _depthCompensation;
-        private string _changeFeedSpeed;
-        private int _allCutLine;
-        private string _allCutLineLength;
-        private double _cutWidth;
-        private double _edgesWidth;
-
-        public string DirectoryId
-        {
-            get => _directoryId;
-            set => SetProperty(ref _directoryId, value);
-        }
-
-        // DeviceDataNo
-        public string DeviceDataNo
-        {
-            get => _deviceDataNo;
-            set => SetProperty(ref _deviceDataNo, value);
-        }
-
-        // DeviceDataId
-        public string DeviceDataId
-        {
-            get => _deviceDataId;
-            set => SetProperty(ref _deviceDataId, value);
-        }
-
-        // DepthCompensation
-        public string DepthCompensation
-        {
-            get => _depthCompensation;
-            set => SetProperty(ref _depthCompensation, value);
-        }
-
-        // ChannelNum
-        public string ChannelNum
-        {
-            get => _channelNum;
-            set => SetProperty(ref _channelNum, value);
-        }
-
-        // BladeHeight
-        public string BladeHeight
-        {
-            get => _bladeHeight;
-            set => SetProperty(ref _bladeHeight, value);
-        }
-
-        // FeedSpeed
-        public string FeedSpeed
-        {
-            get => _feedSpeed;
-            set => SetProperty(ref _feedSpeed, value);
-        }
-
-        // CutWidth
-        public double CutWidth
-        {
-            get => _cutWidth;
-            set => SetProperty(ref _cutWidth, value);
-        }
-
-        // DdgesWidth
-        public double DdgesWidth
-        {
-            get => _edgesWidth;
-            set => SetProperty(ref _edgesWidth, value);
-        }
-
-        // ChangeFeedSpeed
-        public string ChangeFeedSpeed
-        {
-            get => _changeFeedSpeed;
-            set => SetProperty(ref _changeFeedSpeed, value);
-        }
-
-        private int _runCutLine;
-        public int RunCutLine
-        {
-            get => _runCutLine;
-            set => SetProperty(ref _runCutLine, value);
-        }
-
-        private int _allRunCutLine;
-        public int AllRunCutLine
-        {
-            get => _allRunCutLine;
-            set => SetProperty(ref _allRunCutLine, value);
-        }
-
-        private string _expectedProcessingEndTime;
-
-        public string ExpectedProcessingEndTime
-        {
-            get => _expectedProcessingEndTime;
-            set => SetProperty(ref _expectedProcessingEndTime, value);
-        }
-
-        public int AllCutLine
-        {
-            get => _allCutLine;
-            set => SetProperty(ref _allCutLine, value);
-        }
-
-        public string AllCutLineLength
-        {
-            get => _allCutLineLength;
-            set => SetProperty(ref _allCutLineLength, value);
-        }
+        public SemiAutomaticCutParamModel CutParam { get; set; }
 
         public MQSemiAutomaticCuttingStopViewModel()
         {
@@ -164,8 +49,8 @@ namespace 精密切割系统.ViewModel
             BottomButtonCollection.Clear();
             //BottomButtonCollection.Add(RightButtonParams.BlueButton("刀片状态信息", "UnfoldMoreHorizontal", () => NavigateUtils.NavigateToPage("Pages/F4_BladeMaintenance/BladeInfo", false)));
             //BottomButtonCollection.Add(RightButtonParams.BlueButton("型号参数", "UnfoldMoreHorizontal", () => NavigateUtils.NavigateToPage("Pages/F3_ModelCatalog/MCDeviceDataListConf", false)));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("高度补偿", "UnfoldMoreHorizontal", SetDepthCompensation));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("速度更改", "UnfoldMoreHorizontal", SetFeedSpeed));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("高度补偿", "FormatLineHeight", SetDepthCompensation));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("速度更改", "SpeedometerMedium", SetFeedSpeed));
             BottomButtonCollection.Add(RightButtonParams.BlueButton("刀痕识别", "TextRecognition", AutomaticRecognition));
             BottomButtonCollection.Add(RightButtonParams.BlueButton("工件吹气", "WeatherWindy", () => _semaph.ExecuteAsync(WorkpieceBlowing, "工件吹气")));
             BottomButtonCollection.Add(RightButtonParams.BlueButton("精细对焦", "FocusAuto", () => _semaph.ExecuteAsync(FocusAuto, "精细对焦")));
@@ -178,15 +63,15 @@ namespace 精密切割系统.ViewModel
         private void SetDepthCompensation()
         {
             // 高度补偿
-            _semiAutoCutService.DepthCompensationValue = DepthCompensation.ToFloat();
-            MaterialSnackUtils.MaterialSnack("刀片高度补偿设置成功！", MaterialSnackUtils.SnackType.SUCCESS);
+            _semiAutoCutService.DepthCompensationValue = CutParam.DepthCompensation.ToFloat();
+            MaterialSnackUtils.MaterialSnack($"刀片高度补偿设置为{_semiAutoCutService.DepthCompensationValue}！", MaterialSnackUtils.SnackType.SUCCESS);
         }
 
         private void SetFeedSpeed()
         {
             // 速度更改
-            _semiAutoCutService.FeedSpeedCompCompensationValue = ChangeFeedSpeed.ToFloat();
-            MaterialSnackUtils.MaterialSnack("变更进刀速度成功！", MaterialSnackUtils.SnackType.SUCCESS);
+            _semiAutoCutService.FeedSpeedCompCompensationValue = CutParam.ChangeFeedSpeed.ToFloat();
+            MaterialSnackUtils.MaterialSnack($"变更进刀速度设置为{_semiAutoCutService.FeedSpeedCompCompensationValue}！", MaterialSnackUtils.SnackType.SUCCESS);
         }
 
         private async Task GlobalFocus()
@@ -304,6 +189,7 @@ namespace 精密切割系统.ViewModel
             InitBottomButton();
             InitRightButton();
             _semiAutomaticCuttingRunViewModel = navigationContext.Parameters.GetValue<MQSemiAutomaticCuttingRunViewModel>(nameof(MQSemiAutomaticCuttingRunViewModel));
+            CutParam = _semiAutomaticCuttingRunViewModel.CutParam;
             float? xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync();
             float? yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync();
             // 初始化起始点位置

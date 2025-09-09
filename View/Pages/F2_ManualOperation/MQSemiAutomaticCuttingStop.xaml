@@ -53,7 +53,7 @@
                         FontWeight="Bold" />
                     <Controls:InputTextBox
                         IsEnabled="False"
-                        Text="{Binding Path=DeviceDataNo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        Text="{Binding Path=CutParam.DeviceDataNo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         TextWrapping="Wrap" />
                     <Label Content="" FontSize="16" />
                     <Label
@@ -62,7 +62,7 @@
                         FontWeight="Bold" />
                     <Controls:InputTextBox
                         IsEnabled="False"
-                        Text="{Binding Path=DeviceDataId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        Text="{Binding Path=CutParam.DeviceDataId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         TextWrapping="Wrap" />
                     <Label Content="" FontSize="16" />
                     <Label
@@ -72,12 +72,12 @@
                     <StackPanel Orientation="Horizontal">
                         <Controls:InputTextBox
                             IsEnabled="False"
-                            Text="{Binding Path=RunCutLine, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Text="{Binding Path=CutParam.RunCutLine, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             TextWrapping="Wrap" />
                         <Label Content=" / " FontSize="18" />
                         <Controls:InputTextBox
                             IsEnabled="False"
-                            Text="{Binding Path=AllRunCutLine, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Text="{Binding Path=CutParam.AllRunCutLine, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             TextWrapping="Wrap" />
                     </StackPanel>
                     <Label Content="" FontSize="16" />
@@ -87,7 +87,7 @@
                         FontWeight="Bold" />
                     <Controls:InputTextBox
                         IsEnabled="False"
-                        Text="{Binding Path=ChannelNum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        Text="{Binding Path=CutParam.ChannelNum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         TextWrapping="Wrap" />
                     <Label Content="" FontSize="16" />
                     <Label
@@ -96,7 +96,7 @@
                         FontWeight="Bold" />
                     <Controls:InputTextBox
                         IsEnabled="False"
-                        Text="{Binding Path=BladeHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        Text="{Binding Path=CutParam.BladeHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         TextWrapping="Wrap" />
                     <Label Content="mm" FontSize="16" />
                     <Label
@@ -107,7 +107,7 @@
                     <Controls:InputTextBox
                         x:Name="HeightChange2"
                         InputType="Decimal"
-                        Text="{Binding Path=DepthCompensation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        Text="{Binding Path=CutParam.DepthCompensation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         TextWrapping="Wrap"
                         XMax="0.3"
                         XMin="-0.3"
@@ -122,7 +122,7 @@
                         FontWeight="Bold" />
                     <Controls:InputTextBox
                         IsEnabled="False"
-                        Text="{Binding Path=FeedSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        Text="{Binding Path=CutParam.FeedSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         TextWrapping="Wrap" />
                     <Label Content="mm/s" FontSize="16" />
                     <Label
@@ -133,7 +133,7 @@
                     <Controls:InputTextBox
                         x:Name="ChangeFeedSpeed2"
                         InputType="Decimal"
-                        Text="{Binding Path=ChangeFeedSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        Text="{Binding Path=CutParam.ChangeFeedSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         TextWrapping="Wrap"
                         XMax="100"
                         XMin="0"
@@ -149,13 +149,13 @@
                     <StackPanel Grid.ColumnSpan="2" Orientation="Horizontal">
                         <Controls:InputTextBox
                             IsEnabled="False"
-                            Text="{Binding Path=AllCutLine, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Text="{Binding Path=CutParam.AllCutLine, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             TextWrapping="Wrap" />
                         <Label Content="lines" FontSize="16" />
                         <Label Content="" FontSize="16" />
                         <Controls:InputTextBox
                             IsEnabled="False"
-                            Text="{Binding Path=AllCutLineLength, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Text="{Binding Path=CutParam.AllCutLineLength, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             TextWrapping="Wrap" />
                         <Label Content="m" FontSize="16" />
                         <Button
@@ -174,7 +174,7 @@
                         FontWeight="Bold" />
                     <Controls:InputTextBox
                         IsEnabled="False"
-                        Text="{Binding Path=ExpectedProcessingEndTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        Text="{Binding Path=CutParam.ExpectedProcessingEndTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         TextWrapping="Wrap" />
                     <Label Content="" FontSize="16" />
                 </auto:AutoGrid>

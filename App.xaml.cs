@@ -41,7 +41,7 @@ namespace 精密切割系统
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterForNavigation<EmptyView>();
-            containerRegistry.RegisterForNavigation<BladeReplacementConfiguration, BladeReplacementConfigurationViewModel>();
+            containerRegistry.RegisterForNavigation<FullyAutomatic, FullyAutomaticViewModel>();
             containerRegistry.RegisterForNavigation<AutoCutRuning, AutoCutRuningViewModel>();
             containerRegistry.RegisterForNavigation<AutoCutPausing, AutoCutPausingViewModel>();
             containerRegistry.RegisterForNavigation<AutoCut, AutoCutViewModel>();

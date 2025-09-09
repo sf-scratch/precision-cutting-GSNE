@@ -1,81 +1,129 @@
-﻿<Page x:Class="精密切割系统.View.Pages.F4_BladeMaintenance.BMBladeReplacementConf"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:Controls="clr-namespace:精密切割系统.View.Controls" 
-      xmlns:local="clr-namespace:精密切割系统.ViewModel"
-      mc:Ignorable="d" 
-      d:DesignHeight="676" d:DesignWidth="1448"
-      Title="BMBladeReplacementConf" Loaded="Page_Loaded" Unloaded="Page_Unloaded">
+﻿<Page
+    x:Class="精密切割系统.View.Pages.F4_BladeMaintenance.BMBladeReplacementConf"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:精密切割系统.ViewModel"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="BMBladeReplacementConf"
+    d:DesignHeight="676"
+    d:DesignWidth="1448"
+    Loaded="Page_Loaded"
+    mc:Ignorable="d">
     <Page.DataContext>
-        <local:ReplaceBladeViewModel></local:ReplaceBladeViewModel>
+        <local:ReplaceBladeViewModel />
     </Page.DataContext>
-    <Grid Margin="30,30,0,0"  >
-        <Grid.RowDefinitions >
-            <RowDefinition Height="60"/>
-            <RowDefinition/>
+    <Grid Margin="30,30,0,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60" />
+            <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
+            <ColumnDefinition />
+            <ColumnDefinition />
+            <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <Label x:Name="labBladeReplacementHeader" Content="刀片更换(3.1)" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"  FontWeight="Bold" FontSize="22"/>
-        <StackPanel Grid.Row="1" Grid.Column="0" x:Name="sp1" HorizontalAlignment="Left" >
-            <StackPanel Visibility="Collapsed">
-                <Label x:Name="labUnit" Width="250" Height="35" Content="单位" FontWeight="Bold" FontSize="16" />
-            </StackPanel>
-            <StackPanel  Margin="0,0,0,0" Orientation="Horizontal" Visibility="Collapsed">
-                <RadioButton IsChecked="{Binding Path=IsBladeUnitMm,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" x:Name="rbMm" Content="mm" FontWeight="Bold" FontSize="18" Height="35" Width="70"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="5,0,0,0"/>
-                <RadioButton IsChecked="{Binding Path=IsBladeUnitInch,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" x:Name="rbInch" Content="inch" FontWeight="Bold" FontSize="18" Height="35"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"  Width="70" Margin="30,0,0,0" />
-            </StackPanel>
-            <StackPanel  Margin="0,10,0,0" >
-                <Label x:Name="labLotID"  Height="35" Content="刀片批号I.D" FontWeight="Bold" FontSize="16" />
-                <StackPanel  Orientation="Horizontal" >
-                    <Controls:InputTextBox Text="{Binding Path=BladeLotID,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" x:Name="tbxLotID" Width="250"  TextWrapping="Wrap"  Height="35" MaxLength="20" />
+        <Label
+            x:Name="labBladeReplacementHeader"
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            Content="刀片更换(3.1)"
+            FontSize="22"
+            FontWeight="Bold" />
+        <StackPanel
+            Grid.Row="1"
+            Grid.Column="0"
+            HorizontalAlignment="Left">
+            <StackPanel Margin="0,10,0,0">
+                <Label
+                    x:Name="labUnit2"
+                    Height="35"
+                    Content="刀片外径"
+                    FontSize="16"
+                    FontWeight="Bold" />
+                <StackPanel Orientation="Horizontal">
+                    <Controls:InputTextBox
+                        x:Name="bladeOuterDiameter"
+                        Width="250"
+                        Height="35"
+                        InputType="Decimal"
+                        TextWrapping="Wrap"
+                        XMin="0"
+                        XPrecision="3" />
+                    <Label
+                        Height="35"
+                        Content="mm"
+                        FontSize="14"
+                        FontWeight="Bold"
+                        Foreground="Black" />
                 </StackPanel>
             </StackPanel>
-            <StackPanel  Margin="0,10,0,0" >
-                <Label x:Name="labNewUsed"  Height="35" Content="新/旧" FontWeight="Bold" FontSize="16" />
-                <StackPanel  Orientation="Horizontal" >
-                    <!-- cmbNewOrUsed.Text  取到文本 New -->
-                    <ComboBox Text="{Binding Path=NewOrOld,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" ItemsSource="{Binding Path=NewOrOldComboBoxItems,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" x:Name="cmbNewOrUsed" Width="250"  Height="35" VerticalContentAlignment="Center" >
-                        <ComboBox.ItemContainerStyle>
-                            <Style TargetType="ComboBoxItem">
-                                <Setter Property="Height" Value="35"/>
-                            </Style>
-                        </ComboBox.ItemContainerStyle>
-                    </ComboBox>
+            <StackPanel Margin="0,10,0,0">
+                <Label
+                    x:Name="labBladeThickness"
+                    Height="35"
+                    Content="刀片厚度"
+                    FontSize="16"
+                    FontWeight="Bold" />
+                <StackPanel Orientation="Horizontal">
+                    <Controls:InputTextBox
+                        x:Name="bladeThickness"
+                        Width="250"
+                        Height="35"
+                        InputType="Decimal"
+                        TextWrapping="Wrap"
+                        XMin="0"
+                        XPrecision="3" />
+                    <Label
+                        Height="35"
+                        Content="mm"
+                        FontSize="14"
+                        FontWeight="Bold" />
                 </StackPanel>
             </StackPanel>
-            <StackPanel  Margin="0,10,0,0" >
-                <Label x:Name="labUnit2"  Height="35" Content="刀片外径" FontWeight="Bold" FontSize="16" />                
-                <StackPanel  Orientation="Horizontal" >
-                    <Controls:InputTextBox x:Name="tbxOutside" Text="{Binding Path=BladeOutside,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Width="250"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XPrecision="3" />
-                    <Label  Height="35" Content="mm" FontWeight="Bold" FontSize="14" Foreground="Black" />
+            <StackPanel Margin="0,10,0,0">
+                <Label
+                    x:Name="labBladeLife"
+                    Height="35"
+                    Content="刀片使用寿命"
+                    FontSize="16"
+                    FontWeight="Bold" />
+                <StackPanel Orientation="Horizontal">
+                    <Controls:InputTextBox
+                        x:Name="afterReplaceBladeCutTimes"
+                        Width="250"
+                        Height="35"
+                        InputType="Numeral"
+                        TextWrapping="Wrap"
+                        XMin="0" />
+                    <Label
+                        Height="35"
+                        Content="刀"
+                        FontSize="14"
+                        FontWeight="Bold" />
                 </StackPanel>
-            </StackPanel>
-            <StackPanel  Margin="0,10,0,0" >
-                <Label x:Name="labBladeThickness"  Height="35" Content="刀片厚度" FontWeight="Bold" FontSize="16" />
-                <StackPanel Orientation="Horizontal" >
-                    <Controls:InputTextBox x:Name="tbxThickness" Text="{Binding Path=BladeThickness,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Width="250"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XPrecision="3" />
-                    <Label Height="35" Content="mm" FontWeight="Bold" FontSize="14" />
-                </StackPanel>
-            </StackPanel>
-            <StackPanel  Margin="0,10,0,0" >
-                <Label x:Name="labBladeLife"  Height="35" Content="刀片使用寿命" FontWeight="Bold" FontSize="16" />
-                <StackPanel  Orientation="Horizontal" >
-                    <Controls:InputTextBox x:Name="tbxLifeLines" Text="{Binding Path=BladeLife,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Width="250"  TextWrapping="Wrap"  Height="35" InputType="Numeral" XMin="0" />
-                    <Label Height="35" Content="刀" FontWeight="Bold" FontSize="14" />
-                </StackPanel>
-                <StackPanel  Orientation="Horizontal"  Margin="0,5,0,0">
-                    <Controls:InputTextBox x:Name="tbxLifeM" Text="{Binding Path=BladeLifeM,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Width="250"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XPrecision="3" />
-                    <Label Height="35" Content="m" FontWeight="Bold" FontSize="14" />
+                <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                    <Controls:InputTextBox
+                        x:Name="afterReplaceBladeCutLength"
+                        Width="250"
+                        Height="35"
+                        InputType="Decimal"
+                        TextWrapping="Wrap"
+                        XMin="0"
+                        XPrecision="3" />
+                    <Label
+                        Height="35"
+                        Content="m"
+                        FontSize="14"
+                        FontWeight="Bold" />
                 </StackPanel>
             </StackPanel>
         </StackPanel>
-        <StackPanel Grid.Row="1" Grid.Column="1" x:Name="sp2"  HorizontalAlignment="Left">
+        <!--<StackPanel Grid.Row="1" Grid.Column="1" x:Name="sp2"  HorizontalAlignment="Left">
             <Label x:Name="labSpec" Width="250" Height="35" Content="更换刀片的品种名称" FontWeight="Bold" FontSize="16" />
             <Controls:InputTextBox x:Name="tbxSpec" Text="{Binding Path=SpecName,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Width="250"  TextWrapping="Wrap"  Height="35" MaxLength="15"  />
             <Label x:Name="labReplacementReason" Width="250" Height="35" Content="更换原因" FontWeight="Bold" FontSize="16" Margin="0,10,0,0"/>
@@ -114,6 +162,6 @@
                     <Label Height="35" Content="mm" FontWeight="Bold" FontSize="14" />
                 </StackPanel>
             </StackPanel>
-        </StackPanel>
+        </StackPanel>-->
     </Grid>
 </Page>

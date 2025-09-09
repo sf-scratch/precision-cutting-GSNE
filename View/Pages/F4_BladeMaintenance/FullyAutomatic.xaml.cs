@@ -29,14 +29,14 @@ using 精密切割系统.ViewModel;
 namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 {
     /// <summary>
-    /// BladeReplacementConfiguration.xaml 的交互逻辑
+    /// FullyAutomatic.xaml 的交互逻辑
     /// </summary>
-    public partial class BladeReplacementConfiguration : UserControl
+    public partial class FullyAutomatic : UserControl
     {
         private readonly IEventAggregator _eventAggregator;
         private MainWindow? _mainWindow;
 
-        public BladeReplacementConfiguration(IEventAggregator eventAggregator)
+        public FullyAutomatic(IEventAggregator eventAggregator)
         {
             InitializeComponent();
             _eventAggregator = eventAggregator;

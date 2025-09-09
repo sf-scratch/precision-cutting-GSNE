@@ -135,13 +135,13 @@ namespace 精密切割系统.ViewModel
                 default:
                     break;
             }
-            _regionManager.RequestNavigate(RegionName.MainRegion, nameof(BladeReplacementConfiguration));
+            _regionManager.RequestNavigate(RegionName.MainRegion, nameof(FullyAutomatic));
         }
 
         private void Back()
         {
             StopGetAxisInfo();
-            _regionManager.RequestNavigate(RegionName.MainRegion, nameof(BladeReplacementConfiguration));
+            _regionManager.RequestNavigate(RegionName.MainRegion, nameof(FullyAutomatic));
         }
 
         private void StartGetAxisInfo()

@@ -853,11 +853,12 @@ namespace 精密切割系统.ViewModel
                         //CurrentJogSpeedZ1 = await PlcControl.tagControl.Z1axis.GetJogRelativeSpeedAsync() ?? float.NaN;
                         //CurrentJogSpeedZ2 = await PlcControl.tagControl.Z2axis.GetJogRelativeSpeedAsync() ?? float.NaN;
                         //CurrentJogSpeedTheta = await PlcControl.tagControl.ThetaAxis.GetJogRelativeSpeedAsync() ?? float.NaN;
-                        //IsReadyX = await PlcControl.tagControl.Xaxis.IsReadyAsync();
-                        //IsReadyY = await PlcControl.tagControl.Yaxis.IsReadyAsync();
-                        //IsReadyZ1 = await PlcControl.tagControl.Z1axis.IsReadyAsync();
-                        //IsReadyZ2 = await PlcControl.tagControl.Z2axis.IsReadyAsync();
-                        //IsReadyTheta = await PlcControl.tagControl.ThetaAxis.IsReadyAsync();
+                        var axisState = await AutoCutUtils.GetAxisStateAsync();
+                        IsReadyX = axisState.X == true;
+                        IsReadyY = axisState.Y == true;
+                        IsReadyZ1 = axisState.Z1 == true;
+                        IsReadyZ2 = axisState.Z2 == true;
+                        IsReadyTheta = axisState.Theta == true;
                     }
                     catch (Exception ex)
                     {

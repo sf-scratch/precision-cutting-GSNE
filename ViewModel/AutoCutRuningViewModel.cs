@@ -847,7 +847,7 @@ namespace 精密切割系统.ViewModel
         {
             if (!GlobalParams.onlineFlag)
             {
-                _regionManager.RequestNavigate(RegionName.MainRegion, nameof(BladeReplacementConfiguration));
+                _regionManager.RequestNavigate(RegionName.MainRegion, nameof(FullyAutomatic));
                 return;
             }
             //中止监控报警线程
@@ -869,7 +869,7 @@ namespace 精密切割系统.ViewModel
                     await PlcControl.tagControl.bladeMantance.WaitHeightMeasurementCompletedAsync(default);
                 }
             }
-            _regionManager.RequestNavigate(RegionName.MainRegion, nameof(BladeReplacementConfiguration));
+            _regionManager.RequestNavigate(RegionName.MainRegion, nameof(FullyAutomatic));
         }
 
         private void UpdateMaterialSnack()

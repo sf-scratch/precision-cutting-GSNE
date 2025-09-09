@@ -93,6 +93,24 @@ namespace 精密切割系统.Helpers
         }
 
         /// <summary>
+        /// 刀片外径
+        /// </summary>
+        public static float? BladeOuterDiameter
+        {
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
+        }
+
+        /// <summary>
+        /// 刀片厚度
+        /// </summary>
+        public static float? BladeThickness
+        {
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
+        }
+
+        /// <summary>
         /// 测高位置theta角度
         /// </summary>
         public static int? ContactHeightMeasurementThetaDeg

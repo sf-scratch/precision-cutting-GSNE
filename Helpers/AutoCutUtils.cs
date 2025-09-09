@@ -62,6 +62,17 @@ namespace 精密切割系统.Helpers
             return new AxisPosition(positions[0], positions[1], positions[2], positions[3], positions[4]);
         }
 
+        public static async Task<AxisState> GetAxisStateAsync()
+        {
+            var states = await Task.WhenAll(
+                        PlcControl.tagControl.Xaxis.IsReadyAsync(),
+                        PlcControl.tagControl.Yaxis.IsReadyAsync(),
+                        PlcControl.tagControl.Z1axis.IsReadyAsync(),
+                        PlcControl.tagControl.Z2axis.IsReadyAsync(),
+                        PlcControl.tagControl.ThetaAxis.IsReadyAsync());
+            return new AxisState(states[0], states[1], states[2], states[3], states[4]);
+        }
+
         /// <summary>
         /// 换刀片
         /// </summary>
@@ -85,7 +96,7 @@ namespace 精密切割系统.Helpers
             }
             catch (OperationCanceledException)
             {
-                MaterialSnackUtils.MaterialSnack("更换刀片操作失败！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+                MaterialSnackUtils.MaterialSnack("更换刀片操作取消！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
             }
         }
 
@@ -1832,4 +1843,5 @@ namespace 精密切割系统.Helpers
 
 
     public record class AxisPosition(float? X, float? Y, float? Z1, float? Z2, float? Theta);
+    public record class AxisState(bool? X, bool? Y, bool? Z1, bool? Z2, bool? Theta);
 }

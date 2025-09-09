@@ -138,6 +138,11 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 MaterialSnack("请先结束暖机再开始切割！", SnackType.WARNING);
                 return;
             }
+            if (_viewModel.CutDirection == "----")
+            {
+                MaterialSnack("请选择切割方向！", SnackType.WARNING);
+                return;
+            }
             ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(MQSemiAutomaticCuttingRun));
         }
 

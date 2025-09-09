@@ -39,7 +39,7 @@ using 精密切割系统.ViewModel.Dialogs;
 
 namespace 精密切割系统.ViewModel
 {
-    public class BladeReplacementConfigurationViewModel : CustomBindableBase
+    public class FullyAutomaticViewModel : CustomBindableBase
     {
         private static readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
         private readonly IRegionManager _regionManager;
@@ -158,7 +158,7 @@ namespace 精密切割系统.ViewModel
             }
         }
 
-        public BladeReplacementConfigurationViewModel(IRegionManager regionManager, IEventAggregator eventAggregator)
+        public FullyAutomaticViewModel(IRegionManager regionManager, IEventAggregator eventAggregator)
         {
             _regionManager = regionManager;
             _eventAggregator = eventAggregator;
@@ -168,7 +168,7 @@ namespace 精密切割系统.ViewModel
             InitCommand = new AsyncDelegateCommand(InitAsync);
         }
 
-        public BladeReplacementConfigurationViewModel()
+        public FullyAutomaticViewModel()
         {
         }
 

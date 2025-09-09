@@ -92,7 +92,7 @@ namespace 精密切割系统.ViewModel
 
         private void Back()
         {
-            _regionManager.RequestNavigate(RegionName.MainRegion, nameof(BladeReplacementConfiguration));
+            _regionManager.RequestNavigate(RegionName.MainRegion, nameof(FullyAutomatic));
         }
 
         private async Task UpdateKnifeWearListAsync()
