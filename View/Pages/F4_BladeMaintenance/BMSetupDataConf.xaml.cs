@@ -89,6 +89,11 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 
         private async void BtnStartSetup_RightClicked(object? sender, bool e)
         {
+            if (Appsettings.BladeOuterDiameter is null)
+            {
+                MaterialSnack("未设置刀片外径！", SnackType.WARNING);
+                return;
+            }
             try
             {
                 _rightPage.btnStartSetup.Visibility = Visibility.Collapsed;
@@ -98,8 +103,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 _measureHeightCts = new CancellationTokenSource();
                 _eventAggregator.GetEvent<AutoRuningMessageEvent>().Subscribe(OnMessageReceived, ThreadOption.UIThread);
                 await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
-                //await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(56));
-                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(16.7F);
+                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(Appsettings.BladeOuterDiameter.Value));
                 CommonResult<float> curHeightZ = await AutoCutUtils.ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, _eventAggregator, _measureHeightCts.Token);
                 if (!curHeightZ.IsSuccess)
                 {

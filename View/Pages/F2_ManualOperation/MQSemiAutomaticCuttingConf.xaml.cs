@@ -143,6 +143,11 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 MaterialSnack("请选择切割方向！", SnackType.WARNING);
                 return;
             }
+            if (Appsettings.BladeOuterDiameter is null)
+            {
+                MaterialSnack("未设置刀片外径！", SnackType.WARNING);
+                return;
+            }
             ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(MQSemiAutomaticCuttingRun));
         }
 

@@ -96,6 +96,11 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 MaterialSnack(cutStepResult.Message, SnackType.WARNING);
                 return;
             }
+            if (Appsettings.BladeOuterDiameter is null)
+            {
+                MaterialSnack("未设置刀片外径！", SnackType.WARNING);
+                return;
+            }
             BmSharpenParameterModel bmSharpenParameter = sharpenParamResult.Data;
             // 初始化数据
             bladeHeight.Text = bmSharpenParameter.CutHeight.ToString();
@@ -109,7 +114,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             {
                 int spindleRev = int.Parse(bmSharpenParameter.RotateSpeed);
                 await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
-                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(56f));
+                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(Appsettings.BladeOuterDiameter.Value));
                 CommonResult<float> firstHeightZ = await AutoCutUtils.ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, default, _pauseCts.Token);
                 if (!firstHeightZ.IsSuccess)
                 {

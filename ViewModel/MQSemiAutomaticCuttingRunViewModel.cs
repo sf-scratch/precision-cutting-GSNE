@@ -180,13 +180,17 @@ namespace 精密切割系统.ViewModel
                     MaterialSnack(fileTableItemResult.Message, SnackType.WARNING);
                     return;
                 }
+                if (Appsettings.BladeOuterDiameter is null)
+                {
+                    MaterialSnack("未设置刀片外径！", SnackType.WARNING);
+                    return;
+                }
                 FileTableItemModel fileTableItem = fileTableItemResult.Data;
                 _ = MonitoringAlarmAsync(_monitoringCts.Token);
                 _ = MonitoringCutProgressAsync(_monitoringCts.Token);
                 float cutY = (await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0).ToActualY();
                 await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
-                //await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(56.5F));
-                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(15f);
+                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(Appsettings.BladeOuterDiameter.Value));
                 CommonResult<float> curHeightZ = await AutoCutUtils.ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, _eventAggregator, _pauseCts.Token);
                 if (!curHeightZ.IsSuccess)
                 {
