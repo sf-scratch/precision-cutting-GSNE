@@ -92,6 +92,8 @@ namespace 精密切割系统.Helpers
                 await Task.WhenAll(taskXY, taskTheta, speedZero);
                 Appsettings.AfterReplaceBladeCutTimes = 0;
                 Appsettings.AfterReplaceBladeCutLength = 0;
+                Appsettings.BladeOuterDiameter = null;
+                Appsettings.BladeThickness = null;
                 MaterialSnackUtils.MaterialSnack("请打开切割安全门，更换刀片！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
             }
             catch (OperationCanceledException)
@@ -204,6 +206,7 @@ namespace 精密切割系统.Helpers
                     await PlcControl.tagControl.bladeMantance.SetBladeSetuInitPositionAsync(initPos.NoContactBladeSetupInitX, initPos.NoContactBladeSetupInitY);
                     await PlcControl.tagControl.bladeMantance.StartNoContactHeightMeasurement();
                     break;
+
                 default:
                     break;
             }
@@ -303,7 +306,7 @@ namespace 精密切割系统.Helpers
                             eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高偏差过大，重新测高"));
                             if (times % 3 == 0)
                             {
-                                var res = await DialogHost.Show(SelectionDialog.NewInstance("继续测高", "结束切割", title:"测高多次失败，请确认操作"));
+                                var res = await DialogHost.Show(SelectionDialog.NewInstance("继续测高", "结束切割", title: "测高多次失败，请确认操作"));
                                 if (res is string dialogResult)
                                 {
                                     if (dialogResult == SelectionDialog.NO)
@@ -620,8 +623,6 @@ namespace 精密切割系统.Helpers
             return initialPosition;
         }
 
-        
-
         /// <summary>
         /// 切割校准
         /// </summary>
@@ -744,7 +745,6 @@ namespace 精密切割系统.Helpers
 
         public static async Task<CommonResult<float>> AutoFocusAsync(IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
-
             eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始相机精细对焦..."));
             CameraCommon? cameraCommon = GetCameraCommon();
             if (cameraCommon is null)
@@ -791,9 +791,9 @@ namespace 精密切割系统.Helpers
             for (float newPosition = startPositionZ2 - margin; newPosition <= startPositionZ2 + margin; newPosition += singleMoveDistance)
             {
                 await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(newPosition, default, token);
-                if (cameraCommon.localBitmap != null)
+                if (cameraCommon.LocalBitmap != null)
                 {
-                    float tenengradBlurriness = (float)VisionAnalyzer.CalculateTenengrad2(cameraCommon.localBitmap.ToMat());
+                    float tenengradBlurriness = (float)VisionAnalyzer.CalculateTenengrad2(cameraCommon.LocalBitmap.ToMat());
                     eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"当前位置：{newPosition} 当前模糊度：{tenengradBlurriness}"));
                     if (lastBlurriness > 0 && lastBlurriness - tenengradBlurriness > 0.5)
                     {
@@ -836,7 +836,6 @@ namespace 精密切割系统.Helpers
 
         public static float CalculateCutY(float cutY, float cutSize, CutDirection cutDirection)
         {
-
             //计算切割线的偏移
             var cutYOffset = cutDirection switch
             {
@@ -882,7 +881,7 @@ namespace 精密切割系统.Helpers
             //计算工件圆心坐标
             DataPoint<float> workpieceCenterPoint = new DataPoint<float>(thetaCenterPoint.X, thetaCenterPoint.Y + centerDistance);
             //计算切割线与工件圆的交点
-            LineSegment? line = GeometryUtils.CalculateSemicircleIntersectionLine(thetaCenterPoint, new DataPoint<float>(workpieceCenterPoint.X - thetaCenterPoint.X, workpieceCenterPoint.Y - thetaCenterPoint.Y), 
+            LineSegment? line = GeometryUtils.CalculateSemicircleIntersectionLine(thetaCenterPoint, new DataPoint<float>(workpieceCenterPoint.X - thetaCenterPoint.X, workpieceCenterPoint.Y - thetaCenterPoint.Y),
                 workpieceRadius, rotationAngle, cutY);
             if (line == null)
             {
@@ -1749,7 +1748,7 @@ namespace 精密切割系统.Helpers
                             {
                                 byte[] bBitmap = new byte[destImgSize];
                                 Marshal.Copy(destImg, bBitmap, 0, (int)destImgSize);
-                                int stride = (int)imgWidth; // Assuming 1 byte per pixel  
+                                int stride = (int)imgWidth; // Assuming 1 byte per pixel
                                 bitmap = new WriteableBitmap((int)imgWidth, (int)imgHeight, 96, 96, PixelFormats.Gray8, null);
                                 bitmap.WritePixels(new System.Windows.Int32Rect(0, 0, (int)imgWidth, (int)imgHeight), bBitmap, stride, 0);
                             }
@@ -1840,7 +1839,6 @@ namespace 精密切割系统.Helpers
             }
         }
     }
-
 
     public record class AxisPosition(float? X, float? Y, float? Z1, float? Z2, float? Theta);
     public record class AxisState(bool? X, bool? Y, bool? Z1, bool? Z2, bool? Theta);

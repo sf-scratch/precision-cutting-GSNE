@@ -16,6 +16,7 @@ namespace 精密切割系统.Model.cut
     {
         // 对焦参数（可配置）
         private const float InitialSpeed = 1.0f;    // 初始速度（高速）
+
         private const float FineTuneSpeed = 0.05f;  // 精细对焦速度
         private const double BlurThreshold = 0.5;   // 模糊度变化阈值
         private const float MaxLimitZ = 7.5f;  // Z轴位置限制
@@ -88,7 +89,7 @@ namespace 精密切割系统.Model.cut
                 using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
                 while (await timer.WaitForNextTickAsync(token))
                 {
-                    var bitmap = camera.localBitmap;
+                    var bitmap = camera.LocalBitmap;
                     // 1. 获取当前帧和位置
                     if (bitmap == null)
                     {

@@ -16,6 +16,7 @@ namespace 精密切割系统.Model.cut
     public class ThetaAlignService
     {
         private static readonly Lazy<ThetaAlignService> _lazy = new(() => new ThetaAlignService());
+
         public static ThetaAlignService Instance
         {
             get { return _lazy.Value; }
@@ -84,10 +85,12 @@ namespace 精密切割系统.Model.cut
                         _thetaAlignCompletedDeg = await PlcControl.tagControl.ThetaAxis.GetCurrentLocationAsync() ?? 0;
                         MaterialSnackUtils.MaterialSnack("横向拉直完成！", MaterialSnackUtils.SnackType.SUCCESS);
                         break;
+
                     case ThetaAlignStatus.Vertical:
                         _currentThetaAlignStatus = ThetaAlignStatus.None;
                         MaterialSnackUtils.MaterialSnack("已取消竖向拉直!", MaterialSnackUtils.SnackType.WARNING);
                         break;
+
                     default:
                         xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationWaitAsync(token) ?? 0;
                         yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationWaitAsync(token) ?? 0;
@@ -128,6 +131,7 @@ namespace 精密切割系统.Model.cut
                         _currentThetaAlignStatus = ThetaAlignStatus.None;
                         MaterialSnackUtils.MaterialSnack("已取消横向拉直!", MaterialSnackUtils.SnackType.WARNING);
                         break;
+
                     case ThetaAlignStatus.Vertical:
                         MaterialSnackUtils.MaterialSnack("竖向拉直中！", MaterialSnackUtils.SnackType.SUCCESS, 0);
                         xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationWaitAsync(token) ?? 0;
@@ -150,6 +154,7 @@ namespace 精密切割系统.Model.cut
                         _thetaAlignCompletedDeg = await PlcControl.tagControl.ThetaAxis.GetCurrentLocationAsync() ?? 0;
                         MaterialSnackUtils.MaterialSnack("竖向拉直完成！", MaterialSnackUtils.SnackType.SUCCESS);
                         break;
+
                     default:
                         xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationWaitAsync(token) ?? 0;
                         yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationWaitAsync(token) ?? 0;
@@ -271,7 +276,7 @@ namespace 精密切割系统.Model.cut
             return new PointF(newX + center.X, newY + center.Y);
         }
 
-        void SetCalibrationAngle()
+        private void SetCalibrationAngle()
         {
             // 获取当前面的切割角度，然后用当前角度减去切割角度 等于拉直误差角度
             FileTableItemChModel chModel = CurrentUtils.GetFileTableItemChModel();
@@ -283,7 +288,6 @@ namespace 精密切割系统.Model.cut
             Tools.LogInfo($"tempCh:{tempCh}");
         }
     }
-
 
     public enum ThetaAlignStatus
     {

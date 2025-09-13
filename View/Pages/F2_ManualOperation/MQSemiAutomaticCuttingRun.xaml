@@ -249,7 +249,7 @@
                 </auto:AutoGrid>
                 <Controls:RealTimeInfoBox
                     Grid.Row="2"
-                    Height="200"
+                    Height="150"
                     Margin="30"
                     Messages="{Binding MessageList}" />
             </StackPanel>
