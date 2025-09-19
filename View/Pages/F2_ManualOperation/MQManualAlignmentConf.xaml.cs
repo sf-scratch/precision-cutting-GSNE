@@ -34,24 +34,31 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         private readonly DynamicIntervalTimer _intervalTimer = new DynamicIntervalTimer(TimeSpan.FromMilliseconds(500), TimeSpan.FromMilliseconds(100));
         private MainWindow _mainWindow;
         private RightPage _rightPage;
+
         // 操作类型 0 菜单进入 1 半自动进入 2 磨刀进入
         private int _operateType = 0;
+
         // 相机操作对象
-        CameraCommon _cameraCommon;
+        private CameraCommon _cameraCommon;
+
         // 当前页面状态 0 校准 1 对焦 2 测量 根据状态不同，退出的操作不同
-        int pageStatus = 0;
+        private int pageStatus = 0;
+
         // 读取轴实时位置标识
-        bool axisRealTimeFlag = true;
+        private bool axisRealTimeFlag = true;
+
         // 清零后X位置
-        string cleanXPosition = "";
+        private string cleanXPosition = "";
+
         // 清零后Y位置
-        string cleanYPosition = "";
+        private string cleanYPosition = "";
+
         private CancellationTokenSource _cts;
 
         public MQManualAlignmentConf()
         {
             InitializeComponent();
-            _mainWindow = Application.Current.MainWindow as MainWindow ?? new MainWindow(); 
+            _mainWindow = Application.Current.MainWindow as MainWindow ?? new MainWindow();
             _cts = new CancellationTokenSource();
         }
 
@@ -106,7 +113,8 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             RealTimeInfo.Messages.Add(model);
         }
 
-        bool confirmFlag = false;
+        private bool confirmFlag = false;
+
         private async void SureHandler(object? sender, bool e)
         {
             // 判断是否Theta轴拉直 等于0 说明没有做Theta轴校准
@@ -180,7 +188,6 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 titleName.Content = "单一切割面校准 (1.1)";
                 _rightPage.btnSure.Visibility = Visibility.Visible;
             }
-
         }
 
         public async void ClickHandler(object? sender, int code)
@@ -208,6 +215,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                         }, "精细对焦");
                     }
                     break;
+
                 case 2441:
                     {
                         await _semaphore.ExecuteAsync(async () =>
@@ -229,21 +237,26 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                         }, "全局对焦");
                     }
                     break;
+
                 case 2445:
                     Appsettings.FocusClearZ = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync();
                     break;
+
                 case 2443:
                     await _alignService.ThetaVerticalAlignAsync();
                     break;
+
                 case 2453:
                     await _alignService.ThetaHorizontalAlignAsync();
                     break;
+
                 case 2479:
                     // 倍率变更
                     _cameraCommon.ChangeCamera();
-                    Thread.Sleep(100);;
+                    Thread.Sleep(100); ;
                     commonDimming.InitData();
                     break;
+
                 case 2050:
                     // 测量
                     // absolutePositionPanel.Visibility = Visibility.Visible;
@@ -257,18 +270,21 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                     titleName.Content = "测量";
                     _rightPage.btnSure.Visibility = Visibility.Collapsed;
                     break;
+
                 case 2570:
                     // 位置清零
                     cleanXPosition = PlcControl.plc.GetPlcValueString(DeviceKey.curLocationKey);
                     cleanYPosition = PlcControl.plc.GetPlcValueString(DeviceKey.yCurLocationKey);
                     break;
+
                 case 2433:
-                    _cameraCommon.localBitmap.ToMat().SaveImage($"C:\\MySpace\\Dev\\ProjectXiHua\\precision-cutting-321\\bin\\x64\\Debug\\testImage\\{DateTime.Now.Ticks}.jpg");
-                    //MaterialSnack("识别中...", SnackType.WARNING, 0);
-                    //await AutoCutUtils.FineTuneAxisYAsync();
-                    //await AutoCutUtils.UpdateCameraCommonLineAsync();
-                    //MaterialSnack("识别完成！", SnackType.SUCCESS);
+                    //_cameraCommon.LocalBitmap.ToMat().SaveImage($"C:\\MySpace\\Dev\\ProjectXiHua\\precision-cutting-321\\bin\\x64\\Debug\\testImage\\{DateTime.Now.Ticks}.jpg");
+                    MaterialSnack("识别中...", SnackType.WARNING, 0);
+                    await AutoCutUtils.FineTuneAxisYAsync();
+                    await AutoCutUtils.UpdateCameraCommonLineAsync();
+                    MaterialSnack("识别完成！", SnackType.SUCCESS);
                     break;
+
                 default:
                     break;
             }
@@ -335,12 +351,14 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 case 2041:
                     _intervalTimer.Stop();
                     break;
+
                 case 2466:
                 case 2477:
                     PlcControl.tagControl.Z2axis.StopMove();
                     break;
             }
         }
+
         private void TouchDownHandler(object? sender, int code)
         {
             switch (code)
@@ -356,6 +374,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                     _intervalTimer.RegisterAction(() => DisposeDatumLine(code));
                     _intervalTimer.Start();
                     break;
+
                 case 2466:
                 case 2477:
                     // Z2轴上升
@@ -365,6 +384,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                     PlcControl.tagControl.Z2axis.SetRelativeSpeed("0.2");
                     PlcControl.tagControl.Z2axis.StartJog(code == 2466 ? 1 : 0);
                     break;
+
                 default:
                     break;
             }

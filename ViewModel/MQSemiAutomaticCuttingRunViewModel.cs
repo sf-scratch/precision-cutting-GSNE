@@ -38,6 +38,7 @@ namespace 精密切割系统.ViewModel
         private CancellationTokenSource _monitoringCts;
 
         private string _yAxisCutPosition;
+
         public string YAxisCutPosition
         {
             get { return _yAxisCutPosition; }
@@ -45,6 +46,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private string _xAxisCurrentPosition;
+
         public string XAxisCurrentPosition
         {
             get { return _xAxisCurrentPosition; }
@@ -52,6 +54,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private string _yAxisCurrentPosition;
+
         public string YAxisCurrentPosition
         {
             get { return _yAxisCurrentPosition; }
@@ -59,6 +62,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private string _zAxisCurrentPosition;
+
         public string ZAxisCurrentPosition
         {
             get { return _zAxisCurrentPosition; }
@@ -66,6 +70,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private string _z2AxisCurrentPosition;
+
         public string Z2AxisCurrentPosition
         {
             get { return _z2AxisCurrentPosition; }
@@ -73,6 +78,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private string _thetaAxisCurrentPosition;
+
         public string ThetaAxisCurrentPosition
         {
             get { return _thetaAxisCurrentPosition; }
@@ -95,7 +101,7 @@ namespace 精密切割系统.ViewModel
 
         private void InitRightButton()
         {
-            RightButtonCollection.Add(RightButtonParams.YelloRightButton("暂停", "/Assets/icon/right/stop.png", () => Pause()));
+            RightButtonCollection.Add(RightButtonParams.YelloRightButton("暂停", "/Assets/icon/right/stop.png", Pause));
         }
 
         private async Task MonitoringAlarmAsync(CancellationToken token)
@@ -150,8 +156,7 @@ namespace 精密切割系统.ViewModel
         {
             if (!GlobalParams.onlineFlag)
             {
-                MaterialSnack($"切割中...", SnackType.WARNING, 0);
-                _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("切割中..."));
+                MaterialSnack($"切割中...", SnackType.WARNING, 0, _eventAggregator);
                 return;
             }
             if (!_semiAutoCutService.IsReady)
@@ -165,24 +170,24 @@ namespace 精密切割系统.ViewModel
                 CommonResult checkResult = await SemiAutoCutService.CheckCutAsync();
                 if (!checkResult.IsSuccess)
                 {
-                    MaterialSnack(checkResult.Message, SnackType.WARNING);
+                    MaterialSnack(checkResult.Message, SnackType.WARNING, 0, _eventAggregator);
                     return;
                 }
                 CommonResult<List<CutStep>> cutStepResult = await GenerateCutStepListAsync(_semiAutoCutService.IsOpenPrecut);
                 if (!cutStepResult.IsSuccess || cutStepResult.Data is null)
                 {
-                    MaterialSnack(cutStepResult.Message, SnackType.WARNING);
+                    MaterialSnack(cutStepResult.Message, SnackType.WARNING, 0, _eventAggregator);
                     return;
                 }
                 CommonResult<FileTableItemModel> fileTableItemResult = await GetFileTableItemModelAsync();
                 if (!fileTableItemResult.IsSuccess || fileTableItemResult.Data is null)
                 {
-                    MaterialSnack(fileTableItemResult.Message, SnackType.WARNING);
+                    MaterialSnack(fileTableItemResult.Message, SnackType.WARNING, 0, _eventAggregator);
                     return;
                 }
                 if (Appsettings.BladeOuterDiameter is null)
                 {
-                    MaterialSnack("未设置刀片外径！", SnackType.WARNING);
+                    MaterialSnack("未设置刀片外径！", SnackType.WARNING, 0, _eventAggregator);
                     return;
                 }
                 FileTableItemModel fileTableItem = fileTableItemResult.Data;
@@ -194,17 +199,17 @@ namespace 精密切割系统.ViewModel
                 CommonResult<float> curHeightZ = await AutoCutUtils.ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, _eventAggregator, _pauseCts.Token);
                 if (!curHeightZ.IsSuccess)
                 {
-                    MaterialSnack(curHeightZ.Message, SnackType.WARNING, 0);
+                    MaterialSnack(curHeightZ.Message, SnackType.WARNING, 0, _eventAggregator);
                     return;
                 }
                 IWorkpieces workpiece = GenerateWorkpieces(fileTableItem, cutY);
                 _semiAutoCutService.CutServiceProcessChanged += CutService_CutServiceProcessChanged;
                 _semiAutoCutService.CutServicePaused += CutService_CutServicePaused;
-                MaterialSnack($"切割中...", SnackType.WARNING, 0);
+                MaterialSnack($"切割中...", SnackType.WARNING, 0, _eventAggregator);
                 RunResult cutResult = await _semiAutoCutService.RunAsync(cutStepResult.Data, workpiece, 30, fileTableItem.SpindleRev, curHeightZ.Data, GlobalParams.BladeLiftingHeight, _pauseCts.Token);
                 if (!cutResult.IsSuccess)
                 {
-                    MaterialSnack($"{cutResult.Message}", SnackType.WARNING, 0);
+                    MaterialSnack($"{cutResult.Message}", SnackType.WARNING, 0, _eventAggregator);
                     return;
                 }
                 stopwatch.Stop();
@@ -214,7 +219,7 @@ namespace 精密切割系统.ViewModel
             }
             catch (Exception ex)
             {
-                MaterialSnack($"切割异常：{ex.Message}", SnackType.WARNING, 0);
+                MaterialSnack($"切割异常：{ex.Message}", SnackType.WARNING, 0, _eventAggregator);
             }
             finally
             {
@@ -262,7 +267,7 @@ namespace 精密切割系统.ViewModel
             }
             if (_pauseCts.IsCancellationRequested)
             {
-                MaterialSnack("操作频繁！", SnackType.WARNING, 0);
+                MaterialSnack("操作频繁！", SnackType.WARNING, 0, _eventAggregator);
                 return;
             }
             // 暂停token
@@ -276,11 +281,11 @@ namespace 精密切割系统.ViewModel
                 SemiAutoCutService.Instance.Continue(_pauseCts.Token);
                 return;
             }
-            MaterialSnack("正在继续切割...", SnackType.WARNING, 0);
+            MaterialSnack("正在继续切割...", SnackType.WARNING, 0, _eventAggregator);
             _pauseCts = new CancellationTokenSource();
             await PlcControl.tagControl.cutting.EnterCuttingModeAsync(_pauseCts.Token);
             SemiAutoCutService.Instance.Continue(_pauseCts.Token);
-            MaterialSnack("切割中...", SnackType.WARNING, 0);
+            MaterialSnack("切割中...", SnackType.WARNING, 0, _eventAggregator);
         }
 
         public async Task ContinueAndResetCutYAsync()
@@ -290,11 +295,11 @@ namespace 精密切割系统.ViewModel
                 SemiAutoCutService.Instance.ContinueAndResetCutY(_pauseCts.Token);
                 return;
             }
-            MaterialSnack("正在继续切割...", SnackType.WARNING, 0);
+            MaterialSnack("正在继续切割...", SnackType.WARNING, 0, _eventAggregator);
             _pauseCts = new CancellationTokenSource();
             await PlcControl.tagControl.cutting.EnterCuttingModeAsync(_pauseCts.Token);
             SemiAutoCutService.Instance.ContinueAndResetCutY(_pauseCts.Token);
-            MaterialSnack("切割中...", SnackType.WARNING, 0);
+            MaterialSnack("切割中...", SnackType.WARNING, 0, _eventAggregator);
         }
 
         public async Task StopAsync(ServicePauseResult pauseResult)
@@ -319,7 +324,7 @@ namespace 精密切割系统.ViewModel
 
         private async Task AfterPauseThenMoveToPosition(LineSegment? line, string? message)
         {
-            MaterialSnack("正在暂停切割...", SnackType.WARNING, 0);
+            MaterialSnack("正在暂停切割...", SnackType.WARNING, 0, _eventAggregator);
             int runTime = 60;
             try
             {
@@ -338,15 +343,15 @@ namespace 精密切割系统.ViewModel
                     await AutoCutUtils.FineTuneAxisYAsync();
                     await AutoCutUtils.UpdateCameraCommonLineAsync();
                 }
-                MaterialSnack(message ?? "暂停中...", SnackType.WARNING, 0);
+                MaterialSnack(message ?? "暂停中...", SnackType.WARNING, 0, _eventAggregator);
             }
             catch (OperationCanceledException)
             {
-                MaterialSnack("暂停切割超时", SnackType.WARNING, 0);
+                MaterialSnack("暂停切割超时", SnackType.WARNING, 0, _eventAggregator);
             }
             catch (Exception ex)
             {
-                MaterialSnack($"暂停切割时遇到其他错误: {ex.Message}", SnackType.WARNING, 0);
+                MaterialSnack($"暂停切割时遇到其他错误: {ex.Message}", SnackType.WARNING, 0, _eventAggregator);
             }
             finally
             {
@@ -428,7 +433,7 @@ namespace 精密切割系统.ViewModel
                 // 生成子序列
                 List<string> repetitions = [.. loops];
                 List<int> sequences = [.. Enumerable.Range(0, maxIndex + 1)];
-                List<int> newSeq = CutUtils.CombineSequences(sequences, repetitions);
+                List<int> newSeq = isLoop ? CutUtils.CombineSequences(sequences, repetitions) : sequences;
                 List<CutStep> tempCutSteps = [];
                 foreach (int index in newSeq)
                 {
