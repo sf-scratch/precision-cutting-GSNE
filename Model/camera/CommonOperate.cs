@@ -22,13 +22,14 @@ namespace 精密切割系统.FrmWindow.common
 {
     internal class CommonOperate
     {
+        
         public static int xLocation = 0; // 横向拉直x轴的位置 0 左边 1 右边 2 已完成
         public static int xVerticalLocation = 0; // 竖向拉直x轴的位置 0 左边 1 右边 2 已完成
-
         // 聚焦运行状态
-        private bool focusRunStatus = false;
+        bool focusRunStatus = false;
+        
 
-        private static CommonOperate _obj;
+        static CommonOperate _obj;
 
         public static CommonOperate GetInstance()
         {
@@ -38,7 +39,7 @@ namespace 精密切割系统.FrmWindow.common
             }
             return _obj;
         }
-
+        
         /// <summary>
         /// 自动聚焦
         /// </summary>
@@ -70,17 +71,14 @@ namespace 精密切割系统.FrmWindow.common
                     modeName = "校准模式";
                     readyFlag = CommonCheck.GetParamsStatus(DeviceKey.alignStatusKey);
                     break;
-
                 case 2:
                     modeName = "半自动模式";
                     readyFlag = CommonCheck.GetParamsStatus(DeviceKey.cutStatusKey);
                     break;
-
                 case 3:
                     modeName = "自动模式";
                     readyFlag = CommonCheck.GetParamsStatus(DeviceKey.cutStatusKey);
                     break;
-
                 default:
                     break;
             }
@@ -100,7 +98,7 @@ namespace 精密切割系统.FrmWindow.common
                 BmSharpenParameterModel bmSharpenParameterModel = new BmSharpenParameterModel();
                 BladeLotID = string.IsNullOrEmpty(BladeLotID) ? "0" : BladeLotID;
                 // 如果是磨刀，则选择磨刀参数
-                List<BmSharpenParameterModel> list = SqlHelper.Table<BmSharpenParameterModel>().Where(t => t.BladeLotID == BladeLotID).ToList();
+                List < BmSharpenParameterModel > list = SqlHelper.Table<BmSharpenParameterModel>().Where(t => t.BladeLotID == BladeLotID).ToList();
                 if (list.Count == 0)
                 {
                     MaterialSnackUtils.MaterialSnack("磨刀参数错误", MaterialSnackUtils.SnackType.WARNING);
@@ -109,6 +107,7 @@ namespace 精密切割系统.FrmWindow.common
                 bmSharpenParameterModel = list.FirstOrDefault();
                 startPosition = GlobalParams.workDiscFocusPosition - float.Parse(bmSharpenParameterModel.CutThickness) - bmSharpenParameterModel.CoJiaoHeight - 0.1;
             }
+
 
             focusRunStatus = true;
             MaterialSnackUtils.MaterialSnack("自动聚焦中....", MaterialSnackUtils.SnackType.SUCCESS, 0);
@@ -119,8 +118,7 @@ namespace 精密切割系统.FrmWindow.common
             string z2CurLocation = PlcControl.plc.GetPlcValueString(DeviceKey.z2CurLocationKey);
             if (z2CurLocation != null)
             {
-                Task.Run(() =>
-                {
+                Task.Run(() => {
                     Tools.WaitForValue(PlcControl.allTags[DeviceKey.z2CurLocationKey], startPosition.ToString());
                     Tools.WaitForValue(PlcControl.allTags[DeviceKey.z2CurSpeedKey], "0");
                     Thread.Sleep(500);
@@ -159,9 +157,9 @@ namespace 精密切割系统.FrmWindow.common
                         Thread.Sleep(50);
                         Application.Current.Dispatcher.Invoke(() =>
                         {
-                            if (cameraCommon.LocalBitmap != null)
+                            if (cameraCommon.localBitmap != null)
                             {
-                                double tenengradBlurriness = VisualUtils.CalculateTenengrad2(cameraCommon.LocalBitmap);
+                                double tenengradBlurriness = VisualUtils.CalculateTenengrad2(cameraCommon.localBitmap);
                                 Tools.LogInfo("当前位置：" + newPosition + " 当前模糊度：" + tenengradBlurriness);
                                 if (lastBlurriness > 0 && lastBlurriness - tenengradBlurriness > 0.5)
                                 {
@@ -181,8 +179,7 @@ namespace 精密切割系统.FrmWindow.common
                                 if (tenengradBlurriness < 10)
                                 {
                                     dynamicIncrement = 0.05;
-                                }
-                                else if (tenengradBlurriness < 20)
+                                } else if (tenengradBlurriness < 20)
                                 {
                                     dynamicIncrement = 0.03;
                                 }
@@ -192,8 +189,7 @@ namespace 精密切割系统.FrmWindow.common
                                 }
                                 lastBlurriness = tenengradBlurriness;
                                 lastPosition = newPosition;
-                            }
-                            else
+                            } else
                             {
                                 focusRunStatus = false;
                                 GlobalParams.globalRunFlag = false;
@@ -214,7 +210,6 @@ namespace 精密切割系统.FrmWindow.common
                 });
             }
         }
-
         public WriteableBitmap CloneWriteableBitmap(WriteableBitmap source)
         {
             // 确保源的格式是 Gray8
@@ -244,11 +239,12 @@ namespace 精密切割系统.FrmWindow.common
         /// 获取当前刀痕得宽度和崩边宽度
         /// </summary>
         /// <returns></returns>
-        ///
+        /// 
         [HandleProcessCorruptedStateExceptions]
         [SecurityCritical]
         public static double[] GetCutEdgeWidth(string fileName)
         {
+            
             double[] cutEdgeWidths = [0, 0];
             // CameraUtils.SaveImagePng(fileName);
             while (!File.Exists(fileName))
@@ -274,6 +270,7 @@ namespace 精密切割系统.FrmWindow.common
                     double wj = CameraOperateUtils.ConvertToRealSize(temps[1]);
                     cutEdgeWidths = [nj, wj];
                 }
+                
             }
             catch (AccessViolationException ex)
             {
@@ -284,7 +281,7 @@ namespace 精密切割系统.FrmWindow.common
         }
     }
 
-    internal class ImageDataComparer : IEqualityComparer<ImageData>
+    class ImageDataComparer : IEqualityComparer<ImageData>
     {
         public bool Equals(ImageData x, ImageData y)
         {
@@ -299,7 +296,6 @@ namespace 精密切割系统.FrmWindow.common
             return obj.TenengradBlurriness.GetHashCode() ^ obj.Position.GetHashCode();
         }
     }
-
     public class ImageData
     {
         public double TenengradBlurriness { get; set; }

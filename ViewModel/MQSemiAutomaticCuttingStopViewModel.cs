@@ -16,10 +16,9 @@ using 精密切割系统.View.Pages.F2_ManualOperation;
 
 namespace 精密切割系统.ViewModel
 {
-    internal class MQSemiAutomaticCuttingStopViewModel : CustomBindableBase
+    class MQSemiAutomaticCuttingStopViewModel : CustomBindableBase
     {
         private readonly IRegionManager _regionManager;
-        private readonly IEventAggregator _eventAggregator;
         private readonly SemiAutoCutService _semiAutoCutService = SemiAutoCutService.Instance;
         private static CameraCommon? _cameraCommon;
         private MQSemiAutomaticCuttingRunViewModel _semiAutomaticCuttingRunViewModel;
@@ -30,12 +29,12 @@ namespace 精密切割系统.ViewModel
 
         public MQSemiAutomaticCuttingStopViewModel()
         {
+
         }
 
-        public MQSemiAutomaticCuttingStopViewModel(IRegionManager regionManager, IEventAggregator eventAggregator)
+        public MQSemiAutomaticCuttingStopViewModel(IRegionManager regionManager)
         {
             _regionManager = regionManager;
-            _eventAggregator = eventAggregator;
         }
 
         private void InitRightButton()
@@ -79,13 +78,13 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                CommonResult<float> focusRusult = await AutoFocusService.GlobalFocusAsync(_eventAggregator, _operatCts.Token);
+                CommonResult<float> focusRusult = await AutoFocusService.GlobalFocusAsync(default, _operatCts.Token);
                 if (!focusRusult.IsSuccess)
                 {
                     MaterialSnackUtils.MaterialSnack(focusRusult.Message, MaterialSnackUtils.SnackType.WARNING);
                     return;
                 }
-                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(focusRusult.Data, default, _operatCts.Token);
+                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(focusRusult.Data, default, default);
             }
             catch (OperationCanceledException) { }
         }
@@ -94,13 +93,13 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                CommonResult<float> focusRusult = await AutoCutUtils.AutoFocusAsync(_eventAggregator, _operatCts.Token);
+                CommonResult<float> focusRusult = await AutoCutUtils.AutoFocusAsync(token: _operatCts.Token);
                 if (!focusRusult.IsSuccess)
                 {
                     MaterialSnackUtils.MaterialSnack(focusRusult.Message, MaterialSnackUtils.SnackType.WARNING);
                     return;
                 }
-                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(focusRusult.Data, default, _operatCts.Token);
+                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(focusRusult.Data, default, default);
             }
             catch (OperationCanceledException) { }
         }
@@ -151,8 +150,8 @@ namespace 精密切割系统.ViewModel
             try
             {
                 float curX = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0;
-                await AutoCutUtils.WorkpieceBlowingAsync(_eventAggregator, _operatCts.Token);
-                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(curX, default, _operatCts.Token);
+                await AutoCutUtils.WorkpieceBlowingAsync(token: _operatCts.Token);
+                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(curX, default, default);
                 await AutoCutUtils.FineTuneAxisYAsync();
                 await AutoCutUtils.UpdateCameraCommonLineAsync();
             }

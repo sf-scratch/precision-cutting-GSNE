@@ -20,11 +20,10 @@ namespace 精密切割系统.ViewModel
         private CancellationTokenSource _cancelGetAxisInfoCts;
 
         private DelegateCommand _startXCommand;
-
         public DelegateCommand StartXCommand =>
             _startXCommand ?? (_startXCommand = new DelegateCommand(ExecuteStartXCommand));
 
-        private async void ExecuteStartXCommand()
+        async void ExecuteStartXCommand()
         {
             if (IsAbsMoveX)
             {
@@ -37,32 +36,29 @@ namespace 精密切割系统.ViewModel
         }
 
         private DelegateCommand _startHomingXCommand;
-
         public DelegateCommand StartHomingXCommand =>
             _startHomingXCommand ?? (_startHomingXCommand = new DelegateCommand(ExecuteStartHomingXCommand, CanExecuteStartHomingXCommand));
 
-        private async void ExecuteStartHomingXCommand()
+        async void ExecuteStartHomingXCommand()
         {
             await PlcControl.tagControl.Xaxis.StartHomingAsync();
         }
 
-        private bool CanExecuteStartHomingXCommand()
+        bool CanExecuteStartHomingXCommand()
         {
             return true;
         }
 
         private DelegateCommand _relaxXCommand;
-
         public DelegateCommand RelaxXCommand =>
             _relaxXCommand ?? (_relaxXCommand = new DelegateCommand(ExecuteRelaxXCommand));
 
-        private async void ExecuteRelaxXCommand()
+        async void ExecuteRelaxXCommand()
         {
             await PlcControl.tagControl.Xaxis.RelaxAxisAsync();
         }
 
         private float _currentPositionX;
-
         public float CurrentPositionX
         {
             get { return _currentPositionX; }
@@ -70,7 +66,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _currentJogSpeedX;
-
         public float CurrentJogSpeedX
         {
             get { return _currentJogSpeedX; }
@@ -78,7 +73,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _currentSpeedX;
-
         public float CurrentSpeedX
         {
             get { return _currentSpeedX; }
@@ -86,7 +80,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _speedX;
-
         public float SpeedX
         {
             get { return _speedX; }
@@ -94,7 +87,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _targetPositionX;
-
         public float TargetPositionX
         {
             get { return _targetPositionX; }
@@ -102,7 +94,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private bool _isAbsMoveX;
-
         public bool IsAbsMoveX
         {
             get { return _isAbsMoveX; }
@@ -110,7 +101,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private bool _isReadyX;
-
         public bool IsReadyX
         {
             get { return _isReadyX; }
@@ -118,11 +108,10 @@ namespace 精密切割系统.ViewModel
         }
 
         private DelegateCommand _startYCommand;
-
         public DelegateCommand StartYCommand =>
             _startYCommand ?? (_startYCommand = new DelegateCommand(ExecuteStartYCommand));
 
-        private async void ExecuteStartYCommand()
+        async void ExecuteStartYCommand()
         {
             if (IsAbsMoveY)
             {
@@ -135,32 +124,29 @@ namespace 精密切割系统.ViewModel
         }
 
         private DelegateCommand _startHomingYCommand;
-
         public DelegateCommand StartHomingYCommand =>
             _startHomingYCommand ?? (_startHomingYCommand = new DelegateCommand(ExecuteStartHomingYCommand, CanExecuteStartHomingYCommand));
 
-        private async void ExecuteStartHomingYCommand()
+        async void ExecuteStartHomingYCommand()
         {
             await PlcControl.tagControl.Yaxis.StartHomingAsync();
         }
 
-        private bool CanExecuteStartHomingYCommand()
+        bool CanExecuteStartHomingYCommand()
         {
             return true;
         }
 
         private DelegateCommand _relaxYCommand;
-
         public DelegateCommand RelaxYCommand =>
             _relaxYCommand ?? (_relaxYCommand = new DelegateCommand(ExecuteRelaxYCommand));
 
-        private async void ExecuteRelaxYCommand()
+        async void ExecuteRelaxYCommand()
         {
             await PlcControl.tagControl.Yaxis.RelaxAxisAsync();
         }
 
         private float _currentPositionY;
-
         public float CurrentPositionY
         {
             get { return _currentPositionY; }
@@ -168,7 +154,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _currentJogSpeedY;
-
         public float CurrentJogSpeedY
         {
             get { return _currentJogSpeedY; }
@@ -176,7 +161,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _currentSpeedY;
-
         public float CurrentSpeedY
         {
             get { return _currentSpeedY; }
@@ -184,7 +168,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _speedY;
-
         public float SpeedY
         {
             get { return _speedY; }
@@ -192,7 +175,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _targetPositionY;
-
         public float TargetPositionY
         {
             get { return _targetPositionY; }
@@ -200,7 +182,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private bool _isAbsMoveY;
-
         public bool IsAbsMoveY
         {
             get { return _isAbsMoveY; }
@@ -208,7 +189,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private bool _isReadyY;
-
         public bool IsReadyY
         {
             get { return _isReadyY; }
@@ -216,11 +196,10 @@ namespace 精密切割系统.ViewModel
         }
 
         private DelegateCommand _startZ1Command;
-
         public DelegateCommand StartZ1Command =>
             _startZ1Command ?? (_startZ1Command = new DelegateCommand(ExecuteStartZ1Command));
 
-        private async void ExecuteStartZ1Command()
+        async void ExecuteStartZ1Command()
         {
             if (IsAbsMoveZ1)
             {
@@ -233,32 +212,29 @@ namespace 精密切割系统.ViewModel
         }
 
         private DelegateCommand _startHomingZ1Command;
-
         public DelegateCommand StartHomingZ1Command =>
             _startHomingZ1Command ?? (_startHomingZ1Command = new DelegateCommand(ExecuteStartHomingZ1Command, CanExecuteStartHomingZ1Command));
 
-        private async void ExecuteStartHomingZ1Command()
+        async void ExecuteStartHomingZ1Command()
         {
             await PlcControl.tagControl.Z1axis.StartHomingAsync();
         }
 
-        private bool CanExecuteStartHomingZ1Command()
+        bool CanExecuteStartHomingZ1Command()
         {
             return true;
         }
 
         private DelegateCommand _relaxZ1Command;
-
         public DelegateCommand RelaxZ1Command =>
             _relaxZ1Command ?? (_relaxZ1Command = new DelegateCommand(ExecuteRelaxZ1Command));
 
-        private async void ExecuteRelaxZ1Command()
+        async void ExecuteRelaxZ1Command()
         {
             await PlcControl.tagControl.Z1axis.RelaxAxisAsync();
         }
 
         private float _currentPositionZ1;
-
         public float CurrentPositionZ1
         {
             get { return _currentPositionZ1; }
@@ -266,7 +242,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _currentJogSpeedZ1;
-
         public float CurrentJogSpeedZ1
         {
             get { return _currentJogSpeedZ1; }
@@ -274,7 +249,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _currentSpeedZ1;
-
         public float CurrentSpeedZ1
         {
             get { return _currentSpeedZ1; }
@@ -282,7 +256,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _speedZ1;
-
         public float SpeedZ1
         {
             get { return _speedZ1; }
@@ -290,7 +263,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _targetPositionZ1;
-
         public float TargetPositionZ1
         {
             get { return _targetPositionZ1; }
@@ -298,7 +270,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private bool _isAbsMoveZ1;
-
         public bool IsAbsMoveZ1
         {
             get { return _isAbsMoveZ1; }
@@ -306,7 +277,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private bool _isReadyZ1;
-
         public bool IsReadyZ1
         {
             get { return _isReadyZ1; }
@@ -314,14 +284,14 @@ namespace 精密切割系统.ViewModel
         }
 
         private DelegateCommand _startZ2Command;
-
         public DelegateCommand StartZ2Command =>
             _startZ2Command ?? (_startZ2Command = new DelegateCommand(ExecuteStartZ2Command));
 
-        private async void ExecuteStartZ2Command()
+        async void ExecuteStartZ2Command()
         {
             if (IsAbsMoveZ2)
             {
+
                 await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(TargetPositionZ2, SpeedZ2, default);
             }
             else
@@ -331,32 +301,29 @@ namespace 精密切割系统.ViewModel
         }
 
         private DelegateCommand _startHomingZ2Command;
-
         public DelegateCommand StartHomingZ2Command =>
             _startHomingZ2Command ?? (_startHomingZ2Command = new DelegateCommand(ExecuteStartHomingZ2Command, CanExecuteStartHomingZ2Command));
 
-        private async void ExecuteStartHomingZ2Command()
+        async void ExecuteStartHomingZ2Command()
         {
             await PlcControl.tagControl.Z2axis.StartHomingAsync();
         }
 
-        private bool CanExecuteStartHomingZ2Command()
+        bool CanExecuteStartHomingZ2Command()
         {
             return true;
         }
 
         private DelegateCommand _relaxZ2Command;
-
         public DelegateCommand RelaxZ2Command =>
             _relaxZ2Command ?? (_relaxZ2Command = new DelegateCommand(ExecuteRelaxZ2Command));
 
-        private async void ExecuteRelaxZ2Command()
+        async void ExecuteRelaxZ2Command()
         {
             await PlcControl.tagControl.Z2axis.RelaxAxisAsync();
         }
 
         private float _currentPositionZ2;
-
         public float CurrentPositionZ2
         {
             get { return _currentPositionZ2; }
@@ -364,7 +331,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _currentJogSpeedZ2;
-
         public float CurrentJogSpeedZ2
         {
             get { return _currentJogSpeedZ2; }
@@ -372,7 +338,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _currentSpeedZ2;
-
         public float CurrentSpeedZ2
         {
             get { return _currentSpeedZ2; }
@@ -380,7 +345,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _speedZ2;
-
         public float SpeedZ2
         {
             get { return _speedZ2; }
@@ -388,7 +352,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _targetPositionZ2;
-
         public float TargetPositionZ2
         {
             get { return _targetPositionZ2; }
@@ -396,7 +359,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private bool _isAbsMoveZ2;
-
         public bool IsAbsMoveZ2
         {
             get { return _isAbsMoveZ2; }
@@ -404,7 +366,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private bool _isReadyZ2;
-
         public bool IsReadyZ2
         {
             get { return _isReadyZ2; }
@@ -412,21 +373,19 @@ namespace 精密切割系统.ViewModel
         }
 
         private DelegateCommand _startThetaCommand;
-
         public DelegateCommand StartThetaCommand =>
             _startThetaCommand ?? (_startThetaCommand = new DelegateCommand(ExecuteStartThetaCommand));
 
-        private async void ExecuteStartThetaCommand()
+        async void ExecuteStartThetaCommand()
         {
             await PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(TargetPositionTheta, SpeedTheta, default);
         }
 
         private DelegateCommand _startHomingThetaCommand;
-
         public DelegateCommand StartHomingThetaCommand =>
             _startHomingThetaCommand ?? (_startHomingThetaCommand = new DelegateCommand(ExecuteStartHomingThetaCommand, CanExecuteStartHomingThetaCommand));
 
-        private async void ExecuteStartHomingThetaCommand()
+        async void ExecuteStartHomingThetaCommand()
         {
             if (IsAbsMoveTheta)
             {
@@ -438,23 +397,21 @@ namespace 精密切割系统.ViewModel
             }
         }
 
-        private bool CanExecuteStartHomingThetaCommand()
+        bool CanExecuteStartHomingThetaCommand()
         {
             return true;
         }
 
         private DelegateCommand _relaxThetaCommand;
-
         public DelegateCommand RelaxThetaCommand =>
             _relaxThetaCommand ?? (_relaxThetaCommand = new DelegateCommand(ExecuteRelaxThetaCommand));
 
-        private async void ExecuteRelaxThetaCommand()
+        async void ExecuteRelaxThetaCommand()
         {
             await PlcControl.tagControl.ThetaAxis.RelaxAxisAsync();
         }
 
         private float _currentPositionTheta;
-
         public float CurrentPositionTheta
         {
             get { return _currentPositionTheta; }
@@ -462,7 +419,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _currentJogSpeedTheta;
-
         public float CurrentJogSpeedTheta
         {
             get { return _currentJogSpeedTheta; }
@@ -470,7 +426,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _currentSpeedTheta;
-
         public float CurrentSpeedTheta
         {
             get { return _currentSpeedTheta; }
@@ -478,7 +433,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _speedTheta;
-
         public float SpeedTheta
         {
             get { return _speedTheta; }
@@ -486,7 +440,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _targetPositionTheta;
-
         public float TargetPositionTheta
         {
             get { return _targetPositionTheta; }
@@ -494,7 +447,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private bool _isAbsMoveTheta;
-
         public bool IsAbsMoveTheta
         {
             get { return _isAbsMoveTheta; }
@@ -502,7 +454,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private bool _isReadyTheta;
-
         public bool IsReadyTheta
         {
             get { return _isReadyTheta; }
@@ -510,7 +461,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private bool _isShowKeyboard;
-
         public bool IsShowKeyboard
         {
             get { return _isShowKeyboard; }
@@ -518,11 +468,10 @@ namespace 精密切割系统.ViewModel
         }
 
         private AsyncDelegateCommand _xRelativeNegativeCommand;
-
         public AsyncDelegateCommand XRelativeNegativeCommand =>
             _xRelativeNegativeCommand ?? (_xRelativeNegativeCommand = new AsyncDelegateCommand(ExecuteXRelativeNegativeCommand));
 
-        private async Task ExecuteXRelativeNegativeCommand(CancellationToken token)
+        async Task ExecuteXRelativeNegativeCommand(CancellationToken token)
         {
             try
             {
@@ -534,11 +483,10 @@ namespace 精密切割系统.ViewModel
         }
 
         private AsyncDelegateCommand _xRelativePositiveCommand;
-
         public AsyncDelegateCommand XRelativePositiveCommand =>
             _xRelativePositiveCommand ?? (_xRelativePositiveCommand = new AsyncDelegateCommand(ExecuteXRelativePositiveCommand));
 
-        private async Task ExecuteXRelativePositiveCommand(CancellationToken token)
+        async Task ExecuteXRelativePositiveCommand(CancellationToken token)
         {
             try
             {
@@ -550,31 +498,28 @@ namespace 精密切割系统.ViewModel
         }
 
         private DelegateCommand _startXCorotationCommand;
-
         public DelegateCommand StartXCorotationCommand =>
             _startXCorotationCommand ?? (_startXCorotationCommand = new DelegateCommand(ExecuteStartXCorotationCommand));
 
-        private async void ExecuteStartXCorotationCommand()
+        async void ExecuteStartXCorotationCommand()
         {
             await PlcControl.tagControl.Xaxis.StartJogAsync(0);
         }
 
         private DelegateCommand _startXReversalCommand;
-
         public DelegateCommand StartXReversalCommand =>
             _startXReversalCommand ?? (_startXReversalCommand = new DelegateCommand(ExecuteStartXReversalCommand));
 
-        private async void ExecuteStartXReversalCommand()
+        async void ExecuteStartXReversalCommand()
         {
             await PlcControl.tagControl.Xaxis.StartJogAsync(1);
         }
 
         private DelegateCommand _stopJogXCommand;
-
         public DelegateCommand StopJogXCommand =>
             _stopJogXCommand ?? (_stopJogXCommand = new DelegateCommand(ExecuteStopJogXCommand));
 
-        private async void ExecuteStopJogXCommand()
+        async void ExecuteStopJogXCommand()
         {
             try
             {
@@ -585,11 +530,10 @@ namespace 精密切割系统.ViewModel
         }
 
         private AsyncDelegateCommand _yRelativeNegativeCommand;
-
         public AsyncDelegateCommand YRelativeNegativeCommand =>
             _yRelativeNegativeCommand ?? (_yRelativeNegativeCommand = new AsyncDelegateCommand(ExecuteYRelativeNegativeCommand));
 
-        private async Task ExecuteYRelativeNegativeCommand(CancellationToken token)
+        async Task ExecuteYRelativeNegativeCommand(CancellationToken token)
         {
             try
             {
@@ -601,11 +545,10 @@ namespace 精密切割系统.ViewModel
         }
 
         private AsyncDelegateCommand _yRelativePositiveCommand;
-
         public AsyncDelegateCommand YRelativePositiveCommand =>
             _yRelativePositiveCommand ?? (_yRelativePositiveCommand = new AsyncDelegateCommand(ExecuteYRelativePositiveCommand));
 
-        private async Task ExecuteYRelativePositiveCommand(CancellationToken token)
+        async Task ExecuteYRelativePositiveCommand(CancellationToken token)
         {
             try
             {
@@ -617,31 +560,28 @@ namespace 精密切割系统.ViewModel
         }
 
         private DelegateCommand _startYCorotationCommand;
-
         public DelegateCommand StartYCorotationCommand =>
             _startYCorotationCommand ?? (_startYCorotationCommand = new DelegateCommand(ExecuteStartYCorotationCommand));
 
-        private async void ExecuteStartYCorotationCommand()
+        async void ExecuteStartYCorotationCommand()
         {
             await PlcControl.tagControl.Yaxis.StartJogAsync(0);
         }
 
         private DelegateCommand _startYReversalCommand;
-
         public DelegateCommand StartYReversalCommand =>
             _startYReversalCommand ?? (_startYReversalCommand = new DelegateCommand(ExecuteStartYReversalCommand));
 
-        private async void ExecuteStartYReversalCommand()
+        async void ExecuteStartYReversalCommand()
         {
             await PlcControl.tagControl.Yaxis.StartJogAsync(1);
         }
 
         private DelegateCommand _stopJogYCommand;
-
         public DelegateCommand StopJogYCommand =>
             _stopJogYCommand ?? (_stopJogYCommand = new DelegateCommand(ExecuteStopJogYCommand));
 
-        private async void ExecuteStopJogYCommand()
+        async void ExecuteStopJogYCommand()
         {
             try
             {
@@ -652,31 +592,28 @@ namespace 精密切割系统.ViewModel
         }
 
         private DelegateCommand _startThetaCorotationCommand;
-
         public DelegateCommand StartThetaCorotationCommand =>
             _startThetaCorotationCommand ?? (_startThetaCorotationCommand = new DelegateCommand(ExecuteStartThetaCorotationCommand));
 
-        private async void ExecuteStartThetaCorotationCommand()
+        async void ExecuteStartThetaCorotationCommand()
         {
             await PlcControl.tagControl.ThetaAxis.StartJogAsync(0);
         }
 
         private DelegateCommand _startThetaReversalCommand;
-
         public DelegateCommand StartThetaReversalCommand =>
             _startThetaReversalCommand ?? (_startThetaReversalCommand = new DelegateCommand(ExecuteStartThetaReversalCommand));
 
-        private async void ExecuteStartThetaReversalCommand()
+        async void ExecuteStartThetaReversalCommand()
         {
             await PlcControl.tagControl.ThetaAxis.StartJogAsync(1);
         }
 
         private DelegateCommand _stopJogThetaCommand;
-
         public DelegateCommand StopJogThetaCommand =>
             _stopJogThetaCommand ?? (_stopJogThetaCommand = new DelegateCommand(ExecuteStopJogThetaCommand));
 
-        private async void ExecuteStopJogThetaCommand()
+        async void ExecuteStopJogThetaCommand()
         {
             try
             {
@@ -687,31 +624,28 @@ namespace 精密切割系统.ViewModel
         }
 
         private DelegateCommand _startRaiseZ1Command;
-
         public DelegateCommand StartRaiseZ1Command =>
             _startRaiseZ1Command ?? (_startRaiseZ1Command = new DelegateCommand(ExecuteStartRaiseZ1Command));
 
-        private async void ExecuteStartRaiseZ1Command()
+        async void ExecuteStartRaiseZ1Command()
         {
             await PlcControl.tagControl.Z1axis.StartJogAsync(1);
         }
 
         private DelegateCommand _startDropZ1Command;
-
         public DelegateCommand StartDropZ1Command =>
             _startDropZ1Command ?? (_startDropZ1Command = new DelegateCommand(ExecuteStartDropZ1Command));
 
-        private async void ExecuteStartDropZ1Command()
+        async void ExecuteStartDropZ1Command()
         {
             await PlcControl.tagControl.Z1axis.StartJogAsync(0);
         }
 
         private DelegateCommand _stopJogZ1Command;
-
         public DelegateCommand StopJogZ1Command =>
             _stopJogZ1Command ?? (_stopJogZ1Command = new DelegateCommand(ExecuteStopJogZ1Command));
 
-        private async void ExecuteStopJogZ1Command()
+        async void ExecuteStopJogZ1Command()
         {
             try
             {
@@ -722,31 +656,28 @@ namespace 精密切割系统.ViewModel
         }
 
         private DelegateCommand _startRaiseZ2Command;
-
         public DelegateCommand StartRaiseZ2Command =>
             _startRaiseZ2Command ?? (_startRaiseZ2Command = new DelegateCommand(ExecuteStartRaiseZ2Command));
 
-        private async void ExecuteStartRaiseZ2Command()
+        async void ExecuteStartRaiseZ2Command()
         {
             await PlcControl.tagControl.Z2axis.StartJogAsync(1);
         }
 
         private DelegateCommand _startDropZ2Command;
-
         public DelegateCommand StartDropZ2Command =>
             _startDropZ2Command ?? (_startDropZ2Command = new DelegateCommand(ExecuteStartDropZ2Command));
 
-        private async void ExecuteStartDropZ2Command()
+        async void ExecuteStartDropZ2Command()
         {
             await PlcControl.tagControl.Z2axis.StartJogAsync(0);
         }
 
         private DelegateCommand _stopJogZ2Command;
-
         public DelegateCommand StopJogZ2Command =>
             _stopJogZ2Command ?? (_stopJogZ2Command = new DelegateCommand(ExecuteStopJogZ2Command));
 
-        private async void ExecuteStopJogZ2Command()
+        async void ExecuteStopJogZ2Command()
         {
             try
             {
@@ -757,11 +688,10 @@ namespace 精密切割系统.ViewModel
         }
 
         private AsyncDelegateCommand _z1RelativePositiveCommand;
-
         public AsyncDelegateCommand Z1RelativePositiveCommand =>
             _z1RelativePositiveCommand ?? (_z1RelativePositiveCommand = new AsyncDelegateCommand(ExecuteZ1RelativePositiveCommand));
 
-        private async Task ExecuteZ1RelativePositiveCommand(CancellationToken token)
+        async Task ExecuteZ1RelativePositiveCommand(CancellationToken token)
         {
             try
             {
@@ -773,11 +703,10 @@ namespace 精密切割系统.ViewModel
         }
 
         private AsyncDelegateCommand _z1RelativeNegativeCommand;
-
         public AsyncDelegateCommand Z1RelativeNegativeCommand =>
             _z1RelativeNegativeCommand ?? (_z1RelativeNegativeCommand = new AsyncDelegateCommand(ExecuteZ1RelativeNegativeCommand));
 
-        private async Task ExecuteZ1RelativeNegativeCommand(CancellationToken token)
+        async Task ExecuteZ1RelativeNegativeCommand(CancellationToken token)
         {
             try
             {
@@ -789,11 +718,10 @@ namespace 精密切割系统.ViewModel
         }
 
         private AsyncDelegateCommand _z2RelativePositiveCommand;
-
         public AsyncDelegateCommand Z2RelativePositiveCommand =>
             _z2RelativePositiveCommand ?? (_z2RelativePositiveCommand = new AsyncDelegateCommand(ExecuteZ2RelativePositiveCommand));
 
-        private async Task ExecuteZ2RelativePositiveCommand(CancellationToken token)
+        async Task ExecuteZ2RelativePositiveCommand(CancellationToken token)
         {
             try
             {
@@ -805,11 +733,10 @@ namespace 精密切割系统.ViewModel
         }
 
         private AsyncDelegateCommand _z2RelativeNegativeCommand;
-
         public AsyncDelegateCommand Z2RelativeNegativeCommand =>
             _z2RelativeNegativeCommand ?? (_z2RelativeNegativeCommand = new AsyncDelegateCommand(ExecuteZ2RelativeNegativeCommand));
 
-        private async Task ExecuteZ2RelativeNegativeCommand(CancellationToken token)
+        async Task ExecuteZ2RelativeNegativeCommand(CancellationToken token)
         {
             try
             {
@@ -821,11 +748,10 @@ namespace 精密切割系统.ViewModel
         }
 
         private AsyncDelegateCommand _thetaRelativePositiveCommand;
-
         public AsyncDelegateCommand ThetaRelativePositiveCommand =>
             _thetaRelativePositiveCommand ?? (_thetaRelativePositiveCommand = new AsyncDelegateCommand(ExecuteThetaRelativePositiveCommand));
 
-        private async Task ExecuteThetaRelativePositiveCommand(CancellationToken token)
+        async Task ExecuteThetaRelativePositiveCommand(CancellationToken token)
         {
             try
             {
@@ -837,11 +763,10 @@ namespace 精密切割系统.ViewModel
         }
 
         private AsyncDelegateCommand _thetaRelativeNegativeCommand;
-
         public AsyncDelegateCommand ThetaRelativeNegativeCommand =>
             _thetaRelativeNegativeCommand ??= new AsyncDelegateCommand(ExecuteThetaRelativeNegativeCommand);
 
-        private async Task ExecuteThetaRelativeNegativeCommand(CancellationToken token)
+        async Task ExecuteThetaRelativeNegativeCommand(CancellationToken token)
         {
             try
             {
@@ -853,7 +778,6 @@ namespace 精密切割系统.ViewModel
         }
 
         private bool _isHighSpeed;
-
         public bool IsHighSpeed
         {
             get { return _isHighSpeed; }
@@ -866,15 +790,15 @@ namespace 精密切割系统.ViewModel
                     {
                         // 设置为高速
                         await PlcControl.tagControl.Xaxis.SetHighSpeedAsync(1);
-                        await PlcControl.tagControl.Xaxis.SetJogRelativeSpeedAsync(8);
+                        await PlcControl.tagControl.Xaxis.SetJogRelativeSpeedAsync(GlobalParams.XDefaultSpeed);
                         await PlcControl.tagControl.Yaxis.SetHighSpeedAsync(1);
-                        await PlcControl.tagControl.Yaxis.SetJogRelativeSpeedAsync(8);
+                        await PlcControl.tagControl.Yaxis.SetJogRelativeSpeedAsync(GlobalParams.YDefaultSpeed);
                         await PlcControl.tagControl.Z1axis.SetHighSpeedAsync(1);
-                        await PlcControl.tagControl.Z1axis.SetJogRelativeSpeedAsync(2);
+                        await PlcControl.tagControl.Z1axis.SetJogRelativeSpeedAsync(GlobalParams.Z1DefaultSpeed);
                         await PlcControl.tagControl.Z2axis.SetHighSpeedAsync(1);
-                        await PlcControl.tagControl.Z2axis.SetJogRelativeSpeedAsync(2);
+                        await PlcControl.tagControl.Z2axis.SetJogRelativeSpeedAsync(GlobalParams.Z2DefaultSpeed);
                         await PlcControl.tagControl.ThetaAxis.SetHighSpeedAsync(1);
-                        await PlcControl.tagControl.ThetaAxis.SetJogRelativeSpeedAsync(10);
+                        await PlcControl.tagControl.ThetaAxis.SetJogRelativeSpeedAsync(GlobalParams.ThetaDefaultSpeed);
                     });
                 }
                 else

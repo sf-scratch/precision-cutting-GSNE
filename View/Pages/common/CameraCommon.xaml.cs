@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -37,18 +36,28 @@ namespace 精密切割系统.View.Pages.common
             InitializeComponent();
         }
 
-        private SciCam m_currentDev = new SciCam();
-        private Thread m_hGrabThread = null;            //取流线程句柄
-        private bool m_bThreadState = false;			//线程状态
+        SciCam.SCI_DEVICE_INFO_LIST m_stDevList = new SciCam.SCI_DEVICE_INFO_LIST();
+        SciCam m_currentDev = new SciCam();
+
+        WriteableBitmap bitmap;
+        bool m_bDeviceReady = false;         //是否存在相机
+        bool m_bDeviceOpened = false;        //相机是否打开
+        bool m_bStartGrabbing = false;       //开始采集状态
+
+        Thread m_hGrabThread = null;            //取流线程句柄
+        bool m_bThreadState = false;			//线程状态  
+
+        private readonly object bitmapLock = new object();
+
         private Point centerLocation;
+        private float scalingRatio; // 缩放比例
+        private Point[] triangle1, triangle2, triangle3, triangle4;
         private static List<CustomLine> _lines = new List<CustomLine>();
         private TextBlock cutWidthTextBlock;
         private TextBlock edgeWidthTextBlock;
-
         public event Action LineChanged;
 
         private float _cutMarkWidth;
-
         /// <summary>
         /// 刀痕宽度
         /// </summary>
@@ -59,7 +68,6 @@ namespace 精密切割系统.View.Pages.common
         }
 
         private float _edgeChipWidth;
-
         /// <summary>
         /// 崩边
         /// </summary>
@@ -79,9 +87,7 @@ namespace 精密切割系统.View.Pages.common
             centerLocation = new Point(cameraImage.Width / 2, cameraImage.Height / 2);
             SetupOverlayPanel();
         }
-
-        private bool changeCameraRunFlag = false;
-
+        bool changeCameraRunFlag = false;
         // 切换相机
         public void ChangeCamera()
         {
@@ -119,7 +125,6 @@ namespace 精密切割系统.View.Pages.common
             StartGrabbing();
             changeCameraRunFlag = false;
         }
-
         private void StartGrabbing()
         {
             if (!GlobalParams.onlineFlag)
@@ -137,6 +142,8 @@ namespace 精密切割系统.View.Pages.common
                 m_bThreadState = false;
                 return;
             }
+
+            m_bStartGrabbing = true;
         }
 
         public void StopGrabbing()
@@ -151,8 +158,9 @@ namespace 精密切割系统.View.Pages.common
             {
                 return;
             }
-        }
 
+            m_bStartGrabbing = false;
+        }
         private void GrabThreadProcess()
         {
             if (!GlobalParams.onlineFlag)
@@ -164,13 +172,20 @@ namespace 精密切割系统.View.Pages.common
 
             while (m_bThreadState)
             {
+                var startTime1 = DateTime.Now;
                 nReVal = m_currentDev.Grab(ref payload);
+                // Debug.WriteLine($"采集帧耗时: {(DateTime.Now - startTime1).TotalMilliseconds} 毫秒");
+
                 if (nReVal == SciCam.SCI_CAMERA_OK)
                 {
                     // 确保 payload 有效
                     if (payload != nint.Zero)
                     {
-                        DisplayImage(payload);
+                        // 使用Dispatcher将更新操作封送到UI线程  
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            DisplayImage(payload);
+                        });
                     }
                 }
                 else
@@ -178,6 +193,7 @@ namespace 精密切割系统.View.Pages.common
                     // 处理错误，例如记录日志
                     Debug.WriteLine($"Error grabbing image: {nReVal}");
                 }
+                var startTime = DateTime.Now;
                 // 释放负载
                 if (payload != nint.Zero)
                 {
@@ -189,6 +205,12 @@ namespace 精密切割系统.View.Pages.common
                     }
                     payload = nint.Zero; // 重置 payload
                 }
+
+                // 计算耗时
+                var elapsed = DateTime.Now - startTime;
+                // 输出耗时
+                // Debug.WriteLine($"释放耗时: {elapsed.TotalMilliseconds} 毫秒");
+
             }
         }
 
@@ -197,43 +219,46 @@ namespace 精密切割系统.View.Pages.common
             IPAddress iPAddress = new IPAddress(ip);
             return iPAddress.ToString();
         }
-
-        public WriteableBitmap LocalBitmap { get; private set; }
-
+        public WriteableBitmap localBitmap = null;
         public void DisplayImage(nint payload)
         {
-            if (TryGetConvertedInfo(payload, out WriteableBitmap bitmap) && bitmap != null)
+            localBitmap = null;
+            var startTime = DateTime.Now;
+            int result = GetConvertedInfo(payload, out localBitmap);
+            // 输出耗时
+            // Debug.WriteLine($"转换耗时: {(DateTime.Now - startTime).TotalMilliseconds} 毫秒");
+            if (result == 0 && localBitmap != null)
             {
-                Application.Current.Dispatcher.Invoke(() =>
+                lock (bitmapLock)
                 {
-                    // 确保Image_Control已初始化
-                    if (cameraImage != null)
-                    {
-                        cameraImage.Source = bitmap;
-                        LocalBitmap = bitmap;
-                    }
-                });
+                    // 更新bitmap变量，确保线程安全  
+                    bitmap = localBitmap;
+                }
+                // 使用Dispatcher将UI更新操作封送到UI线程
+                if (cameraImage != null) // 确保Image_Control已初始化  
+                {
+                    cameraImage.Source = bitmap;
+                }
             }
             else
             {
-                // Handle error
+                // Handle error  
             }
         }
-
-        private bool TryGetConvertedInfo(nint payload, out WriteableBitmap bitmap)
+        private int GetConvertedInfo(nint payload, out WriteableBitmap bitmap)
         {
             bitmap = null;
 
             if (payload == nint.Zero)
             {
-                return false;
+                return -1;
             }
 
             SciCam.SCI_CAM_PAYLOAD_ATTRIBUTE payloadAttribute = new SciCam.SCI_CAM_PAYLOAD_ATTRIBUTE();
             uint nReVal = SciCam.PayloadGetAttribute(payload, ref payloadAttribute);
             if (nReVal != SciCam.SCI_CAMERA_OK)
             {
-                return false;
+                return -1;
             }
 
             bool imgIsComplete = payloadAttribute.isComplete;
@@ -244,18 +269,19 @@ namespace 精密切割系统.View.Pages.common
 
             if (!imgIsComplete || payloadMode != SciCam.SciCamPayloadMode.SciCam_PayloadMode_2D)
             {
-                return false;
+                return -1;
             }
 
             nint imgData = nint.Zero;
             nReVal = SciCam.PayloadGetImage(payload, ref imgData);
             if (nReVal != SciCam.SCI_CAMERA_OK)
             {
-                return false;
+                return -1;
             }
 
             long destImgSize = 0;
-            nint destImg = nint.Zero;
+            nint destImg = nint.Zero; // Initialize destImg
+
             try
             {
                 if (IsValidPixelType(imgPixelType))
@@ -272,7 +298,7 @@ namespace 精密切割系统.View.Pages.common
                                 byte[] bBitmap = new byte[destImgSize];
                                 Marshal.Copy(destImg, bBitmap, 0, (int)destImgSize);
 
-                                int stride = (int)imgWidth; // Assuming 1 byte per pixel
+                                int stride = (int)imgWidth; // Assuming 1 byte per pixel  
                                 bitmap = new WriteableBitmap((int)imgWidth, (int)imgHeight, 96, 96, PixelFormats.Gray8, null);
 
                                 bitmap.WritePixels(new Int32Rect(0, 0, (int)imgWidth, (int)imgHeight), bBitmap, stride, 0);
@@ -281,11 +307,10 @@ namespace 精密切割系统.View.Pages.common
                             }
                         }
                         catch (Exception ex)
-
                         {
                             // 处理异常，例如记录日志
                             Console.WriteLine($"Error during image conversion: {ex.Message}");
-                            return false;
+                            return -1;
                         }
                     }
                 }
@@ -298,8 +323,10 @@ namespace 精密切割系统.View.Pages.common
                 }
             }
 
-            return true;
+            return 0;
         }
+
+
 
         private bool IsValidPixelType(SciCam.SciCamPixelType pixelType)
         {
@@ -318,8 +345,7 @@ namespace 精密切割系统.View.Pages.common
                    pixelType == SciCam.SciCamPixelType.Mono12Packed ||
                    pixelType == SciCam.SciCamPixelType.Mono14p;
         }
-
-        private enum ImageSaveType
+        enum ImageSaveType
         {
             Type_NONE = 0,
             Type_BMP,
@@ -327,8 +353,7 @@ namespace 精密切割系统.View.Pages.common
             Type_TIFF,
             Type_PNG,
         };
-
-        private ImageSaveType m_imageSaveType = ImageSaveType.Type_JPG;
+        ImageSaveType m_imageSaveType = ImageSaveType.Type_JPG;
 
         public bool SaveWriteableBitmap(string filePath)
         {
@@ -338,7 +363,7 @@ namespace 精密切割系统.View.Pages.common
                 try
                 {
                     PngBitmapEncoder encoder = new PngBitmapEncoder();
-                    encoder.Frames.Add(BitmapFrame.Create(LocalBitmap));
+                    encoder.Frames.Add(BitmapFrame.Create(localBitmap));
 
                     // 将图像数据写入文件
                     using (FileStream fileStream = new FileStream(filePath, FileMode.Create))
@@ -354,12 +379,13 @@ namespace 精密切割系统.View.Pages.common
                 return false;
             });
             return true;
+
         }
 
         private void Save_Image(string fileName)
         {
             SaveFileDialog dialog = new SaveFileDialog();
-            dialog.Filter = "jpg file(*.jpg)|*.jpg|bmp file(*.bmp)|*.bmp|tiff file(*.tiff)|*.tiff|png file(*.png)|*.png|所有文件(*.*)|*.*||";       //设置文件类型
+            dialog.Filter = "jpg file(*.jpg)|*.jpg|bmp file(*.bmp)|*.bmp|tiff file(*.tiff)|*.tiff|png file(*.png)|*.png|所有文件(*.*)|*.*||";       //设置文件类型                                              
             string extension; //文件拓展名
             bool? result = dialog.ShowDialog();
             if (result == true) ;
@@ -370,6 +396,7 @@ namespace 精密切割系统.View.Pages.common
             if (extension == ".jpg")
             {
                 m_imageSaveType = ImageSaveType.Type_JPG;
+
             }
             else
             {
@@ -381,9 +408,8 @@ namespace 精密切割系统.View.Pages.common
         {
             StopGrabbing();
         }
-
         /// <summary>
-        ///
+        /// 
         /// </summary>
         /// <param name="width">需要修改的宽度</param>
         /// <param name="type">类型 1 自动 2 半自动</param>
@@ -397,7 +423,6 @@ namespace 精密切割系统.View.Pages.common
             _edgeChipWidth = (float)CameraOperateUtils.ConvertPictureBoxToRealSize(tempEdgeWidth + (width * 2));
             SetEdgeWidthTextBlockY();
         }
-
         public void SetCutMarkWidth(float width, int type)
         {
             float tempCutMarkWidth = (float)CameraOperateUtils.ConvertToPictureBoxSize(_cutMarkWidth);
@@ -433,7 +458,6 @@ namespace 精密切割系统.View.Pages.common
             SetCutWidthTextBlockY();
             SetEdgeWidthTextBlockY();
         }
-
         /// <summary>
         /// 更改刀痕和崩边的高度
         /// 索引 0 1 是上刀痕 下刀痕
@@ -462,7 +486,6 @@ namespace 精密切割系统.View.Pages.common
                 Console.WriteLine("索引超出范围");
             }
         }
-
         private void AddTextToCanvas()
         {
             // 创建一个TextBlock控件
@@ -518,13 +541,13 @@ namespace 精密切割系统.View.Pages.common
                 _cutMarkWidth = (float)CameraOperateUtils.ConvertPictureBoxToRealSize(pictureCutMarkWidth);
                 _edgeChipWidth = (float)CameraOperateUtils.ConvertPictureBoxToRealSize(pictureEdgeChipWidth);
 
-                // 获取图像高度 / 2
+                // 获取图像高度 / 2 
                 float imagMideHeight = (float)(cameraImage.Height / 2);
                 // 开始点位的X
                 float startX = 0;
                 // 结束点位Y
                 float enxX = (float)cameraImage.Width;
-                // 计算刀痕宽度
+                // 计算刀痕宽度 
                 // 上刀痕 = 中间点 - （刀痕宽度 / 2）
                 float resultCutMark = (float)pictureCutMarkWidth / 2;
                 float startTopCutMarkY = imagMideHeight - resultCutMark;
@@ -551,6 +574,7 @@ namespace 精密切割系统.View.Pages.common
 
                 AddLinesAndRedraw(lines);
             });
+
         }
 
         public void AddLinesAndRedraw(List<CustomLine> lines)
@@ -585,10 +609,13 @@ namespace 精密切割系统.View.Pages.common
             MyCanvas.Children.Add(line);
         }
 
-        private async void cameraImage_MouseDown(object sender, MouseButtonEventArgs e)
+        private void cameraImage_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            var axisIsReady = await Task.WhenAll(PlcControl.tagControl.Xaxis.IsReadyAsync(), PlcControl.tagControl.Yaxis.IsReadyAsync());
-            if (axisIsReady.All(p => p == true))
+            if (CommonCheck.CheckGlobalRunStatus())
+            {
+                return;
+            }
+            if (!CommonCheck.AxisReady(false))
             {
                 return;
             }
@@ -599,10 +626,14 @@ namespace 精密切割系统.View.Pages.common
             cameraPictureClick(x, y);
         }
 
-        private async void cameraImage_TouchDown(object sender, TouchEventArgs e)
+
+        private void cameraImage_TouchDown(object sender, TouchEventArgs e)
         {
-            var axisIsReady = await Task.WhenAll(PlcControl.tagControl.Xaxis.IsReadyAsync(), PlcControl.tagControl.Yaxis.IsReadyAsync());
-            if (axisIsReady.All(p => p == true))
+            if (CommonCheck.CheckGlobalRunStatus())
+            {
+                return;
+            }
+            if (!CommonCheck.AxisReady(false))
             {
                 return;
             }
@@ -615,13 +646,10 @@ namespace 精密切割系统.View.Pages.common
 
         private async void cameraPictureClick(double x, double y)
         {
-            var positon = await Task.WhenAll(PlcControl.tagControl.Xaxis.GetCurrentLocationAsync(), PlcControl.tagControl.Yaxis.GetCurrentLocationAsync());
-            double? xPosition = positon[0];
-            double? yPosition = positon[1];
-            if (xPosition is null || yPosition is null)
-            {
-                return;
-            }
+            string xCurPosition = PlcControl.plc.GetPlcValueString(DeviceKey.curLocationKey);
+            string yCurPosition = PlcControl.plc.GetPlcValueString(DeviceKey.yCurLocationKey);
+            double xPosition = double.Parse(xCurPosition);
+            double yPosition = double.Parse(yCurPosition);
             if (x != 0)
             {
                 // 根据图片像素和真实比例，计算要走的位置
@@ -630,10 +658,12 @@ namespace 精密切割系统.View.Pages.common
                 // 如果大于0 正转 小于0 反转
                 if (x > 0)
                 {
+                    // deviceApi.StartRelativeMotion(deviceApi.xName, "30", distance + "", 0);
                     xPosition += distance;
                 }
                 else
                 {
+                    // deviceApi.StartRelativeMotion(deviceApi.xName, "30", distance + "", 1);
                     xPosition -= distance;
                 }
             }
@@ -644,40 +674,42 @@ namespace 精密切割系统.View.Pages.common
                 // 如果大于0 正转 小于0 反转
                 if (y > 0)
                 {
+                    // deviceApi.StartRelativeMotion(deviceApi.yName, "30", distance + "", 1);
                     yPosition += distance;
                 }
                 else
                 {
+                    // deviceApi.StartRelativeMotion(deviceApi.yName, "30", distance + "", 0);
                     yPosition -= distance;
                 }
             }
-            //// 判断X 和Y是否超限，超限则保留最大或者最小值
-            //Tag xLimitUpperTag = PlcControl.allTags[DeviceKey.softUpperLimitKey];
-            //Tag xLimitLowerTag = PlcControl.allTags[DeviceKey.softLowerLimitKey];
+            // 判断X 和Y是否超限，超限则保留最大或者最小值
+            Tag xLimitUpperTag = PlcControl.allTags[DeviceKey.softUpperLimitKey];
+            Tag xLimitLowerTag = PlcControl.allTags[DeviceKey.softLowerLimitKey];
 
-            //Tag yLimitUpperTag = PlcControl.allTags[DeviceKey.ySoftUpperLimitKey];
-            //Tag yLimitLowerTag = PlcControl.allTags[DeviceKey.ySoftLowerLimitKey];
+            Tag yLimitUpperTag = PlcControl.allTags[DeviceKey.ySoftUpperLimitKey];
+            Tag yLimitLowerTag = PlcControl.allTags[DeviceKey.ySoftLowerLimitKey];
 
-            //float xUpperValue = float.Parse(xLimitUpperTag.defaultValue);
-            //float xLowerValue = float.Parse(xLimitLowerTag.defaultValue);
-            //float yUpperValue = float.Parse(yLimitUpperTag.defaultValue);
-            //float yLowerValue = float.Parse(yLimitLowerTag.defaultValue);
-            //if (xPosition >= xUpperValue)
-            //{
-            //    xPosition = xUpperValue;
-            //}
-            //if (xPosition <= xLowerValue)
-            //{
-            //    xPosition = xLowerValue;
-            //}
-            //if (yPosition >= yUpperValue)
-            //{
-            //    yPosition = yUpperValue;
-            //}
-            //if (yPosition <= yLowerValue)
-            //{
-            //    yPosition = yLowerValue;
-            //}
+            float xUpperValue = float.Parse(xLimitUpperTag.defaultValue);
+            float xLowerValue = float.Parse(xLimitLowerTag.defaultValue);
+            float yUpperValue = float.Parse(yLimitUpperTag.defaultValue);
+            float yLowerValue = float.Parse(yLimitLowerTag.defaultValue);
+            if (xPosition >= xUpperValue)
+            {
+                xPosition = xUpperValue;
+            }
+            if (xPosition <= xLowerValue)
+            {
+                xPosition = xLowerValue;
+            }
+            if (yPosition >= yUpperValue)
+            {
+                yPosition = yUpperValue;
+            }
+            if (yPosition <= yLowerValue)
+            {
+                yPosition = yLowerValue;
+            }
             await PlcControl.tagControl.cutting.RunMotionNoWaitAsync((float)xPosition, (float)yPosition);
         }
 
@@ -790,6 +822,8 @@ namespace 精密切割系统.View.Pages.common
             return result;
         }
     }
+
+
 
     public class CustomLine
     {
