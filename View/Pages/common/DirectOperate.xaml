@@ -57,7 +57,7 @@
                 <auto:AutoGrid
                     Margin="10"
                     ChildMargin="5"
-                    Columns="auto,*,*,*,*,*,*,*"
+                    Columns="auto,*,*,*"
                     RowCount="5">
                     <auto:AutoGrid.Resources>
                         <ResourceDictionary>
@@ -75,7 +75,7 @@
                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                         Text="{Binding CurrentPositionX}" />
                     <!--<TextBox materialDesign:HintAssist.Hint="运动速度mm/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedX}" />-->
-                    <TextBox
+                    <!--<TextBox
                         materialDesign:HintAssist.Hint="目标位置mm"
                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                         Text="{Binding TargetPositionX}" />
@@ -90,7 +90,7 @@
                         Command="{Binding StartXCommand}"
                         Content="开始"
                         IsEnabled="{Binding IsReadyX}"
-                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />-->
                     <Button
                         Command="{Binding StartHomingXCommand}"
                         Content="原点"
@@ -108,7 +108,7 @@
                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                         Text="{Binding CurrentPositionY}" />
                     <!--<TextBox materialDesign:HintAssist.Hint="运动速度mm/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedY}" />-->
-                    <TextBox
+                    <!--<TextBox
                         materialDesign:HintAssist.Hint="目标位置mm"
                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                         Text="{Binding TargetPositionY}" />
@@ -123,7 +123,7 @@
                         Command="{Binding StartYCommand}"
                         Content="开始"
                         IsEnabled="{Binding IsReadyY}"
-                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />-->
                     <Button
                         Command="{Binding StartHomingYCommand}"
                         Content="原点"
@@ -141,7 +141,7 @@
                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                         Text="{Binding CurrentPositionZ1}" />
                     <!--<TextBox materialDesign:HintAssist.Hint="运动速度mm/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedZ1}" />-->
-                    <TextBox
+                    <!--<TextBox
                         materialDesign:HintAssist.Hint="目标位置mm"
                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                         Text="{Binding TargetPositionZ1}" />
@@ -156,7 +156,7 @@
                         Command="{Binding StartZ1Command}"
                         Content="开始"
                         IsEnabled="{Binding IsReadyZ1}"
-                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />-->
                     <Button
                         Command="{Binding StartHomingZ1Command}"
                         Content="原点"
@@ -174,7 +174,7 @@
                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                         Text="{Binding CurrentPositionZ2}" />
                     <!--<TextBox materialDesign:HintAssist.Hint="运动速度mm/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedZ2}" />-->
-                    <TextBox
+                    <!--<TextBox
                         materialDesign:HintAssist.Hint="目标位置mm"
                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                         Text="{Binding TargetPositionZ2}" />
@@ -189,7 +189,7 @@
                         Command="{Binding StartZ2Command}"
                         Content="开始"
                         IsEnabled="{Binding IsReadyZ2}"
-                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />-->
                     <Button
                         Command="{Binding StartHomingZ2Command}"
                         Content="原点"
@@ -207,7 +207,7 @@
                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                         Text="{Binding CurrentPositionTheta}" />
                     <!--<TextBox materialDesign:HintAssist.Hint="运动速度deg/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedTheta}" />-->
-                    <TextBox
+                    <!--<TextBox
                         materialDesign:HintAssist.Hint="目标位置deg"
                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                         Text="{Binding TargetPositionTheta}" />
@@ -222,7 +222,7 @@
                         Command="{Binding StartThetaCommand}"
                         Content="开始"
                         IsEnabled="{Binding IsReadyTheta}"
-                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />-->
                     <Button
                         Command="{Binding StartHomingThetaCommand}"
                         Content="原点"
@@ -302,7 +302,6 @@
                                     Text="高速" />
                             </StackPanel>
                         </Grid>
-
                     </Grid>
                     <Grid Grid.Column="1">
                         <Grid.Resources>

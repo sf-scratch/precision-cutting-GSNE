@@ -202,9 +202,9 @@ namespace 精密切割系统.View.Pages.common
 
         public void DisplayImage(nint payload)
         {
-            if (TryGetConvertedInfo(payload, out WriteableBitmap bitmap) && bitmap != null)
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                Application.Current.Dispatcher.Invoke(() =>
+                if (TryGetConvertedInfo(payload, out WriteableBitmap bitmap) && bitmap != null)
                 {
                     // 确保Image_Control已初始化
                     if (cameraImage != null)
@@ -212,12 +212,12 @@ namespace 精密切割系统.View.Pages.common
                         cameraImage.Source = bitmap;
                         LocalBitmap = bitmap;
                     }
-                });
-            }
-            else
-            {
-                // Handle error
-            }
+                }
+                else
+                {
+                    // Handle error
+                }
+            });
         }
 
         private bool TryGetConvertedInfo(nint payload, out WriteableBitmap bitmap)
@@ -587,33 +587,33 @@ namespace 精密切割系统.View.Pages.common
 
         private async void cameraImage_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            var axisIsReady = await Task.WhenAll(PlcControl.tagControl.Xaxis.IsReadyAsync(), PlcControl.tagControl.Yaxis.IsReadyAsync());
-            if (axisIsReady.All(p => p == true))
-            {
-                return;
-            }
+            //var axisIsReady = await Task.WhenAll(PlcControl.tagControl.Xaxis.IsReadyAsync(), PlcControl.tagControl.Yaxis.IsReadyAsync());
+            //if (!axisIsReady.All(p => p == true))
+            //{
+            //    return;
+            //}
             // 获取当前点击的坐标
             var touchPoint = e.GetPosition(this);
             double x = touchPoint.X - centerLocation.X;
             double y = touchPoint.Y - centerLocation.Y;
-            cameraPictureClick(x, y);
+            await CameraPictureRunAsync(x, y);
         }
 
         private async void cameraImage_TouchDown(object sender, TouchEventArgs e)
         {
-            var axisIsReady = await Task.WhenAll(PlcControl.tagControl.Xaxis.IsReadyAsync(), PlcControl.tagControl.Yaxis.IsReadyAsync());
-            if (axisIsReady.All(p => p == true))
-            {
-                return;
-            }
+            //var axisIsReady = await Task.WhenAll(PlcControl.tagControl.Xaxis.IsReadyAsync(), PlcControl.tagControl.Yaxis.IsReadyAsync());
+            //if (!axisIsReady.All(p => p == true))
+            //{
+            //    return;
+            //}
             // 获取当前触摸的坐标
             var touchPoint = e.GetTouchPoint(this).Position;
             double x = touchPoint.X - centerLocation.X;
             double y = touchPoint.Y - centerLocation.Y;
-            cameraPictureClick(x, y);
+            await CameraPictureRunAsync(x, y);
         }
 
-        private async void cameraPictureClick(double x, double y)
+        private async Task CameraPictureRunAsync(double x, double y)
         {
             var positon = await Task.WhenAll(PlcControl.tagControl.Xaxis.GetCurrentLocationAsync(), PlcControl.tagControl.Yaxis.GetCurrentLocationAsync());
             double? xPosition = positon[0];
