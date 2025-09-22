@@ -13,6 +13,7 @@ namespace 精密切割系统.Helpers
     {
         // 控制右侧按钮
         protected ObservableCollection<RightButtonParams> RightButtonCollection { get; } = WindowLayout.RightPageButtons;
+
         // 控制底部侧按钮
         protected ObservableCollection<RightButtonParams> BottomButtonCollection { get; } = WindowLayout.OperatePageButtons;
 
@@ -29,7 +30,7 @@ namespace 精密切割系统.Helpers
 
         public virtual void OnNavigatedTo(NavigationContext navigationContext)
         {
-            NavigateUtils.ClearRightPage();
+            NavigateUtils.ClearOperatePage();
             NavigateUtils.ClearMainFrame();
         }
     }

@@ -59,7 +59,7 @@ namespace 精密切割系统.Helpers
             return false;
         }
 
-        public static void ClearRightPage()
+        public static void ClearOperatePage()
         {
             MainWindow? mainWindow = Application.Current.MainWindow as MainWindow;
             if (mainWindow == null)

@@ -33,16 +33,19 @@ namespace 精密切割系统.View.Pages.Auto
     /// </summary>
     public partial class AutoCutPausing : UserControl
     {
-        MainWindow mainWindow;
-        bool runFlag = false;
-        bool stopCheckFlag = false;
-        bool cameraOffsetStatus = false;
-        float cameraCutOffset = 0;
+        private MainWindow mainWindow;
+        private bool runFlag = false;
+        private bool stopCheckFlag = false;
+        private bool cameraOffsetStatus = false;
+        private float cameraCutOffset = 0;
+
         // 手动调整基准线标识
-        bool adjustDatumLineFlag = false;
+        private bool adjustDatumLineFlag = false;
+
         // 创建一个定时器
-        System.Timers.Timer timer = null;
-        static CameraCommon cameraCommon;
+        private System.Timers.Timer timer = null;
+
+        private static CameraCommon cameraCommon;
 
         public AutoCutPausing()
         {
@@ -52,7 +55,7 @@ namespace 精密切割系统.View.Pages.Auto
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             mainWindow = Application.Current.MainWindow as MainWindow;
-            NavigateUtils.ClearRightPage(); 
+            NavigateUtils.ClearOperatePage();
             //updateDefineDataModel();
         }
 
@@ -73,10 +76,12 @@ namespace 精密切割系统.View.Pages.Auto
             mainWindow.UpdateOperatePage(OperateData.GetSemiAutoCuttingStopOperate(!isSpeedChange, !isHeightChange)
                 , OperateClickHandler, OperateTouchLeaveHandler, OperateTouchDownHandler);
         }
+
         private void UpdateMenu2()
         {
             mainWindow.UpdateOperatePage(OperateData.GetSemiAutoCuttingStopTwoOperate(), OperateClickHandler);
         }
+
         private void DisposeDatumLine(int code)
         {
             if (code == 23040)
@@ -90,7 +95,6 @@ namespace 精密切割系统.View.Pages.Auto
             else if (code == 23407)
             {
                 cameraCommon?.SetCutMarkWidth(-1, 2);
-
             }
             else if (code == 23408)
             {
@@ -100,6 +104,7 @@ namespace 精密切割系统.View.Pages.Auto
             //viewModel.CutWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((cameraCommon._cutMarkWidth / 1000).ToString(), 4));
             //viewModel.DdgesWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((cameraCommon._edgeChipWidth / 1000).ToString(), 4));
         }
+
         public void OperateTouchDownHandler(object sender, int code)
         {
             switch (code)
@@ -147,10 +152,12 @@ namespace 精密切割系统.View.Pages.Auto
 
                     timer.Start(); // 启动定时器
                     break;
+
                 default:
                     break;
             }
         }
+
         public void OperateTouchLeaveHandler(object sender, int code)
         {
             switch (code)
@@ -170,10 +177,12 @@ namespace 精密切割系统.View.Pages.Auto
                         timer = null;
                     }
                     break;
+
                 default:
                     break;
             }
         }
+
         public void OperateClickHandler(object sender, int code)
         {
             switch (code)
@@ -187,6 +196,7 @@ namespace 精密切割系统.View.Pages.Auto
                     Tools.LogInfo($"最新基准线：{GlobalParams.cameraOffsetY}");
                     cameraOffsetStatus = true;
                     break;
+
                 case 2401:
                     //float tempDepthCompensation = Tools.GetFloatStringValue(viewModel.DepthCompensation);
                     //// 高度补偿
@@ -194,12 +204,14 @@ namespace 精密切割系统.View.Pages.Auto
                     // CutOperateUtils.SetBladeHeightComp(tempDepthCompensation);
                     MaterialSnackUtils.MaterialSnack("刀片高度补偿设置成功！", MaterialSnackUtils.SnackType.SUCCESS);
                     break;
+
                 case 2403:
                     //float tempChangeFeedSpeed = Tools.GetFloatStringValue(viewModel.ChangeFeedSpeed);
                     //// 速度更改
                     //CutOperateUtils.SetFeedSpeedComp(tempChangeFeedSpeed);
                     MaterialSnackUtils.MaterialSnack("变更进刀速度成功！", MaterialSnackUtils.SnackType.SUCCESS);
                     break;
+
                 case 2442:
                     // 聚焦
                     if (!CommonCheck.FocusStatsCheck())
@@ -208,27 +220,33 @@ namespace 精密切割系统.View.Pages.Auto
                     }
                     CommonOperate.GetInstance().AutoFocus(2, mainWindow, null);
                     break;
+
                 case 2412:
                     UpdateMenu2();
                     // 调光
                     ShowDimming(1);
                     break;
+
                 case 2411:
                     updateDefineDataModel();
                     // 调光
                     ShowDimming(0);
                     break;
+
                 case 2422:
                     // 刀片状态信息
                     mainWindow.NavigateToPage("Pages/F4_BladeMaintenance/BladeInfo", "pageName=Pages/F2_ManualOperation/MQSemiAutomaticCuttingStop");
                     break;
+
                 case 2405:
                     mainWindow.NavigateToPage("Pages/F3_ModelCatalog/MCDeviceDataListConf");
                     break;
+
                 default:
                     break;
             }
         }
+
         /// <summary>
         /// 显示调光
         /// </summary>
@@ -292,7 +310,8 @@ namespace 精密切割系统.View.Pages.Auto
                 {
                     Thread.Sleep(500);
                     widthInfo = CommonOperate.GetCutEdgeWidth(fileName);
-                    Task.Run(() => {
+                    Task.Run(() =>
+                    {
                         Thread.Sleep(2000);
                         // 删除照片
                         Tools.DeleteFile(fileName);

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,8 +19,10 @@ using System.Windows.Shapes;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
+using 精密切割系统.Model.common;
 using 精密切割系统.Model.plc;
 using 精密切割系统.Utils;
+using 精密切割系统.View.common;
 using 精密切割系统.View.Controls;
 using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.operate;
@@ -35,7 +38,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
     {
         private MainWindow? _mainWindow;
         private RightPage? _rightPage;
-        private OperatePage? _operatePage;
+        private CancellationTokenSource _cts;
 
         public BMBladeReplacementConf()
         {
@@ -43,7 +46,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             _mainWindow = Application.Current.MainWindow as MainWindow;
         }
 
-        private async void Page_Loaded(object sender, RoutedEventArgs e)
+        private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             if (_mainWindow is null) return;
             _rightPage = _mainWindow.rightFrame.Content as RightPage;
@@ -54,10 +57,22 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             _rightPage.btnBack.SetRightClickedHandler(BtnBack_RightClicked);
             _rightPage.btnSure.Visibility = Visibility.Visible;
             _rightPage.btnSure.SetRightClickedHandler(BladeReplaceSure);
-            _operatePage = _mainWindow.operateFrame.Content as OperatePage;
-            _operatePage?.UpdateOperate([]);
-            InitData(); 
-            await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(60));
+            _cts = new CancellationTokenSource();
+            NavigateUtils.ClearOperatePage();
+            WindowLayout.OperatePageButtons.Add(RightButtonParams.BlueButton("换刀片", "SawBlade", ReplaceBlade));
+            InitData();
+        }
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            _cts.Cancel();
+            _cts.Dispose();
+            WindowLayout.OperatePageButtons.Clear();
+        }
+
+        private async void ReplaceBlade()
+        {
+            await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(60), _cts.Token);
             await AutoCutUtils.ReplaceBladeAsync(default, timeoutToken.Token);
         }
 
@@ -75,15 +90,11 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             Appsettings.BladeThickness = bladeThickness.Text.ToFloat();
             Appsettings.AfterReplaceBladeCutTimes = afterReplaceBladeCutTimes.Text.ToInt();
             Appsettings.AfterReplaceBladeCutLength = afterReplaceBladeCutLength.Text.ToFloat();
-        }   
+        }
 
         private void BtnBack_RightClicked(object? sender, bool e)
         {
-            GlobalParams.globalRunFlag = true;
-            PlcControl.tagControl.bladeMantance.RunBladeReplace(0);
-            GlobalParams.globalRunFlag = false;
             _mainWindow?.NavigateToPage("MainMenu");
-
         }
 
         private void BladeReplaceSure(object? sender, bool e)
