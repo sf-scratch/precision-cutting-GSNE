@@ -16,10 +16,13 @@ namespace 精密切割系统.FrmWindow.common
     internal class GlobalParams
     {
         // true 在线版本 false 离线版本
-        public static bool onlineFlag = true;
+        public static bool OnlineFlag { get; set; } = false;
 
         // 是否上传MES
-        public static bool OnlineMES = true;
+        public static bool OnlineMES { get; set; } = true;
+
+        // 是否带Theta轴
+        public static bool HasTheta { get; set; } = false;
 
         // 当前页面是否是首页
         public static bool currentPageIsHome = false;

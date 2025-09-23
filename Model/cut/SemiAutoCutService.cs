@@ -86,7 +86,7 @@ namespace 精密切割系统.Model.cut
 
         public static async Task<CommonResult> CheckCutAsync()
         {
-            if (!GlobalParams.onlineFlag) return CommonResult.Success();
+            if (!GlobalParams.OnlineFlag) return CommonResult.Success();
             if (!await PlcControl.tagControl.wholeDevice.IsCompletedSystemInitAsync())
             {
                 return CommonResult.Failure("请完成系统初始化！");

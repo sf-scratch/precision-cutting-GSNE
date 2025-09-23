@@ -62,7 +62,7 @@ namespace 精密切割系统.View.Pages.operate
             ctViewModel.UpdateImage(false, 8004);
             isSwitchOpen(false, 7);
             isSwitchOpen(false, 8);
-            if (GlobalParams.onlineFlag)
+            if (GlobalParams.OnlineFlag)
             {
                 Thread _thread = new Thread(ShowOperateBtn);
                 _thread.IsBackground = true;
@@ -323,7 +323,7 @@ namespace 精密切割系统.View.Pages.operate
                     await CutWaterOperateAsync();
                     break;
                 case 6:
-                    if (!GlobalParams.onlineFlag)
+                    if (!GlobalParams.OnlineFlag)
                     {
                         return;
                     }
@@ -331,7 +331,7 @@ namespace 精密切割系统.View.Pages.operate
                     await SystemInitOperateAsync();
                     break;
                 case 7:
-                    if (!GlobalParams.onlineFlag)
+                    if (!GlobalParams.OnlineFlag)
                     {
                         return;
                     }
@@ -346,7 +346,7 @@ namespace 精密切割系统.View.Pages.operate
                     await CameraBlowingOperateAsync();
                     break;
                 case 10:
-                    if (!GlobalParams.onlineFlag)
+                    if (!GlobalParams.OnlineFlag)
                     {
                         return;
                     }

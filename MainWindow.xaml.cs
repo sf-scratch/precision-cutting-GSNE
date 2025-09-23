@@ -144,7 +144,7 @@ namespace 精密切割系统
                 operatePage.SetOperateShowType(0);
                 operatePage.UpdateOperate(OperateData.GetTab01Operate());
                 InitializeData.initSystemData();
-                if (!GlobalParams.onlineFlag)
+                if (!GlobalParams.OnlineFlag)
                 {
                     GlobalParams.systemInitFlag = true;
                 }
@@ -219,7 +219,7 @@ namespace 精密切割系统
             mainPlc = PlcControl.GetInstance();
             // 加载配置参数
             CurrentUtils.UpdateParams();
-            if (!GlobalParams.onlineFlag)
+            if (!GlobalParams.OnlineFlag)
             {
                 GlobalParams.globalRunFlag = false;
                 return;

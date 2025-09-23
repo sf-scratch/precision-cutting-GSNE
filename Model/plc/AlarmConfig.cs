@@ -117,7 +117,7 @@ namespace 精密切割系统.Model.plc
         /// <returns></returns>
         public bool HasActiveErrorAlarm(params string[] notCheckedAddres)
         {
-            if (!GlobalParams.onlineFlag) return false; // 如果不在线，则不检查报警
+            if (!GlobalParams.OnlineFlag) return false; // 如果不在线，则不检查报警
 
             lock (_lock)
             {
@@ -143,7 +143,7 @@ namespace 精密切割系统.Model.plc
         /// <returns></returns>
         public bool HasActiveErrorAlarm()
         {
-            if (!GlobalParams.onlineFlag) return false; // 如果不在线，则不检查报警
+            if (!GlobalParams.OnlineFlag) return false; // 如果不在线，则不检查报警
 
             lock (_lock)
             {
@@ -161,7 +161,7 @@ namespace 精密切割系统.Model.plc
 
         public bool HasTargetActiveErrorAlarm(params string[] targetAddres)
         {
-            if (!GlobalParams.onlineFlag) return false; // 如果不在线，则不检查报警
+            if (!GlobalParams.OnlineFlag) return false; // 如果不在线，则不检查报警
             lock (_lock)
             {
                 if (_newestAlarms == null || _newestAlarms.Length == 0 || _newestAlarms.Length != _alarmInfos.Length) return true;
@@ -186,7 +186,7 @@ namespace 精密切割系统.Model.plc
         /// <returns></returns>
         public bool HasActiveAxisAlarm()
         {
-            if (GlobalParams.onlineFlag == false) return false; // 如果不在线，则不检查报警
+            if (GlobalParams.OnlineFlag == false) return false; // 如果不在线，则不检查报警
             lock (_lock)
             {
                 if (_newestAlarms is null || _newestAlarms.Length == 0 || _newestAlarms.Length != _alarmInfos.Length) return true;

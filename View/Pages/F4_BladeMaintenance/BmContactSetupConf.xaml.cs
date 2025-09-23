@@ -136,7 +136,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 
         private void BtnBack_RightClicked(object? sender, bool e)
         {
-            if (!GlobalParams.onlineFlag)
+            if (!GlobalParams.OnlineFlag)
             {
                 mainWindow.NavigateToPage("MainMenu");
                 return;

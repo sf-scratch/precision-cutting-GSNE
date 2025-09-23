@@ -154,7 +154,7 @@ namespace 精密切割系统.ViewModel
 
         private async void RunAutoCut()
         {
-            if (!GlobalParams.onlineFlag)
+            if (!GlobalParams.OnlineFlag)
             {
                 MaterialSnack($"切割中...", SnackType.WARNING, 0, _eventAggregator);
                 return;
@@ -257,7 +257,7 @@ namespace 精密切割系统.ViewModel
 
         private void Pause()
         {
-            if (!GlobalParams.onlineFlag)
+            if (!GlobalParams.OnlineFlag)
             {
                 // 暂停token
                 _pauseCts.Cancel();
@@ -276,7 +276,7 @@ namespace 精密切割系统.ViewModel
 
         public async Task ContinueAsync()
         {
-            if (!GlobalParams.onlineFlag)
+            if (!GlobalParams.OnlineFlag)
             {
                 SemiAutoCutService.Instance.Continue(_pauseCts.Token);
                 return;
@@ -290,7 +290,7 @@ namespace 精密切割系统.ViewModel
 
         public async Task ContinueAndResetCutYAsync()
         {
-            if (!GlobalParams.onlineFlag)
+            if (!GlobalParams.OnlineFlag)
             {
                 SemiAutoCutService.Instance.ContinueAndResetCutY(_pauseCts.Token);
                 return;
@@ -304,7 +304,7 @@ namespace 精密切割系统.ViewModel
 
         public async Task StopAsync(ServicePauseResult pauseResult)
         {
-            if (!GlobalParams.onlineFlag)
+            if (!GlobalParams.OnlineFlag)
             {
                 NavigateUtils.NavigateToPage("Pages/F2_ManualOperation/MQSemiAutomaticCuttingConf");
                 ShowMessage();

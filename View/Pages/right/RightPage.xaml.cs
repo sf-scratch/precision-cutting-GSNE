@@ -144,7 +144,7 @@ namespace 精密切割系统.View.page.right
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            if (GlobalParams.onlineFlag)
+            if (GlobalParams.OnlineFlag)
             {
                 // 刷新主轴转速等状态信息
                 RefreshDeviceStatus();

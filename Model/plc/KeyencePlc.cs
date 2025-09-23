@@ -68,7 +68,7 @@ namespace 精密切割系统.Driver
                 }
                 if (plc != null && (connect == null || !connect.IsSuccess))
                 {
-                    if (GlobalParams.onlineFlag)
+                    if (GlobalParams.OnlineFlag)
                     {
                         plc.EnsurePlcConnected();  // 确保PLC连接;
                     }
@@ -223,7 +223,7 @@ namespace 精密切割系统.Driver
 
         public string readData(string plcAddr, PlcDataType dataType = PlcDataType.Int32, ushort dataNumber = 1)
         {
-            if (!GlobalParams.onlineFlag) return "";
+            if (!GlobalParams.OnlineFlag) return "";
 
             const int maxRetries = 3;
             const int retryDelayMs = 100;
@@ -384,7 +384,7 @@ namespace 精密切割系统.Driver
 
         public async Task<bool[]?> ReadDataAsync(string plcAddr, ushort dataNumber)
         {
-            if (!GlobalParams.onlineFlag) return null;
+            if (!GlobalParams.OnlineFlag) return null;
             const int maxRetries = 3;
             const int retryDelayMs = 100;
             for (int attempt = 1; attempt <= maxRetries; attempt++)
@@ -715,7 +715,7 @@ namespace 精密切割系统.Driver
 
         public string GetPlcValueString(string tKey)
         {
-            if (!GlobalParams.onlineFlag || !PlcControl.connectionStatus)
+            if (!GlobalParams.OnlineFlag || !PlcControl.connectionStatus)
             {
                 return "0";
             }
@@ -762,7 +762,7 @@ namespace 精密切割系统.Driver
 
         public bool writeTag(Tag tag)
         {
-            if (!GlobalParams.onlineFlag)
+            if (!GlobalParams.OnlineFlag)
             {
                 return true;
             }
@@ -811,7 +811,7 @@ namespace 精密切割系统.Driver
 
         public async Task<bool> WriteTagAsync(Tag tag)
         {
-            if (!GlobalParams.onlineFlag)
+            if (!GlobalParams.OnlineFlag)
             {
                 return true;
             }

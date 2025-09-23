@@ -203,7 +203,7 @@ namespace 精密切割系统.ViewModel
 
         private async void RunAutoCut()
         {
-            if (!GlobalParams.onlineFlag)
+            if (!GlobalParams.OnlineFlag)
             {
                 RunStatus = AutoRunStatus.SharpeningInProgress;
                 return;
@@ -458,7 +458,7 @@ namespace 精密切割系统.ViewModel
 
         //private async void RunAutoCut_WearAmount()
         //{
-        //    if (!GlobalParams.onlineFlag)
+        //    if (!GlobalParams.OnlineFlag)
         //    {
         //        RunStatus = AutoRunStatus.SharpeningInProgress;
         //        return;
@@ -797,7 +797,7 @@ namespace 精密切割系统.ViewModel
 
         private void Pause()
         {
-            if (!GlobalParams.onlineFlag)
+            if (!GlobalParams.OnlineFlag)
             {
                 NavigationParameters parameters = new NavigationParameters { { "AutoCutRuningViewModel", this } };
                 _regionManager.RequestNavigate(RegionName.AutoCutStateRegion, nameof(AutoCutPausing), parameters);
@@ -845,7 +845,7 @@ namespace 精密切割系统.ViewModel
 
         public async Task StopAsync(ServicePauseResult pauseResult)
         {
-            if (!GlobalParams.onlineFlag)
+            if (!GlobalParams.OnlineFlag)
             {
                 _regionManager.RequestNavigate(RegionName.MainRegion, nameof(FullyAutomatic));
                 return;

@@ -269,7 +269,7 @@ namespace 精密切割系统.View
                     }
                 case 8:
                     {
-                        if (!GlobalParams.onlineFlag)
+                        if (!GlobalParams.OnlineFlag)
                         {
                             mainWindow.NavigateToPage(bean.PageUrl);
                             break;
@@ -316,7 +316,7 @@ namespace 精密切割系统.View
                     ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(AutoCutSelectConfig));
                     break;
                 case 402:
-                    if (!GlobalParams.onlineFlag)
+                    if (!GlobalParams.OnlineFlag)
                     {
                         mainWindow.NavigateToPage(bean.PageUrl);
                         break;

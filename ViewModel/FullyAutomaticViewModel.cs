@@ -228,7 +228,7 @@ namespace 精密切割系统.ViewModel
 
         private async Task CheckLunguAsync(string lunguId)
         {
-            if (!GlobalParams.onlineFlag)
+            if (!GlobalParams.OnlineFlag)
             {
                 InitRightButton();
                 MaterialSnackUtils.MaterialSnack("检查轮毂信息完成，可开始执行自动切割！", MaterialSnackUtils.SnackType.SUCCESS, 0, _eventAggregator);
@@ -261,7 +261,7 @@ namespace 精密切割系统.ViewModel
 
         private async Task AutoRunAsync()
         {
-            if (!GlobalParams.onlineFlag)
+            if (!GlobalParams.OnlineFlag)
             {
                 NavigationParameters paramet = new NavigationParameters
                 {

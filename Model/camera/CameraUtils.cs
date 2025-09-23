@@ -111,7 +111,7 @@ namespace 精密切割系统.Driver
         /// <param name="intensity">光源亮度 1-255</param>
         public static void SetLightIntensity(int intensity, int channel)
         {
-            /*if (!GlobalParams.onlineFlag)
+            /*if (!GlobalParams.OnlineFlag)
             {
                 return;
             }*/

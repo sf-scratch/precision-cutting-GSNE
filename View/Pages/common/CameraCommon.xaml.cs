@@ -122,7 +122,7 @@ namespace 精密切割系统.View.Pages.common
 
         private void StartGrabbing()
         {
-            if (!GlobalParams.onlineFlag)
+            if (!GlobalParams.OnlineFlag)
             {
                 return;
             }
@@ -141,7 +141,7 @@ namespace 精密切割系统.View.Pages.common
 
         public void StopGrabbing()
         {
-            if (!GlobalParams.onlineFlag)
+            if (!GlobalParams.OnlineFlag)
             {
                 return;
             }
@@ -155,7 +155,7 @@ namespace 精密切割系统.View.Pages.common
 
         private void GrabThreadProcess()
         {
-            if (!GlobalParams.onlineFlag)
+            if (!GlobalParams.OnlineFlag)
             {
                 return;
             }

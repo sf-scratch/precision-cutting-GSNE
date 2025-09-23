@@ -70,7 +70,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 
         private async void StartCut()
         {
-            if (!GlobalParams.onlineFlag)
+            if (!GlobalParams.OnlineFlag)
             {
                 return;
             }
@@ -163,7 +163,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 
         private async void ReStart(object? sender, bool e)
         {
-            if (!GlobalParams.onlineFlag)
+            if (!GlobalParams.OnlineFlag)
             {
                 UpdateToRunStatus();
                 return;
@@ -177,7 +177,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 
         private void Pause(object? sender, bool e)
         {
-            if (!GlobalParams.onlineFlag)
+            if (!GlobalParams.OnlineFlag)
             {
                 UpdateToPauseStatus();
                 return;
@@ -202,7 +202,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             string bladeLotID = QueryUtils.GetValueFromQueryParams(this, "BladeLotID");
             string idStr = QueryUtils.GetValueFromQueryParams(this, "Id");
             MainWindow? mainWindow = Application.Current.MainWindow as MainWindow;
-            if (!GlobalParams.onlineFlag)
+            if (!GlobalParams.OnlineFlag)
             {
                 mainWindow?.NavigateToPage("Pages/F4_BladeMaintenance/BmSharpenParameterForm", "Id=" + idStr + "&Flag=" + flag + "&BladeLotID=" + bladeLotID);
                 return;

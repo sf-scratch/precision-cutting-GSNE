@@ -18,7 +18,7 @@ namespace 精密切割系统.ViewModel
     {
         private PlcControl()
         {
-            if (GlobalParams.onlineFlag)
+            if (GlobalParams.OnlineFlag)
             {
                 //readTags = new Thread(updateAllTags);
                 //readTags.IsBackground = true;
