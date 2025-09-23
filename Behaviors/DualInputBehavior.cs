@@ -129,10 +129,10 @@ namespace 精密切割系统.Behaviors
 
         private async Task ExecutePrompt(CancellationToken token)
         {
-            if (Volatile.Read(ref _isRaiseCommand) == 0 && PromptCommand?.CanExecute() == true)
-            {
-                await PromptCommand.Execute(token);
-            }
+            //if (Volatile.Read(ref _isRaiseCommand) == 0 && PromptCommand?.CanExecute() == true)
+            //{
+            //    await PromptCommand.Execute(token);
+            //}
         }
 
         private void ExecuteStart(object? sender, object e)

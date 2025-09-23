@@ -1,322 +1,100 @@
-﻿<Page x:Class="精密切割系统.View.Pages.operate.OperatePage"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:精密切割系统.View.Pages.operate" 
-      xmlns:controls="clr-namespace:精密切割系统.View.Controls" 
-      xmlns:common="clr-namespace:精密切割系统.View.Pages.common"
-      xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
-      xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
-      xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
-      xmlns:behav="clr-namespace:精密切割系统.Behaviors"
-      mc:Ignorable="d" 
-      d:DesignHeight="250" d:DesignWidth="1450"
-      d:DataContext="{d:DesignInstance viewModel:CtViewModel, IsDesignTimeCreatable=True}"
-      Loaded="Page_Loaded" 
-      Title="OperatePage">
+﻿<Page
+    x:Class="精密切割系统.View.Pages.operate.OperatePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
+    xmlns:behav="clr-namespace:精密切割系统.Behaviors"
+    xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:common="clr-namespace:精密切割系统.View.Pages.common"
+    xmlns:controls="clr-namespace:精密切割系统.View.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:精密切割系统.View.Pages.operate"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
+    Title="OperatePage"
+    d:DataContext="{d:DesignInstance viewModel:CtViewModel,
+                                     IsDesignTimeCreatable=True}"
+    d:DesignHeight="250"
+    d:DesignWidth="1450"
+    Loaded="Page_Loaded"
+    mc:Ignorable="d">
     <Page.Resources>
         <Style TargetType="Controls:KeyboardBtn">
-            <Setter Property="Width" Value="72"></Setter>
-            <Setter Property="Height" Value="62"></Setter>
-            <Setter Property="Margin" Value="5"></Setter>
+            <Setter Property="Width" Value="72" />
+            <Setter Property="Height" Value="62" />
+            <Setter Property="Margin" Value="5" />
         </Style>
         <Style TargetType="ListBoxItem">
-            <Setter Property="Margin" Value="0"/>
-            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Padding" Value="0" />
         </Style>
     </Page.Resources>
     <Grid>
-        <Grid x:Name="OperateGrid" Width="1450" Height="250" Margin="15,0,0,0">
+        <Grid
+            x:Name="OperateGrid"
+            Width="1450"
+            Height="250"
+            Margin="15,0,0,0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
         </Grid>
 
-        <controls:DirectOperate x:Name="commonDirection"  Visibility="Collapsed"/>
-        <!-- <common:CustomKeyboard x:Name="costomKeyboardGrid" Visibility="Collapsed" ></common:CustomKeyboard> -->
-        <Grid x:Name="costomKeyboardGrid">
-            <Border BorderThickness="1" CornerRadius="10" Background="#DFFCFF" Margin="20,5,0,10">
-                <Border.Effect>
-                    <DropShadowEffect 
-        ShadowDepth="5" 
-        BlurRadius="20" 
-        Color="#4DC9EBF7" 
-        Direction="315" />
-                </Border.Effect>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="830"/>
-                        <ColumnDefinition Width="340"/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <Grid Grid.Column="0">
-                        <Grid.RowDefinitions>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                        </Grid.RowDefinitions>
-                        <Grid Grid.Row="0">
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom">
-                                <Controls:KeyboardBtn BtnValue="Q" BtnType="0"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="W" BtnType="0"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="E" BtnType="0"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="R" BtnType="0"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="T" BtnType="0"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="Y" BtnType="0"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="U" BtnType="0"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="I" BtnType="0"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="O" BtnType="0"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="P" BtnType="0"></Controls:KeyboardBtn>
-                            </StackPanel>
-                        </Grid>
-                        <Grid Grid.Row="1">
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <Controls:KeyboardBtn BtnValue="A" BtnType="0"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="S" BtnType="0"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="D" BtnType="0"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="F" BtnType="0"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="G" BtnType="0"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="H" BtnType="0"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="J" BtnType="0"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="K" BtnType="0"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="L" BtnType="0"></Controls:KeyboardBtn>
-                            </StackPanel>
-                        </Grid>
-                        <Grid Grid.Row="2" VerticalAlignment="Top">
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <Controls:KeyboardBtn BtnValue="Z"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="X"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="C"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="V"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="B"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="N"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="M"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="-" BtnType="2"></Controls:KeyboardBtn>
-                            </StackPanel>
-                        </Grid>
-                    </Grid>
-                    <Grid Grid.Column="1">
-                        <Grid.RowDefinitions>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                        </Grid.RowDefinitions>
-                        <Grid Grid.Row="0">
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom">
-                                <Controls:KeyboardBtn BtnValue="7"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="8"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="9"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="." BtnType="2"></Controls:KeyboardBtn>
-                            </StackPanel>
-                        </Grid>
-                        <Grid Grid.Row="1">
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <Controls:KeyboardBtn BtnValue="4"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="5"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="6"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="0"></Controls:KeyboardBtn>
-                            </StackPanel>
-                        </Grid>
-                        <Grid Grid.Row="2">
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top">
-                                <Controls:KeyboardBtn BtnValue="1"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="2"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="3"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="Down" BtnType="2"></Controls:KeyboardBtn>
-                            </StackPanel>
-                        </Grid>
-                    </Grid>
-                    <Grid Grid.Column="2">
-                        <Grid.RowDefinitions>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                        </Grid.RowDefinitions>
-                        <Grid Grid.Row="0">
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom">
-                                <Controls:KeyboardBtn BtnValue="Backtab" BtnType="2"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="↑" BtnType="3"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="Tab" BtnType="2"></Controls:KeyboardBtn>
-                            </StackPanel>
-                        </Grid>
-                        <Grid Grid.Row="1">
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <Controls:KeyboardBtn BtnValue="←" BtnType="3"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="Home" BtnType="2"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="→" BtnType="3"></Controls:KeyboardBtn>
-                            </StackPanel>
-                        </Grid>
-                        <Grid Grid.Row="2">
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top">
-                                <Controls:KeyboardBtn BtnValue="Del" BtnType="2"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="↓" BtnType="3"></Controls:KeyboardBtn>
-                                <Controls:KeyboardBtn BtnValue="Shift" BtnType="2"></Controls:KeyboardBtn>
-                            </StackPanel>
-                        </Grid>
-                    </Grid>
-                </Grid>
-            </Border>
-        </Grid>
-        <ItemsControl Margin="15,0,0,0" Width="1450" Height="250" x:Name="OperateButtonListBox"
-                 HorizontalAlignment="Stretch"
-                 VerticalAlignment="Stretch"
-                 Visibility="Visible"
-                 Background="Transparent"
-                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                 ScrollViewer.CanContentScroll="True"
-                 VirtualizingPanel.ScrollUnit="Pixel"
-                 BorderThickness="0"
-                 BorderBrush="Transparent"
-                 ItemsSource="{Binding RightButtonParams}" d:ItemsSource="{d:SampleData ItemCount=13}">
+        <controls:DirectOperate x:Name="commonDirection" Visibility="Collapsed" />
+        <common:CustomKeyboard x:Name="costomKeyboardGrid" />
+        <ItemsControl
+            x:Name="OperateButtonListBox"
+            Width="1450"
+            Height="250"
+            Margin="15,0,0,0"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            d:ItemsSource="{d:SampleData ItemCount=13}"
+            d:Visibility="Collapsed"
+            Background="Transparent"
+            BorderBrush="Transparent"
+            BorderThickness="0"
+            ItemsSource="{Binding RightButtonParams}"
+            ScrollViewer.CanContentScroll="True"
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+            VirtualizingPanel.ScrollUnit="Pixel"
+            Visibility="Visible">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <!-- 每行3个元素 -->
-                    <UniformGrid Columns="5" Rows="2"/>
+                    <!--  每行3个元素  -->
+                    <UniformGrid Columns="5" Rows="2" />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Controls:BottomButton
+                        Margin="8"
                         BackFlag="{Binding BackFlag}"
                         BackgroundDefColor="{Binding BackgroundDefColor}"
                         BackgroundDownColor="{Binding BackgroundDownColor}"
+                        ButtonHeight="100"
+                        ButtonWidth="268"
                         ContentText="{Binding ContentText}"
                         ContentTextFontSize="{Binding ContentTextFontSize}"
                         ImagePath="{Binding ImagePath}"
-                        Visibility="{Binding Visibility}"
-                        OpenOrCloseVisibility="{Binding OpenOrCloseVisibility}"
                         IsOpen="{Binding IsOpen}"
-                        ButtonWidth="268"
-                        ButtonHeight="100"
-                        Margin="8">
+                        OpenOrCloseVisibility="{Binding OpenOrCloseVisibility}"
+                        Visibility="{Binding Visibility}">
                         <behaviors:Interaction.Behaviors>
-                            <behav:TouchAndClickBehavior TouchAndClickCommand="{Binding RightClickCommand}"/>
+                            <behav:TouchAndClickBehavior TouchAndClickCommand="{Binding RightClickCommand}" />
                         </behaviors:Interaction.Behaviors>
                     </Controls:BottomButton>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-        <!--<ListBox Margin="15,0,0,0" Width="1450" Height="250" x:Name="OperateButtonListBox"
-                 HorizontalAlignment="Stretch"
-                 VerticalAlignment="Stretch"
-                 Visibility="Visible"
-                 Background="Transparent"
-                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                 ScrollViewer.CanContentScroll="True"
-                 VirtualizingPanel.ScrollUnit="Pixel"
-                 SelectionMode="Extended"
-                 BorderThickness="0"
-                 BorderBrush="Transparent"
-                 ItemsSource="{Binding RightButtonParams}" d:ItemsSource="{d:SampleData ItemCount=13}">
-            <ListBox.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel/>
-                </ItemsPanelTemplate>
-            </ListBox.ItemsPanel>
-            <ListBox.ItemContainerStyle>
-                <Style TargetType="ListBoxItem">
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="ListBoxItem">
-                                <ContentPresenter />
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                    <Setter Property="Background" Value="Transparent"/>
-                    <Style.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="Transparent"/>
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </ListBox.ItemContainerStyle>
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <Controls:RightButton
-                        BackFlag="{Binding BackFlag}"
-                        BackgroundDefColor="{Binding BackgroundDefColor}"
-                        BackgroundDownColor="{Binding BackgroundDownColor}"
-                        ContentText="{Binding ContentText}"
-                        ContentTextFontSize="{Binding ContentTextFontSize}"
-                        ImagePath="{Binding ImagePath}"
-                        Visibility="{Binding Visibility}"
-                        ButtonWidth="268"
-                        ButtonHeight="100"
-                        Margin="8">
-                        <behaviors:Interaction.Behaviors>
-                            <behav:TouchAndClickBehavior TouchAndClickCommand="{Binding RightClickCommand}"/>
-                        </behaviors:Interaction.Behaviors>
-                    </Controls:RightButton>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>-->
-
-        <!--<ListBox Margin="15,0,0,0" Width="1450" Height="250" x:Name="OperateuttonListBox"
-         HorizontalAlignment="Stretch"
-         VerticalAlignment="Stretch"
-         Visibility="Visible"
-         Background="Transparent"
-         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-         ScrollViewer.CanContentScroll="True"
-         VirtualizingPanel.ScrollUnit="Pixel"
-         SelectionMode="Extended"
-         BorderThickness="0"
-         BorderBrush="Transparent"
-         ItemsSource="{Binding RightButtonParams}" d:ItemsSource="{d:SampleData ItemCount=10}">
-            <ListBox.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel/>
-                </ItemsPanelTemplate>
-            </ListBox.ItemsPanel>
-            <ListBox.ItemContainerStyle>
-                <Style TargetType="ListBoxItem">
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="ListBoxItem">
-                                <ContentPresenter />
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                    <Setter Property="Background" Value="Transparent"/>
-                    <Setter Property="IsHitTestVisible" Value="True"/>
-                    <Style.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="Transparent"/>
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </ListBox.ItemContainerStyle>
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <Controls:RightButton
-                        Width="268"
-                        Height="100"
-                        IsHitTestVisible="True"
-                        BackFlag="{Binding BackFlag}"
-                        BackgroundDefColor="{Binding BackgroundDefColor}"
-                        BackgroundDownColor="{Binding BackgroundDownColor}"
-                        ContentText="{Binding ContentText}"
-                        ContentTextFontSize="{Binding ContentTextFontSize}"
-                        ImagePath="{Binding ImagePath}"
-                        Visibility="{Binding Visibility}">
-                        <behaviors:Interaction.Triggers>
-                            <behaviors:EventTrigger EventName="RightButtonClicked">
-                                <behaviors:InvokeCommandAction Command="{Binding RightClickCommand}"/>
-                            </behaviors:EventTrigger>
-                        </behaviors:Interaction.Triggers>
-                    </Controls:RightButton>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>-->
     </Grid>
 
 </Page>

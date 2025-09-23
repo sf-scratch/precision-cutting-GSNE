@@ -25,14 +25,13 @@ namespace 精密切割系统.View.Pages.common
     /// </summary>
     public partial class CustomKeyboard : UserControl
     {
+        private MainWindow? mainWindow;
+        private bool _upperFlag = true;
         public CustomKeyboard()
         {
             InitializeComponent();
             mainWindow = Application.Current.MainWindow as MainWindow;
         }
-        private MainWindow? mainWindow;
-
-        private bool upperFlag = false;
 
         public void btnClick(object sender, string key)
         {
@@ -41,25 +40,25 @@ namespace 精密切割系统.View.Pages.common
             //  0 是字母  null 或者是1，则是数字或者字母
             if (btn.BtnType == null)
             {
-                KeyboardSimulator.SimulateKeyPress(btn.BtnValue);
-            } 
+                CustomKeyPress(btn.BtnValue);
+            }
             else if (btn.BtnType.Equals("0"))
             {
                 // 0 
-                KeyboardSimulator.SimulateKeyPress(btn.BtnValue);
+                CustomKeyPress(btn.BtnValue);
             }
             else if (btn.BtnType.Equals("2"))
             {
                 string sendKey = "";
-                if (btn.BtnValue == "Shift")
+                if (btn.BtnValue == "Caps")
                 {
-                    upperFlag = upperFlag ? false : true;
-                    SetLettersCase(upperFlag);
-                    sendKey = "shift";
+                    _upperFlag = _upperFlag ? false : true;
+                    SetLettersCase(_upperFlag);
+                    sendKey = "capslock";
                 }
-                else if (btn.BtnValue == "Backtab")
+                else if (btn.BtnValue == "Shift")
                 {
-                    sendKey = "shift+tab";
+                    sendKey = "shift";
                 }
                 else if (btn.BtnValue == "Home")
                 {
@@ -91,16 +90,16 @@ namespace 精密切割系统.View.Pages.common
                 }
                 if (!string.IsNullOrEmpty(sendKey))
                 {
-                    KeyboardSimulator.SimulateKeyPress(sendKey);
+                    CustomKeyPress(sendKey);
                 }
-            } 
+            }
             else if (btn.BtnType.Equals("3"))
             {
                 string sendKey = "";
                 if ("↑".Equals(btn.BtnValue))
                 {
                     sendKey = "up";
-                } 
+                }
                 else if ("↓".Equals(btn.BtnValue))
                 {
                     sendKey = "down";
@@ -115,13 +114,18 @@ namespace 精密切割系统.View.Pages.common
                 }
                 if (btn.BtnValue != "")
                 {
-                    KeyboardSimulator.SimulateKeyPress(sendKey);
+                    CustomKeyPress(sendKey);
                 }
             }
         }
 
+        private void CustomKeyPress(string key)
+        {
+            Task.Run(() => KeyboardSimulator.SimulateKeyPress(key));
+        }
+
         // caseType 大小写类型 0 大写 1 小写
-        public void SetLettersCase(bool upperFlag)
+        public void SetLettersCase(bool upperFlagValue)
         {
             List<KeyboardBtn> list = Tools.GetChildrenOfType<KeyboardBtn>(this);
             list.ForEach(btn =>
@@ -131,20 +135,15 @@ namespace 精密切割系统.View.Pages.common
                     string btnText = btn.BtnValue;
                     if (btnText != null && btnText.Length > 0)
                     {
-                        btn.BtnValue = upperFlag ? btnText.ToUpper() : btnText.ToLower();
+                        btn.BtnValue = upperFlagValue ? btnText.ToUpper() : btnText.ToLower();
                     }
                 }
-                
             });
         }
 
-        public static bool IsBetweenAandZ(char c)
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            return c >= 'a' && c <= 'z';
-        }
-
-        private void Page_Loaded(object sender, RoutedEventArgs e)
-        {
+            SetLettersCase(_upperFlag);
             List<KeyboardBtn> list = Tools.GetChildrenOfType<KeyboardBtn>(this);
             list.ForEach(btn => {
                 btn.KeyPressed -= btnClick;
@@ -152,57 +151,12 @@ namespace 精密切割系统.View.Pages.common
             });
         }
 
-        private void functionBtn()
+        private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
-            /*string functionText = BtnType;
-            string sendKey = "";
-            if (functionText == "Shift")
-            {
-                upperFlag = upperFlag ? false : true;
-                CustomKeyboard customKeyboard = (CustomKeyboard)this.Parent;
-                customKeyboard.setLettersCase(upperFlag);
-            }
-            else if (functionText == "Backtab")
-            {
-                sendKey = "+{TAB}";
-            }
-            else if (functionText == "Tab")
-            {
-                sendKey = "{TAB}";
-            }
-            else if (functionText == "Del")
-            {
-                sendKey = "{DEL}";
-            }
-            else if (functionText == "Home")
-            {
-                sendKey = "^a";
-            }
-            if (functionText != "")
-            {
-                SendKeys.Send(sendKey);
-            }*/
-        }
-
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
-        {
-            var _this = this;
-            Task.Run(() =>
-            {
-                Thread.Sleep(2000);
-                Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    List<KeyboardBtn> list = Tools.GetChildrenOfType<KeyboardBtn>(_this);
-                    list.ForEach(btn => {
-                        btn.KeyPressed -= btnClick;
-                        btn.KeyPressed += btnClick;
-                    });
-                    
-                }));
-                
+            List<KeyboardBtn> list = Tools.GetChildrenOfType<KeyboardBtn>(this);
+            list.ForEach(btn => {
+                btn.KeyPressed -= btnClick;
             });
-            
         }
-
     }
 }
