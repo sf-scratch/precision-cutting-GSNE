@@ -30,7 +30,6 @@ namespace 精密切割系统.View.Controls
         public static readonly DependencyProperty XMinProperty;//最小值 针对数字小数
         public static readonly DependencyProperty XMaxProperty;//最大值 针对数字小数
         public static readonly DependencyProperty XPrecisionProperty;//小数位数 针对数字小数
-                                                                     //
 
         #endregion 依赖属性
 
@@ -45,7 +44,7 @@ namespace 精密切割系统.View.Controls
             //XWmkText 水印文字  比如 请输入内容
             XWmkTextProperty = DependencyProperty.Register("XWmkText", typeof(String), typeof(InputTextBox), new PropertyMetadata(null));
             XIsErrorProperty = DependencyProperty.Register("XIsError", typeof(bool), typeof(InputTextBox), new PropertyMetadata(false));
-            InputTextBox.XAllowNullProperty = DependencyProperty.Register("XAllowNull", typeof(bool), typeof(InputTextBox), new PropertyMetadata(true));
+            XAllowNullProperty = DependencyProperty.Register("XAllowNull", typeof(bool), typeof(InputTextBox), new PropertyMetadata(true));
             XWmkForegroundProperty = DependencyProperty.Register("XWmkForeground", typeof(Brush), typeof(InputTextBox), new PropertyMetadata(Brushes.Silver));
             XRegExpProperty = DependencyProperty.Register("XRegExp", typeof(string), typeof(InputTextBox), new PropertyMetadata(""));
             FrameworkElement.DefaultStyleKeyProperty.OverrideMetadata(typeof(InputTextBox), new FrameworkPropertyMetadata(typeof(InputTextBox)));

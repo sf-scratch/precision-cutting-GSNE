@@ -194,9 +194,7 @@ namespace 精密切割系统.ViewModel
                 _ = MonitoringAlarmAsync(_monitoringCts.Token);
                 _ = MonitoringCutProgressAsync(_monitoringCts.Token);
                 float cutY = (await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0).ToActualY();
-                await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
-                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(Appsettings.BladeOuterDiameter.Value));
-                CommonResult<float> curHeightZ = await AutoCutUtils.ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, _eventAggregator, _pauseCts.Token);
+                CommonResult<float> curHeightZ = await AutoCutUtils.ProcessCombineMeasureHeightAsync(_eventAggregator, _pauseCts.Token);
                 if (!curHeightZ.IsSuccess)
                 {
                     MaterialSnack(curHeightZ.Message, SnackType.WARNING, 0, _eventAggregator);

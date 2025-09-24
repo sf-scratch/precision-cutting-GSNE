@@ -12,6 +12,22 @@
     Loaded="Page_Loaded"
     Unloaded="Page_Unloaded"
     mc:Ignorable="d">
+    <Page.Resources>
+        <Style TargetType="Label">
+            <Setter Property="Height" Value="35" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style BasedOn="{StaticResource InputTextStyle}" TargetType="Controls:InputTextBox">
+            <Setter Property="Width" Value="250" />
+            <Setter Property="Height" Value="35" />
+            <Setter Property="InputType" Value="Decimal" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="XMin" Value="0" />
+            <Setter Property="XPrecision" Value="3" />
+        </Style>
+    </Page.Resources>
     <Page.DataContext>
         <local:ReplaceBladeViewModel />
     </Page.DataContext>
@@ -40,87 +56,42 @@
             Grid.Column="0"
             HorizontalAlignment="Left">
             <StackPanel Margin="0,10,0,0">
-                <Label
-                    x:Name="labUnit2"
-                    Height="35"
-                    Content="刀片外径"
-                    FontSize="16"
-                    FontWeight="Bold" />
+                <Label Content="刀片外径" />
                 <StackPanel Orientation="Horizontal">
-                    <Controls:InputTextBox
-                        x:Name="bladeOuterDiameter"
-                        Width="250"
-                        Height="35"
-                        InputType="Decimal"
-                        TextWrapping="Wrap"
-                        XMin="0"
-                        XPrecision="3" />
-                    <Label
-                        Height="35"
-                        Content="mm"
-                        FontSize="14"
-                        FontWeight="Bold"
-                        Foreground="Black" />
+                    <Controls:InputTextBox x:Name="bladeOuterDiameter" />
+                    <Label Content="mm" FontSize="14" />
                 </StackPanel>
             </StackPanel>
             <StackPanel Margin="0,10,0,0">
-                <Label
-                    x:Name="labBladeThickness"
-                    Height="35"
-                    Content="刀片厚度"
-                    FontSize="16"
-                    FontWeight="Bold" />
+                <Label Content="刀片厚度" />
                 <StackPanel Orientation="Horizontal">
-                    <Controls:InputTextBox
-                        x:Name="bladeThickness"
-                        Width="250"
-                        Height="35"
-                        InputType="Decimal"
-                        TextWrapping="Wrap"
-                        XMin="0"
-                        XPrecision="3" />
-                    <Label
-                        Height="35"
-                        Content="mm"
-                        FontSize="14"
-                        FontWeight="Bold" />
+                    <Controls:InputTextBox x:Name="bladeThickness" />
+                    <Label Content="mm" FontSize="14" />
                 </StackPanel>
             </StackPanel>
             <StackPanel Margin="0,10,0,0">
-                <Label
-                    x:Name="labBladeLife"
-                    Height="35"
-                    Content="刀片使用寿命"
-                    FontSize="16"
-                    FontWeight="Bold" />
+                <Label Content="刀片使用寿命" />
                 <StackPanel Orientation="Horizontal">
-                    <Controls:InputTextBox
-                        x:Name="afterReplaceBladeCutTimes"
-                        Width="250"
-                        Height="35"
-                        InputType="Numeral"
-                        TextWrapping="Wrap"
-                        XMin="0" />
-                    <Label
-                        Height="35"
-                        Content="刀"
-                        FontSize="14"
-                        FontWeight="Bold" />
+                    <Controls:InputTextBox x:Name="afterReplaceBladeCutTimes" IsEnabled="False" />
+                    <Label Content="刀" FontSize="14" />
                 </StackPanel>
                 <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
-                    <Controls:InputTextBox
-                        x:Name="afterReplaceBladeCutLength"
-                        Width="250"
-                        Height="35"
-                        InputType="Decimal"
-                        TextWrapping="Wrap"
-                        XMin="0"
-                        XPrecision="3" />
-                    <Label
-                        Height="35"
-                        Content="m"
-                        FontSize="14"
-                        FontWeight="Bold" />
+                    <Controls:InputTextBox x:Name="afterReplaceBladeCutLength" IsEnabled="False" />
+                    <Label Content="m" FontSize="14" />
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Margin="0,10,0,0">
+                <Label Content="第一次测高" />
+                <StackPanel Orientation="Horizontal">
+                    <Controls:InputTextBox x:Name="measureHeightFirst" IsEnabled="False" />
+                    <Label Content="mm" FontSize="14" />
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Margin="0,10,0,0">
+                <Label Content="最后一次测高" />
+                <StackPanel Orientation="Horizontal">
+                    <Controls:InputTextBox x:Name="measureHeightLast" IsEnabled="False" />
+                    <Label Content="mm" FontSize="14" />
                 </StackPanel>
             </StackPanel>
         </StackPanel>

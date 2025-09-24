@@ -82,14 +82,14 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             bladeThickness.Text = Appsettings.BladeThickness?.ToString("F3");
             afterReplaceBladeCutTimes.Text = Appsettings.AfterReplaceBladeCutTimes?.ToString();
             afterReplaceBladeCutLength.Text = Appsettings.AfterReplaceBladeCutLength?.ToString("F3");
+            measureHeightFirst.Text = Appsettings.MeasureHeightFirst?.ToString("F3");
+            measureHeightLast.Text = Appsettings.MeasureHeightLast?.ToString("F3");
         }
 
         private void SaveData()
         {
             Appsettings.BladeOuterDiameter = bladeOuterDiameter.Text.ToFloat();
             Appsettings.BladeThickness = bladeThickness.Text.ToFloat();
-            Appsettings.AfterReplaceBladeCutTimes = afterReplaceBladeCutTimes.Text.ToInt();
-            Appsettings.AfterReplaceBladeCutLength = afterReplaceBladeCutLength.Text.ToFloat();
         }
 
         private void BtnBack_RightClicked(object? sender, bool e)

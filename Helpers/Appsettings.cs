@@ -93,6 +93,24 @@ namespace 精密切割系统.Helpers
         }
 
         /// <summary>
+        /// 第一次测高位置
+        /// </summary>
+        public static float? MeasureHeightFirst
+        {
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
+        }
+
+        /// <summary>
+        /// 最后一次测高位置
+        /// </summary>
+        public static float? MeasureHeightLast
+        {
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
+        }
+
+        /// <summary>
         /// 刀片外径
         /// </summary>
         public static float? BladeOuterDiameter
@@ -158,9 +176,7 @@ namespace 精密切割系统.Helpers
         /// <summary>
         /// 切割theta中心点位置
         /// </summary>
-        public static DataPoint<float> ThetaCenterPoint { get => new(CameraThetaCenterPoint.X.ToActualX(), CameraThetaCenterPoint.Y.ToActualY());  }
-
-
+        public static DataPoint<float> ThetaCenterPoint { get => new(CameraThetaCenterPoint.X.ToActualX(), CameraThetaCenterPoint.Y.ToActualY()); }
 
         /// <summary>
         /// 设备号
@@ -170,8 +186,6 @@ namespace 精密切割系统.Helpers
             get => GetString();
             set => UpdateAppSettings(value);
         }
-
-
 
         private static bool TryGetPoint(out DataPoint<float> point, [CallerMemberName] string? prefix = null)
         {

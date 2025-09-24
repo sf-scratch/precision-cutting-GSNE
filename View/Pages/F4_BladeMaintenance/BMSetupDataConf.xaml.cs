@@ -102,9 +102,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 _ = AutoCutUtils.MonitoringAlarmAsync(StopMeasureHeight, AlarmConfig.Instance.HasAnyExceptConductivityAlarm, _eventAggregator, _monitorCts.Token);
                 _measureHeightCts = new CancellationTokenSource();
                 _eventAggregator.GetEvent<AutoRuningMessageEvent>().Subscribe(OnMessageReceived, ThreadOption.UIThread);
-                await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
-                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(Appsettings.BladeOuterDiameter.Value));
-                CommonResult<float> curHeightZ = await AutoCutUtils.ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, _eventAggregator, _measureHeightCts.Token);
+                CommonResult<float> curHeightZ = await AutoCutUtils.ProcessCombineMeasureHeightAsync(_eventAggregator, _measureHeightCts.Token);
                 if (!curHeightZ.IsSuccess)
                 {
                     MaterialSnack(curHeightZ.Message, SnackType.WARNING, 0);
@@ -133,7 +131,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             List<BladeHeightModel> list = await SqlHelper.TableAsync<BladeHeightModel>().Where(t => t.Id == 1).ToListAsync();
             if (list.Count > 0)
             {
-                _viewModel._bladeHeightModel = list[0];           
+                _viewModel._bladeHeightModel = list[0];
             }
             else
             {
@@ -143,9 +141,8 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             _viewModel.SetupDefault = "CONTACT";
             _viewModel.CallOperatorWhenAutoSetup = "NO";
             _viewModel.PrecutAfterNonContactSetup = "NO";
-            
-
         }
+
         private void BtnBack_RightClicked(object? sender, bool e)
         {
             string rePapg = QueryUtils.GetValueFromQueryParams(this, "RePage");
@@ -201,7 +198,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 _bladeHeightModel.Unit = "mm";
             }
             if (_bladeHeightModel != null)
-            {              
+            {
                 await SqlHelper.UpdateAsync(_bladeHeightModel);
             }
         }

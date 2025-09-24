@@ -78,7 +78,8 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         }
 
         // 当前状态，0 参数设置 1 切割中 2 切割完成，确认中
-        int status = 0;
+        private int status = 0;
+
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             _rightPage = _mainWindow.rightFrame.Content as RightPage ?? new RightPage();
@@ -118,9 +119,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 _startX = await PlcControl.tagControl.Xaxis.GetCurrentLocationWaitAsync(_stopCts.Token) ?? 0;
                 _endX = _startX + _viewModel.WorkSize.ToFloat();
                 _startY = await PlcControl.tagControl.Yaxis.GetCurrentLocationWaitAsync(_stopCts.Token) ?? 0;
-                await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
-                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(Appsettings.BladeOuterDiameter.Value));
-                CommonResult<float> curHeightResult = await AutoCutUtils.ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, default, _stopCts.Token);
+                CommonResult<float> curHeightResult = await AutoCutUtils.ProcessCombineMeasureHeightAsync(default, _stopCts.Token);
                 // 开始测高
                 if (!curHeightResult.IsSuccess)
                 {
@@ -167,6 +166,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                         Appsettings.CameraRelativeBladePosition = new DataPoint<float>(relativePostion.X, y - _startY);
                         await PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(SecondCutThetaDeg, default, _stopCts.Token);
                         break;
+
                     case ThetaCenterAlignStep.FindSecondIntersection:
                         if (_firstIntersection is null)
                         {
@@ -177,6 +177,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                         _step = ThetaCenterAlignStep.FindThirdIntersection;
                         await PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(ThirdCutThetaDeg, default, _stopCts.Token);
                         break;
+
                     case ThetaCenterAlignStep.FindThirdIntersection:
                         if (_secondIntersection is null)
                         {
@@ -188,6 +189,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                         await RunCutLineByThetaDegAsync([FirstCutThetaDeg, SecondCutThetaDeg], _startY + (distanceY / 2), _stopCts.Token);
                         _step = ThetaCenterAlignStep.FindCenterIntersection;
                         break;
+
                     case ThetaCenterAlignStep.FindCenterIntersection:
                         if (_thirdIntersection is null)
                         {
@@ -206,10 +208,12 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                         await PlcControl.tagControl.cutting.RunMotionAsync(x.ToCameraX(), y.ToCameraY(), _stopCts.Token);
                         _step = ThetaCenterAlignStep.FindRightEndpoint;
                         break;
+
                     case ThetaCenterAlignStep.FindRightEndpoint:
                         _rightPoint = new PointF(x, y);
                         _step = ThetaCenterAlignStep.FindLeftEndpoint;
                         break;
+
                     case ThetaCenterAlignStep.FindLeftEndpoint:
                         if (_rightPoint is null)
                         {
@@ -221,6 +225,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                         Appsettings.CameraRelativeBladePosition = new DataPoint<float>(relativeX, relativePostion.Y);
                         _step = ThetaCenterAlignStep.Completed;
                         break;
+
                     default:
                         break;
                 }
@@ -313,6 +318,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 case 44002:
                     await AutoCutUtils.AutoFocusAsync();
                     break;
+
                 default:
                     break;
             }
@@ -331,17 +337,20 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                         directionGrid.Visibility = Visibility.Collapsed;
                         centerPanel.Visibility = Visibility.Collapsed;
                         break;
+
                     case 1:
                         thetaCenterParamsGrid.Visibility = Visibility.Visible;
                         dimmingGrid.Visibility = Visibility.Collapsed;
                         directionGrid.Visibility = Visibility.Collapsed;
                         break;
+
                     case 2:
                         thetaCenterParamsGrid.Visibility = Visibility.Collapsed;
                         centerPanel.Visibility = Visibility.Visible;
                         dimmingGrid.Visibility = Visibility.Visible;
                         directionGrid.Visibility = Visibility.Visible;
                         break;
+
                     default:
                         break;
                 }
@@ -352,18 +361,25 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         {
             [Description("请开始校准")]
             None,
+
             [Description("请完成第一次确认交点")]
             FindFirstIntersection,
+
             [Description("请完成第二次确认交点")]
             FindSecondIntersection,
+
             [Description("请完成第三次确认交点")]
             FindThirdIntersection,
+
             [Description("请确认中心交点")]
             FindCenterIntersection,
+
             [Description("请刀痕线段右侧端点")]
             FindRightEndpoint,
+
             [Description("请刀痕线段左侧端点")]
             FindLeftEndpoint,
+
             [Description("已完成校准！")]
             Completed
         }

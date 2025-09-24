@@ -94,6 +94,8 @@ namespace 精密切割系统.Helpers
                 Appsettings.AfterReplaceBladeCutLength = 0;
                 Appsettings.BladeOuterDiameter = null;
                 Appsettings.BladeThickness = null;
+                Appsettings.MeasureHeightFirst = null;
+                Appsettings.MeasureHeightLast = null;
                 MaterialSnackUtils.MaterialSnack("请打开切割安全门，更换刀片！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
             }
             catch (OperationCanceledException)
@@ -176,6 +178,29 @@ namespace 精密切割系统.Helpers
             Appsettings.CutThetaDegList = null;
             Appsettings.CutDistance = null;
             await ReplaceWaferAsync(eventAggregator, token);
+        }
+
+        public static async Task<CommonResult<float>> ProcessCombineMeasureHeightAsync(IEventAggregator? eventAggregator = null, CancellationToken token = default)
+        {
+            await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
+            CommonResult<float> curHeightZ;
+            if (Appsettings.MeasureHeightLast == null)
+            {
+                if (Appsettings.BladeOuterDiameter == null)
+                {
+                    return CommonResult<float>.Failure("未设置刀片外径，无法测高！");
+                }
+                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(CaculateZAxisMaxDistance(Appsettings.BladeOuterDiameter.Value));
+                curHeightZ = await ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, eventAggregator, token);
+                Appsettings.MeasureHeightFirst = curHeightZ.IsSuccess ? curHeightZ.Data : null;
+            }
+            else
+            {
+                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(Appsettings.MeasureHeightLast.Value - 0.15f);
+                curHeightZ = await ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, eventAggregator, token);
+            }
+            Appsettings.MeasureHeightLast = curHeightZ.IsSuccess ? curHeightZ.Data : null;
+            return curHeightZ;
         }
 
         /// <summary>

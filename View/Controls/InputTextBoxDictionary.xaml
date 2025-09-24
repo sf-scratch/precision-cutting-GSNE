@@ -2,9 +2,9 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ctrl="clr-namespace:精密切割系统.View.Controls">
-    <Style TargetType="{x:Type ctrl:InputTextBox}">
+    <Style x:Key="InputTextStyle" TargetType="{x:Type ctrl:InputTextBox}">
         <!--  StyleFocusVisual在上一篇里说了  -->
-        <!--<Setter Property="FocusVisualStyle" Value="{StaticResource StyleFocusVisual}"/>-->
+        <!--<Setter Property="FocusVisualStyle" Value="{StaticResource StyleFocusVisual}" />-->
         <Setter Property="BorderBrush" Value="Silver" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Template">

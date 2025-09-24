@@ -107,20 +107,13 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             FeedSpeed.Text = bmSharpenParameter.MoCutOneSpeed;
             currentCutNum.Text = "0";
             totalCutNum.Text = cutStepResult.Data.Count.ToString();
-            dirLightRatio.Text = Math.Round(GlobalParams.intensityRatio * 100, 2).ToString(); 
+            dirLightRatio.Text = Math.Round(GlobalParams.intensityRatio * 100, 2).ToString();
             _ = MonitoringAlarmAsync(_monitoringAlarmCts.Token);
             Stopwatch stopwatch = Stopwatch.StartNew();
             try
             {
                 int spindleRev = int.Parse(bmSharpenParameter.RotateSpeed);
-                await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
-                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(Appsettings.BladeOuterDiameter.Value));
-                CommonResult<float> firstHeightZ = await AutoCutUtils.ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, default, _pauseCts.Token);
-                if (!firstHeightZ.IsSuccess)
-                {
-                    MaterialSnack(firstHeightZ.Message, SnackType.WARNING, 0);
-                    return;
-                }
+                CommonResult<float> firstHeightZ = await AutoCutUtils.ProcessCombineMeasureHeightAsync(default, _pauseCts.Token);
                 RectangleWorkpiece workpiece = new(Appsettings.ThetaCenterPoint, GlobalParams.SharpenRect.Width, GlobalParams.SharpenRect.Height, (await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0).ToActualY())
                 {
                     WorkThickness = float.Parse(bmSharpenParameter.CutThickness),
@@ -134,7 +127,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                     MaterialSnack($"磨刀失败：{cutResult.Message}", SnackType.WARNING, 0);
                     return;
                 }
-                CommonResult<float> lastHeightZ = await AutoCutUtils.ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, default, _pauseCts.Token);
+                CommonResult<float> lastHeightZ = await AutoCutUtils.ProcessCombineMeasureHeightAsync(default, _pauseCts.Token);
                 if (!lastHeightZ.IsSuccess)
                 {
                     MaterialSnack(lastHeightZ.Message, SnackType.WARNING, 0);
@@ -374,9 +367,10 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             switch (code)
             {
                 case 2023:
-                    // 手动校准 type 
+                    // 手动校准 type
                     _mainWindow.mainFrame.Source = new Uri($"View/Pages/F2_ManualOperation/MQManualAlignmentConf.xaml?type=2", UriKind.Relative);
                     break;
+
                 case 2442:
                     var focusResult = await AutoCutUtils.AutoFocusAsync();
                     if (!focusResult.IsSuccess)
@@ -384,6 +378,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                         MaterialSnack(focusResult.Message, SnackType.WARNING, 0);
                     }
                     break;
+
                 default:
                     break;
             }
@@ -446,7 +441,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         {
             decimal t_intensity = Convert.ToDecimal(GlobalParams.intensityRatio);
             t_intensity += adjustment;
-            // 设置初始光源亮度v_intensity = 255*0.85 = 216.75 
+            // 设置初始光源亮度v_intensity = 255*0.85 = 216.75
             int v_intensity = (int)Math.Ceiling(t_intensity * 255);
             int reNum = Math.Clamp(v_intensity, 1, 255); //值在这个区间
             CameraUtils.SetLightIntensity(reNum, GlobalParams.LightIntensityChannel);
