@@ -52,8 +52,6 @@ namespace 精密切割系统.View.Controls
             XMinProperty = DependencyProperty.Register("XMin", typeof(decimal), typeof(InputTextBox), new PropertyMetadata(decimal.MinValue));
             XMaxProperty = DependencyProperty.Register("XMax", typeof(decimal), typeof(InputTextBox), new PropertyMetadata(decimal.MaxValue));
             XPrecisionProperty = DependencyProperty.Register("XPrecision", typeof(int), typeof(InputTextBox), new PropertyMetadata(3));
-
-            mainWindow = Application.Current.MainWindow as MainWindow;
         }
 
         #region 内部方法
@@ -83,7 +81,7 @@ namespace 精密切割系统.View.Controls
 
         private void InputTextBox_Loaded(object sender, RoutedEventArgs e)
         {
-            //Debug.WriteLine(Text);
+            mainWindow = Application.Current.MainWindow as MainWindow;
             InputTextBox inputTextBox = (InputTextBox)sender;
             if (!inputTextBox.IsEnabled)
             {
@@ -99,7 +97,7 @@ namespace 精密切割系统.View.Controls
         private void InputTextBox_TouchDown(object? sender, TouchEventArgs e)
         {
             this.SelectAll();
-            mainWindow.ShowKeyboardPage(1);
+            mainWindow?.ShowKeyboardPage(1);
         }
 
         private Regex RegDefalt = new Regex("^[0-9a-zA-Z._-]+$"); //默认可输入字符 数字英文大小写._-
@@ -237,7 +235,7 @@ namespace 精密切割系统.View.Controls
         private void XTextBox_GotFocus(object sender, RoutedEventArgs e)
         {
             this.SelectAll();
-            mainWindow.ShowKeyboardPage(1);
+            mainWindow?.ShowKeyboardPage(1);
         }
 
         /// <summary>
@@ -257,7 +255,7 @@ namespace 精密切割系统.View.Controls
             //    e.Handled = true;
             //}
             this.SelectAll();
-            mainWindow.ShowKeyboardPage(1);
+            mainWindow?.ShowKeyboardPage(1);
         }
 
         /// <summary>

@@ -16,7 +16,7 @@ namespace 精密切割系统.FrmWindow.common
     internal class GlobalParams
     {
         // true 在线版本 false 0
-        public static bool OnlineFlag { get; set; } = true;
+        public static bool OnlineFlag { get; set; } = false;
 
         // 是否上传MES
         public static bool OnlineMES { get; set; } = true;
