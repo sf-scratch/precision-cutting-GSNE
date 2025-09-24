@@ -35,6 +35,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
     {
         private MainWindow? mainWindow;
         private RightPage? rightPage;
+
         public ESUserDefineDataConf()
         {
             InitializeComponent();
@@ -43,7 +44,6 @@ namespace 精密切割系统.View.F7_ElectricSpark
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -85,7 +85,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 viewModel.WaterPumpOnTimer = list[0].WaterPumpOnTimer;
                 viewModel.AtomizingNozzlePositionX = list[0].AtomizingNozzlePositionX;
                 viewModel.AtomizingNozzlePositionY = list[0].AtomizingNozzlePositionY;
-                Debug.WriteLine("语言：" + viewModel.Language);
+                viewModel.AxisToWorkingDiscDistance = Appsettings.AxisToWorkingDiscDistance?.ToString("F3") ?? string.Empty;
                 DataContext = viewModel;
             }
             else
@@ -105,6 +105,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
             //如果是空或者小数位数不足-小数初始化为0
             initTbNumber();
         }
+
         public void initTbNumber()
         {
             List<InputTextBox> tbs = Tools.GetChildrenOfType<InputTextBox>(this);
@@ -118,6 +119,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
         {
             _ = this.BtnOnClicked(e);
         }
+
         private async Task BtnOnClicked(int code)
         {
             //日期设置
@@ -163,6 +165,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
             WarmUpHelper.StopWarmUp();
             mainWindow.NavigateToPage("MainMenu");
         }
+
         private void save(object sender, bool e)
         {
             var success = this.FormSuccess();
@@ -213,6 +216,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 WarmUpEndY = viewModel.WarmUpEndY,
                 WarmUpStartY = viewModel.WarmUpStartY,
             };
+            Appsettings.AxisToWorkingDiscDistance = viewModel.AxisToWorkingDiscDistance.ToFloat();
             if (list.Count > 0)
             {
                 UserDefineDataModel originUserDefineData = list[0];

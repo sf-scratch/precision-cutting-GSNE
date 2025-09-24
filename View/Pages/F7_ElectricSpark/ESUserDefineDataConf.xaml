@@ -1,159 +1,679 @@
-﻿<Page x:Class="精密切割系统.View.F7_ElectricSpark.ESUserDefineDataConf"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:精密切割系统.ViewModel"
-      xmlns:Controls="clr-namespace:精密切割系统.View.Controls" 
-      mc:Ignorable="d" 
-      d:DesignHeight="657" d:DesignWidth="1587"
-      Title="ESUserDefineDataConf" Loaded="Page_Loaded">
+﻿<Page
+    x:Class="精密切割系统.View.F7_ElectricSpark.ESUserDefineDataConf"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
+    xmlns:auto="clr-namespace:WpfAutoGrid;assembly=WpfAutoGrid.Core"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:精密切割系统.ViewModel"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="ESUserDefineDataConf"
+    d:DesignHeight="657"
+    d:DesignWidth="1587"
+    Loaded="Page_Loaded"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <Style TargetType="Label">
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+    </Page.Resources>
     <Page.DataContext>
-        <local:UserDefineDataViewModel></local:UserDefineDataViewModel>
+        <local:UserDefineDataViewModel />
     </Page.DataContext>
     <Grid x:Name="bigGrid">
         <Grid.RowDefinitions>
-            <RowDefinition Height="80"></RowDefinition>
-            <RowDefinition Height="65"></RowDefinition>
-            <RowDefinition Height="65"></RowDefinition>
-            <RowDefinition Height="65"></RowDefinition>
-            <RowDefinition Height="65"></RowDefinition>
-            <RowDefinition Height="65"></RowDefinition>
-            <RowDefinition Height="65"></RowDefinition>
-            <RowDefinition Height="65"></RowDefinition>
-            <RowDefinition Height="65"></RowDefinition>
+            <RowDefinition Height="80" />
+            <RowDefinition Height="65" />
+            <RowDefinition Height="65" />
+            <RowDefinition Height="65" />
+            <RowDefinition Height="65" />
+            <RowDefinition Height="65" />
+            <RowDefinition Height="65" />
+            <RowDefinition Height="65" />
+            <RowDefinition Height="65" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="800"/>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="800" />
+            <ColumnDefinition />
+            <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <Label x:Name="labUserDefineData" Content="功能参数设定（5.3）" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="30" Margin="30,30,0,0" FontWeight="Bold"/>
-        <Label Content="机器ID" HorizontalAlignment="Left" Grid.Row="1" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="30,0,0,0" />
-        <Controls:InputTextBox x:Name="inputMachineId" Text="{Binding Path=MachineId,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.ColumnSpan="1" HorizontalAlignment="Left" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="300" Height="32" Margin="35,30,0,0" MaxLength="20" XAllowNull="False"/>
+        <Label
+            x:Name="labUserDefineData"
+            Margin="30,30,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            Content="功能参数设定（5.3）"
+            FontSize="30"
+            FontWeight="Bold" />
+        <auto:AutoGrid
+            Grid.Row="1"
+            Grid.RowSpan="8"
+            Margin="20"
+            ChildMargin="5"
+            Columns="3*,2*,*,3*,2*,*"
+            RowCount="10">
+            <Label x:Name="inputMachineId" Content="机器ID" />
+            <Controls:InputTextBox
+                Grid.ColumnSpan="2"
+                MaxLength="20"
+                Text="{Binding Path=MachineId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                TextWrapping="Wrap"
+                XAllowNull="False" />
+            <Label Grid.ColumnSpan="3" />
+            <Label Content="密码" />
+            <PasswordBox x:Name="inputPassword" Grid.ColumnSpan="2" />
+            <Label Grid.ColumnSpan="3" />
+            <Label x:Name="labAtomizingNozzlePosition" Content="雾化喷嘴位置X" />
+            <Controls:InputTextBox
+                x:Name="inputAtomizingNozzlePositionX"
+                InputType="Decimal"
+                Text="{Binding Path=AtomizingNozzlePositionX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                TextWrapping="Wrap"
+                XMax="300"
+                XMin="-200" />
+            <Label HorizontalAlignment="Left" Content="mm" />
+            <Label Content="雾化喷嘴位置Y" />
+            <Controls:InputTextBox
+                x:Name="inputAtomizingNozzlePositionY"
+                InputType="Decimal"
+                Text="{Binding Path=AtomizingNozzlePositionY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                TextWrapping="Wrap"
+                XMax="300"
+                XMin="-200" />
+            <Label HorizontalAlignment="Left" Content="mm" />
 
-        <Label x:Name="labPassword" Content="密码" HorizontalAlignment="Left" Grid.Row="2" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="30,0,0,0"/>
-        <PasswordBox x:Name="inputPassword" Grid.ColumnSpan="2" HorizontalAlignment="Left" Grid.Row="2" VerticalAlignment="Top" Width="300" Height="32" Margin="35,30,0,0" />
+            <Label x:Name="labPosAfterEdgeDress" Content="刀座修整时Y轴位置" />
+            <Controls:InputTextBox
+                x:Name="inputAfterEdgeDressPos"
+                InputType="Decimal"
+                Text="{Binding Path=AfterEdgeDressPos, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                TextWrapping="Wrap"
+                XMax="300"
+                XMin="-200" />
+            <Label HorizontalAlignment="Left" Content="mm" />
 
-        <Label x:Name="labAtomizingNozzlePosition" Content="雾化喷嘴位置" HorizontalAlignment="Left" Grid.Row="3" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="30,0,0,0"/>
-        <Label Content="X" HorizontalAlignment="Left" Grid.Row="3" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="30,31,0,0"/>
-        <Controls:InputTextBox x:Name="inputAtomizingNozzlePositionX" Text="{Binding Path=AtomizingNozzlePositionX,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.ColumnSpan="3" HorizontalAlignment="Left" Grid.Row="3" TextWrapping="Wrap" VerticalAlignment="Top" Width="128" Height="32"   XMax="300" XMin="-200" Margin="60,30,0,0" InputType="Decimal"/>
-        <Label Content="mm" HorizontalAlignment="Left" Grid.Row="3" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="190,30,0,0"/>
+            <Label x:Name="labBladeExchangeYPos" Content="交换刀片时Y轴位置" />
+            <Controls:InputTextBox
+                x:Name="inputBladeExchangeYPos"
+                InputType="Decimal"
+                Text="{Binding Path=BladeExchangeYPos, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                TextWrapping="Wrap"
+                XMax="300"
+                XMin="-200" />
+            <Label HorizontalAlignment="Left" Content="mm" />
 
-        <Label Content="Y" HorizontalAlignment="Left" Grid.Row="4" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="30,5,0,0"/>
-        <Controls:InputTextBox x:Name="inputAtomizingNozzlePositionY" Text="{Binding Path=AtomizingNozzlePositionY,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.ColumnSpan="4" HorizontalAlignment="Left" Grid.Row="4" TextWrapping="Wrap" VerticalAlignment="Top" Width="128" Height="32"   XMax="300" XMin="-200" Margin="60,4,0,0" InputType="Decimal" />
-        <Label Content="mm" HorizontalAlignment="Left" Grid.Row="4" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="190,4,0,0"/>
+            <Label x:Name="label14" Content="基准线调整极限" />
+            <Controls:InputTextBox
+                x:Name="inputHairlineAdjustLimit"
+                InputType="Decimal"
+                Text="{Binding Path=HairlineAdjustLimit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                TextWrapping="Wrap"
+                XMax="300"
+                XMin="-200" />
+            <Label HorizontalAlignment="Left" Content="mm" />
 
-        <Label x:Name="labPosAfterEdgeDress" Content="刀座修整时Y轴位置" HorizontalAlignment="Left" Grid.Row="5" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="30,0,0,0"/>
-        <Controls:InputTextBox x:Name="inputAfterEdgeDressPos" Text="{Binding Path=AfterEdgeDressPos,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.ColumnSpan="5" HorizontalAlignment="Left" Grid.Row="5" TextWrapping="Wrap" VerticalAlignment="Top" Width="128" Height="32"   XMax="300" XMin="-200" Margin="35,30,0,0" InputType="Decimal" />
-        <Label Content="mm" HorizontalAlignment="Left" Grid.Row="5" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="165,30,0,0"/>
+            <Label x:Name="labBlowTimeCT" Content="相机暂停吹气时间" />
+            <Controls:InputTextBox
+                x:Name="inputBlowTime"
+                InputType="Decimal"
+                Text="{Binding Path=BlowTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                TextWrapping="Wrap"
+                XMax="300"
+                XMin="0" />
+            <Label
+                x:Name="label18"
+                HorizontalAlignment="Left"
+                Content="s" />
 
-        <Label x:Name="labBladeExchangeYPos" Content="交换刀片时Y轴位置" HorizontalAlignment="Left" Grid.Row="5" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="220,0,0,0"/>
-        <Controls:InputTextBox x:Name="inputBladeExchangeYPos" Text="{Binding Path=BladeExchangeYPos,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.ColumnSpan="5" HorizontalAlignment="Left" Grid.Row="5" TextWrapping="Wrap" VerticalAlignment="Top" Width="128" Height="32"    XMax="300" XMin="-200" Margin="225,30,0,0" InputType="Decimal" />
-        <Label Content="mm" HorizontalAlignment="Left" Grid.Row="5" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="355,30,0,0"/>
+            <Label x:Name="labelWarmUpTime" Content="暖机时间" />
+            <Controls:InputTextBox
+                x:Name="warmUpTimeInput"
+                InputType="Decimal"
+                Text="{Binding Path=WarmUpTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                TextWrapping="Wrap"
+                XMax="3600"
+                XMin="0" />
+            <Label
+                x:Name="labelWarmUpTimeUnit"
+                Grid.ColumnSpan="4"
+                HorizontalAlignment="Left"
+                Content="s" />
 
-        <Label x:Name="label14" Content="基准线调整极限" HorizontalAlignment="Left" Grid.Row="5" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="415,0,0,0"/>
-        <Controls:InputTextBox x:Name="inputHairlineAdjustLimit" Text="{Binding Path=HairlineAdjustLimit,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.ColumnSpan="5" HorizontalAlignment="Left" Grid.Row="5" TextWrapping="Wrap" VerticalAlignment="Top" Width="128" Height="32"   XMax="300" XMin="-200" Margin="415,30,0,0" InputType="Decimal" />
-        <Label Content="mm" HorizontalAlignment="Left" Grid.Row="5" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="545,30,0,0"/>
+            <Label Grid.Row="7" Content="暖机时X轴位置" />
+            <Controls:InputTextBox
+                InputType="Decimal"
+                Text="{Binding Path=WarmUpStartX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                TextWrapping="Wrap"
+                XMax="300"
+                XMin="-200" />
+            <Label HorizontalAlignment="Left" Content="mm" />
+            <Label Content="暖机时Y轴位置" />
+            <Controls:InputTextBox
+                InputType="Decimal"
+                Text="{Binding Path=WarmUpStartY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                TextWrapping="Wrap"
+                XMax="300"
+                XMin="-200" />
+            <Label HorizontalAlignment="Left" Content="mm" />
+            <Label Content="轴心零点到工作盘距离" />
+            <Controls:InputTextBox
+                x:Name="axisToWorkingDiscDistance"
+                InputType="Decimal"
+                Text="{Binding Path=AxisToWorkingDiscDistance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                TextWrapping="Wrap"
+                XMax="300"
+                XMin="-200" />
+            <Label HorizontalAlignment="Left" Content="mm" />
+        </auto:AutoGrid>
 
-        <Label x:Name="labBlowTimeCT" Content="相机暂停吹气时间" HorizontalAlignment="Left" Grid.Row="6" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="30,0,0,0"/>
-        <Controls:InputTextBox x:Name="inputBlowTime" Text="{Binding Path=BlowTime,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.ColumnSpan="6" HorizontalAlignment="Left" Grid.Row="6" TextWrapping="Wrap" VerticalAlignment="Top" Width="128" Height="32"   XMax="300" XMin="0" Margin="35,30,0,0" InputType="Decimal" />
-        <Label x:Name="label18" Content="s" HorizontalAlignment="Left" Grid.Row="6" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="165,30,0,0"/>
-
-
-
-        <Label x:Name="labelWarmUpTime" Content="暖机时间" HorizontalAlignment="Left" Grid.Row="7" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="30,0,0,0"/>
-        <Controls:InputTextBox x:Name="warmUpTimeInput" Text="{Binding Path=WarmUpTime,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.ColumnSpan="6" HorizontalAlignment="Left" Grid.Row="7" TextWrapping="Wrap" VerticalAlignment="Top" Width="128" Height="32"   XMax="3600" XMin="0" Margin="35,30,0,0" InputType="Decimal" />
-        <Label x:Name="labelWarmUpTimeUnit" Content="s" HorizontalAlignment="Left" Grid.Row="7" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="165,30,0,0"/>
-
-        <Label Content="暖机时X轴位置" HorizontalAlignment="Left" Grid.Row="7" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="220,0,0,0"/>
-        <Controls:InputTextBox Text="{Binding Path=WarmUpStartX,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.ColumnSpan="5" HorizontalAlignment="Left" Grid.Row="7" TextWrapping="Wrap" VerticalAlignment="Top" Width="128" Height="32"    XMax="300" XMin="-200" Margin="225,30,0,0" InputType="Decimal" />
-        <Label Content="mm" HorizontalAlignment="Left" Grid.Row="7" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="355,30,0,0"/>
-
-        <!--<Label Content="暖机时X轴结束位置" HorizontalAlignment="Left" Grid.Row="7" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="450,0,0,0"/>
+        <!--<Label Content="暖机时X轴结束位置" HorizontalAlignment="Left" Grid.Row="7" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="450,0,0,0" />
         <Controls:InputTextBox Text="{Binding Path=WarmUpEndX,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.ColumnSpan="5" HorizontalAlignment="Left" Grid.Row="7" TextWrapping="Wrap" VerticalAlignment="Top" Width="128" Height="32"   XMax="300" XMin="-200" Margin="455,30,0,0" InputType="Decimal" />
-        <Label Content="mm" HorizontalAlignment="Left" Grid.Row="7" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="590,30,0,0"/>-->
+        <Label Content="mm" HorizontalAlignment="Left" Grid.Row="7" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="590,30,0,0" />-->
 
-        <Label Content="暖机时Y轴位置" HorizontalAlignment="Left" Grid.Row="7" Grid.ColumnSpan="2" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="415,0,0,0"/>
-        <Controls:InputTextBox Text="{Binding Path=WarmUpStartY,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.ColumnSpan="5" HorizontalAlignment="Left" Grid.Row="7" TextWrapping="Wrap" VerticalAlignment="Top" Width="128" Height="32"    XMax="300" XMin="-200" Margin="415,30,0,0" InputType="Decimal" />
-        <Label Content="mm" HorizontalAlignment="Left" Grid.Row="7" Grid.ColumnSpan="2" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="545,30,0,0"/>
-
-        <!--<Label Content="暖机时Y轴结束位置" HorizontalAlignment="Left" Grid.Row="7" Grid.ColumnSpan="2" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="910,0,0,0"/>
+        <!--<Label Content="暖机时Y轴结束位置" HorizontalAlignment="Left" Grid.Row="7" Grid.ColumnSpan="2" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="910,0,0,0" />
         <Controls:InputTextBox Text="{Binding Path=WarmUpEndY,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.ColumnSpan="5" HorizontalAlignment="Left" Grid.Row="7" TextWrapping="Wrap" VerticalAlignment="Top" Width="128" Height="32"   XMax="300" XMin="-200" Margin="915,30,0,0" InputType="Decimal" />
-        <Label Content="mm" HorizontalAlignment="Left" Grid.Row="7" Grid.ColumnSpan="2" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="1050,30,0,0"/>-->
+        <Label Content="mm" HorizontalAlignment="Left" Grid.Row="7" Grid.ColumnSpan="2" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="1050,30,0,0" />-->
 
-        <Label Content="工作真空检查时间" Visibility="Collapsed" HorizontalAlignment="Left" Grid.Row="6" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="220,0,0,0"/>
-        <Controls:InputTextBox Visibility="Collapsed" Text="{Binding Path=WorkVacuumCheckTime,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.ColumnSpan="6" HorizontalAlignment="Left" Grid.Row="6" TextWrapping="Wrap" VerticalAlignment="Top" Width="128" Height="32"   XMax="300" XMin="-200" Margin="225,30,0,0" InputType="Decimal" />
-        <Label Content="s" Visibility="Collapsed" HorizontalAlignment="Left" Grid.Row="6" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="355,30,0,0"/>
+        <Label
+            Grid.Row="6"
+            Margin="220,0,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="工作真空检查时间"
+            FontSize="16"
+            FontWeight="Bold"
+            Visibility="Collapsed" />
+        <Controls:InputTextBox
+            Grid.Row="6"
+            Grid.ColumnSpan="6"
+            Width="128"
+            Height="32"
+            Margin="225,30,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            InputType="Decimal"
+            Text="{Binding Path=WorkVacuumCheckTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            TextWrapping="Wrap"
+            Visibility="Collapsed"
+            XMax="300"
+            XMin="-200" />
+        <Label
+            Grid.Row="6"
+            Margin="355,30,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="s"
+            FontSize="16"
+            FontWeight="Bold"
+            Visibility="Collapsed" />
 
-        <Label Content="节能时间" Visibility="Collapsed" HorizontalAlignment="Left" Grid.Row="6" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="450,0,0,0"/>
-        <Controls:InputTextBox Visibility="Collapsed" Text="{Binding Path=WaitTimeUntilEnergySavingMode,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.ColumnSpan="6" HorizontalAlignment="Left" Grid.Row="6" TextWrapping="Wrap" VerticalAlignment="Top" Width="128" Height="32"   XMax="300" XMin="-200" Margin="455,30,0,0" InputType="Decimal"/>
-        <Label Content="mm" Visibility="Collapsed" HorizontalAlignment="Left" Grid.Row="6" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="590,30,0,0"/>
-        <CheckBox Content="BBO被检出时回云轴停止" Visibility="Collapsed" HorizontalAlignment="Left" IsChecked="{Binding Path=StopSpindleByBbd,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.Row="7" VerticalAlignment="Top" Margin="35,20,0,0" FontSize="16" FontWeight="Bold"/>
+        <Label
+            Grid.Row="6"
+            Margin="450,0,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="节能时间"
+            FontSize="16"
+            FontWeight="Bold"
+            Visibility="Collapsed" />
+        <Controls:InputTextBox
+            Grid.Row="6"
+            Grid.ColumnSpan="6"
+            Width="128"
+            Height="32"
+            Margin="455,30,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            InputType="Decimal"
+            Text="{Binding Path=WaitTimeUntilEnergySavingMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            TextWrapping="Wrap"
+            Visibility="Collapsed"
+            XMax="300"
+            XMin="-200" />
+        <Label
+            Grid.Row="6"
+            Margin="590,30,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="mm"
+            FontSize="16"
+            FontWeight="Bold"
+            Visibility="Collapsed" />
+        <CheckBox
+            Grid.Row="7"
+            Margin="35,20,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="BBO被检出时回云轴停止"
+            FontSize="16"
+            FontWeight="Bold"
+            IsChecked="{Binding Path=StopSpindleByBbd, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            Visibility="Collapsed" />
 
-        <Label Content="语言" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="1" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="0,0,0,0"/>
-        <ComboBox ItemsSource="{Binding Path= Languages}" Text="{Binding Path=Language,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" Height="32" Margin="5,31,0,0"  Grid.Row="1" SelectionChanged="ComboBox_SelectionChanged" FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center">
-        </ComboBox>
+        <Label
+            Grid.Row="1"
+            Grid.Column="1"
+            Margin="0,0,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="语言"
+            FontSize="16"
+            FontWeight="Bold" />
+        <ComboBox
+            Grid.Row="1"
+            Grid.Column="1"
+            Width="300"
+            Height="32"
+            Margin="5,31,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            VerticalContentAlignment="Center"
+            FontSize="14"
+            FontWeight="Bold"
+            ItemsSource="{Binding Path=Languages}"
+            SelectionChanged="ComboBox_SelectionChanged"
+            Text="{Binding Path=Language, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-        <Label Content="型号改变后速度清零" Visibility="Collapsed" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="1" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="0,0,0,0"/>
-        <ComboBox Visibility="Collapsed" ItemsSource="{Binding Path= DeviceChangeCutSpeeds}" Text="{Binding Path=DeviceChangeCutSpeed,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.Column="1"  HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" Height="32" Margin="5,31,0,0"  Grid.Row="2" SelectionChanged="ComboBox_SelectionChanged" FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center">
-        </ComboBox>
+        <Label
+            Grid.Row="1"
+            Grid.Column="1"
+            Margin="0,0,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="型号改变后速度清零"
+            FontSize="16"
+            FontWeight="Bold"
+            Visibility="Collapsed" />
+        <ComboBox
+            Grid.Row="2"
+            Grid.Column="1"
+            Width="300"
+            Height="32"
+            Margin="5,31,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            VerticalContentAlignment="Center"
+            FontSize="14"
+            FontWeight="Bold"
+            ItemsSource="{Binding Path=DeviceChangeCutSpeeds}"
+            SelectionChanged="ComboBox_SelectionChanged"
+            Text="{Binding Path=DeviceChangeCutSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            Visibility="Collapsed" />
 
-        <Label Content="速度变更" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="2" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="0,0,0,0"/>
-        <ComboBox Grid.Column="1" ItemsSource="{Binding Path= SpeedChanges}" Text="{Binding Path=SpeedChange,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" Height="32" Margin="5,31,0,0"  Grid.Row="2" SelectionChanged="ComboBox_SelectionChanged" FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center" >
-        </ComboBox>
+        <Label
+            Grid.Row="2"
+            Grid.Column="1"
+            Margin="0,0,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="速度变更"
+            FontSize="16"
+            FontWeight="Bold" />
+        <ComboBox
+            Grid.Row="2"
+            Grid.Column="1"
+            Width="300"
+            Height="32"
+            Margin="5,31,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            VerticalContentAlignment="Center"
+            FontSize="14"
+            FontWeight="Bold"
+            ItemsSource="{Binding Path=SpeedChanges}"
+            SelectionChanged="ComboBox_SelectionChanged"
+            Text="{Binding Path=SpeedChange, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-        <Label Content="高度补偿" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="3" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="0,0,0,0"/>
-        <ComboBox Grid.Column="1" ItemsSource="{Binding Path= HeightChanges}" Text="{Binding Path=HeightChange,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" Height="32" Margin="5,31,0,0"  Grid.Row="3" SelectionChanged="ComboBox_SelectionChanged" FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center">
-        </ComboBox>
+        <Label
+            Grid.Row="3"
+            Grid.Column="1"
+            Margin="0,0,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="高度补偿"
+            FontSize="16"
+            FontWeight="Bold" />
+        <ComboBox
+            Grid.Row="3"
+            Grid.Column="1"
+            Width="300"
+            Height="32"
+            Margin="5,31,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            VerticalContentAlignment="Center"
+            FontSize="14"
+            FontWeight="Bold"
+            ItemsSource="{Binding Path=HeightChanges}"
+            SelectionChanged="ComboBox_SelectionChanged"
+            Text="{Binding Path=HeightChange, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-        <Label Content="Z轴切割模式" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="4" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="0,0,0,0"/>
-        <ComboBox Grid.Column="1" ItemsSource="{Binding Path= ZAxisCutModels}" Text="{Binding Path=ZAxisCutModel,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" Height="32" Margin="5,31,0,0"  Grid.Row="4" SelectionChanged="ComboBox_SelectionChanged" FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center">
-        </ComboBox>
+        <Label
+            Grid.Row="4"
+            Grid.Column="1"
+            Margin="0,0,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="Z轴切割模式"
+            FontSize="16"
+            FontWeight="Bold" />
+        <ComboBox
+            Grid.Row="4"
+            Grid.Column="1"
+            Width="300"
+            Height="32"
+            Margin="5,31,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            VerticalContentAlignment="Center"
+            FontSize="14"
+            FontWeight="Bold"
+            ItemsSource="{Binding Path=ZAxisCutModels}"
+            SelectionChanged="ComboBox_SelectionChanged"
+            Text="{Binding Path=ZAxisCutModel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-        <Label Content="校准时是否进行过切割的检查" Visibility="Collapsed" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="4" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="0,0,0,0"/>
-        <ComboBox Visibility="Collapsed" ItemsSource="{Binding Path= CutWorkCheckWhenAlignments}" Grid.Column="1" Text="{Binding Path=CutWorkCheckWhenAlignment,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" Height="32" Margin="5,31,0,0"  Grid.Row="4" SelectionChanged="ComboBox_SelectionChanged" FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center">
-        </ComboBox>
+        <Label
+            Grid.Row="4"
+            Grid.Column="1"
+            Margin="0,0,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="校准时是否进行过切割的检查"
+            FontSize="16"
+            FontWeight="Bold"
+            Visibility="Collapsed" />
+        <ComboBox
+            Grid.Row="4"
+            Grid.Column="1"
+            Width="300"
+            Height="32"
+            Margin="5,31,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            VerticalContentAlignment="Center"
+            FontSize="14"
+            FontWeight="Bold"
+            ItemsSource="{Binding Path=CutWorkCheckWhenAlignments}"
+            SelectionChanged="ComboBox_SelectionChanged"
+            Text="{Binding Path=CutWorkCheckWhenAlignment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            Visibility="Collapsed" />
 
-        <Label Content="刀片使用限制错误后继续" Visibility="Collapsed" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="5" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="0,0,0,0"/>
-        <ComboBox Visibility="Collapsed" ItemsSource="{Binding Path= ContinueAfterBladeUserLimitErrors }" Grid.Column="1" Text="{Binding Path=ContinueAfterBladeUserLimitError,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" Height="32" Margin="5,31,0,0"  Grid.Row="5" SelectionChanged="ComboBox_SelectionChanged" FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center">
-        </ComboBox>
+        <Label
+            Grid.Row="5"
+            Grid.Column="1"
+            Margin="0,0,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="刀片使用限制错误后继续"
+            FontSize="16"
+            FontWeight="Bold"
+            Visibility="Collapsed" />
+        <ComboBox
+            Grid.Row="5"
+            Grid.Column="1"
+            Width="300"
+            Height="32"
+            Margin="5,31,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            VerticalContentAlignment="Center"
+            FontSize="14"
+            FontWeight="Bold"
+            ItemsSource="{Binding Path=ContinueAfterBladeUserLimitErrors}"
+            SelectionChanged="ComboBox_SelectionChanged"
+            Text="{Binding Path=ContinueAfterBladeUserLimitError, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            Visibility="Collapsed" />
 
-        <Label Visibility="Collapsed" Content="刀片使用极限误差处理" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="6" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="0,0,0,0"/>
-        <ComboBox Visibility="Collapsed" ItemsSource="{Binding Path= ProcessingAfterBladeUserLimitErrors }" Grid.Column="1" Text="{Binding Path=ProcessingAfterBladeUserLimitError,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" Height="32" Margin="5,31,0,0"  Grid.Row="6" SelectionChanged="ComboBox_SelectionChanged" FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center">
-        </ComboBox>
+        <Label
+            Grid.Row="6"
+            Grid.Column="1"
+            Margin="0,0,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="刀片使用极限误差处理"
+            FontSize="16"
+            FontWeight="Bold"
+            Visibility="Collapsed" />
+        <ComboBox
+            Grid.Row="6"
+            Grid.Column="1"
+            Width="300"
+            Height="32"
+            Margin="5,31,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            VerticalContentAlignment="Center"
+            FontSize="14"
+            FontWeight="Bold"
+            ItemsSource="{Binding Path=ProcessingAfterBladeUserLimitErrors}"
+            SelectionChanged="ComboBox_SelectionChanged"
+            Text="{Binding Path=ProcessingAfterBladeUserLimitError, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            Visibility="Collapsed" />
 
-        <Label Visibility="Collapsed" Content="BBD动作时刻" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="7" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="0,0,0,0"/>
-        <ComboBox Visibility="Collapsed" ItemsSource="{Binding Path= BBDTimings }" Grid.Column="1" Text="{Binding Path=BBDTiming,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" Height="32" Margin="5,31,0,0"  Grid.Row="7" SelectionChanged="ComboBox_SelectionChanged" FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center">
-        </ComboBox>
+        <Label
+            Grid.Row="7"
+            Grid.Column="1"
+            Margin="0,0,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="BBD动作时刻"
+            FontSize="16"
+            FontWeight="Bold"
+            Visibility="Collapsed" />
+        <ComboBox
+            Grid.Row="7"
+            Grid.Column="1"
+            Width="300"
+            Height="32"
+            Margin="5,31,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            VerticalContentAlignment="Center"
+            FontSize="14"
+            FontWeight="Bold"
+            ItemsSource="{Binding Path=BBDTimings}"
+            SelectionChanged="ComboBox_SelectionChanged"
+            Text="{Binding Path=BBDTiming, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            Visibility="Collapsed" />
 
-        <Label Content="基准线校准" Visibility="Collapsed" HorizontalAlignment="Left" Grid.Column="2" Grid.Row="1" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="0,0,0,0"/>
-        <ComboBox Visibility="Collapsed" ItemsSource="{Binding Path= HairlineAdjustments }" Grid.Column="2" Text="{Binding Path=HairlineAdjustment,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" Height="32" Margin="5,31,0,0"  Grid.Row="1" SelectionChanged="ComboBox_SelectionChanged" FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center">
-        </ComboBox>
+        <Label
+            Grid.Row="1"
+            Grid.Column="2"
+            Margin="0,0,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="基准线校准"
+            FontSize="16"
+            FontWeight="Bold"
+            Visibility="Collapsed" />
+        <ComboBox
+            Grid.Row="1"
+            Grid.Column="2"
+            Width="300"
+            Height="32"
+            Margin="5,31,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            VerticalContentAlignment="Center"
+            FontSize="14"
+            FontWeight="Bold"
+            ItemsSource="{Binding Path=HairlineAdjustments}"
+            SelectionChanged="ComboBox_SelectionChanged"
+            Text="{Binding Path=HairlineAdjustment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            Visibility="Collapsed" />
 
-        <Label Content="手动调光" Visibility="Collapsed" HorizontalAlignment="Left" Grid.Column="2" Grid.Row="2" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="0,0,0,0"/>
-        <ComboBox Visibility="Collapsed" ItemsSource="{Binding Path= LightingAdjustments }" Grid.Column="2" Text="{Binding Path=LightingAdjustment,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" Height="32" Margin="5,31,0,0"  Grid.Row="2" SelectionChanged="ComboBox_SelectionChanged" FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center">
-        </ComboBox>
+        <Label
+            Grid.Row="2"
+            Grid.Column="2"
+            Margin="0,0,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="手动调光"
+            FontSize="16"
+            FontWeight="Bold"
+            Visibility="Collapsed" />
+        <ComboBox
+            Grid.Row="2"
+            Grid.Column="2"
+            Width="300"
+            Height="32"
+            Margin="5,31,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            VerticalContentAlignment="Center"
+            FontSize="14"
+            FontWeight="Bold"
+            ItemsSource="{Binding Path=LightingAdjustments}"
+            SelectionChanged="ComboBox_SelectionChanged"
+            Text="{Binding Path=LightingAdjustment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            Visibility="Collapsed" />
 
-        <Label Content="刀片更换检查" Visibility="Collapsed" HorizontalAlignment="Left" Grid.Column="2" Grid.Row="3" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="0,0,0,0"/>
-        <ComboBox Visibility="Collapsed" ItemsSource="{Binding Path= BladeReplacementChecks }" Grid.Column="2" Text="{Binding Path=BladeReplacementCheck,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" Height="32" Margin="5,31,0,0"  Grid.Row="3" SelectionChanged="ComboBox_SelectionChanged" FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center">
-        </ComboBox>
+        <Label
+            Grid.Row="3"
+            Grid.Column="2"
+            Margin="0,0,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="刀片更换检查"
+            FontSize="16"
+            FontWeight="Bold"
+            Visibility="Collapsed" />
+        <ComboBox
+            Grid.Row="3"
+            Grid.Column="2"
+            Width="300"
+            Height="32"
+            Margin="5,31,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            VerticalContentAlignment="Center"
+            FontSize="14"
+            FontWeight="Bold"
+            ItemsSource="{Binding Path=BladeReplacementChecks}"
+            SelectionChanged="ComboBox_SelectionChanged"
+            Text="{Binding Path=BladeReplacementCheck, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            Visibility="Collapsed" />
 
-        <Label Content="Z轴加工数据选择" Visibility="Collapsed" HorizontalAlignment="Left" Grid.Column="2" Grid.Row="4" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="0,0,0,0"/>
-        <ComboBox Visibility="Collapsed" ItemsSource="{Binding Path= ZProcessingDataSelections }" Grid.Column="2" Text="{Binding Path=ZProcessingDataSelection,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" Height="32" Margin="5,31,0,0"  Grid.Row="4" SelectionChanged="ComboBox_SelectionChanged" FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center">
-        </ComboBox>
+        <Label
+            Grid.Row="4"
+            Grid.Column="2"
+            Margin="0,0,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="Z轴加工数据选择"
+            FontSize="16"
+            FontWeight="Bold"
+            Visibility="Collapsed" />
+        <ComboBox
+            Grid.Row="4"
+            Grid.Column="2"
+            Width="300"
+            Height="32"
+            Margin="5,31,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            VerticalContentAlignment="Center"
+            FontSize="14"
+            FontWeight="Bold"
+            ItemsSource="{Binding Path=ZProcessingDataSelections}"
+            SelectionChanged="ComboBox_SelectionChanged"
+            Text="{Binding Path=ZProcessingDataSelection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            Visibility="Collapsed" />
 
-        <Label Visibility="Collapsed" Content="半自动切割时是否对齐" HorizontalAlignment="Left" Grid.Column="2" Grid.Row="5" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="0,0,0,0"/>
-        <ComboBox Visibility="Collapsed" ItemsSource="{Binding Path= AlignSelectionsWhenSemiAutoCutting }" Grid.Column="2" Text="{Binding Path=AlignSelectionWhenSemiAutoCutting,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" Height="32" Margin="5,31,0,0"  Grid.Row="5" SelectionChanged="ComboBox_SelectionChanged" FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center">
-        </ComboBox>
+        <Label
+            Grid.Row="5"
+            Grid.Column="2"
+            Margin="0,0,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="半自动切割时是否对齐"
+            FontSize="16"
+            FontWeight="Bold"
+            Visibility="Collapsed" />
+        <ComboBox
+            Grid.Row="5"
+            Grid.Column="2"
+            Width="300"
+            Height="32"
+            Margin="5,31,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            VerticalContentAlignment="Center"
+            FontSize="14"
+            FontWeight="Bold"
+            ItemsSource="{Binding Path=AlignSelectionsWhenSemiAutoCutting}"
+            SelectionChanged="ComboBox_SelectionChanged"
+            Text="{Binding Path=AlignSelectionWhenSemiAutoCutting, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            Visibility="Collapsed" />
 
-        <Label Visibility="Collapsed" Content="主轴中心位置（偏移）" HorizontalAlignment="Left" Grid.Row="6" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"  Grid.Column="2"/>
-        <Controls:InputTextBox Visibility="Collapsed" Text="{Binding Path=SpindleCenterPositionOffset,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.ColumnSpan="2" HorizontalAlignment="Left" Grid.Row="6" TextWrapping="Wrap" VerticalAlignment="Top" Width="300" Height="32"  XMax="300" XMin="-200" Margin="5,30,0,0" />
-        <Label Visibility="Collapsed" Content="mm" HorizontalAlignment="Left" Grid.Row="6" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="305,30,0,0" Grid.Column="2"/>
+        <Label
+            Grid.Row="6"
+            Grid.Column="2"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="主轴中心位置（偏移）"
+            FontSize="16"
+            FontWeight="Bold"
+            Visibility="Collapsed" />
+        <Controls:InputTextBox
+            Grid.Row="6"
+            Grid.Column="2"
+            Grid.ColumnSpan="2"
+            Width="300"
+            Height="32"
+            Margin="5,30,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Text="{Binding Path=SpindleCenterPositionOffset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            TextWrapping="Wrap"
+            Visibility="Collapsed"
+            XMax="300"
+            XMin="-200" />
+        <Label
+            Grid.Row="6"
+            Grid.Column="2"
+            Margin="305,30,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="mm"
+            FontSize="16"
+            FontWeight="Bold"
+            Visibility="Collapsed" />
 
-        <Label Content="水泵开启频率" Visibility="Collapsed" HorizontalAlignment="Left" Grid.Row="7" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"  Grid.Column="2"/>
-        <Controls:InputTextBox Visibility="Collapsed" Text="{Binding Path=WaterPumpOnTimer,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.ColumnSpan="2" HorizontalAlignment="Left" Grid.Row="7" TextWrapping="Wrap" VerticalAlignment="Top" Width="300" Height="32"    XMax="300" XMin="-200" Margin="5,30,0,0" />
-        <Label Visibility="Collapsed" Content="s" HorizontalAlignment="Left" Grid.Row="7" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="305,30,0,0" Grid.Column="2"/>
-
+        <Label
+            Grid.Row="7"
+            Grid.Column="2"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="水泵开启频率"
+            FontSize="16"
+            FontWeight="Bold"
+            Visibility="Collapsed" />
+        <Controls:InputTextBox
+            Grid.Row="7"
+            Grid.Column="2"
+            Grid.ColumnSpan="2"
+            Width="300"
+            Height="32"
+            Margin="5,30,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Text="{Binding Path=WaterPumpOnTimer, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            TextWrapping="Wrap"
+            Visibility="Collapsed"
+            XMax="300"
+            XMin="-200" />
+        <Label
+            Grid.Row="7"
+            Grid.Column="2"
+            Margin="305,30,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="s"
+            FontSize="16"
+            FontWeight="Bold"
+            Visibility="Collapsed" />
     </Grid>
 </Page>

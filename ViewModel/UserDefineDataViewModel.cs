@@ -8,11 +8,12 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using 精密切割系统.database.db.modle;
+using 精密切割系统.Helpers;
 using 精密切割系统.Utils;
 
 namespace 精密切割系统.ViewModel
 {
-    public class UserDefineDataViewModel : INotifyPropertyChanged
+    public class UserDefineDataViewModel : BindableBase
     {
         private UserDefineDataModel _model;
 
@@ -57,6 +58,7 @@ namespace 精密切割系统.ViewModel
 
         // 半自动切割时对齐选择选项
         public ObservableCollection<string> AlignSelectionsWhenSemiAutoCutting { get; private set; }
+
         public UserDefineDataViewModel()
         {
             _model = CurrentUtils.GetCurrentUserDefineDataModel();
@@ -84,7 +86,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.Id != value)
                 {
                     _model.Id = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -97,7 +99,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.MachineId != value)
                 {
                     _model.MachineId = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -110,7 +112,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.SystemPassword != value)
                 {
                     _model.SystemPassword = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -123,7 +125,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.SystemPasswordTime != value)
                 {
                     _model.SystemPasswordTime = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -136,7 +138,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.AfterEdgeDressPos != value)
                 {
                     _model.AfterEdgeDressPos = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -149,7 +151,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.BladeExchangeYPos != value)
                 {
                     _model.BladeExchangeYPos = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -162,7 +164,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.HairlineAdjustLimit != value)
                 {
                     _model.HairlineAdjustLimit = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -175,7 +177,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.BlowTime != value)
                 {
                     _model.BlowTime = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -188,7 +190,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.BaselineWidthCh1 != value)
                 {
                     _model.BaselineWidthCh1 = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -201,7 +203,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.BaselineWidthCh2 != value)
                 {
                     _model.BaselineWidthCh2 = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -214,7 +216,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.BaselineWidthCh3 != value)
                 {
                     _model.BaselineWidthCh3 = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -227,7 +229,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.BaselineWidthCh4 != value)
                 {
                     _model.BaselineWidthCh4 = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -240,7 +242,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.WarmUpTime != value)
                 {
                     _model.WarmUpTime = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -253,7 +255,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.WarmUpStartX != value)
                 {
                     _model.WarmUpStartX = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -266,7 +268,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.WarmUpEndX != value)
                 {
                     _model.WarmUpEndX = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -279,7 +281,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.WarmUpStartY != value)
                 {
                     _model.WarmUpStartY = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -292,7 +294,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.WarmUpEndY != value)
                 {
                     _model.WarmUpEndY = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -305,7 +307,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.WorkVacuumCheckTime != value)
                 {
                     _model.WorkVacuumCheckTime = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -318,7 +320,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.WaitTimeUntilEnergySavingMode != value)
                 {
                     _model.WaitTimeUntilEnergySavingMode = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -331,12 +333,10 @@ namespace 精密切割系统.ViewModel
                 if (_model.Language != value)
                 {
                     _model.Language = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
-
-
 
         public string DeviceChangeCutSpeed
         {
@@ -346,7 +346,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.DeviceChangeCutSpeed != value)
                 {
                     _model.DeviceChangeCutSpeed = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -359,7 +359,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.SpeedChange != value)
                 {
                     _model.SpeedChange = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -372,10 +372,11 @@ namespace 精密切割系统.ViewModel
                 if (_model.HeightChange != value)
                 {
                     _model.HeightChange = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
+
         public string ZAxisCutModel
         {
             get { return _model.ZAxisCutModel; }
@@ -384,7 +385,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.ZAxisCutModel != value)
                 {
                     _model.ZAxisCutModel = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -397,7 +398,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.CutWorkCheckWhenAlignment != value)
                 {
                     _model.CutWorkCheckWhenAlignment = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -410,7 +411,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.ContinueAfterBladeUserLimitError != value)
                 {
                     _model.ContinueAfterBladeUserLimitError = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -423,7 +424,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.ProcessingAfterBladeUserLimitError != value)
                 {
                     _model.ProcessingAfterBladeUserLimitError = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -436,7 +437,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.BBDTiming != value)
                 {
                     _model.BBDTiming = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -449,7 +450,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.StopSpindleByBbd != value)
                 {
                     _model.StopSpindleByBbd = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -462,7 +463,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.HairlineAdjustment != value)
                 {
                     _model.HairlineAdjustment = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -475,7 +476,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.LightingAdjustment != value)
                 {
                     _model.LightingAdjustment = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -488,7 +489,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.BladeReplacementCheck != value)
                 {
                     _model.BladeReplacementCheck = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -501,7 +502,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.ZProcessingDataSelection != value)
                 {
                     _model.ZProcessingDataSelection = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -514,7 +515,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.AlignSelectionWhenSemiAutoCutting != value)
                 {
                     _model.AlignSelectionWhenSemiAutoCutting = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -527,7 +528,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.SpindleCenterPositionOffset != value)
                 {
                     _model.SpindleCenterPositionOffset = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -540,7 +541,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.WaterPumpOnTimer != value)
                 {
                     _model.WaterPumpOnTimer = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -553,7 +554,7 @@ namespace 精密切割系统.ViewModel
                 if (_model.AtomizingNozzlePositionX != value)
                 {
                     _model.AtomizingNozzlePositionX = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -566,15 +567,17 @@ namespace 精密切割系统.ViewModel
                 if (_model.AtomizingNozzlePositionY != value)
                 {
                     _model.AtomizingNozzlePositionY = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        private string _axisToWorkingDiscDistance;
+
+        public string AxisToWorkingDiscDistance
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            get { return _axisToWorkingDiscDistance; }
+            set { SetProperty(ref _axisToWorkingDiscDistance, value); }
         }
     }
 }

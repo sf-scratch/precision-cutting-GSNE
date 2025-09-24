@@ -55,6 +55,7 @@ namespace 精密切割系统.Assets.config.buttom
             list.Add(new OperateBean(-1, "推拉门", "/Assets/icon/tab_0/tab_010.png"));
             return list;
         }
+
         //Tab0202
         public static List<OperateBean> GetTab0202Operate()
         {
@@ -81,6 +82,7 @@ namespace 精密切割系统.Assets.config.buttom
             list.Add(new OperateBean(2422, "刀片状态信息", "/Assets/icon/tab_8/tab_85.png"));
             return list;
         }
+
         /// <summary>
         /// 获取空操作栏
         /// </summary>
@@ -108,14 +110,15 @@ namespace 精密切割系统.Assets.config.buttom
             return list;
         }
 
-        // 半自动切割操作按钮 
-        public static List<OperateBean> GetSemiAutoCuttingOperate(bool SpeedChange,bool HeightChange)
+        // 半自动切割操作按钮
+        public static List<OperateBean> GetSemiAutoCuttingOperate(bool SpeedChange, bool HeightChange)
         {
             var list = new List<OperateBean>();
             list.Add(new OperateBean(-1, "", ""));
-            if (HeightChange) {
+            if (HeightChange)
+            {
                 list.Add(new OperateBean(2401, "高度补偿", "/Assets/icon/tab_1/02/tab_20.png"));
-            } 
+            }
             else
             {
                 list.Add(new OperateBean(-1, "", ""));
@@ -127,7 +130,7 @@ namespace 精密切割系统.Assets.config.buttom
             if (SpeedChange)
             {
                 list.Add(new OperateBean(2403, "速度更改", "/Assets/icon/tab_1/02/tab_25.png"));
-            } 
+            }
             else
             {
                 list.Add(new OperateBean(-1, "", ""));
@@ -137,7 +140,8 @@ namespace 精密切割系统.Assets.config.buttom
             list.Add(new OperateBean(3, "C/T真空", "/Assets/icon/tab_1/02/tab_23.png"));
             return list;
         }
-        // 半自动切割切割中操作按钮 
+
+        // 半自动切割切割中操作按钮
         public static List<OperateBean> GetSemiAutoCuttingRunOperate(bool SpeedChange, bool HeightChange)
         {
             var list = new List<OperateBean>();
@@ -146,7 +150,8 @@ namespace 精密切割系统.Assets.config.buttom
             {
                 // list.Add(new OperateBean(2401, "高度补偿", "/Assets/icon/tab_1/02/tab_20.png"));
                 list.Add(new OperateBean(-1, "", ""));
-            } else
+            }
+            else
             {
                 list.Add(new OperateBean(-1, "", ""));
             }
@@ -155,23 +160,28 @@ namespace 精密切割系统.Assets.config.buttom
             list.Add(new OperateBean(24051, "型号参数", "/Assets/icon/tab_0/tab_02.png"));
             list.Add(new OperateBean(-1, "", ""));
             list.Add(new OperateBean(-1, "", ""));
-            if (SpeedChange) {
+            if (SpeedChange)
+            {
                 // list.Add(new OperateBean(2403, "速度更改", "/Assets/icon/tab_1/02/tab_25.png"));
                 list.Add(new OperateBean(-1, "", ""));
-            } else
+            }
+            else
             {
                 list.Add(new OperateBean(-1, "", ""));
             }
             return list;
         }
-        // 半自动切割暂停中操作按钮 
+
+        // 半自动切割暂停中操作按钮
         public static List<OperateBean> GetSemiAutoCuttingStopOperate(bool SpeedChange, bool HeightChange)
         {
             var list = new List<OperateBean>();
             list.Add(new OperateBean(-1, "", "/Assets/icon/tab_1/03/tab_07.png"));
-            if (HeightChange) {
+            if (HeightChange)
+            {
                 list.Add(new OperateBean(2401, "高度补偿", "/Assets/icon/tab_1/02/tab_20.png"));
-            } else
+            }
+            else
             {
                 list.Add(new OperateBean(-1, "", ""));
             }
@@ -183,7 +193,8 @@ namespace 精密切割系统.Assets.config.buttom
             if (SpeedChange)
             {
                 list.Add(new OperateBean(2403, "速度更改", "/Assets/icon/tab_1/02/tab_25.png"));
-            } else
+            }
+            else
             {
                 list.Add(new OperateBean(-1, "", ""));
             }
@@ -193,7 +204,8 @@ namespace 精密切割系统.Assets.config.buttom
             return list;
         }
 
-        public static List<OperateBean> GetThetaCenterAlignConfOperate() {
+        public static List<OperateBean> GetThetaCenterAlignConfOperate()
+        {
             var list = new List<OperateBean>();
             list.Add(new OperateBean(44002, "对焦", "/Assets/icon/tab_0/tab_02.png"));
             return list;
@@ -211,7 +223,8 @@ namespace 精密切割系统.Assets.config.buttom
             list.Add(new OperateBean(2442, "对焦", "/Assets/icon/tab_1/03/tab_01.png"));
             return list;
         }
-        // 半自动切割切割中操作按钮 
+
+        // 半自动切割切割中操作按钮
         public static List<OperateBean> GetManualAlignmentOperate()
         {
             var list = new List<OperateBean>();
@@ -241,6 +254,7 @@ namespace 精密切割系统.Assets.config.buttom
             }
             return list;
         }
+
         /// <summary>
         /// 测量操作按钮
         /// </summary>
@@ -260,6 +274,7 @@ namespace 精密切割系统.Assets.config.buttom
             list.Add(new OperateBean(2453, "θ轴横向校正", "/Assets/icon/tab_1/03/tab_04.png"));
             return list;
         }
+
         // 对焦相关操作按钮
         public static List<OperateBean> GetManualFocusOperate()
         {
@@ -282,6 +297,7 @@ namespace 精密切割系统.Assets.config.buttom
             list.Add(new OperateBean(4401, "删除", "/Assets/icon/tab_1/01/tab_15.png"));
             return list;
         }
+
         // 4.4.0磨刀参数清单-磨刀程序 底部按钮
         public static List<OperateBean> GetTab4401Operate()
         {
@@ -353,6 +369,7 @@ namespace 精密切割系统.Assets.config.buttom
             list.Add(new OperateBean(5111, "长度控制", "/Assets/icon/tab_5/tab_03.png"));
             return list;
         }
+
         public static List<OperateBean> GetFlangeTrimmingOperate()
         {
             var list = new List<OperateBean>();
@@ -416,6 +433,7 @@ namespace 精密切割系统.Assets.config.buttom
             list.Add(new OperateBean(5002, "校准参数", "/Assets/icon/tab_3/tab_32.png"));
             return list;
         }
+
         // 3.1.2 目录详情
         public static List<OperateBean> GetMCDeviceDataOperate02(string chName = "Ch 1")
         {
@@ -435,6 +453,5 @@ namespace 精密切割系统.Assets.config.buttom
             list.Add(new OperateBean(2407, "暖机", "/Assets/icon/menu_2/menu_2_3_white.png"));
             return list;
         }
-
     }
 }

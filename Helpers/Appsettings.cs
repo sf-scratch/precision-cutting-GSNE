@@ -129,6 +129,15 @@ namespace 精密切割系统.Helpers
         }
 
         /// <summary>
+        /// 轴心零点到工作盘距离
+        /// </summary>
+        public static float? AxisToWorkingDiscDistance
+        {
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
+        }
+
+        /// <summary>
         /// 测高位置theta角度
         /// </summary>
         public static int? ContactHeightMeasurementThetaDeg

@@ -190,7 +190,12 @@ namespace 精密切割系统.Helpers
                 {
                     return CommonResult<float>.Failure("未设置刀片外径，无法测高！");
                 }
-                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(CaculateZAxisMaxDistance(Appsettings.BladeOuterDiameter.Value));
+                var caculateResult = CaculateZAxisMaxDistance(Appsettings.BladeOuterDiameter.Value);
+                if (!caculateResult.IsSuccess)
+                {
+                    return caculateResult;
+                }
+                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(caculateResult.Data - 0.15f);
                 curHeightZ = await ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, eventAggregator, token);
                 Appsettings.MeasureHeightFirst = curHeightZ.IsSuccess ? curHeightZ.Data : null;
             }
@@ -373,9 +378,13 @@ namespace 精密切割系统.Helpers
             return CommonResult<float>.Failure("测高失败次数过多！");
         }
 
-        public static float CaculateZAxisMaxDistance(float bladeOuterDiameter)
+        public static CommonResult<float> CaculateZAxisMaxDistance(float bladeOuterDiameter)
         {
-            return (55.5f - bladeOuterDiameter) / 2 + 17.55f;
+            if (Appsettings.AxisToWorkingDiscDistance is null)
+            {
+                return CommonResult<float>.Failure("功能参数设定异常，未配置轴心零点到工作盘距离！");
+            }
+            return CommonResult<float>.Success(Appsettings.AxisToWorkingDiscDistance.Value - bladeOuterDiameter / 2);
         }
 
         //public static async Task<CommonResult<float>> ProcessMeasureWearAmountAsync(HeightMeasurementMode mode, bool isFirst, IDialogService dialogService, IEventAggregator? eventAggregator = null, CancellationToken token = default)

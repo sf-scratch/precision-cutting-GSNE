@@ -110,22 +110,8 @@ namespace 精密切割系统.View.Controls
         /// <param name="e"></param>
         private void XTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            //InputTextBox inputTextBox = (InputTextBox)sender;
-            //if (string.IsNullOrEmpty(this.Text)) {
-            //    if (InputTypement.Decimal == InputType)
-            //    {
-            //        this.Text = "0.000";
-            //    } else if (InputTypement.Numeral == InputType)
-            //    {
-            //        this.Text = "0";
-            //    }
-            //}
-            //else
-            //{
-            //}
             initNumber();
             ValidationCheck();
-            // mainWindow.ShowKeyboardPage(0);
         }
 
         public void initNumber()

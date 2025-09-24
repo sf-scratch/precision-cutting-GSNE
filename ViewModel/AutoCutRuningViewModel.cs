@@ -70,6 +70,7 @@ namespace 精密切割系统.ViewModel
         public LunguSksjModel LunguSksj { get; set; }
 
         private float _afterHeightMeasurementZ;
+
         /// <summary>
         /// 测高位置
         /// </summary>
@@ -80,6 +81,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _sharpenBladeHeight;
+
         /// <summary>
         /// 磨刀片高度
         /// </summary>
@@ -90,6 +92,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _sharpenSpeed;
+
         /// <summary>
         /// 磨刀速度
         /// </summary>
@@ -100,6 +103,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private string _sharpenProgress;
+
         /// <summary>
         /// 磨刀进度
         /// </summary>
@@ -110,6 +114,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _totalWearAmount;
+
         /// <summary>
         /// 总磨损量
         /// </summary>
@@ -120,6 +125,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private string _deviceDataNo;
+
         /// <summary>
         /// 型号参数No
         /// </summary>
@@ -130,6 +136,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _cutBladeHeight;
+
         /// <summary>
         /// 切割刀片高度
         /// </summary>
@@ -140,6 +147,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _cutSpeed;
+
         /// <summary>
         /// 磨刀速度
         /// </summary>
@@ -150,6 +158,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private string _cutProgress;
+
         /// <summary>
         /// 切割进度
         /// </summary>
@@ -169,6 +178,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private AutoRunStatus _autoRunStatus;
+
         public AutoRunStatus RunStatus
         {
             get { return _autoRunStatus; }
@@ -259,9 +269,15 @@ namespace 精密切割系统.ViewModel
                 // 测高的同时移动相机位置
                 RunStatus = AutoRunStatus.HeightMeasurementInProgress;
                 HeightMeasurementMode heightMeasurementMode = HeightMeasurementMode.Contact;
+                var caculateResult = AutoCutUtils.CaculateZAxisMaxDistance(LunguSksj.BladeOuterDiameter);
+                if (!caculateResult.IsSuccess)
+                {
+                    MaterialSnackUtils.MaterialSnack(caculateResult.Message, MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                    return;
+                }
                 // 设置测高参数
                 await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
-                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(AutoCutUtils.CaculateZAxisMaxDistance(LunguSksj.BladeOuterDiameter));
+                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(caculateResult.Data - 0.15f);
                 Task zAxisTask = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(Appsettings.FocusClearZ ?? 0, 1, _pauseCts.Token);
                 Task<CommonResult<float>> measureHeightTask = AutoCutUtils.ProcessMeasureHeightAsync(heightMeasurementMode, _dialogService, _eventAggregator, _pauseCts.Token);
                 await Task.WhenAll(zAxisTask, measureHeightTask);
@@ -437,7 +453,7 @@ namespace 精密切割系统.ViewModel
                 }
                 else
                 {
-                    var res = await DialogHost.Show(SelectionDialog.NewInstance("清除记录", "只下机", title:"切割未完成，MES切割数据处理"));
+                    var res = await DialogHost.Show(SelectionDialog.NewInstance("清除记录", "只下机", title: "切割未完成，MES切割数据处理"));
                     if (res is string dialogResult)
                     {
                         if (dialogResult == SelectionDialog.NO)
@@ -714,9 +730,11 @@ namespace 精密切割系统.ViewModel
                     case AutoRunStatus.ReplaceWafer:
                         await AutoCutUtils.ReplaceWaferAsync(_eventAggregator, cts.Token);
                         break;
+
                     case AutoRunStatus.ReplaceSharpenBoard:
                         await AutoCutUtils.ReplaceSharpeningBoardAsync(_eventAggregator, cts.Token);
                         break;
+
                     default:
                         // 轴不报警时移动到指定位置
                         if (line != null && !AlarmConfig.Instance.HasAxisErrorAlarms())
@@ -879,27 +897,35 @@ namespace 精密切割系统.ViewModel
                 case AutoRunStatus.HeightMeasurementInProgress:
                     MaterialSnackUtils.MaterialSnack("测高进行中...", MaterialSnackUtils.SnackType.SUCCESS, 0, _eventAggregator);
                     break;
+
                 case AutoRunStatus.AutoFocus:
                     MaterialSnackUtils.MaterialSnack("自动聚焦中....", MaterialSnackUtils.SnackType.SUCCESS, 0, _eventAggregator);
                     break;
+
                 case AutoRunStatus.SharpenCalibrat:
                     MaterialSnackUtils.MaterialSnack("磨刀校准中...", MaterialSnackUtils.SnackType.SUCCESS, 0, _eventAggregator);
                     break;
+
                 case AutoRunStatus.CutingCalibrat:
                     MaterialSnackUtils.MaterialSnack("切割校准中...", MaterialSnackUtils.SnackType.SUCCESS, 0, _eventAggregator);
                     break;
+
                 case AutoRunStatus.SharpeningInProgress:
                     MaterialSnackUtils.MaterialSnack("磨刀进行中...", MaterialSnackUtils.SnackType.SUCCESS, 0, _eventAggregator);
                     break;
+
                 case AutoRunStatus.CutingInProgress:
                     MaterialSnackUtils.MaterialSnack("切割进行中...", MaterialSnackUtils.SnackType.SUCCESS, 0, _eventAggregator);
                     break;
+
                 case AutoRunStatus.ReplaceSharpenBoard:
                     MaterialSnackUtils.MaterialSnack("替换磨刀板...", MaterialSnackUtils.SnackType.SUCCESS, 0, _eventAggregator);
                     break;
+
                 case AutoRunStatus.ReplaceWafer:
                     MaterialSnackUtils.MaterialSnack("替换硅片...", MaterialSnackUtils.SnackType.SUCCESS, 0, _eventAggregator);
                     break;
+
                 default:
                     //MaterialSnackUtils.MaterialSnack("未知状态", MaterialSnackUtils.SnackType.WARNING, 0);
                     break;
@@ -993,7 +1019,7 @@ namespace 精密切割系统.ViewModel
 
         private void ReceivedAutoRuningMessage(MessageModel message)
         {
-            Tools.LogDebug(message.Message); 
+            Tools.LogDebug(message.Message);
             MessageList.Add(message);
         }
 
