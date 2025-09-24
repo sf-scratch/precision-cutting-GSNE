@@ -118,7 +118,6 @@ namespace 精密切割系统
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-
             RightPage rightPage = rightFrame.Content as RightPage;
             rightPage.OnFrameSourceChanged(null, null);
             /*Task task = Task.Run(() =>
@@ -127,7 +126,9 @@ namespace 精密切割系统
             });*/
             NavigateToPage("main");
         }
-        OperatePage operatePage;
+
+        private OperatePage operatePage;
+
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             // 禁用触摸到鼠标事件的转换
@@ -183,7 +184,6 @@ namespace 精密切割系统
                     new RunLogsViewModel("结果", "初始化成功！")
                 });
             }), DispatcherPriority.ContextIdle);
-            
         }
 
         private void ShortcutDirectBtn_TouchUp(object? sender, TouchEventArgs e)
@@ -209,8 +209,10 @@ namespace 精密切割系统
 
         private void InitDevice()
         {
-            // SetInputLanguageToEnglishUS();
-            KeyboardSimulator.SimulateKeyPress("capslock");
+            if (!KeyboardSimulator.CapsLockStatus)
+            {
+                KeyboardSimulator.SimulateKeyPress("capslock");
+            }
             GlobalParams.globalRunFlag = true;
             var taskStartTime = DateTime.Now;
             // 设备初始化重试3分钟
@@ -224,7 +226,7 @@ namespace 精密切割系统
                 GlobalParams.globalRunFlag = false;
                 return;
             }
-            
+
             while ((DateTime.Now - taskStartTime) < maxExecutionTime)
             {
                 try
@@ -282,13 +284,13 @@ namespace 精密切割系统
             // 退出所有模式
             PlcControl.plc.exitAllModel();
             GlobalParams.globalRunFlag = false;
-            
+
             Thread.Sleep(1000);
             CurrentUtils.initPlcPosition();
             BunkeringHandler.AddBunkeringRecord();
             // 设置面板禁用
             PlcControl.tagControl.wholeDevice.SetPanelButtonsStauts(0);
-            
+
             // 关闭Y轴光栅尺校准
             PlcControl.tagControl.cutting.SetYAxisCompStatus(0);
 
@@ -324,6 +326,7 @@ namespace 精密切割系统
                 MessageBox.Show($"发生异常: {ex.Message}");
             }
         }
+
         private void TextBox_GotFocus(object sender, RoutedEventArgs e)
         {
             try
@@ -335,7 +338,9 @@ namespace 精密切割系统
                 MessageBox.Show(ex.Message);
             }
         }
+
         public bool isNavigating = false;
+
         // 事件处理程序
         private void OperateFrame_Navigated(object sender, NavigationEventArgs e)
         {
@@ -354,7 +359,7 @@ namespace 精密切割系统
             {
                 // 显示方向界面
                 operatePage.SetOperateShowType(1);
-            } 
+            }
             else
             {
                 if (WindowLayout.OperatePageButtons.Count != 0)
@@ -392,6 +397,7 @@ namespace 精密切割系统
             }
             ShortcutBtnClick();
         }
+
         /// <summary>
         /// 显示/隐藏 键盘
         /// </summary>
@@ -407,7 +413,7 @@ namespace 精密切割系统
                 CommonEvent.BtnScaleDown(shortcutDirectBtn, 0);
                 CommonEvent.BtnScaleDown(shortcutTopBtn, 0);
             }
-            else if (status == 0) 
+            else if (status == 0)
             {
                 // operateFrame.Navigate(new Uri("View/Pages/operate/OperatePage.xaml", UriKind.Relative));
                 operatePage.SetOperateShowType(0);
@@ -444,7 +450,6 @@ namespace 精密切割系统
                 operatePage.UpdateOperate(GlobalParams.currentOperateBeanList);
             }
         }
-
 
         public void SetShortcutBtnStatus(bool _shortcutTopBtnSel, bool _shortcutBottomBtnSel)
         {
@@ -486,9 +491,7 @@ namespace 精密切割系统
             ((SolidColorBrush)button.Background).BeginAnimation(SolidColorBrush.ColorProperty, colorAnimation);
             // 切换图标
             icon.Source = Tools.BitmapImageToBitmap(isSelected ? selectedIconPath : unselectedIconPath);
-            
         }
-
 
         //监听页面是否改变，然后关闭消息提示
         private void SourceChanged()

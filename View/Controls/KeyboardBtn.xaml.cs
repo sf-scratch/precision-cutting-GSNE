@@ -36,6 +36,7 @@ namespace 精密切割系统.View.Controls
             get { return (string)GetValue(BtnValueProperty); }
             set { SetValue(BtnValueProperty, value); }
         }
+
         public static readonly DependencyProperty BtnTypeProperty =
         DependencyProperty.Register("BtnType", typeof(string), typeof(KeyboardBtn), new PropertyMetadata(null, OnBtnTypeChanged));
 
@@ -44,6 +45,7 @@ namespace 精密切割系统.View.Controls
             get { return (string)GetValue(BtnTypeProperty); }
             set { SetValue(BtnTypeProperty, value); }
         }
+
         private static void OnBtnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var control = (KeyboardBtn)d;
@@ -57,44 +59,36 @@ namespace 精密切割系统.View.Controls
         {
             if (BtnType != null)
             {
-                if ("0".Equals(BtnType))
+                if (BtnType.Equals("2"))
                 {
-                    keyboardBtn.FontSize = 22;
-                }
-                else if (BtnType.Equals("2"))
-                {
-                    keyboardBtn.FontSize = 18;
                     keyboardText.Padding = new Thickness(3, 2, 1, 1);
                 }
                 else if (BtnType.Equals("3"))
                 {
                     keyboardBorderBtn.BorderThickness = new Thickness(0);
-                    keyboardBtn.FontSize = 26;
                     keyboardText.HorizontalAlignment = HorizontalAlignment.Center;
                     keyboardText.VerticalAlignment = VerticalAlignment.Center;
                 }
             }
-            else
-            {
-                keyboardBtn.FontSize = 22;
-            }
         }
 
         private DelegateCommand _keyDownCommand;
+
         public DelegateCommand KeyDownCommand =>
             _keyDownCommand ?? (_keyDownCommand = new DelegateCommand(ExecuteKeyDownCommand));
 
-        void ExecuteKeyDownCommand()
+        private void ExecuteKeyDownCommand()
         {
             KeyPressed?.Invoke(this, BtnValue);
             keyboardBorderBtn.Background = new SolidColorBrush(Color.FromRgb(80, 135, 203));
         }
 
         private DelegateCommand _keyUpCommand;
+
         public DelegateCommand KeyUpCommand =>
             _keyUpCommand ?? (_keyUpCommand = new DelegateCommand(ExecuteKeyUpCommand));
 
-        void ExecuteKeyUpCommand()
+        private void ExecuteKeyUpCommand()
         {
             keyboardBorderBtn.Background = new SolidColorBrush(Color.FromRgb(135, 182, 211));
         }

@@ -16,6 +16,7 @@
             <Setter Property="Width" Value="72" />
             <Setter Property="Height" Value="62" />
             <Setter Property="Margin" Value="5" />
+            <Setter Property="FontSize" Value="22" />
         </Style>
     </UserControl.Resources>
     <Border
@@ -81,7 +82,10 @@
                         <Controls:KeyboardBtn BtnType="0" BtnValue="B" />
                         <Controls:KeyboardBtn BtnType="0" BtnValue="N" />
                         <Controls:KeyboardBtn BtnType="0" BtnValue="M" />
-                        <Controls:KeyboardBtn BtnType="2" BtnValue="-" />
+                        <Controls:KeyboardBtn
+                            BtnType="2"
+                            BtnValue="-"
+                            FontSize="35" />
                     </StackPanel>
                 </Grid>
             </Grid>
@@ -141,7 +145,10 @@
                 <Grid Grid.Row="1">
                     <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                         <Controls:KeyboardBtn BtnType="3" BtnValue="←" />
-                        <Controls:KeyboardBtn BtnType="2" BtnValue="Home" />
+                        <Controls:KeyboardBtn
+                            BtnType="2"
+                            BtnValue="Home"
+                            FontSize="20" />
                         <Controls:KeyboardBtn BtnType="3" BtnValue="→" />
                     </StackPanel>
                 </Grid>
@@ -158,5 +165,4 @@
             </Grid>
         </Grid>
     </Border>
-
 </UserControl>

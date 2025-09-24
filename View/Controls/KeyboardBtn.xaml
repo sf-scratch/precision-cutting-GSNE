@@ -38,6 +38,7 @@
         <Button
             x:Name="keyboardBtn"
             Focusable="False"
+            FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
             FontWeight="Bold"
             Foreground="#FFFFFF">
             <behaviors:Interaction.Behaviors>
@@ -47,6 +48,7 @@
                 <TextBlock
                     x:Name="keyboardText"
                     Padding="3,3,0,0"
+                    VerticalAlignment="Center"
                     Text="SDF"
                     TextAlignment="Left"
                     TextWrapping="Wrap" />
@@ -64,5 +66,4 @@
             <TranslateTransform x:Name="ContentTransform" X="0" Y="0" />
         </Border.RenderTransform>
     </Border>
-
 </UserControl>

@@ -13,6 +13,10 @@ namespace 精密切割系统.Helpers
         [DllImport("user32.dll")]
         private static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, int dwExtraInfo);
 
+        //声明部分
+        [DllImport("user32.dll", EntryPoint = "GetKeyboardState")]
+        public static extern int GetKeyboardState(byte[] pbKeyState); //自写函数监听键盘按键
+
         private const int KEYEVENTF_KEYUP = 0x0002;
         private const byte VK_SHIFT = 0x10; // Shift 键的虚拟键码
         private const byte VK_CONTROL = 0x11; // Ctrl 键的虚拟键码
@@ -46,6 +50,19 @@ namespace 精密切割系统.Helpers
         {"backspace", 0x08}, // 删除（backspace）
         // 添加其他键...
     };
+
+        /// <summary>
+        /// 实现部分，如果按键索引码为14，则为大写键，返回为真
+        /// </summary>
+        public static bool CapsLockStatus
+        {
+            get
+            {
+                byte[] bs = new byte[256];
+                GetKeyboardState(bs);
+                return (bs[0x14] == 1);
+            }
+        }
 
         public static void SimulateKeyPress(byte key)
         {
@@ -118,9 +135,10 @@ namespace 精密切割系统.Helpers
                 }
             }
         }
+
         // 释放组合键
         // 辅助函数：释放键盘按键
-        static void ReleaseKey(byte virtualKey)
+        private static void ReleaseKey(byte virtualKey)
         {
             keybd_event(virtualKey, 0, KEYEVENTF_KEYUP, 0);
         }

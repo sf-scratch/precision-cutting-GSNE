@@ -1,5 +1,4 @@
-﻿
-using MathNet.Numerics;
+﻿using MathNet.Numerics;
 using NPOI.SS.Formula.Functions;
 using System;
 using System.Diagnostics;
@@ -20,6 +19,7 @@ namespace 精密切割系统.View.Controls
     public class InputTextBox : System.Windows.Controls.TextBox
     {
         #region 依赖属性
+
         public static readonly DependencyProperty InputTypeProperty;
         public static readonly DependencyProperty XWmkTextProperty;//水印文字
         public static readonly DependencyProperty XWmkForegroundProperty;//水印着色
@@ -31,9 +31,11 @@ namespace 精密切割系统.View.Controls
         public static readonly DependencyProperty XMaxProperty;//最大值 针对数字小数
         public static readonly DependencyProperty XPrecisionProperty;//小数位数 针对数字小数
                                                                      //
-        #endregion
+
+        #endregion 依赖属性
 
         private static MainWindow? mainWindow;
+
         /// <summary>
         /// 静态构造函数
         /// </summary>
@@ -44,19 +46,18 @@ namespace 精密切割系统.View.Controls
             XWmkTextProperty = DependencyProperty.Register("XWmkText", typeof(String), typeof(InputTextBox), new PropertyMetadata(null));
             XIsErrorProperty = DependencyProperty.Register("XIsError", typeof(bool), typeof(InputTextBox), new PropertyMetadata(false));
             InputTextBox.XAllowNullProperty = DependencyProperty.Register("XAllowNull", typeof(bool), typeof(InputTextBox), new PropertyMetadata(true));
-            XWmkForegroundProperty = DependencyProperty.Register("XWmkForeground", typeof(Brush),typeof(InputTextBox), new PropertyMetadata(Brushes.Silver));
+            XWmkForegroundProperty = DependencyProperty.Register("XWmkForeground", typeof(Brush), typeof(InputTextBox), new PropertyMetadata(Brushes.Silver));
             XRegExpProperty = DependencyProperty.Register("XRegExp", typeof(string), typeof(InputTextBox), new PropertyMetadata(""));
             FrameworkElement.DefaultStyleKeyProperty.OverrideMetadata(typeof(InputTextBox), new FrameworkPropertyMetadata(typeof(InputTextBox)));
 
             XMinProperty = DependencyProperty.Register("XMin", typeof(decimal), typeof(InputTextBox), new PropertyMetadata(decimal.MinValue));
             XMaxProperty = DependencyProperty.Register("XMax", typeof(decimal), typeof(InputTextBox), new PropertyMetadata(decimal.MaxValue));
             XPrecisionProperty = DependencyProperty.Register("XPrecision", typeof(int), typeof(InputTextBox), new PropertyMetadata(3));
-            
+
             mainWindow = Application.Current.MainWindow as MainWindow;
         }
 
         #region 内部方法
-        
 
         /// <summary>
         /// 注册事件
@@ -87,9 +88,10 @@ namespace 精密切割系统.View.Controls
             InputTextBox inputTextBox = (InputTextBox)sender;
             if (!inputTextBox.IsEnabled)
             {
-                inputTextBox.Background = new SolidColorBrush(Color.FromRgb(240,242,245));
-            }            
+                inputTextBox.Background = new SolidColorBrush(Color.FromRgb(240, 242, 245));
+            }
         }
+
         private void InputTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             ValidationCheck();
@@ -101,7 +103,7 @@ namespace 精密切割系统.View.Controls
             mainWindow.ShowKeyboardPage(1);
         }
 
-        private Regex RegDefalt = new Regex("^[0-9a-zA-Z._-]+$"); //默认可输入字符 数字英文大小写._- 
+        private Regex RegDefalt = new Regex("^[0-9a-zA-Z._-]+$"); //默认可输入字符 数字英文大小写._-
         private Regex RegEnglish = new Regex("^[0-9a-zA-Z]*$");
 
         /// <summary>
@@ -109,7 +111,7 @@ namespace 精密切割系统.View.Controls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void XTextBox_LostFocus(object sender, RoutedEventArgs e)
+        private void XTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
             //InputTextBox inputTextBox = (InputTextBox)sender;
             //if (string.IsNullOrEmpty(this.Text)) {
@@ -120,17 +122,17 @@ namespace 精密切割系统.View.Controls
             //    {
             //        this.Text = "0";
             //    }
-            //} 
+            //}
             //else
             //{
-
             //}
             initNumber();
             ValidationCheck();
             // mainWindow.ShowKeyboardPage(0);
         }
 
-        public void initNumber() {
+        public void initNumber()
+        {
             //小数可设置小数位数 数字是0
             if ((InputTypement.Decimal == InputType || InputTypement.Numeral == InputType) && XAllowNull == false)
             {
@@ -139,7 +141,7 @@ namespace 精密切割系统.View.Controls
                 {
                     text = "0";
                 }
-                // 格式化文本 
+                // 格式化文本
                 string formattedValue = Tools.FormatDecimalString(text, InputTypement.Decimal == InputType ? XPrecision : 0);
                 // 设置格式化后的值
                 this.Text = formattedValue;
@@ -147,13 +149,14 @@ namespace 精密切割系统.View.Controls
             }
         }
 
-        public  string ToStringNoRounding(double value, int decimalPlaces)
+        public string ToStringNoRounding(double value, int decimalPlaces)
         {
             double scale = Math.Pow(10, decimalPlaces);
             return (((long)(value * scale)) / scale).ToString();
         }
 
-        public void ValidationCheck() {
+        public void ValidationCheck()
+        {
             this.XIsError = false;
             //不允许为空时候
             if (XAllowNull == false && (this.Text == null || this.Text.Trim() == ""))
@@ -223,7 +226,6 @@ namespace 精密切割系统.View.Controls
                 }
                 else
                 {
-
                 }
             }
         }
@@ -233,7 +235,7 @@ namespace 精密切割系统.View.Controls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void XTextBox_GotFocus(object sender, RoutedEventArgs e)
+        private void XTextBox_GotFocus(object sender, RoutedEventArgs e)
         {
             this.SelectAll();
             mainWindow.ShowKeyboardPage(1);
@@ -244,19 +246,21 @@ namespace 精密切割系统.View.Controls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void XTextBox_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        private void XTextBox_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (this.IsFocused == false)
-            {
-                //TextBox textBox = e.Source as TextBox;
-                InputTextBox? textBox2 = sender as InputTextBox;
-                if (textBox2 != null) {
-                    textBox2.Focus();
-                }                
-                e.Handled = true;
-            }
+            //if (this.IsFocused == false)
+            //{
+            //    //TextBox textBox = e.Source as TextBox;
+            //    InputTextBox? textBox2 = sender as InputTextBox;
+            //    if (textBox2 != null) {
+            //        textBox2.Focus();
+            //    }
+            //    e.Handled = true;
+            //}
+            this.SelectAll();
+            mainWindow.ShowKeyboardPage(1);
         }
-        
+
         /// <summary>
         /// 输入内容检测 默认、英文、数字、小数
         /// </summary>
@@ -267,35 +271,38 @@ namespace 精密切割系统.View.Controls
             /// 默认
             /// </summary>
             Default,
+
             /// <summary>
             /// 英文
             /// </summary>
             English,
+
             /// <summary>
             /// 数字
             /// </summary>
             Numeral,
+
             /// <summary>
             /// 数字或小数
             /// </summary>
             Decimal,
         }
 
-        
         /// <summary>
         /// 输入内容类型
         /// </summary>
         public InputTypement InputType
         {
-            get 
-            {                
-                return (InputTypement)GetValue(InputTypeProperty); 
+            get
+            {
+                return (InputTypement)GetValue(InputTypeProperty);
             }
             set
             {
                 SetValue(InputTypeProperty, value);
             }
         }
+
         /// <summary>
         /// 数字、小数时的最小值
         /// </summary>
@@ -310,6 +317,7 @@ namespace 精密切割系统.View.Controls
                 SetValue(XMinProperty, value);
             }
         }
+
         /// <summary>
         /// 数字、小数时的最大值
         /// </summary>
@@ -324,6 +332,7 @@ namespace 精密切割系统.View.Controls
                 SetValue(XMaxProperty, value);
             }
         }
+
         /// <summary>
         /// 小数类型时的小数位数默认4为
         /// </summary>
@@ -336,7 +345,6 @@ namespace 精密切割系统.View.Controls
             set
             {
                 SetValue(XPrecisionProperty, value);
-                
             }
         }
 
@@ -353,7 +361,7 @@ namespace 精密切割系统.View.Controls
             {
                 SetValue(XWmkTextProperty, value);
             }
-        } 
+        }
 
         /// <summary>
         /// 公布属性XIsError（是否字段有误）
@@ -369,7 +377,6 @@ namespace 精密切割系统.View.Controls
                 base.SetValue(XIsErrorProperty, value);
             }
         }
-
 
         /// <summary>
         /// 公布属性XWmkForeground（水印着色）
@@ -416,7 +423,6 @@ namespace 精密切割系统.View.Controls
             }
         }
 
-        #endregion
-
+        #endregion 内部方法
     }
 }

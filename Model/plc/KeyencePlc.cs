@@ -27,7 +27,7 @@ namespace 精密切割系统.Driver
         public static string plcIP = "192.168.10.10";
         private static KeyencePlc? plc = null;
         private static readonly object _Object = new object();
-        private volatile static KeyenceMcNet keyence_net = new KeyenceMcNet(plcIP, 5000);
+        private static volatile KeyenceMcNet keyence_net = new KeyenceMcNet(plcIP, 5000);
         private static KeyenceMcNet _keyence_async_net = new KeyenceMcNet(plcIP, 5000);
         public static OperateResult connect;
         public Dictionary<string, PlcDataType> typeMap = new Dictionary<string, PlcDataType>();
@@ -55,7 +55,7 @@ namespace 精密切割系统.Driver
         /// <summary>
         /// 全局访问点, 获取唯一系统操作类实例
         /// 设置为静态方法则可在外边无需创建该类的实例就可调用该方法
-        /// 回原点 MR304 Z2  MR204 Z1  MR104 Y轴  MR004 X轴  标定 MR500 复位 MR501 停止 MR502 
+        /// 回原点 MR304 Z2  MR204 Z1  MR104 Y轴  MR004 X轴  标定 MR500 复位 MR501 停止 MR502
         /// </summary>
         /// <returns></returns>
         public static KeyencePlc GetInstance(string? plcIP = null)
@@ -76,12 +76,10 @@ namespace 精密切割系统.Driver
                     {
                         plc = new KeyencePlc(plcIP);
                     }
-                    
                 }
             }
             return plc;
         }
-
 
         public bool ConnectPlc(string? IP = null)
         {
@@ -190,7 +188,6 @@ namespace 精密切割系统.Driver
             bool result = verifyRead.IsSuccess && verifyRead.Content[0] == testRead.Content[0];
             if (!result)
             {
-
             }
             return result;
         }
@@ -243,10 +240,11 @@ namespace 精密切割系统.Driver
                     {
                         case PlcDataType.Bool:
                             var boolResult = keyence_net.ReadBool(plcAddr, dataNumber);
-                            read = boolResult.IsSuccess ? 
-                                OperateResult.CreateSuccessResult(boolResult.Content.Cast<object>().ToArray()) : 
+                            read = boolResult.IsSuccess ?
+                                OperateResult.CreateSuccessResult(boolResult.Content.Cast<object>().ToArray()) :
                                 OperateResult.CreateFailedResult<object[]>(boolResult);
                             break;
+
                         case PlcDataType.Int16:
                             var int16Result = keyence_net.ReadInt16(plcAddr, dataNumber);
                             if (int16Result.IsSuccess)
@@ -259,6 +257,7 @@ namespace 精密切割系统.Driver
                                 read = OperateResult.CreateFailedResult<object[]>(int16Result);
                             }
                             break;
+
                         case PlcDataType.UInt16:
                             var uint16Result = keyence_net.ReadUInt16(plcAddr, dataNumber);
                             if (uint16Result.IsSuccess)
@@ -271,6 +270,7 @@ namespace 精密切割系统.Driver
                                 read = OperateResult.CreateFailedResult<object[]>(uint16Result);
                             }
                             break;
+
                         case PlcDataType.Int32:
                             var int32Result = keyence_net.ReadInt32(plcAddr, dataNumber);
                             if (int32Result.IsSuccess)
@@ -283,6 +283,7 @@ namespace 精密切割系统.Driver
                                 read = OperateResult.CreateFailedResult<object[]>(int32Result);
                             }
                             break;
+
                         case PlcDataType.UInt32:
                             var uint32Result = keyence_net.ReadUInt32(plcAddr, dataNumber);
                             if (uint32Result.IsSuccess)
@@ -295,6 +296,7 @@ namespace 精密切割系统.Driver
                                 read = OperateResult.CreateFailedResult<object[]>(uint32Result);
                             }
                             break;
+
                         case PlcDataType.Int64:
                             var int64Result = keyence_net.ReadInt64(plcAddr, dataNumber);
                             if (int64Result.IsSuccess)
@@ -307,6 +309,7 @@ namespace 精密切割系统.Driver
                                 read = OperateResult.CreateFailedResult<object[]>(int64Result);
                             }
                             break;
+
                         case PlcDataType.UInt64:
                             var uint64Result = keyence_net.ReadUInt64(plcAddr, dataNumber);
                             if (uint64Result.IsSuccess)
@@ -319,6 +322,7 @@ namespace 精密切割系统.Driver
                                 read = OperateResult.CreateFailedResult<object[]>(uint64Result);
                             }
                             break;
+
                         case PlcDataType.Float:
                             var floatResult = keyence_net.ReadFloat(plcAddr, dataNumber);
                             if (floatResult.IsSuccess)
@@ -331,6 +335,7 @@ namespace 精密切割系统.Driver
                                 read = OperateResult.CreateFailedResult<object[]>(floatResult);
                             }
                             break;
+
                         case PlcDataType.Double:
                             var doubleResult = keyence_net.ReadDouble(plcAddr, dataNumber);
                             if (doubleResult.IsSuccess)
@@ -343,6 +348,7 @@ namespace 精密切割系统.Driver
                                 read = OperateResult.CreateFailedResult<object[]>(doubleResult);
                             }
                             break;
+
                         default:
                             throw new ArgumentException($"不支持的数据类型：{dataType}");
                     }
@@ -495,7 +501,6 @@ namespace 精密切割系统.Driver
                     }
                     else if (type == typeof(float))
                     {
-
                         var floatResult = await _keyence_async_net.ReadFloatAsync(plcAddr, dataNumber);
                         if (floatResult.IsSuccess)
                         {
@@ -698,7 +703,6 @@ namespace 精密切割系统.Driver
             return write;
         }
 
-
         /// <summary>
         /// 退出所有模式
         /// </summary>
@@ -710,7 +714,7 @@ namespace 精密切割系统.Driver
             PlcControl.tagControl.sparkRepairKnife.EnterElectrical(0);
             PlcControl.tagControl.calibration.AlignInit(0);
             PlcControl.tagControl.wholeDevice.IoModelSet(0);
-            PlcControl.tagControl.flange.JoinTrimming(0) ;
+            PlcControl.tagControl.flange.JoinTrimming(0);
         }
 
         public string GetPlcValueString(string tKey)
@@ -719,7 +723,7 @@ namespace 精密切割系统.Driver
             {
                 return "0";
             }
-            if (PlcControl.allTags == null||PlcControl.allTags.Count==0) return "";
+            if (PlcControl.allTags == null || PlcControl.allTags.Count == 0) return "";
             Tag tmpTag = PlcControl.allTags.ContainsKey(tKey) ? PlcControl.allTags[tKey] : null;
             if (tmpTag == null)
             {
@@ -740,7 +744,7 @@ namespace 精密切割系统.Driver
 
         public string GetPlcDefaultValueString(string tKey)
         {
-            if (PlcControl.allTags == null||PlcControl.allTags.Count==0) return "";
+            if (PlcControl.allTags == null || PlcControl.allTags.Count == 0) return "";
             Tag tmpTag = PlcControl.allTags.ContainsKey(tKey) ? PlcControl.allTags[tKey] : null;
             if (tmpTag == null)
             {
@@ -857,7 +861,6 @@ namespace 精密切割系统.Driver
             Tools.LogError($"写入PLC失败：地址 {tag.addr}，值 {writeValue}，所有尝试均失败");
             return false;
         }
-
 
         /// <summary>
         /// 检查PLC连接状态，如果未连接则尝试重连3次。
@@ -986,7 +989,6 @@ namespace 精密切割系统.Driver
 
             return writeValue;
         }
-
     }
 
     public enum PlcDataType
@@ -1004,7 +1006,8 @@ namespace 精密切割系统.Driver
 
     public class PlcTags
     {
-        public PlcTags() { }
+        public PlcTags()
+        { }
 
         public Axis Xaxis { get; set; } = new Axis(AxisName.X);
         public Axis Yaxis { get; set; } = new Axis(AxisName.Y);
@@ -1024,13 +1027,12 @@ namespace 精密切割系统.Driver
         public Flange flange { get; set; }
     }
 
-
     public class Axis
     {
         public Axis()
         {
-
         }
+
         public Axis(string name)
         {
             this.axisName = name;
@@ -1040,49 +1042,69 @@ namespace 精密切割系统.Driver
 
         // 运动轴名称
         public string axisName;
+
         // 运动轴是否定位到原点
         public Tag hasOriginPoint { get; set; }
+
         // 运动轴当前位置
         public Tag curLocation { get; set; }
+
         // 光栅尺当前位置
         public Tag gratingRulerCurLocation { get; set; }
+
         // 运动轴当前速度curMotion
         public Tag curSpeed { get; set; }
+
         // 运动轴当前状态 =1  axis ready
         public Tag curStatus { get; set; }
+
         // 电机当前状态 =1 busy，=2 done
         public Tag curMotion { get; set; }
 
         // 运动类型 0 点动 1 相对运动
         public Tag runType { get; set; }
+
         // 回原点启动
         public Tag startHoming { get; set; }
+
         public Tag relaxAxis { get; set; }
+
         // 模式正转开始
         public Tag jogStart { get; set; }
+
         // 模式反转开始
         public Tag jogAntiStart { get; set; }
+
         // 点动/相对模式速度
         public Tag jogRelativeSpeed { get; set; }
+
         // 高速-点动/相对模式速度
         public Tag jogRelativeHighSpeed { get; set; }
+
         // 相对运动目标位置
         public Tag relativeDistance { get; set; }
+
         // 绝对运动开始
         public Tag absoluteStart { get; set; }
+
         // 绝对运动速度
         public Tag absoluteSpeed { get; set; }
+
         // 绝对运动目标位置
         public Tag absoluteLocation { get; set; }
+
         // 面板按钮运动距离
         public Tag panelRelativeDistance { get; set; }
+
         // 高速运动 0 低速 1 高速
         public Tag highSpeed { get; set; }
+
         public Tag isReady { get; set; }
         public Tag isCompleteAbsoluteMotion { get; set; }
 
         // 轴软正限位
         public Tag softUpperLimit { get; set; }
+
         // 轴软负限位F
         public Tag softLowerLimit { get; set; }
 
@@ -1329,7 +1351,7 @@ namespace 精密切割系统.Driver
 
         public void SetAbsoluteSpeed(string speed)
         {
-            absoluteSpeed.writeValue= speed;
+            absoluteSpeed.writeValue = speed;
             keyencePlc.writeTag(absoluteSpeed);
         }
 
@@ -1353,7 +1375,7 @@ namespace 精密切割系统.Driver
                 location = PlcControl.GetCompensate(location, axisName);
             }
             // 设置绝对运动位置
-            absoluteLocation.writeValue= location;
+            absoluteLocation.writeValue = location;
             keyencePlc.writeTag(absoluteLocation);
             // 设置绝对运动速度
             SetAbsoluteSpeed(speed);
@@ -1363,7 +1385,7 @@ namespace 精密切割系统.Driver
             keyencePlc.writeTag(absoluteStart);
             Thread.Sleep(5);*/
             // 设置绝对运功开始
-            absoluteStart.writeValue= "1";
+            absoluteStart.writeValue = "1";
             keyencePlc.writeTag(absoluteStart);
             return location;
         }
@@ -1377,6 +1399,10 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task StartAbsoluteAsync(float location, float? speed, CancellationToken token)
         {
+            if (!GlobalParams.HasTheta && axisName == AxisName.Theta)
+            {
+                return;
+            }
             await WaitStopJogAsync(token.WithDefaultTimeout());
             // 等待轴准备好
             await WaitAxisReadyAsync(token.WithDefaultTimeout());
@@ -1542,7 +1568,7 @@ namespace 精密切割系统.Driver
             Thread.Sleep(5);
             // 点动速度-高速
             jogRelativeHighSpeed.writeValue = jogRelativeHighSpeedValue;
-            keyencePlc.writeTag (jogRelativeHighSpeed);
+            keyencePlc.writeTag(jogRelativeHighSpeed);
             Thread.Sleep(5);
             // 点动距离
             relativeDistance.writeValue = relativeDistanceValue;
@@ -1557,8 +1583,6 @@ namespace 精密切割系统.Driver
             keyencePlc.writeTag(panelRelativeDistance);
             Thread.Sleep(5);
         }
-        
-        
     }
 
     public class AxisName
@@ -1569,14 +1593,18 @@ namespace 精密切割系统.Driver
         public const string Z2 = "Z2轴";
         public const string Theta = "Theta轴";
     }
+
     public class BladeMantance
     {
         public BladeMantance()
         {
         }
+
         private KeyencePlc keyencePlc = KeyencePlc.GetInstance();
+
         // ============刀片维护相关
         public Tag initReplaceLocation { get; set; }
+
         public Tag firstMeasureHight { get; set; }
         public Tag heightMeasurementEarlyEnd { get; set; }
         public Tag NoContactHeightMeasurement { get; set; }
@@ -1588,23 +1616,33 @@ namespace 精密切割系统.Driver
         public Tag z1ReplaceLocation { get; set; }
         public Tag z2ReplaceLocation { get; set; }
         public Tag bladeSetup { get; set; }
+
         // 设置参数确认
         public Tag confirmParams { get; set; }
+
         // 是否已准备好测高
         public Tag bladeMantanceStatus { get; set; }
+
         // x轴测高位置设置
         public Tag xHeightSet { get; set; }
+
         // Y轴测高位置设置
         public Tag yHeightSet { get; set; }
+
         // Y轴测高位置设置
         public Tag z1HeightSet { get; set; }
+
         // Y轴测高位置设置
         public Tag z2HeightSet { get; set; }
+
         public Tag thetaSet { get; set; }
+
         // x轴基准线测量位置设置
         public Tag xBaseMeasurePos { get; set; }
+
         // Y轴基准线测量位置设置
         public Tag yBaseMeasurePos { get; set; }
+
         public Tag z1BaseMeasurePos { get; set; }
         public Tag z2BaseMeasurePos { get; set; }
         public Tag setupStart { get; set; }
@@ -1696,7 +1734,7 @@ namespace 精密切割系统.Driver
             NoContactHeightMeasurement.writeValue = "1";
             await keyencePlc.WriteTagAsync(NoContactHeightMeasurement);
         }
-        
+
         // 判断是否已准备好测高
         public static async Task<bool> IsReadyToMeasureHeightAsync()
         {
@@ -1719,7 +1757,7 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task<int?> GetHeightMeasureSetupNumberAsync()
         {
-           return await PlcControl.plc.ReadDataAsync<int>(setupNumber.addr);
+            return await PlcControl.plc.ReadDataAsync<int>(setupNumber.addr);
         }
 
         /// <summary>
@@ -1739,7 +1777,7 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task<float?> GetHeightMeasurementSetupValue()
         {
-           return await PlcControl.plc.ReadDataAsync<float>(setupValue.addr);
+            return await PlcControl.plc.ReadDataAsync<float>(setupValue.addr);
         }
 
         /// <summary>
@@ -1946,6 +1984,7 @@ namespace 精密切割系统.Driver
             // 确认设置参数
             ConfirmParams();
         }
+
         /// <summary>
         /// 设置刀片更换初始位置
         /// </summary>
@@ -1969,7 +2008,7 @@ namespace 精密切割系统.Driver
             Thread.Sleep(10);
             ConfirmParams();
         }
-        
+
         /// <summary>
         /// 确认参数
         /// </summary>
@@ -1984,11 +2023,13 @@ namespace 精密切割系统.Driver
     {
         public WholeDevice()
         {
-
         }
+
         private KeyencePlc keyencePlc = KeyencePlc.GetInstance();
+
         // ============整机相关==========
         public Tag canSystemInit { get; set; }
+
         public Tag systemInit { get; set; }
         public Tag urgentRaise { get; set; }
         public Tag isSystemIniting { get; set; }
@@ -2009,36 +2050,50 @@ namespace 精密切割系统.Driver
         public Tag spindleSpeedStatus { get; set; }
         public Tag vacuumSwitch { get; set; }
         public Tag vacuumSwitchStatus { get; set; }
+
         // 工作盘真空
         public Tag workVacuumSwitch { get; set; }
 
         // 主轴切割水
         public Tag cuttingWater { get; set; }
+
         // 工件吹气
         public Tag workpieceBlowing { get; set; }
+
         // 工件吹气状态
         public Tag workpieceBlowingStatus { get; set; }
+
         // 确认系统报警
         public Tag clearSystemAlarm { get; set; }
+
         public Tag systemErrorClear { get; set; }
+
         // 手动运行轴
         public Tag spindleManuallyRun { get; set; }
 
         public Tag spindleManuallyRunStatus { get; set; }
+
         // 轴错误报警已解除
         public Tag systemErrorReset { get; set; }
+
         // 面板按钮
         public Tag panelButtons { get; set; }
+
         // 是否开启插补 1 开启 0 关闭
         public Tag interpositionStatus { get; set; }
+
         // 油泵计数
         public Tag refuelingPumpCount { get; set; }
+
         // 油泵计数清零
         public Tag refuelingPumpReset { get; set; }
+
         // 蜂鸣
         public Tag buzzer { get; set; }
+
         // 黄灯闪
         public Tag yellowLightFlash { get; set; }
+
         // IO检测模式
         public Tag ioModel { get; set; }
 
@@ -2135,6 +2190,7 @@ namespace 精密切割系统.Driver
             ioModel.writeValue = status.ToString();
             keyencePlc.writeTag(ioModel);
         }
+
         /// <summary>
         /// 是否开启插补运动
         /// </summary>
@@ -2144,7 +2200,7 @@ namespace 精密切割系统.Driver
             interpositionStatus.writeValue = status + "";
             keyencePlc.writeTag(interpositionStatus);
         }
-        
+
         /// <summary>
         /// 整机复位
         /// </summary>
@@ -2212,6 +2268,7 @@ namespace 精密切割系统.Driver
             panelButtons.writeValue = status + "";
             keyencePlc.writeTag(panelButtons);
         }
+
         /// <summary>
         /// 异常清除
         /// </summary>
@@ -2418,8 +2475,9 @@ namespace 精密切割系统.Driver
         public void SetRefuelingPumpReset(int status)
         {
             refuelingPumpReset.writeValue = status + "";
-            keyencePlc.writeTag (refuelingPumpReset);
+            keyencePlc.writeTag(refuelingPumpReset);
         }
+
         /// <summary>
         /// 设置蜂鸣
         /// </summary>
@@ -2427,7 +2485,7 @@ namespace 精密切割系统.Driver
         public void SetBuzzerStatus(int status)
         {
             buzzer.writeValue = status + "";
-            keyencePlc.writeTag (buzzer);
+            keyencePlc.writeTag(buzzer);
         }
 
         /// <summary>
@@ -2468,7 +2526,7 @@ namespace 精密切割系统.Driver
         public void SetYellowLightFlash(int status)
         {
             yellowLightFlash.writeValue = status + "";
-            keyencePlc.writeTag (yellowLightFlash);
+            keyencePlc.writeTag(yellowLightFlash);
         }
     }
 
@@ -2476,25 +2534,31 @@ namespace 精密切割系统.Driver
     {
         public Calibration()
         {
-
         }
 
         private KeyencePlc keyencePlc = KeyencePlc.GetInstance();
+
         // ============校准 ===============
         // 进入校准画面
         public Tag alignInit { get; set; }
 
         public Tag alignStatus { get; set; }
+
         // x轴校准初始设置
         public Tag alignInitX { get; set; }
+
         // y轴校准初始设置
         public Tag alignInitY { get; set; }
+
         // z1轴校准初始设置
         public Tag alignInitZ1 { get; set; }
+
         // z2轴校准初始设置
         public Tag alignInitZ2 { get; set; }
+
         // 设置参数确认
         public Tag confirmParams { get; set; }
+
         // ============校准结束===========
 
         /// <summary>
@@ -2530,6 +2594,7 @@ namespace 精密切割系统.Driver
             // 确认设置参数
             ConfirmParams();
         }
+
         /// <summary>
         /// 确认参数
         /// </summary>
@@ -2542,78 +2607,114 @@ namespace 精密切割系统.Driver
 
     public class Cutting
     {
-        public Cutting() { }
+        public Cutting()
+        { }
 
         private KeyencePlc keyencePlc = KeyencePlc.GetInstance();
+
         // ================切割相关
         // 自动切割画面进入
         public Tag fullAutoInit { get; set; }
+
         // 是否已准备好进入切割模式
         public Tag isReadyToCutting { get; set; }
+
         // 切割设置参数确认
         public Tag confirmParams { get; set; }
+
         // 切割设置参数确认状态
         public Tag confirmParamsStatus { get; set; }
+
         // 切割方向-前切
         public Tag cutDirectionAgo { get; set; }
+
         // 切割方向-后切
         public Tag cutDirectionAfter { get; set; }
+
         // 切割方式 A-0 从左往右切（默认）  B_ZKEEP-1
         public Tag cutMethod { get; set; }
+
         // Y 轴是否开启光栅尺补偿 False 补偿 True 不补偿
         public Tag yAxisCompStatus { get; set; }
+
         // Z1 轴是否开启光栅尺补偿 False 补偿 True 不补偿
         public Tag z1AxisCompStatus { get; set; }
+
         // 切割开始
         public Tag cutStart { get; set; }
+
         // 切割停止
         public Tag cutStop { get; set; }
+
         // X轴切割开始位置
         public Tag xStartPosition { get; set; }
+
         // Y轴切割开始位置
         public Tag yStartPosition { get; set; }
+
         // z1轴切割开始位置
         public Tag z1StartPosition { get; set; }
+
         // 主轴速度
         public Tag spindleRev { get; set; }
+
         // 切割次数
         public Tag cutNum { get; set; }
+
         // 自动切割结束
         public Tag fullAutoCutEnd { get; set; }
+
         // 是否退出切割模式
         public Tag isExitCuttingMode { get; set; }
+
         // 停机检查
         public Tag shutdownCheck { get; set; }
+
         // Z1轴结束位置（切割位置）
         public Tag z1EndPosition { get; set; }
+
         // 自动当前切割面角度
         public Tag cutFaceAngle { get; set; }
+
         // 是否进入切割模式
         public Tag isEnterCuttingMode { get; set; }
+
         // X轴切割结束位置
         public Tag xLength { get; set; }
+
         // X轴初始位置
         public Tag xInitPosition { get; set; }
+
         // Y轴初始位置
         public Tag yInitPosition { get; set; }
+
         // Z1轴初始位置
         public Tag z1InitPosition { get; set; }
+
         // x轴停机检查位置
         public Tag xStopLocation { get; set; }
+
         // y轴停机检查位置
         public Tag yStopLocation { get; set; }
+
         // z2轴停机检查位置
         public Tag z2StopLocation { get; set; }
+
         // 切割返回速度
         public Tag returnSpeed { get; set; }
+
         // 切割停止延时检查
         public Tag cutStopDelayTime { get; set; }
+
         // 差步运动开始
         public Tag startInterpolationMotion { get; set; }
+
         // 差步运动是否完成
         public Tag isCompleteInterpolationMotion { get; set; }
+
         // 差步X运动位置
         public Tag xInterpolationMotion { get; set; }
+
         // 差步Y轴运动位置
         public Tag yInterpolationMotion { get; set; }
 
@@ -2628,7 +2729,7 @@ namespace 精密切割系统.Driver
             CancellationToken useToken = token.WithDefaultTimeout();
             Task waitX = PlcControl.tagControl.Xaxis.WaitAxisStopAsync(useToken);
             Task waitY = PlcControl.tagControl.Yaxis.WaitAxisStopAsync(useToken);
-            await Task.WhenAll(waitX,  waitY);
+            await Task.WhenAll(waitX, waitY);
             xInterpolationMotion.writeValue = xInterpolationMotionValue.ToString();
             await keyencePlc.WriteTagAsync(xInterpolationMotion);
             yInterpolationMotion.writeValue = yInterpolationMotionValue.ToString();
@@ -2785,7 +2886,7 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task<int?> GetCutNumAsync()
         {
-           return await keyencePlc.ReadDataAsync<int>(cutNum.addr);
+            return await keyencePlc.ReadDataAsync<int>(cutNum.addr);
         }
 
         /// <summary>
@@ -2823,6 +2924,7 @@ namespace 精密切割系统.Driver
             yAxisCompStatus.writeValue = status.ToString();
             keyencePlc.writeTag(yAxisCompStatus);
         }
+
         /// <summary>
         /// Z轴光栅尺补偿
         /// </summary>
@@ -2832,7 +2934,7 @@ namespace 精密切割系统.Driver
             z1AxisCompStatus.writeValue = status.ToString();
             keyencePlc.writeTag(z1AxisCompStatus);
         }
-        
+
         /// <summary>
         /// 停止切割
         /// </summary>
@@ -2850,7 +2952,6 @@ namespace 精密切割系统.Driver
             cutStop.writeValue = status + "";
             await keyencePlc.WriteTagAsync(cutStop);
         }
-
 
         /// <summary>
         /// 切割结束
@@ -2870,7 +2971,6 @@ namespace 精密切割系统.Driver
             await keyencePlc.WriteTagAsync(fullAutoCutEnd);
         }
 
-
         /// <summary>
         /// 设置Y轴开始位置
         /// </summary>
@@ -2879,19 +2979,21 @@ namespace 精密切割系统.Driver
             yStartPosition.writeValue = position.ToString();
             keyencePlc.writeTag(yStartPosition);
         }
+
         /// <summary>
         /// 设置切割方向
         /// </summary>
         /// <param name="cutDirection">切割方向 0 前切 1 后切</param>
         public void SetCutDirection(int cutDirection)
         {
-            if(cutDirection == 0)
+            if (cutDirection == 0)
             {
                 cutDirectionAfter.writeValue = "0";
                 cutDirectionAgo.writeValue = "1";
                 keyencePlc.writeTag(cutDirectionAfter);
                 keyencePlc.writeTag(cutDirectionAgo);
-            } else
+            }
+            else
             {
                 cutDirectionAfter.writeValue = "1";
                 cutDirectionAgo.writeValue = "0";
@@ -2899,6 +3001,7 @@ namespace 精密切割系统.Driver
                 keyencePlc.writeTag(cutDirectionAgo);
             }
         }
+
         /// <summary>
         /// 设置切割刀数
         /// </summary>
@@ -2964,7 +3067,8 @@ namespace 精密切割系统.Driver
                 Thread.Sleep(10);
                 cutDirectionAgo.writeValue = "1";
                 keyencePlc.writeTag(cutDirectionAgo);
-            } else if (cutDirection == 1)
+            }
+            else if (cutDirection == 1)
             {
                 cutDirectionAgo.writeValue = "0";
                 keyencePlc.writeTag(cutDirectionAgo);
@@ -3093,17 +3197,19 @@ namespace 精密切割系统.Driver
             // 确认切割参数
             ConfirmParams();
         }
+
         /// <summary>
         /// 设置切割延时时间
         /// </summary>
         /// <param name="second"></param>
-        public void SetCutStopDelayTime(int second) 
+        public void SetCutStopDelayTime(int second)
         {
             cutStopDelayTime.writeValue = second.ToString();
             keyencePlc.writeTag(cutStopDelayTime);
             // 确认切割参数
             ConfirmParams();
         }
+
         /// <summary>
         /// 设置切割初始位置
         /// </summary>
@@ -3129,26 +3235,29 @@ namespace 精密切割系统.Driver
     public class SparkRepairKnife
     {
         private KeyencePlc keyencePlc = KeyencePlc.GetInstance();
-        public SparkRepairKnife() { }
+
+        public SparkRepairKnife()
+        { }
 
         // 进入修刀画面
         public Tag enterElectrical { get; set; }
 
         // 参数设置确认
         public Tag confirmParams { get; set; }
+
         public Tag axisParamsConfirm { get; set; }
 
         // 修刀开始
         public Tag sharpenStart { get; set; }
+
         // 修刀停止
         public Tag sharpenEnd { get; set; }
 
         // 修刀停止
         public Tag sharpenStop { get; set; }
+
         // 修刀模式状态
         public Tag sharpenStatus { get; set; }
-        
-
 
         // z1轴修刀开始位置
         public Tag z1StartPos { get; set; }
@@ -3179,13 +3288,15 @@ namespace 精密切割系统.Driver
 
         // Z轴极限位置
         public Tag zLimitPos { get; set; }
+
         // 当前修刀次数
         public Tag currentCount { get; set; }
+
         // 修刀工作中
         public Tag electricalStatus { get; set; }
 
         // ====================切割相关结束
-        
+
         /// <summary>
         /// 进入修刀
         /// </summary>
@@ -3200,6 +3311,7 @@ namespace 精密切割系统.Driver
                 keyencePlc.writeTag(enterElectrical);
             }
         }
+
         /// <summary>
         /// 启动/停止修刀
         /// </summary>
@@ -3221,7 +3333,8 @@ namespace 精密切割系统.Driver
                 Thread.Sleep(10);
                 sharpenStop.writeValue = "1";
                 keyencePlc.writeTag(sharpenStop);
-            }else if (type == 2)
+            }
+            else if (type == 2)
             {
                 sharpenEnd.writeValue = "0";
                 keyencePlc.writeTag(sharpenEnd);
@@ -3229,7 +3342,6 @@ namespace 精密切割系统.Driver
                 sharpenEnd.writeValue = "1";
                 keyencePlc.writeTag(sharpenEnd);
             }
-
         }
 
         /// <summary>
@@ -3266,11 +3378,11 @@ namespace 精密切割系统.Driver
             z1EndPos.writeValue = Math.Round(z1EndPosValue, 4).ToString();
             keyencePlc.writeTag(z1EndPos);
             Thread.Sleep(2);
-            // x轴修刀开始位置 
+            // x轴修刀开始位置
             xStartPos.writeValue = xStartPosValue.ToString();
             keyencePlc.writeTag(xStartPos);
             Thread.Sleep(2);
-            // z轴每次修刀下降距离 
+            // z轴每次修刀下降距离
             zStepAmount.writeValue = zStepAmountValue;
             keyencePlc.writeTag(zStepAmount);
             Thread.Sleep(2);
@@ -3278,15 +3390,15 @@ namespace 精密切割系统.Driver
             repeatCount.writeValue = repeatCountValue + "";
             keyencePlc.writeTag(repeatCount);
             Thread.Sleep(2);
-            // 修刀速度 
+            // 修刀速度
             sharpenSpeed.writeValue = bladeCorrctionSpeedValue;
             keyencePlc.writeTag(sharpenSpeed);
             Thread.Sleep(2);
-            // 主轴速度 
+            // 主轴速度
             spindleSpeed.writeValue = spindleSpeedValue;
             keyencePlc.writeTag(spindleSpeed);
             Thread.Sleep(2);
-            // Z轴极限位置  
+            // Z轴极限位置
             zLimitPos.writeValue = zLimitPosValue;
             keyencePlc.writeTag(zLimitPos);
             Thread.Sleep(2);
@@ -3295,13 +3407,14 @@ namespace 精密切割系统.Driver
             keyencePlc.writeTag(confirmParams);
             Thread.Sleep(10);
         }
-        
     }
 
     public class Flange
     {
         private KeyencePlc keyencePlc = KeyencePlc.GetInstance();
-        public Flange() { }
+
+        public Flange()
+        { }
 
         /// <summary>
         /// 自动法兰研磨画面进入
@@ -3317,6 +3430,7 @@ namespace 精密切割系统.Driver
         /// 研磨停止
         /// </summary>
         public Tag GrindingStop { get; set; }
+
         /// <summary>
         /// 研磨结束
         /// </summary>
@@ -3376,6 +3490,7 @@ namespace 精密切割系统.Driver
         /// 研磨步进间隔
         /// </summary>
         public Tag GrindingStepInterval { get; set; }
+
         /// <summary>
         /// 当前研磨次数
         /// </summary>
@@ -3389,6 +3504,7 @@ namespace 精密切割系统.Driver
             GrindingStart.writeValue = "1";
             keyencePlc.writeTag(GrindingStart);
         }
+
         /// <summary>
         /// 暂停修整
         /// </summary>
@@ -3397,6 +3513,7 @@ namespace 精密切割系统.Driver
             GrindingStop.writeValue = "1";
             keyencePlc.writeTag(GrindingStop);
         }
+
         /// <summary>
         /// 结束修整
         /// </summary>
@@ -3405,6 +3522,7 @@ namespace 精密切割系统.Driver
             EndTrimming.writeValue = "1";
             keyencePlc.writeTag(EndTrimming);
         }
+
         /// <summary>
         /// 进入修整
         /// </summary>
@@ -3492,7 +3610,9 @@ namespace 精密切割系统.Driver
         public Tag()
         {
         }
+
         private KeyencePlc keyencePlc = KeyencePlc.GetInstance();
+
         public Tag(string addr)
         {
             this.addr = addr;
@@ -3504,6 +3624,7 @@ namespace 精密切割系统.Driver
             this.name = name;
             this.valueType = valueType;
         }
+
         public Tag(string addr, string writeAddr, string name, string valueType, string desc)
         {
             this.addr = addr;
@@ -3522,34 +3643,49 @@ namespace 精密切割系统.Driver
 
         // plc变量名称
         public string name = "";
+
         // plc变量地址
         public string addr = "";
+
         // plc变量写入地址
         public string writeAddr = "";
+
         // plc变量默认值
         public string defaultValue = "";
+
         // plc变量类型
         public string valueType = "";
+
         // plc变量实际值
         public string value = "";
+
         // 最大值
         public string maxValue = "";
+
         // 最小值
         public string minValue = "";
+
         // plc变量写入值
         public string writeValue = "";
+
         // 变量描述
         public string describe = "";
+
         // 变量上限值（不为空字符串的情况下，超过则报警）
         public string upperValue = "";
+
         // 变量下限值（不为空字符串的情况下，低于则报警）
         public string lowerValue = "";
+
         // 变量有效值（不为null或空的情况下，变量值不在这个范围则报警，用于离散量校验和报警）
         public List<string>? validValue = null;
+
         // 变量无效值（不为null或空的情况下，变量值在这个范围则报警，用于离散量校验和报警）
         public List<string>? invalidValue = null;
+
         // 变量报警优先级
         public int alarmPriority = 0;
+
         // 变量状态：是否处于异常报警状态
         public bool errorStatus = false;
 
