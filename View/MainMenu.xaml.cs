@@ -47,12 +47,12 @@ namespace 精密切割系统.View
     /// </summary>
     public partial class MainMenu : Page
     {
-
         private MainWindow? mainWindow;
         private static RightPage? rightPage;
         private String CachedMenuKey = "CachedMenuData";
         private UserDefineDataModel userDefineDataModel = null;
         private String menuId = "";
+
         public MainMenu()
         {
             InitializeComponent();
@@ -66,7 +66,7 @@ namespace 精密切割系统.View
             // OnFrameSourceChanged();
             //获取菜单数据
             MenuItem item = Application.Current.Properties[CachedMenuKey] as MenuItem;
-            if (item==null)
+            if (item == null)
             {
                 item = MenuData.GetF1Menu();
             }
@@ -83,6 +83,7 @@ namespace 精密切割系统.View
                     case "5":
                         UpdateMenu(MenuData.GetF5Menu());
                         break;
+
                     case "7":
                         UpdateMenu(MenuData.GetF7Menu());
                         break;
@@ -116,13 +117,13 @@ namespace 精密切割系统.View
                 // mainWindow.isNavigating = true;
                 // mainWindow.operateFrame.Navigate(new Uri("View/Pages/operate/OperatePage.xaml", UriKind.Relative));
                 operatePage.SetOperateShowType(0);
-            } else
+            }
+            else
             {
                 mainWindow.shortcutBottomBtnSel = true;
                 mainWindow.SetOperateBtn(operatePage);
             }
             GlobalParams.currentOperateBeanList = new List<OperateBean>();
-            
         }
 
         private void BtnBack_RightClicked(object? sender, bool e)
@@ -151,7 +152,6 @@ namespace 精密切割系统.View
             rightPage.machineID.Text = userDefineDataModel.MachineId;
         }
 
-
         //动态创建多个菜单
         private void InitMenuView(MenuItem item)
         {
@@ -160,22 +160,22 @@ namespace 精密切割系统.View
             MenuGrid.Children.Clear();
             menuTitle.Text = item.Title;
             List<MenuBean> list = item.list;
-            if (list.Count>4)//两行
+            if (list.Count > 4)//两行
             {
                 for (int row = 0; row < 2; row++)
                 {
-
                     MenuBean bean;
                     if (row == 0)
                     {
-                        for (int col = 0; col < 4; col++) {
+                        for (int col = 0; col < 4; col++)
+                        {
                             bean = list[col];
                             addMenuButton(row, col, bean);
                         }
                     }
                     else
                     {
-                        for (int col = 0; col < list.Count-4; col++)
+                        for (int col = 0; col < list.Count - 4; col++)
                         {
                             bean = list[col + row + 3];
                             addMenuButton(row, col, bean);
@@ -189,10 +189,10 @@ namespace 精密切割系统.View
                 {
                     addMenuButton(0, col, list[col]);
                 }
-            }  
+            }
         }
 
-        private void addMenuButton(int row, int col,MenuBean bean)
+        private void addMenuButton(int row, int col, MenuBean bean)
         {
             MenuButton menuButton = new MenuButton(bean);
             menuButton.Width = 302;
@@ -234,7 +234,8 @@ namespace 精密切割系统.View
                     }
                 case 5:
                     {
-                        if (havePassWord()) {
+                        if (havePassWord())
+                        {
                             mainWindow.NavigateToPage("Pages/passowrd/PasswordPage", $"menuId={bean.Code}");
                         }
                         else
@@ -264,7 +265,7 @@ namespace 精密切割系统.View
                             rightPage.btnBack.Visibility = Visibility.Visible;
                             UpdateMenu(MenuData.GetF7Menu());
                         }
-                        
+
                         break;
                     }
                 case 8:
@@ -279,7 +280,6 @@ namespace 精密切割系统.View
                         {
                             // 新发送PLC进入模式，当模式进入成功后，跳转页面
                             MenuButton menu = sender as MenuButton;
-                            menu.resetState = false;
                             MaterialSnackUtils.MaterialSnack("进入电火花修刀模式中...", SnackType.WARNING, 0);
                             PlcControl.tagControl.sparkRepairKnife.EnterElectrical(1);
                             GlobalParams.globalRunFlag = true;
@@ -293,8 +293,7 @@ namespace 精密切割系统.View
                                     mainWindow.NavigateToPage(bean.PageUrl);
                                 }
                                 else
-                                {   
-                                    menu.resetState = true;
+                                {
                                     MaterialSnackUtils.MaterialSnack("进入电火花修刀模式失败！", SnackType.WARNING, 0);
                                     // 进入失败，退出模式
                                     PlcControl.tagControl.sparkRepairKnife.EnterElectrical(0);
@@ -312,9 +311,11 @@ namespace 精密切割系统.View
                 case 409:
                     mainWindow.NavigateToPage(bean.PageUrl);
                     break;
+
                 case 439:
                     ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(AutoCutSelectConfig));
                     break;
+
                 case 402:
                     if (!GlobalParams.OnlineFlag)
                     {
@@ -328,7 +329,6 @@ namespace 精密切割系统.View
                         // 进入测高模式
                         MaterialSnackUtils.MaterialSnack("进入测高模式中...", SnackType.WARNING, 0);
                         MenuButton menu = sender as MenuButton;
-                        menu.resetState = false;
                         PlcControl.tagControl.bladeMantance.RunBladeSetup(1);
                         PlcControl.tagControl.wholeDevice.SetPanelButtonsStauts(1);
                         GlobalParams.globalRunFlag = true;
@@ -343,7 +343,6 @@ namespace 精密切割系统.View
                             }
                             else
                             {
-                                menu.resetState = true;
                                 PlcControl.tagControl.bladeMantance.RunBladeSetup(0);
                                 PlcControl.tagControl.wholeDevice.SetPanelButtonsStauts(0);
                                 MaterialSnackUtils.MaterialSnack("进入刀片测高失败！", SnackType.WARNING, 0);
@@ -351,6 +350,7 @@ namespace 精密切割系统.View
                         });
                     }
                     break;
+
                 case 203:
                 case 706:
                 case 440:
@@ -358,13 +358,16 @@ namespace 精密切割系统.View
                 case 607:
                     mainWindow.NavigateToPage(bean.PageUrl);
                     break;
+
                 case 520:
                     ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(EmptyRun));
                     break;
+
                 case 709:
                     PlcControl.tagControl.flange.JoinTrimming(1);
                     mainWindow.NavigateToPage(bean.PageUrl);
                     break;
+
                 default:
 
                     break;
@@ -382,7 +385,6 @@ namespace 精密切割系统.View
             mainWindow.NavigateToPage("camera/Camera");
         }
 
-
         //刷新菜单数据
         public void UpdateMenu(MenuItem menuItem)
         {
@@ -393,7 +395,8 @@ namespace 精密切割系统.View
         }
 
         //是否需要密码
-        private Boolean havePassWord() {
+        private Boolean havePassWord()
+        {
             if (!string.IsNullOrEmpty(userDefineDataModel.SystemPassword))
             {
                 //查询录入的密码时间戳
@@ -412,10 +415,5 @@ namespace 精密切割系统.View
             }
             return false;
         }
-       
     }
-
-
-
-   
 }

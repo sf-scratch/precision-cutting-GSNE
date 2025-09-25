@@ -51,10 +51,11 @@ namespace 精密切割系统.ViewModel
         public AsyncDelegateCommand<string> CheckLunguCommand { get; set; }
 
         private DelegateCommand _setCutYCommand;
+
         public DelegateCommand SetCutYCommand =>
             _setCutYCommand ?? (_setCutYCommand = new DelegateCommand(ExecuteSetCutYCommand));
 
-        void ExecuteSetCutYCommand()
+        private void ExecuteSetCutYCommand()
         {
             NavigationParameters paramet = new()
             {
@@ -65,10 +66,11 @@ namespace 精密切割系统.ViewModel
         }
 
         private DelegateCommand _setSharpenYCommand;
+
         public DelegateCommand SetSharpenYCommand =>
             _setSharpenYCommand ?? (_setSharpenYCommand = new DelegateCommand(ExecuteSetSharpenYCommand));
 
-        void ExecuteSetSharpenYCommand()
+        private void ExecuteSetSharpenYCommand()
         {
             NavigationParameters paramet = new()
             {
@@ -79,6 +81,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private string _lunguId;
+
         public string LunguId
         {
             get { return _lunguId; }
@@ -94,6 +97,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private SharpenParamsModel _sharpenParams;
+
         /// <summary>
         /// 磨刀参数
         /// </summary>
@@ -104,6 +108,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private CutParamsModel _cutParams;
+
         /// <summary>
         /// 切割参数
         /// </summary>
@@ -114,6 +119,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _sharpenY;
+
         public float SharpenY
         {
             get { return _sharpenY; }
@@ -121,6 +127,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _cutY;
+
         public float CutY
         {
             get { return _cutY; }
@@ -132,9 +139,9 @@ namespace 精密切割系统.ViewModel
         public bool IsProductEnvironment
         {
             get { return _isProductEnvironment; }
-            set 
-            { 
-                _isProductEnvironment = value; 
+            set
+            {
+                _isProductEnvironment = value;
                 if (_isProductEnvironment)
                 {
                     HttpRestClient.UpdateProd();
@@ -256,7 +263,6 @@ namespace 精密切割系统.ViewModel
             LunguSksj = MapperConfig.Mapper.Map<LunguSksjModel>(lunguSksjResult.Data);
             InitRightButton();
             MaterialSnackUtils.MaterialSnack("检查轮毂信息完成，可开始执行自动切割！", MaterialSnackUtils.SnackType.SUCCESS, 0, _eventAggregator);
-
         }
 
         private async Task AutoRunAsync()

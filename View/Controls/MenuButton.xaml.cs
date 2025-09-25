@@ -25,18 +25,27 @@ namespace 精密切割系统.View.Controls
     /// </summary>
     public partial class MenuButton : UserControl
     {
+        private readonly SolidColorBrush LeaveBackground = new SolidColorBrush(Color.FromRgb(255, 255, 255));
+        private readonly SolidColorBrush DownBackground = new SolidColorBrush(Color.FromRgb(23, 124, 250));
 
-        private SolidColorBrush LeaveBackground = new SolidColorBrush(Color.FromRgb(255, 255, 255));
-        private SolidColorBrush DownBackground = new SolidColorBrush(Color.FromRgb(23, 124, 250));
-        //private bool resetState = true;
+        //图片ICON
+        public static readonly DependencyProperty ImagePathProperty =
+       DependencyProperty.Register("ImagePath", typeof(string), typeof(MenuButton), new PropertyMetadata(null));
+
+        public string ImagePath
+        {
+            get { return (string)GetValue(ImagePathProperty); }
+            set { SetValue(ImagePathProperty, value); }
+        }
+
         public MenuButton(MenuBean bean)
         {
             InitializeComponent();
-            menuIcon.Source = bean.BlackIcon;
+            ImagePath = bean.BlackIcon;
             menuText.Text = bean.Title;
             menuBorder.Background = LeaveBackground;
             menuBorder.Tag = bean;
-            
+
             if (DevicesUtis.IsTouchSupported())
             {
                 //触摸屏上使用
@@ -48,76 +57,67 @@ namespace 精密切割系统.View.Controls
             {
                 menuBorder.MouseDown += MenuBorder_MouseDown;
                 menuBorder.MouseUp += MenuBorder_MouseUp;
-            }    
+            }
         }
 
+        private void Down(object? sender)
+        {
+            if (sender is Border menuButton && menuButton.Tag is MenuBean bean)
+            {
+                menuButton.Background = DownBackground;
+                ImagePath = bean.BlackIcon;
+            }
+        }
+
+        private void Leave(object? sender)
+        {
+            if (sender is Border menuButton && menuButton.Tag is MenuBean bean)
+            {
+                menuButton.Background = LeaveBackground;
+                ImagePath = bean.BlackIcon;
+            }
+        }
+
+        private void Up(object? sender)
+        {
+            if (sender is Border menuButton && menuButton.Tag is MenuBean bean)
+            {
+                menuButton.Background = LeaveBackground;
+                ImagePath = bean.BlackIcon;
+                OnClick(bean);
+            }
+        }
 
         private void MenuBorder_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            
-            Border menuButton = sender as Border;
-            MenuBean bean = menuButton.Tag as MenuBean;
-            menuButton.Background = LeaveBackground;
-            menuIcon.Source = bean.BlackIcon;
-            menuText.Foreground = new SolidColorBrush(Color.FromRgb(0, 0, 0));
-            onClick(bean);
+            Up(sender);
         }
-
 
         private void MenuBorder_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            Border menuButton = sender as Border;
-            MenuBean bean = menuButton.Tag as MenuBean;
-            menuButton.Background = DownBackground;
-            menuIcon.Source = bean.WhiteIcon;
-            menuText.Foreground = new SolidColorBrush(Color.FromRgb(255, 255, 255));
+            Down(sender);
         }
 
         private void MenuBorder_TouchLeave(object? sender, TouchEventArgs e)
         {
-            if (resetState)
-            {
-                Border menuButton = sender as Border;
-                MenuBean bean = menuButton.Tag as MenuBean;
-                menuButton.Background = LeaveBackground;
-                menuIcon.Source = bean.BlackIcon;
-                menuText.Foreground = new SolidColorBrush(Color.FromRgb(0, 0, 0));
-            }
-            resetState = true;
+            Leave(sender);
         }
-
 
         private void MenuBorder_TouchUp(object? sender, TouchEventArgs e)
         {
-            Border menuButton = sender as Border;
-            MenuBean bean = menuButton.Tag as MenuBean;
-            onClick(bean);
+            Up(sender);
         }
-
-
 
         private void MenuBorder_TouchDown(object? sender, TouchEventArgs e)
         {
-            Debug.WriteLine("MenuBorder_TouchDown");
-            Border menuButton = sender as Border;
-            MenuBean bean = menuButton.Tag as MenuBean;
-            menuButton.Background = DownBackground;
-            menuIcon.Source = bean.WhiteIcon;
-            menuText.Foreground = new SolidColorBrush(Color.FromRgb(255, 255, 255));
+            Down(sender);
         }
 
-        private void onClick(MenuBean bean)
+        private void OnClick(MenuBean bean)
         {
             MenuClicked?.Invoke(this, bean);
-            //MenuBean bean = menuBtn.Tag as MenuBean;
         }
+
         public event EventHandler<MenuBean> MenuClicked;
-
-        public bool resetState { get; set; }  =true;
-
-        public void resetBg()
-        {
-        }
-
     }
 }

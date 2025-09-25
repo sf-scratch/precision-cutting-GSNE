@@ -122,7 +122,10 @@
                         <Controls:KeyboardBtn BtnValue="1" />
                         <Controls:KeyboardBtn BtnValue="2" />
                         <Controls:KeyboardBtn BtnValue="3" />
-                        <Controls:KeyboardBtn BtnType="2" BtnValue="Down" />
+                        <Controls:KeyboardBtn
+                            BtnType="2"
+                            BtnValue="Down"
+                            FontSize="20" />
                     </StackPanel>
                 </Grid>
             </Grid>
@@ -137,19 +140,34 @@
                         HorizontalAlignment="Center"
                         VerticalAlignment="Bottom"
                         Orientation="Horizontal">
-                        <Controls:KeyboardBtn BtnType="2" BtnValue="Caps" />
-                        <Controls:KeyboardBtn BtnType="3" BtnValue="↑" />
-                        <Controls:KeyboardBtn BtnType="2" BtnValue="Del" />
+                        <Controls:KeyboardBtn
+                            BtnType="2"
+                            BtnValue="Caps"
+                            FontSize="20" />
+                        <Controls:KeyboardBtn
+                            BtnType="3"
+                            BtnValue="↑"
+                            FontSize="40" />
+                        <Controls:KeyboardBtn
+                            BtnType="2"
+                            BtnValue="Del"
+                            FontSize="20" />
                     </StackPanel>
                 </Grid>
                 <Grid Grid.Row="1">
                     <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                        <Controls:KeyboardBtn BtnType="3" BtnValue="←" />
+                        <Controls:KeyboardBtn
+                            BtnType="3"
+                            BtnValue="←"
+                            FontSize="40" />
                         <Controls:KeyboardBtn
                             BtnType="2"
                             BtnValue="Home"
                             FontSize="20" />
-                        <Controls:KeyboardBtn BtnType="3" BtnValue="→" />
+                        <Controls:KeyboardBtn
+                            BtnType="3"
+                            BtnValue="→"
+                            FontSize="40" />
                     </StackPanel>
                 </Grid>
                 <Grid Grid.Row="2">
@@ -157,9 +175,18 @@
                         HorizontalAlignment="Center"
                         VerticalAlignment="Top"
                         Orientation="Horizontal">
-                        <Controls:KeyboardBtn BtnType="2" BtnValue="Shift" />
-                        <Controls:KeyboardBtn BtnType="3" BtnValue="↓" />
-                        <Controls:KeyboardBtn BtnType="2" BtnValue="Tab" />
+                        <Controls:KeyboardBtn
+                            BtnType="2"
+                            BtnValue="Shift"
+                            FontSize="20" />
+                        <Controls:KeyboardBtn
+                            BtnType="3"
+                            BtnValue="↓"
+                            FontSize="40" />
+                        <Controls:KeyboardBtn
+                            BtnType="2"
+                            BtnValue="Tab"
+                            FontSize="20" />
                     </StackPanel>
                 </Grid>
             </Grid>
