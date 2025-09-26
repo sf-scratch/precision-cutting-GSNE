@@ -1,4 +1,5 @@
 ﻿using Emgu.CV.Dnn;
+using MaterialDesignThemes.Wpf;
 using NPOI.SS.Formula.Functions;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,7 @@ using 精密切割系统.Model.plc;
 using 精密切割系统.Utils;
 using 精密切割系统.View.common;
 using 精密切割系统.View.Controls;
+using 精密切割系统.View.Dialogs;
 using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.operate;
 using 精密切割系统.ViewModel;
@@ -59,7 +61,8 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             _rightPage.btnSure.SetRightClickedHandler(BladeReplaceSure);
             _cts = new CancellationTokenSource();
             NavigateUtils.ClearOperatePage();
-            WindowLayout.OperatePageButtons.Add(RightButtonParams.BlueButton("换刀片", "SawBlade", ReplaceBlade));
+            WindowLayout.OperatePageButtons.Add(RightButtonParams.BlueButton("换刀片", "SawBlade", ReplaceBladeAsync));
+            WindowLayout.OperatePageButtons.Add(RightButtonParams.BlueButton("换工件", "Square", ReplaceWaferAsync));
             InitData();
         }
 
@@ -70,10 +73,16 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             WindowLayout.OperatePageButtons.Clear();
         }
 
-        private async void ReplaceBlade()
+        private async Task ReplaceBladeAsync()
         {
             await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(60), _cts.Token);
             await AutoCutUtils.ReplaceBladeAsync(default, timeoutToken.Token);
+        }
+
+        private async Task ReplaceWaferAsync()
+        {
+            await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(60), _cts.Token);
+            await AutoCutUtils.ReplaceWaferAsync(default, timeoutToken.Token);
         }
 
         private void InitData()

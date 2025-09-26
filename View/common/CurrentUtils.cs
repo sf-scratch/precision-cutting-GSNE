@@ -1,5 +1,5 @@
 ﻿using 精密切割系统.database.db.modle;
-using 精密切割系统.FrmWindow.common;
+using 精密切割系统.Helpers;
 using 精密切割系统.Model.bunkering;
 using 精密切割系统.Model.plc;
 using 精密切割系统.ViewModel;

@@ -22,7 +22,6 @@ using System.Windows.Shapes;
 using 精密切割系统.Assets.config.buttom;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
-using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.cut;
 using 精密切割系统.Model.cut.Workpieces;

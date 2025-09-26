@@ -7,6 +7,7 @@
     xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:convert="clr-namespace:精密切割系统.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:精密切割系统.Helpers"
     xmlns:local="clr-namespace:精密切割系统.View.Controls"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -198,14 +199,18 @@
                         Command="{Binding RelaxZ2Command}"
                         Content="放松"
                         Style="{StaticResource MaterialDesignOutlinedLightButton}" />
-                    <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" Text="θ" />
+                    <TextBlock
+                        Style="{StaticResource MaterialDesignBody1TextBlock}"
+                        Text="θ"
+                        Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
                     <!--<TextBox materialDesign:HintAssist.Hint="当前Jog速度deg/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedTheta}" />
                     <TextBox materialDesign:HintAssist.Hint="当前速度deg/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedTheta}" />-->
                     <TextBox
                         materialDesign:HintAssist.Hint="当前位置deg"
                         IsEnabled="False"
                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                        Text="{Binding CurrentPositionTheta}" />
+                        Text="{Binding CurrentPositionTheta}"
+                        Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
                     <!--<TextBox materialDesign:HintAssist.Hint="运动速度deg/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedTheta}" />-->
                     <!--<TextBox
                         materialDesign:HintAssist.Hint="目标位置deg"
@@ -226,11 +231,13 @@
                     <Button
                         Command="{Binding StartHomingThetaCommand}"
                         Content="原点"
-                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}"
+                        Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
                     <Button
                         Command="{Binding RelaxThetaCommand}"
                         Content="放松"
-                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}"
+                        Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
                 </auto:AutoGrid>
             </Border>
             <Border
@@ -333,7 +340,8 @@
                                 Content="{materialDesign:PackIcon ArrowDownLeftBold,
                                                                   Size=40}"
                                 Foreground="White"
-                                Style="{StaticResource ArrowButton}">
+                                Style="{StaticResource ArrowButton}"
+                                Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}">
                                 <behaviors:Interaction.Behaviors>
                                     <behav:DualInputBehavior
                                         PromptCommand="{Binding ThetaRelativeNegativeCommand}"
@@ -476,7 +484,8 @@
                                 Content="{materialDesign:PackIcon ArrowDownRightBold,
                                                                   Size=40}"
                                 Foreground="White"
-                                Style="{StaticResource ArrowButton}">
+                                Style="{StaticResource ArrowButton}"
+                                Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}">
                                 <behaviors:Interaction.Behaviors>
                                     <behav:DualInputBehavior
                                         PromptCommand="{Binding ThetaRelativePositiveCommand}"

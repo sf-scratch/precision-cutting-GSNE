@@ -6,6 +6,7 @@
     xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:convert="clr-namespace:精密切割系统.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:精密切割系统.Helpers"
     xmlns:local="clr-namespace:精密切割系统.View.Pages.common"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -111,7 +112,8 @@
                             VerticalAlignment="Center"
                             Content="{materialDesign:PackIcon ArrowDownLeftBold,
                                                               Size=40}"
-                            Style="{StaticResource ArrowButton}">
+                            Style="{StaticResource ArrowButton}"
+                            Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}">
                             <behaviors:Interaction.Behaviors>
                                 <behav:DualInputBehavior
                                     PromptCommand="{Binding ThetaRelativeNegativeCommand}"
@@ -232,7 +234,8 @@
                             VerticalAlignment="Center"
                             Content="{materialDesign:PackIcon ArrowDownRightBold,
                                                               Size=40}"
-                            Style="{StaticResource ArrowButton}">
+                            Style="{StaticResource ArrowButton}"
+                            Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}">
                             <behaviors:Interaction.Behaviors>
                                 <behav:DualInputBehavior
                                     PromptCommand="{Binding ThetaRelativePositiveCommand}"

@@ -9,7 +9,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Windows.Documents;
-using 精密切割系统.FrmWindow.common;
+using 精密切割系统.Helpers;
 using 精密切割系统.Model.cut;
 using 精密切割系统.Utils;
 using 精密切割系统.ViewModel;

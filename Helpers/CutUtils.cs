@@ -4,7 +4,6 @@ using System.Text;
 using System.Threading.Tasks;
 using 精密切割系统.Assets.config.buttom;
 using 精密切割系统.Driver;
-using 精密切割系统.FrmWindow.common;
 
 namespace 精密切割系统.Helpers
 {

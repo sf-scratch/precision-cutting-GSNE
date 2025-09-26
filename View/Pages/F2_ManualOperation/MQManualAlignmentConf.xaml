@@ -4,7 +4,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
     xmlns:common="clr-namespace:精密切割系统.View.Pages.common"
+    xmlns:cvert="clr-namespace:精密切割系统.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:精密切割系统.Helpers"
     xmlns:local="clr-namespace:精密切割系统.View.Pages.F2_ManualOperation"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="MQManualAlignmentConf"
@@ -31,6 +33,8 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <!--  布尔到可见性转换器  -->
+        <cvert:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
     </Page.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -135,12 +139,14 @@
                             VerticalAlignment="Center"
                             Content="θ"
                             FontSize="16"
-                            FontWeight="Bold" />
+                            FontWeight="Bold"
+                            Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
                         <Controls:InputTextBox
                             x:Name="thetaAbsolutePosition"
                             Width="100"
                             Margin="5,0,0,0"
-                            IsEnabled="False" />
+                            IsEnabled="False"
+                            Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
                     </StackPanel>
                 </StackPanel>
                 <StackPanel
@@ -224,7 +230,7 @@
                         FontSize="16" />
                 </StackPanel>
             </StackPanel>
-            <!--<common:SimpleDirectOperate Grid.Row="2" Margin="60"/>-->
+            <!--<common:SimpleDirectOperate Grid.Row="2" Margin="60" />-->
             <Controls:RealTimeInfoBox
                 x:Name="RealTimeInfo"
                 Grid.Row="2"

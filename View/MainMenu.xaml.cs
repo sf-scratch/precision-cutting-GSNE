@@ -29,7 +29,6 @@ using static 精密切割系统.Helpers.MaterialSnackUtils;
 using 精密切割系统.Utils;
 using 精密切割系统.Driver;
 using 精密切割系统.View.Pages.operate;
-using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Assets.config.buttom;
 using 精密切割系统.Model.plc;
 using 精密切割系统.ViewModel;

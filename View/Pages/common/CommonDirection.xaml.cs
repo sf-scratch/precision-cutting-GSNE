@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using 精密切割系统.Driver;
-using 精密切割系统.FrmWindow.common;
+using 精密切割系统.Helpers;
 using 精密切割系统.Utils;
 using 精密切割系统.ViewModel;
 

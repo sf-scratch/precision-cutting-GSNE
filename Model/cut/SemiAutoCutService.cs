@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using 精密切割系统.Driver;
-using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.cut.Workpieces;
 using 精密切割系统.ViewModel;

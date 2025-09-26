@@ -8,12 +8,11 @@ using System.Text;
 using System.Threading.Tasks;
 using 精密切割系统.Assets.config.buttom;
 using 精密切割系统.Driver;
-using 精密切割系统.Helpers;
 using 精密切割系统.Model.cut;
 
-namespace 精密切割系统.FrmWindow.common
+namespace 精密切割系统.Helpers
 {
-    internal class GlobalParams
+    public static class GlobalParams
     {
         // true 在线版本 false 0
         public static bool OnlineFlag { get; set; } = false;
