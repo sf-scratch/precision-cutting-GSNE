@@ -81,12 +81,19 @@ namespace 精密切割系统.Helpers
         {
             try
             {
+                List<UserDefineDataModel> list = SqlHelper.Table<UserDefineDataModel>().ToList();
+                if (list.Count != 1)
+                {
+                    MaterialSnackUtils.MaterialSnack("功能参数设定，雾化喷嘴位置设定错误！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+                    return;
+                }
+                UserDefineDataModel userDefineData = list.First();
                 MaterialSnackUtils.MaterialSnack("请准备更换刀片,轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
                 await PlcControl.tagControl.wholeDevice.StopSpindleAsync();
                 Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, token);
                 Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, default, token);
                 await Task.WhenAll(taskZ1, taskZ2);
-                Task taskXY = PlcControl.tagControl.cutting.RunMotionAsync(0, 150, token);
+                Task taskXY = PlcControl.tagControl.cutting.RunMotionAsync(0, userDefineData.BladeExchangeYPos.ToFloat(), token);
                 Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0, default, token);
                 Task speedZero = PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync(token);
                 await Task.WhenAll(taskXY, taskTheta, speedZero);
@@ -182,6 +189,7 @@ namespace 精密切割系统.Helpers
 
         public static async Task<CommonResult<float>> ProcessCombineMeasureHeightAsync(IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
+            return CommonResult<float>.Success(15);
             await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
             CommonResult<float> curHeightZ;
             if (Appsettings.MeasureHeightLast == null)
@@ -853,14 +861,36 @@ namespace 精密切割系统.Helpers
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
+        public static async Task WorkpieceBlowingThenBackAsync(IEventAggregator? eventAggregator = null, CancellationToken token = default)
+        {
+            Task<float?> xTask = PlcControl.tagControl.Xaxis.GetCurrentLocationAsync();
+            Task<float?> yTask = PlcControl.tagControl.Yaxis.GetCurrentLocationAsync();
+            await Task.WhenAll(xTask, yTask);
+            float curX = xTask.Result ?? 0, curY = yTask.Result ?? 0;
+            await WorkpieceBlowingAsync(eventAggregator, token);
+            await PlcControl.tagControl.cutting.RunMotionAsync(curX, curY, token);
+        }
+
+        /// <summary>
+        /// 工作盘吹气
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public static async Task WorkpieceBlowingAsync(IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
+            List<UserDefineDataModel> list = SqlHelper.Table<UserDefineDataModel>().ToList();
+            if (list.Count != 1)
+            {
+                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("功能参数设定，雾化喷嘴位置设定错误！"));
+                return;
+            }
+            UserDefineDataModel userDefineData = list.First();
             eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始工件吹气..."));
             try
             {
                 await PlcControl.tagControl.wholeDevice.OpenWorkpieceBlowingAsync();
-                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(190, 100, token);
-                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(2, 15, token);
+                await PlcControl.tagControl.cutting.RunMotionAsync(userDefineData.AtomizingNozzlePositionX.ToFloat(), userDefineData.AtomizingNozzlePositionY.ToFloat(), token);
+                await Task.Delay(TimeSpan.FromSeconds(userDefineData.BlowTime.ToFloat()), token);
             }
             finally
             {

@@ -24,6 +24,7 @@ namespace 精密切割系统.ViewModel
         private SemaphoreSlim _semaph = new SemaphoreSlim(1, 1);
 
         private string _title;
+
         public string Title
         {
             get { return _title; }
@@ -31,6 +32,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _originPositionY;
+
         public float OriginPositionY
         {
             get { return _originPositionY; }
@@ -38,6 +40,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _currentPositionY;
+
         public float CurrentPositionY
         {
             get { return _currentPositionY; }
@@ -106,9 +109,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                float curX = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0;
-                await AutoCutUtils.WorkpieceBlowingAsync(token: _cts?.Token ?? default);
-                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(curX, default, default);
+                await AutoCutUtils.WorkpieceBlowingThenBackAsync(token: _cts?.Token ?? default);
                 await AutoCutUtils.FineTuneAxisYAsync();
                 await AutoCutUtils.UpdateCameraCommonLineAsync();
             }
@@ -128,10 +129,12 @@ namespace 精密切割系统.ViewModel
                     Appsettings.CutY = CurrentPositionY;
                     MaterialSnackUtils.MaterialSnack($"切割开始位置设置成功！", MaterialSnackUtils.SnackType.SUCCESS);
                     break;
+
                 case AutoCutSetCutPositionType.SetSharpen:
                     Appsettings.SharpenY = CurrentPositionY;
                     MaterialSnackUtils.MaterialSnack($"磨刀开始位置设置成功！", MaterialSnackUtils.SnackType.SUCCESS);
                     break;
+
                 default:
                     break;
             }
@@ -213,12 +216,14 @@ namespace 精密切割系统.ViewModel
                         await AutoCutUtils.GoPreCutLineAsync(_cts?.Token ?? default);
                         CameraUtils.SetCameraDeviceWaferParams();
                         break;
+
                     case AutoCutSetCutPositionType.SetSharpen:
                         Title = "设置磨刀位置";
                         OriginPositionY = Appsettings.SharpenY ?? 0;
                         await AutoCutUtils.GoPreSharpenLineAsync(_cts?.Token ?? default);
                         CameraUtils.SetCameraDeviceSharpenParams();
                         break;
+
                     default:
                         break;
                 }

@@ -11,18 +11,24 @@ namespace 精密切割系统.Model.cut
     public class SemiAutoCutService
     {
         private static readonly Lazy<SemiAutoCutService> _lazy = new(() => new SemiAutoCutService());
+
         public static SemiAutoCutService Instance
         {
             get { return _lazy.Value; }
         }
 
         private readonly ThetaAlignService _alignService;
+
         public event Action<CutServiceProcess>? CutServiceProcessChanged;
+
         public event Action<LineSegment?, string?>? CutServicePaused;
+
         public event Action? RemindReplaceWafer;
+
         private TaskCompletionSource<ServicePauseResult>? _continueTcs;
 
         private CutDirection _cutDirection;
+
         /// <summary>
         /// 切割方向
         /// </summary>
@@ -33,6 +39,7 @@ namespace 精密切割系统.Model.cut
         }
 
         private bool _isReady;
+
         /// <summary>
         /// 是否准备就绪
         /// </summary>
@@ -43,6 +50,7 @@ namespace 精密切割系统.Model.cut
         }
 
         private float _depthCompensationValue;
+
         /// <summary>
         /// 深度补偿值
         /// </summary>
@@ -53,6 +61,7 @@ namespace 精密切割系统.Model.cut
         }
 
         private float _feedSpeedCompCompensationValue;
+
         /// <summary>
         /// 进给速度补偿值
         /// </summary>
@@ -63,6 +72,7 @@ namespace 精密切割系统.Model.cut
         }
 
         private bool _isOpenPrecut;
+
         /// <summary>
         /// 是否打开预切割
         /// </summary>
@@ -95,14 +105,14 @@ namespace 精密切割系统.Model.cut
             {
                 return CommonResult.Failure("请打开工作盘真空！");
             }
-            if (await PlcControl.tagControl.wholeDevice.IsOpenCutSecurityDoorAsync())
-            {
-                return CommonResult.Failure("请关闭切割安全门！");
-            }
-            if (await PlcControl.tagControl.wholeDevice.IsOpenCameraSecurityDoorAsync())
-            {
-                return CommonResult.Failure("请关闭相机安全门！");
-            }
+            //if (await PlcControl.tagControl.wholeDevice.IsOpenCutSecurityDoorAsync())
+            //{
+            //    return CommonResult.Failure("请关闭切割安全门！");
+            //}
+            //if (await PlcControl.tagControl.wholeDevice.IsOpenCameraSecurityDoorAsync())
+            //{
+            //    return CommonResult.Failure("请关闭相机安全门！");
+            //}
             return CommonResult.Success();
         }
 
@@ -258,15 +268,18 @@ namespace 精密切割系统.Model.cut
                     goto case ServicePauseResultType.Continue;
                 case ServicePauseResultType.Continue:
                     // 更新使用的暂停令牌
-                    CancellationToken usingPauseToken = result.Token ?? default; 
+                    CancellationToken usingPauseToken = result.Token ?? default;
                     _cutThetaAlignDeg = await GetCutThetaAlignDegAsync();
                     await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
                     return (RunResult.Success(), usingPauseToken);
+
                 case ServicePauseResultType.BladeScrap:
                     return (RunResult.Fail("刀片已报废！"), default);
-                case ServicePauseResultType.Stop: 
+
+                case ServicePauseResultType.Stop:
                     return (RunResult.Fail("停止切割！"), default);
-                default: 
+
+                default:
                     return (RunResult.Fail("切割异常！"), default);
             }
         }

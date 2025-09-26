@@ -164,42 +164,42 @@ namespace 精密切割系统.ViewModel
                 //正在切割中
                 return;
             }
+            CommonResult checkResult = await SemiAutoCutService.CheckCutAsync();
+            if (!checkResult.IsSuccess)
+            {
+                ShowWarnMessageNavigateHome(checkResult.Message);
+                return;
+            }
+            CommonResult<List<CutStep>> cutStepResult = await GenerateCutStepListAsync(_semiAutoCutService.IsOpenPrecut);
+            if (!cutStepResult.IsSuccess || cutStepResult.Data is null)
+            {
+                ShowWarnMessageNavigateHome(cutStepResult.Message);
+                return;
+            }
+            CommonResult<FileTableItemModel> fileTableItemResult = await GetFileTableItemModelAsync();
+            if (!fileTableItemResult.IsSuccess || fileTableItemResult.Data is null)
+            {
+                ShowWarnMessageNavigateHome(fileTableItemResult.Message);
+                return;
+            }
+            if (Appsettings.BladeOuterDiameter is null)
+            {
+                ShowWarnMessageNavigateHome("未设置刀片外径！");
+                return;
+            }
+            FileTableItemModel fileTableItem = fileTableItemResult.Data;
+            _ = MonitoringAlarmAsync(_monitoringCts.Token);
+            _ = MonitoringCutProgressAsync(_monitoringCts.Token);
+            float cutY = (await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0).ToActualY();
+            CommonResult<float> curHeightZ = await AutoCutUtils.ProcessCombineMeasureHeightAsync(_eventAggregator, _pauseCts.Token);
+            if (!curHeightZ.IsSuccess)
+            {
+                ShowWarnMessageNavigateHome(curHeightZ.Message);
+                return;
+            }
             Stopwatch stopwatch = Stopwatch.StartNew();
             try
             {
-                CommonResult checkResult = await SemiAutoCutService.CheckCutAsync();
-                if (!checkResult.IsSuccess)
-                {
-                    MaterialSnack(checkResult.Message, SnackType.WARNING, 0, _eventAggregator);
-                    return;
-                }
-                CommonResult<List<CutStep>> cutStepResult = await GenerateCutStepListAsync(_semiAutoCutService.IsOpenPrecut);
-                if (!cutStepResult.IsSuccess || cutStepResult.Data is null)
-                {
-                    MaterialSnack(cutStepResult.Message, SnackType.WARNING, 0, _eventAggregator);
-                    return;
-                }
-                CommonResult<FileTableItemModel> fileTableItemResult = await GetFileTableItemModelAsync();
-                if (!fileTableItemResult.IsSuccess || fileTableItemResult.Data is null)
-                {
-                    MaterialSnack(fileTableItemResult.Message, SnackType.WARNING, 0, _eventAggregator);
-                    return;
-                }
-                if (Appsettings.BladeOuterDiameter is null)
-                {
-                    MaterialSnack("未设置刀片外径！", SnackType.WARNING, 0, _eventAggregator);
-                    return;
-                }
-                FileTableItemModel fileTableItem = fileTableItemResult.Data;
-                _ = MonitoringAlarmAsync(_monitoringCts.Token);
-                _ = MonitoringCutProgressAsync(_monitoringCts.Token);
-                float cutY = (await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0).ToActualY();
-                CommonResult<float> curHeightZ = await AutoCutUtils.ProcessCombineMeasureHeightAsync(_eventAggregator, _pauseCts.Token);
-                if (!curHeightZ.IsSuccess)
-                {
-                    MaterialSnack(curHeightZ.Message, SnackType.WARNING, 0, _eventAggregator);
-                    return;
-                }
                 IWorkpieces workpiece = GenerateWorkpieces(fileTableItem, cutY);
                 _semiAutoCutService.CutServiceProcessChanged += CutService_CutServiceProcessChanged;
                 _semiAutoCutService.CutServicePaused += CutService_CutServicePaused;
@@ -228,6 +228,13 @@ namespace 精密切割系统.ViewModel
                 _pauseCts.Cancel();
                 await StopAsync(ServicePauseResult.Stop);
             }
+        }
+
+        private void ShowWarnMessageNavigateHome(string message)
+        {
+            MaterialSnack($"{message}", SnackType.WARNING, 0, _eventAggregator);
+            NavigateUtils.NavigateToPage("Pages/F2_ManualOperation/MQSemiAutomaticCuttingConf");
+            ShowMessage();
         }
 
         private IWorkpieces GenerateWorkpieces(FileTableItemModel fileTableItem, float cutY)

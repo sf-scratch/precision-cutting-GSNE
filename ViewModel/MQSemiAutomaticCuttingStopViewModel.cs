@@ -150,9 +150,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                float curX = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0;
-                await AutoCutUtils.WorkpieceBlowingAsync(_eventAggregator, _operatCts.Token);
-                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(curX, default, _operatCts.Token);
+                await AutoCutUtils.WorkpieceBlowingThenBackAsync(_eventAggregator, _operatCts.Token);
                 await AutoCutUtils.FineTuneAxisYAsync();
                 await AutoCutUtils.UpdateCameraCommonLineAsync();
             }

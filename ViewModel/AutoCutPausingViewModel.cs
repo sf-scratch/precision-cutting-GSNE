@@ -36,6 +36,7 @@ namespace 精密切割系统.ViewModel
         private CancellationTokenSource _operatCts;
 
         private static int _afterReplaceBladeCutTimes;
+
         /// <summary>
         /// 自更换刀片起刀片切了几道
         /// </summary>
@@ -46,6 +47,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _afterHeightMeasurementZ;
+
         /// <summary>
         /// 测高位置
         /// </summary>
@@ -56,6 +58,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _sharpenBladeHeight;
+
         /// <summary>
         /// 磨刀片高度
         /// </summary>
@@ -66,6 +69,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _sharpenSpeed;
+
         /// <summary>
         /// 磨刀速度
         /// </summary>
@@ -76,6 +80,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private string _sharpenProgress;
+
         /// <summary>
         /// 磨刀进度
         /// </summary>
@@ -86,6 +91,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private string _deviceDataNo;
+
         /// <summary>
         /// 型号参数No
         /// </summary>
@@ -96,6 +102,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _cutBladeHeight;
+
         /// <summary>
         /// 切割刀片高度
         /// </summary>
@@ -106,6 +113,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _cutSpeed;
+
         /// <summary>
         /// 磨刀速度
         /// </summary>
@@ -116,6 +124,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private string _cutProgress;
+
         /// <summary>
         /// 切割进度
         /// </summary>
@@ -126,6 +135,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _baselineWidth;
+
         /// <summary>
         /// 基准线宽度
         /// </summary>
@@ -136,6 +146,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private float _brokenEdgeWidth;
+
         /// <summary>
         /// 崩边宽度
         /// </summary>
@@ -279,9 +290,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                float curX = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0;
-                await AutoCutUtils.WorkpieceBlowingAsync(token: _operatCts.Token);
-                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(curX, default, default);
+                await AutoCutUtils.WorkpieceBlowingThenBackAsync(token: _operatCts.Token);
                 await AutoCutUtils.FineTuneAxisYAsync();
                 await AutoCutUtils.UpdateCameraCommonLineAsync();
             }
@@ -364,7 +373,7 @@ namespace 精密切割系统.ViewModel
 
         public override async void OnNavigatedTo(NavigationContext navigationContext)
         {
-            base.OnNavigatedTo(navigationContext); 
+            base.OnNavigatedTo(navigationContext);
             _operatCts = new CancellationTokenSource();
             InitBottomButton();
             InitRightButton();
