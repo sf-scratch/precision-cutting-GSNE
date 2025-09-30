@@ -210,6 +210,11 @@ namespace 精密切割系统.View
                 mainWindow.NavigateToPage(bean.PageUrl);
                 return;
             }
+            else if (bean.Type == 4)
+            {
+                ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, bean.PageUrl);
+                return;
+            }
             switch (bean.Code)
             {
                 case 1:

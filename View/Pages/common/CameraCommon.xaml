@@ -29,7 +29,7 @@
             TouchDown="cameraImage_TouchDown">
             <Image.RenderTransform>
                 <!--  图像翻转并放大  -->
-                <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="-2" ScaleY="-2" />
+                <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="-1" ScaleY="-1" />
             </Image.RenderTransform>
 
             <!--  裁剪超出部分  -->
@@ -43,6 +43,5 @@
             Height="640"
             Background="Transparent"
             IsHitTestVisible="False" />
-
     </Grid>
 </UserControl>

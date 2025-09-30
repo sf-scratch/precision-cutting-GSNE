@@ -77,6 +77,10 @@
                 <DataTemplate>
                     <Controls:BottomButton
                         Margin="8"
+                        behav:BehaviorHelper.IsABehaviorActive="{Binding IsOpen}"
+                        behav:BehaviorHelper.StartCommand="{Binding StartCommand}"
+                        behav:BehaviorHelper.StopCommand="{Binding StopCommand}"
+                        behav:BehaviorHelper.TouchAndClickCommand="{Binding TouchAndClickCommand}"
                         BackFlag="{Binding BackFlag}"
                         BackgroundDefColor="{Binding BackgroundDefColor}"
                         BackgroundDownColor="{Binding BackgroundDownColor}"
@@ -87,14 +91,14 @@
                         ImagePath="{Binding ImagePath}"
                         IsOpen="{Binding IsOpen}"
                         OpenOrCloseVisibility="{Binding OpenOrCloseVisibility}"
-                        Visibility="{Binding Visibility}">
+                        Visibility="{Binding ButtonVisibility}">
                         <behaviors:Interaction.Behaviors>
                             <behav:TouchAndClickBehavior TouchAndClickCommand="{Binding RightClickCommand}" />
+                            <behav:DualInputBehavior StartCommand="{Binding StartCommand}" StopCommand="{Binding StopCommand}" />
                         </behaviors:Interaction.Behaviors>
                     </Controls:BottomButton>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
     </Grid>
-
 </Page>

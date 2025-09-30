@@ -83,7 +83,7 @@ namespace 精密切割系统.View.Controls
         {
             mainWindow = Application.Current.MainWindow as MainWindow;
             InputTextBox inputTextBox = (InputTextBox)sender;
-            if (!inputTextBox.IsEnabled)
+            if (!inputTextBox.IsEnabled && inputTextBox.Background == null)
             {
                 inputTextBox.Background = new SolidColorBrush(Color.FromRgb(240, 242, 245));
             }

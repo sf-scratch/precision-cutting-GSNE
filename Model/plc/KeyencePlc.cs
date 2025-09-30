@@ -1008,11 +1008,11 @@ namespace 精密切割系统.Driver
         public PlcTags()
         { }
 
-        public Axis Xaxis { get; set; } = new Axis(AxisName.X);
-        public Axis Yaxis { get; set; } = new Axis(AxisName.Y);
-        public Axis Z1axis { get; set; } = new Axis(AxisName.Z1);
-        public Axis Z2axis { get; set; } = new Axis(AxisName.Z2);
-        public Axis ThetaAxis { get; set; } = new Axis(AxisName.Theta);
+        public Axis Xaxis { get; set; } = new Axis(AxisNameType.X);
+        public Axis Yaxis { get; set; } = new Axis(AxisNameType.Y);
+        public Axis Z1axis { get; set; } = new Axis(AxisNameType.Z1);
+        public Axis Z2axis { get; set; } = new Axis(AxisNameType.Z2);
+        public Axis ThetaAxis { get; set; } = new Axis(AxisNameType.Theta);
 
         public BladeMantance bladeMantance { get; set; }
 
@@ -1398,7 +1398,7 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task StartAbsoluteAsync(float location, float? speed, CancellationToken token)
         {
-            if (!GlobalParams.HasTheta && axisName == AxisName.Theta)
+            if (!GlobalParams.HasTheta && axisName == AxisNameType.Theta)
             {
                 return;
             }
@@ -1421,11 +1421,11 @@ namespace 精密切割系统.Driver
             {
                 float defaultSpeed = axisName switch
                 {
-                    AxisName.X => GlobalParams.XDefaultSpeed,
-                    AxisName.Y => GlobalParams.YDefaultSpeed,
-                    AxisName.Z1 => GlobalParams.Z1DefaultSpeed,
-                    AxisName.Z2 => GlobalParams.Z2DefaultSpeed,
-                    AxisName.Theta => GlobalParams.ThetaDefaultSpeed,
+                    AxisNameType.X => GlobalParams.XDefaultSpeed,
+                    AxisNameType.Y => GlobalParams.YDefaultSpeed,
+                    AxisNameType.Z1 => GlobalParams.Z1DefaultSpeed,
+                    AxisNameType.Z2 => GlobalParams.Z2DefaultSpeed,
+                    AxisNameType.Theta => GlobalParams.ThetaDefaultSpeed,
                     _ => 1f // 默认值
                 };
                 await SetAbsoluteSpeedAsync(defaultSpeed);
@@ -1454,11 +1454,11 @@ namespace 精密切割系统.Driver
             {
                 float defaultSpeed = axisName switch
                 {
-                    AxisName.X => GlobalParams.XDefaultSpeed,
-                    AxisName.Y => GlobalParams.YDefaultSpeed,
-                    AxisName.Z1 => GlobalParams.Z1DefaultSpeed,
-                    AxisName.Z2 => GlobalParams.Z2DefaultSpeed,
-                    AxisName.Theta => GlobalParams.ThetaDefaultSpeed,
+                    AxisNameType.X => GlobalParams.XDefaultSpeed,
+                    AxisNameType.Y => GlobalParams.YDefaultSpeed,
+                    AxisNameType.Z1 => GlobalParams.Z1DefaultSpeed,
+                    AxisNameType.Z2 => GlobalParams.Z2DefaultSpeed,
+                    AxisNameType.Theta => GlobalParams.ThetaDefaultSpeed,
                     _ => 1f // 默认值
                 };
                 await SetAbsoluteSpeedAsync(defaultSpeed);
@@ -1584,7 +1584,7 @@ namespace 精密切割系统.Driver
         }
     }
 
-    public class AxisName
+    public class AxisNameType
     {
         public const string X = "X轴";
         public const string Y = "Y轴";
@@ -2387,7 +2387,7 @@ namespace 精密切割系统.Driver
 
         public async Task OpenCutSecurityDoorAsync()
         {
-            if (await GetSpindleSpeedAsync() != 0)
+            if (GlobalParams.HasTheta && await GetSpindleSpeedAsync() != 0)
             {
                 MaterialSnackUtils.MaterialSnack("打开安全门失败，主轴未停止！", MaterialSnackUtils.SnackType.WARNING, 0);
                 return;

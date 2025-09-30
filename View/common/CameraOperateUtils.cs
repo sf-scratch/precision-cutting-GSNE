@@ -11,9 +11,10 @@ namespace 精密切割系统.Driver
     {
         private const double PictureBoxWidth = 765.0;
         private const double PictureBoxHeight = 640.0;
-        private const double Scale = 2;
+        private const double Scale = 1;
         private const double RealWidth = 997.5 / Scale;
         private const double RealHeight = 834.5 / Scale;
+
         // private const double RealWidth = 848.671875;
         // private const double RealHeight = 710.0;
         private const double CameraHeight = 2048;
@@ -29,6 +30,7 @@ namespace 精密切割系统.Driver
             double realHeight = Math.Round(RealHeight * aspectRatio, 4);
             return realHeight;
         }
+
         /// <summary>
         /// 根据相机图片的高度换算真实尺寸
         /// </summary>
@@ -40,6 +42,7 @@ namespace 精密切割系统.Driver
             double realHeight = Math.Round(RealHeight * aspectRatio, 4);
             return realHeight;
         }
+
         /// <summary>
         /// 根据相机图片的宽度换算真实尺寸
         /// </summary>
@@ -86,22 +89,30 @@ namespace 精密切割系统.Driver
 
         // 刀痕内径,上内径左点，下内径左点
         public List<Point> lineInnerPoint = new List<Point>();
+
         // 刀痕外径,上外径左点，下外径左点
         public List<Point> lineExternalPoint = new List<Point>();
+
         // 最大崩角中心点
         //public System.Drawing.Point circleCenter = new System.Drawing.Point();
 
         // 识别图像后的返回对象
         public ImageResult imageResult = new ImageResult();
+
         // 最大崩角半径
         public int radius = 0;
+
         // 原始图像对象
         public Ocs.Mat mat = new Ocs.Mat();
+
         // 预处理后的图像对象
         public Ocs.Mat preBinary = new Ocs.Mat();
+
         // 原始图像绝对路径
         public string srcImagePath = "";
+
         public int width, height;
+
         public ImageProcess(string path)
         {
             srcImagePath = path;
@@ -219,9 +230,10 @@ namespace 精密切割系统.Driver
         }
 
         public List<int> myRowSumList = new List<int>();
+
         // 查找刀痕
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="startRow"></param>
         public ImageResult FindLinePoint(string? imgPath)
@@ -232,7 +244,7 @@ namespace 精密切割系统.Driver
             }
             Ocs.Mat mat = PreProcess(imgPath);
             imageResult = new ImageResult();
-            imageResult.width = width; 
+            imageResult.width = width;
             imageResult.height = height;
             Ocs.Mat.Indexer<Ocs.Vec3b> indexer = mat.GetGenericIndexer<Ocs.Vec3b>();
             // 遍历图像的每个像素
@@ -254,7 +266,6 @@ namespace 精密切割系统.Driver
                     indexer[row, col] = new Ocs.Vec3b(blue, green, red);
                 }
             }
-
 
             List<int> myRowSumList = new List<int>();
             // 遍历图片的每个像素,按行遍历，累加每行
@@ -300,7 +311,6 @@ namespace 精密切割系统.Driver
                 }
                 if ((myRowSumList[i] <= tagValueLow) && (begin1 == 1))
                 {
-
                     begin1 = 2;
                     d_2 = i;
                     break;
@@ -309,11 +319,8 @@ namespace 精密切割系统.Driver
             // 找到上刀痕外径的一行d_1
             if (begin1 == 2)
             {
-                
-
-                for (int i = d_2; i>10; i--)
+                for (int i = d_2; i > 10; i--)
                 {
-
                     byte pixelValue1 = 255;
                     byte pixelValue2 = 255;
                     byte pixelValue3 = 255;
@@ -375,7 +382,7 @@ namespace 精密切割系统.Driver
                         {
                             if (ints[x] > ints[x - 1] && !stat)
                             {
-                                increaseCount ++;
+                                increaseCount++;
                                 stat = true;
                             }
                             if (ints[x] < ints[x - 1] && stat)
@@ -536,7 +543,6 @@ namespace 精密切割系统.Driver
             return imageResult;
         }
 
-
         public void FitLine(double[] x, double[] y)
         {
             if (x.Length != y.Length)
@@ -681,7 +687,6 @@ namespace 精密切割系统.Driver
             double variance = stddev.Val0 * stddev.Val0;
             return variance;
 
-
             //// 将图像转换为灰度图，因为拉普拉斯算子通常在灰度图像上操作
             //Mat grayImage = new Mat();
             //Cv2.CvtColor(mat, grayImage, ColorConversionCodes.BGR2GRAY);
@@ -709,18 +714,25 @@ namespace 精密切割系统.Driver
         public ImageResult()
         {
         }
+
         // 图像识别返回码：0为正常识别
         public int returnCode = 0;
+
         // 刀痕识别四个定位点：最左边的上外径点，上内径点，下内径点，下外径点
         public List<Point> knifeMarkPoint = new List<Point>();
+
         // 图像的宽度和高度像素分辨率
         public int width, height;
+
         // 图像的宽度和高度范围实际长度值
         public float widthSpace, heightSpace;
+
         // 最大崩边像素值
         public int maxChipping;
+
         // 刀痕斜率四个定位点：最左边的上刀痕点，最右边的上刀痕点，最左边的下刀痕点，最右边的下刀痕点
         public List<Point> knifeSlopePoint = new List<Point>();
+
         // 上崩边斜率，下崩边斜率
         public double upperSlope, lowerSlope;
     }

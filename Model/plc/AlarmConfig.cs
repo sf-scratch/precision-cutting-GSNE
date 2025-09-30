@@ -39,11 +39,14 @@ namespace 精密切割系统.Model.plc
         private readonly object _lock = new();
         private bool[]? _newestAlarms;
 
-
         private AlarmConfig()
         {
+            if (!GlobalParams.OnlineFlag)
+            {
+                return; // 如果不在线，则不初始化报警配置
+            }
             string alarmConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets\\config\\AlarmConfig.json");
-            string allText = File.ReadAllText(alarmConfigPath); 
+            string allText = File.ReadAllText(alarmConfigPath);
             var options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,  // 可选：忽略大小写

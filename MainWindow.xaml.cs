@@ -212,6 +212,11 @@ namespace 精密切割系统
             {
                 KeyboardSimulator.SimulateKeyPress("capslock");
             }
+            if (!GlobalParams.OnlineFlag)
+            {
+                GlobalParams.globalRunFlag = false;
+                return;
+            }
             GlobalParams.globalRunFlag = true;
             var taskStartTime = DateTime.Now;
             // 设备初始化重试3分钟
@@ -220,11 +225,6 @@ namespace 精密切割系统
             mainPlc = PlcControl.GetInstance();
             // 加载配置参数
             CurrentUtils.UpdateParams();
-            if (!GlobalParams.OnlineFlag)
-            {
-                GlobalParams.globalRunFlag = false;
-                return;
-            }
 
             while ((DateTime.Now - taskStartTime) < maxExecutionTime)
             {

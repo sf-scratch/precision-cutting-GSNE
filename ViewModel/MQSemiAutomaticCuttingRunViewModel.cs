@@ -89,8 +89,6 @@ namespace 精密切割系统.ViewModel
             _regionManager = regionManager;
             _eventAggregator = eventAggregator;
             _semiAutoCutService = SemiAutoCutService.Instance;
-            _pauseCts = new CancellationTokenSource();
-            _monitoringCts = new CancellationTokenSource();
             RunAutoCutCommand = new DelegateCommand(RunAutoCut);
         }
 
@@ -246,8 +244,8 @@ namespace 精密切割系统.ViewModel
             }
             else if (fileTableItem.WorkShape == 2)
             {
-                float width = fileTableItem.WorkbenchCh1;
-                float height = fileTableItem.WorkbenchCh2;
+                float width = fileTableItem.SquareCh1.ToFloat();
+                float height = fileTableItem.SquareCh2.ToFloat();
                 workpiece = new RectangleWorkpiece(thetaCenterPoint, width, height, cutY);
             }
             else
@@ -539,6 +537,8 @@ namespace 精密切割系统.ViewModel
         public override void OnNavigatedTo(NavigationContext navigationContext)
         {
             base.OnNavigatedTo(navigationContext);
+            _pauseCts = new CancellationTokenSource();
+            _monitoringCts = new CancellationTokenSource();
             _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Subscribe(ReceivedMessage, ThreadOption.UIThread);
             // 加载参数
             FileTableItemModel fileTableItem = CurrentUtils.GetFileTableItemModel();

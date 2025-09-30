@@ -187,7 +187,6 @@ namespace 精密切割系统.Helpers
 
         public static async Task<CommonResult<float>> ProcessCombineMeasureHeightAsync(IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
-            return CommonResult<float>.Success(15);
             await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
             CommonResult<float> curHeightZ;
             if (Appsettings.MeasureHeightLast == null)

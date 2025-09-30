@@ -16,6 +16,7 @@ namespace 精密切割系统.ViewModel
     public class EmptyRunViewModel : CustomBindableBase
     {
         private bool _runX;
+
         public bool RunX
         {
             get { return _runX; }
@@ -23,6 +24,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private bool _runY;
+
         public bool RunY
         {
             get { return _runY; }
@@ -30,6 +32,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private bool _runZ1;
+
         public bool RunZ1
         {
             get { return _runZ1; }
@@ -37,6 +40,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private bool _runZ2;
+
         public bool RunZ2
         {
             get { return _runZ2; }
@@ -44,6 +48,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private bool _runTheta;
+
         public bool RunTheta
         {
             get { return _runTheta; }
@@ -51,6 +56,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private bool _isEnabledGrid;
+
         public bool IsEnabledGrid
         {
             get { return _isEnabledGrid; }
@@ -58,6 +64,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private bool _isOpenWater;
+
         public bool IsOpenWater
         {
             get { return _isOpenWater; }
@@ -65,6 +72,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private bool _isFlowing;
+
         public bool IsFlowing
         {
             get { return _isFlowing; }
@@ -137,29 +145,29 @@ namespace 精密切割系统.ViewModel
                             List<Task> tasks = [];
                             if (RunX)
                             {
-                                tasks.Add(PlcControl.tagControl.Xaxis.StartAbsoluteAsync(200, default, _emptyRunCts.Token));
+                                tasks.Add(PlcControl.tagControl.Xaxis.StartAbsoluteAsync(PlcControl.tagControl.Xaxis.softUpperLimit.value.ToFloat(), default, _emptyRunCts.Token));
                                 tasks.Add(PlcControl.tagControl.Xaxis.StartAbsoluteAsync(0, default, _emptyRunCts.Token));
                             }
                             if (RunY)
                             {
-                                tasks.Add(PlcControl.tagControl.Yaxis.StartAbsoluteAsync(130, default, _emptyRunCts.Token));
+                                tasks.Add(PlcControl.tagControl.Yaxis.StartAbsoluteAsync(PlcControl.tagControl.Yaxis.softUpperLimit.value.ToFloat(), default, _emptyRunCts.Token));
                                 tasks.Add(PlcControl.tagControl.Yaxis.StartAbsoluteAsync(0, default, _emptyRunCts.Token));
                             }
                             if (RunTheta)
                             {
-                                tasks.Add(PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(180, default, _emptyRunCts.Token));
+                                tasks.Add(PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(PlcControl.tagControl.ThetaAxis.softUpperLimit.value.ToFloat(), default, _emptyRunCts.Token));
                                 tasks.Add(PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0, default, _emptyRunCts.Token));
                             }
                             await Task.WhenAll(tasks);
                             tasks.Clear();
                             if (RunZ1)
                             {
-                                tasks.Add(PlcControl.tagControl.Z1axis.StartAbsoluteAsync(15, default, _emptyRunCts.Token));
+                                tasks.Add(PlcControl.tagControl.Z1axis.StartAbsoluteAsync(PlcControl.tagControl.Z1axis.softUpperLimit.value.ToFloat(), default, _emptyRunCts.Token));
                                 tasks.Add(PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, _emptyRunCts.Token));
                             }
                             if (RunZ2)
                             {
-                                tasks.Add(PlcControl.tagControl.Z2axis.StartAbsoluteAsync(15, default, _emptyRunCts.Token));
+                                tasks.Add(PlcControl.tagControl.Z2axis.StartAbsoluteAsync(PlcControl.tagControl.Z2axis.softUpperLimit.value.ToFloat(), default, _emptyRunCts.Token));
                                 tasks.Add(PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, default, _emptyRunCts.Token));
                             }
                             await Task.WhenAll(tasks);

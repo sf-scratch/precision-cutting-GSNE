@@ -137,7 +137,7 @@ namespace 精密切割系统.Assets.config.menu
             //list.Add(new MenuBean(706, "自动精度补偿", "/Assets/icon/menu_7/menu_7_5.png", "/Assets/icon/menu_7/menu_7_5_white.png", 3, "Pages/F7_ElectricSpark/AutoAlignPosition"));
             list.Add(new MenuBean(702, "I/O设备检查", "/Assets/icon/menu_7/menu_7_2.png", "/Assets/icon/menu_7/menu_7_2_white.png", 2, "Pages/F7_ElectricSpark/ESIOCheckConf"));
             list.Add(new MenuBean(703, "功能参数设定", "/Assets/icon/menu_7/menu_7_3.png", "/Assets/icon/menu_7/menu_7_3_white.png", 2, "Pages/F7_ElectricSpark/ESUserDefineDataConf"));
-            list.Add(new MenuBean(704, "轴运动控制", "AxisArrow", "/Assets/icon/menu_7/menu_7_3_white.png", 2, "Pages/F7_ElectricSpark/F7_2_Axis_Operation"));
+            list.Add(new MenuBean(704, "轴运动控制", "AxisArrow", "/Assets/icon/menu_7/menu_7_3_white.png", 4, "F7_2_Axis_Operation"));
             list.Add(new MenuBean(708, "运行日志", "/Assets/icon/menu_7/menu_7_4.png", "/Assets/icon/menu_7/menu_7_4_white.png", 2, "Pages/F7_ElectricSpark/RunLogsPage"));
             // list.Add(new MenuBean(707, "轨道加油记录", "/Assets/icon/menu_7/bunkering-icon.png", "/Assets/icon/menu_7/menu_7_5_white.png", 2, "Pages/F7_ElectricSpark/BunkeringRecord"));
             // list.Add(new MenuBean(704, "制造商配置", "/Assets/icon/menu_7/menu_7_4.png", "/Assets/icon/menu_7/menu_7_4_white.png"));

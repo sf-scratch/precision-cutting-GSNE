@@ -153,7 +153,7 @@ namespace 精密切割系统.Model.cut
                         float cutLength = MathF.Abs(line.EndPoint.X - line.StartPoint.X);
                         float cutSpeed = cutStep.Speed + _feedSpeedCompCompensationValue;
                         //加上边距
-                        float startX = line.StartPoint.X + cutStep.OffsetX - margin;
+                        float startX = line.StartPoint.X - cutStep.OffsetX - margin;
                         float endX = line.EndPoint.X + cutStep.OffsetX + margin;
                         //x方向交替切割
                         if (cutStep.IsAlternatingCuttingStroke)

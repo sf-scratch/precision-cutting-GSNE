@@ -172,7 +172,7 @@
                 </auto:AutoGrid>
                 <Grid>
                     <Label
-                        Margin="30,30,0,0"
+                        Margin="30,5,0,0"
                         Content="切割数据"
                         FontSize="22"
                         FontWeight="Bold" />
