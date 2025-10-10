@@ -138,39 +138,58 @@ namespace 精密切割系统.ViewModel
                             await PlcControl.tagControl.wholeDevice.OpenWorkpieceBlowingAsync();
                         }
                         using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(500));
+                        List<Task> tasks = [];
                         while (await timer.WaitForNextTickAsync())
                         {
                             await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, _emptyRunCts.Token);
                             await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, default, _emptyRunCts.Token);
-                            List<Task> tasks = [];
                             if (RunX)
                             {
-                                tasks.Add(PlcControl.tagControl.Xaxis.StartAbsoluteAsync(PlcControl.tagControl.Xaxis.softUpperLimit.value.ToFloat(), default, _emptyRunCts.Token));
+                                tasks.Add(PlcControl.tagControl.Xaxis.StartAbsoluteAsync(PlcControl.tagControl.Xaxis.softUpperLimit.defaultValue.ToFloat(), default, _emptyRunCts.Token));
+                            }
+                            if (RunY)
+                            {
+                                tasks.Add(PlcControl.tagControl.Yaxis.StartAbsoluteAsync(PlcControl.tagControl.Yaxis.softUpperLimit.defaultValue.ToFloat(), default, _emptyRunCts.Token));
+                            }
+                            if (RunTheta)
+                            {
+                                tasks.Add(PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(PlcControl.tagControl.ThetaAxis.softUpperLimit.defaultValue.ToFloat(), default, _emptyRunCts.Token));
+                            }
+                            await Task.WhenAll(tasks);
+                            if (RunX)
+                            {
                                 tasks.Add(PlcControl.tagControl.Xaxis.StartAbsoluteAsync(0, default, _emptyRunCts.Token));
                             }
                             if (RunY)
                             {
-                                tasks.Add(PlcControl.tagControl.Yaxis.StartAbsoluteAsync(PlcControl.tagControl.Yaxis.softUpperLimit.value.ToFloat(), default, _emptyRunCts.Token));
                                 tasks.Add(PlcControl.tagControl.Yaxis.StartAbsoluteAsync(0, default, _emptyRunCts.Token));
                             }
                             if (RunTheta)
                             {
-                                tasks.Add(PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(PlcControl.tagControl.ThetaAxis.softUpperLimit.value.ToFloat(), default, _emptyRunCts.Token));
                                 tasks.Add(PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0, default, _emptyRunCts.Token));
                             }
                             await Task.WhenAll(tasks);
-                            tasks.Clear();
                             if (RunZ1)
                             {
-                                tasks.Add(PlcControl.tagControl.Z1axis.StartAbsoluteAsync(PlcControl.tagControl.Z1axis.softUpperLimit.value.ToFloat(), default, _emptyRunCts.Token));
+                                //tasks.Add(PlcControl.tagControl.Z1axis.StartAbsoluteAsync(PlcControl.tagControl.Z1axis.softUpperLimit.value.ToFloat(), default, _emptyRunCts.Token));
+                                tasks.Add(PlcControl.tagControl.Z1axis.StartAbsoluteAsync(8, default, _emptyRunCts.Token));
+                            }
+                            if (RunZ2)
+                            {
+                                //tasks.Add(PlcControl.tagControl.Z2axis.StartAbsoluteAsync(PlcControl.tagControl.Z2axis.softUpperLimit.value.ToFloat(), default, _emptyRunCts.Token));
+                                tasks.Add(PlcControl.tagControl.Z2axis.StartAbsoluteAsync(8, default, _emptyRunCts.Token));
+                            }
+                            await Task.WhenAll(tasks);
+                            if (RunZ1)
+                            {
                                 tasks.Add(PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, _emptyRunCts.Token));
                             }
                             if (RunZ2)
                             {
-                                tasks.Add(PlcControl.tagControl.Z2axis.StartAbsoluteAsync(PlcControl.tagControl.Z2axis.softUpperLimit.value.ToFloat(), default, _emptyRunCts.Token));
                                 tasks.Add(PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, default, _emptyRunCts.Token));
                             }
                             await Task.WhenAll(tasks);
+                            tasks.Clear();
                         }
                     }
                     catch (OperationCanceledException)
@@ -181,13 +200,16 @@ namespace 精密切割系统.ViewModel
                     {
                         MaterialSnackUtils.MaterialSnack($"空运行发生错误: {ex.Message}", MaterialSnackUtils.SnackType.ERROR);
                     }
+                    finally
+                    {
+                        await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
+                        await PlcControl.tagControl.wholeDevice.CloseWorkpieceBlowingAsync();
+                    }
                 }, _emptyRunCts.Token);
             }
             finally
             {
                 _emptyRunSemaphore.Release();
-                await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
-                await PlcControl.tagControl.wholeDevice.CloseWorkpieceBlowingAsync();
             }
         }
 

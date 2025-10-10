@@ -62,7 +62,8 @@ namespace 精密切割系统.ViewModel
         public UserDefineDataViewModel()
         {
             _model = CurrentUtils.GetCurrentUserDefineDataModel();
-            Languages = new ObservableCollection<string> { "Chinese", "English", "Japanese" };
+            //Languages = new ObservableCollection<string> { "Chinese", "English", "Japanese" };
+            Languages = new ObservableCollection<string> { "Chinese" };
             DeviceChangeCutSpeeds = new ObservableCollection<string> { "clear", "keep" };
             SpeedChanges = new ObservableCollection<string> { "YES", "NO", "PAUSE", "SPEED" };
             HeightChanges = new ObservableCollection<string> { "YES", "NO", "PAUSE" };
@@ -578,6 +579,14 @@ namespace 精密切割系统.ViewModel
         {
             get { return _axisToWorkingDiscDistance; }
             set { SetProperty(ref _axisToWorkingDiscDistance, value); }
+        }
+
+        private string _additionalMargin;
+
+        public string AdditionalMargin
+        {
+            get { return _additionalMargin; }
+            set { SetProperty(ref _additionalMargin, value); }
         }
     }
 }

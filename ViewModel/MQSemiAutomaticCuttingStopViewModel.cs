@@ -196,12 +196,21 @@ namespace 精密切割系统.ViewModel
             {
                 _originPoint = new DataPoint<float>(xLocation.Value, yLocation.Value);
             }
+
+            if (!GlobalParams.HasTheta)
+            {
+                await PlcControl.tagControl.wholeDevice.CloseCutSecurityDoorAsync();
+            }
         }
 
-        public override void OnNavigatedFrom(NavigationContext navigationContext)
+        public override async void OnNavigatedFrom(NavigationContext navigationContext)
         {
             base.OnNavigatedFrom(navigationContext);
             _operatCts.Cancel();
+            if (!GlobalParams.HasTheta)
+            {
+                await PlcControl.tagControl.wholeDevice.OpenCutSecurityDoorAsync();
+            }
         }
     }
 }

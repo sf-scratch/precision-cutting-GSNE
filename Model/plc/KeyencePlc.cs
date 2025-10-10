@@ -2,6 +2,7 @@ using Emgu.CV.Dnn;
 using HslCommunication;
 using HslCommunication.Profinet.Keyence;
 using Newtonsoft.Json.Linq;
+using NPOI.OpenXmlFormats.Dml.Diagram;
 using NPOI.SS.Formula.Functions;
 using Prism.Events;
 using System.ComponentModel;
@@ -3088,17 +3089,23 @@ namespace 精密切割系统.Driver
         /// <param name="xEndLocation">X轴结束位置</param>
         /// <param name="yCutLocation">Y轴切割位置</param>
         /// <param name="spindleRev">主轴转速</param>
-        public async Task SetCutParamsAsync(float feedSpeedValue, float zEndLocation, float zStartLocation, float xStartLoaction
-            , float xEndLocation, float yCutLocation, string checkStatus, float thetaDeg, int spindleRevValue)
+        public async Task SetCutParamsAsync(float feedSpeedValue, float zEndLocation, float zStartLocation, float xStartLoaction, float xEndLocation,
+            float yCutLocation, string checkStatus, float thetaDeg, int spindleRevValue, bool isCompensate = false)
         {
             float xSoftUpperLimit = float.Parse(PlcControl.tagControl.Xaxis.softUpperLimit.defaultValue);
-            if (xEndLocation > xSoftUpperLimit) xEndLocation = xSoftUpperLimit;
-
+            if (xEndLocation > xSoftUpperLimit)
+            {
+                xEndLocation = xSoftUpperLimit;
+            }
             float ySoftUpperLimit = float.Parse(PlcControl.tagControl.Yaxis.softUpperLimit.defaultValue);
-            if (yCutLocation > ySoftUpperLimit) yCutLocation = ySoftUpperLimit;
-            //float temp = xStartLoaction;
-            //xStartLoaction = -xEndLocation;
-            //xEndLocation = -temp;
+            if (yCutLocation > ySoftUpperLimit)
+            {
+                yCutLocation = ySoftUpperLimit;
+            }
+            if (isCompensate)
+            {
+                yCutLocation = await PlcControl.GetCompensateAsync(PlcControl.tagControl.Yaxis, yCutLocation);
+            }
             Tools.LogDebug(
                 $"\r\n切割速度: {feedSpeedValue}\r\n" +
                 $"Z轴开始位置: {zStartLocation}\r\n" +

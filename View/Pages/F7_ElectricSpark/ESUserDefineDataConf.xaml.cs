@@ -86,6 +86,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 viewModel.AtomizingNozzlePositionX = list[0].AtomizingNozzlePositionX;
                 viewModel.AtomizingNozzlePositionY = list[0].AtomizingNozzlePositionY;
                 viewModel.AxisToWorkingDiscDistance = Appsettings.AxisToWorkingDiscDistance?.ToString("F3") ?? string.Empty;
+                viewModel.AdditionalMargin = Appsettings.AdditionalMargin?.ToString("F3") ?? string.Empty;
                 DataContext = viewModel;
             }
             else
@@ -217,6 +218,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 WarmUpStartY = viewModel.WarmUpStartY,
             };
             Appsettings.AxisToWorkingDiscDistance = viewModel.AxisToWorkingDiscDistance.ToFloat();
+            Appsettings.AdditionalMargin = viewModel.AdditionalMargin.ToFloat();
             if (list.Count > 0)
             {
                 UserDefineDataModel originUserDefineData = list[0];

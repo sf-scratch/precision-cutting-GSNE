@@ -132,7 +132,7 @@ namespace 精密切割系统.Assets.config.menu
         {
             var list = new List<MenuBean>();
             //list.Add(new MenuBean(709, "法兰修整", "ScissorsCutting", "/Assets/icon/menu_7/menu_7_3_white.png", 3, "Pages/F7_ElectricSpark/FlangeTrimmingConf"));
-            //list.Add(new MenuBean(701, "轴运动补偿设定", "/Assets/icon/menu_7/menu_7_1.png", "/Assets/icon/menu_7/menu_7_1_white.png", 2, "Pages/F7_ElectricSpark/ESAxisDataConf"));
+            list.Add(new MenuBean(701, "轴运动补偿设定", "/Assets/icon/menu_7/menu_7_1.png", "/Assets/icon/menu_7/menu_7_1_white.png", 2, "Pages/F7_ElectricSpark/ESAxisDataConf"));
             // list.Add(new MenuBean(705, "精度测量", "/Assets/icon/menu_7/menu_7_5.png", "/Assets/icon/menu_7/menu_7_5_white.png", 2, "Pages/F7_ElectricSpark/FrmMain"));
             //list.Add(new MenuBean(706, "自动精度补偿", "/Assets/icon/menu_7/menu_7_5.png", "/Assets/icon/menu_7/menu_7_5_white.png", 3, "Pages/F7_ElectricSpark/AutoAlignPosition"));
             list.Add(new MenuBean(702, "I/O设备检查", "/Assets/icon/menu_7/menu_7_2.png", "/Assets/icon/menu_7/menu_7_2_white.png", 2, "Pages/F7_ElectricSpark/ESIOCheckConf"));

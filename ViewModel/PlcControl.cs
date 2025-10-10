@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
 using 精密切割系统.Helpers;
@@ -14,7 +15,7 @@ using 精密切割系统.Utils;
 
 namespace 精密切割系统.ViewModel
 {
-    class PlcControl
+    internal class PlcControl
     {
         private PlcControl()
         {
@@ -33,6 +34,7 @@ namespace 精密切割系统.ViewModel
 
         private static readonly object _Object = new object();
         private static PlcControl? plcControl = null;
+
         public static PlcControl GetInstance()
         {
             lock (_Object)
@@ -44,11 +46,14 @@ namespace 精密切割系统.ViewModel
             }
             return plcControl;
         }
-        float epsilon = 0.00001f; // 一个小的容差值
+
+        private float epsilon = 0.00001f; // 一个小的容差值
         public static string DefaultPlcIP = "192.168.10.10";
         public static KeyencePlc plc = KeyencePlc.GetInstance(DefaultPlcIP);
+
         // plc变量默认值是否初始化完成（tag中的default value属性会在连上plc的时候写入plc一次）
         public bool plcInit = false;
+
         // 循环更新所有使用到的plc变量的值，更新到tag的value属性中，如果要写入tag值，使用tag的writeValue属性
         private Thread readTags;
 
@@ -137,8 +142,9 @@ namespace 精密切割系统.ViewModel
             }
         }
 
-        static AlarmItem currentAxisAlarmItem = null;
-        static AlarmItem currentDeviceAlarmItem = null;
+        private static AlarmItem currentAxisAlarmItem = null;
+        private static AlarmItem currentDeviceAlarmItem = null;
+
         /// <summary>
         /// 记录报警日志
         /// </summary>
@@ -150,7 +156,7 @@ namespace 精密切割系统.ViewModel
             {
                 // 轴报警错误
                 string dm1000 = PlcControl.plc.GetPlcValueStringByAddr("DM1000", PlcDataType.Int16);
-                if (!"0".Equals(dm1000) && (currentAxisAlarmItem == null || !dm1000.Equals(currentAxisAlarmItem.code)) )
+                if (!"0".Equals(dm1000) && (currentAxisAlarmItem == null || !dm1000.Equals(currentAxisAlarmItem.code)))
                 {
                     currentAxisAlarmItem = new AlarmItem();
                     currentAxisAlarmItem.code = dm1000;
@@ -167,7 +173,8 @@ namespace 精密切割系统.ViewModel
                         new RunLogsViewModel("异常编码", "A-" + currentAxisAlarmItem.code),
                         new RunLogsViewModel("异常描述", currentAxisAlarmItem.title),
                     });
-                } else if ("0".Equals(dm1000))
+                }
+                else if ("0".Equals(dm1000))
                 {
                     currentAxisAlarmItem = null;
                 }
@@ -190,7 +197,8 @@ namespace 精密切割系统.ViewModel
                         new RunLogsViewModel("异常编码", "D-" + currentDeviceAlarmItem.code),
                         new RunLogsViewModel("异常描述", currentDeviceAlarmItem.title),
                     });
-                } else if ("0".Equals(dm1010))
+                }
+                else if ("0".Equals(dm1010))
                 {
                     currentDeviceAlarmItem = null;
                 }
@@ -214,7 +222,6 @@ namespace 精密切割系统.ViewModel
             // 获取补偿数据模型
             List<PositionCompensationModel> models = CurrentUtils.GetPositionCompensationModels();
             if (models == null || models.Count == 0) return null;
-
 
             if (!float.TryParse(currentLocationStr, out float currLocation))
             {
@@ -259,6 +266,7 @@ namespace 精密切割系统.ViewModel
                    , "logs/compInfo.txt");
             return yCurrentPosition.ToString("F6"); // 返回调整后的目标位置，保留6位小数
         }
+
         /// <summary>
         /// 步进补偿
         /// </summary>
@@ -268,14 +276,13 @@ namespace 精密切割系统.ViewModel
         /// <returns></returns>
         public static string GetCompensateStep(string stepValue, string axisParams, float targetLocationValue, int directionType = -1)
         {
-            // 获取当前位置 Tools.GetFloatStringValue(GetCurrentLocation(axisParams)) 
+            // 获取当前位置 Tools.GetFloatStringValue(GetCurrentLocation(axisParams))
             string currentLocationStr = GetCurrentLocation(axisParams);
             float targetLocation = (float)((GlobalParams.upPosition == -100 ? targetLocationValue
                 : GlobalParams.upPosition) + Tools.GetFloatStringValue(stepValue));
             // 获取补偿数据模型
             List<PositionCompensationModel> models = CurrentUtils.GetPositionCompensationModels();
             if (models == null || models.Count == 0) return targetLocation.ToString();
-
 
             if (!float.TryParse(currentLocationStr, out float currLocation))
             {
@@ -309,7 +316,8 @@ namespace 精密切割系统.ViewModel
                     realPosition += targetLocationComp;
                     compStr = $"反方向补偿-={targetLocationComp}";
                 }
-            } else
+            }
+            else
             {
                 // 获取当前点位(上一点位)的补偿数据
                 float currentLocationComp = CalculateCompensation(axisModel, GlobalParams.upPosition, directionType);
@@ -344,6 +352,7 @@ namespace 精密切割系统.ViewModel
                    , "logs/compInfo.txt");
             return realPosition.ToString("F4"); // 返回调整后的目标位置，保留6位小数
         }
+
         public static string GetCompensate(string location, string axisParams, int directionType = -1)
         {
             // 获取补偿数据模型
@@ -379,6 +388,38 @@ namespace 精密切割系统.ViewModel
                 targetLocation += adjustedLocation;
             }
             return targetLocation.ToString("F6"); // 返回调整后的目标位置，保留6位小数
+        }
+
+        public static async Task<float> GetCompensateAsync(Axis axis, float location)
+        {
+            // 获取补偿数据模型
+            List<PositionCompensationModel> models = CurrentUtils.GetPositionCompensationModels();
+            if (models == null || models.Count == 0)
+            {
+                return location;
+            }
+            float currLocation = await axis.GetCurrentLocationAsync() ?? 0;
+            // 确定补偿方向
+            PositionCompensationModel? axisModel;
+            int directionType = location > currLocation ? 0 : 1;
+            axisModel = models.Find(item => item.AxisType.Equals(axis.axisName + (directionType == 1 ? "-反向" : "")));
+            // 无法找到对应轴的补偿信息
+            if (axisModel == null)
+            {
+                return location;
+            }
+            float targetLocation = MathF.Round(location, GlobalParams.decimalPlaces);
+            // 调用补偿计算函数
+            float adjustedLocation = CalculateCompensation(axisModel, targetLocation, directionType);
+            if (directionType == 0)
+            {
+                targetLocation -= adjustedLocation;
+            }
+            else if (directionType == 1)
+            {
+                targetLocation += adjustedLocation;
+            }
+            return targetLocation; // 返回调整后的目标位置，保留6位小数
         }
 
         /// <summary>
@@ -469,7 +510,7 @@ namespace 精密切割系统.ViewModel
                         {
                             break;
                         }
-                        // 计算出2个位置之间的差 
+                        // 计算出2个位置之间的差
                         float positionComp = x2 - x1;
                         // 计算实际补偿量：插值计算出目标位置的补偿后位置
                         float interpolatedCompensate = y1 + (y2 - y1) * (targetLocation - x1) / (x2 - x1);
@@ -487,6 +528,7 @@ namespace 精密切割系统.ViewModel
 
             return (float)Math.Round(compensation, GlobalParams.decimalPlaces);
         }
+
         /// <summary>
         /// 根据补偿模型计算目标位置
         /// </summary>
@@ -515,7 +557,6 @@ namespace 精密切割系统.ViewModel
                 double[] y = compensateNumbers.Select(c => (double)c).ToArray();*/
                 /*
 
-
                  // 设置高斯过程的参数（例如，核函数的尺度和噪声）
                  double sigmaF = 1.0;  // 核函数的尺度
                  double sigmaN = 1e-2; // 噪声方差
@@ -539,7 +580,6 @@ namespace 精密切割系统.ViewModel
                  double[] testPosition = new double[] { targetLocation };
                  double predictedCompensation_new = optimizer_new.Predict(testPosition);
                  Debug.WriteLine($"贝叶斯 - 预测位置 {targetLocation}mm 的补偿值为: {predictedCompensation_new}");*/
-
 
                 // 确保数据长度一致
                 if (positionNumbers.Length != compensateNumbers.Length) return location;
@@ -587,7 +627,7 @@ namespace 精密切割系统.ViewModel
                         {
                             break;
                         }
-                        // 计算出2个位置之间的差 
+                        // 计算出2个位置之间的差
                         float positionComp = x2 - x1;
                         // 计算实际补偿量：插值计算出目标位置的补偿后位置
                         float interpolatedCompensate = y1 + (y2 - y1) * (targetLocation - x1) / (x2 - x1);
@@ -640,7 +680,6 @@ namespace 精密切割系统.ViewModel
             return (float)(targetPosition - errorAtTarget);
         }
 
-
         /// <summary>
         /// 根据拟合结果计算补偿后的光栅尺位置
         /// </summary>
@@ -673,8 +712,6 @@ namespace 精密切割系统.ViewModel
 
             return (a, b);
         }
-
-
 
         public bool ConnectPlc()
         {

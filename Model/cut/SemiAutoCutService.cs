@@ -180,7 +180,7 @@ namespace 精密切割系统.Model.cut
                             stopwatch.Restart();
                             await PlcControl.tagControl.ThetaAxis.SetAbsoluteSpeedAsync(GlobalParams.ThetaDefaultSpeed);
                             //设置切割参数
-                            await PlcControl.tagControl.cutting.SetCutParamsAsync(cutSpeed, endZ, startZ, startX, endX, line.StartPoint.Y, "0", _cutThetaAlignDeg + cutStep.ThetaDeg, spindleRev);
+                            await PlcControl.tagControl.cutting.SetCutParamsAsync(cutSpeed, endZ, startZ, startX, endX, line.StartPoint.Y, "0", _cutThetaAlignDeg + cutStep.ThetaDeg, spindleRev, true);
                             //当前切割次数
                             int? curCutNum = await PlcControl.tagControl.cutting.GetCutNumAsync();
                             if (curCutNum == null)

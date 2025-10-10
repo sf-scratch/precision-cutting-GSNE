@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Prism.Events;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Interop;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
 using 精密切割系统.Helpers;
@@ -184,6 +186,10 @@ namespace 精密切割系统.ViewModel
                 ShowWarnMessageNavigateHome("未设置刀片外径！");
                 return;
             }
+            if (!GlobalParams.HasTheta)
+            {
+                await PlcControl.tagControl.wholeDevice.OpenCutSecurityDoorAsync();
+            }
             FileTableItemModel fileTableItem = fileTableItemResult.Data;
             _ = MonitoringAlarmAsync(_monitoringCts.Token);
             _ = MonitoringCutProgressAsync(_monitoringCts.Token);
@@ -201,7 +207,8 @@ namespace 精密切割系统.ViewModel
                 _semiAutoCutService.CutServiceProcessChanged += CutService_CutServiceProcessChanged;
                 _semiAutoCutService.CutServicePaused += CutService_CutServicePaused;
                 MaterialSnack($"切割中...", SnackType.WARNING, 0, _eventAggregator);
-                RunResult cutResult = await _semiAutoCutService.RunAsync(cutStepResult.Data, workpiece, 30, fileTableItem.SpindleRev, curHeightZ.Data, GlobalParams.BladeLiftingHeight, _pauseCts.Token);
+                float margin = Appsettings.AdditionalMargin ?? 20;
+                RunResult cutResult = await _semiAutoCutService.RunAsync(cutStepResult.Data, workpiece, margin, fileTableItem.SpindleRev, curHeightZ.Data, GlobalParams.BladeLiftingHeight, _pauseCts.Token);
                 if (!cutResult.IsSuccess)
                 {
                     MaterialSnack($"{cutResult.Message}", SnackType.WARNING, 0, _eventAggregator);
@@ -267,11 +274,11 @@ namespace 精密切割系统.ViewModel
                 _regionManager.RequestNavigate(RegionName.MainRegion, nameof(MQSemiAutomaticCuttingStop), parameters);
                 return;
             }
-            if (_pauseCts.IsCancellationRequested)
-            {
-                MaterialSnack("操作频繁！", SnackType.WARNING, 0, _eventAggregator);
-                return;
-            }
+            //if (_pauseCts.IsCancellationRequested)
+            //{
+            //    _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("操作频繁！"));
+            //    return;
+            //}
             // 暂停token
             _pauseCts.Cancel();
         }

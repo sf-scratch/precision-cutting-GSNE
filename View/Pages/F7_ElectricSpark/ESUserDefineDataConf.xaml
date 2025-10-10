@@ -166,6 +166,15 @@
                 XMax="300"
                 XMin="-200" />
             <Label HorizontalAlignment="Left" Content="mm" />
+            <Label Content="外加裕量" />
+            <Controls:InputTextBox
+                x:Name="additionalMargin"
+                InputType="Decimal"
+                Text="{Binding Path=AdditionalMargin, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                TextWrapping="Wrap"
+                XMax="300"
+                XMin="-200" />
+            <Label HorizontalAlignment="Left" Content="mm" />
         </auto:AutoGrid>
 
         <!--<Label Content="暖机时X轴结束位置" HorizontalAlignment="Left" Grid.Row="7" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="450,0,0,0" />
