@@ -116,7 +116,7 @@
       "describe": "X轴是否完成绝对运动"
     },
     "softUpperLimit": {
-      "defaultValue": "222",
+      "defaultValue": "300",
       "valueType": "float",
       "addr": "DM20",
       "name": "X轴软正限位",
@@ -258,7 +258,7 @@
       "describe": "Y轴是否完成绝对运动"
     },
     "softUpperLimit": {
-      "defaultValue": "160",
+      "defaultValue": "125",
       "valueType": "float",
       "addr": "DM120",
       "name": "Y轴软正限位",
@@ -851,7 +851,6 @@
       "name": "刀片测高计数",
       "describe": "刀片测高计数"
     }
-
   },
   "wholeDevice": {
     "canSystemInit": {

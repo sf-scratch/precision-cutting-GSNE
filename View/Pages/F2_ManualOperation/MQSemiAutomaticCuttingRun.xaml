@@ -250,7 +250,7 @@
                 <Controls:RealTimeInfoBox
                     Grid.Row="2"
                     Height="150"
-                    Margin="30"
+                    Margin="30,5,30,30"
                     Messages="{Binding MessageList}" />
             </StackPanel>
         </Grid>

@@ -274,11 +274,11 @@ namespace 精密切割系统.ViewModel
                 _regionManager.RequestNavigate(RegionName.MainRegion, nameof(MQSemiAutomaticCuttingStop), parameters);
                 return;
             }
-            //if (_pauseCts.IsCancellationRequested)
-            //{
-            //    _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("操作频繁！"));
-            //    return;
-            //}
+            if (_pauseCts.IsCancellationRequested)
+            {
+                _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("正在执行暂停，无需重复操作！"));
+                return;
+            }
             // 暂停token
             _pauseCts.Cancel();
         }
@@ -544,9 +544,12 @@ namespace 精密切割系统.ViewModel
         public override void OnNavigatedTo(NavigationContext navigationContext)
         {
             base.OnNavigatedTo(navigationContext);
-            _pauseCts = new CancellationTokenSource();
-            _monitoringCts = new CancellationTokenSource();
             _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Subscribe(ReceivedMessage, ThreadOption.UIThread);
+            if (!navigationContext.Parameters.TryGetValue("isContinue", out bool isContinue))
+            {
+                _pauseCts = new CancellationTokenSource();
+                _monitoringCts = new CancellationTokenSource();
+            }
             // 加载参数
             FileTableItemModel fileTableItem = CurrentUtils.GetFileTableItemModel();
             CutParam.DeviceDataNo = fileTableItem.DeviceDataNo;
@@ -560,6 +563,7 @@ namespace 精密切割系统.ViewModel
         public override void OnNavigatedFrom(NavigationContext navigationContext)
         {
             base.OnNavigatedFrom(navigationContext);
+            _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Unsubscribe(ReceivedMessage);
         }
 
         public override bool IsNavigationTarget(NavigationContext navigationContext)

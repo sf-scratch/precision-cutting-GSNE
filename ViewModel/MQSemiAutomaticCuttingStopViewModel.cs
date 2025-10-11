@@ -178,7 +178,8 @@ namespace 精密切割系统.ViewModel
             }
             await _operatCts.CancelAsync();
             await _semiAutomaticCuttingRunViewModel.ContinueAsync();
-            _regionManager.RequestNavigate(RegionName.MainRegion, nameof(MQSemiAutomaticCuttingRun));
+            NavigationParameters parameters = new NavigationParameters { { "isContinue", true } };
+            _regionManager.RequestNavigate(RegionName.MainRegion, nameof(MQSemiAutomaticCuttingRun), parameters);
         }
 
         public override async void OnNavigatedTo(NavigationContext navigationContext)

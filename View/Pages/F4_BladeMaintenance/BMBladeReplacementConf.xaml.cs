@@ -90,7 +90,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             bladeOuterDiameter.Text = Appsettings.BladeOuterDiameter?.ToString("F3");
             bladeThickness.Text = Appsettings.BladeThickness?.ToString("F3");
             afterReplaceBladeCutTimes.Text = Appsettings.AfterReplaceBladeCutTimes?.ToString();
-            afterReplaceBladeCutLength.Text = Appsettings.AfterReplaceBladeCutLength?.ToString("F3");
+            afterReplaceBladeCutLength.Text = (Appsettings.AfterReplaceBladeCutLength / 1000 ?? 0).ToString("F2");
             measureHeightFirst.Text = Appsettings.MeasureHeightFirst?.ToString("F3");
             measureHeightLast.Text = Appsettings.MeasureHeightLast?.ToString("F3");
         }
