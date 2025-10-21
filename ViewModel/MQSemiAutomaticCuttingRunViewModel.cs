@@ -116,6 +116,14 @@ namespace 精密切割系统.ViewModel
                         {
                             if (!_pauseCts.IsCancellationRequested)
                             {
+                                bool[]? alarms = AlarmConfig.Instance.GetNewestAlarms();
+                                if (alarms != null && AlarmConfig.Instance.TryGetActiveAlarms(alarms, out List<AlarmInfo> alarmInfos))
+                                {
+                                    foreach (AlarmInfo alarmInfo in alarmInfos)
+                                    {
+                                        Tools.LogDebug($"切割异常报警：{alarmInfo.Message}");
+                                    }
+                                }
                                 Pause();
                             }
                         }
@@ -208,7 +216,7 @@ namespace 精密切割系统.ViewModel
                 _semiAutoCutService.CutServicePaused += CutService_CutServicePaused;
                 MaterialSnack($"切割中...", SnackType.WARNING, 0, _eventAggregator);
                 float margin = Appsettings.AdditionalMargin ?? 20;
-                RunResult cutResult = await _semiAutoCutService.RunAsync(cutStepResult.Data, workpiece, margin, fileTableItem.SpindleRev, curHeightZ.Data, GlobalParams.BladeLiftingHeight, _pauseCts.Token);
+                RunResult cutResult = await _semiAutoCutService.RunAsync(cutStepResult.Data, workpiece, margin, fileTableItem.SpindleRev, curHeightZ.Data, GlobalParams.BladeLiftingHeight, false, _pauseCts.Token);
                 if (!cutResult.IsSuccess)
                 {
                     MaterialSnack($"{cutResult.Message}", SnackType.WARNING, 0, _eventAggregator);
@@ -326,15 +334,15 @@ namespace 精密切割系统.ViewModel
             ShowMessage();
         }
 
-        private async void CutService_CutServicePaused(LineSegment? line, string? message)
+        private async void CutService_CutServicePaused(LineSegment? line, string? message, float currentKnifeRemainTime)
         {
-            await AfterPauseThenMoveToPosition(line, message);
+            await AfterPauseThenMoveToPosition(line, message, currentKnifeRemainTime);
         }
 
-        private async Task AfterPauseThenMoveToPosition(LineSegment? line, string? message)
+        private async Task AfterPauseThenMoveToPosition(LineSegment? line, string? message, float currentKnifeRemainTime)
         {
             MaterialSnack("正在暂停切割...", SnackType.WARNING, 0, _eventAggregator);
-            int runTime = 60;
+            float runTime = 60 + currentKnifeRemainTime;
             try
             {
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(runTime));// 超时自动取消
@@ -348,9 +356,6 @@ namespace 精密切割系统.ViewModel
                     await Task.WhenAll(z1Task, z2Task);
                     await AutoCutUtils.WorkpieceBlowingAsync(_eventAggregator, cts.Token);
                     await PlcControl.tagControl.cutting.RunMotionAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), line.StartPoint.Y.ToCameraY(), cts.Token);
-                    await AutoFocusService.GlobalFocusAsync(_eventAggregator, cts.Token);
-                    await AutoCutUtils.FineTuneAxisYAsync();
-                    await AutoCutUtils.UpdateCameraCommonLineAsync();
                 }
                 MaterialSnack(message ?? "暂停中...", SnackType.WARNING, 0, _eventAggregator);
             }

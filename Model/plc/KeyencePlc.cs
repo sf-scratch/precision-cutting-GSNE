@@ -2718,6 +2718,10 @@ namespace 精密切割系统.Driver
         // 差步Y轴运动位置
         public Tag yInterpolationMotion { get; set; }
 
+        public Tag flangeRepairBegins { get; set; }
+        public Tag detectedSparks { get; set; }
+        public Tag spindleRevReach { get; set; }
+
         /// <summary>
         /// 执行插补运动
         /// </summary>
@@ -3081,11 +3085,61 @@ namespace 精密切割系统.Driver
         }
 
         /// <summary>
+        /// 主轴转速设置
+        /// </summary>
+        /// <param name="spindleRevValue"></param>
+        /// <returns></returns>
+        public async Task SetSpindleSpeedAsync(int spindleRevValue)
+        {
+            spindleRev.writeValue = spindleRevValue.ToString();
+            await keyencePlc.WriteTagAsync(spindleRev);
+        }
+
+        /// <summary>
+        /// 等待主轴转速达到预期
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public async Task WaitSpindleRevReachAsync(CancellationToken token)
+        {
+            await TaskUtils.WaitExpectedResultAsync(IsSpindleRevReachAsync, default, token);
+        }
+
+        /// <summary>
+        /// 主轴转速是否达到预期
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> IsSpindleRevReachAsync()
+        {
+            return await keyencePlc.ReadDataAsync(spindleRevReach.addr) == true;
+        }
+
+        public async Task FlangeRepairBeginsAsync()
+        {
+            flangeRepairBegins.writeValue = "1";
+            await keyencePlc.WriteTagAsync(flangeRepairBegins);
+        }
+
+        public async Task FlangeRepairEndAsync()
+        {
+            flangeRepairBegins.writeValue = "0";
+            await keyencePlc.WriteTagAsync(flangeRepairBegins);
+        }
+
+        /// <summary>
+        /// 是否检测到电火花
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> IsDetectedSparksAsync()
+        {
+            return await keyencePlc.ReadDataAsync(detectedSparks.addr) == true;
+        }
+
+        /// <summary>
         /// 设置切割需要的参数
         /// </summary>
         /// <param name="feedSpeedValue">切割速度</param>
         /// <param name="zEndIndex">Z轴切割位置</param>
-        /// <param name="xStartLoaction">X轴开始位置</param>
         /// <param name="xEndLocation">X轴结束位置</param>
         /// <param name="yCutLocation">Y轴切割位置</param>
         /// <param name="spindleRev">主轴转速</param>

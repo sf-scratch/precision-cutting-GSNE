@@ -1247,6 +1247,24 @@
       "name": "主轴速度",
       "describe": "主轴速度"
     },
+    "spindleRevReach": {
+      "valueType": "int16",
+      "addr": "MR1003",
+      "name": "主轴转速达到预期",
+      "describe": "主轴转速达到预期"
+    },
+    "flangeRepairBegins": {
+      "valueType": "int16",
+      "addr": "MR1000",
+      "name": "法兰修整开始",
+      "describe": "法兰修整开始"
+    },
+    "detectedSparks": {
+      "valueType": "int16",
+      "addr": "MR1002",
+      "name": "检测到电火花",
+      "describe": "检测到电火花"
+    },
     "confirmParamsStatus": {
       "valueType": "int16",
       "addr": "DM605",

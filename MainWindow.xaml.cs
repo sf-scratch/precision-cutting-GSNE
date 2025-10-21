@@ -351,27 +351,22 @@ namespace 精密切割系统
 
         private void shortcutTopBtn_TouchDown(object? sender, TouchEventArgs e)
         {
-            shortcutTopBtnSel = !shortcutTopBtnSel;
-            shortcutBottomBtnSel = false;
-            ShortcutBtnClick();
-            if (shortcutTopBtnSel)
-            {
-                // 显示方向界面
-                operatePage.SetOperateShowType(1);
-            }
-            else
-            {
-                if (WindowLayout.OperatePageButtons.Count != 0)
-                {
-                    operatePage.SetOperateShowType(3);
-                }
-                else
-                {
-                    operatePage.SetOperateShowType(0);
-                }
-            }
-            CommonEvent.BtnScaleDown(sender, 1);
-            CommonEvent.BtnScaleDown(shortcutDirectBtn, 0);
+            TopBtnDown();
+        }
+
+        private void shortcutDirectBtn_TouchDown(object? sender, TouchEventArgs e)
+        {
+            DirectBtnDown();
+        }
+
+        private void shortcutTopBtn_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            TopBtnDown();
+        }
+
+        private void shortcutDirectBtn_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            DirectBtnDown();
         }
 
         public void UpdateOperatePage(List<OperateBean> operateBeans, EventHandler<int> _onClicked, EventHandler<int> _touchLeave = null, EventHandler<int> _touchDown = null)
@@ -420,34 +415,6 @@ namespace 精密切割系统
                 isNavigating = true;
             }
             ShortcutBtnClick();
-        }
-
-        private void shortcutDirectBtn_TouchDown(object? sender, TouchEventArgs e)
-        {
-            operatePage.SetOperateShowType(0);
-            shortcutBottomBtnSel = !shortcutBottomBtnSel;
-            shortcutTopBtnSel = false;
-            ShortcutBtnClick();
-            CommonEvent.BtnScaleDown(sender, 1);
-            CommonEvent.BtnScaleDown(shortcutTopBtn, 0);
-            if (shortcutBottomBtnSel)
-            {
-                operatePage.UpdateOperate(OperateData.GetTab01Operate());
-            }
-            else
-            {
-                if (GlobalParams.currentOperateBeanList.Count != 0)
-                {
-                    operatePage.UpdateOperate(GlobalParams.currentOperateBeanList);
-                    return;
-                }
-                if (WindowLayout.OperatePageButtons.Count != 0)
-                {
-                    operatePage.SetOperateShowType(3);
-                    return;
-                }
-                operatePage.UpdateOperate(GlobalParams.currentOperateBeanList);
-            }
         }
 
         public void SetShortcutBtnStatus(bool _shortcutTopBtnSel, bool _shortcutBottomBtnSel)
@@ -506,8 +473,9 @@ namespace 精密切割系统
             headerPage.messgePanel.Visibility = Visibility.Hidden;
         }
 
-        private void shortcutTopBtn_MouseDown(object sender, MouseButtonEventArgs e)
+        private void TopBtnDown()
         {
+            operatePage.SetOperateShowType(0);
             shortcutTopBtnSel = !shortcutTopBtnSel;
             shortcutBottomBtnSel = false;
             ShortcutBtnClick();
@@ -518,18 +486,21 @@ namespace 精密切割系统
             }
             else
             {
+                if (GlobalParams.currentOperateBeanList.Count != 0)
+                {
+                    operatePage.UpdateOperate(GlobalParams.currentOperateBeanList);
+                    return;
+                }
                 if (WindowLayout.OperatePageButtons.Count != 0)
                 {
                     operatePage.SetOperateShowType(3);
+                    return;
                 }
-                else
-                {
-                    operatePage.SetOperateShowType(0);
-                }
+                operatePage.UpdateOperate(GlobalParams.currentOperateBeanList);
             }
         }
 
-        private void shortcutDirectBtn_MouseDown(object sender, MouseButtonEventArgs e)
+        private void DirectBtnDown()
         {
             operatePage.SetOperateShowType(0);
             shortcutBottomBtnSel = !shortcutBottomBtnSel;

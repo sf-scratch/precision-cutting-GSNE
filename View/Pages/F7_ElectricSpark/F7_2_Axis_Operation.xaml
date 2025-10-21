@@ -51,8 +51,18 @@
     </UserControl.Resources>
     <Grid Margin="30">
         <Grid.RowDefinitions>
+            <RowDefinition Height="50" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
+        <Grid>
+            <Label
+                Padding="0,0,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Content="轴运动控制"
+                FontSize="30"
+                FontWeight="Bold" />
+        </Grid>
         <ListBox
             Grid.Row="1"
             HorizontalAlignment="Center"

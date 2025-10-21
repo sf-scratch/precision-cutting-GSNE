@@ -1,0 +1,13 @@
+{
+  "YStepDistance": "0.005",
+  "CutSpeed": "5.000",
+  "RepeatCount": "10",
+  "SparkFreeStep": "5",
+  "SpindleRev": "30000",
+  "XAxisTravel": "10.000",
+  "XCenterPosition": "0.000",
+  "XLowSpeed": "0",
+  "YCenterPosition": "0.000",
+  "YLowSpeed": "0",
+  "ZCenterPosition": "0.000"
+}

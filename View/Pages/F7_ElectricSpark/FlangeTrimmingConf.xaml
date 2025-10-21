@@ -1,100 +1,165 @@
-﻿<Page x:Class="精密切割系统.View.Pages.F7_ElectricSpark.FlangeTrimmingConf"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:精密切割系统.View.Pages.F7_ElectricSpark" 
-      xmlns:controls="clr-namespace:精密切割系统.View.Controls"
-      mc:Ignorable="d" 
-      d:DesignHeight="676" d:DesignWidth="1448"
-      Title="FlangeTrimmingConf" Loaded="Page_Loaded" Unloaded="Page_Unloaded">
+﻿<Page
+    x:Class="精密切割系统.View.Pages.F7_ElectricSpark.FlangeTrimmingConf"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:精密切割系统.View.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:精密切割系统.View.Pages.F7_ElectricSpark"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="FlangeTrimmingConf"
+    d:DesignHeight="676"
+    d:DesignWidth="1448"
+    Loaded="Page_Loaded"
+    Unloaded="Page_Unloaded"
+    mc:Ignorable="d">
     <Page.Resources>
-        <!-- 定义公共样式 -->
+        <!--  定义公共样式  -->
         <Style x:Key="CommonLabelStyle" TargetType="Label">
             <Setter Property="Width" Value="155" />
             <Setter Property="FontSize" Value="16" />
             <Setter Property="HorizontalContentAlignment" Value="Right" />
-            <Setter Property="Margin" Value="0 10 0 0" />
+            <Setter Property="Margin" Value="0,10,0,0" />
             <Setter Property="FontWeight" Value="Bold" />
         </Style>
         <Style x:Key="CommonInputBoxStyle" TargetType="controls:InputTextBox">
-            <Setter Property="Margin" Value="0 10 0 0" />
+            <Setter Property="Margin" Value="0,10,0,0" />
             <Setter Property="Width" Value="200" />
         </Style>
     </Page.Resources>
     <Grid Margin="30">
         <Grid.RowDefinitions>
-            <RowDefinition Height="50">
-                
-            </RowDefinition>
-            <RowDefinition>
-                
-            </RowDefinition>
+            <RowDefinition Height="50" />
+            <RowDefinition />
         </Grid.RowDefinitions>
-        
+
         <Grid Grid.Row="0">
             <Label
                 Grid.Row="0"
                 Padding="0,0,0,0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
-                Content="型号参数 (2.1.1)"
+                Content="法兰修整 (2.1.1)"
                 FontSize="30"
-                FontWeight="Bold"/>
+                FontWeight="Bold" />
         </Grid>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="50*"/>
-                <ColumnDefinition Width="50*"/>
+                <ColumnDefinition Width="50*" />
+                <ColumnDefinition Width="50*" />
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <Label Content="X轴位置：" Style="{StaticResource CommonLabelStyle}"></Label>
-                        <controls:InputTextBox Width="200" x:Name="xCenterPosition" Margin="0 10 0 0"></controls:InputTextBox>
+                        <Label Content="刀片类型：" Style="{StaticResource CommonLabelStyle}" />
+                        <ListBox Margin="0,5,0,0" Style="{StaticResource MaterialDesignChoiceChipOutlineListBox}">
+                            <ListBoxItem x:Name="hardKnife" Content="硬刀" />
+                            <ListBoxItem Content="软刀" IsSelected="True" />
+                        </ListBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <Label Content="Z轴位置：" Style="{StaticResource CommonLabelStyle}"></Label>
-                        <controls:InputTextBox Width="200" x:Name="zCenterPosition" Margin="0 10 0 0"></controls:InputTextBox>
+                        <Label Content="X轴位置：" Style="{StaticResource CommonLabelStyle}" />
+                        <controls:InputTextBox
+                            x:Name="xCenterPosition"
+                            Width="200"
+                            Margin="0,10,0,0"
+                            IsEnabled="False" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <Label Content="Y轴位置：" Style="{StaticResource CommonLabelStyle}"></Label>
-                        <controls:InputTextBox Width="200" x:Name="yCenterPosition" Margin="0 10 0 0"></controls:InputTextBox>
+                        <Label Content="Y轴位置：" Style="{StaticResource CommonLabelStyle}" />
+                        <controls:InputTextBox
+                            x:Name="yCenterPosition"
+                            Width="200"
+                            Margin="0,10,0,0"
+                            IsEnabled="False" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <Label Content="Y轴步进距离：" Style="{StaticResource CommonLabelStyle}"></Label>
-                        <controls:InputTextBox Width="200" x:Name="yIndex" Margin="0 10 0 0"></controls:InputTextBox>
+                        <Label Content="Z轴位置：" Style="{StaticResource CommonLabelStyle}" />
+                        <controls:InputTextBox
+                            x:Name="zCenterPosition"
+                            Width="200"
+                            Margin="0,10,0,0"
+                            IsEnabled="False" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <Label Content="X轴行程：" Style="{StaticResource CommonLabelStyle}"></Label>
-                        <controls:InputTextBox Width="200" x:Name="coXDistance" Margin="0 10 0 0"></controls:InputTextBox>
+                        <Label Content="Y轴步进距离：" Style="{StaticResource CommonLabelStyle}" />
+                        <controls:InputTextBox
+                            x:Name="yStepDistance"
+                            Width="200"
+                            Margin="0,10,0,0"
+                            InputType="Decimal"
+                            XPrecision="3" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <Label Content="研磨次数：" Style="{StaticResource CommonLabelStyle}"></Label>
-                        <controls:InputTextBox Width="200" x:Name="repectCount" Margin="0 10 0 0"></controls:InputTextBox>
+                        <Label Content="X轴行程：" Style="{StaticResource CommonLabelStyle}" />
+                        <controls:InputTextBox
+                            x:Name="xAxisTravel"
+                            Width="200"
+                            Margin="0,10,0,0"
+                            InputType="Decimal"
+                            XPrecision="3" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <Label Content="主轴速度：" Style="{StaticResource CommonLabelStyle}"></Label>
-                        <controls:InputTextBox Width="200" x:Name="spindleRev" Margin="0 10 0 0"></controls:InputTextBox>
+                        <Label Content="研磨次数：" Style="{StaticResource CommonLabelStyle}" />
+                        <controls:InputTextBox
+                            x:Name="repectCount"
+                            Width="200"
+                            Margin="0,10,0,0"
+                            InputType="Decimal"
+                            XPrecision="0" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <Label Content="X轴速度：" Style="{StaticResource CommonLabelStyle}"></Label>
-                        <controls:InputTextBox Width="200" x:Name="xAxisSpeed" Margin="0 10 0 0"></controls:InputTextBox>
+                        <Label Content="主轴转速：" Style="{StaticResource CommonLabelStyle}" />
+                        <controls:InputTextBox
+                            x:Name="spindleRev"
+                            Width="200"
+                            Margin="0,10,0,0"
+                            InputType="Decimal"
+                            XPrecision="0" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <Label Content="研磨步进间隔次数：" Style="{StaticResource CommonLabelStyle}"></Label>
-                        <controls:InputTextBox Width="200" x:Name="grindingStepInterval" Margin="0 10 0 0"></controls:InputTextBox>
+                        <Label Content="进刀速度：" Style="{StaticResource CommonLabelStyle}" />
+                        <controls:InputTextBox
+                            x:Name="cutSpeed"
+                            Width="200"
+                            Margin="0,10,0,0"
+                            InputType="Decimal"
+                            XPrecision="3" />
                     </StackPanel>
-
+                    <!--<StackPanel Orientation="Horizontal">
+                        <Label Content="研磨步进间隔次数：" Style="{StaticResource CommonLabelStyle}" />
+                        <controls:InputTextBox
+                            x:Name="grindingStepInterval"
+                            Width="200"
+                            Margin="0,10,0,0"
+                            InputType="Decimal"
+                            XPrecision="0" />
+                    </StackPanel>-->
                     <StackPanel Orientation="Horizontal">
-                        <Label Content="研磨进度：" Style="{StaticResource CommonLabelStyle}"></Label>
-                        <controls:InputTextBox Width="93" x:Name="currentCount" Margin="0 10 0 0" Text="0"></controls:InputTextBox>
-                        <Label Content="-" Height="20"></Label>
-                        <controls:InputTextBox Width="92" x:Name="allCount" Margin="0 10 0 0" Text="0"></controls:InputTextBox>
+                        <Label Content="无火花研磨次数：" Style="{StaticResource CommonLabelStyle}" />
+                        <controls:InputTextBox
+                            x:Name="sparkFreeStep"
+                            Width="200"
+                            Margin="0,10,0,0"
+                            InputType="Decimal"
+                            XPrecision="0" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="研磨进度：" Style="{StaticResource CommonLabelStyle}" />
+                        <controls:InputTextBox
+                            x:Name="currentCount"
+                            Width="93"
+                            Margin="0,10,0,0"
+                            IsEnabled="False"
+                            Text="0" />
+                        <Label Height="20" Content="-" />
+                        <controls:InputTextBox
+                            Width="92"
+                            Margin="0,10,0,0"
+                            IsEnabled="False"
+                            Text="{Binding Text, ElementName=repectCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>
                 </StackPanel>
             </Grid>
-            
         </Grid>
     </Grid>
 </Page>

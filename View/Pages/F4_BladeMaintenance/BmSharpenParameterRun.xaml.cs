@@ -120,7 +120,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 };
                 _semiAutoCutService.CutServiceProcessChanged += CutService_CutServiceProcessChanged;
                 _semiAutoCutService.CutServicePaused += CutService_CutServicePaused;
-                RunResult cutResult = await _semiAutoCutService.RunAsync(cutStepResult.Data, workpiece, 30, spindleRev, firstHeightZ.Data, GlobalParams.BladeLiftingHeight, _pauseCts.Token);
+                RunResult cutResult = await _semiAutoCutService.RunAsync(cutStepResult.Data, workpiece, 30, spindleRev, firstHeightZ.Data, GlobalParams.BladeLiftingHeight, false, _pauseCts.Token);
                 if (!cutResult.IsSuccess)
                 {
                     MaterialSnack($"磨刀失败：{cutResult.Message}", SnackType.WARNING, 0);
@@ -226,7 +226,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             sharpenTitle.Content = "磨刀暂停状态";
         }
 
-        private async void CutService_CutServicePaused(LineSegment? line, string? message)
+        private async void CutService_CutServicePaused(LineSegment? line, string? message, float currentKnifeRemainTime)
         {
             await AfterPauseThenMoveToPosition(line, message);
         }
