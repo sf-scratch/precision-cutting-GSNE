@@ -1,108 +1,289 @@
-﻿<Page x:Class="精密切割系统.View.Pages.F4_BladeMaintenance.BladeInfo"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:精密切割系统.View.Pages.F4_BladeMaintenance" xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
-      mc:Ignorable="d" 
-      d:DesignHeight="676" d:DesignWidth="1448"
-      Title="BladeInfo" Loaded="Page_Loaded">
+﻿<Page
+    x:Class="精密切割系统.View.Pages.F4_BladeMaintenance.BladeInfo"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:精密切割系统.View.Pages.F4_BladeMaintenance"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="BladeInfo"
+    d:DesignHeight="676"
+    d:DesignWidth="1448"
+    Loaded="Page_Loaded"
+    mc:Ignorable="d">
 
     <Grid Margin="30,30,0,0">
-        <Grid.RowDefinitions >
-            <RowDefinition Height="60"/>
-            <RowDefinition/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60" />
+            <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="620"/>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="620" />
+            <ColumnDefinition />
+            <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
-        <Label x:Name="labContactSetup" Content="刀片状态信息(3.2)" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"  FontWeight="Bold" FontSize="22"/>
-        <StackPanel Grid.Row="1" Grid.Column="0" x:Name="sp1" HorizontalAlignment="Left" >
+        <Label
+            x:Name="labContactSetup"
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            Content="刀片状态信息(3.2)"
+            FontSize="22"
+            FontWeight="Bold" />
+        <StackPanel
+            x:Name="sp1"
+            Grid.Row="1"
+            Grid.Column="0"
+            HorizontalAlignment="Left">
             <StackPanel Margin="0,0,0,0" HorizontalAlignment="Left">
-                <Label x:Name="labLotID"  Height="35" Content="批号ID" FontWeight="Bold" FontSize="16" />
-                <StackPanel   Orientation="Horizontal">
-                    <Controls:InputTextBox IsEnabled="False" x:Name="tbBladeLotID" Width="355"  TextWrapping="Wrap"  Height="35" />
+                <Label
+                    x:Name="labLotID"
+                    Height="35"
+                    Content="批号ID"
+                    FontSize="16"
+                    FontWeight="Bold" />
+                <StackPanel Orientation="Horizontal">
+                    <Controls:InputTextBox
+                        x:Name="tbBladeLotID"
+                        Width="355"
+                        Height="35"
+                        IsEnabled="False"
+                        TextWrapping="Wrap" />
                 </StackPanel>
             </StackPanel>
             <StackPanel Margin="0,0,0,0" HorizontalAlignment="Left">
-                <Label x:Name="labSpec"  Height="35" Content="品种名称" FontWeight="Bold" FontSize="16" />
-                <StackPanel Orientation="Horizontal" >
-                    <Controls:InputTextBox IsEnabled="False" x:Name="tbSpecName" Width="355"  TextWrapping="Wrap"  Height="35" />
+                <Label
+                    x:Name="labSpec"
+                    Height="35"
+                    Content="品种名称"
+                    FontSize="16"
+                    FontWeight="Bold" />
+                <StackPanel Orientation="Horizontal">
+                    <Controls:InputTextBox
+                        x:Name="tbSpecName"
+                        Width="355"
+                        Height="35"
+                        IsEnabled="False"
+                        TextWrapping="Wrap" />
                 </StackPanel>
             </StackPanel>
-            <StackPanel Margin="0,0,0,0" Orientation="Horizontal" HorizontalAlignment="Left">
-                <StackPanel Width="165" >
-                    <Label x:Name="labBlade0D"  Height="35" Content="刀片外经" FontWeight="Bold" FontSize="16" />
-                    <StackPanel Width="165" Orientation="Horizontal" >
-                        <Controls:InputTextBox IsEnabled="False" x:Name="tbBladeOutside" Width="130"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XPrecision="3" />
-                        <Label Height="35" Content="mm" FontWeight="Bold" FontSize="16" />
+            <StackPanel
+                Margin="0,0,0,0"
+                HorizontalAlignment="Left"
+                Orientation="Horizontal">
+                <StackPanel Width="165">
+                    <Label
+                        x:Name="labBlade0D"
+                        Height="35"
+                        Content="刀片外经"
+                        FontSize="16"
+                        FontWeight="Bold" />
+                    <StackPanel Width="165" Orientation="Horizontal">
+                        <Controls:InputTextBox
+                            x:Name="tbBladeOutside"
+                            Width="130"
+                            Height="35"
+                            InputType="Decimal"
+                            IsEnabled="False"
+                            TextWrapping="Wrap"
+                            XMin="0"
+                            XPrecision="3" />
+                        <Label
+                            Height="35"
+                            Content="mm"
+                            FontSize="16"
+                            FontWeight="Bold" />
                     </StackPanel>
                 </StackPanel>
-                <StackPanel Width="165" Margin="15,0,0,0"  >
-                    <Label x:Name="labSetupPosition"  Height="35" Content="测高位置" FontWeight="Bold" FontSize="16" />
-                    <StackPanel Width="165" Orientation="Horizontal" >
-                        <Controls:InputTextBox IsEnabled="False" x:Name="inputTextBox6" Width="120"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" />
-                        <Label Height="35" Content="mm" FontWeight="Bold" FontSize="16" />
+                <StackPanel Width="165" Margin="15,0,0,0">
+                    <Label
+                        x:Name="labSetupPosition"
+                        Height="35"
+                        Content="测高位置"
+                        FontSize="16"
+                        FontWeight="Bold" />
+                    <StackPanel Width="165" Orientation="Horizontal">
+                        <Controls:InputTextBox
+                            x:Name="inputTextBox6"
+                            Width="120"
+                            Height="35"
+                            InputType="Decimal"
+                            IsEnabled="False"
+                            TextWrapping="Wrap"
+                            XMin="0" />
+                        <Label
+                            Height="35"
+                            Content="mm"
+                            FontSize="16"
+                            FontWeight="Bold" />
                     </StackPanel>
                 </StackPanel>
             </StackPanel>
-            <StackPanel Width="350" >
-                <Label x:Name="labCumulativeCutSince"  Height="35" Content="刀片寿命记录" FontWeight="Bold" FontSize="18" Margin="0,10,0,0"/>
-                <Label x:Name="lablabBladeReplacementTitle"  Height="35" Content="自刀片更换算起" FontWeight="Bold" FontSize="16" />
+            <StackPanel Width="350">
+                <Label
+                    x:Name="labCumulativeCutSince"
+                    Height="35"
+                    Margin="0,10,0,0"
+                    Content="刀片寿命记录"
+                    FontSize="18"
+                    FontWeight="Bold" />
+                <Label
+                    x:Name="lablabBladeReplacementTitle"
+                    Height="35"
+                    Content="自刀片更换算起"
+                    FontSize="16"
+                    FontWeight="Bold" />
                 <StackPanel Orientation="Horizontal">
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                        <Controls:InputTextBox IsEnabled="False" x:Name="inputTextBox14" Width="130"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XPrecision="3" />
-                        <Label Width="50" Height="35" Content="m" FontWeight="Bold" FontSize="16"  />
+                    <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+                        <Controls:InputTextBox
+                            x:Name="inputTextBox14"
+                            Width="130"
+                            Height="35"
+                            InputType="Decimal"
+                            IsEnabled="False"
+                            TextWrapping="Wrap"
+                            XMin="0"
+                            XPrecision="3" />
+                        <Label
+                            Width="50"
+                            Height="35"
+                            Content="m"
+                            FontSize="16"
+                            FontWeight="Bold" />
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,5,0,0" >
-                        <Controls:InputTextBox IsEnabled="False" x:Name="inputTextBox15" Width="130"  TextWrapping="Wrap"  Height="35" InputType="Numeral" XMin="0" />
-                        <Label Width="50" Height="35" Content="lines" FontWeight="Bold" FontSize="16"  />
+                    <StackPanel
+                        Margin="0,5,0,0"
+                        HorizontalAlignment="Left"
+                        Orientation="Horizontal">
+                        <Controls:InputTextBox
+                            x:Name="inputTextBox15"
+                            Width="130"
+                            Height="35"
+                            InputType="Numeral"
+                            IsEnabled="False"
+                            TextWrapping="Wrap"
+                            XMin="0" />
+                        <Label
+                            Width="50"
+                            Height="35"
+                            Content="lines"
+                            FontSize="16"
+                            FontWeight="Bold" />
                     </StackPanel>
                 </StackPanel>
-                <Label x:Name="labLastSetupTitle"  Height="35" Content="自上次测高算起" FontWeight="Bold" FontSize="16" Margin="0,0,0,0"/>
+                <Label
+                    x:Name="labLastSetupTitle"
+                    Height="35"
+                    Margin="0,0,0,0"
+                    Content="自上次测高算起"
+                    FontSize="16"
+                    FontWeight="Bold" />
                 <StackPanel Orientation="Horizontal">
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" >
-                        <Controls:InputTextBox IsEnabled="False" x:Name="inputTextBox17" Width="130"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XPrecision="3" />
-                        <Label Width="50" Height="35" Content="m" FontWeight="Bold" FontSize="16"  />
+                    <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+                        <Controls:InputTextBox
+                            x:Name="inputTextBox17"
+                            Width="130"
+                            Height="35"
+                            InputType="Decimal"
+                            IsEnabled="False"
+                            TextWrapping="Wrap"
+                            XMin="0"
+                            XPrecision="3" />
+                        <Label
+                            Width="50"
+                            Height="35"
+                            Content="m"
+                            FontSize="16"
+                            FontWeight="Bold" />
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,5,0,0" >
-                        <Controls:InputTextBox IsEnabled="False" x:Name="inputTextBox16" Width="130"  TextWrapping="Wrap"  Height="35" InputType="Numeral" XMin="0" />
-                        <Label Width="50" Height="35" Content="lines" FontWeight="Bold" FontSize="16"  />
+                    <StackPanel
+                        Margin="0,5,0,0"
+                        HorizontalAlignment="Left"
+                        Orientation="Horizontal">
+                        <Controls:InputTextBox
+                            x:Name="inputTextBox16"
+                            Width="130"
+                            Height="35"
+                            InputType="Numeral"
+                            IsEnabled="False"
+                            TextWrapping="Wrap"
+                            XMin="0" />
+                        <Label
+                            Width="50"
+                            Height="35"
+                            Content="lines"
+                            FontSize="16"
+                            FontWeight="Bold" />
                     </StackPanel>
                 </StackPanel>
-                <Label x:Name="labLastReset"  Height="35" Content="自上次清除算起" FontWeight="Bold" FontSize="16" Margin="0,0,0,0"/>
+                <Label
+                    x:Name="labLastReset"
+                    Height="35"
+                    Margin="0,0,0,0"
+                    Content="自上次清除算起"
+                    FontSize="16"
+                    FontWeight="Bold" />
                 <StackPanel Orientation="Horizontal">
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" >
-                        <Controls:InputTextBox IsEnabled="False" x:Name="inputTextBox19" Width="130"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XPrecision="3" />
-                        <Label Width="50" Height="35" Content="m" FontWeight="Bold" FontSize="16"  />
+                    <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+                        <Controls:InputTextBox
+                            x:Name="inputTextBox19"
+                            Width="130"
+                            Height="35"
+                            InputType="Decimal"
+                            IsEnabled="False"
+                            TextWrapping="Wrap"
+                            XMin="0"
+                            XPrecision="3" />
+                        <Label
+                            Width="50"
+                            Height="35"
+                            Content="m"
+                            FontSize="16"
+                            FontWeight="Bold" />
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,5,0,0" >
-                        <Controls:InputTextBox IsEnabled="False" x:Name="inputTextBox18" Width="130"  TextWrapping="Wrap"  Height="35" InputType="Numeral" XMin="0" />
-                        <Label Width="50" Height="35" Content="lines" FontWeight="Bold" FontSize="16"  />
+                    <StackPanel
+                        Margin="0,5,0,0"
+                        HorizontalAlignment="Left"
+                        Orientation="Horizontal">
+                        <Controls:InputTextBox
+                            x:Name="inputTextBox18"
+                            Width="130"
+                            Height="35"
+                            InputType="Numeral"
+                            IsEnabled="False"
+                            TextWrapping="Wrap"
+                            XMin="0" />
+                        <Label
+                            Width="50"
+                            Height="35"
+                            Content="lines"
+                            FontSize="16"
+                            FontWeight="Bold" />
                     </StackPanel>
                 </StackPanel>
             </StackPanel>
         </StackPanel>
-        <StackPanel Grid.Row="1" Width="550" Grid.Column="1" x:Name="sp2"  HorizontalAlignment="Left" Margin="10,0,0,0">
-            <Label x:Name="label21" Width="150"  Height="35" Content="工作盘形状" FontWeight="Bold" FontSize="16"  HorizontalAlignment="Left"/>
+        <!--<StackPanel Grid.Row="1" Width="550" Grid.Column="1" x:Name="sp2"  HorizontalAlignment="Left" Margin="10,0,0,0">
+            <Label x:Name="label21" Width="150"  Height="35" Content="工作盘形状" FontWeight="Bold" FontSize="16"  HorizontalAlignment="Left" />
             <StackPanel Width="350" Margin="0,0,0,0" Orientation="Horizontal" HorizontalAlignment="Left">
                 <Controls:InputTextBox IsEnabled="False" x:Name="tbChuckTableShape" Width="130"  TextWrapping="Wrap"  Height="35" />
-                <Label x:Name="label22" Width="50" Height="35" Content="类型" FontWeight="Bold" FontSize="16"/>
+                <Label x:Name="label22" Width="50" Height="35" Content="类型" FontWeight="Bold" FontSize="16" />
                 <Controls:InputTextBox IsEnabled="False" x:Name="tbTableType" Width="130"  TextWrapping="Wrap"  Height="35" />
             </StackPanel>
-            <!--圆形时候显示-->
+        -->
+        <!--  圆形时候显示  -->
+        <!--
             <StackPanel Width="350" Margin="0,0,0,0" Orientation="Horizontal" HorizontalAlignment="Left" x:Name="showRound">
-                <StackPanel Width="350" >
+                <StackPanel Width="350">
                     <Label x:Name="labTableSize"  Height="35" Content="工作盘尺寸" FontWeight="Bold" FontSize="16" />
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" >
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                         <Controls:InputTextBox IsEnabled="False" x:Name="tbChuckTableSize" Width="130"  TextWrapping="Wrap"  Height="35" />
                     </StackPanel>
                 </StackPanel>
             </StackPanel>
-        </StackPanel>
-
+        </StackPanel>-->
     </Grid>
 </Page>

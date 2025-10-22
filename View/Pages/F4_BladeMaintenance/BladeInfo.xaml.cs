@@ -31,9 +31,10 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         private MainWindow? mainWindow;
         private RightPage? rightPage;
         private OperatePage? operatePage;
-        BladeHeightModel _model = null;
-        string urlParams = null;
-        string pageName = null;
+        private BladeHeightModel _model = null;
+        private string urlParams = null;
+        private string pageName = null;
+
         public BladeInfo()
         {
             mainWindow = Application.Current.MainWindow as MainWindow;
@@ -63,7 +64,8 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             if (string.IsNullOrEmpty(pageName))
             {
                 mainWindow.NavigateToPage("MainMenu");
-            } else
+            }
+            else
             {
                 mainWindow.NavigateToPage(pageName, urlParams);
             }
@@ -85,19 +87,18 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             else
             {
                 _model = list[0];
-
             }
-            tbChuckTableSize.Text = _model.ChuckTableSize;
-            tbTableType.Text = _model.TableType;
-            tbChuckTableShape.Text = _model.ChuckTableShape;
-            if ("ROUND".Equals(_model.ChuckTableShape))
-            {
-                showRound.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                showRound.Visibility = Visibility.Hidden; //隐藏
-            }
+            //tbChuckTableSize.Text = _model.ChuckTableSize;
+            //tbTableType.Text = _model.TableType;
+            //tbChuckTableShape.Text = _model.ChuckTableShape;
+            //if ("ROUND".Equals(_model.ChuckTableShape))
+            //{
+            //    showRound.Visibility = Visibility.Visible;
+            //}
+            //else
+            //{
+            //    showRound.Visibility = Visibility.Hidden; //隐藏
+            //}
 
             //刀片更换的数据
             ReplaceBladeModel _gh = new ReplaceBladeModel();

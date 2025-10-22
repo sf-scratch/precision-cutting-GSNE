@@ -1,6 +1,7 @@
 ﻿using System.Configuration;
 using System.Data;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using 精密切割系统.Utils;
 using 精密切割系统.View.Controls;
@@ -10,6 +11,7 @@ using 精密切割系统.View.Pages.common;
 using 精密切割系统.View.Pages.F2_ManualOperation;
 using 精密切割系统.View.Pages.F4_BladeMaintenance;
 using 精密切割系统.View.Pages.F7_ElectricSpark;
+using 精密切割系统.View.Pages.operate;
 using 精密切割系统.ViewModel;
 using 精密切割系统.ViewModel.Dialogs;
 
@@ -30,6 +32,16 @@ namespace 精密切割系统
             {
                 MessageBox.Show("HSL授权码错误，请联系作者获取最新授权码！", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                 Environment.Exit(0);
+            }
+            // 为所有TextBox注册焦点事件
+            EventManager.RegisterClassHandler(typeof(TextBox), TextBox.GotFocusEvent, new RoutedEventHandler(OnTextBoxGotFocus));
+        }
+
+        private void OnTextBoxGotFocus(object sender, RoutedEventArgs e)
+        {
+            if (Application.Current.MainWindow is MainWindow mainWindow && mainWindow.operateFrame.Content is OperatePage operatePage)
+            {
+                operatePage.SetOperateShowType(2);
             }
         }
 

@@ -76,7 +76,8 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         private async Task ReplaceBladeAsync()
         {
             await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(60), _cts.Token);
-            await AutoCutUtils.ReplaceBladeAsync(default, timeoutToken.Token);
+            await AutoCutUtils.ReplaceBladeAsync(default, timeoutToken.Token); 
+            InitData();
         }
 
         private async Task ReplaceWaferAsync()

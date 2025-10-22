@@ -34,12 +34,13 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
         private MainWindow? mainWindow;
         private RightPage? rightPage;
         private OperatePage? operatePage;
+
         //实体类
         private PositionAlignmentModel _model;
 
         public ETPositionAlignmentConf()
         {
-            InitializeComponent();            
+            InitializeComponent();
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -60,7 +61,6 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
 
             //调用
             _ = initData();
-
         }
 
         private void BtnBack_RightClicked(object? sender, bool e)
@@ -107,7 +107,6 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
             initView();
         }
 
-
         //数据显示
         private void initView()
         {
@@ -125,9 +124,9 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
             // inputInitPosition.Text = _model.InitPosition;
             //inputFocusRatio.Text = _model.FocusRatio;
             // inputMultipleNum.Text = _model.MultipleNum;
-            inputLightIntensityChannel.Text = _model.LightIntensityChannel + "";
-            inputLowLightIntensityChannel.Text = _model.LowLightIntensityChannel + "";
-            inputRingLightIntensityChannel.Text = _model.RingLightIntensityChannel + "";
+            //inputLightIntensityChannel.Text = _model.LightIntensityChannel + "";
+            //inputLowLightIntensityChannel.Text = _model.LowLightIntensityChannel + "";
+            //inputRingLightIntensityChannel.Text = _model.RingLightIntensityChannel + "";
             inputWorkDiscFocusPosition.Text = (Appsettings.FocusClearZ ?? 0).ToString();
 
             //如果是空或者小数位数不足-小数初始化为0
@@ -157,9 +156,9 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
                 //_model.CameraOffsetY = inputCameraOffsetY.Text;
                 //_model.HighMagToLowMagCameraXOffset = inputHighMagToLowMagCameraXOffset.Text;
                 //_model.HighMagToLowMagCameraYOffset = inputHighMagToLowMagCameraYOffset.Text;
-                _model.LightIntensityChannel = Tools.GetIntStringValue(inputLightIntensityChannel.Text);
-                _model.LowLightIntensityChannel = Tools.GetIntStringValue(inputLowLightIntensityChannel.Text);
-                _model.RingLightIntensityChannel = Tools.GetIntStringValue(inputRingLightIntensityChannel.Text);
+                //_model.LightIntensityChannel = Tools.GetIntStringValue(inputLightIntensityChannel.Text);
+                //_model.LowLightIntensityChannel = Tools.GetIntStringValue(inputLowLightIntensityChannel.Text);
+                //_model.RingLightIntensityChannel = Tools.GetIntStringValue(inputRingLightIntensityChannel.Text);
                 _model.WorkDiscFocusPosition = Tools.GetFloatStringValue(inputWorkDiscFocusPosition.Text);
                 Appsettings.FocusClearZ = inputWorkDiscFocusPosition.Text.ToFloat();
                 Appsettings.CameraThetaCenterPoint = new DataPoint<float>(inputThetaCameraLocationX.Text.ToFloat(), inputThetaCameraLocationY.Text.ToFloat());
@@ -172,6 +171,7 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
                 Tools.LogError("6.5数据异常！");
             }
         }
+
         public void initTbNumber()
         {
             List<InputTextBox> tbs = Tools.GetChildrenOfType<InputTextBox>(this);
@@ -185,13 +185,15 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
         /// 表单内容是否错误  false是正常 true是出错了
         /// </summary>
         /// <returns>false表示没有错误，true表示出错了</returns>
-        public bool FormError() { 
+        public bool FormError()
+        {
             bool result = false;
             List<InputTextBox> tbs = Tools.GetChildrenOfType<InputTextBox>(this);
             for (int i = 0; i < tbs.Count; i++)
             {
                 bool isError = tbs[i].XIsError;
-                if (isError) {
+                if (isError)
+                {
                     result = true;
                     break;
                 }
@@ -207,7 +209,5 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
         {
             return !FormError();
         }
-
-       
     }
 }

@@ -244,7 +244,7 @@ namespace 精密切割系统.ViewModel
 
         public override void OnNavigatedTo(NavigationContext navigationContext)
         {
-            base.OnNavigatedTo(navigationContext);
+            NavigateUtils.ClearMainFrame();
             InitRightButton();
         }
     }

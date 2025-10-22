@@ -182,8 +182,8 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
                         await PlcControl.tagControl.Yaxis.StartRelativeAsync(-0.5f, 5, token);
                         await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(xRight, FlangeTrimmingData.Instance.CutSpeed, token);
                         await PlcControl.tagControl.Yaxis.StartRelativeAsync(0.5f, 5, token);
-                        await PlcControl.tagControl.Yaxis.StartRelativeAsync(FlangeTrimmingData.Instance.YStepDistance, 1, token);
                     }
+                    await PlcControl.tagControl.Yaxis.StartRelativeAsync(FlangeTrimmingData.Instance.YStepDistance, 1, token);
                     currentCount.Text = (currentCount.Text.ToInt() + 1).ToString();
                 }
             }

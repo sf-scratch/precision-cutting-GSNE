@@ -263,15 +263,16 @@ namespace 精密切割系统.Assets.config.buttom
         {
             var list = new List<OperateBean>();
             list.Add(new OperateBean(2466, "Z轴上升", "/Assets/icon/tab_1/03/z_axis_up.png"));
-            list.Add(new OperateBean(-1, "", ""));
-            list.Add(new OperateBean(-1, "", ""));
             list.Add(new OperateBean(2407, "基准线调窄", "/Assets/icon/tab_1/03/tab_02.png"));
-            list.Add(new OperateBean(2443, "θ轴竖向校正", "/Assets/icon/tab_1/03/theta-align-vertical.png"));
+            list.Add(new OperateBean(-1, "", ""));
+            list.Add(new OperateBean(-1, "", ""));
+            list.Add(new OperateBean(-1, "", ""));
             list.Add(new OperateBean(2477, "Z轴下降", "/Assets/icon/tab_1/03/z_axis_down.png"));
-            list.Add(new OperateBean(2442, "对焦", "/Assets/icon/tab_1/03/tab_01.png"));
-            list.Add(new OperateBean(2570, "位置清零", "/Assets/icon/tab_1/03/z_axis_down.png"));
             list.Add(new OperateBean(2408, "基准线调宽", "/Assets/icon/tab_1/03/tab_05.png"));
-            list.Add(new OperateBean(2453, "θ轴横向校正", "/Assets/icon/tab_1/03/tab_04.png"));
+            list.Add(new OperateBean(2570, "位置清零", "/Assets/icon/tab_1/03/z_axis_down.png"));
+            //list.Add(new OperateBean(2443, "θ轴竖向校正", "/Assets/icon/tab_1/03/theta-align-vertical.png"));
+            //list.Add(new OperateBean(2442, "对焦", "/Assets/icon/tab_1/03/tab_01.png"));
+            //list.Add(new OperateBean(2453, "θ轴横向校正", "/Assets/icon/tab_1/03/tab_04.png"));
             return list;
         }
 
