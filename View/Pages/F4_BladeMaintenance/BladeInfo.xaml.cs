@@ -56,7 +56,21 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             }
             pageName = QueryUtils.GetValueFromQueryParams(this, "pageName");
             mainWindow.UpdateOperatePage(new List<OperateBean>(), null);
-            initData();
+            InitData();
+        }
+
+        private void InitData()
+        {
+            bladeOuterDiameter.Text = Appsettings.BladeOuterDiameter?.ToString("F3");
+            bladeThickness.Text = Appsettings.BladeThickness?.ToString("F3");
+            afterReplaceBladeCutTimes.Text = Appsettings.AfterReplaceBladeCutTimes?.ToString();
+            afterReplaceBladeCutLength.Text = (Appsettings.AfterReplaceBladeCutLength / 1000 ?? 0).ToString("F2");
+            afterMeasureHeightCutTimes.Text = Appsettings.AfterMeasureHeightCutTimes?.ToString();
+            afterMeasureHeightCutLength.Text = (Appsettings.AfterMeasureHeightCutLength / 1000 ?? 0).ToString("F2");
+            afterClearDataCutTimes.Text = Appsettings.AfterClearDataCutTimes?.ToString();
+            afterClearDataCutLength.Text = (Appsettings.AfterClearDataCutLength / 1000 ?? 0).ToString("F2");
+            measureHeightFirst.Text = Appsettings.MeasureHeightFirst?.ToString("F3");
+            measureHeightLast.Text = Appsettings.MeasureHeightLast?.ToString("F3");
         }
 
         private void BtnBack_RightClicked(object? sender, bool e)
@@ -68,74 +82,6 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             else
             {
                 mainWindow.NavigateToPage(pageName, urlParams);
-            }
-        }
-
-        //初始化数据
-        private async Task initData()
-        {
-            //测高参数的数据
-            List<BladeHeightModel> list = await SqlHelper.TableAsync<BladeHeightModel>()
-                    .Where(t => t.Id == 1).ToListAsync();
-            //数据不存在，则初始化数据
-            if (list.Count() == 0)
-            {
-                _model = new BladeHeightModel();
-                _model.Id = 1;
-                //await SqlHelper.AddAsync(_model);
-            }
-            else
-            {
-                _model = list[0];
-            }
-            //tbChuckTableSize.Text = _model.ChuckTableSize;
-            //tbTableType.Text = _model.TableType;
-            //tbChuckTableShape.Text = _model.ChuckTableShape;
-            //if ("ROUND".Equals(_model.ChuckTableShape))
-            //{
-            //    showRound.Visibility = Visibility.Visible;
-            //}
-            //else
-            //{
-            //    showRound.Visibility = Visibility.Hidden; //隐藏
-            //}
-
-            //刀片更换的数据
-            ReplaceBladeModel _gh = new ReplaceBladeModel();
-            List<ReplaceBladeModel> list_gh = await SqlHelper.TableAsync<ReplaceBladeModel>()
-                    .Where(t => t.Id == 1).ToListAsync();
-            if (list_gh.Count() == 0)
-            {
-                _gh = new ReplaceBladeModel();
-                _model.Id = 1;
-                //await SqlHelper.AddAsync(_model);
-            }
-            else
-            {
-                _gh = list_gh[0];
-            }
-            tbBladeLotID.Text = _gh.BladeLotID;
-            tbBladeOutside.Text = _gh.BladeOutside;
-            tbSpecName.Text = _gh.SpecName;
-            inputTextBox6.Text = _model.BladeHeight;
-            // 切割数据
-            inputTextBox14.Text = GlobalParams.cutAllDistance + "";
-            inputTextBox15.Text = GlobalParams.cutAllNum + "";
-            inputTextBox17.Text = GlobalParams.heightCutAllDistance + "";
-            inputTextBox16.Text = GlobalParams.heightCutAllNum + "";
-            CurrentConfigurationModel currentConfigurationModel = CurrentUtils.GetCurrentConfiguration();
-            inputTextBox19.Text = currentConfigurationModel.ClearedCutAllDistance + "";
-            inputTextBox18.Text = currentConfigurationModel.ClearedCutAllNum + "";
-            //如果是空或者小数位数不足-小数初始化为0
-            initTbNumber();
-        }
-
-        public void initTbNumber()
-        {
-            List<InputTextBox> tbs = Tools.GetChildrenOfType<InputTextBox>(this);
-            for (int i = 0; i < tbs.Count; i++)
-            {
-                tbs[i].initNumber();
             }
         }
     }

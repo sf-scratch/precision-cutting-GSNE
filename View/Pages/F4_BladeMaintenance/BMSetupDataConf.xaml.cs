@@ -16,7 +16,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using 精密切割系统.Assets.config.buttom;
+using 精密切割系统.Data;
 using 精密切割系统.database.db.modle;
+using 精密切割系统.Extensions;
 using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.common;
@@ -50,7 +52,6 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         {
             InitializeComponent();
             _eventAggregator = ContainerLocator.Current.Resolve<IEventAggregator>();
-            _viewModel = new BladeHeightViewModel();
             RealTimeInfo.Messages = [];
         }
 
@@ -126,21 +127,24 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             RealTimeInfo.Messages.Add(model);
         }
 
-        public async void LoadDBData()
+        public void LoadDBData()
         {
-            List<BladeHeightModel> list = await SqlHelper.TableAsync<BladeHeightModel>().Where(t => t.Id == 1).ToListAsync();
-            if (list.Count > 0)
+            spindleRev.Text = BmSetupData.Instance.SpindleRev.ToString();
+            heightMeasureTimes.Text = BmSetupData.Instance.HeightMeasureTimes.ToString();
+            isAutomHeightMeasureBeforeCutting.IsChecked = BmSetupData.Instance.IsAutomHeightMeasureBeforeCutting;
+        }
+
+        private void BtnSure_RightClicked(object? sender, bool e)
+        {
+            if (this.HasFormError())
             {
-                _viewModel._bladeHeightModel = list[0];
+                MaterialSnack("表单填写有误，请检查!", SnackType.ERROR);
+                return;
             }
-            else
-            {
-                await SqlHelper.AddAsync(_viewModel._bladeHeightModel);
-            }
-            DataContext = _viewModel;
-            _viewModel.SetupDefault = "CONTACT";
-            _viewModel.CallOperatorWhenAutoSetup = "NO";
-            _viewModel.PrecutAfterNonContactSetup = "NO";
+            BmSetupData.Instance.SpindleRev = spindleRev.Text.ToInt();
+            BmSetupData.Instance.HeightMeasureTimes = heightMeasureTimes.Text.ToInt();
+            BmSetupData.Instance.IsAutomHeightMeasureBeforeCutting = isAutomHeightMeasureBeforeCutting.IsChecked ?? false;
+            MaterialSnack("测高参数已确认!", SnackType.SUCCESS);
         }
 
         private void BtnBack_RightClicked(object? sender, bool e)
@@ -153,84 +157,6 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 return;
             }
             _mainWindow.NavigateToPage("MainMenu");
-        }
-
-        private async void BtnSure_RightClicked(object? sender, bool e)
-        {
-            if (string.IsNullOrEmpty(_viewModel.ChuckTableSize))
-            {
-                MaterialSnackUtils.MaterialSnack("请选择工作盘尺寸", MaterialSnackUtils.SnackType.ERROR);
-                return;
-            }
-            if (string.IsNullOrEmpty(_viewModel.ChuckTableShape))
-            {
-                MaterialSnackUtils.MaterialSnack("请选择工作盘形状", MaterialSnackUtils.SnackType.ERROR);
-                return;
-            }
-            if (string.IsNullOrEmpty(_viewModel.TableType))
-            {
-                MaterialSnackUtils.MaterialSnack("请选择工作盘种类", MaterialSnackUtils.SnackType.ERROR);
-                return;
-            }
-            //执行数据库数据保存。
-            var success = this.FormSuccess();
-            if (success)
-            {
-                await SaveData();
-                MaterialSnackUtils.MaterialSnack("操作成功", MaterialSnackUtils.SnackType.SUCCESS);
-                PlcControl.tagControl.bladeMantance.SetSetupParams(_viewModel._bladeHeightModel);
-            }
-            else
-            {
-                MaterialSnackUtils.MaterialSnack("数据异常", MaterialSnackUtils.SnackType.ERROR);
-            }
-        }
-
-        public async Task SaveData()
-        {
-            _bladeHeightModel = _viewModel._bladeHeightModel;
-            if (_viewModel.IsBladeUnitInch)
-            {
-                _bladeHeightModel.Unit = "inch";
-            }
-            else if (_viewModel.IsBladeUnitMm)
-            {
-                _bladeHeightModel.Unit = "mm";
-            }
-            if (_bladeHeightModel != null)
-            {
-                await SqlHelper.UpdateAsync(_bladeHeightModel);
-            }
-        }
-
-        /// <summary>
-        /// 表单内容是否错误  false是正常 true是出错了
-        /// </summary>
-        /// <returns>false表示没有错误，true表示出错了</returns>
-        public bool FormError()
-        {
-            bool result = false;
-            List<InputTextBox> tbs = Tools.GetChildrenOfType<InputTextBox>(this);
-            for (int i = 0; i < tbs.Count; i++)
-            {
-                InputTextBox tb = tbs[i];
-                tb.ValidationCheck();
-                bool isError = tb.XIsError;
-                if (isError)
-                {
-                    result = true;
-                }
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// 表单内容验证通过  false是不通过 true是通过
-        /// </summary>
-        /// <returns>false是不通过 true是通过</returns>
-        public bool FormSuccess()
-        {
-            return !FormError();
         }
     }
 }

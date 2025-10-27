@@ -15,7 +15,7 @@ namespace 精密切割系统.Data
 
         public static FlangeTrimmingData Instance => _lazy.Value;
 
-        private FlangeTrimmingData() : base("Assets\\config\\data\\flangeTrimming.json")
+        private FlangeTrimmingData() : base("flangeTrimming.json")
         {
         }
 

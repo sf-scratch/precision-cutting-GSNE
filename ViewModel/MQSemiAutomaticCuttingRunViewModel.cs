@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
+using 精密切割系统.Data;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
 using 精密切割系统.Helpers;
@@ -112,19 +113,29 @@ namespace 精密切割系统.ViewModel
                 {
                     try
                     {
-                        if (AlarmConfig.Instance.HasAutoRunUnexpectedAlarms())
+                        if (AlarmConfig.Instance.HasAutoRunUnexpectedAlarms(out bool[]? alarms))
                         {
-                            if (!_pauseCts.IsCancellationRequested)
+                            // 等待1秒钟再判断报警是否还存在
+                            await Task.Delay(1000, default);
+                            if (AlarmConfig.Instance.HasAutoRunUnexpectedAlarms())
                             {
-                                bool[]? alarms = AlarmConfig.Instance.GetNewestAlarms();
+                                if (!_pauseCts.IsCancellationRequested)
+                                {
+                                    if (alarms != null && AlarmConfig.Instance.TryGetActiveAlarms(alarms, out List<AlarmInfo> alarmInfos))
+                                    {
+                                        string alarmMessages = string.Join(",", alarmInfos.Select(a => a.Message));
+                                        _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"切割异常：{alarmMessages}"));
+                                    }
+                                    Pause();
+                                }
+                            }
+                            else
+                            {
                                 if (alarms != null && AlarmConfig.Instance.TryGetActiveAlarms(alarms, out List<AlarmInfo> alarmInfos))
                                 {
-                                    foreach (AlarmInfo alarmInfo in alarmInfos)
-                                    {
-                                        Tools.LogDebug($"切割异常报警：{alarmInfo.Message}");
-                                    }
+                                    string alarmMessages = string.Join(",", alarmInfos.Select(a => a.Message));
+                                    _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"切割中途闪烁异常：{alarmMessages}"));
                                 }
-                                Pause();
                             }
                         }
                     }
@@ -198,15 +209,25 @@ namespace 精密切割系统.ViewModel
             {
                 await PlcControl.tagControl.wholeDevice.OpenCutSecurityDoorAsync();
             }
+            await PlcControl.tagControl.wholeDevice.OpenGreenLightAsync();
             FileTableItemModel fileTableItem = fileTableItemResult.Data;
             _ = MonitoringAlarmAsync(_monitoringCts.Token);
             _ = MonitoringCutProgressAsync(_monitoringCts.Token);
             float cutY = (await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0).ToActualY();
-            CommonResult<float> curHeightZ = await AutoCutUtils.ProcessCombineMeasureHeightAsync(_eventAggregator, _pauseCts.Token);
-            if (!curHeightZ.IsSuccess)
+            float measureHeightZ = 0;
+            if (BmSetupData.Instance.IsAutomHeightMeasureBeforeCutting && Appsettings.MeasureHeightLast is not null)
             {
-                ShowWarnMessageNavigateHome(curHeightZ.Message);
-                return;
+                measureHeightZ = Appsettings.MeasureHeightLast.Value;
+            }
+            else
+            {
+                CommonResult<float> curHeightZ = await AutoCutUtils.ProcessCombineMeasureHeightAsync(_eventAggregator, _pauseCts.Token);
+                if (!curHeightZ.IsSuccess)
+                {
+                    ShowWarnMessageNavigateHome(curHeightZ.Message);
+                    return;
+                }
+                measureHeightZ = curHeightZ.Data;
             }
             Stopwatch stopwatch = Stopwatch.StartNew();
             try
@@ -216,7 +237,7 @@ namespace 精密切割系统.ViewModel
                 _semiAutoCutService.CutServicePaused += CutService_CutServicePaused;
                 MaterialSnack($"切割中...", SnackType.WARNING, 0, _eventAggregator);
                 float margin = Appsettings.AdditionalMargin ?? 20;
-                RunResult cutResult = await _semiAutoCutService.RunAsync(cutStepResult.Data, workpiece, margin, fileTableItem.SpindleRev, curHeightZ.Data, GlobalParams.BladeLiftingHeight, false, _pauseCts.Token);
+                RunResult cutResult = await _semiAutoCutService.RunAsync(cutStepResult.Data, workpiece, margin, fileTableItem.SpindleRev, measureHeightZ, GlobalParams.BladeLiftingHeight, false, _pauseCts.Token);
                 if (!cutResult.IsSuccess)
                 {
                     MaterialSnack($"{cutResult.Message}", SnackType.WARNING, 0, _eventAggregator);
@@ -272,7 +293,7 @@ namespace 精密切割系统.ViewModel
             return workpiece;
         }
 
-        private void Pause()
+        private async void Pause()
         {
             if (!GlobalParams.OnlineFlag)
             {
@@ -289,6 +310,7 @@ namespace 精密切割系统.ViewModel
             }
             // 暂停token
             _pauseCts.Cancel();
+            await PlcControl.tagControl.wholeDevice.OpenYellowLightAsync();
         }
 
         public async Task ContinueAsync()
@@ -300,6 +322,7 @@ namespace 精密切割系统.ViewModel
             }
             MaterialSnack("正在继续切割...", SnackType.WARNING, 0, _eventAggregator);
             _pauseCts = new CancellationTokenSource();
+            await PlcControl.tagControl.wholeDevice.OpenGreenLightAsync();
             await PlcControl.tagControl.cutting.EnterCuttingModeAsync(_pauseCts.Token);
             SemiAutoCutService.Instance.Continue(_pauseCts.Token);
             MaterialSnack("切割中...", SnackType.WARNING, 0, _eventAggregator);
@@ -388,6 +411,10 @@ namespace 精密切割系统.ViewModel
                 {
                     Appsettings.AfterReplaceBladeCutTimes++;
                     Appsettings.AfterReplaceBladeCutLength += process.CutLength;
+                    Appsettings.AfterMeasureHeightCutTimes++;
+                    Appsettings.AfterMeasureHeightCutLength += process.CutLength;
+                    Appsettings.AfterClearDataCutTimes++;
+                    Appsettings.AfterClearDataCutLength += process.CutLength;
                     CutParam.AllCutLine = Appsettings.AfterReplaceBladeCutTimes ?? 0;
                     CutParam.AllCutLineLength = (Appsettings.AfterReplaceBladeCutLength / 1000 ?? 0).ToString("F2");
                     if (process.CutTimes > 1)

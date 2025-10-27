@@ -1057,11 +1057,23 @@
       "name": "蜂鸣",
       "describe": "蜂鸣"
     },
-    "yellowLightFlash": {
+    "greenLightFlash": {
       "valueType": "bool",
       "addr": "MR1007",
+      "name": "绿灯闪",
+      "describe": "绿灯闪"
+    },
+    "yellowLightFlash": {
+      "valueType": "bool",
+      "addr": "MR1008",
       "name": "黄灯闪",
       "describe": "黄灯闪"
+    },
+    "redLightFlash": {
+      "valueType": "bool",
+      "addr": "MR1009",
+      "name": "红灯闪",
+      "describe": "红灯闪"
     },
     "ioModel": {
       "valueType": "bool",

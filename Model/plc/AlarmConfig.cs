@@ -144,6 +144,33 @@ namespace 精密切割系统.Model.plc
         /// 是否有激活的错误报警
         /// </summary>
         /// <returns></returns>
+        public bool HasActiveErrorAlarm(out bool[]? newestAlarms, params string[] notCheckedAddres)
+        {
+            newestAlarms = null;
+            if (!GlobalParams.OnlineFlag) return false; // 如果不在线，则不检查报警
+            lock (_lock)
+            {
+                if (_newestAlarms == null || _newestAlarms.Length == 0 || _newestAlarms.Length != _alarmInfos.Length) return true;
+
+                // 将排除地址转换为HashSet提高查找性能
+                var excludeAddresses = notCheckedAddres?.Length > 0 ? new HashSet<string>(notCheckedAddres) : null;
+
+                for (int i = 0; i < _newestAlarms.Length; i++)
+                {
+                    if (_newestAlarms[i] && _alarmInfos[i].Level == AlarmLevel.Error && (excludeAddresses == null || !excludeAddresses.Contains(_alarmInfos[i].Address)))
+                    {
+                        newestAlarms = _newestAlarms.Clone() as bool[];
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 是否有激活的错误报警
+        /// </summary>
+        /// <returns></returns>
         public bool HasActiveErrorAlarm()
         {
             if (!GlobalParams.OnlineFlag) return false; // 如果不在线，则不检查报警
@@ -238,6 +265,15 @@ namespace 精密切割系统.Model.plc
         public bool HasAutoRunUnexpectedAlarms()
         {
             return Instance.HasActiveErrorAlarm("MR60408", "MR61000", "MR61100", "MR61200", "MR61300", "MR61400");
+        }
+
+        /// <summary>
+        /// 自动运行预料外的报警
+        /// </summary>
+        /// <returns></returns>
+        public bool HasAutoRunUnexpectedAlarms(out bool[]? newestAlarms)
+        {
+            return Instance.HasActiveErrorAlarm(out newestAlarms, "MR60408", "MR61000", "MR61100", "MR61200", "MR61300", "MR61400");
         }
 
         /// <summary>

@@ -38,7 +38,7 @@
                 Padding="0,0,0,0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
-                Content="法兰修整 (2.1.1)"
+                Content="法兰修整 (5.1)"
                 FontSize="30"
                 FontWeight="Bold" />
         </Grid>

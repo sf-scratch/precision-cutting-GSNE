@@ -26,7 +26,14 @@ namespace 精密切割系统.ViewModel
         private DataPoint<float>? _originPoint;
         private SemaphoreSlim _semaph = new SemaphoreSlim(1, 1);
         private CancellationTokenSource _operatCts;
-        public SemiAutomaticCutParamModel CutParam { get; set; }
+
+        private SemiAutomaticCutParamModel _cutParam;
+
+        public SemiAutomaticCutParamModel CutParam
+        {
+            get { return _cutParam; }
+            set { SetProperty(ref _cutParam, value); }
+        }
 
         public MQSemiAutomaticCuttingStopViewModel()
         {

@@ -93,6 +93,24 @@ namespace 精密切割系统.Helpers
         }
 
         /// <summary>
+        /// 自测高起刀片切了多长
+        /// </summary>
+        public static float? AfterMeasureHeightCutLength
+        {
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
+        }
+
+        /// <summary>
+        /// 自清空数据起刀片切了多长
+        /// </summary>
+        public static float? AfterClearDataCutLength
+        {
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
+        }
+
+        /// <summary>
         /// 第一次测高位置
         /// </summary>
         public static float? MeasureHeightFirst
@@ -159,6 +177,24 @@ namespace 精密切割系统.Helpers
         /// 自更换刀片起刀片切了几道
         /// </summary>
         public static int? AfterReplaceBladeCutTimes
+        {
+            get => GetValue<int>();
+            set => UpdateAppSettings(value);
+        }
+
+        /// <summary>
+        /// 自更测高起刀片切了几道
+        /// </summary>
+        public static int? AfterMeasureHeightCutTimes
+        {
+            get => GetValue<int>();
+            set => UpdateAppSettings(value);
+        }
+
+        /// <summary>
+        /// 自清空数据起刀片切了几道
+        /// </summary>
+        public static int? AfterClearDataCutTimes
         {
             get => GetValue<int>();
             set => UpdateAppSettings(value);

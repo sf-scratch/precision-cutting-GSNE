@@ -44,7 +44,7 @@
             Margin="30,30,0,0"
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
-            Content="功能参数设定（5.3）"
+            Content="功能参数设定（5.4）"
             FontSize="30"
             FontWeight="Bold" />
         <auto:AutoGrid

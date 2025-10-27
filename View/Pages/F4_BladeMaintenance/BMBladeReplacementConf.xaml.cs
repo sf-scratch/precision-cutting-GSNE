@@ -76,7 +76,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         private async Task ReplaceBladeAsync()
         {
             await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(60), _cts.Token);
-            await AutoCutUtils.ReplaceBladeAsync(default, timeoutToken.Token); 
+            await AutoCutUtils.ReplaceBladeAsync(default, timeoutToken.Token);
             InitData();
         }
 
@@ -92,6 +92,10 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             bladeThickness.Text = Appsettings.BladeThickness?.ToString("F3");
             afterReplaceBladeCutTimes.Text = Appsettings.AfterReplaceBladeCutTimes?.ToString();
             afterReplaceBladeCutLength.Text = (Appsettings.AfterReplaceBladeCutLength / 1000 ?? 0).ToString("F2");
+            afterMeasureHeightCutTimes.Text = Appsettings.AfterMeasureHeightCutTimes?.ToString();
+            afterMeasureHeightCutLength.Text = (Appsettings.AfterMeasureHeightCutLength / 1000 ?? 0).ToString("F2");
+            afterClearDataCutTimes.Text = Appsettings.AfterClearDataCutTimes?.ToString();
+            afterClearDataCutLength.Text = (Appsettings.AfterClearDataCutLength / 1000 ?? 0).ToString("F2");
             measureHeightFirst.Text = Appsettings.MeasureHeightFirst?.ToString("F3");
             measureHeightLast.Text = Appsettings.MeasureHeightLast?.ToString("F3");
         }

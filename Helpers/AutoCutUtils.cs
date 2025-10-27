@@ -22,6 +22,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using 精密切割系统.Data;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
 using 精密切割系统.DTOs;
@@ -187,6 +188,7 @@ namespace 精密切割系统.Helpers
 
         public static async Task<CommonResult<float>> ProcessCombineMeasureHeightAsync(IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
+            await PlcControl.tagControl.cutting.SetSpindleSpeedAsync(BmSetupData.Instance.SpindleRev);
             await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
             CommonResult<float> curHeightZ;
             if (Appsettings.MeasureHeightLast == null)
@@ -209,6 +211,8 @@ namespace 精密切割系统.Helpers
                 await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(Appsettings.MeasureHeightLast.Value - 0.15f);
                 curHeightZ = await ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, eventAggregator, token);
             }
+            Appsettings.AfterReplaceBladeCutTimes = 0;
+            Appsettings.AfterReplaceBladeCutLength = 0;
             Appsettings.MeasureHeightLast = curHeightZ.IsSuccess ? curHeightZ.Data : null;
             return curHeightZ;
         }
@@ -288,19 +292,6 @@ namespace 精密切割系统.Helpers
                         //进入测高模式
                         await PlcControl.tagControl.bladeMantance.StartBladeSetupAsync();
                         eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始测高！"));
-                        BladeHeightModel bladeHeightModel;
-                        //测高参数的数据
-                        List<BladeHeightModel> list = await SqlHelper.TableAsync<BladeHeightModel>().Where(t => t.Id == 1).ToListAsync();
-                        //数据不存在，则初始化数据
-                        if (list == null || list.Count == 0)
-                        {
-                            return CommonResult<float>.Failure("获取测高参数失败！");
-                        }
-                        bladeHeightModel = list[0];
-                        if (!int.TryParse(bladeHeightModel.Retry, out int retry))
-                        {
-                            return CommonResult<float>.Failure("测高参数异常！");
-                        }
                         // 发送测高开始信号到PLC
                         await PlcControl.tagControl.bladeMantance.StartSetupAsync();
                         List<float> setupValueList = [];
@@ -310,7 +301,8 @@ namespace 精密切割系统.Helpers
                             return CommonResult<float>.Failure("测高次数获取失败！");
                         }
                         int curMeasureHeightTimes = measureHeightTimes.Value;
-                        while (curMeasureHeightTimes < retry)
+                        int heightMeasureTimes = BmSetupData.Instance.HeightMeasureTimes;
+                        while (curMeasureHeightTimes < heightMeasureTimes)
                         {
                             curMeasureHeightTimes++;
                             await PlcControl.tagControl.bladeMantance.WaitHeightMeasureSetupNumberUdatedAsync(curMeasureHeightTimes, useToken);
@@ -379,6 +371,8 @@ namespace 精密切割系统.Helpers
                 repeatMeasureCts.Dispose();
                 linkedCts.Cancel();
                 linkedCts.Dispose();
+                // 关闭接触测高
+                await PlcControl.tagControl.bladeMantance.StartNoContactHeightMeasurement();
             }
             return CommonResult<float>.Failure("测高失败次数过多！");
         }

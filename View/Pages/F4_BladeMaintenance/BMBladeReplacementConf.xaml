@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
+    xmlns:auto="clr-namespace:WpfAutoGrid;assembly=WpfAutoGrid.Core"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:精密切割系统.ViewModel"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -14,14 +15,18 @@
     mc:Ignorable="d">
     <Page.Resources>
         <Style TargetType="Label">
-            <Setter Property="Height" Value="35" />
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="FontSize" Value="16" />
             <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="Bold" />
         </Style>
         <Style BasedOn="{StaticResource InputTextStyle}" TargetType="Controls:InputTextBox">
-            <Setter Property="Width" Value="250" />
-            <Setter Property="Height" Value="35" />
             <Setter Property="InputType" Value="Decimal" />
             <Setter Property="TextWrapping" Value="Wrap" />
             <Setter Property="XMin" Value="0" />
@@ -39,7 +44,6 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
             <ColumnDefinition />
-            <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <Label
             x:Name="labBladeReplacementHeader"
@@ -51,50 +55,44 @@
             Content="刀片更换(3.1)"
             FontSize="22"
             FontWeight="Bold" />
-        <StackPanel
+        <auto:AutoGrid
             Grid.Row="1"
-            Grid.Column="0"
-            HorizontalAlignment="Left">
-            <StackPanel Margin="0,10,0,0">
-                <Label Content="刀片外径" />
-                <StackPanel Orientation="Horizontal">
-                    <Controls:InputTextBox x:Name="bladeOuterDiameter" />
-                    <Label Content="mm" FontSize="14" />
-                </StackPanel>
-            </StackPanel>
-            <StackPanel Margin="0,10,0,0">
-                <Label Content="刀片厚度" />
-                <StackPanel Orientation="Horizontal">
-                    <Controls:InputTextBox x:Name="bladeThickness" />
-                    <Label Content="mm" FontSize="14" />
-                </StackPanel>
-            </StackPanel>
-            <StackPanel Margin="0,10,0,0">
-                <Label Content="刀片使用寿命" />
-                <StackPanel Orientation="Horizontal">
-                    <Controls:InputTextBox x:Name="afterReplaceBladeCutTimes" IsEnabled="False" />
-                    <Label Content="刀" FontSize="14" />
-                </StackPanel>
-                <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
-                    <Controls:InputTextBox x:Name="afterReplaceBladeCutLength" IsEnabled="False" />
-                    <Label Content="m" FontSize="14" />
-                </StackPanel>
-            </StackPanel>
-            <StackPanel Margin="0,10,0,0">
-                <Label Content="第一次测高" />
-                <StackPanel Orientation="Horizontal">
-                    <Controls:InputTextBox x:Name="measureHeightFirst" IsEnabled="False" />
-                    <Label Content="mm" FontSize="14" />
-                </StackPanel>
-            </StackPanel>
-            <StackPanel Margin="0,10,0,0">
-                <Label Content="最后一次测高" />
-                <StackPanel Orientation="Horizontal">
-                    <Controls:InputTextBox x:Name="measureHeightLast" IsEnabled="False" />
-                    <Label Content="mm" FontSize="14" />
-                </StackPanel>
-            </StackPanel>
-        </StackPanel>
+            Margin="10"
+            ChildMargin="5"
+            Columns="2*,2*,*,2*,2*,*"
+            RowCount="10">
+            <Label Content="刀片外径" />
+            <Controls:InputTextBox x:Name="bladeOuterDiameter" />
+            <TextBlock Text="mm" />
+            <Label Content="刀片厚度" />
+            <Controls:InputTextBox x:Name="bladeThickness" />
+            <TextBlock Text="mm" />
+            <Label Content="第一次测高" />
+            <Controls:InputTextBox x:Name="measureHeightFirst" IsEnabled="False" />
+            <TextBlock Text="mm" />
+            <Label Content="最后一次测高" />
+            <Controls:InputTextBox x:Name="measureHeightLast" IsEnabled="False" />
+            <TextBlock Text="mm" />
+            <TextBlock
+                Grid.ColumnSpan="6"
+                FontSize="20"
+                Text="刀片使用寿命" />
+            <Label Content="刀片更换后" />
+            <Controls:InputTextBox x:Name="afterReplaceBladeCutTimes" IsEnabled="False" />
+            <TextBlock Grid.ColumnSpan="2" Text="刀" />
+            <Controls:InputTextBox x:Name="afterReplaceBladeCutLength" IsEnabled="False" />
+            <TextBlock Text="m" />
+            <Label Content="测高后" />
+            <Controls:InputTextBox x:Name="afterMeasureHeightCutTimes" IsEnabled="False" />
+            <TextBlock Grid.ColumnSpan="2" Text="刀" />
+            <Controls:InputTextBox x:Name="afterMeasureHeightCutLength" IsEnabled="False" />
+            <TextBlock Text="m" />
+            <Label Content="清除数据后" />
+            <Controls:InputTextBox x:Name="afterClearDataCutTimes" IsEnabled="False" />
+            <TextBlock Grid.ColumnSpan="2" Text="刀" />
+            <Controls:InputTextBox x:Name="afterClearDataCutLength" IsEnabled="False" />
+            <TextBlock Text="m" />
+        </auto:AutoGrid>
         <!--<StackPanel Grid.Row="1" Grid.Column="1" x:Name="sp2"  HorizontalAlignment="Left">
             <Label x:Name="labSpec" Width="250" Height="35" Content="更换刀片的品种名称" FontWeight="Bold" FontSize="16" />
             <Controls:InputTextBox x:Name="tbxSpec" Text="{Binding Path=SpecName,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Width="250"  TextWrapping="Wrap"  Height="35" MaxLength="15" />

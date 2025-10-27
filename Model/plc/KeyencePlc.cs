@@ -2091,8 +2091,14 @@ namespace 精密切割系统.Driver
         // 蜂鸣
         public Tag buzzer { get; set; }
 
+        // 绿灯闪
+        public Tag greenLightFlash { get; set; }
+
         // 黄灯闪
         public Tag yellowLightFlash { get; set; }
+
+        // 红灯闪
+        public Tag redLightFlash { get; set; }
 
         // IO检测模式
         public Tag ioModel { get; set; }
@@ -2517,6 +2523,53 @@ namespace 精密切割系统.Driver
         {
             buzzer.writeValue = "0";
             await keyencePlc.WriteTagAsync(buzzer);
+        }
+
+        /// <summary>
+        /// 打开绿灯闪烁
+        /// </summary>
+        /// <returns></returns>
+        public async Task OpenGreenLightAsync()
+        {
+            await CloseAllLightAsync();
+            greenLightFlash.writeValue = "1";
+            await keyencePlc.WriteTagAsync(greenLightFlash);
+        }
+
+        /// <summary>
+        /// 打开黄灯闪烁
+        /// </summary>
+        /// <returns></returns>
+        public async Task OpenYellowLightAsync()
+        {
+            await CloseAllLightAsync();
+            yellowLightFlash.writeValue = "1";
+            await keyencePlc.WriteTagAsync(yellowLightFlash);
+        }
+
+        /// <summary>
+        /// 打开红灯闪烁
+        /// </summary>
+        /// <returns></returns>
+        public async Task OpenRedLightAsync()
+        {
+            await CloseAllLightAsync();
+            redLightFlash.writeValue = "1";
+            await keyencePlc.WriteTagAsync(redLightFlash);
+        }
+
+        /// <summary>
+        /// 关闭所有灯闪烁
+        /// </summary>
+        /// <returns></returns>
+        public async Task CloseAllLightAsync()
+        {
+            greenLightFlash.writeValue = "0";
+            await keyencePlc.WriteTagAsync(greenLightFlash);
+            yellowLightFlash.writeValue = "0";
+            await keyencePlc.WriteTagAsync(yellowLightFlash);
+            redLightFlash.writeValue = "0";
+            await keyencePlc.WriteTagAsync(redLightFlash);
         }
 
         /// <summary>

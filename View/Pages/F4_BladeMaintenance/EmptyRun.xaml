@@ -37,8 +37,8 @@
             Margin="30,30,0,0"
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
-            Content="空运行"
-            FontSize="22"
+            Content="空运行(4.4)"
+            FontSize="30"
             FontWeight="Bold" />
         <auto:AutoGrid
             Grid.Row="1"

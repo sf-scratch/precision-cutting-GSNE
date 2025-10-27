@@ -21,9 +21,9 @@ namespace 精密切割系统.Helpers
 
         private readonly IConfigurationRoot _configuration;
 
-        protected JsonBase(string configPath)
+        protected JsonBase(string fileName)
         {
-            _configPath = Path.Combine(AppContext.BaseDirectory, configPath);
+            _configPath = Path.Combine(AppContext.BaseDirectory, $"Assets\\config\\data\\{fileName}");
             _configuration = new ConfigurationBuilder().AddJsonFile(_configPath, optional: false, reloadOnChange: true).Build();
         }
 
