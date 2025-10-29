@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.common;
+using 精密切割系统.Model.cut;
 using 精密切割系统.Model.plc;
 using 精密切割系统.Utils;
 using 精密切割系统.View.common;
@@ -19,13 +20,13 @@ namespace 精密切割系统.ViewModel
 {
     public class RightPageViewModel : BindableBase
     {
-
         public ObservableCollection<RightButtonParams> RightButtonParams { get; set; }
         public ObservableCollection<ActiveAlarmModel> ActiveAlarms { get; set; }
 
         public ObservableCollection<string> WaitingFuncNames { get; set; }
 
         private Visibility _alarmVisibility;
+
         public Visibility AlarmVisibility
         {
             get => _alarmVisibility;
@@ -33,12 +34,12 @@ namespace 精密切割系统.ViewModel
         }
 
         private Visibility _waitingFuncNamesVisibility;
+
         public Visibility WaitingFuncNamesVisibility
         {
             get => _waitingFuncNamesVisibility;
             set => SetProperty(ref _waitingFuncNamesVisibility, value);
         }
-
 
         public RightPageViewModel()
         {
@@ -46,13 +47,26 @@ namespace 精密切割系统.ViewModel
             ActiveAlarms = new ObservableCollection<ActiveAlarmModel>();
             WaitingFuncNames = new ObservableCollection<string>();
             _alarmVisibility = Visibility.Visible;
-            Task.Run(async () => 
+            Task.Run(async () =>
             {
                 using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(300));
                 while (await timer.WaitForNextTickAsync())
                 {
                     try
                     {
+                        if (SemiAutoCutService.Instance.IsReady)
+                        {
+                            if (AlarmConfig.Instance.HasActiveErrorAlarm(false))
+                            {
+                                // 不在切割状态下，且有报警时，三色灯报警红色
+                                await PlcControl.tagControl.wholeDevice.OpenRedLightAsync();
+                            }
+                            else
+                            {
+                                // 不在切割状态下，且有没报警时，三色灯报警黄色
+                                await PlcControl.tagControl.wholeDevice.OpenYellowLightAsync();
+                            }
+                        }
                         bool[]? alarms = AlarmConfig.Instance.GetNewestAlarms();
                         if (alarms != null && AlarmConfig.Instance.TryGetActiveAlarms(alarms, out List<AlarmInfo> alarmInfos))
                         {

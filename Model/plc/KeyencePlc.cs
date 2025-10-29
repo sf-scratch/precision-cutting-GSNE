@@ -2531,8 +2531,12 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task OpenGreenLightAsync()
         {
-            await CloseAllLightAsync();
             greenLightFlash.writeValue = "1";
+            await keyencePlc.WriteTagAsync(greenLightFlash);
+            yellowLightFlash.writeValue = "0";
+            await keyencePlc.WriteTagAsync(yellowLightFlash);
+            redLightFlash.writeValue = "0";
+            await keyencePlc.WriteTagAsync(redLightFlash);
             await keyencePlc.WriteTagAsync(greenLightFlash);
         }
 
@@ -2542,9 +2546,12 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task OpenYellowLightAsync()
         {
-            await CloseAllLightAsync();
+            greenLightFlash.writeValue = "0";
+            await keyencePlc.WriteTagAsync(greenLightFlash);
             yellowLightFlash.writeValue = "1";
             await keyencePlc.WriteTagAsync(yellowLightFlash);
+            redLightFlash.writeValue = "0";
+            await keyencePlc.WriteTagAsync(redLightFlash);
         }
 
         /// <summary>
@@ -2553,7 +2560,10 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task OpenRedLightAsync()
         {
-            await CloseAllLightAsync();
+            greenLightFlash.writeValue = "0";
+            await keyencePlc.WriteTagAsync(greenLightFlash);
+            yellowLightFlash.writeValue = "0";
+            await keyencePlc.WriteTagAsync(yellowLightFlash);
             redLightFlash.writeValue = "1";
             await keyencePlc.WriteTagAsync(redLightFlash);
         }

@@ -133,7 +133,7 @@ namespace 精密切割系统
             // 禁用触摸到鼠标事件的转换
             Touch.FrameReported += (s, e) => { /* 防止触摸触发鼠标事件 */ };
             AlarmConfig alarmConfig = AlarmConfig.Instance;
-            await Dispatcher.BeginInvoke(new Action(() =>
+            await Dispatcher.BeginInvoke(new Action(async () =>
             {
                 string logDirectory = "logs";
                 int daysThreshold = 30; // 清理超过 30 天的日志
@@ -182,6 +182,7 @@ namespace 精密切割系统
                     new RunLogsViewModel(LogType.INIT, "初始化"),
                     new RunLogsViewModel("结果", "初始化成功！")
                 });
+                await PlcControl.tagControl.wholeDevice.OpenYellowLightAsync();
             }), DispatcherPriority.ContextIdle);
         }
 

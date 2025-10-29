@@ -37,15 +37,13 @@ namespace 精密切割系统.Model.cut
             set { _cutDirection = value; }
         }
 
-        private bool _isReady;
-
         /// <summary>
         /// 是否准备就绪
         /// </summary>
         public bool IsReady
         {
-            get { return _isReady; }
-            set { _isReady = value; }
+            get { return AtomicConfig.IsCutProcessing; }
+            set { AtomicConfig.IsCutProcessing = value; }
         }
 
         private float _depthCompensationValue;
@@ -85,11 +83,11 @@ namespace 精密切割系统.Model.cut
 
         private SemiAutoCutService()
         {
+            IsReady = true;
             _alignService = ThetaAlignService.Instance;
             _cutDirection = CutDirection.Backward;
             _depthCompensationValue = 0;
             _feedSpeedCompCompensationValue = 0;
-            _isReady = true;
             _isOpenPrecut = false;
         }
 
@@ -146,7 +144,6 @@ namespace 精密切割系统.Model.cut
                                 return runResult;
                             }
                         }
-                        float cutY = workpiece.CalculateCutY();
                         line = workpiece.CalculateCuttingLine();
                         float targetEndZ = bladeContactWorkingDiscZ1 - cutStep.CutHeight - _depthCompensationValue;
                         float startZ = bladeContactWorkingDiscZ1 - workpiece.WorkThickness - workpiece.TapeThickness - bladeLiftingHeight;

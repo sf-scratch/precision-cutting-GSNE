@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using HslCommunication.Profinet.OpenProtocol;
+using Newtonsoft.Json;
 using Prism.Events;
 using System;
 using System.Collections.Generic;
@@ -101,7 +102,7 @@ namespace 精密切割系统.ViewModel
 
         private void InitRightButton()
         {
-            RightButtonCollection.Add(RightButtonParams.YelloRightButton("暂停", "/Assets/icon/right/stop.png", Pause));
+            RightButtonCollection.Add(RightButtonParams.YelloRightButton("暂停", "/Assets/icon/right/stop.png", async () => { await PauseAsync(PlcControl.tagControl.wholeDevice.OpenYellowLightAsync); }));
         }
 
         private async Task MonitoringAlarmAsync(CancellationToken token)
@@ -121,12 +122,23 @@ namespace 精密切割系统.ViewModel
                             {
                                 if (!_pauseCts.IsCancellationRequested)
                                 {
-                                    if (alarms != null && AlarmConfig.Instance.TryGetActiveAlarms(alarms, out List<AlarmInfo> alarmInfos))
+                                    if (alarms != null)
                                     {
-                                        string alarmMessages = string.Join(",", alarmInfos.Select(a => a.Message));
-                                        _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"切割异常：{alarmMessages}"));
+                                        if (AlarmConfig.Instance.TryGetActiveAlarms(alarms, out List<AlarmInfo> alarmInfos))
+                                        {
+                                            string alarmMessages = string.Join(",", alarmInfos.Select(a => a.Message));
+                                            _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"切割报警监控：{alarmMessages}"));
+                                            await PauseAsync(PlcControl.tagControl.wholeDevice.OpenRedLightAsync);
+                                        }
+                                        else
+                                        {
+                                            _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"切割报警监控：未获取到有效报警信息！{alarms}"));
+                                        }
                                     }
-                                    Pause();
+                                    else
+                                    {
+                                        _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"切割报警监控：读到空数据！"));
+                                    }
                                 }
                             }
                             else
@@ -134,7 +146,7 @@ namespace 精密切割系统.ViewModel
                                 if (alarms != null && AlarmConfig.Instance.TryGetActiveAlarms(alarms, out List<AlarmInfo> alarmInfos))
                                 {
                                     string alarmMessages = string.Join(",", alarmInfos.Select(a => a.Message));
-                                    _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"切割中途闪烁异常：{alarmMessages}"));
+                                    _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"切割报警监控：切割中途闪烁异常 {alarmMessages}"));
                                 }
                             }
                         }
@@ -215,7 +227,7 @@ namespace 精密切割系统.ViewModel
             _ = MonitoringCutProgressAsync(_monitoringCts.Token);
             float cutY = (await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0).ToActualY();
             float measureHeightZ = 0;
-            if (BmSetupData.Instance.IsAutomHeightMeasureBeforeCutting && Appsettings.MeasureHeightLast is not null)
+            if (!BmSetupData.Instance.IsAutomHeightMeasureBeforeCutting && Appsettings.MeasureHeightLast is not null)
             {
                 measureHeightZ = Appsettings.MeasureHeightLast.Value;
             }
@@ -293,7 +305,7 @@ namespace 精密切割系统.ViewModel
             return workpiece;
         }
 
-        private async void Pause()
+        private async Task PauseAsync(Func<Task> actionAsync)
         {
             if (!GlobalParams.OnlineFlag)
             {
@@ -310,7 +322,7 @@ namespace 精密切割系统.ViewModel
             }
             // 暂停token
             _pauseCts.Cancel();
-            await PlcControl.tagControl.wholeDevice.OpenYellowLightAsync();
+            await actionAsync.Invoke();
         }
 
         public async Task ContinueAsync()
@@ -351,6 +363,7 @@ namespace 精密切割系统.ViewModel
                 return;
             }
             SemiAutoCutService.Instance.Stop(pauseResult);
+            await PlcControl.tagControl.wholeDevice.OpenYellowLightAsync();
             //结束切割
             await PlcControl.tagControl.cutting.ExitCuttingModeAsync(default);
             NavigateUtils.NavigateToPage("Pages/F2_ManualOperation/MQSemiAutomaticCuttingConf");

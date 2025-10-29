@@ -1,4 +1,5 @@
 ﻿using DryIoc.ImTools;
+using HslCommunication.BasicFramework;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -171,13 +172,13 @@ namespace 精密切割系统.Model.plc
         /// 是否有激活的错误报警
         /// </summary>
         /// <returns></returns>
-        public bool HasActiveErrorAlarm()
+        public bool HasActiveErrorAlarm(bool alarmReadExceptionDefaultValue = true)
         {
             if (!GlobalParams.OnlineFlag) return false; // 如果不在线，则不检查报警
 
             lock (_lock)
             {
-                if (_newestAlarms == null || _newestAlarms.Length == 0 || _newestAlarms.Length != _alarmInfos.Length) return true;
+                if (_newestAlarms == null || _newestAlarms.Length == 0 || _newestAlarms.Length != _alarmInfos.Length) return alarmReadExceptionDefaultValue;
                 for (int i = 0; i < _newestAlarms.Length; i++)
                 {
                     if (_newestAlarms[i] && _alarmInfos[i].Level == AlarmLevel.Error)

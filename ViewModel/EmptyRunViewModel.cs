@@ -124,7 +124,7 @@ namespace 精密切割系统.ViewModel
                 _emptyRunCts = new CancellationTokenSource();
                 IsEnabledGrid = false;
                 InitRuningRightButton();
-                _ = AutoCutUtils.MonitoringAlarmAsync(Stop, AlarmConfig.Instance.HasActiveErrorAlarm, default, _emptyRunCts.Token);
+                _ = AutoCutUtils.MonitoringAlarmAsync(Stop, () => AlarmConfig.Instance.HasActiveErrorAlarm(false), default, _emptyRunCts.Token);
                 _ = Task.Run(async () =>
                 {
                     try
