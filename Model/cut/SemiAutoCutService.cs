@@ -122,6 +122,7 @@ namespace 精密切割系统.Model.cut
             {
                 PathCalculator pathCalculator = new(cutStepList.Select(p => p.Speed).ToList());
                 IsReady = false;
+                await PlcControl.tagControl.wholeDevice.OpenGreenLightAsync();
                 //打开切割水
                 await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
                 //进入全自动切割模式

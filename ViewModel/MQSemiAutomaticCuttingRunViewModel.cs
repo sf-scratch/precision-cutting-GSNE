@@ -221,7 +221,6 @@ namespace 精密切割系统.ViewModel
             {
                 await PlcControl.tagControl.wholeDevice.OpenCutSecurityDoorAsync();
             }
-            await PlcControl.tagControl.wholeDevice.OpenGreenLightAsync();
             FileTableItemModel fileTableItem = fileTableItemResult.Data;
             _ = MonitoringAlarmAsync(_monitoringCts.Token);
             _ = MonitoringCutProgressAsync(_monitoringCts.Token);
