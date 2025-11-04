@@ -372,6 +372,10 @@ namespace 精密切割系统.View
                     mainWindow.NavigateToPage(bean.PageUrl);
                     break;
 
+                case 710:
+                    mainWindow.NavigateToPage(bean.PageUrl);
+                    break;
+
                 default:
 
                     break;

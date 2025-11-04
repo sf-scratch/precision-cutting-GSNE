@@ -34,7 +34,6 @@ namespace 精密切割系统.View.page.right
             SourceChanged();
         }
 
-
         //监听Frame中Source改变
         private void SourceChanged()
         {
@@ -48,7 +47,8 @@ namespace 精密切割系统.View.page.right
 
         private void RefreshDeviceStatus()
         {
-            Thread _thread = new Thread(() => {
+            Thread _thread = new Thread(() =>
+            {
                 Thread.Sleep(5000);
                 bool vacuumStateStatus = false;
                 bool spindleAirStatus = false;
@@ -100,7 +100,6 @@ namespace 精密切割系统.View.page.right
                             spindleSpeedPlcValue = tempSpindleSpeedPlcValue;
                             spindleSpeedValue.Content = spindleSpeedPlcValue;
                         }
-
                     });
                     firstFlag = false;
                     Thread.Sleep(500);
@@ -136,10 +135,10 @@ namespace 精密切割系统.View.page.right
             btnSure.Visibility = Visibility.Collapsed;
             btnStartSetup.Visibility = Visibility.Collapsed;
             btnSave.Visibility = Visibility.Collapsed;
+            btnClear.Visibility = Visibility.Collapsed;
             //告警提示
             // ShowTemplate.Visibility = Visibility.Collapsed;
             MachinePanel.Visibility = Visibility.Collapsed;
-
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)

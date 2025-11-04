@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
@@ -15,6 +16,9 @@ using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut;
 using 精密切割系统.Model.position;
 using 精密切割系统.PubSubEvent;
+using 精密切割系统.View.common;
+using 精密切割系统.View.page.right;
+using 精密切割系统.View.Pages.operate;
 using static NPOI.HSSF.Util.HSSFColor;
 
 namespace 精密切割系统.ViewModel
@@ -32,7 +36,24 @@ namespace 精密切割系统.ViewModel
         private void InitRightButton()
         {
             RightButtonCollection.Clear();
+            RightButtonCollection.Add(RightButtonParams.GreenRightButton("确定", "CogBox", Sure));
             RightButtonCollection.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
+        }
+
+        private void Sure()
+        {
+            MainWindow? mainWindow = Application.Current.MainWindow as MainWindow;
+            if (mainWindow == null)
+            {
+                return;
+            }
+            RightPage? rightPage = mainWindow.rightFrame.Content as RightPage;
+            OperatePage? operatePage = mainWindow.operateFrame.Content as OperatePage;
+            if (rightPage == null || operatePage == null)
+            {
+                return;
+            }
+            operatePage.SetOperateShowType(3);
         }
 
         private void Back()

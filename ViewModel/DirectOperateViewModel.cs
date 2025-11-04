@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using 精密切割系统.Behaviors;
+using 精密切割系统.database.db.modle;
 using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
 using 精密切割系统.Utils;
@@ -862,19 +863,22 @@ namespace 精密切割系统.ViewModel
                 SetProperty(ref _isHighSpeed, value);
                 if (_isHighSpeed)
                 {
+                    var list = SqlHelper.Table<OperationParametersModel>().Where(t => t.Id == 1).ToList();
+                    if (list.Count < 1) return;
+                    var operationParam = list.First();
                     Task.Run(async () =>
                     {
                         // 设置为高速
                         await PlcControl.tagControl.Xaxis.SetHighSpeedAsync(1);
-                        await PlcControl.tagControl.Xaxis.SetJogRelativeSpeedAsync(8);
+                        await PlcControl.tagControl.Xaxis.SetJogRelativeSpeedAsync(operationParam.XScanSpeed.ToFloat());
                         await PlcControl.tagControl.Yaxis.SetHighSpeedAsync(1);
-                        await PlcControl.tagControl.Yaxis.SetJogRelativeSpeedAsync(8);
+                        await PlcControl.tagControl.Yaxis.SetJogRelativeSpeedAsync(operationParam.YScanSpeed.ToFloat());
                         await PlcControl.tagControl.Z1axis.SetHighSpeedAsync(1);
-                        await PlcControl.tagControl.Z1axis.SetJogRelativeSpeedAsync(2);
+                        await PlcControl.tagControl.Z1axis.SetJogRelativeSpeedAsync(operationParam.ZScanSpeed.ToFloat());
                         await PlcControl.tagControl.Z2axis.SetHighSpeedAsync(1);
                         await PlcControl.tagControl.Z2axis.SetJogRelativeSpeedAsync(2);
                         await PlcControl.tagControl.ThetaAxis.SetHighSpeedAsync(1);
-                        await PlcControl.tagControl.ThetaAxis.SetJogRelativeSpeedAsync(10);
+                        await PlcControl.tagControl.ThetaAxis.SetJogRelativeSpeedAsync(operationParam.RScanSpeed.ToFloat());
                     });
                 }
                 else

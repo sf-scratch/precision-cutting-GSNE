@@ -299,11 +299,11 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                     var axisPostion = await AutoCutUtils.GetAxisPositionAsync();
                     Application.Current.Dispatcher.Invoke(() =>
                     {
-                        xAbsolutePosition.Text = axisPostion.X?.ToString("F4");
-                        yAbsolutePosition.Text = axisPostion.Y?.ToString("F4");
-                        zAbsolutePosition.Text = axisPostion.Z1?.ToString("F4");
-                        z2AbsolutePosition.Text = axisPostion.Z2?.ToString("F4");
-                        thetaAbsolutePosition.Text = axisPostion.Theta?.ToString("F4");
+                        xAbsolutePosition.Text = axisPostion.X?.ToString("F5");
+                        yAbsolutePosition.Text = axisPostion.Y?.ToString("F5");
+                        zAbsolutePosition.Text = axisPostion.Z1?.ToString("F5");
+                        z2AbsolutePosition.Text = axisPostion.Z2?.ToString("F5");
+                        thetaAbsolutePosition.Text = axisPostion.Theta?.ToString("F5");
                         // 显示清零后位置
                         xCleanPosition.Text = (Tools.GetDoubleStringValue(xAbsolutePosition.Text) - Tools.GetDoubleStringValue(cleanXPosition)).ToString("F4");
                         yCleanPosition.Text = (Tools.GetDoubleStringValue(yAbsolutePosition.Text) - Tools.GetDoubleStringValue(cleanYPosition)).ToString("F4");

@@ -169,11 +169,11 @@ namespace 精密切割系统.ViewModel
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         YAxisCutPosition = CutOperateUtils.globalYCutPosition.ToString();
-                        XAxisCurrentPosition = MathF.Round(axisPostion.X ?? 0, 3).ToString();
-                        YAxisCurrentPosition = MathF.Round(axisPostion.Y ?? 0, 3).ToString();
-                        ZAxisCurrentPosition = MathF.Round(axisPostion.Z1 ?? 0, 3).ToString();
-                        Z2AxisCurrentPosition = MathF.Round(axisPostion.Z2 ?? 0, 3).ToString();
-                        ThetaAxisCurrentPosition = MathF.Round(axisPostion.Theta ?? 0, 3).ToString();
+                        XAxisCurrentPosition = MathF.Round(axisPostion.X ?? 0, 5).ToString();
+                        YAxisCurrentPosition = MathF.Round(axisPostion.Y ?? 0, 5).ToString();
+                        ZAxisCurrentPosition = MathF.Round(axisPostion.Z1 ?? 0, 5).ToString();
+                        Z2AxisCurrentPosition = MathF.Round(axisPostion.Z2 ?? 0, 5).ToString();
+                        ThetaAxisCurrentPosition = MathF.Round(axisPostion.Theta ?? 0, 5).ToString();
                     });
                 }
                 catch (Exception)
