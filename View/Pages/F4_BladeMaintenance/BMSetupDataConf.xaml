@@ -32,8 +32,8 @@
             Grid.ColumnSpan="3"
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
-            Content="测高参数(3.4)"
-            FontSize="22"
+            Content="测高参数(3.3)"
+            FontSize="30"
             FontWeight="Bold" />
         <auto:AutoGrid
             Grid.Row="1"

@@ -54,7 +54,7 @@
                 x:Name="titleName"
                 Margin="30,30,0,0"
                 Content="单一切割面校准 (1.1)"
-                FontSize="22"
+                FontSize="30"
                 FontWeight="Bold" />
             <StackPanel Grid.Row="1" Margin="30,30,0,0">
                 <StackPanel

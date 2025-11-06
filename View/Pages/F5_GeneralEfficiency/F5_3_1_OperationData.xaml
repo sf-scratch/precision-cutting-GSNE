@@ -39,7 +39,7 @@
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
             Content="功能参数维护 (4.1)"
-            FontSize="22"
+            FontSize="30"
             FontWeight="Bold" />
         <StackPanel
             x:Name="sp1"

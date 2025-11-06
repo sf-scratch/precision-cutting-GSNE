@@ -30,7 +30,7 @@
                     <Label
                         Margin="30,30,0,0"
                         Content="半自动切割 (1.2)"
-                        FontSize="22"
+                        FontSize="30"
                         FontWeight="Bold" />
                 </Grid>
                 <Grid>

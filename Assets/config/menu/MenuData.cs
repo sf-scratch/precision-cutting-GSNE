@@ -103,7 +103,6 @@ namespace 精密切割系统.Assets.config.menu
             var list = new List<MenuBean>();
             //list.Add(new MenuBean(502, "测量维护", "/Assets/icon/menu_5/menu_5_2.png", "/Assets/icon/menu_5/menu_5_2_white.png"));
             list.Add(new MenuBean(503, "功能参数维护", "/Assets/icon/menu_5/menu_5_3.png", "/Assets/icon/menu_5/menu_5_3_white.png", 2, "Pages/F5_GeneralEfficiency/F5_3_1_OperationData"));
-            //list.Add(new MenuBean(601, "轴空转", "/Assets/icon/menu_6/menu_6_1.png", "/Assets/icon/menu_6/menu_6_1_white.png", 2, "Pages/F6_EngineeringTechnology/ETAxisIdlingMaintenanceConf"));
             list.Add(new MenuBean(605, "位置校准", "/Assets/icon/menu_6/menu_6_5.png", "/Assets/icon/menu_6/menu_6_5_white.png", 2, "Pages/F6_EngineeringTechnology/ETPositionAlignmentConf"));
             list.Add(new MenuBean(606, "各模式初始位置", "/Assets/icon/menu_6/menu_6_6.png", "/Assets/icon/menu_6/menu_6_6_white.png", 2, "Pages/F6_EngineeringTechnology/ETInitialPositionConf"));
             list.Add(new MenuBean(520, "轴空运行", "/Assets/icon/menu_5/menu_5_2.png", "/Assets/icon/menu_5/menu_5_2_white.png", 3, ""));
@@ -111,6 +110,7 @@ namespace 精密切割系统.Assets.config.menu
             {
                 list.Add(new MenuBean(607, "θ轴旋转中心位校正", "CropRotate", "/Assets/icon/menu_6/menu_6_6_white.png", 3, "Pages/F4_BladeMaintenance/ThetaCenterAlignConf"));
             }
+            list.Add(new MenuBean(601, "对焦维护", "FocusAuto", "/Assets/icon/menu_6/menu_6_1_white.png", 2, "Pages/F4_BladeMaintenance/FocusMaintenanceConf"));
             return list;
         }
 

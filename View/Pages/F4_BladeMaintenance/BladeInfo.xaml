@@ -50,8 +50,8 @@
             Grid.ColumnSpan="3"
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
-            Content="刀片状态信息(3.2)"
-            FontSize="22"
+            Content="刀片状态信息(3.5)"
+            FontSize="30"
             FontWeight="Bold" />
         <auto:AutoGrid
             Grid.Row="1"
