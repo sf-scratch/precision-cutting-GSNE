@@ -5,7 +5,9 @@
     xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
     xmlns:auto="clr-namespace:WpfAutoGrid;assembly=WpfAutoGrid.Core"
     xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:convert="clr-namespace:精密切割系统.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:精密切割系统.Helpers"
     xmlns:local="clr-namespace:精密切割系统.View.Pages.F2_ManualOperation"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
@@ -21,6 +23,7 @@
         </behaviors:EventTrigger>
     </behaviors:Interaction.Triggers>
     <UserControl.Resources>
+        <convert:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <Style TargetType="Label">
             <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
@@ -229,13 +232,18 @@
                         Margin="10,0,0,0"
                         Content="θ轴"
                         FontSize="18"
-                        FontWeight="Bold" />
+                        FontWeight="Bold"
+                        Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
                     <Controls:InputTextBox
                         IsEnabled="False"
                         Text="{Binding ThetaAxisCurrentPosition}"
                         TextWrapping="Wrap"
+                        Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}"
                         XPrecision="3" />
-                    <Label Content="°" FontSize="16" />
+                    <Label
+                        Content="°"
+                        FontSize="16"
+                        Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
                     <Label
                         Content="Y偏差"
                         FontSize="18"

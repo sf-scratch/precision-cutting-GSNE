@@ -28,7 +28,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
         private MainWindow? _mainWindow;
         private RightPage? _rightPage;
         private List<double> _dataY = new List<double>();
-        private double minY = double.MaxValue, maxY = double.MinValue;
+        private CancellationTokenSource? _cts = null;
 
         public WaveformDiagram()
         {
@@ -48,7 +48,13 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
             _rightPage.btnClear.Visibility = Visibility.Visible;
             _rightPage.btnClear.BackFlag = false;
             _rightPage.btnClear.SetRightClickedHandler(BtnClear_RightClicked);
+            _cts = new CancellationTokenSource();
             InitializePlot();
+        }
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            _cts?.Cancel();
         }
 
         private void InitializePlot()
@@ -62,7 +68,12 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
             ScottPlot.Plottables.Signal? signalPlot = null;
             ScottPlot.Plottables.HorizontalLine? hLine = null;
             ScottPlot.Plottables.HorizontalLine? hLine2 = null;
-            while (true)
+            CancellationToken token = _cts!.Token;
+            double maxValue = 2000;
+            double targetMaxValue = 150;
+            formsPlot1.Plot.Axes.Bottom.Min = 0;
+            formsPlot1.Plot.Axes.Bottom.Max = targetMaxValue;
+            while (!token.IsCancellationRequested)
             {
                 var result = await PlcControl.plc.ReadDataAsync<short>("DM2000");
                 if (result == null) continue;
@@ -75,30 +86,32 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
                         formsPlot1.Plot.Remove(signalPlot);
                     signalPlot = formsPlot1.Plot.Add.Signal(_dataY, 1, ScottPlot.Color.FromColor(System.Drawing.Color.Red));
 
-                    if (minY != Math.Min(minY, value))
-                    {
-                        minY = Math.Min(minY, value);
-                        if (hLine is not null) formsPlot1.Plot.Remove(hLine);
-                        // 添加水平横线
-                        hLine = formsPlot1.Plot.Add.HorizontalLine(minY); // Y=0.5的水平线
-                        hLine.LineWidth = 2;
-                        hLine.LinePattern = LinePattern.Dotted;
-                        hLine.LineColor = Colors.Red;
-                        hLine.Text = "Min: " + minY;
-                    }
+                    if (hLine is not null) formsPlot1.Plot.Remove(hLine);
+                    // 添加水平横线
+                    hLine = formsPlot1.Plot.Add.HorizontalLine(_dataY.Min()); // Y=0.5的水平线
+                    hLine.LineWidth = 2;
+                    hLine.LinePattern = LinePattern.Dotted;
+                    hLine.LineColor = Colors.Red;
+                    hLine.Text = "Min: " + _dataY.Min();
 
-                    if (maxY != Math.Max(maxY, value))
+                    if (hLine2 is not null) formsPlot1.Plot.Remove(hLine2);
+                    // 添加水平横线
+                    hLine2 = formsPlot1.Plot.Add.HorizontalLine(_dataY.Max()); // Y=0.5的水平线
+                    hLine2.LineWidth = 2;
+                    hLine2.LinePattern = LinePattern.Dotted;
+                    hLine2.LineColor = Colors.Red;
+                    hLine2.Text = "Max: " + _dataY.Max();
+                    formsPlot1.Plot.Axes.AutoScaleY();
+                    if (targetMaxValue < _dataY.Count)
                     {
-                        maxY = Math.Max(maxY, value);
-                        if (hLine2 is not null) formsPlot1.Plot.Remove(hLine2);
-                        // 添加水平横线
-                        hLine2 = formsPlot1.Plot.Add.HorizontalLine(maxY); // Y=0.5的水平线
-                        hLine2.LineWidth = 2;
-                        hLine2.LinePattern = LinePattern.Dotted;
-                        hLine2.LineColor = Colors.Red;
-                        hLine2.Text = "Max: " + maxY;
+                        targetMaxValue *= 3;
+                        if (targetMaxValue > maxValue)
+                        {
+                            targetMaxValue = maxValue;
+                            _dataY.RemoveAt(0);
+                        }
+                        formsPlot1.Plot.Axes.Bottom.Max = targetMaxValue;
                     }
-
                     formsPlot1.Refresh();
                 });
                 Thread.Sleep(50);
@@ -107,8 +120,6 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
 
         private void BtnClear_RightClicked(object? sender, bool e)
         {
-            minY = double.MaxValue;
-            maxY = double.MinValue;
             _dataY.Clear();
             formsPlot1.Plot.Clear();
             formsPlot1.Refresh();

@@ -1114,7 +1114,7 @@ namespace 精密切割系统.Driver
             {
                 return false;
             }
-            return IsReadyAsync().Result;
+            return IsReadyAsync().ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
         /// <summary>

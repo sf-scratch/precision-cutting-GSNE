@@ -62,7 +62,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             _cts = new CancellationTokenSource();
         }
 
-        private void Page_Loaded(object sender, RoutedEventArgs e)
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             if (_cts.IsCancellationRequested)
             {
@@ -99,6 +99,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             cutWidth.Text = Tools.FormatDecimalString((cameraCommon.CutMarkWidth / 1000).ToString(), 4);
             edgesWidth.Text = Tools.FormatDecimalString((cameraCommon.EdgeChipWidth / 1000).ToString(), 4);
             LoadPosition();
+            await Task.Delay(10000);
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -210,7 +211,14 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                             }
                             catch (OperationCanceledException)
                             {
-                                MaterialSnack("精细对焦超时！", SnackType.WARNING, default, _eventAggregator);
+                                if (_cts.IsCancellationRequested)
+                                {
+                                    MaterialSnack("精细对焦已取消！", SnackType.WARNING, default, _eventAggregator);
+                                }
+                                else
+                                {
+                                    MaterialSnack("精细对焦超时！", SnackType.WARNING, default, _eventAggregator);
+                                }
                             }
                         }, "精细对焦");
                     }
@@ -232,7 +240,14 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                             }
                             catch (OperationCanceledException)
                             {
-                                MaterialSnack("全局对焦超时！", SnackType.WARNING, default, _eventAggregator);
+                                if (_cts.IsCancellationRequested)
+                                {
+                                    MaterialSnack("全局对焦已取消！", SnackType.WARNING, default, _eventAggregator);
+                                }
+                                else
+                                {
+                                    MaterialSnack("全局对焦超时！", SnackType.WARNING, default, _eventAggregator);
+                                }
                             }
                         }, "全局对焦");
                     }

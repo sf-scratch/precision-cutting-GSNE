@@ -8,12 +8,11 @@ using System.Threading.Tasks;
 namespace 精密切割系统.database.db.modle
 {
     [Table("initial_position")]
-    internal class InitialPositionModel
+    public class InitialPositionModel
     {
         [PrimaryKey, AutoIncrement]
         [Column("id")]
         public long Id { get; set; }
-
 
         // 测高位置
         [Column("bladeSetupInitX")]//x轴初始位置
@@ -27,7 +26,6 @@ namespace 精密切割系统.database.db.modle
 
         [Column("bladeSetupInitZ2")]//z2轴初始位置
         public string BladeSetupInitZ2 { get; set; } = "20.000";
-
 
         // 非接触测高位置
         [Column("noContactBladeSetupInitX")]//x轴初始位置
@@ -57,7 +55,6 @@ namespace 精密切割系统.database.db.modle
         [Column("alignInitZ2")]//z2轴初始位置
         public string AlignInitZ2 { get; set; } = "20.000";
 
-
         // 切割位置
         [Column("cutInitX")]//x轴初始位置
         public string CutInitX { get; set; } = "21.000";
@@ -70,7 +67,6 @@ namespace 精密切割系统.database.db.modle
 
         [Column("cutInitZ2")]//z2轴初始位置
         public string CutInitZ2 { get; set; } = "25.000";
-
 
         // 刀片更换位置
         [Column("cutReplaceInitX")]//x轴初始位置

@@ -129,11 +129,25 @@ namespace 精密切割系统.Model.cut
                 await PlcControl.tagControl.cutting.EnterCuttingModeAsync(usingPauseToken);
                 float currentKnifeRemainTime = 60; //初始值
                 LineSegment? preLine = null;
+                int currentChannelNum = 1;
                 int cutTime = 0;
                 while (cutTime < cutStepList.Count)
                 {
                     LineSegment? line = null;
                     CutStep cutStep = cutStepList[cutTime];
+                    if (cutStep.ChannelNum != currentChannelNum)
+                    {
+                        //切换通道
+                        if (cutStep.IsAbsolute)
+                        {
+                            workpiece.Reset(cutStep.ChannelStartY);
+                        }
+                        else
+                        {
+                            workpiece.Reset(workpiece.CalculateCutY() + cutStep.ChannelStartY);
+                        }
+                    }
+                    currentChannelNum = cutStep.ChannelNum;
                     try
                     {
                         //检查是否暂停
@@ -203,7 +217,7 @@ namespace 精密切割系统.Model.cut
                         if (!workpiece.CheckCutDistance(_cutDirection, cutStep.OffsetY))
                         {
                             RemindReplaceWafer?.Invoke();
-                            (RunResult runResult, usingPauseToken) = await WaitContinueAsync(preLine ?? line, workpiece, currentKnifeRemainTime, "检测到工件当前面已切完");
+                            (RunResult runResult, usingPauseToken) = await WaitContinueAsync(preLine ?? line, workpiece, currentKnifeRemainTime, "下一刀将超出工件！");
                             if (!runResult.IsSuccess)
                             {
                                 return runResult;
@@ -288,5 +302,5 @@ namespace 精密切割系统.Model.cut
         }
     }
 
-    public record CutStep(float CutHeight, float Speed, float OffsetY, float ThetaDeg, float OffsetX = 0, bool IsAlternatingCuttingStroke = false, int ChannelNum = 1, float? SingleCutDeep = null);
+    public record CutStep(float CutHeight, float Speed, float OffsetY, float ThetaDeg, bool IsAbsolute, float ChannelStartY, float OffsetX = 0, bool IsAlternatingCuttingStroke = false, int ChannelNum = 1, float? SingleCutDeep = null);
 }

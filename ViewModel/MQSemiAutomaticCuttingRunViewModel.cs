@@ -206,6 +206,7 @@ namespace 精密切割系统.ViewModel
                 ShowWarnMessageNavigateHome(cutStepResult.Message);
                 return;
             }
+            List<CutStep> cutSteps = cutStepResult.Data;
             CommonResult<FileTableItemModel> fileTableItemResult = await GetFileTableItemModelAsync();
             if (!fileTableItemResult.IsSuccess || fileTableItemResult.Data is null)
             {
@@ -224,7 +225,8 @@ namespace 精密切割系统.ViewModel
             FileTableItemModel fileTableItem = fileTableItemResult.Data;
             _ = MonitoringAlarmAsync(_monitoringCts.Token);
             _ = MonitoringCutProgressAsync(_monitoringCts.Token);
-            float cutY = (await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0).ToActualY();
+            CutStep firtStep = cutSteps.First();
+            float cutY = firtStep.IsAbsolute ? firtStep.ChannelStartY : (await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0).ToActualY();
             float measureHeightZ = 0;
             if (!BmSetupData.Instance.IsAutomHeightMeasureBeforeCutting && Appsettings.MeasureHeightLast is not null)
             {
@@ -248,7 +250,7 @@ namespace 精密切割系统.ViewModel
                 _semiAutoCutService.CutServicePaused += CutService_CutServicePaused;
                 MaterialSnack($"切割中...", SnackType.WARNING, 0, _eventAggregator);
                 float margin = Appsettings.AdditionalMargin ?? 20;
-                RunResult cutResult = await _semiAutoCutService.RunAsync(cutStepResult.Data, workpiece, margin, fileTableItem.SpindleRev, measureHeightZ, GlobalParams.BladeLiftingHeight, false, _pauseCts.Token);
+                RunResult cutResult = await _semiAutoCutService.RunAsync(cutSteps, workpiece, margin, fileTableItem.SpindleRev, measureHeightZ, GlobalParams.BladeLiftingHeight, false, _pauseCts.Token);
                 if (!cutResult.IsSuccess)
                 {
                     MaterialSnack($"{cutResult.Message}", SnackType.WARNING, 0, _eventAggregator);
@@ -416,8 +418,8 @@ namespace 精密切割系统.ViewModel
                 // 设置切割进度
                 CutParam.RunCutLine = process.CutTimes;
                 CutParam.AllRunCutLine = process.TotalCutTimes;
-                CutParam.FeedSpeed = process.CutSpeed.ToString("F0");
-                CutParam.BladeHeight = process.CutBladeHeight.ToString("F3");
+                CutParam.FeedSpeed = process.CutSpeed.ToString("F5");
+                CutParam.BladeHeight = process.CutBladeHeight.ToString("F5");
                 CutParam.ChannelNum = $"CH{process.ChannelNum}";
                 if (process.IsCompleted)
                 {
@@ -496,11 +498,13 @@ namespace 精密切割系统.ViewModel
                         float speed = feedSpeeds[index];
                         float offsetY = yIndexs[index];
                         float thetaDeg = float.Parse(ch.ThetaDeg);
+                        bool isAbsolute = ch.ComBoxCutMethod.Equals("绝对");
+                        float channelStartY = isAbsolute ? ch.AbsoluteCutPosition.ToFloat() : 0;
                         float offsetX = ch.OffsetX.ToFloat();
                         bool isAlternatingCuttingStroke = ch.CutMode == CutOperateUtils.B_ZKEEP;
                         int channelNum = chSeq;
                         float? singleCutDeep = isDeep ? cutDepths[index] : null;
-                        tempCutSteps.Add(new CutStep(cutHeight, speed, offsetY, thetaDeg, offsetX, isAlternatingCuttingStroke, channelNum, singleCutDeep));
+                        tempCutSteps.Add(new CutStep(cutHeight, speed, offsetY, thetaDeg, isAbsolute, channelStartY, offsetX, isAlternatingCuttingStroke, channelNum, singleCutDeep));
                     }
                 }
                 int chCutLines = Tools.GetIntStringValue(ch.CutLine);

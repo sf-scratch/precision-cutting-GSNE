@@ -23,7 +23,7 @@
             <Setter Property="Height" Value="70" />
             <Setter Property="Width" Value="70" />
             <Setter Property="Background" Value="#5087Cb" />
-            <Setter Property="Foreground" Value="Black" />
+            <Setter Property="Foreground" Value="White" />
             <Setter Property="BorderBrush" Value="#5087Cb" />
         </Style>
         <Style BasedOn="{StaticResource MaterialDesignFlatLightBgButton}" TargetType="Button">
@@ -32,7 +32,7 @@
             <Setter Property="FontSize" Value="18" />
             <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="Background" Value="#5087Cb" />
-            <Setter Property="Foreground" Value="Black" />
+            <Setter Property="Foreground" Value="White" />
             <Setter Property="BorderBrush" Value="#5087Cb" />
         </Style>
     </UserControl.Resources>

@@ -700,7 +700,10 @@ namespace 精密切割系统.View.Pages.common
             //{
             //    yPosition = yLowerValue;
             //}
-            await PlcControl.tagControl.cutting.RunMotionNoWaitAsync((float)xPosition, (float)yPosition);
+            if (await PlcControl.tagControl.Xaxis.IsReadyAsync() && await PlcControl.tagControl.Yaxis.IsReadyAsync())
+            {
+                await PlcControl.tagControl.cutting.RunMotionNoWaitAsync((float)xPosition, (float)yPosition);
+            }
         }
 
         //// 截取指定Grid控件内容

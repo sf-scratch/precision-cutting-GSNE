@@ -20,7 +20,7 @@ namespace 精密切割系统.Model.cut
         private const float FineTuneSpeed = 0.05f;  // 精细对焦速度
         private const double BlurThreshold = 0.5;   // 模糊度变化阈值
         private const float MaxLimitZ = 19.5f;  // Z轴位置限制
-        private const float MinLimitZ = 5f;  // Z轴位置限制
+        private const float MinLimitZ = 2f;  // Z轴位置限制
 
         public static async Task<CommonResult<float>> GlobalFocusAsync(IEventAggregator? eventAggregator, CancellationToken token)
         {

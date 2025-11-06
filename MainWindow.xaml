@@ -97,10 +97,9 @@
                                 Grid.Column="0"
                                 NavigationUIVisibility="Hidden"
                                 Source="View/MainMenu.xaml" />
-                            <ContentControl prism:RegionManager.RegionName="MainRegion" />
+                            <ContentControl x:Name="mainRegion" prism:RegionManager.RegionName="MainRegion" />
                         </Grid>
                     </Border>
-
 
                     <Grid Grid.Row="1">
                         <Grid.ColumnDefinitions>

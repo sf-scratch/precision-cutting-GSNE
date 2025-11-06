@@ -26,6 +26,7 @@ using 精密切割系统.Utils;
 using 精密切割系统.View.Controls;
 using 精密切割系统.View.Pages.Auto;
 using 精密切割系统.View.Pages.common;
+using 精密切割系统.View.Pages.F2_ManualOperation;
 using 精密切割系统.View.Pages.F4_BladeMaintenance;
 using 精密切割系统.ViewModel;
 using static 精密切割系统.Helpers.MaterialSnackUtils;
@@ -37,14 +38,15 @@ namespace 精密切割系统.View.Pages.operate
     /// </summary>
     public partial class OperatePage : Page
     {
-        static CtViewModel ctViewModel = new CtViewModel();
+        private static CtViewModel ctViewModel = new CtViewModel();
+
         public OperatePage()
         {
             InitializeComponent();
             this.DataContext = ctViewModel;
         }
 
-        MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
+        private MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
@@ -96,7 +98,8 @@ namespace 精密切割系统.View.Pages.operate
                 bool tempIsOpenWorkVacuumSwitchStatus = await PlcControl.tagControl.wholeDevice.IsOpenWorkVacuumSwitchAsync();
                 bool tempIsRuningSpindle = await PlcControl.tagControl.wholeDevice.GetSpindleSpeedAsync() != 0;
                 bool tempPanelStatus = CommonCheck.GetParamsStatus(DeviceKey.panelStatusKey);
-                Application.Current.Dispatcher.Invoke(() => {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
                     if (tempIsOpenOpticalFiberSensorBlowing != isOpenOpticalFiberSensorBlowing || firstJoin)
                     {
                         isOpenOpticalFiberSensorBlowing = tempIsOpenOpticalFiberSensorBlowing;
@@ -167,7 +170,8 @@ namespace 精密切割系统.View.Pages.operate
          * type true：开；false：关
          * code 当前按钮的编码
          * */
-        public static void isSwitchOpen(bool type,int code)
+
+        public static void isSwitchOpen(bool type, int code)
         {
             ctViewModel.UpdateImage(type, code);
         }
@@ -184,7 +188,8 @@ namespace 精密切割系统.View.Pages.operate
             costomKeyboardGrid.Visibility = type == 2 ? Visibility.Visible : Visibility.Collapsed;
             OperateButtonListBox.Visibility = type == 3 ? Visibility.Visible : Visibility.Collapsed;
 
-            Task.Run(() => {
+            Task.Run(() =>
+            {
                 Thread.Sleep(500);
                 // 延时释放触控设备
                 Dispatcher.InvokeAsync(() =>
@@ -201,7 +206,6 @@ namespace 精密切割系统.View.Pages.operate
                     Panel.SetZIndex(costomKeyboardGrid, type == 2 ? 1 : 0);
                     Panel.SetZIndex(OperateButtonListBox, type == 3 ? 1 : 0);
                 }, System.Windows.Threading.DispatcherPriority.Background);
-                
             });
         }
 
@@ -218,7 +222,7 @@ namespace 精密切割系统.View.Pages.operate
             }
 
             OperateGrid.Children.Clear();
-            if (list.Count==0)
+            if (list.Count == 0)
             {
                 return;
             }
@@ -257,7 +261,7 @@ namespace 精密切割系统.View.Pages.operate
         private void addOperateButton(int row, int col, OperateBean bean)
         {
             //-1为占位空
-            if (bean.Code==-1)
+            if (bean.Code == -1)
             {
                 Label lbl = new Label();
                 lbl.SetValue(Grid.RowProperty, row);
@@ -273,14 +277,13 @@ namespace 精密切割系统.View.Pages.operate
                 operateButton.SetValue(Grid.ColumnProperty, col);
                 operateButton.OperateClicked += null;
                 operateButton.OperateClicked += OperateButton_OperateClicked;
-                
+
                 operateButton.OperateonLeave += null;
                 operateButton.OperateonLeave += OperateButton_OperateonLeave;
                 operateButton.OperateonDown += null;
                 operateButton.OperateonDown += OperateButton_OperateonDown;
                 OperateGrid.Children.Add(operateButton);
             }
-            
         }
 
         private void OperateButton_OperateonDown(object? sender, OperateBean e)
@@ -297,7 +300,14 @@ namespace 精密切割系统.View.Pages.operate
         {
             if (!string.IsNullOrEmpty(e.PageUrl))
             {
-                mainWindow.NavigateToPage(e.PageUrl);
+                if (mainWindow.mainRegion.Content is not MQSemiAutomaticCuttingRun && mainWindow.mainRegion.Content is not MQSemiAutomaticCuttingStop)
+                {
+                    mainWindow.NavigateToPage(e.PageUrl);
+                }
+                else
+                {
+                    MaterialSnackUtils.MaterialSnack("半自动切割运行/暂停中，无法切换页面！", MaterialSnackUtils.SnackType.WARNING);
+                }
                 return;
             }
 
@@ -307,20 +317,25 @@ namespace 精密切割系统.View.Pages.operate
                 case 1:
                     await OpticalFiberSensorBlowingAsync();
                     break;
+
                 case 2:
                     await OpticalFiberSensorBlowingWaterAsync();
                     break;
+
                 case 3:
                     // CT 真空
                     await VacuumOperateAsync();
                     break;
+
                 case 4:
                     await OperateCameraSecurityDoorAsync();
                     break;
+
                 case 5:
                     // 切割水
                     await CutWaterOperateAsync();
                     break;
+
                 case 6:
                     if (!GlobalParams.OnlineFlag)
                     {
@@ -329,6 +344,7 @@ namespace 精密切割系统.View.Pages.operate
                     // 系统初始化
                     await SystemInitOperateAsync();
                     break;
+
                 case 7:
                     if (!GlobalParams.OnlineFlag)
                     {
@@ -337,13 +353,16 @@ namespace 精密切割系统.View.Pages.operate
                     // 操作切割安全门
                     await OperateCutSecurityDoorAsync();
                     break;
+
                 case 8:
                     await SpindleManuallyRunAsync();
                     break;
+
                 case 9:
                     // 相机吹气
                     await CameraBlowingOperateAsync();
                     break;
+
                 case 10:
                     if (!GlobalParams.OnlineFlag)
                     {
@@ -352,20 +371,31 @@ namespace 精密切割系统.View.Pages.operate
                     // 操作工作盘真空
                     await OperateWorkVacuumSwitchAsync();
                     break;
-                case 5302:
-                        // 弹出确认对话框
-                        MessageBoxResult result = MessageBox.Show("确定要关机吗？", "关机确认", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
-                        if (result == MessageBoxResult.Yes)
-                        {
-                            ProcessStartInfo psi = new ProcessStartInfo("shutdown", "/s /t 0")
-                            {
-                                UseShellExecute = true,
-                                Verb = "runas" // 以管理员权限运行
-                            };
-                            Process.Start(psi);
-                        }
+                case 11:
+                    if (AlarmConfig.Instance.HasActiveAlarm())
+                    {
+                        MaterialSnackUtils.MaterialSnack("存在未处理报警，无法更换刀片！", MaterialSnackUtils.SnackType.WARNING);
+                        return;
+                    }
+                    await AutoCutUtils.ReplaceBladeAsync(default, default);
                     break;
+
+                case 5302:
+                    // 弹出确认对话框
+                    MessageBoxResult result = MessageBox.Show("确定要关机吗？", "关机确认", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        ProcessStartInfo psi = new ProcessStartInfo("shutdown", "/s /t 0")
+                        {
+                            UseShellExecute = true,
+                            Verb = "runas" // 以管理员权限运行
+                        };
+                        Process.Start(psi);
+                    }
+                    break;
+
                 default:
                     onClicked?.Invoke(this, e.Code);
                     break;
@@ -383,9 +413,12 @@ namespace 精密切割系统.View.Pages.operate
             onDown = null;
             onDown += downHandler;
         }
+
         //操作代理
         public event EventHandler<int> onClicked;
+
         public event EventHandler<int> onDown;
+
         public event EventHandler<int> onLeave;
 
         // CT 真空
@@ -431,7 +464,6 @@ namespace 精密切割系统.View.Pages.operate
             }
         }
 
-
         /// <summary>
         /// 光纤传感器吹水
         /// </summary>
@@ -452,6 +484,7 @@ namespace 精密切割系统.View.Pages.operate
         /// </summary>
         private async Task SystemInitOperateAsync()
         {
+            await PlcControl.tagControl.wholeDevice.AlarmResetAsync();
             if (await PlcControl.tagControl.wholeDevice.IsSystemInitingAsync())
             {
                 MaterialSnackUtils.MaterialSnack("初始化中，请等待初始化完成！", MaterialSnackUtils.SnackType.WARNING);
@@ -482,7 +515,6 @@ namespace 精密切割系统.View.Pages.operate
                 MaterialSnackUtils.MaterialSnack($"系统初始化时遇到其他错误: {ex.Message}", MaterialSnackUtils.SnackType.WARNING, 0);
             }
         }
-
 
         /// <summary>
         /// 操作切割安全门

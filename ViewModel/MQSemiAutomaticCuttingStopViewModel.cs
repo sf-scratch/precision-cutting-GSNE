@@ -27,6 +27,16 @@ namespace 精密切割系统.ViewModel
         private SemaphoreSlim _semaph = new SemaphoreSlim(1, 1);
         private CancellationTokenSource _operatCts;
 
+        private DelegateCommand _loadedCommand;
+
+        public DelegateCommand LoadedCommand =>
+            _loadedCommand ?? (_loadedCommand = new DelegateCommand(ExecuteLoadedCommand));
+
+        private void ExecuteLoadedCommand()
+        {
+            _cameraCommon = AutoCutUtils.GetCameraCommon();
+        }
+
         private SemiAutomaticCutParamModel _cutParam;
 
         public SemiAutomaticCutParamModel CutParam

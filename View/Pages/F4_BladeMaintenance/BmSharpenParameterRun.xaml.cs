@@ -332,7 +332,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                     {
                         break;
                     }
-                    cutSteps.Add(new CutStep(bmSharpenParameter.CutHeight, cutData.Item2, bmSharpenParameter.CoCutSize, 0));
+                    cutSteps.Add(new CutStep(bmSharpenParameter.CutHeight, cutData.Item2, bmSharpenParameter.CoCutSize, 0, false, 0));
                 }
             }
             int chCutLines = bmSharpenParameter.CoCutNum;

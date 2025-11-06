@@ -191,7 +191,7 @@
                 XMin="-5"
                 XPrecision="3" />
         </StackPanel>-->
-        <!--<StackPanel
+        <StackPanel
             x:Name="sp2"
             Grid.Row="1"
             Grid.Column="2"
@@ -273,7 +273,7 @@
                 XMax="50"
                 XMin="-5"
                 XPrecision="3" />
-        </StackPanel>-->
+        </StackPanel>
         <!--<StackPanel
             x:Name="sp3"
             Grid.Row="1"

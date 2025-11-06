@@ -107,10 +107,10 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
             //inputNoContactBladeSetupInitY.Text = _model.NoContactBladeSetupInitY;
             //inputNoContactBladeSetupInitZ1.Text = _model.NoContactBladeSetupInitZ1;
             //inputNoContactBladeSetupInitZ2.Text = _model.NoContactBladeSetupInitZ2;
-            //inputAlignInitX.Text = _model.AlignInitX;
-            //inputAlignInitY.Text = _model.AlignInitY;
-            //inputAlignInitZ1.Text = _model.AlignInitZ1;
-            //inputAlignInitZ2.Text = _model.AlignInitZ2;
+            inputAlignInitX.Text = _model.AlignInitX;
+            inputAlignInitY.Text = _model.AlignInitY;
+            inputAlignInitZ1.Text = _model.AlignInitZ1;
+            inputAlignInitZ2.Text = _model.AlignInitZ2;
             //inputCutInitX.Text = _model.CutInitX;
             //inputCutInitY.Text = _model.CutInitY;
             //inputCutInitZ1.Text = _model.CutInitZ1;
@@ -146,10 +146,10 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
                 //_model.NoContactBladeSetupInitZ1 = inputNoContactBladeSetupInitZ1.Text;
                 //_model.NoContactBladeSetupInitZ2 = inputNoContactBladeSetupInitZ2.Text;
 
-                //_model.AlignInitX = inputAlignInitX.Text;
-                //_model.AlignInitY = inputAlignInitY.Text;
-                //_model.AlignInitZ1 = inputAlignInitZ1.Text;
-                //_model.AlignInitZ2 = inputAlignInitZ2.Text;
+                _model.AlignInitX = inputAlignInitX.Text;
+                _model.AlignInitY = inputAlignInitY.Text;
+                _model.AlignInitZ1 = inputAlignInitZ1.Text;
+                _model.AlignInitZ2 = inputAlignInitZ2.Text;
 
                 //_model.CutInitX = inputCutInitX.Text;
                 //_model.CutInitY = inputCutInitY.Text;

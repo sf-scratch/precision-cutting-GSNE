@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Media3D;
+using 精密切割系统.Utils;
 
 namespace 精密切割系统.Model.cut.Workpieces
 {
@@ -45,7 +46,7 @@ namespace 精密切割系统.Model.cut.Workpieces
             //切割距离达到最终位置
             if (cutDirection == CutDirection.Backward)
             {
-                if (_rect.Y - _currentY + cutSize >= - 5)
+                if (_rect.Y - _currentY + cutSize >= -5)
                 {
                     return false;
                 }
@@ -59,6 +60,7 @@ namespace 精密切割系统.Model.cut.Workpieces
                 }
                 _currentY += cutSize;
             }
+            Tools.LogDebug($"CheckCutDistance:    {_rect.X}  {_rect.Y}  {_rect.Width}  {_rect.Height}  {_currentY}  {cutDirection}  {cutSize}");
             return true;
         }
 

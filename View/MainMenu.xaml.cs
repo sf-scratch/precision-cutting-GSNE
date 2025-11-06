@@ -202,7 +202,7 @@ namespace 精密切割系统.View
             MenuGrid.Children.Add(menuButton);
         }
 
-        private void MenuButton_MenuClicked(object? sender, MenuBean bean)
+        private async void MenuButton_MenuClicked(object? sender, MenuBean bean)
         {
             Tools.LogInfo("当点事件：" + bean.Code + ":" + bean.Title);
             if (bean.Type == 2)
@@ -288,7 +288,7 @@ namespace 精密切割系统.View
                             PlcControl.tagControl.sparkRepairKnife.EnterElectrical(1);
                             GlobalParams.globalRunFlag = true;
                             // 监听状态，如果模式准备完成，则跳转页面
-                            Task.Run(() =>
+                            _ = Task.Run(() =>
                             {
                                 bool flag = Tools.WaitForValue(DeviceKey.sharpenStatusKey, 1);
                                 GlobalParams.globalRunFlag = false;
@@ -307,7 +307,31 @@ namespace 精密切割系统.View
                         break;
                     }
                 case 202:
-                    mainWindow.NavigateToPage(bean.PageUrl);
+                    if (!GlobalParams.OnlineFlag)
+                    {
+                        mainWindow?.NavigateToPage(bean.PageUrl);
+                        break;
+                    }
+                    if (AlarmConfig.Instance.HasActiveErrorAlarm())
+                    {
+                        MaterialSnackUtils.MaterialSnack("存在未处理的告警，请先处理告警！", SnackType.WARNING, 0);
+                        break;
+                    }
+                    InitialPositionModel? initPos = await AutoCutUtils.GetInitialPositionAsync();
+                    if (initPos is null)
+                    {
+                        MaterialSnackUtils.MaterialSnack("获取初始位置失败，请检查初始位置配置！", SnackType.WARNING, 0);
+                        break;
+                    }
+                    await Task.WhenAll(
+                        PlcControl.tagControl.Z1axis.StartAbsoluteAsync(initPos.AlignInitZ1.ToFloat(), default, default),
+                        PlcControl.tagControl.Z2axis.StartAbsoluteAsync(initPos.AlignInitZ2.ToFloat(), default, default)
+                    );
+                    await Task.WhenAll(
+                        PlcControl.tagControl.Xaxis.StartAbsoluteAsync(initPos.AlignInitX.ToFloat(), default, default),
+                        PlcControl.tagControl.Yaxis.StartAbsoluteAsync(initPos.AlignInitY.ToFloat(), default, default)
+                    );
+                    mainWindow?.NavigateToPage(bean.PageUrl);
                     break;
                 //case 401:
                 //    ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(FullyAutomatic));

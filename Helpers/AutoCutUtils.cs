@@ -157,14 +157,14 @@ namespace 精密切割系统.Helpers
             try
             {
                 MaterialSnackUtils.MaterialSnack("请准备更换硅片,轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
-                await PlcControl.tagControl.wholeDevice.StopSpindleAsync();
+                //await PlcControl.tagControl.wholeDevice.StopSpindleAsync();
                 Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, token);
                 Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, default, token);
                 await Task.WhenAll(taskZ1, taskZ2);
                 Task taskXY = PlcControl.tagControl.cutting.RunMotionAsync(0, 0, token);
                 Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0, default, token);
-                Task speedZero = PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync(token);
-                await Task.WhenAll(taskXY, taskTheta, speedZero);
+                //Task speedZero = PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync(token);
+                await Task.WhenAll(taskXY, taskTheta);
                 MaterialSnackUtils.MaterialSnack("请打开相机安全门，更换硅片！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
             }
             catch (OperationCanceledException)
@@ -644,7 +644,7 @@ namespace 精密切割系统.Helpers
             return totalCutTimes;
         }
 
-        private static async Task<InitialPositionModel?> GetInitialPositionAsync()
+        public static async Task<InitialPositionModel?> GetInitialPositionAsync()
         {
             InitialPositionModel? initialPosition = null;
             var list = await SqlHelper.TableAsync<InitialPositionModel>().Where(t => t.Id == 1).ToListAsync();
@@ -751,11 +751,12 @@ namespace 精密切割系统.Helpers
             }
             // 获取相机页面
             List<CameraCommon> cameraCommons = Tools.GetChildrenOfType<CameraCommon>(mainWindow);
-            if (cameraCommons.Count == 0)
+            if (cameraCommons.Count != 0)
             {
-                return null;
+                return cameraCommons.FirstOrDefault();
             }
-            return cameraCommons.FirstOrDefault();
+
+            return null;
         }
 
         public static async Task GoPreCutLineAsync(CancellationToken token)

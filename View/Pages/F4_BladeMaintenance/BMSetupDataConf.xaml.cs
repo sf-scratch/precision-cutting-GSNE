@@ -100,7 +100,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 _rightPage.btnStartSetup.Visibility = Visibility.Collapsed;
                 _rightPage.btnCutStop.Visibility = Visibility.Visible;
                 _monitorCts = new CancellationTokenSource();
-                _ = AutoCutUtils.MonitoringAlarmAsync(StopMeasureHeight, AlarmConfig.Instance.HasAnyExceptConductivityAlarm, _eventAggregator, _monitorCts.Token);
+                _ = AutoCutUtils.MonitoringAlarmAsync(StopMeasureHeight, AlarmConfig.Instance.HasAutoRunUnexpectedAlarms, _eventAggregator, _monitorCts.Token);
                 _measureHeightCts = new CancellationTokenSource();
                 _eventAggregator.GetEvent<AutoRuningMessageEvent>().Subscribe(OnMessageReceived, ThreadOption.UIThread);
                 CommonResult<float> curHeightZ = await AutoCutUtils.ProcessCombineMeasureHeightAsync(_eventAggregator, _measureHeightCts.Token);

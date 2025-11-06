@@ -91,7 +91,7 @@ namespace 精密切割系统.Assets.config.menu
                 list.Add(new MenuBean(439, "自动切割参数清单", "ClipboardListOutline", "/Assets/icon/menu_4/menu_4_5_white.png", 3, "Pages/Auto/AutoCutSelectConfig"));
             }
             list.Add(new MenuBean(440, "磨刀参数清单", "ClipboardListOutline", "/Assets/icon/menu_4/menu_4_5_white.png", 3, "Pages/F4_BladeMaintenance/BmSharpenParameter"));
-            list.Add(new MenuBean(447, "刀片测高参数", "ArrowUpDownBoldOutline", "/Assets/icon/menu_4/menu_4_3_white.png", 2, "Pages/F4_BladeMaintenance/BMSetupDataConf"));
+            list.Add(new MenuBean(447, "刀片测高", "ArrowUpDownBoldOutline", "/Assets/icon/menu_4/menu_4_3_white.png", 2, "Pages/F4_BladeMaintenance/BMSetupDataConf"));
             list.Add(new MenuBean(501, "预切割参数维护", "FormatListNumbered", "/Assets/icon/menu_5/menu_5_1_white.png", 2, "Pages/F5_GeneralEfficiency/F5_1_PrecutData"));
             list.Add(new MenuBean(512, "刀片状态信息", "/Assets/icon/menu_5/menu_5_1.png", "/Assets/icon/menu_5/menu_5_1_white.png", 2, "Pages/F4_BladeMaintenance/BladeInfo"));
             return list;
