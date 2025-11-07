@@ -61,7 +61,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             // 初始化配置
             LoadConfigInfo();
         }
-        
+
         //根据默认配置控制对应显示和隐藏
         private void UpdateDefineDataModel()
         {
@@ -89,21 +89,24 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                     _semiAutoCutService.DepthCompensationValue = tempDepthCompensation;
                     MaterialSnack("刀片高度补偿设置成功！", SnackType.SUCCESS);
                     break;
+
                 case 2403:
                     float tempChangeFeedSpeed = Tools.GetFloatStringValue(_viewModel.ChangeFeedSpeed);
                     // 速度更改
                     _semiAutoCutService.FeedSpeedCompCompensationValue = tempChangeFeedSpeed;
                     MaterialSnack("变更进刀速度成功！", SnackType.SUCCESS);
                     break;
+
                 case 2023:
-                    // 手动校准 type 
+                    // 手动校准 type
                     mainWindow.NavigateToPage("Pages/F2_ManualOperation/MQManualAlignmentConf", "type=1");
                     break;
+
                 case 2404:
                     if (_semiAutoCutService.IsOpenPrecut)
                     {
                         MaterialSnack("关闭预切割！", SnackType.SUCCESS);
-                    } 
+                    }
                     else
                     {
                         MaterialSnack("开启预切割！", SnackType.SUCCESS);
@@ -111,19 +114,23 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                     // 预切启动
                     _semiAutoCutService.IsOpenPrecut = !_semiAutoCutService.IsOpenPrecut;
                     break;
+
                 case 2405:
                     // 进入型号参数
                     // 查询当前配置,跳转到型号参数目录
                     mainWindow.NavigateToPage("Pages/F3_ModelCatalog/MCDeviceDataConf", "id=" + CurrentUtils.GetCurrentConfiguration().DeviceDataId + "&url=Pages/F2_ManualOperation/MQSemiAutomaticCuttingConf");
                     break;
+
                 case 2422:
                     // 刀片状态信息
                     mainWindow.NavigateToPage("Pages/F4_BladeMaintenance/BladeInfo", "pageName=Pages/F2_ManualOperation/MQSemiAutomaticCuttingConf");
                     break;
+
                 case 5001:
                     // 暖机
                     _ = WarmUpHelper.TriggerWarmUpAsync();
                     break;
+
                 default:
                     break;
             }
@@ -147,6 +154,8 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 MaterialSnack("未设置刀片外径！", SnackType.WARNING);
                 return;
             }
+            _semiAutoCutService.CutLine = _viewModel.CutLine;
+            _semiAutoCutService.SpindleRev = _viewModel.SpindleRev;
             ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(MQSemiAutomaticCuttingRun));
         }
 
@@ -164,6 +173,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             _semiAutoCutService.CutDirection = CutDirection.Forward;
             //CutOperateUtils.cutDirection = cutDirection;
         }
+
         private void CutBackward(object? sender, bool e)
         {
             _viewModel.CutDirection = "向后切";
@@ -202,9 +212,9 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         }
 
         /// <summary>
-         /// 设置当前通道
-         /// </summary>
-         /// <param name="channelNoValue"></param>
+        /// 设置当前通道
+        /// </summary>
+        /// <param name="channelNoValue"></param>
         public void SetChannelNo(string channelNoValue)
         {
             _viewModel.ChannelNum = channelNoValue;
@@ -212,7 +222,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
 
         private void repeatedCheckbox_Click(object sender, RoutedEventArgs e)
         {
-            CutOperateUtils.repeatedFlag = repeatedCheckbox.IsChecked == true; 
+            CutOperateUtils.repeatedFlag = repeatedCheckbox.IsChecked == true;
         }
 
         private void z1CompCheckbox_Checked(object sender, RoutedEventArgs e)

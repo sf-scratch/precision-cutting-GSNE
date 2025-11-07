@@ -155,5 +155,10 @@ namespace 精密切割系统.View.page.right
             // 调试补偿
             // Debug.WriteLine(PlcControl.GetCompensate("35.5", DeviceKey.yName, 0));
         }
+
+        private void customPlot_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            customPlot.Clear();
+        }
     }
 }

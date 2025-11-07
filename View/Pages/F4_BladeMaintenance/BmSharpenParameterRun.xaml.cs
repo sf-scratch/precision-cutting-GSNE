@@ -111,7 +111,6 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             Stopwatch stopwatch = Stopwatch.StartNew();
             try
             {
-                int spindleRev = int.Parse(bmSharpenParameter.RotateSpeed);
                 CommonResult<float> firstHeightZ = await AutoCutUtils.ProcessCombineMeasureHeightAsync(default, _pauseCts.Token);
                 RectangleWorkpiece workpiece = new(Appsettings.ThetaCenterPoint, GlobalParams.SharpenRect.Width, GlobalParams.SharpenRect.Height, (await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0).ToActualY())
                 {
@@ -120,7 +119,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 };
                 _semiAutoCutService.CutServiceProcessChanged += CutService_CutServiceProcessChanged;
                 _semiAutoCutService.CutServicePaused += CutService_CutServicePaused;
-                RunResult cutResult = await _semiAutoCutService.RunAsync(cutStepResult.Data, workpiece, 30, spindleRev, firstHeightZ.Data, GlobalParams.BladeLiftingHeight, false, _pauseCts.Token);
+                RunResult cutResult = await _semiAutoCutService.RunAsync(cutStepResult.Data, workpiece, 30, firstHeightZ.Data, GlobalParams.BladeLiftingHeight, false, _pauseCts.Token);
                 if (!cutResult.IsSuccess)
                 {
                     MaterialSnack($"磨刀失败：{cutResult.Message}", SnackType.WARNING, 0);

@@ -38,16 +38,19 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         private RightPage _rightPage;
         private BmSharpenParameterModel? _model;
         private List<BmSharpenParameterModel> list;
+
         public BmSharpenParameterForm()
         {
             InitializeComponent();
             _mainWindow = Application.Current.MainWindow as MainWindow ?? new MainWindow();
             _semiAutoCutService = SemiAutoCutService.Instance;
         }
+
         //获取参数
-        string IdStr;
-        string Flag;
-        string BladeLotID;
+        private string IdStr;
+
+        private string Flag;
+        private string BladeLotID;
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
@@ -57,7 +60,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             _rightPage.btnSure.Visibility = Visibility.Visible; //右侧显示 - 确定按钮显示
             _rightPage.btnBack.Visibility = Visibility.Visible; //右侧显示 - 返回按钮显示
             _rightPage.btnSure.BackFlag = false; //确定按钮不执行返回，执行自己的代理事件。
-            _rightPage.btnSure.SetRightClickedHandler(BtnSure_RightClicked); 
+            _rightPage.btnSure.SetRightClickedHandler(BtnSure_RightClicked);
             _rightPage.btnBack.BackFlag = false;
             _rightPage.btnBack.SetRightClickedHandler(BtnBack_RightClicked);
             _rightPage.btnCutStart.Visibility = Visibility.Visible;
@@ -77,11 +80,12 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             //获取参数
             IdStr = QueryUtils.GetValueFromQueryParams(this, "Id");
             Flag = QueryUtils.GetValueFromQueryParams(this, "Flag");
-            BladeLotID = QueryUtils.GetValueFromQueryParams(this, "BladeLotID");            
+            BladeLotID = QueryUtils.GetValueFromQueryParams(this, "BladeLotID");
             int Id = 0;
-            if (IdStr != null) {
+            if (IdStr != null)
+            {
                 Id = int.Parse(IdStr);
-            }            
+            }
             _ = initData(Id, Flag, BladeLotID);
         }
 
@@ -101,6 +105,13 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 
         private void BtnCutStart_RightClicked(object? sender, bool e)
         {
+            if (_model is null)
+            {
+                MaterialSnackUtils.MaterialSnack("数据异常", MaterialSnackUtils.SnackType.ERROR);
+                return;
+            }
+            _semiAutoCutService.CutLine = _model.CoCutNum;
+            _semiAutoCutService.SpindleRev = _model.RotateSpeed.ToInt();
             _mainWindow.NavigateToPage("Pages/F4_BladeMaintenance/BmSharpenParameterRun", "Id=" + IdStr + "&Flag=" + Flag + "&BladeLotID=" + BladeLotID);
         }
 
@@ -130,6 +141,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 MaterialSnackUtils.MaterialSnack("数据异常", MaterialSnackUtils.SnackType.ERROR);
             }
         }
+
         private async Task BtnOnClicked(int code)
         {
             //位置清零
@@ -181,21 +193,23 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 _mainWindow.NavigateToPage("Pages/F2_ManualOperation/MQManualAlignmentConf", "type=2&Id=" + IdStr + "&Flag=" + Flag + "&BladeLotID=" + BladeLotID);
             }
         }
-            //校准参数（6.5）
-        private async Task initData(long Id,string Flag,string BladeLotID)
+
+        //校准参数（6.5）
+        private async Task initData(long Id, string Flag, string BladeLotID)
         {
             var list = await SqlHelper.TableAsync<BmSharpenParameterModel>()
-                            .Where(t => t.Id == Id).ToListAsync(); 
+                            .Where(t => t.Id == Id).ToListAsync();
             //数据不存在，则初始化数据
             if (list.Count() == 0)
-            {               
+            {
                 _model = new BmSharpenParameterModel();
-                _model.BladeLotID = "0";                
+                _model.BladeLotID = "0";
             }
-            else 
+            else
             {
                 _model = list[0];
-                if (Flag != null && Flag == "copy") {                    
+                if (Flag != null && Flag == "copy")
+                {
                     _model.Id = 0;
                     _model.BladeLotID = BladeLotID;
                 }
@@ -213,7 +227,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             //    rbMm.IsChecked = true;
             //    rbInch.IsChecked = false;
             //}
-            //else 
+            //else
             //{
             //    rbMm.IsChecked = false;
             //    rbInch.IsChecked = true;
@@ -227,13 +241,13 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             {
                 cmbCutMethod.SelectedIndex = 1;
             }
-            else 
+            else
             {
                 cmbCutMethod.SelectedIndex = 0;
             }
             tbCutThickness.Text = _model.CutThickness;
             tbCutHeight.Text = _model.CutHeight + "";
-            cbIfCorrectHeight.IsChecked = _model.IfCorrectHeight=="1";
+            cbIfCorrectHeight.IsChecked = _model.IfCorrectHeight == "1";
             tbCoCutNum.Text = _model.CoCutNum + "";
             tbCoXDistance.Text = _model.CoXDistance + "";
             tbCoYDistance.Text = _model.CoYDistance + "";
@@ -278,7 +292,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         {
             if (_model != null)
             {
-                _model.BladeLotID = lbBladeLotID.Content.ToString() ;
+                _model.BladeLotID = lbBladeLotID.Content.ToString();
                 //if (rbMm.IsChecked == true)
                 //{
                 //    _model.Unit = "mm";
@@ -288,11 +302,11 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 //    _model.Unit = "inch";
                 //}
                 _model.Unit = "mm";
-                _model.RotateSpeed  = tbRotateSpeed.Text;
+                _model.RotateSpeed = tbRotateSpeed.Text;
                 _model.CutMethod = cmbCutMethod.Text;
                 _model.CutThickness = tbCutThickness.Text;
                 _model.CutHeight = float.Parse(tbCutHeight.Text);
-                _model.IfCorrectHeight = cbIfCorrectHeight.IsChecked==true?"1":"0";
+                _model.IfCorrectHeight = cbIfCorrectHeight.IsChecked == true ? "1" : "0";
                 _model.CoCutNum = int.Parse(tbCoCutNum.Text);
                 _model.CoXDistance = float.Parse(tbCoXDistance.Text);
                 _model.CoYDistance = float.Parse(tbCoYDistance.Text);
@@ -324,8 +338,9 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 {
                     await SqlHelper.UpdateAsync(_model);
                 }
-                else {
-                    var Id = await SqlHelper.AddAsync(_model);                  
+                else
+                {
+                    var Id = await SqlHelper.AddAsync(_model);
                 }
                 MaterialSnackUtils.MaterialSnack("保存成功！", MaterialSnackUtils.SnackType.SUCCESS);
             }
@@ -343,6 +358,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 tbs[i].initNumber();
             }
         }
+
         /// <summary>
         /// 表单内容是否错误  false是正常 true是出错了
         /// </summary>
@@ -372,6 +388,5 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         {
             return !FormError();
         }
-
     }
 }

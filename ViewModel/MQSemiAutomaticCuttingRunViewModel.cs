@@ -223,58 +223,63 @@ namespace 精密切割系统.ViewModel
                 await PlcControl.tagControl.wholeDevice.OpenCutSecurityDoorAsync();
             }
             AtomicConfig.IsCutProcessing = true;
-            FileTableItemModel fileTableItem = fileTableItemResult.Data;
-            _ = MonitoringAlarmAsync(_monitoringCts.Token);
-            _ = MonitoringCutProgressAsync(_monitoringCts.Token);
-            CutStep firtStep = cutSteps.First();
-            float cutY = firtStep.IsAbsolute ? firtStep.ChannelStartY : (await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0).ToActualY();
-            float measureHeightZ = 0;
-            if (!BmSetupData.Instance.IsAutomHeightMeasureBeforeCutting && Appsettings.MeasureHeightLast is not null)
-            {
-                measureHeightZ = Appsettings.MeasureHeightLast.Value;
-            }
-            else
-            {
-                CommonResult<float> curHeightZ = await AutoCutUtils.ProcessCombineMeasureHeightAsync(_eventAggregator, _pauseCts.Token);
-                if (!curHeightZ.IsSuccess)
-                {
-                    ShowWarnMessageNavigateHome(curHeightZ.Message);
-                    AtomicConfig.IsCutProcessing = false;
-                    return;
-                }
-                measureHeightZ = curHeightZ.Data;
-            }
-            Stopwatch stopwatch = Stopwatch.StartNew();
             try
             {
-                IWorkpieces workpiece = GenerateWorkpieces(fileTableItem, cutY);
-                _semiAutoCutService.CutServiceProcessChanged += CutService_CutServiceProcessChanged;
-                _semiAutoCutService.CutServicePaused += CutService_CutServicePaused;
-                MaterialSnack($"切割中...", SnackType.WARNING, 0, _eventAggregator);
-                float margin = Appsettings.AdditionalMargin ?? 20;
-                RunResult cutResult = await _semiAutoCutService.RunAsync(cutSteps, workpiece, margin, fileTableItem.SpindleRev, measureHeightZ, GlobalParams.BladeLiftingHeight, false, _pauseCts.Token);
-                if (!cutResult.IsSuccess)
+                FileTableItemModel fileTableItem = fileTableItemResult.Data;
+                _ = MonitoringAlarmAsync(_monitoringCts.Token);
+                _ = MonitoringCutProgressAsync(_monitoringCts.Token);
+                CutStep firtStep = cutSteps.First();
+                float cutY = firtStep.IsAbsolute ? firtStep.ChannelStartY : (await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0).ToActualY();
+                float measureHeightZ = 0;
+                if (!BmSetupData.Instance.IsAutomHeightMeasureBeforeCutting && Appsettings.MeasureHeightLast is not null)
                 {
-                    MaterialSnack($"{cutResult.Message}", SnackType.WARNING, 0, _eventAggregator);
-                    return;
+                    measureHeightZ = Appsettings.MeasureHeightLast.Value;
                 }
-                stopwatch.Stop();
-                TimeSpan timeSpan = TimeSpan.FromSeconds(stopwatch.Elapsed.TotalSeconds);
-                string formattedTime = $"{timeSpan.Hours:D2}:{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}";
-                MaterialSnack($"切割完成！ 总用时：{formattedTime}", SnackType.SUCCESS, 0);
-            }
-            catch (Exception ex)
-            {
-                MaterialSnack($"切割异常：{ex.Message}", SnackType.WARNING, 0, _eventAggregator);
+                else
+                {
+                    CommonResult<float> curHeightZ = await AutoCutUtils.ProcessCombineMeasureHeightAsync(_eventAggregator, _pauseCts.Token);
+                    if (!curHeightZ.IsSuccess)
+                    {
+                        ShowWarnMessageNavigateHome(curHeightZ.Message);
+                        return;
+                    }
+                    measureHeightZ = curHeightZ.Data;
+                }
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                try
+                {
+                    IWorkpieces workpiece = GenerateWorkpieces(fileTableItem, cutY);
+                    _semiAutoCutService.CutServiceProcessChanged += CutService_CutServiceProcessChanged;
+                    _semiAutoCutService.CutServicePaused += CutService_CutServicePaused;
+                    MaterialSnack($"切割中...", SnackType.WARNING, 0, _eventAggregator);
+                    float margin = Appsettings.AdditionalMargin ?? 20;
+                    RunResult cutResult = await _semiAutoCutService.RunAsync(cutSteps, workpiece, margin, measureHeightZ, GlobalParams.BladeLiftingHeight, false, _pauseCts.Token);
+                    if (!cutResult.IsSuccess)
+                    {
+                        MaterialSnack($"{cutResult.Message}", SnackType.WARNING, 0, _eventAggregator);
+                        return;
+                    }
+                    stopwatch.Stop();
+                    TimeSpan timeSpan = TimeSpan.FromSeconds(stopwatch.Elapsed.TotalSeconds);
+                    string formattedTime = $"{timeSpan.Hours:D2}:{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}";
+                    MaterialSnack($"切割完成！ 总用时：{formattedTime}", SnackType.SUCCESS, 0);
+                }
+                catch (Exception ex)
+                {
+                    MaterialSnack($"切割异常：{ex.Message}", SnackType.WARNING, 0, _eventAggregator);
+                }
+                finally
+                {
+                    _semiAutoCutService.CutServiceProcessChanged -= CutService_CutServiceProcessChanged;
+                    _semiAutoCutService.CutServicePaused -= CutService_CutServicePaused;
+                    stopwatch.Stop();
+                    _monitoringCts.Cancel();
+                    _pauseCts.Cancel();
+                    await StopAsync(ServicePauseResult.Stop);
+                }
             }
             finally
             {
-                _semiAutoCutService.CutServiceProcessChanged -= CutService_CutServiceProcessChanged;
-                _semiAutoCutService.CutServicePaused -= CutService_CutServicePaused;
-                stopwatch.Stop();
-                _monitoringCts.Cancel();
-                _pauseCts.Cancel();
-                await StopAsync(ServicePauseResult.Stop);
                 AtomicConfig.IsCutProcessing = false;
             }
         }

@@ -81,6 +81,28 @@ namespace 精密切割系统.Model.cut
             set { _isOpenPrecut = value; }
         }
 
+        private int _cutLine;
+
+        /// <summary>
+        /// 切割刀数（0=all）
+        /// </summary>
+        public int CutLine
+        {
+            get { return _cutLine; }
+            set { _cutLine = value; }
+        }
+
+        private int _spindleRev;
+
+        /// <summary>
+        /// 主轴转速
+        /// </summary>
+        public int SpindleRev
+        {
+            get { return _spindleRev; }
+            set { _spindleRev = value; }
+        }
+
         private float _cutThetaAlignDeg;
 
         private SemiAutoCutService()
@@ -115,14 +137,20 @@ namespace 精密切割系统.Model.cut
             return CommonResult.Success();
         }
 
-        public async Task<RunResult> RunAsync(List<CutStep> cutStepList, IWorkpieces workpiece, float margin, int spindleRev, float bladeContactWorkingDiscZ1, float bladeLiftingHeight, bool isExchangeX, CancellationToken pauseToken)
+        public async Task<RunResult> RunAsync(List<CutStep> cutStepList, IWorkpieces workpiece, float margin, float bladeContactWorkingDiscZ1, float bladeLiftingHeight, bool isExchangeX, CancellationToken pauseToken)
         {
+            List<CutStep> cutSteps = cutStepList;
+            //切割刀数（0 = all）
+            if (_cutLine < cutStepList.Count)
+            {
+                cutSteps = cutStepList.GetRange(0, _cutLine);
+            }
             CancellationToken usingPauseToken = pauseToken;
             _cutThetaAlignDeg = await GetCutThetaAlignDegAsync();
             Stopwatch stopwatch = new();
             try
             {
-                PathCalculator pathCalculator = new(cutStepList.Select(p => p.Speed).ToList());
+                PathCalculator pathCalculator = new(cutSteps.Select(p => p.Speed).ToList());
                 IsReady = false;
                 //打开切割水
                 await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
@@ -132,10 +160,10 @@ namespace 精密切割系统.Model.cut
                 LineSegment? preLine = null;
                 int currentChannelNum = 1;
                 int cutTime = 0;
-                while (cutTime < cutStepList.Count)
+                while (cutTime < cutSteps.Count)
                 {
                     LineSegment? line = null;
-                    CutStep cutStep = cutStepList[cutTime];
+                    CutStep cutStep = cutSteps[cutTime];
                     if (cutStep.ChannelNum != currentChannelNum)
                     {
                         //切换通道
@@ -168,7 +196,15 @@ namespace 精密切割系统.Model.cut
                         //加上边距
                         float startX = line.StartPoint.X + cutStep.OffsetX - margin;
                         float endX = line.EndPoint.X + cutStep.OffsetX + margin;
-                        currentKnifeRemainTime = MathF.Abs(startX - endX) / cutSpeed;
+                        //计算当前刀剩余时间
+                        if (cutTime <= 0)
+                        {
+                            currentKnifeRemainTime = MathF.Abs(startX - endX) / cutSpeed;
+                        }
+                        else
+                        {
+                            currentKnifeRemainTime -= MathF.Abs(startX - endX) / cutSteps[cutTime - 1].Speed;
+                        }
                         //x方向交替切割
                         if (cutStep.IsAlternatingCuttingStroke)
                         {
@@ -190,11 +226,11 @@ namespace 精密切割系统.Model.cut
                         foreach (float endZ in endZList)
                         {
                             //触发切割进度更新事件
-                            CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, cutStepList.Count, cutTime));
+                            CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, cutSteps.Count, cutTime));
                             stopwatch.Restart();
                             await PlcControl.tagControl.ThetaAxis.SetAbsoluteSpeedAsync(GlobalParams.ThetaDefaultSpeed);
                             //设置切割参数
-                            await PlcControl.tagControl.cutting.SetCutParamsAsync(cutSpeed, endZ, startZ, startX, endX, line.StartPoint.Y, "0", _cutThetaAlignDeg + cutStep.ThetaDeg, spindleRev, true);
+                            await PlcControl.tagControl.cutting.SetCutParamsAsync(cutSpeed, endZ, startZ, startX, endX, line.StartPoint.Y, "0", _cutThetaAlignDeg + cutStep.ThetaDeg, _spindleRev, true);
                             //当前切割次数
                             int? curCutNum = await PlcControl.tagControl.cutting.GetCutNumAsync();
                             if (curCutNum == null)
@@ -213,7 +249,7 @@ namespace 精密切割系统.Model.cut
                         }
                         cutTime++;
                         //触发切割进度更新事件
-                        CutServiceProcessChanged?.Invoke(new CutServiceProcess(targetEndZ, cutSpeed, cutStepList.Count, cutTime, cutLength, cutStep.ChannelNum, pathCalculator.EstimateRemainingTime(), true));
+                        CutServiceProcessChanged?.Invoke(new CutServiceProcess(targetEndZ, cutSpeed, cutSteps.Count, cutTime, cutLength, cutStep.ChannelNum, pathCalculator.EstimateRemainingTime(), true));
                         //检测工件是否切完
                         if (!workpiece.CheckCutDistance(_cutDirection, cutStep.OffsetY))
                         {

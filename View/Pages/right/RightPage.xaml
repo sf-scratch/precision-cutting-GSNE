@@ -57,38 +57,80 @@
                 <Label />
                 <Label x:Name="spindleSpeedValue" Content="0" />
             </auto:AutoGrid>
-            <DataGrid
-                materialDesign:DataGridAssist.CellPadding="4 2 2 2"
-                materialDesign:DataGridAssist.ColumnHeaderPadding="4 2 2 2"
-                AutoGenerateColumns="False"
-                Background="Transparent"
-                CanUserAddRows="False"
-                FontWeight="Bold"
-                ItemsSource="{Binding ActiveAlarms}"
-                Visibility="{Binding AlarmVisibility}">
-                <DataGrid.Resources>
-                    <ResourceDictionary>
-                        <ResourceDictionary.MergedDictionaries>
-                            <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
-                        </ResourceDictionary.MergedDictionaries>
-                        <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="DataGridColumnHeader">
-                            <Setter Property="FontWeight" Value="Bold" />
-                            <Setter Property="FontSize" Value="16" />
-                        </Style>
-                    </ResourceDictionary>
-                </DataGrid.Resources>
-                <DataGrid.Columns>
-                    <DataGridTextColumn Binding="{Binding Address}" Header="报警地址" />
-                    <DataGridTextColumn Binding="{Binding Level}" Header="级别">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Foreground" Value="{Binding LevelBrush}" />
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
-                    <DataGridTextColumn Binding="{Binding Message}" Header="消息" />
-                </DataGrid.Columns>
-            </DataGrid>
+            <materialDesign:Card>
+                <TabControl
+                    materialDesign:ColorZoneAssist.Mode="PrimaryMid"
+                    materialDesign:NavigationRailAssist.SelectionCornerRadius="50 10 10 10"
+                    materialDesign:NavigationRailAssist.ShowSelectionBackground="True"
+                    Style="{StaticResource MaterialDesignTabControl}"
+                    TabStripPlacement="Top">
+                    <TabItem>
+                        <TabItem.Header>
+                            <StackPanel Width="auto" Height="auto">
+                                <materialDesign:PackIcon
+                                    Width="24"
+                                    Height="24"
+                                    HorizontalAlignment="Center"
+                                    Kind="ShieldAccountOutline" />
+                                <TextBlock HorizontalAlignment="Center" Text="Photos" />
+                            </StackPanel>
+                        </TabItem.Header>
+                        <DataGrid
+                            HorizontalAlignment="Left"
+                            materialDesign:DataGridAssist.CellPadding="4 2 2 2"
+                            materialDesign:DataGridAssist.ColumnHeaderPadding="4 2 2 2"
+                            AutoGenerateColumns="False"
+                            Background="Transparent"
+                            CanUserAddRows="False"
+                            FontWeight="Bold"
+                            ItemsSource="{Binding ActiveAlarms}"
+                            Visibility="{Binding AlarmVisibility}">
+                            <DataGrid.Resources>
+                                <ResourceDictionary>
+                                    <ResourceDictionary.MergedDictionaries>
+                                        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
+                                    </ResourceDictionary.MergedDictionaries>
+                                    <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="DataGridColumnHeader">
+                                        <Setter Property="FontWeight" Value="Bold" />
+                                        <Setter Property="FontSize" Value="16" />
+                                    </Style>
+                                </ResourceDictionary>
+                            </DataGrid.Resources>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding Address}" Header="地址" />
+                                <DataGridTextColumn Binding="{Binding Level}" Header="级别">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="{Binding LevelBrush}" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Binding="{Binding Message}" Header="消息" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </TabItem>
+                    <TabItem>
+                        <TabItem.Header>
+                            <StackPanel Width="auto" Height="auto">
+                                <materialDesign:PackIcon
+                                    Width="24"
+                                    Height="24"
+                                    HorizontalAlignment="Center"
+                                    Kind="Waveform" />
+                                <TextBlock HorizontalAlignment="Center" Text="Sounds" />
+                            </StackPanel>
+                        </TabItem.Header>
+                        <Controls:CustomPlot
+                            x:Name="customPlot"
+                            Width="auto"
+                            Height="200"
+                            MouseDown="customPlot_MouseDown"
+                            ShowLine="False"
+                            XInitialMaxValue="150"
+                            XMaxValue="300" />
+                    </TabItem>
+                </TabControl>
+            </materialDesign:Card>
             <ListBox
                 d:ItemsSource="{d:SampleData}"
                 Background="Transparent"
