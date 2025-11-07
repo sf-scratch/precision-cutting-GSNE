@@ -187,8 +187,11 @@ namespace 精密切割系统.ViewModel
                 new AxisOperationModel(PlcControl.tagControl.Xaxis, async (a,b) => { if(!b) await a.AxisObject.StopJogAsync();}){IsChecked = true, AxisSlowSpeed = "0", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0"},
                 new AxisOperationModel(PlcControl.tagControl.Yaxis, async (a,b) => { if(!b) await a.AxisObject.StopJogAsync();}){AxisSlowSpeed = "0", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0"},
                 new AxisOperationModel(PlcControl.tagControl.Z1axis, async(a, b) => { if(!b) await a.AxisObject.StopJogAsync();}){AxisSlowSpeed = "0", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0"},
-                new AxisOperationModel(PlcControl.tagControl.Z2axis, async(a, b) => { if(! b) await a.AxisObject.StopJogAsync(); }){AxisSlowSpeed = "0", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0"},
-                new AxisOperationModel(PlcControl.tagControl.ThetaAxis, async(a, b) => { if(! b) await a.AxisObject.StopJogAsync(); }){AxisSlowSpeed = "0", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0",IsReady = true},]);
+                new AxisOperationModel(PlcControl.tagControl.Z2axis, async(a, b) => { if(! b) await a.AxisObject.StopJogAsync(); }){AxisSlowSpeed = "0", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0"}]);
+            if (GlobalParams.HasTheta)
+            {
+                AxisOperationList.Add(new AxisOperationModel(PlcControl.tagControl.ThetaAxis, async (a, b) => { if (!b) await a.AxisObject.StopJogAsync(); }) { AxisSlowSpeed = "0", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", IsReady = true });
+            }
             _ = MonitiorAxisState(_cts.Token);
             InitRightButton();
             InitBottomButton();

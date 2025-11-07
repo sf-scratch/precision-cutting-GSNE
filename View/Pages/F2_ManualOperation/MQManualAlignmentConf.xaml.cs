@@ -99,7 +99,11 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             cutWidth.Text = Tools.FormatDecimalString((cameraCommon.CutMarkWidth / 1000).ToString(), 4);
             edgesWidth.Text = Tools.FormatDecimalString((cameraCommon.EdgeChipWidth / 1000).ToString(), 4);
             LoadPosition();
-            await Task.Delay(10000);
+            // 打开相机镜头盖
+            if (!GlobalParams.HasTheta)
+            {
+                await PlcControl.tagControl.wholeDevice.CloseCutSecurityDoorAsync();
+            }
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)

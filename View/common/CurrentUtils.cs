@@ -11,20 +11,28 @@ namespace 精密切割系统.Utils
     {
         // 刀片测高参数
         public static BladeHeightModel bladeHeightModel;
+
         // 型号参数
         public static FileTableItemModel fileTableItemModel;
+
         // 型号参数-当前切割面
         public static FileTableItemChModel fileTableItemChModel;
+
         // 型号参数-面列表
         public static List<FileTableItemChModel> fileTableItemChModels;
+
         // 电火花修刀
         public static ElectricalDischargeTruingModel electricalDischargeTruingModel;
+
         // 位置补偿
         public static List<PositionCompensationModel> positionCompensationModels;
+
         // 预切割
         public static PreCutModel preCutModel;
+
         // 各轴初始位置
         public static InitialPositionModel initialPositionModel;
+
         public static SpeedSettingModel speedSettingModel;
         public static OperationParametersModel operationParametersModel;
         public static PositionAlignmentModel positionAlignmentModel;
@@ -53,7 +61,7 @@ namespace 精密切割系统.Utils
 
         public static void initPlcPosition()
         {
-            // 各轴运动速度 点动高速/低速速度  绝对运动速度 
+            // 各轴运动速度 点动高速/低速速度  绝对运动速度
             InitAxisSpeedIndex(operationParametersModel);
             // 设置位置校准
             InitPositionAlignment(positionAlignmentModel);
@@ -81,7 +89,7 @@ namespace 精密切割系统.Utils
 
         public static void InitPositionAlignment(PositionAlignmentModel _model)
         {
-            //赋值全局变量 
+            //赋值全局变量
             float result = 0;
             //theta轴切割中心点位置 X轴
             bool tryRe = float.TryParse(_model.ThetaCenterLocationX, out result);
@@ -174,7 +182,6 @@ namespace 精密切割系统.Utils
                 , operationParametersModel.ZSscanDistance
                 , operationParametersModel.ZScanSpeed, operationParametersModel.zPanelJogDistance);
 
-
             // 设置屏幕移动量 θ轴的屏幕移动量根据选择的型号参数来动
             GlobalParams.xScreenIndex = operationParametersModel.XScreenIndex;
             GlobalParams.yScreenIndex = operationParametersModel.YScreenIndex;
@@ -216,6 +223,7 @@ namespace 精密切割系统.Utils
             }
             return current;
         }
+
         /// <summary>
         /// 修改当前切割面
         /// </summary>
@@ -242,7 +250,6 @@ namespace 精密切割系统.Utils
             PlcControl.tagControl.ThetaAxis.StartAbsolute("90", "0");
         }
 
-
         //刷新当前配置集合
         public static async Task UpdateCurrentConfiguration(CurrentConfigurationModel model)
         {
@@ -254,7 +261,8 @@ namespace 精密切割系统.Utils
             long id = GetCurrentConfiguration().BladeHeightDataId;
             var listConf = SqlHelper.Table<BladeHeightModel>().Where(t => t.Id == id).ToList();
             BladeHeightModel _model = new BladeHeightModel();
-            if (listConf.Count() > 0) {
+            if (listConf.Count() > 0)
+            {
                 _model = listConf[0];
             }
             return _model;
@@ -293,6 +301,7 @@ namespace 精密切割系统.Utils
             }
             return query.FirstOrDefault() ?? new FileTableItemChModel();
         }
+
         public static List<FileTableItemChModel> GetFileTableItemChModels()
         {
             var currentConfig = GetCurrentConfiguration();
@@ -300,52 +309,62 @@ namespace 精密切割系统.Utils
 
             return SqlHelper.Table<FileTableItemChModel>().Where(t => t.ItemId == deviceDataId).ToList();
         }
+
         public static FileTableItemModel GetFileTableItemModel()
         {
             long id = GetCurrentConfiguration().DeviceDataId;
             var listConf = SqlHelper.Table<FileTableItemModel>().Where(t => t.Id == id).ToList();
             FileTableItemModel _model = new FileTableItemModel();
-            if (listConf.Count() > 0) {
+            if (listConf.Count() > 0)
+            {
                 _model = listConf[0];
             }
             return _model;
         }
+
         public static PreCutModel GetPreCutModel()
         {
             string id = GetFileTableItemModel().PrecutProcessNo;
             var listConf = SqlHelper.Table<PreCutModel>().Where(t => t.PrecutNo == id).ToList();
             PreCutModel _model = new PreCutModel();
-            if (listConf.Count() > 0) {
+            if (listConf.Count() > 0)
+            {
                 _model = listConf[0];
             }
             return _model;
         }
+
         public static InitialPositionModel GetInitialPositionModel()
         {
             long id = 1;
             var listConf = SqlHelper.Table<InitialPositionModel>().Where(t => t.Id == id).ToList();
             InitialPositionModel _model = null;
-            if (listConf.Count() > 0) {
+            if (listConf.Count() > 0)
+            {
                 _model = listConf[0];
             }
             return _model;
         }
+
         public static SpeedSettingModel GetSpeedSettingModel()
         {
             long id = 1;
             var listConf = SqlHelper.Table<SpeedSettingModel>().Where(t => t.Id == id).ToList();
             SpeedSettingModel _model = null;
-            if (listConf.Count() > 0) {
+            if (listConf.Count() > 0)
+            {
                 _model = listConf[0];
             }
             return _model;
         }
+
         public static OperationParametersModel GetOperationParametersModel()
         {
             long id = 1;
             var listConf = SqlHelper.Table<OperationParametersModel>().Where(t => t.Id == id).ToList();
             OperationParametersModel _model = null;
-            if (listConf.Count() > 0) {
+            if (listConf.Count() > 0)
+            {
                 _model = listConf[0];
             }
             return _model;
@@ -367,6 +386,7 @@ namespace 精密切割系统.Utils
             var listConf = SqlHelper.Table<ElectricalDischargeTruingModel>().ToList();
             return listConf.Count > 0 ? listConf[0] : new ElectricalDischargeTruingModel();
         }
+
         public static List<PositionCompensationModel> GetPositionCompensationModels()
         {
             return SqlHelper.Table<PositionCompensationModel>().ToList();

@@ -222,6 +222,7 @@ namespace 精密切割系统.ViewModel
             {
                 await PlcControl.tagControl.wholeDevice.OpenCutSecurityDoorAsync();
             }
+            AtomicConfig.IsCutProcessing = true;
             FileTableItemModel fileTableItem = fileTableItemResult.Data;
             _ = MonitoringAlarmAsync(_monitoringCts.Token);
             _ = MonitoringCutProgressAsync(_monitoringCts.Token);
@@ -238,6 +239,7 @@ namespace 精密切割系统.ViewModel
                 if (!curHeightZ.IsSuccess)
                 {
                     ShowWarnMessageNavigateHome(curHeightZ.Message);
+                    AtomicConfig.IsCutProcessing = false;
                     return;
                 }
                 measureHeightZ = curHeightZ.Data;
@@ -273,6 +275,7 @@ namespace 精密切割系统.ViewModel
                 _monitoringCts.Cancel();
                 _pauseCts.Cancel();
                 await StopAsync(ServicePauseResult.Stop);
+                AtomicConfig.IsCutProcessing = false;
             }
         }
 

@@ -307,9 +307,14 @@ namespace 精密切割系统.View
                         break;
                     }
                 case 202:
+                    if (mainWindow == null) return;
                     if (!GlobalParams.OnlineFlag)
                     {
-                        mainWindow?.NavigateToPage(bean.PageUrl);
+                        MaterialSnackUtils.MaterialSnack("进入校准模式中...", SnackType.WARNING, 0);
+                        mainWindow.IsEnabled = false;
+                        await Task.Delay(2000);
+                        mainWindow.IsEnabled = true;
+                        mainWindow.NavigateToPage(bean.PageUrl);
                         break;
                     }
                     if (AlarmConfig.Instance.HasActiveErrorAlarm())
@@ -323,15 +328,23 @@ namespace 精密切割系统.View
                         MaterialSnackUtils.MaterialSnack("获取初始位置失败，请检查初始位置配置！", SnackType.WARNING, 0);
                         break;
                     }
-                    await Task.WhenAll(
-                        PlcControl.tagControl.Z1axis.StartAbsoluteAsync(initPos.AlignInitZ1.ToFloat(), default, default),
-                        PlcControl.tagControl.Z2axis.StartAbsoluteAsync(initPos.AlignInitZ2.ToFloat(), default, default)
-                    );
-                    await Task.WhenAll(
-                        PlcControl.tagControl.Xaxis.StartAbsoluteAsync(initPos.AlignInitX.ToFloat(), default, default),
-                        PlcControl.tagControl.Yaxis.StartAbsoluteAsync(initPos.AlignInitY.ToFloat(), default, default)
-                    );
-                    mainWindow?.NavigateToPage(bean.PageUrl);
+                    MaterialSnackUtils.MaterialSnack("进入校准模式中...", SnackType.WARNING, 0);
+                    try
+                    {
+                        mainWindow.IsEnabled = false;
+                        await Task.WhenAll(
+                            PlcControl.tagControl.Z1axis.StartAbsoluteAsync(initPos.AlignInitZ1.ToFloat(), default, default)
+                        );
+                        await Task.WhenAll(
+                            PlcControl.tagControl.Xaxis.StartAbsoluteAsync(initPos.AlignInitX.ToFloat(), default, default),
+                            PlcControl.tagControl.Yaxis.StartAbsoluteAsync(initPos.AlignInitY.ToFloat(), default, default)
+                        );
+                    }
+                    finally
+                    {
+                        mainWindow.IsEnabled = true;
+                    }
+                    mainWindow.NavigateToPage(bean.PageUrl);
                     break;
                 //case 401:
                 //    ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(FullyAutomatic));

@@ -54,7 +54,7 @@ namespace 精密切割系统.ViewModel
                 {
                     try
                     {
-                        if (SemiAutoCutService.Instance.IsReady)
+                        if (!AtomicConfig.IsCutProcessing)
                         {
                             if (AlarmConfig.Instance.HasActiveErrorAlarm(false))
                             {

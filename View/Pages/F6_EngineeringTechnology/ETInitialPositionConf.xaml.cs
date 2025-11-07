@@ -102,7 +102,7 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
             inputBladeSetupInitX.Text = _model.BladeSetupInitX;
             inputBladeSetupInitY.Text = _model.BladeSetupInitY;
             inputBladeSetupInitZ1.Text = _model.BladeSetupInitZ1;
-            inputBladeSetupInitZ2.Text = _model.BladeSetupInitZ2;
+            //inputBladeSetupInitZ2.Text = _model.BladeSetupInitZ2;
             //inputNoContactBladeSetupInitX.Text = _model.NoContactBladeSetupInitX;
             //inputNoContactBladeSetupInitY.Text = _model.NoContactBladeSetupInitY;
             //inputNoContactBladeSetupInitZ1.Text = _model.NoContactBladeSetupInitZ1;
@@ -110,7 +110,7 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
             inputAlignInitX.Text = _model.AlignInitX;
             inputAlignInitY.Text = _model.AlignInitY;
             inputAlignInitZ1.Text = _model.AlignInitZ1;
-            inputAlignInitZ2.Text = _model.AlignInitZ2;
+            //inputAlignInitZ2.Text = _model.AlignInitZ2;
             //inputCutInitX.Text = _model.CutInitX;
             //inputCutInitY.Text = _model.CutInitY;
             //inputCutInitZ1.Text = _model.CutInitZ1;
@@ -118,7 +118,7 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
             inputCutReplaceInitX.Text = _model.CutReplaceInitX;
             inputCutReplaceInitY.Text = _model.CutReplaceInitY;
             inputCutReplaceInitZ1.Text = _model.CutReplaceInitZ1;
-            inputCutReplaceInitZ2.Text = _model.CutReplaceInitZ2;
+            //inputCutReplaceInitZ2.Text = _model.CutReplaceInitZ2;
 
             //如果是空或者小数位数不足-小数初始化为0
             initTbNumber();
@@ -139,7 +139,7 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
                 _model.BladeSetupInitX = inputBladeSetupInitX.Text;
                 _model.BladeSetupInitY = inputBladeSetupInitY.Text;
                 _model.BladeSetupInitZ1 = inputBladeSetupInitZ1.Text;
-                _model.BladeSetupInitZ2 = inputBladeSetupInitZ2.Text;
+                //_model.BladeSetupInitZ2 = inputBladeSetupInitZ2.Text;
 
                 //_model.NoContactBladeSetupInitX = inputNoContactBladeSetupInitX.Text;
                 //_model.NoContactBladeSetupInitY = inputNoContactBladeSetupInitY.Text;
@@ -149,7 +149,7 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
                 _model.AlignInitX = inputAlignInitX.Text;
                 _model.AlignInitY = inputAlignInitY.Text;
                 _model.AlignInitZ1 = inputAlignInitZ1.Text;
-                _model.AlignInitZ2 = inputAlignInitZ2.Text;
+                //_model.AlignInitZ2 = inputAlignInitZ2.Text;
 
                 //_model.CutInitX = inputCutInitX.Text;
                 //_model.CutInitY = inputCutInitY.Text;
@@ -159,7 +159,7 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
                 _model.CutReplaceInitX = inputCutReplaceInitX.Text;
                 _model.CutReplaceInitY = inputCutReplaceInitY.Text;
                 _model.CutReplaceInitZ1 = inputCutReplaceInitZ1.Text;
-                _model.CutReplaceInitZ2 = inputCutReplaceInitZ2.Text;
+                //_model.CutReplaceInitZ2 = inputCutReplaceInitZ2.Text;
 
                 await SqlHelper.UpdateAsync(_model);
 

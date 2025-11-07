@@ -23,6 +23,8 @@ namespace 精密切割系统.Helpers
         // 是否带Theta轴
         public static bool HasTheta { get; set; } = false;
 
+        public static string DecimalStringFormat { get; set; } = "F5";
+
         // 当前页面是否是首页
         public static bool currentPageIsHome = false;
 

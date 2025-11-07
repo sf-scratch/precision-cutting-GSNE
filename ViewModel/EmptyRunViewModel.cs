@@ -224,10 +224,24 @@ namespace 精密切割系统.ViewModel
             {
                 _emptyRunCts?.Cancel();
                 IsEnabledGrid = true;
+                NavigateUtils.SetWindowIsEnable(false);
+                var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(60));
+                await Task.WhenAll(
+                    PlcControl.tagControl.Xaxis.WaitAxisStopAsync(timeoutToken.Token),
+                    PlcControl.tagControl.Yaxis.WaitAxisStopAsync(timeoutToken.Token),
+                    PlcControl.tagControl.Z1axis.WaitAxisStopAsync(timeoutToken.Token),
+                    PlcControl.tagControl.Z2axis.WaitAxisStopAsync(timeoutToken.Token),
+                    PlcControl.tagControl.ThetaAxis.WaitAxisStopAsync(timeoutToken.Token)
+                );
                 InitRightButton();
+            }
+            catch (Exception ex)
+            {
+                MaterialSnackUtils.MaterialSnack($"停止空运行超时！", MaterialSnackUtils.SnackType.ERROR);
             }
             finally
             {
+                NavigateUtils.SetWindowIsEnable(true);
                 _emptyRunSemaphore.Release();
             }
         }

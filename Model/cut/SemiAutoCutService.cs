@@ -37,13 +37,15 @@ namespace 精密切割系统.Model.cut
             set { _cutDirection = value; }
         }
 
+        private bool _isReady;
+
         /// <summary>
         /// 是否准备就绪
         /// </summary>
         public bool IsReady
         {
-            get { return AtomicConfig.IsCutProcessing; }
-            set { AtomicConfig.IsCutProcessing = value; }
+            get { return _isReady; }
+            set { _isReady = value; }
         }
 
         private float _depthCompensationValue;
@@ -122,7 +124,6 @@ namespace 精密切割系统.Model.cut
             {
                 PathCalculator pathCalculator = new(cutStepList.Select(p => p.Speed).ToList());
                 IsReady = false;
-                await PlcControl.tagControl.wholeDevice.OpenGreenLightAsync();
                 //打开切割水
                 await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
                 //进入全自动切割模式
