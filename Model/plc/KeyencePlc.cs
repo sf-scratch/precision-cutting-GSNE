@@ -35,7 +35,7 @@ namespace 精密切割系统.Driver
         static KeyencePlc()
         {
             _keyence_async_net.ConnectTimeOut = 1000;
-            _keyence_async_net.ReceiveTimeOut = 1000;
+            _keyence_async_net.ReceiveTimeOut = 50;
         }
 
         private KeyencePlc(string ip)

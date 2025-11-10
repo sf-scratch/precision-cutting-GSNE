@@ -55,7 +55,7 @@
                         <RowDefinition />
                         <RowDefinition />
                     </Grid.RowDefinitions>
-                    <Grid Grid.Row="0">
+                    <!--<Grid Grid.Row="0">
                         <Grid Width="100" Height="100">
                             <StackPanel Orientation="Vertical">
                                 <Border
@@ -74,7 +74,7 @@
                                     Text="Scan" />
                             </StackPanel>
                         </Grid>
-                    </Grid>
+                    </Grid>-->
                     <Grid Grid.Row="1">
                         <StackPanel VerticalAlignment="Center" Orientation="Vertical">
                             <ToggleButton

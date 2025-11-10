@@ -2,6 +2,8 @@
 using 精密切割系统.Driver;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.cut.Workpieces;
+using 精密切割系统.Model.logs;
+using 精密切割系统.Utils;
 using 精密切割系统.ViewModel;
 using static 精密切割系统.Model.cut.ServicePauseResult;
 
@@ -239,6 +241,17 @@ namespace 精密切割系统.Model.cut
                             }
                             //开始切割信号
                             await PlcControl.tagControl.cutting.StartCutAsync();
+                            // 记录日志
+                            RunLogsCommon.LogEvent(LogType.Cut,
+                                new RunLogsViewModel(LogType.Cut, "切割"),
+                                new RunLogsViewModel("切割速度", cutSpeed.ToString()),
+                                new RunLogsViewModel("Z轴开始位置", endZ.ToString()),
+                                new RunLogsViewModel("Z轴结束位置", startZ.ToString()),
+                                new RunLogsViewModel("X轴开始位置", startX.ToString()),
+                                new RunLogsViewModel("X轴结束位置", endX.ToString()),
+                                new RunLogsViewModel("Y轴切割位置", line.StartPoint.Y.ToString()),
+                                new RunLogsViewModel("theta角度", (_cutThetaAlignDeg + cutStep.ThetaDeg).ToString()),
+                                new RunLogsViewModel("主轴转速", _spindleRev.ToString()));
                             //等待切割次数变化
                             await PlcControl.tagControl.cutting.WaitCutNumUdatedAsync(curCutNum.Value + 1, usingPauseToken);
                             stopwatch.Stop();

@@ -115,7 +115,6 @@
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel
-                                        HorizontalAlignment="Center"
                                         VerticalAlignment="Center"
                                         Orientation="Horizontal">
                                         <Label
@@ -145,7 +144,6 @@
                                         Content="{Binding title}" />
                                     <TextBox
                                         Width="270"
-                                        Height="40"
                                         Padding="10,0,0,0"
                                         VerticalAlignment="Center"
                                         VerticalContentAlignment="Center"
@@ -158,6 +156,5 @@
                 </GroupBox>
             </StackPanel>
         </StackPanel>
-
     </Grid>
 </Page>

@@ -1,4 +1,5 @@
 ﻿using Emgu.CV.Dnn;
+using ScottPlot;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,6 +18,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using 精密切割系统.Model.cut;
+using 精密切割系统.Model.logs;
 using 精密切割系统.Model.sqlite;
 using 精密切割系统.View.page.right;
 using 精密切割系统.ViewModel;
@@ -31,9 +34,9 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
         private MainWindow? mainWindow;
         private RightPage? rightPage;
 
-        ObservableCollection<RunLogsModel> runLogsModels { get; set; } = new ObservableCollection<RunLogsModel>();
+        private ObservableCollection<RunLogsModel> runLogsModels { get; set; } = new ObservableCollection<RunLogsModel>();
 
-        ObservableCollection<RunLogsViewModel> eventDataRows { get; set; } = new ObservableCollection<RunLogsViewModel>();
+        private ObservableCollection<RunLogsViewModel> eventDataRows { get; set; } = new ObservableCollection<RunLogsViewModel>();
 
         public RunLogsPage()
         {
@@ -55,14 +58,15 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
         {
             List<RunLogsModel> models = SqlHelper.Table<RunLogsModel>().ToList();
             int index = 1; // 外部变量用于跟踪索引
-            models.ForEach(model => {
+            models.ForEach(model =>
+            {
                 model.Index = index;
                 List<RunLogsViewModel> logsList = JsonSerializer.Deserialize<List<RunLogsViewModel>>(model.RecordContent);
                 model.EventData = string.Join(" ", logsList.Where(x => x.title != "事件时间").Select(x => x.content));
                 runLogsModels.Add(model);
                 index++;
             });
-            pre_listView.ItemsSource = runLogsModels;
+            pre_listView.ItemsSource = runLogsModels.Reverse();
         }
 
         private void BtnBack_RightClicked(object? sender, bool e)
