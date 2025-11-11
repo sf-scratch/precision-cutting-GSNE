@@ -94,48 +94,56 @@ namespace 精密切割系统.View.Controls
             double xMaxValue = xMax;
             formsPlot1.Plot.Axes.Bottom.Min = 0;
             formsPlot1.Plot.Axes.Bottom.Max = curMaxValue;
+            int dataInterval = 50;
+            int refreshInterval = 1000;
+            int currentInterval = 0;
             while (!token.IsCancellationRequested)
             {
                 var value = PLCValue.SlightVibration;
                 _dataY.Add(value);
-                Application.Current.Dispatcher.Invoke(() =>
+                currentInterval += dataInterval;
+                if (refreshInterval < currentInterval)
                 {
-                    if (signalPlot is not null)
-                        formsPlot1.Plot.Remove(signalPlot);
-                    signalPlot = formsPlot1.Plot.Add.Signal(_dataY, 1, ScottPlot.Color.FromColor(System.Drawing.Color.Red));
-
-                    if (showLine)
+                    currentInterval = 0;
+                    Application.Current.Dispatcher.Invoke(() =>
                     {
-                        if (hLine is not null) formsPlot1.Plot.Remove(hLine);
-                        // 添加水平横线
-                        hLine = formsPlot1.Plot.Add.HorizontalLine(_dataY.Min()); // Y=0.5的水平线
-                        hLine.LineWidth = 2;
-                        hLine.LinePattern = LinePattern.Dotted;
-                        hLine.LineColor = Colors.Red;
-                        hLine.Text = "Min: " + _dataY.Min();
+                        if (signalPlot is not null)
+                            formsPlot1.Plot.Remove(signalPlot);
+                        signalPlot = formsPlot1.Plot.Add.Signal(_dataY, 1, ScottPlot.Color.FromColor(System.Drawing.Color.Red));
 
-                        if (hLine2 is not null) formsPlot1.Plot.Remove(hLine2);
-                        // 添加水平横线
-                        hLine2 = formsPlot1.Plot.Add.HorizontalLine(_dataY.Max()); // Y=0.5的水平线
-                        hLine2.LineWidth = 2;
-                        hLine2.LinePattern = LinePattern.Dotted;
-                        hLine2.LineColor = Colors.Red;
-                        hLine2.Text = "Max: " + _dataY.Max();
-                    }
-                    formsPlot1.Plot.Axes.AutoScaleY();
-                    if (curMaxValue < _dataY.Count)
-                    {
-                        curMaxValue *= 3;
-                        if (curMaxValue > xMaxValue)
+                        if (showLine)
                         {
-                            curMaxValue = xMaxValue;
-                            _dataY.RemoveAt(0);
+                            if (hLine is not null) formsPlot1.Plot.Remove(hLine);
+                            // 添加水平横线
+                            hLine = formsPlot1.Plot.Add.HorizontalLine(_dataY.Min()); // Y=0.5的水平线
+                            hLine.LineWidth = 2;
+                            hLine.LinePattern = LinePattern.Dotted;
+                            hLine.LineColor = Colors.Red;
+                            hLine.Text = "Min: " + _dataY.Min();
+
+                            if (hLine2 is not null) formsPlot1.Plot.Remove(hLine2);
+                            // 添加水平横线
+                            hLine2 = formsPlot1.Plot.Add.HorizontalLine(_dataY.Max()); // Y=0.5的水平线
+                            hLine2.LineWidth = 2;
+                            hLine2.LinePattern = LinePattern.Dotted;
+                            hLine2.LineColor = Colors.Red;
+                            hLine2.Text = "Max: " + _dataY.Max();
                         }
-                        formsPlot1.Plot.Axes.Bottom.Max = curMaxValue;
-                    }
-                    formsPlot1.Refresh();
-                });
-                Thread.Sleep(50);
+                        formsPlot1.Plot.Axes.AutoScaleY();
+                        if (curMaxValue < _dataY.Count)
+                        {
+                            curMaxValue *= 3;
+                            if (curMaxValue > xMaxValue)
+                            {
+                                curMaxValue = xMaxValue;
+                                _dataY.RemoveAt(0);
+                            }
+                            formsPlot1.Plot.Axes.Bottom.Max = curMaxValue;
+                        }
+                        formsPlot1.Refresh();
+                    });
+                }
+                Thread.Sleep(dataInterval);
             }
         }
 

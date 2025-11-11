@@ -332,13 +332,13 @@ namespace 精密切割系统.View
                     try
                     {
                         mainWindow.IsEnabled = false;
-                        await Task.WhenAll(
-                            PlcControl.tagControl.Z1axis.StartAbsoluteAsync(initPos.AlignInitZ1.ToFloat(), default, default)
-                        );
-                        await Task.WhenAll(
-                            PlcControl.tagControl.Xaxis.StartAbsoluteAsync(initPos.AlignInitX.ToFloat(), default, default),
-                            PlcControl.tagControl.Yaxis.StartAbsoluteAsync(initPos.AlignInitY.ToFloat(), default, default)
-                        );
+                        //await Task.WhenAll(
+                        //    PlcControl.tagControl.Z1axis.StartAbsoluteAsync(initPos.AlignInitZ1.ToFloat(), default, default)
+                        //);
+                        //await Task.WhenAll(
+                        //    PlcControl.tagControl.Xaxis.StartAbsoluteAsync(initPos.AlignInitX.ToFloat(), default, default),
+                        //    PlcControl.tagControl.Yaxis.StartAbsoluteAsync(initPos.AlignInitY.ToFloat(), default, default)
+                        //);
                     }
                     finally
                     {

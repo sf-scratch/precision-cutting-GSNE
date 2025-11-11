@@ -143,7 +143,7 @@ namespace 精密切割系统.Model.cut
         {
             List<CutStep> cutSteps = cutStepList;
             //切割刀数（0 = all）
-            if (_cutLine < cutStepList.Count)
+            if (_cutLine != 0 && _cutLine < cutStepList.Count)
             {
                 cutSteps = cutStepList.GetRange(0, _cutLine);
             }
@@ -239,11 +239,22 @@ namespace 精密切割系统.Model.cut
                             {
                                 return RunResult.Fail("获取当前切割次数失败！");
                             }
+                            DateTime startTime = DateTime.Now;
+                            var monitor = new ManualPropertyMonitor<int>();
+                            monitor.StartMonitoring(() => PLCValue.SlightVibration);
                             //开始切割信号
                             await PlcControl.tagControl.cutting.StartCutAsync();
+                            //等待切割次数变化
+                            await PlcControl.tagControl.cutting.WaitCutNumUdatedAsync(curCutNum.Value + 1, usingPauseToken);
+                            var monitorResult = monitor.StopMonitoring();
                             // 记录日志
-                            RunLogsCommon.LogEvent(LogType.Cut,
+                            RunLogsCommon.LogEvent(
+                                LogType.Cut,
                                 new RunLogsViewModel(LogType.Cut, "切割"),
+                                new RunLogsViewModel("刀数", (cutTime + 1).ToString()),
+                                new RunLogsViewModel("开始时间", startTime.ToString("yyyy年MM月dd日 HH:mm:ss")),
+                                new RunLogsViewModel("结束时间", DateTime.Now.ToString("yyyy年MM月dd日 HH:mm:ss")),
+                                new RunLogsViewModel("耗时", (DateTime.Now - startTime).TotalSeconds.ToString("F2") + "sec"),
                                 new RunLogsViewModel("切割速度", cutSpeed.ToString()),
                                 new RunLogsViewModel("Z轴开始位置", endZ.ToString()),
                                 new RunLogsViewModel("Z轴结束位置", startZ.ToString()),
@@ -251,9 +262,9 @@ namespace 精密切割系统.Model.cut
                                 new RunLogsViewModel("X轴结束位置", endX.ToString()),
                                 new RunLogsViewModel("Y轴切割位置", line.StartPoint.Y.ToString()),
                                 new RunLogsViewModel("theta角度", (_cutThetaAlignDeg + cutStep.ThetaDeg).ToString()),
-                                new RunLogsViewModel("主轴转速", _spindleRev.ToString()));
-                            //等待切割次数变化
-                            await PlcControl.tagControl.cutting.WaitCutNumUdatedAsync(curCutNum.Value + 1, usingPauseToken);
+                                new RunLogsViewModel("主轴转速", _spindleRev.ToString()),
+                                new RunLogsViewModel("震动幅度", string.Join(" ", monitorResult))
+                                );
                             stopwatch.Stop();
                             if (preLine is not null)
                             {

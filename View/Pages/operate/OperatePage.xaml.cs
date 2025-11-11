@@ -373,12 +373,13 @@ namespace 精密切割系统.View.Pages.operate
                     break;
 
                 case 11:
-                    if (AlarmConfig.Instance.HasActiveAlarm())
+                    if (AlarmConfig.Instance.HasActiveErrorAlarm())
                     {
-                        MaterialSnackUtils.MaterialSnack("存在未处理报警，无法更换刀片！", MaterialSnackUtils.SnackType.WARNING);
+                        MaterialSnackUtils.MaterialSnack("存在未处理报警，无法更换工件！", MaterialSnackUtils.SnackType.WARNING);
                         return;
                     }
-                    await AutoCutUtils.ReplaceBladeAsync(default, default);
+                    TimeoutToken timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(120));
+                    await AutoCutUtils.ReplaceWaferAsync(default, timeoutToken.Token);
                     break;
 
                 case 5302:

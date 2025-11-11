@@ -12,8 +12,12 @@ namespace 精密切割系统.Driver
         private const double PictureBoxWidth = 765.0;
         private const double PictureBoxHeight = 640.0;
         private const double Scale = 1;
-        private const double RealWidth = 997.5 / Scale;
-        private const double RealHeight = 834.5 / Scale;
+
+        //private const double RealWidth = 997.5 / Scale;
+        //private const double RealHeight = 834.5 / Scale;1.216
+        private const double RealWidth = 820.3125 / Scale;
+
+        private const double RealHeight = 686.266 / Scale;
 
         // private const double RealWidth = 848.671875;
         // private const double RealHeight = 710.0;

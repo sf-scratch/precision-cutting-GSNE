@@ -18,11 +18,13 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using 精密切割系统.Driver;
 using 精密切割系统.Model.cut;
 using 精密切割系统.Model.logs;
 using 精密切割系统.Model.sqlite;
 using 精密切割系统.View.page.right;
 using 精密切割系统.ViewModel;
+using static NPOI.HSSF.Util.HSSFColor;
 
 namespace 精密切割系统.View.Pages.F7_ElectricSpark
 {
@@ -56,6 +58,23 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
 
         public void InitData()
         {
+            // 记录日志
+            //RunLogsCommon.LogEvent(
+            //    LogType.Cut,
+            //    new RunLogsViewModel(LogType.Cut, "切割"),
+            //    new RunLogsViewModel("刀数", "3"),
+            //    new RunLogsViewModel("开始时间", DateTime.Now.ToString("yyyy年MM月dd日 HH:mm:ss")),
+            //    new RunLogsViewModel("结束时间", DateTime.Now.ToString("yyyy年MM月dd日 HH:mm:ss")),
+            //    new RunLogsViewModel("切割速度", "cutSpeed.ToString()"),
+            //    new RunLogsViewModel("Z轴开始位置", "endZ.ToString()"),
+            //    new RunLogsViewModel("Z轴结束位置", "startZ.ToString()"),
+            //    new RunLogsViewModel("X轴开始位置", "startX.ToString()"),
+            //    new RunLogsViewModel("X轴结束位置", "endX.ToString()"),
+            //    new RunLogsViewModel("Y轴切割位置", "line.StartPoint.Y.ToString()"),
+            //    new RunLogsViewModel("theta角度", "(_cutThetaAlignDeg + cutStep.ThetaDeg).ToString()"),
+            //    new RunLogsViewModel("主轴转速", "_spindleRev.ToString()"),
+            //    new RunLogsViewModel("震动幅度", string.Join(" ", new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }))
+            //    );
             List<RunLogsModel> models = SqlHelper.Table<RunLogsModel>().ToList();
             int index = 1; // 外部变量用于跟踪索引
             models.ForEach(model =>
