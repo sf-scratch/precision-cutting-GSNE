@@ -205,7 +205,7 @@ namespace 精密切割系统.Model.cut
                         }
                         else
                         {
-                            currentKnifeRemainTime -= MathF.Abs(startX - endX) / cutSteps[cutTime - 1].Speed;
+                            currentKnifeRemainTime = MathF.Abs(startX - endX) / cutSteps[cutTime - 1].Speed;
                         }
                         //x方向交替切割
                         if (cutStep.IsAlternatingCuttingStroke)
@@ -231,8 +231,9 @@ namespace 精密切割系统.Model.cut
                             CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, cutSteps.Count, cutTime));
                             stopwatch.Restart();
                             await PlcControl.tagControl.ThetaAxis.SetAbsoluteSpeedAsync(GlobalParams.ThetaDefaultSpeed);
+                            var compensateY = await PlcControl.GetCompensateAsync(PlcControl.tagControl.Yaxis, line.StartPoint.Y);
                             //设置切割参数
-                            await PlcControl.tagControl.cutting.SetCutParamsAsync(cutSpeed, endZ, startZ, startX, endX, line.StartPoint.Y, "0", _cutThetaAlignDeg + cutStep.ThetaDeg, _spindleRev, true);
+                            await PlcControl.tagControl.cutting.SetCutParamsAsync(cutSpeed, endZ, startZ, startX, endX, compensateY, "0", _cutThetaAlignDeg + cutStep.ThetaDeg, _spindleRev, true);
                             //当前切割次数
                             int? curCutNum = await PlcControl.tagControl.cutting.GetCutNumAsync();
                             if (curCutNum == null)
@@ -261,6 +262,7 @@ namespace 精密切割系统.Model.cut
                                 new RunLogsViewModel("X轴开始位置", startX.ToString()),
                                 new RunLogsViewModel("X轴结束位置", endX.ToString()),
                                 new RunLogsViewModel("Y轴切割位置", line.StartPoint.Y.ToString()),
+                                new RunLogsViewModel("Y轴实际切割位置", compensateY.ToString()),
                                 new RunLogsViewModel("theta角度", (_cutThetaAlignDeg + cutStep.ThetaDeg).ToString()),
                                 new RunLogsViewModel("主轴转速", _spindleRev.ToString()),
                                 new RunLogsViewModel("震动幅度", string.Join(" ", monitorResult))

@@ -3219,10 +3219,6 @@ namespace 精密切割系统.Driver
             {
                 yCutLocation = ySoftUpperLimit;
             }
-            if (isCompensate)
-            {
-                yCutLocation = await PlcControl.GetCompensateAsync(PlcControl.tagControl.Yaxis, yCutLocation);
-            }
             Tools.LogDebug(
                 $"\r\n切割速度: {feedSpeedValue}\r\n" +
                 $"Z轴开始位置: {zStartLocation}\r\n" +

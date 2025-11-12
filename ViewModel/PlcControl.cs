@@ -402,7 +402,7 @@ namespace 精密切割系统.ViewModel
             // 确定补偿方向
             PositionCompensationModel? axisModel;
             int directionType = location > currLocation ? 0 : 1;
-            axisModel = models.Find(item => item.AxisType.Equals(axis.axisName + (directionType == 1 ? "-反向" : "")));
+            axisModel = models.Find(item => item.AxisType.Equals(axis.axisName + (directionType == 1 ? "" : "-反向")));
             // 无法找到对应轴的补偿信息
             if (axisModel == null)
             {

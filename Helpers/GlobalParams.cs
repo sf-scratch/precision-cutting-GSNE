@@ -15,13 +15,13 @@ namespace 精密切割系统.Helpers
     public static class GlobalParams
     {
         // true 在线版本 false 0
-        public static bool OnlineFlag { get; set; } = false;
+        public static bool OnlineFlag { get; set; } = true;
 
         // 是否上传MES
         public static bool OnlineMES { get; set; } = true;
 
         // 是否带Theta轴
-        public static bool HasTheta { get; set; } = true;
+        public static bool HasTheta { get; set; } = false;
 
         public static string DecimalStringFormat { get; set; } = "F5";
 

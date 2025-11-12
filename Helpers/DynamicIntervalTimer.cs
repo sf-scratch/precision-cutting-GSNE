@@ -1,14 +1,12 @@
-﻿
-
-using System;
+﻿using System;
 using System.Windows;
 using System.Timers;
 using System.Threading.Tasks;
 using System.Windows.Threading;
+using 精密切割系统.Utils;
 
 namespace 精密切割系统.Helpers
 {
-
     /// <summary>
     /// 动态间隔定时器（支持同步/异步操作，自动管理生命周期）
     /// </summary>
@@ -68,7 +66,11 @@ namespace 精密切割系统.Helpers
         {
             lock (_locker)
             {
-                if (_timer == null) throw new ObjectDisposedException(nameof(DynamicIntervalTimer));
+                if (_timer == null)
+                {
+                    Tools.LogDebug("RegisterHandler为空！");
+                    return;
+                }
 
                 // 移除旧处理器
                 if (_currentActionHandler != null)
@@ -95,7 +97,11 @@ namespace 精密切割系统.Helpers
         {
             lock (_locker)
             {
-                if (_timer == null) throw new ObjectDisposedException(nameof(DynamicIntervalTimer));
+                if (_timer == null)
+                {
+                    Tools.LogDebug("Start为空！");
+                    return;
+                }
                 _isActive = true;
                 _timer.Interval = _initialDelay.TotalMilliseconds;
                 _timer.Start();

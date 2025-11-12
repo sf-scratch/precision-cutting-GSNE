@@ -1,5 +1,5 @@
 {
-  "SpindleRev": "30000",
   "HeightMeasureTimes": "2",
-  "IsAutomHeightMeasureBeforeCutting": "false"
+  "IsAutomHeightMeasureBeforeCutting": "False",
+  "SpindleRev": "24000"
 }
