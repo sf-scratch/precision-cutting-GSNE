@@ -71,7 +71,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
 
         private void loadAxisPosition()
         {
-            Thread _thread = new Thread(async () =>
+            _ = Task.Run(async () =>
             {
                 using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(300));
                 try
@@ -92,8 +92,6 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
                     Tools.LogDebug("法兰修整界面轴位置更新已取消");
                 }
             });
-            _thread.IsBackground = true;
-            _thread.Start();
         }
 
         private void loadData()

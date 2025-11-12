@@ -84,7 +84,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 while (await timer.WaitForNextTickAsync(token))
                 {
                     float? currentZ2 = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync();
-                    Application.Current.Dispatcher.Invoke(() =>
+                    await Application.Current.Dispatcher.InvokeAsync(() =>
                     {
                         // 显示实时位置
                         z2AbsolutePosition.Text = currentZ2?.ToString(GlobalParams.DecimalStringFormat);

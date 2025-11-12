@@ -84,6 +84,7 @@ namespace 精密切割系统.ViewModel
         {
             // 高度补偿
             _semiAutoCutService.DepthCompensationValue = CutParam.DepthCompensation.ToFloat();
+            _semiAutomaticCuttingRunViewModel.CutParam.DepthCompensation = CutParam.DepthCompensation;
             MaterialSnackUtils.MaterialSnack($"刀片高度补偿设置为{_semiAutoCutService.DepthCompensationValue}！", MaterialSnackUtils.SnackType.SUCCESS);
         }
 
@@ -91,6 +92,7 @@ namespace 精密切割系统.ViewModel
         {
             // 速度更改
             _semiAutoCutService.FeedSpeedCompCompensationValue = CutParam.ChangeFeedSpeed.ToFloat();
+            _semiAutomaticCuttingRunViewModel.CutParam.ChangeFeedSpeed = CutParam.ChangeFeedSpeed;
             MaterialSnackUtils.MaterialSnack($"变更进刀速度设置为{_semiAutoCutService.FeedSpeedCompCompensationValue}！", MaterialSnackUtils.SnackType.SUCCESS);
         }
 

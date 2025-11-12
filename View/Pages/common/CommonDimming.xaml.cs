@@ -29,7 +29,7 @@ namespace 精密切割系统.View.Pages.common
         private DelegateCommand<string> _updateExposureTime;
         public DelegateCommand<string> UpdateExposureTimeCommand => _updateExposureTime ??= new DelegateCommand<string>(ExecuteUpdateExposureTimeCommand);
 
-        void ExecuteUpdateExposureTimeCommand(string exposureTime)
+        private void ExecuteUpdateExposureTimeCommand(string exposureTime)
         {
             CameraUtils.SetCameraExposureTime(CameraUtils.GetCameraExposureTime() + exposureTime.ToFloat());
         }
@@ -86,7 +86,7 @@ namespace 精密切割系统.View.Pages.common
                 {
                     try
                     {
-                        Application.Current.Dispatcher.Invoke(() =>
+                        await Application.Current.Dispatcher.InvokeAsync(() =>
                         {
                             ExposureTime.Text = CameraUtils.GetCameraExposureTime().ToString();
                         });
@@ -100,25 +100,29 @@ namespace 精密切割系统.View.Pages.common
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="t_intensity"></param>
         /// <param name="type">0 高倍 1 低倍 2 环光</param>
         private void SetLightRatio(decimal t_intensity, int type)
         {
-            switch(type) {
+            switch (type)
+            {
                 case 0:
                     GlobalParams.intensityRatio = NormalizeIntensityRatio(t_intensity);
                     dirLightRatio.Text = (Math.Round(GlobalParams.intensityRatio * 100, 2)).ToString();
                     break;
+
                 case 1:
                     GlobalParams.lowIntensityRatio = NormalizeIntensityRatio(t_intensity);
                     dirLightRatio.Text = (Math.Round(GlobalParams.lowIntensityRatio * 100, 2)).ToString();
                     break;
+
                 case 2:
                     GlobalParams.RingIntensityRatio = NormalizeIntensityRatio(t_intensity);
                     ringLightRatio.Text = (Math.Round(GlobalParams.RingIntensityRatio * 100, 2)).ToString();
                     break;
+
                 default:
                     break;
             }
@@ -165,7 +169,7 @@ namespace 精密切割系统.View.Pages.common
         /// <param name="type">0 高倍 1 低倍 2 环光</param>
         private void AdjustIntensity(decimal adjustment, int type)
         {
-            decimal t_intensity = Convert.ToDecimal(type == 0 ? GlobalParams.intensityRatio : type == 1 
+            decimal t_intensity = Convert.ToDecimal(type == 0 ? GlobalParams.intensityRatio : type == 1
                 ? GlobalParams.lowIntensityRatio : GlobalParams.RingIntensityRatio);
             t_intensity += adjustment;  //0.8 + 0.05 = 0.85
             int v_intensity = (int)Math.Ceiling(t_intensity * 255);
@@ -175,7 +179,8 @@ namespace 精密切割系统.View.Pages.common
             if (reNum == 1)
             {
                 CameraUtils.TurnOffChannel(channel);
-            } else
+            }
+            else
             {
                 CameraUtils.TurnOnChannel(channel);
             }

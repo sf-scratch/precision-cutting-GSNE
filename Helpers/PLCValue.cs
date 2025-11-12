@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Media3D;
+using 精密切割系统.database.db.modle;
 using 精密切割系统.ViewModel;
 
 namespace 精密切割系统.Helpers

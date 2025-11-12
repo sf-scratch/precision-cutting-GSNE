@@ -9,6 +9,7 @@ using 精密切割系统.Behaviors;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
+using 精密切割系统.Model.plc;
 using 精密切割系统.Utils;
 
 namespace 精密切割系统.ViewModel
@@ -853,7 +854,7 @@ namespace 精密切割系统.ViewModel
             }
         }
 
-        private bool _isHighSpeed;
+        private bool _isHighSpeed = SpeedManager.IsHighSpeed;
 
         public bool IsHighSpeed
         {
@@ -861,38 +862,7 @@ namespace 精密切割系统.ViewModel
             set
             {
                 SetProperty(ref _isHighSpeed, value);
-                if (_isHighSpeed)
-                {
-                    var list = SqlHelper.Table<OperationParametersModel>().Where(t => t.Id == 1).ToList();
-                    if (list.Count < 1) return;
-                    var operationParam = list.First();
-                    Task.Run(async () =>
-                    {
-                        // 设置为高速
-                        await PlcControl.tagControl.Xaxis.SetHighSpeedAsync(1);
-                        await PlcControl.tagControl.Xaxis.SetJogRelativeSpeedAsync(operationParam.XScanSpeed.ToFloat());
-                        await PlcControl.tagControl.Yaxis.SetHighSpeedAsync(1);
-                        await PlcControl.tagControl.Yaxis.SetJogRelativeSpeedAsync(operationParam.YScanSpeed.ToFloat());
-                        await PlcControl.tagControl.Z1axis.SetHighSpeedAsync(1);
-                        await PlcControl.tagControl.Z1axis.SetJogRelativeSpeedAsync(operationParam.ZScanSpeed.ToFloat());
-                        await PlcControl.tagControl.Z2axis.SetHighSpeedAsync(1);
-                        await PlcControl.tagControl.Z2axis.SetJogRelativeSpeedAsync(2);
-                        await PlcControl.tagControl.ThetaAxis.SetHighSpeedAsync(1);
-                        await PlcControl.tagControl.ThetaAxis.SetJogRelativeSpeedAsync(operationParam.RScanSpeed.ToFloat());
-                    });
-                }
-                else
-                {
-                    Task.Run(async () =>
-                    {
-                        // 设置为低速
-                        await PlcControl.tagControl.Xaxis.SetHighSpeedAsync(0);
-                        await PlcControl.tagControl.Yaxis.SetHighSpeedAsync(0);
-                        await PlcControl.tagControl.Z1axis.SetHighSpeedAsync(0);
-                        await PlcControl.tagControl.Z2axis.SetHighSpeedAsync(0);
-                        await PlcControl.tagControl.ThetaAxis.SetHighSpeedAsync(0);
-                    });
-                }
+                SpeedManager.IsHighSpeed = value;
             }
         }
 
@@ -904,16 +874,22 @@ namespace 精密切割系统.ViewModel
             _speedZ2 = 0.2f;
             _speedTheta = 2;
             IsShowKeyboard = true;
+            SpeedManager.IsHighSpeedPropertyChanged -= SpeedManager_IsHighSpeedPropertyChanged;
+            SpeedManager.IsHighSpeedPropertyChanged += SpeedManager_IsHighSpeedPropertyChanged;
+        }
+
+        private void SpeedManager_IsHighSpeedPropertyChanged(object? sender, bool e)
+        {
+            IsHighSpeed = e;
         }
 
         public void StartGetAxisInfo()
         {
             _cancelGetAxisInfoCts = new CancellationTokenSource();
             CancellationToken token = _cancelGetAxisInfoCts.Token;
-            Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
-                using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
-                while (await timer.WaitForNextTickAsync(token))
+                while (!token.IsCancellationRequested)
                 {
                     try
                     {
@@ -944,6 +920,7 @@ namespace 精密切割系统.ViewModel
                     {
                         Tools.LogError($"StartGetAxisInfo()报警监控异常: {ex.Message}");
                     }
+                    await Task.Delay(200);
                 }
             });
         }

@@ -186,6 +186,7 @@ namespace 精密切割系统.ViewModel
         {
             if (!GlobalParams.OnlineFlag)
             {
+                SpeedManager.IsHighSpeed = false;
                 MaterialSnack($"切割中...", SnackType.WARNING, 0, _eventAggregator);
                 return;
             }

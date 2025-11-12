@@ -173,7 +173,7 @@ namespace 精密切割系统
                     List<DirectOperate> directOperateList = Tools.GetChildrenOfType<DirectOperate>(operateFrame);
                     if (directOperateList != null && directOperateList.Count > 0)
                     {
-                        directOperateList[0].SetHighBtnStatus(GlobalParams.heightSpeedStatus);
+                        directOperateList[0].SetHighBtnStatus(GlobalParams.heightSpeedStatus == 1);
                     }
                 };
 

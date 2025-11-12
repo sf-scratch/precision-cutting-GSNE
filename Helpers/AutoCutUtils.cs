@@ -224,6 +224,7 @@ namespace 精密切割系统.Helpers
         /// <returns></returns>
         public static async Task<CommonResult<float>> ProcessMeasureHeightAsync(HeightMeasurementMode mode, IDialogService? dialogService, IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
+            SpeedManager.IsHighSpeed = false;
             InitialPositionModel? initPos = await GetInitialPositionAsync();
             if (initPos is null) return CommonResult<float>.Failure("获取初始化位置信息失败！");
             switch (mode)
