@@ -228,7 +228,15 @@ namespace 精密切割系统.ViewModel
             {
                 _originPoint = new DataPoint<float>(xLocation.Value, yLocation.Value);
             }
-
+            // 设置三色灯
+            if (AlarmConfig.Instance.HasAutoRunUnexpectedAlarms())
+            {
+                await PlcControl.tagControl.wholeDevice.OpenRedLightAsync();
+            }
+            else
+            {
+                await PlcControl.tagControl.wholeDevice.OpenYellowLightAsync();
+            }
             if (!GlobalParams.HasTheta)
             {
                 await PlcControl.tagControl.wholeDevice.CloseCutSecurityDoorAsync();

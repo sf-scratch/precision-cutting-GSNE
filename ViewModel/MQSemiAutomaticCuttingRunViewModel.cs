@@ -102,7 +102,7 @@ namespace 精密切割系统.ViewModel
 
         private void InitRightButton()
         {
-            RightButtonCollection.Add(RightButtonParams.YelloRightButton("暂停", "/Assets/icon/right/stop.png", async () => { await PauseAsync(PlcControl.tagControl.wholeDevice.OpenYellowLightAsync); }));
+            RightButtonCollection.Add(RightButtonParams.YelloRightButton("暂停", "/Assets/icon/right/stop.png", async () => { await PauseAsync(); }));
         }
 
         private async Task MonitoringAlarmAsync(CancellationToken token)
@@ -224,6 +224,7 @@ namespace 精密切割系统.ViewModel
                 await PlcControl.tagControl.wholeDevice.OpenCutSecurityDoorAsync();
             }
             AtomicConfig.IsCutProcessing = true;
+            await PlcControl.tagControl.wholeDevice.OpenGreenLightAsync();
             try
             {
                 FileTableItemModel fileTableItem = fileTableItemResult.Data;
@@ -315,7 +316,7 @@ namespace 精密切割系统.ViewModel
             return workpiece;
         }
 
-        private async Task PauseAsync(Func<Task> actionAsync)
+        private async Task PauseAsync(Func<Task>? actionAsync = default)
         {
             if (!GlobalParams.OnlineFlag)
             {
@@ -332,7 +333,10 @@ namespace 精密切割系统.ViewModel
             }
             // 暂停token
             _pauseCts.Cancel();
-            await actionAsync.Invoke();
+            if (actionAsync != null)
+            {
+                await actionAsync.Invoke();
+            }
         }
 
         public async Task ContinueAsync()
