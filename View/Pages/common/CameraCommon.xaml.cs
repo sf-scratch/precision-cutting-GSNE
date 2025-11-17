@@ -47,7 +47,7 @@ namespace 精密切割系统.View.Pages.common
 
         public event Action LineChanged;
 
-        private float _cutMarkWidth = 120;
+        private static float _cutMarkWidth = 120;
 
         /// <summary>
         /// 刀痕宽度

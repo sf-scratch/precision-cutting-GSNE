@@ -264,7 +264,7 @@ namespace 精密切割系统.Helpers
                         {
                             await PlcControl.tagControl.wholeDevice.StartSpindleAsync();
                             // 工作盘吹气
-                            await WorkpieceBlowingAsync(eventAggregator, useToken);
+                            await WorkpieceBlowingAsync(default, eventAggregator, useToken);
                         }
                         else if (mode is HeightMeasurementMode.NoContact)
                         {
@@ -860,7 +860,7 @@ namespace 精密切割系统.Helpers
             Task<float?> yTask = PlcControl.tagControl.Yaxis.GetCurrentLocationAsync();
             await Task.WhenAll(xTask, yTask);
             float curX = xTask.Result ?? 0, curY = yTask.Result ?? 0;
-            await WorkpieceBlowingAsync(eventAggregator, token);
+            await WorkpieceBlowingAsync(default, eventAggregator, token);
             await PlcControl.tagControl.cutting.RunMotionAsync(curX, curY, token);
         }
 
@@ -869,7 +869,7 @@ namespace 精密切割系统.Helpers
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        public static async Task WorkpieceBlowingAsync(IEventAggregator? eventAggregator = null, CancellationToken token = default)
+        public static async Task WorkpieceBlowingAsync(float? atomizingNozzlePositionY, IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
             List<UserDefineDataModel> list = SqlHelper.Table<UserDefineDataModel>().ToList();
             if (list.Count != 1)
@@ -882,7 +882,7 @@ namespace 精密切割系统.Helpers
             try
             {
                 await PlcControl.tagControl.wholeDevice.OpenWorkpieceBlowingAsync();
-                await PlcControl.tagControl.cutting.RunMotionAsync(userDefineData.AtomizingNozzlePositionX.ToFloat(), userDefineData.AtomizingNozzlePositionY.ToFloat(), token);
+                await PlcControl.tagControl.cutting.RunMotionAsync(userDefineData.AtomizingNozzlePositionX.ToFloat(), atomizingNozzlePositionY ?? userDefineData.AtomizingNozzlePositionY.ToFloat(), token);
                 await Task.Delay(TimeSpan.FromSeconds(userDefineData.BlowTime.ToFloat()), token);
             }
             finally

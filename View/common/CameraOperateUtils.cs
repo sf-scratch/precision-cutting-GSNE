@@ -15,12 +15,15 @@ namespace 精密切割系统.Driver
 
         //private const double RealWidth = 997.5 / Scale;
         //private const double RealHeight = 834.5 / Scale;1.216
-        private const double RealWidth = 820.3125 / Scale;
+        //private const double RealWidth = 820.3125 / Scale;
 
-        private const double RealHeight = 686.266 / Scale;
+        //private const double RealHeight = 686.266 / Scale;
+        //private const double RealWidth = 798.574 / Scale;
 
-        // private const double RealWidth = 848.671875;
-        // private const double RealHeight = 710.0;
+        //private const double RealHeight = 668.079 / Scale;
+
+        private const double RealWidth = 848.671875;
+        private const double RealHeight = 710.0;
         private const double CameraHeight = 2048;
 
         /// <summary>

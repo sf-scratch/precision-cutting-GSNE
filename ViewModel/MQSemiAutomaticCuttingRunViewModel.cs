@@ -400,7 +400,7 @@ namespace 精密切割系统.ViewModel
                     Task z1Task = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, cts.Token);
                     Task z2Task = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(Appsettings.FocusClearZ ?? 0, default, cts.Token);
                     await Task.WhenAll(z1Task, z2Task);
-                    await AutoCutUtils.WorkpieceBlowingAsync(_eventAggregator, cts.Token);
+                    await AutoCutUtils.WorkpieceBlowingAsync(line.StartPoint.Y.ToCameraY(), _eventAggregator, cts.Token);
                     await PlcControl.tagControl.cutting.RunMotionAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), line.StartPoint.Y.ToCameraY(), cts.Token);
                 }
                 MaterialSnack(message ?? "暂停中...", SnackType.WARNING, 0, _eventAggregator);
@@ -550,6 +550,12 @@ namespace 精密切割系统.ViewModel
                     }
                 }
             }
+            if (cutSteps.Count == 0)
+            {
+                return CommonResult<List<CutStep>>.Failure("未生成有效切割步骤！");
+            }
+            //第一刀不跳步进
+            cutSteps[0] = cutSteps[0] with { OffsetY = 0 };
             return CommonResult<List<CutStep>>.Success(cutSteps);
         }
 

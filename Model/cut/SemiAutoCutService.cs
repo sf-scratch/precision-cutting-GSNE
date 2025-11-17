@@ -166,6 +166,17 @@ namespace 精密切割系统.Model.cut
                 {
                     LineSegment? line = null;
                     CutStep cutStep = cutSteps[cutTime];
+                    //检测工件是否切完
+                    if (!workpiece.CheckCutDistance(_cutDirection, cutStep.OffsetY))
+                    {
+                        RemindReplaceWafer?.Invoke();
+                        (RunResult runResult, usingPauseToken) = await WaitContinueAsync(preLine ?? line, workpiece, currentKnifeRemainTime, "下一刀将超出工件！");
+                        if (!runResult.IsSuccess)
+                        {
+                            return runResult;
+                        }
+                        //workpiece.Reset(await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0);
+                    }
                     if (cutStep.ChannelNum != currentChannelNum)
                     {
                         //切换通道
@@ -248,6 +259,12 @@ namespace 精密切割系统.Model.cut
                             //等待切割次数变化
                             await PlcControl.tagControl.cutting.WaitCutNumUdatedAsync(curCutNum.Value + 1, usingPauseToken);
                             var monitorResult = monitor.StopMonitoring();
+                            int actualMonitorCount = (int)(MathF.Abs(startX - endX) / cutSpeed * 1000 / 50);//切割过程中的震动点数
+                            actualMonitorCount = (int)(actualMonitorCount * 0.9);//再去掉后面部分点，防止误差
+                            if (monitorResult.Count > actualMonitorCount)
+                            {
+                                monitorResult = monitorResult.GetRange(0, actualMonitorCount);
+                            }
                             // 记录日志
                             RunLogsCommon.LogEvent(
                                 LogType.Cut,
@@ -267,6 +284,7 @@ namespace 精密切割系统.Model.cut
                                 new RunLogsViewModel("主轴转速", _spindleRev.ToString()),
                                 new RunLogsViewModel("震动幅度", string.Join(" ", monitorResult))
                                 );
+
                             stopwatch.Stop();
                             if (preLine is not null)
                             {
@@ -276,17 +294,6 @@ namespace 精密切割系统.Model.cut
                         cutTime++;
                         //触发切割进度更新事件
                         CutServiceProcessChanged?.Invoke(new CutServiceProcess(targetEndZ, cutSpeed, cutSteps.Count, cutTime, cutLength, cutStep.ChannelNum, pathCalculator.EstimateRemainingTime(), true));
-                        //检测工件是否切完
-                        if (!workpiece.CheckCutDistance(_cutDirection, cutStep.OffsetY))
-                        {
-                            RemindReplaceWafer?.Invoke();
-                            (RunResult runResult, usingPauseToken) = await WaitContinueAsync(preLine ?? line, workpiece, currentKnifeRemainTime, "下一刀将超出工件！");
-                            if (!runResult.IsSuccess)
-                            {
-                                return runResult;
-                            }
-                            workpiece.Reset(await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0);
-                        }
                         preLine = line;
                     }
                     catch (OperationCanceledException)

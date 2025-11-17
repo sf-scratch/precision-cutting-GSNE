@@ -203,7 +203,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                         await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
                         await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(endY, 0.001f, _stopCts.Token);
                         await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
-                        await AutoCutUtils.WorkpieceBlowingAsync(default, _stopCts.Token);
+                        await AutoCutUtils.WorkpieceBlowingAsync(default, default, _stopCts.Token);
                         await PlcControl.tagControl.cutting.RunMotionAsync(x.ToCameraX(), y.ToCameraY(), _stopCts.Token);
                         _step = ThetaCenterAlignStep.FindRightEndpoint;
                         break;
@@ -284,7 +284,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 await PlcControl.tagControl.cutting.ExitCuttingModeAsync(token);
                 await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
                 // 工作盘吹气
-                await AutoCutUtils.WorkpieceBlowingAsync(default, token);
+                await AutoCutUtils.WorkpieceBlowingAsync(default, default, token);
                 await PlcControl.tagControl.cutting.RunMotionAsync(((_startX + _endX) / 2).ToCameraX(), startY.ToCameraY(), token);
             }
         }

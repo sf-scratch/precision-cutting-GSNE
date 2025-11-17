@@ -246,19 +246,20 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                             {
                                 if (_cts.IsCancellationRequested)
                                 {
-                                    MaterialSnack("全局对焦已取消！", SnackType.WARNING, default, _eventAggregator);
+                                    MaterialSnack("对焦已取消！", SnackType.WARNING, default, _eventAggregator);
                                 }
                                 else
                                 {
-                                    MaterialSnack("全局对焦超时！", SnackType.WARNING, default, _eventAggregator);
+                                    MaterialSnack("对焦超时！", SnackType.WARNING, default, _eventAggregator);
                                 }
                             }
-                        }, "全局对焦");
+                        }, "对焦");
                     }
                     break;
 
                 case 2445:
                     Appsettings.FocusClearZ = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync();
+                    MaterialSnack($"Z2对焦位置已确认：{Appsettings.FocusClearZ}mm！", SnackType.WARNING, default, _eventAggregator);
                     break;
 
                 case 2443:

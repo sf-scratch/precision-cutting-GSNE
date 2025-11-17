@@ -72,7 +72,7 @@ namespace 精密切割系统.ViewModel
             BottomButtonCollection.Add(RightButtonParams.BlueButton("自动曝光参数", "CameraFlipOutline", CameraUtils.SetCameraExposureAutoContinus));
             BottomButtonCollection.Add(RightButtonParams.BlueButton("工件吹气", "WeatherWindy", () => _semaph.ExecuteAsync(WorkpieceBlowing, "工件吹气")));
             BottomButtonCollection.Add(RightButtonParams.BlueButton("精细对焦", "FocusAuto", () => _semaph.ExecuteAsync(FocusAuto, "精细对焦")));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("全局对焦", "FocusAuto", () => _semaph.ExecuteAsync(GlobalFocus, "全局对焦")));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("对焦", "FocusAuto", () => _semaph.ExecuteAsync(GlobalFocus, "对焦")));
         }
 
         private async Task GlobalFocus()

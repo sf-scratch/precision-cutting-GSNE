@@ -245,7 +245,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                     Task z1Task = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, cts.Token);
                     Task z2Task = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(Appsettings.FocusClearZ ?? 0, default, cts.Token);
                     await Task.WhenAll(z1Task, z2Task);
-                    await AutoCutUtils.WorkpieceBlowingAsync(default, cts.Token);
+                    await AutoCutUtils.WorkpieceBlowingAsync(default, default, cts.Token);
                     await PlcControl.tagControl.cutting.RunMotionAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), line.StartPoint.Y.ToCameraY(), cts.Token);
                     await AutoFocusService.GlobalFocusAsync(default, cts.Token);
                     await AutoCutUtils.FineTuneAxisYAsync();

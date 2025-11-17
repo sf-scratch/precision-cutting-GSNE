@@ -26,7 +26,7 @@ namespace 精密切割系统.Model.cut
         {
             try
             {
-                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始相机全局对焦..."));
+                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始相机对焦..."));
                 await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(Appsettings.FocusClearZ ?? 0, default, token);
                 int direction = 1;
                 // 阶段1：快速粗调（正向扫描）
