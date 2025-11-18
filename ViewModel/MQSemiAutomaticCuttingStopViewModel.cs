@@ -237,9 +237,9 @@ namespace 精密切割系统.ViewModel
             {
                 await PlcControl.tagControl.wholeDevice.OpenYellowLightAsync();
             }
-            if (!GlobalParams.HasTheta)
+            if (!GlobalParams.HasFullyAutomatic)
             {
-                await PlcControl.tagControl.wholeDevice.CloseCutSecurityDoorAsync();
+                await PlcControl.tagControl.wholeDevice.OpenCameraLensCapAsync();
             }
         }
 
@@ -248,9 +248,9 @@ namespace 精密切割系统.ViewModel
             base.OnNavigatedFrom(navigationContext);
             _operatCts.Cancel();
             _intervalTimer.Dispose();
-            if (!GlobalParams.HasTheta)
+            if (!GlobalParams.HasFullyAutomatic)
             {
-                await PlcControl.tagControl.wholeDevice.OpenCutSecurityDoorAsync();
+                await PlcControl.tagControl.wholeDevice.CloseCameraLensCapAsync();
             }
         }
     }

@@ -14,7 +14,7 @@ namespace 精密切割系统.Assets.config.buttom
         public static List<OperateBean> GetTab01Operate()
         {
             var list = new List<OperateBean>();
-            if (GlobalParams.HasTheta)
+            if (GlobalParams.HasFullyAutomatic)
             {
                 list.Add(new OperateBean(5302, "关机", "Power"));
                 //list.Add(new OperateBean(1, "传感器吹气", "/Assets/icon/tab_0/tab_01.png"));

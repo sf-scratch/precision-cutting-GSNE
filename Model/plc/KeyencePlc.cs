@@ -7,6 +7,7 @@ using NPOI.SS.Formula.Functions;
 using Prism.Events;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Drawing;
 using System.Numerics;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Extensions;
@@ -2394,7 +2395,7 @@ namespace 精密切割系统.Driver
 
         public async Task OpenCutSecurityDoorAsync()
         {
-            if (GlobalParams.HasTheta && await GetSpindleSpeedAsync() != 0)
+            if (await GetSpindleSpeedAsync() != 0)
             {
                 MaterialSnackUtils.MaterialSnack("打开安全门失败，主轴未停止！", MaterialSnackUtils.SnackType.WARNING, 0);
                 return;
@@ -2406,6 +2407,18 @@ namespace 精密切割系统.Driver
         public async Task CloseCutSecurityDoorAsync()
         {
             cutSecurityDoor.writeValue = "1";
+            await keyencePlc.WriteTagAsync(cutSecurityDoor);
+        }
+
+        public async Task OpenCameraLensCapAsync()
+        {
+            cutSecurityDoor.writeValue = "1";
+            await keyencePlc.WriteTagAsync(cutSecurityDoor);
+        }
+
+        public async Task CloseCameraLensCapAsync()
+        {
+            cutSecurityDoor.writeValue = "0";
             await keyencePlc.WriteTagAsync(cutSecurityDoor);
         }
 

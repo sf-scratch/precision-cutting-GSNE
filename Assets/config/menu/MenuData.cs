@@ -51,7 +51,7 @@ namespace 精密切割系统.Assets.config.menu
         public static List<MenuBean> GetF1MenuList()
         {
             var list = new List<MenuBean>();
-            if (GlobalParams.HasTheta)
+            if (GlobalParams.HasFullyAutomatic)
             {
                 list.Add(new MenuBean(1, "全自动", "/Assets/icon/menu_0/menu_0_1.png", "/Assets/icon/menu_0/menu_0_1_white.png"));
             }
@@ -86,7 +86,7 @@ namespace 精密切割系统.Assets.config.menu
             // list.Add(new MenuBean(403, "刀片配置参数", "/Assets/icon/menu_4/menu_4_3.png", "/Assets/icon/menu_4/menu_4_3_white.png"));
             // list.Add(new MenuBean(404, "刀片对齐", "/Assets/icon/menu_4/menu_4_4.png", "/Assets/icon/menu_4/menu_4_4_white.png"));
             // list.Add(new MenuBean(405, "刀片状态信息", "/Assets/icon/menu_4/menu_4_5.png", "/Assets/icon/menu_4/menu_4_5_white.png"));
-            if (GlobalParams.HasTheta)
+            if (GlobalParams.HasFullyAutomatic)
             {
                 list.Add(new MenuBean(439, "自动切割参数清单", "ClipboardListOutline", "/Assets/icon/menu_4/menu_4_5_white.png", 3, "Pages/Auto/AutoCutSelectConfig"));
             }

@@ -219,9 +219,9 @@ namespace 精密切割系统.ViewModel
                 ShowWarnMessageNavigateHome("未设置刀片外径！");
                 return;
             }
-            if (!GlobalParams.HasTheta)
+            if (!GlobalParams.HasFullyAutomatic)
             {
-                await PlcControl.tagControl.wholeDevice.OpenCutSecurityDoorAsync();
+                await PlcControl.tagControl.wholeDevice.CloseCameraLensCapAsync();
             }
             AtomicConfig.IsCutProcessing = true;
             await PlcControl.tagControl.wholeDevice.OpenGreenLightAsync();

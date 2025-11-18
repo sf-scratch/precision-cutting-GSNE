@@ -99,10 +99,9 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             cutWidth.Text = Tools.FormatDecimalString((cameraCommon.CutMarkWidth / 1000).ToString(), 4);
             edgesWidth.Text = Tools.FormatDecimalString((cameraCommon.EdgeChipWidth / 1000).ToString(), 4);
             LoadPosition();
-            // 打开相机镜头盖
-            if (!GlobalParams.HasTheta)
+            if (!GlobalParams.HasFullyAutomatic)
             {
-                await PlcControl.tagControl.wholeDevice.CloseCutSecurityDoorAsync();
+                await PlcControl.tagControl.wholeDevice.OpenCameraLensCapAsync();
             }
         }
 
