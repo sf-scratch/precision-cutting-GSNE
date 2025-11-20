@@ -58,7 +58,7 @@ namespace 精密切割系统.View.Pages.common
             set { _cutMarkWidth = value; }
         }
 
-        private float _edgeChipWidth = 120;
+        private static float _edgeChipWidth = 120;
 
         /// <summary>
         /// 崩边
@@ -190,12 +190,6 @@ namespace 精密切割系统.View.Pages.common
                     payload = nint.Zero; // 重置 payload
                 }
             }
-        }
-
-        private string i4tos(uint ip)
-        {
-            IPAddress iPAddress = new IPAddress(ip);
-            return iPAddress.ToString();
         }
 
         public WriteableBitmap LocalBitmap { get; private set; }
@@ -354,27 +348,6 @@ namespace 精密切割系统.View.Pages.common
                 return false;
             });
             return true;
-        }
-
-        private void Save_Image(string fileName)
-        {
-            SaveFileDialog dialog = new SaveFileDialog();
-            dialog.Filter = "jpg file(*.jpg)|*.jpg|bmp file(*.bmp)|*.bmp|tiff file(*.tiff)|*.tiff|png file(*.png)|*.png|所有文件(*.*)|*.*||";       //设置文件类型
-            string extension; //文件拓展名
-            bool? result = dialog.ShowDialog();
-            if (result == true) ;
-            {
-                fileName = dialog.FileName.ToString();
-            }
-            extension = System.IO.Path.GetExtension(fileName);
-            if (extension == ".jpg")
-            {
-                m_imageSaveType = ImageSaveType.Type_JPG;
-            }
-            else
-            {
-                MessageBox.Show("请选择相应的文件保存");
-            }
         }
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
@@ -609,11 +582,6 @@ namespace 精密切割系统.View.Pages.common
 
         private async void cameraImage_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            //var axisIsReady = await Task.WhenAll(PlcControl.tagControl.Xaxis.IsReadyAsync(), PlcControl.tagControl.Yaxis.IsReadyAsync());
-            //if (!axisIsReady.All(p => p == true))
-            //{
-            //    return;
-            //}
             // 获取当前点击的坐标
             var touchPoint = e.GetPosition(this);
             double x = touchPoint.X - centerLocation.X;
@@ -623,11 +591,6 @@ namespace 精密切割系统.View.Pages.common
 
         private async void cameraImage_TouchDown(object sender, TouchEventArgs e)
         {
-            //var axisIsReady = await Task.WhenAll(PlcControl.tagControl.Xaxis.IsReadyAsync(), PlcControl.tagControl.Yaxis.IsReadyAsync());
-            //if (!axisIsReady.All(p => p == true))
-            //{
-            //    return;
-            //}
             // 获取当前触摸的坐标
             var touchPoint = e.GetTouchPoint(this).Position;
             double x = touchPoint.X - centerLocation.X;
@@ -705,78 +668,6 @@ namespace 精密切割系统.View.Pages.common
                 await PlcControl.tagControl.cutting.RunMotionNoWaitAsync((float)xPosition, (float)yPosition);
             }
         }
-
-        //// 截取指定Grid控件内容
-        //public BitmapSource Capture()
-        //{
-        //    Grid grid = CameraCommonGrid;
-        //    grid.Background = new SolidColorBrush(Color.FromRgb(0,0,0));
-        //    //// 获取控件实际渲染尺寸
-        //    //Size renderSize = new Size(grid.ActualWidth, grid.ActualHeight);
-        //    //// 创建渲染目标
-        //    //RenderTargetBitmap rtb = new RenderTargetBitmap(
-        //    //    (int)renderSize.Width * 2,
-        //    //    (int)renderSize.Height * 2,
-        //    //    96, 96, PixelFormats.Pbgra32);
-        //    //// 渲染控件
-        //    //rtb.Render(grid);
-        //    // 强制布局更新
-        //    grid.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-        //    grid.Arrange(new Rect(grid.DesiredSize));
-
-        //    RenderTargetBitmap rtb = new RenderTargetBitmap(
-        //        (int)grid.DesiredSize.Width,
-        //        (int)grid.DesiredSize.Height,
-        //        96, 96, PixelFormats.Pbgra32);
-
-        //    rtb.Render(grid);
-        //    rtb.ToMat().ImWrite("C:\\MySpace\\Dev\\ProjectXiHua\\precision-cutting-321\\bin\\x64\\Debug\\image\\2.jpg");
-        //    return rtb;
-        //}
-
-        //public OpenCvSharp.Mat CaptureControl()
-        //{
-        //    // 强制布局更新
-        //    CameraCommonGrid.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-        //    CameraCommonGrid.Arrange(new Rect(CameraCommonGrid.DesiredSize));
-        //    // 确保渲染完成
-        //    CameraCommonGrid.UpdateLayout();
-
-        //    // 创建一个DrawingVisual对象
-        //    DrawingVisual drawingVisual = new DrawingVisual();
-        //    using (DrawingContext drawingContext = drawingVisual.RenderOpen())
-        //    {
-        //        // 将控件绘制到DrawingContext中
-        //        drawingContext.DrawRectangle(new VisualBrush(CameraCommonGrid), null, new Rect(new Point(), CameraCommonGrid.RenderSize));
-        //    }
-
-        //    // 创建一个RenderTargetBitmap对象，用于捕获DrawingVisual的内容
-        //    RenderTargetBitmap renderTargetBitmap = new RenderTargetBitmap((int)CameraCommonGrid.ActualWidth, (int)CameraCommonGrid.ActualHeight, 96, 96, PixelFormats.Pbgra32);
-        //    renderTargetBitmap.Render(drawingVisual);
-
-        //    return new FormatConvertedBitmap(renderTargetBitmap, PixelFormats.Bgr32, null, 0).ToMat();
-        //}
-
-        //public OpenCvSharp.Mat CaptureControl()
-        //{
-        //    // 强制同步布局和渲染
-        //    CameraCommonGrid.Dispatcher.Invoke(() =>
-        //    {
-        //        CameraCommonGrid.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-        //        CameraCommonGrid.Arrange(new Rect(CameraCommonGrid.DesiredSize));
-        //        CameraCommonGrid.UpdateLayout();
-        //    }, DispatcherPriority.Render);
-
-        //    // 使用RenderTargetBitmap直接渲染控件
-        //    var rtb = new RenderTargetBitmap(
-        //        (int)CameraCommonGrid.ActualWidth,
-        //        (int)CameraCommonGrid.ActualHeight,
-        //        96, 96, PixelFormats.Pbgra32);
-
-        //    rtb.Render(CameraCommonGrid);
-
-        //    return new FormatConvertedBitmap(rtb, PixelFormats.Bgr32, null, 0).ToMat();
-        //}
 
         public OpenCvSharp.Mat CaptureControl()
         {

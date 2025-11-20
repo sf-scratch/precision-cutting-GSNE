@@ -17,6 +17,7 @@ namespace 精密切割系统.ViewModel
         private static string connstr = Environment.CurrentDirectory + "\\qg_data.db"; //没有数据库会创建数据库
         public static SQLiteConnection db;
         public static SQLiteAsyncConnection dbAsync;
+
         static SqlHelper()
         {
             db = new SQLiteConnection(connstr, false);
@@ -26,12 +27,11 @@ namespace 精密切割系统.ViewModel
             db.CreateTable<TestModel>();
             try
             {
-
                 db.CreateTable<CurrentConfigurationModel>();//默认配置集合
                 db.CreateTable<FileTableModel>();//目录文件夹
                 db.CreateTable<FileTableItemModel>();//配置文件
                 db.CreateTable<FileTableItemChModel>();//目录库
-                db.CreateTable<ReplaceBladeModel>();//刀片更换记录(4.1)                
+                db.CreateTable<ReplaceBladeModel>();//刀片更换记录(4.1)
                 db.CreateTable<BladeHeightModel>();// 刀片测高参数（4.7）
                 db.CreateTable<PreCutModel>();// 预切割参数（5.1）
                 db.CreateTable<FunctionalParametersModel>();// 功能参数维护（5.3）
@@ -66,7 +66,6 @@ namespace 精密切割系统.ViewModel
             {
                 Debug.WriteLine("数据库错误：" + ex.Message);
             }
-
         }
 
         public static SQLiteConnection getSQLiteConnection()
@@ -96,6 +95,7 @@ namespace 精密切割系统.ViewModel
         {
             return db.Update(model);
         }
+
         public static async Task<int> UpdateAsync(object model)
         {
             return await dbAsync.UpdateAsync(model);
@@ -105,22 +105,27 @@ namespace 精密切割系统.ViewModel
         {
             return db.Delete(model);
         }
+
         public static async Task<int> DeleteAsync(object model)
         {
             return await dbAsync.DeleteAsync(model);
         }
+
         public static List<T> Query<T>(string sql) where T : new()
         {
             return db.Query<T>(sql);
         }
+
         public static async Task<List<T>> QueryAsync<T>(string sql) where T : new()
         {
             return await dbAsync.QueryAsync<T>(sql);
         }
+
         public static int Execute(string sql)
         {
             return db.Execute(sql);
         }
+
         public static async Task<int> ExecuteAsync(string sql)
         {
             return await dbAsync.ExecuteAsync(sql);
@@ -130,11 +135,10 @@ namespace 精密切割系统.ViewModel
         {
             return db.Table<T>();
         }
+
         public static AsyncTableQuery<T> TableAsync<T>() where T : new()
         {
             return dbAsync.Table<T>();
         }
-
-
     }
 }
