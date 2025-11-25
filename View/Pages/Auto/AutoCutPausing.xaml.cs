@@ -294,54 +294,11 @@ namespace 精密切割系统.View.Pages.Auto
             CutOperateUtils.checkStatus = false;
         }
 
-        // 执行校准检查
-        private double[] PerformAlignmentCheck()
-        {
-            // 调用刀痕和崩边识别，获取刀痕宽度、角度等信息
-            Tools.WaitForValue(PlcControl.allTags[DeviceKey.z2CurSpeedKey], "0");
-            // 对焦完成后，测量刀痕宽度
-            double[] widthInfo = [0, 0];
-            try
-            {
-                string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss_fff");
-                string fileName = $"check_{timestamp}.png";
-                bool flag = cameraCommon.SaveWriteableBitmap(fileName);
-                if (flag)
-                {
-                    Thread.Sleep(500);
-                    widthInfo = CommonOperate.GetCutEdgeWidth(fileName);
-                    Task.Run(() =>
-                    {
-                        Thread.Sleep(2000);
-                        // 删除照片
-                        Tools.DeleteFile(fileName);
-                    });
-                }
-            }
-            catch (Exception e)
-            {
-                Tools.LogError("识别失败！原因：" + e.Message);
-            }
-            if (widthInfo == null || widthInfo[0] == 0 || widthInfo[1] == 0)
-            {
-                return widthInfo;
-            }
-            Thread.Sleep(100);
-            // 设置识别出来的刀痕线
-            double cutWidth = CameraOperateUtils.ConvertToPictureBoxSize(widthInfo[0]);
-            double edgesWidth = CameraOperateUtils.ConvertToPictureBoxSize(widthInfo[1]);
-            cameraCommon.DrawLineForWidth((float)cutWidth, (float)edgesWidth);
-            //viewModel.CutWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((cameraCommon._cutMarkWidth / 1000).ToString(), 4));
-            //viewModel.DdgesWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((cameraCommon._edgeChipWidth / 1000).ToString(), 4));
-            return widthInfo;
-        }
-
         private void cutRecognition_Click(object sender, RoutedEventArgs e)
         {
             MaterialSnackUtils.MaterialSnack("识别中...", MaterialSnackUtils.SnackType.WARNING, 0);
             string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss_fff");
             string fileName = $"check_{timestamp}.png";
-            cameraCommon.SaveWriteableBitmap(fileName);
             Thread.Sleep(1000);
             double[] widthInfo = CommonOperate.GetCutEdgeWidth(fileName);
             if (widthInfo == null || widthInfo[0] == 0 || widthInfo[1] == 0)

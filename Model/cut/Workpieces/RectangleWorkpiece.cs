@@ -46,19 +46,19 @@ namespace 精密切割系统.Model.cut.Workpieces
             //切割距离达到最终位置
             if (cutDirection == CutDirection.Backward)
             {
-                if (_rect.Y - _currentY + cutSize >= -5)
+                _currentY -= cutSize;
+                if (_rect.Y >= _currentY)
                 {
                     return false;
                 }
-                _currentY -= cutSize;
             }
             if (cutDirection == CutDirection.Forward)
             {
-                if (_rect.Y + _rect.Height - _currentY - cutSize <= 5)
+                _currentY += cutSize;
+                if (_rect.Y + _rect.Height <= _currentY)
                 {
                     return false;
                 }
-                _currentY += cutSize;
             }
             Tools.LogDebug($"CheckCutDistance:    {_rect.X}  {_rect.Y}  {_rect.Width}  {_rect.Height}  {_currentY}  {cutDirection}  {cutSize}");
             return true;

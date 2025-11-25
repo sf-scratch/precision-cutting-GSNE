@@ -241,11 +241,11 @@ namespace 精密切割系统
                             Thread.Sleep(2000);
                         }
                     }
-                    if (!CameraUtils.m_bDeviceOpened)
+                    if (!CameraUtils.BDeviceOpened)
                     {
                         MaterialSnackUtils.MaterialSnack("相机连接中...", MaterialSnackUtils.SnackType.INFO, 0);
-                        CameraUtils.connectDevice();
-                        if (!CameraUtils.m_bDeviceOpened)
+                        CameraUtils.ConnectDevice();
+                        if (!CameraUtils.BDeviceOpened)
                         {
                             MaterialSnackUtils.MaterialSnack($"相机连接失败: {CameraUtils.errorMessage}", MaterialSnackUtils.SnackType.WARNING);
                             Thread.Sleep(2000);
@@ -261,7 +261,7 @@ namespace 精密切割系统
                             Thread.Sleep(2000);
                         }
                     }
-                    // if (PlcControl.connectionStatus && CameraUtils.m_bDeviceOpened && CameraUtils.l_lightConnectStatus)
+                    // if (PlcControl.connectionStatus && CameraUtils._bDeviceOpened && CameraUtils.l_lightConnectStatus)
                     if (PlcControl.connectionStatus)
                     {
                         MaterialSnackUtils.MaterialSnack("设备加载完成！", MaterialSnackUtils.SnackType.SUCCESS, 0);

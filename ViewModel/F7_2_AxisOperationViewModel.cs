@@ -40,6 +40,20 @@ namespace 精密切割系统.ViewModel
             RightButtonCollection.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }
 
+        private void InitBottomButton()
+        {
+            BottomButtonCollection.Clear();
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("慢相对向前", "/Assets/icon/tab_7/01/tab_01.png", () => SlowRelativeMotionAsync(true)));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("慢相对向后", "/Assets/icon/tab_7/01/tab_02.png", () => SlowRelativeMotionAsync(false)));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("相对向前", "/Assets/icon/tab_7/01/tab_03.png", () => RelativeMotionAsync(true)));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("相对向后", "/Assets/icon/tab_7/01/tab_04.png", () => RelativeMotionAsync(false)));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("", "", () => { }, buttonVisibility: System.Windows.Visibility.Hidden));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("慢点动向前", "/Assets/icon/tab_7/01/tab_05.png", null, () => SlowJogAsync(true), StopJogAsync));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("慢点动向后", "/Assets/icon/tab_7/01/tab_06.png", null, () => SlowJogAsync(false), StopJogAsync));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("点动向前", "/Assets/icon/tab_7/01/tab_07.png", null, () => JogAsync(true), StopJogAsync));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("点动向后", "/Assets/icon/tab_7/01/tab_08.png", null, () => JogAsync(false), StopJogAsync));
+        }
+
         private void Sure()
         {
             MainWindow? mainWindow = Application.Current.MainWindow as MainWindow;
@@ -59,20 +73,6 @@ namespace 精密切割系统.ViewModel
         private void Back()
         {
             NavigateUtils.NavigateToPage("MainMenu");
-        }
-
-        private void InitBottomButton()
-        {
-            BottomButtonCollection.Clear();
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("慢相对向前", "/Assets/icon/tab_7/01/tab_01.png", () => SlowRelativeMotionAsync(true)));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("慢相对向后", "/Assets/icon/tab_7/01/tab_02.png", () => SlowRelativeMotionAsync(false)));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("相对向前", "/Assets/icon/tab_7/01/tab_03.png", () => RelativeMotionAsync(true)));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("相对向后", "/Assets/icon/tab_7/01/tab_04.png", () => RelativeMotionAsync(false)));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("", "", () => { }, buttonVisibility: System.Windows.Visibility.Hidden));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("慢点动向前", "/Assets/icon/tab_7/01/tab_05.png", null, () => SlowJogAsync(true), StopJogAsync));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("慢点动向后", "/Assets/icon/tab_7/01/tab_06.png", null, () => SlowJogAsync(false), StopJogAsync));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("点动向前", "/Assets/icon/tab_7/01/tab_07.png", null, () => JogAsync(true), StopJogAsync));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("点动向后", "/Assets/icon/tab_7/01/tab_08.png", null, () => JogAsync(false), StopJogAsync));
         }
 
         private async Task SlowRelativeMotionAsync(bool isPositive)

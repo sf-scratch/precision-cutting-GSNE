@@ -1,26 +1,13 @@
-﻿using Microsoft.Win32;
-using NPOI.Util;
-using OpenCvSharp.WpfExtensions;
-using SciCamera.Net;
-using System.Diagnostics;
-using System.IO;
-using System.Net;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
+﻿using OpenCvSharp.WpfExtensions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
 using 精密切割系统.Helpers;
-using 精密切割系统.Model.cut;
-using 精密切割系统.Model.plc;
-using 精密切割系统.Utils;
 using 精密切割系统.ViewModel;
 using Color = System.Windows.Media.Color;
 using Point = System.Windows.Point;
@@ -37,9 +24,6 @@ namespace 精密切割系统.View.Pages.common
             InitializeComponent();
         }
 
-        private SciCam m_currentDev = new SciCam();
-        private Thread m_hGrabThread = null;            //取流线程句柄
-        private bool m_bThreadState = false;			//线程状态
         private Point centerLocation;
         private static List<CustomLine> _lines = new List<CustomLine>();
         private TextBlock cutWidthTextBlock;
@@ -69,290 +53,43 @@ namespace 精密切割系统.View.Pages.common
             set { _edgeChipWidth = value; }
         }
 
+        /// <summary>
+        /// 当前图像
+        /// </summary>
+        public WriteableBitmap? LocalBitmap { get; private set; }
+
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            m_currentDev = CameraUtils.m_currentDev;
-            if (!m_bThreadState)
-            {
-                StartGrabbing();
-            }
             centerLocation = new Point(cameraImage.Width / 2, cameraImage.Height / 2);
             SetupOverlayPanel();
-        }
-
-        private bool changeCameraRunFlag = false;
-
-        // 切换相机
-        public void ChangeCamera()
-        {
-            // 如果只有1个相机，则不执行切换逻辑
-            if (CameraUtils.sciCams.Count == 1)
-            {
-                return;
-            }
-            if (changeCameraRunFlag)
-            {
-                return;
-            }
-            changeCameraRunFlag = true;
-            // 移动X和Y轴
-            PositionAlignmentModel positionAlignmentModel = CurrentUtils.positionAlignmentModel;
-            string newX = positionAlignmentModel.HighMagToLowMagCameraXOffset;
-            string newY = positionAlignmentModel.HighMagToLowMagCameraYOffset;
-            // 判断当前是高倍还是低倍  高》低，则X+ Y+  低》高，则X- Y-
-            // 如果当前等于0 则是高倍》低倍
-            if (CameraUtils.currentCameraIndex == 1)
-            {
-                newX = "-" + newX;
-                newY = "-" + newY;
-            }
-            // PlcControl.tagControl.calibration.RunMotion(Tools.GetFloatStringValue(newX), Tools.GetFloatStringValue(newY));
-
-            // 停止当前采集
-            StopGrabbing();
-            Thread.Sleep(50);
-            // 切换相机
-            CameraUtils.ChangeCamera();
-            Thread.Sleep(50);
-            m_currentDev = CameraUtils.m_currentDev;
-            Thread.Sleep(50);
-            StartGrabbing();
-            changeCameraRunFlag = false;
-        }
-
-        private void StartGrabbing()
-        {
-            if (!GlobalParams.OnlineFlag)
-            {
-                return;
-            }
-            m_bThreadState = true;
-            m_hGrabThread = new Thread(GrabThreadProcess);
-            m_hGrabThread.IsBackground = true;
-            m_hGrabThread.Start();
-
-            uint nReVal = m_currentDev.StartGrabbing();
-            if (nReVal != SciCam.SCI_CAMERA_OK)
-            {
-                m_bThreadState = false;
-                return;
-            }
-        }
-
-        public void StopGrabbing()
-        {
-            if (!GlobalParams.OnlineFlag)
-            {
-                return;
-            }
-            m_bThreadState = false;
-            uint nReVal = m_currentDev.StopGrabbing();
-            if (nReVal != SciCam.SCI_CAMERA_OK)
-            {
-                return;
-            }
-        }
-
-        private void GrabThreadProcess()
-        {
-            if (!GlobalParams.OnlineFlag)
-            {
-                return;
-            }
-            uint nReVal = SciCam.SCI_CAMERA_OK;
-            nint payload = nint.Zero;
-
-            while (m_bThreadState)
-            {
-                nReVal = m_currentDev.Grab(ref payload);
-                if (nReVal == SciCam.SCI_CAMERA_OK)
-                {
-                    // 确保 payload 有效
-                    if (payload != nint.Zero)
-                    {
-                        DisplayImage(payload);
-                    }
-                }
-                else
-                {
-                    // 处理错误，例如记录日志
-                    Debug.WriteLine($"Error grabbing image: {nReVal}");
-                }
-                // 释放负载
-                if (payload != nint.Zero)
-                {
-                    nReVal = m_currentDev.FreePayload(payload);
-                    if (nReVal != SciCam.SCI_CAMERA_OK)
-                    {
-                        // 处理错误，例如记录日志
-                        Debug.WriteLine($"Error freeing payload: {nReVal}");
-                    }
-                    payload = nint.Zero; // 重置 payload
-                }
-            }
-        }
-
-        public WriteableBitmap LocalBitmap { get; private set; }
-
-        public void DisplayImage(nint payload)
-        {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                if (TryGetConvertedInfo(payload, out WriteableBitmap bitmap) && bitmap != null)
-                {
-                    // 确保Image_Control已初始化
-                    if (cameraImage != null)
-                    {
-                        cameraImage.Source = bitmap;
-                        LocalBitmap = bitmap;
-                    }
-                }
-                else
-                {
-                    // Handle error
-                }
-            });
-        }
-
-        private bool TryGetConvertedInfo(nint payload, out WriteableBitmap bitmap)
-        {
-            bitmap = null;
-
-            if (payload == nint.Zero)
-            {
-                return false;
-            }
-
-            SciCam.SCI_CAM_PAYLOAD_ATTRIBUTE payloadAttribute = new SciCam.SCI_CAM_PAYLOAD_ATTRIBUTE();
-            uint nReVal = SciCam.PayloadGetAttribute(payload, ref payloadAttribute);
-            if (nReVal != SciCam.SCI_CAMERA_OK)
-            {
-                return false;
-            }
-
-            bool imgIsComplete = payloadAttribute.isComplete;
-            SciCam.SciCamPayloadMode payloadMode = payloadAttribute.payloadMode;
-            SciCam.SciCamPixelType imgPixelType = payloadAttribute.imgAttr.pixelType;
-            ulong imgWidth = payloadAttribute.imgAttr.width;
-            ulong imgHeight = payloadAttribute.imgAttr.height;
-
-            if (!imgIsComplete || payloadMode != SciCam.SciCamPayloadMode.SciCam_PayloadMode_2D)
-            {
-                return false;
-            }
-
-            nint imgData = nint.Zero;
-            nReVal = SciCam.PayloadGetImage(payload, ref imgData);
-            if (nReVal != SciCam.SCI_CAMERA_OK)
-            {
-                return false;
-            }
-
-            long destImgSize = 0;
-            nint destImg = nint.Zero;
-            try
-            {
-                if (IsValidPixelType(imgPixelType))
-                {
-                    nReVal = SciCam.PayloadConvertImage(ref payloadAttribute.imgAttr, imgData, SciCam.SciCamPixelType.Mono8, nint.Zero, ref destImgSize, true);
-                    if (nReVal == SciCam.SCI_CAMERA_OK)
-                    {
-                        destImg = Marshal.AllocHGlobal((int)destImgSize);
-                        try
-                        {
-                            nReVal = SciCam.PayloadConvertImage(ref payloadAttribute.imgAttr, imgData, SciCam.SciCamPixelType.Mono8, destImg, ref destImgSize, true);
-                            if (nReVal == SciCam.SCI_CAMERA_OK)
-                            {
-                                byte[] bBitmap = new byte[destImgSize];
-                                Marshal.Copy(destImg, bBitmap, 0, (int)destImgSize);
-
-                                int stride = (int)imgWidth; // Assuming 1 byte per pixel
-                                bitmap = new WriteableBitmap((int)imgWidth, (int)imgHeight, 96, 96, PixelFormats.Gray8, null);
-
-                                bitmap.WritePixels(new Int32Rect(0, 0, (int)imgWidth, (int)imgHeight), bBitmap, stride, 0);
-
-                                // BitmapExtension.ToMat(bitmap);
-                            }
-                        }
-                        catch (Exception ex)
-
-                        {
-                            // 处理异常，例如记录日志
-                            Console.WriteLine($"Error during image conversion: {ex.Message}");
-                            return false;
-                        }
-                    }
-                }
-            }
-            finally
-            {
-                if (destImg != nint.Zero)
-                {
-                    Marshal.FreeHGlobal(destImg);
-                }
-            }
-
-            return true;
-        }
-
-        private bool IsValidPixelType(SciCam.SciCamPixelType pixelType)
-        {
-            return pixelType == SciCam.SciCamPixelType.Mono1p ||
-                   pixelType == SciCam.SciCamPixelType.Mono2p ||
-                   pixelType == SciCam.SciCamPixelType.Mono4p ||
-                   pixelType == SciCam.SciCamPixelType.Mono8s ||
-                   pixelType == SciCam.SciCamPixelType.Mono8 ||
-                   pixelType == SciCam.SciCamPixelType.Mono10 ||
-                   pixelType == SciCam.SciCamPixelType.Mono10p ||
-                   pixelType == SciCam.SciCamPixelType.Mono12 ||
-                   pixelType == SciCam.SciCamPixelType.Mono12p ||
-                   pixelType == SciCam.SciCamPixelType.Mono14 ||
-                   pixelType == SciCam.SciCamPixelType.Mono16 ||
-                   pixelType == SciCam.SciCamPixelType.Mono10Packed ||
-                   pixelType == SciCam.SciCamPixelType.Mono12Packed ||
-                   pixelType == SciCam.SciCamPixelType.Mono14p;
-        }
-
-        private enum ImageSaveType
-        {
-            Type_NONE = 0,
-            Type_BMP,
-            Type_JPG,
-            Type_TIFF,
-            Type_PNG,
-        };
-
-        private ImageSaveType m_imageSaveType = ImageSaveType.Type_JPG;
-
-        public bool SaveWriteableBitmap(string filePath)
-        {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                // 使用PngBitmapEncoder保存为PNG格式
-                try
-                {
-                    PngBitmapEncoder encoder = new PngBitmapEncoder();
-                    encoder.Frames.Add(BitmapFrame.Create(LocalBitmap));
-
-                    // 将图像数据写入文件
-                    using (FileStream fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        encoder.Save(fileStream);
-                    }
-                    return true;
-                }
-                catch (Exception e)
-                {
-                    Tools.LogError("保存图片异常：" + e.Message);
-                }
-                return false;
-            });
-            return true;
+            CameraUtils.PayloadReceived += CameraUtils_PayloadReceived;
+            CompositionTarget.Rendering += OnCompositionTargetRendering;
+            CameraUtils.StartGrabbing();
         }
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
-            StopGrabbing();
+            CameraUtils.PayloadReceived -= CameraUtils_PayloadReceived;
+            CompositionTarget.Rendering -= OnCompositionTargetRendering;
+            CameraUtils.StopGrabbing();
+        }
+
+        private void OnCompositionTargetRendering(object? sender, EventArgs e)
+        {
+            if (cameraImage is not null && LocalBitmap is not null)
+            {
+                cameraImage.Source = LocalBitmap;
+            }
+        }
+
+        private void CameraUtils_PayloadReceived(Model.camera.ImageData imageData)
+        {
+            // 确保在UI线程更新位图引用
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                var bitmap = imageData.ToWriteableBitmap();
+                LocalBitmap = bitmap;
+            });
         }
 
         /// <summary>

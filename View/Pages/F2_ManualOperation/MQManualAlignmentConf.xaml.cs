@@ -271,8 +271,6 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
 
                 case 2479:
                     // 倍率变更
-                    _cameraCommon.ChangeCamera();
-                    Thread.Sleep(100); ;
                     commonDimming.InitData();
                     break;
 

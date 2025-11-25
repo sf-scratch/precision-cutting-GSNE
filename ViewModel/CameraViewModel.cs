@@ -23,6 +23,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private WriteableBitmap bs = new WriteableBitmap(100, 100, 96, 96, PixelFormats.Gray8, null);
+
         public WriteableBitmap ImageSource
         {
             get => bs;
@@ -40,17 +41,17 @@ namespace 精密切割系统.ViewModel
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        SciCam.SCI_DEVICE_INFO_LIST m_stDevList = new SciCam.SCI_DEVICE_INFO_LIST();
-        SciCam m_currentDev = new SciCam();
+        private SciCam.SCI_DEVICE_INFO_LIST _stDevList = new SciCam.SCI_DEVICE_INFO_LIST();
+        private SciCam _currentDev = new SciCam();
 
-        static WriteableBitmap bitmap;
+        private static WriteableBitmap bitmap;
 
         public static bool m_bDeviceReady = false;         //是否存在相机
-        public static bool m_bDeviceOpened = false;        //相机是否打开
+        public static bool _bDeviceOpened = false;        //相机是否打开
         public static bool m_bStartGrabbing = false;       //开始采集状态
 
-        static Thread m_hGrabThread = null;            //取流线程句柄
-        static bool m_bThreadState = false;			//线程状态  
+        private static Thread m_hGrabThread = null;            //取流线程句柄
+        private static bool m_bThreadState = false;			//线程状态
 
         private readonly object bitmapLock = new object();
 
@@ -65,21 +66,21 @@ namespace 精密切割系统.ViewModel
         private void Discovery_Camera()
         {
             System.GC.Collect();
-            uint nReVal = SciCam.DiscoveryDevices(ref m_stDevList, (uint)(SciCam.SciCamTLType.SciCam_TLType_Gige | SciCam.SciCamTLType.SciCam_TLType_Usb3));
+            uint nReVal = SciCam.DiscoveryDevices(ref _stDevList, (uint)(SciCam.SciCamTLType.SciCam_TLType_Gige | SciCam.SciCamTLType.SciCam_TLType_Usb3));
             if (nReVal != SciCam.SCI_CAMERA_OK)
             {
                 MessageBox.Show("搜索相机失败");
                 return;
             }
-            if (m_stDevList.count == 0)
+            if (_stDevList.count == 0)
             {
                 MessageBox.Show("搜索相机成功，但是相机数为 0");
                 return;
             }
 
-            for (int i = 0; i < m_stDevList.count; i++)
+            for (int i = 0; i < _stDevList.count; i++)
             {
-                SciCam.SCI_DEVICE_INFO device = m_stDevList.pDevInfo[i];
+                SciCam.SCI_DEVICE_INFO device = _stDevList.pDevInfo[i];
                 SciCam.SciCamTLType devTlType = device.tlType;
 
                 if (devTlType == SciCam.SciCamTLType.SciCam_TLType_Gige)
@@ -97,33 +98,30 @@ namespace 精密切割系统.ViewModel
 
         private void OpenDevice()
         {
-
-            uint nReVal = m_currentDev.CreateDevice(ref m_stDevList.pDevInfo[0]);
+            uint nReVal = _currentDev.CreateDevice(ref _stDevList.pDevInfo[0]);
             if (nReVal != SciCam.SCI_CAMERA_OK)
             {
-
                 return;
             }
 
-            nReVal = m_currentDev.OpenDevice();
+            nReVal = _currentDev.OpenDevice();
             if (nReVal != SciCam.SCI_CAMERA_OK)
             {
-
                 return;
             }
             else
             {
                 // MessageBox.Show("打开成功！");
             }
-
         }
+
         public void StartGrabbing()
         {
             m_bThreadState = true;
             m_hGrabThread = new Thread(GrabThreadProcess);
             m_hGrabThread.Start();
 
-            uint nReVal = m_currentDev.StartGrabbing();
+            uint nReVal = _currentDev.StartGrabbing();
             if (nReVal != SciCam.SCI_CAMERA_OK)
             {
                 m_bThreadState = false;
@@ -138,7 +136,7 @@ namespace 精密切割系统.ViewModel
             m_bThreadState = false;
             m_hGrabThread.Join();
 
-            uint nReVal = m_currentDev.StopGrabbing();
+            uint nReVal = _currentDev.StopGrabbing();
             if (nReVal != SciCam.SCI_CAMERA_OK)
             {
                 //errorMessage = "Stop grabbing failed";
@@ -148,7 +146,6 @@ namespace 精密切割系统.ViewModel
             m_bStartGrabbing = false;
         }
 
-
         private void GrabThreadProcess()
         {
             uint nReVal = SciCam.SCI_CAMERA_OK;
@@ -156,24 +153,26 @@ namespace 精密切割系统.ViewModel
 
             while (m_bThreadState)
             {
-                nReVal = m_currentDev.Grab(ref payload);
+                nReVal = _currentDev.Grab(ref payload);
                 /*if (nReVal == SciCam.SCI_CAMERA_OK)
                 {
-                    // 使用Dispatcher将更新操作封送到UI线程  
+                    // 使用Dispatcher将更新操作封送到UI线程
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         DisplayImage(payload);
                     });
                 }*/
 
-                nReVal = m_currentDev.FreePayload(payload);
+                nReVal = _currentDev.FreePayload(payload);
             }
         }
+
         private string i4tos(uint ip)
         {
             IPAddress iPAddress = new IPAddress(ip);
             return iPAddress.ToString();
         }
+
         public void DisplayImage(IntPtr payload)
         {
             /*WriteableBitmap localBitmap = null;
@@ -182,20 +181,21 @@ namespace 精密切割系统.ViewModel
             {
                 lock (bitmapLock)
                 {
-                    // 更新bitmap变量，确保线程安全  
+                    // 更新bitmap变量，确保线程安全
                     bitmap = localBitmap;
                 }
                 // 使用Dispatcher将UI更新操作封送到UI线程
-                if (cameraImage != null) // 确保Image_Control已初始化  
+                if (cameraImage != null) // 确保Image_Control已初始化
                 {
                     cameraImage.Source = bitmap;
                 }
             }
             else
             {
-                // Handle error  
+                // Handle error
             }*/
         }
+
         private int GetConvertedInfo(IntPtr payload, out WriteableBitmap bitmap)
         {
             bitmap = null;
@@ -259,7 +259,7 @@ namespace 精密切割系统.ViewModel
                             byte[] bBitmap = new byte[destImgSize];
                             Marshal.Copy(destImg, bBitmap, 0, (int)destImgSize);
 
-                            int stride = (int)imgWidth; // Assuming 1 byte per pixel  
+                            int stride = (int)imgWidth; // Assuming 1 byte per pixel
                             //bitmap = new WriteableBitmap((int)imgWidth, (int)imgHeight, 96, 96, PixelFormats.Gray8, null);
                             //bitmap.WritePixels(new Int32Rect(0, 0, (int)imgWidth, (int)imgHeight), bBitmap, stride, 0);
                             //bs.WritePixels(new Int32Rect(0, 0, (int)imgWidth, (int)imgHeight), bBitmap, stride, 0);
@@ -276,7 +276,6 @@ namespace 精密切割系统.ViewModel
                     }
                     catch (Exception ex)
                     {
-
                     }
                     finally
                     {

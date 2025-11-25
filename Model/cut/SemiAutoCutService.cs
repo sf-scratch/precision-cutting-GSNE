@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using ScottPlot.TickGenerators.TimeUnits;
+using System.Diagnostics;
 using 精密切割系统.Driver;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.cut.Workpieces;
@@ -105,11 +106,20 @@ namespace 精密切割系统.Model.cut
             set { _spindleRev = value; }
         }
 
+        /// <summary>
+        /// 超出工件后是否继续切割
+        /// </summary>
+        private bool _isContinueBeyondWorkpiece;
+
+        /// <summary>
+        /// theta轴校准角度
+        /// </summary>
         private float _cutThetaAlignDeg;
 
         private SemiAutoCutService()
         {
             IsReady = true;
+            _isContinueBeyondWorkpiece = false;
             _alignService = ThetaAlignService.Instance;
             _cutDirection = CutDirection.Backward;
             _depthCompensationValue = 0;
@@ -141,19 +151,23 @@ namespace 精密切割系统.Model.cut
 
         public async Task<RunResult> RunAsync(List<CutStep> cutStepList, IWorkpieces workpiece, float margin, float bladeContactWorkingDiscZ1, float bladeLiftingHeight, bool isExchangeX, CancellationToken pauseToken)
         {
-            List<CutStep> cutSteps = cutStepList;
+            List<CutStep> cutSteps;
             //切割刀数（0 = all）
             if (_cutLine != 0 && _cutLine < cutStepList.Count)
             {
                 cutSteps = cutStepList.GetRange(0, _cutLine);
+            }
+            else
+            {
+                cutSteps = cutStepList.ToList();
             }
             CancellationToken usingPauseToken = pauseToken;
             _cutThetaAlignDeg = await GetCutThetaAlignDegAsync();
             Stopwatch stopwatch = new();
             try
             {
-                PathCalculator pathCalculator = new(cutSteps.Select(p => p.Speed).ToList());
                 IsReady = false;
+                PathCalculator pathCalculator = new(cutSteps.Select(p => p.Speed).ToList());
                 //打开切割水
                 await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
                 //进入全自动切割模式
@@ -167,7 +181,7 @@ namespace 精密切割系统.Model.cut
                     LineSegment? line = null;
                     CutStep cutStep = cutSteps[cutTime];
                     //检测工件是否切完
-                    if (!workpiece.CheckCutDistance(_cutDirection, cutStep.OffsetY))
+                    if (!workpiece.CheckCutDistance(_cutDirection, cutStep.NextStepDistance) && !_isContinueBeyondWorkpiece)
                     {
                         RemindReplaceWafer?.Invoke();
                         (RunResult runResult, usingPauseToken) = await WaitContinueAsync(preLine ?? line, workpiece, currentKnifeRemainTime, "下一刀将超出工件！");
@@ -175,8 +189,10 @@ namespace 精密切割系统.Model.cut
                         {
                             return runResult;
                         }
-                        //workpiece.Reset(await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0);
+                        _isContinueBeyondWorkpiece = true;
                     }
+                    // 更新切割步骤的NextStepDistance为0，防止累加
+                    cutSteps[cutTime] = cutStep with { NextStepDistance = 0 };
                     if (cutStep.ChannelNum != currentChannelNum)
                     {
                         //切换通道
@@ -313,6 +329,7 @@ namespace 精密切割系统.Model.cut
             finally
             {
                 IsReady = true;
+                _isContinueBeyondWorkpiece = false;
                 //退出全自动切割模式
                 await PlcControl.tagControl.cutting.ExitCuttingModeAsync(default);
                 stopwatch.Stop();
@@ -372,5 +389,5 @@ namespace 精密切割系统.Model.cut
         }
     }
 
-    public record CutStep(float CutHeight, float Speed, float OffsetY, float ThetaDeg, bool IsAbsolute, float ChannelStartY, float OffsetX = 0, bool IsAlternatingCuttingStroke = false, int ChannelNum = 1, float? SingleCutDeep = null);
+    public record CutStep(float CutHeight, float Speed, float NextStepDistance, float ThetaDeg, bool IsAbsolute, float ChannelStartY, float OffsetX = 0, bool IsAlternatingCuttingStroke = false, int ChannelNum = 1, float? SingleCutDeep = null);
 }

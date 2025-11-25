@@ -559,7 +559,7 @@ namespace 精密切割系统.ViewModel
                 return CommonResult<List<CutStep>>.Failure("未生成有效切割步骤！");
             }
             //第一刀不跳步进
-            cutSteps[0] = cutSteps[0] with { OffsetY = 0 };
+            cutSteps[0] = cutSteps[0] with { NextStepDistance = 0 };
             return CommonResult<List<CutStep>>.Success(cutSteps);
         }
 

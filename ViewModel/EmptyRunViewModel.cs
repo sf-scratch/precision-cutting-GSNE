@@ -10,6 +10,7 @@ using 精密切割系统.Model.common;
 using 精密切割系统.Model.plc;
 using 精密切割系统.View.Pages.F4_BladeMaintenance;
 using static NPOI.HSSF.Util.HSSFColor;
+using static 精密切割系统.Helpers.MaterialSnackUtils;
 
 namespace 精密切割系统.ViewModel
 {
@@ -103,6 +104,11 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteEmptyRun()
         {
+            if (AlarmConfig.Instance.HasActiveErrorAlarm())
+            {
+                MaterialSnackUtils.MaterialSnack("存在未处理的告警，请先处理告警！", SnackType.WARNING, 0);
+                return;
+            }
             if (!await _emptyRunSemaphore.WaitAsync(TimeSpan.Zero))
             {
                 MaterialSnackUtils.MaterialSnack("准备空运行中！", MaterialSnackUtils.SnackType.WARNING);

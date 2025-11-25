@@ -53,23 +53,10 @@ namespace 精密切割系统.View.Pages.common
 
         public void InitData()
         {
-            if (CameraUtils.currentCameraIndex == 0)
-            {
-                int intensity = CalculateIntensity(GlobalParams.intensityRatio);
-                CameraUtils.SetLightIntensity(intensity, GlobalParams.LightIntensityChannel);
-                SetLightRatio(Convert.ToDecimal(GlobalParams.intensityRatio), 0);
-                ringPanel.Visibility = Visibility.Collapsed;
-            }
-            else
-            {
-                int lowIntensity = CalculateIntensity(GlobalParams.lowIntensityRatio);
-                int ringIntensity = CalculateIntensity(GlobalParams.RingIntensityRatio);
-                CameraUtils.SetLightIntensity(lowIntensity, GlobalParams.LowLightIntensityChannel);
-                CameraUtils.SetLightIntensity(ringIntensity, GlobalParams.RingLightIntensityChannel);
-                SetLightRatio(Convert.ToDecimal(GlobalParams.lowIntensityRatio), 1);
-                SetLightRatio(Convert.ToDecimal(GlobalParams.RingIntensityRatio), 2);
-                ringPanel.Visibility = Visibility.Visible;
-            }
+            int intensity = CalculateIntensity(GlobalParams.intensityRatio);
+            CameraUtils.SetLightIntensity(intensity, GlobalParams.LightIntensityChannel);
+            SetLightRatio(Convert.ToDecimal(GlobalParams.intensityRatio), 0);
+            ringPanel.Visibility = Visibility.Collapsed;
         }
 
         public void StartMonitor()
@@ -144,22 +131,22 @@ namespace 精密切割系统.View.Pages.common
 
         private void SubFive_OnClick(object sender, RoutedEventArgs e)
         {
-            AdjustIntensity(-0.05m, CameraUtils.currentCameraIndex);
+            AdjustIntensity(-0.05m, 0);
         }
 
         private void SubOne_OnClick(object sender, RoutedEventArgs e)
         {
-            AdjustIntensity(-0.0025m, CameraUtils.currentCameraIndex);
+            AdjustIntensity(-0.0025m, 0);
         }
 
         private void AddOne_OnClick(object sender, RoutedEventArgs e)
         {
-            AdjustIntensity(0.0025m, CameraUtils.currentCameraIndex);
+            AdjustIntensity(0.0025m, 0);
         }
 
         private void AddFive_OnClick(object sender, RoutedEventArgs e)
         {
-            AdjustIntensity(0.05m, CameraUtils.currentCameraIndex);
+            AdjustIntensity(0.05m, 0);
         }
 
         /// <summary>

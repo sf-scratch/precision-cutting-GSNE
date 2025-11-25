@@ -317,11 +317,11 @@ namespace 精密切割系统.View
                         mainWindow.NavigateToPage(bean.PageUrl);
                         break;
                     }
-                    if (AlarmConfig.Instance.HasActiveErrorAlarm())
-                    {
-                        MaterialSnackUtils.MaterialSnack("存在未处理的告警，请先处理告警！", SnackType.WARNING, 0);
-                        break;
-                    }
+                    //if (AlarmConfig.Instance.HasActiveErrorAlarm())
+                    //{
+                    //    MaterialSnackUtils.MaterialSnack("存在未处理的告警，请先处理告警！", SnackType.WARNING, 0);
+                    //    break;
+                    //}
                     InitialPositionModel? initPos = await AutoCutUtils.GetInitialPositionAsync();
                     if (initPos is null)
                     {
@@ -410,6 +410,10 @@ namespace 精密切割系统.View
                     break;
 
                 case 710:
+                    mainWindow.NavigateToPage(bean.PageUrl);
+                    break;
+
+                case 711:
                     mainWindow.NavigateToPage(bean.PageUrl);
                     break;
 

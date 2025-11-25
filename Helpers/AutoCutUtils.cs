@@ -1633,9 +1633,9 @@ namespace 精密切割系统.Helpers
 
         public static WriteableBitmap? GrabWriteableBitmap()
         {
-            SciCam m_currentDev = CameraUtils.m_currentDev;
+            SciCam _currentDev = CameraUtils.CurrentDev;
             nint payload = nint.Zero;
-            uint nReVal = m_currentDev.Grab(ref payload);
+            uint nReVal = _currentDev.Grab(ref payload);
             try
             {
                 if (nReVal == SciCam.SCI_CAMERA_OK)
@@ -1664,7 +1664,7 @@ namespace 精密切割系统.Helpers
                 // 释放负载
                 if (payload != nint.Zero)
                 {
-                    nReVal = m_currentDev.FreePayload(payload);
+                    nReVal = _currentDev.FreePayload(payload);
                     if (nReVal != SciCam.SCI_CAMERA_OK)
                     {
                         Tools.LogError($"Error grabbing image: {nReVal}");

@@ -101,6 +101,10 @@ namespace 精密切割系统.View.Controls
             {
                 var value = PLCValue.SlightVibration;
                 _dataY.Add(value);
+                if (_dataY.Count > xMaxValue)
+                {
+                    _dataY.RemoveAt(0);
+                }
                 currentInterval += dataInterval;
                 if (refreshInterval < currentInterval)
                 {
@@ -136,7 +140,6 @@ namespace 精密切割系统.View.Controls
                             if (curMaxValue > xMaxValue)
                             {
                                 curMaxValue = xMaxValue;
-                                _dataY.RemoveAt(0);
                             }
                             formsPlot1.Plot.Axes.Bottom.Max = curMaxValue;
                         }

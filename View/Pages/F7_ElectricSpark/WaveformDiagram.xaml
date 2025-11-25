@@ -2,9 +2,9 @@
     x:Class="精密切割系统.View.Pages.F7_ElectricSpark.WaveformDiagram"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:精密切割系统.View.Pages.F7_ElectricSpark"
-    xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:scottplot="clr-namespace:ScottPlot.WPF;assembly=ScottPlot.WPF"
     Title="WaveformDiagram"
@@ -14,7 +14,24 @@
     Unloaded="Page_Unloaded"
     mc:Ignorable="d">
 
-    <Grid>
-        <Controls:CustomPlot x:Name="customPlot" XInitialMaxValue="150" XMaxValue="2000" />
+    <Grid Margin="30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid>
+            <Label
+                Padding="0,0,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Content="波形图(5.7)"
+                FontSize="30"
+                FontWeight="Bold" />
+        </Grid>
+        <Controls:CustomPlot
+            x:Name="customPlot"
+            Grid.Row="1"
+            XInitialMaxValue="150"
+            XMaxValue="2000" />
     </Grid>
 </Page>

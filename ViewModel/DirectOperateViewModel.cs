@@ -430,14 +430,7 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteStartHomingThetaCommand()
         {
-            if (IsAbsMoveTheta)
-            {
-                await PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(TargetPositionTheta, SpeedTheta, default);
-            }
-            else
-            {
-                await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(TargetPositionTheta, SpeedTheta, default);
-            }
+            await PlcControl.tagControl.ThetaAxis.StartHomingAsync();
         }
 
         private bool CanExecuteStartHomingThetaCommand()
