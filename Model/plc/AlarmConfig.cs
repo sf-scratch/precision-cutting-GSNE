@@ -26,6 +26,8 @@ namespace 精密切割系统.Model.plc
             get { return _lazy.Value; }
         }
 
+        public const string HasErrorAlarmMessage = "存在未处理的告警，请先处理告警！";
+
         /// <summary>
         /// 报警起始地址
         /// </summary>

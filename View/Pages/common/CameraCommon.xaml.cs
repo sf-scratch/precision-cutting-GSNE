@@ -53,10 +53,12 @@ namespace 精密切割系统.View.Pages.common
             set { _edgeChipWidth = value; }
         }
 
+        private WriteableBitmap? _localBitmap;
+
         /// <summary>
         /// 当前图像
         /// </summary>
-        public WriteableBitmap? LocalBitmap { get; private set; }
+        public WriteableBitmap? LocalBitmap => _localBitmap;
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
@@ -71,14 +73,14 @@ namespace 精密切割系统.View.Pages.common
         {
             CameraUtils.PayloadReceived -= CameraUtils_PayloadReceived;
             CompositionTarget.Rendering -= OnCompositionTargetRendering;
-            CameraUtils.StopGrabbing();
+            //CameraUtils.StopGrabbing();
         }
 
         private void OnCompositionTargetRendering(object? sender, EventArgs e)
         {
-            if (cameraImage is not null && LocalBitmap is not null)
+            if (cameraImage is not null && _localBitmap is not null)
             {
-                cameraImage.Source = LocalBitmap;
+                cameraImage.Source = _localBitmap;
             }
         }
 
@@ -88,8 +90,8 @@ namespace 精密切割系统.View.Pages.common
             Application.Current.Dispatcher.Invoke(() =>
             {
                 var bitmap = imageData.ToWriteableBitmap();
-                LocalBitmap = bitmap;
-            });
+                _localBitmap = bitmap;
+            }, DispatcherPriority.Background);
         }
 
         /// <summary>

@@ -106,7 +106,7 @@ namespace 精密切割系统.ViewModel
         {
             if (AlarmConfig.Instance.HasActiveErrorAlarm())
             {
-                MaterialSnackUtils.MaterialSnack("存在未处理的告警，请先处理告警！", SnackType.WARNING, 0);
+                MaterialSnackUtils.MaterialSnack(AlarmConfig.HasErrorAlarmMessage, SnackType.WARNING);
                 return;
             }
             if (!await _emptyRunSemaphore.WaitAsync(TimeSpan.Zero))

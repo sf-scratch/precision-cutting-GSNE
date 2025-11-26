@@ -96,5 +96,21 @@ namespace 精密切割系统.Model.position
             get { return _isReady; }
             set { SetProperty(ref _isReady, value); }
         }
+
+        private string _unit;
+
+        public string Unit
+        {
+            get { return _unit; }
+            set { SetProperty(ref _unit, value); }
+        }
+
+        private string _sppedUnit;
+
+        public string SpeedUnit
+        {
+            get { return _sppedUnit; }
+            set { SetProperty(ref _sppedUnit, value); }
+        }
     }
 }

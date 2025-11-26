@@ -184,13 +184,13 @@ namespace 精密切割系统.ViewModel
             base.OnNavigatedTo(navigationContext);
             _cts = new CancellationTokenSource();
             AxisOperationList.AddRange([
-                new AxisOperationModel(PlcControl.tagControl.Xaxis, async (a,b) => { if(!b) await a.AxisObject.StopJogAsync();}){IsChecked = true, AxisSlowSpeed = "0", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0"},
-                new AxisOperationModel(PlcControl.tagControl.Yaxis, async (a,b) => { if(!b) await a.AxisObject.StopJogAsync();}){AxisSlowSpeed = "0", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0"},
-                new AxisOperationModel(PlcControl.tagControl.Z1axis, async(a, b) => { if(!b) await a.AxisObject.StopJogAsync();}){AxisSlowSpeed = "0", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0"},
-                new AxisOperationModel(PlcControl.tagControl.Z2axis, async(a, b) => { if(! b) await a.AxisObject.StopJogAsync(); }){AxisSlowSpeed = "0", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0"}]);
+                new AxisOperationModel(PlcControl.tagControl.Xaxis, async (a,b) => { if(!b) await a.AxisObject.StopJogAsync();}){IsChecked = true, AxisSlowSpeed = "0", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", Unit = "mm", SpeedUnit = "mm/s"},
+                new AxisOperationModel(PlcControl.tagControl.Yaxis, async (a,b) => { if(!b) await a.AxisObject.StopJogAsync();}){AxisSlowSpeed = "0", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", Unit = "mm", SpeedUnit = "mm/s"},
+                new AxisOperationModel(PlcControl.tagControl.Z1axis, async(a, b) => { if(!b) await a.AxisObject.StopJogAsync();}){AxisSlowSpeed = "0", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", Unit = "mm", SpeedUnit = "mm/s"},
+                new AxisOperationModel(PlcControl.tagControl.Z2axis, async(a, b) => { if(! b) await a.AxisObject.StopJogAsync(); }){AxisSlowSpeed = "0", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", Unit = "mm", SpeedUnit = "mm/s"}]);
             if (GlobalParams.HasTheta)
             {
-                AxisOperationList.Add(new AxisOperationModel(PlcControl.tagControl.ThetaAxis, async (a, b) => { if (!b) await a.AxisObject.StopJogAsync(); }) { AxisSlowSpeed = "0", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", IsReady = true });
+                AxisOperationList.Add(new AxisOperationModel(PlcControl.tagControl.ThetaAxis, async (a, b) => { if (!b) await a.AxisObject.StopJogAsync(); }) { AxisSlowSpeed = "0", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", IsReady = true, Unit = "deg", SpeedUnit = "deg/s" });
             }
             _ = MonitiorAxisState(_cts.Token);
             InitRightButton();

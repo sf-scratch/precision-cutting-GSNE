@@ -111,15 +111,23 @@
                             IsChecked="{Binding IsChecked}"
                             Style="{StaticResource MaterialDesignChoiceChipSecondaryRadioButton}" />
                         <TextBox
-                            materialDesign:HintAssist.Hint="当前位置(mm)"
+                            materialDesign:HintAssist.Hint="当前位置"
+                            materialDesign:TextFieldAssist.SuffixText="{Binding Unit}"
                             IsEnabled="False"
                             Text="{Binding CurPosition}" />
                         <TextBox
-                            materialDesign:HintAssist.Hint="轴慢速度(mm/s)"
+                            materialDesign:HintAssist.Hint="轴慢速度"
+                            materialDesign:TextFieldAssist.SuffixText="{Binding SpeedUnit}"
                             IsEnabled="False"
                             Text="{Binding AxisSlowSpeed}" />
-                        <TextBox materialDesign:HintAssist.Hint="轴速度(mm/s)" Text="{Binding AxisSpeed}" />
-                        <TextBox materialDesign:HintAssist.Hint="相对运动长度(mm)" Text="{Binding RelativeDistance}" />
+                        <TextBox
+                            materialDesign:HintAssist.Hint="轴速度"
+                            materialDesign:TextFieldAssist.SuffixText="{Binding SpeedUnit}"
+                            Text="{Binding AxisSpeed}" />
+                        <TextBox
+                            materialDesign:HintAssist.Hint="相对运动长度"
+                            materialDesign:TextFieldAssist.SuffixText="{Binding Unit}"
+                            Text="{Binding RelativeDistance}" />
                         <materialDesign:PackIcon
                             Width="40"
                             Height="40"

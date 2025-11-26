@@ -2022,15 +2022,15 @@ namespace 精密切割系统.Driver
 
     public class WholeDevice
     {
+        // ============整机相关==========
         public WholeDevice()
         {
         }
 
         private KeyencePlc keyencePlc = KeyencePlc.GetInstance();
 
-        // ============整机相关==========
         public Tag canSystemInit { get; set; }
-
+        public Tag debugMode { get; set; }
         public Tag systemInit { get; set; }
         public Tag urgentRaise { get; set; }
         public Tag isSystemIniting { get; set; }
@@ -2123,6 +2123,18 @@ namespace 精密切割系统.Driver
             await keyencePlc.WriteTagAsync(systemInit);
             systemInit.writeValue = "1";
             await keyencePlc.WriteTagAsync(systemInit);
+        }
+
+        public async Task OpenDebugModeAsync()
+        {
+            debugMode.writeValue = "1";
+            await keyencePlc.WriteTagAsync(debugMode);
+        }
+
+        public async Task CloseDebugModeAsync()
+        {
+            debugMode.writeValue = "0";
+            await keyencePlc.WriteTagAsync(debugMode);
         }
 
         /// <summary>

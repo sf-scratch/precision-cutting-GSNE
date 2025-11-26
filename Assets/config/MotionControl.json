@@ -859,6 +859,12 @@
       "name": "能否回零点",
       "describe": "能否回零点"
     },
+    "debugMode": {
+      "valueType": "bool",
+      "addr": "MR38001",
+      "name": "调试模式",
+      "describe": "调试模式"
+    },
     "systemInit": {
       "valueType": "bool",
       "addr": "MR48000",

@@ -239,7 +239,7 @@ namespace 精密切割系统.Assets.config.buttom
                 list.Add(new OperateBean(2407, "基准线调窄", "UnfoldLessHorizontal"));
                 list.Add(new OperateBean(2443, "θ轴竖向校正", "/Assets/icon/tab_1/03/theta-align-vertical.png"));
                 list.Add(new OperateBean(2433, "刀痕识别", "TextRecognition"));
-                list.Add(new OperateBean(2442, "精细对焦", "FocusAuto"));
+                //list.Add(new OperateBean(2442, "精细对焦", "FocusAuto"));
                 list.Add(new OperateBean(2050, "测量", "/Assets/icon/tab_1/03/tab_03.png"));
                 list.Add(new OperateBean(2408, "基准线调宽", "UnfoldMoreHorizontal"));
                 list.Add(new OperateBean(2453, "θ轴横向校正", "/Assets/icon/tab_1/03/tab_04.png"));

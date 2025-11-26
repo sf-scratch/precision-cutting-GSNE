@@ -180,34 +180,34 @@ namespace 精密切割系统.Model.cut
                 {
                     LineSegment? line = null;
                     CutStep cutStep = cutSteps[cutTime];
-                    //检测工件是否切完
-                    if (!workpiece.CheckCutDistance(_cutDirection, cutStep.NextStepDistance) && !_isContinueBeyondWorkpiece)
-                    {
-                        RemindReplaceWafer?.Invoke();
-                        (RunResult runResult, usingPauseToken) = await WaitContinueAsync(preLine ?? line, workpiece, currentKnifeRemainTime, "下一刀将超出工件！");
-                        if (!runResult.IsSuccess)
-                        {
-                            return runResult;
-                        }
-                        _isContinueBeyondWorkpiece = true;
-                    }
-                    // 更新切割步骤的NextStepDistance为0，防止累加
-                    cutSteps[cutTime] = cutStep with { NextStepDistance = 0 };
-                    if (cutStep.ChannelNum != currentChannelNum)
-                    {
-                        //切换通道
-                        if (cutStep.IsAbsolute)
-                        {
-                            workpiece.Reset(cutStep.ChannelStartY);
-                        }
-                        else
-                        {
-                            workpiece.Reset(workpiece.CalculateCutY() + cutStep.ChannelStartY);
-                        }
-                    }
-                    currentChannelNum = cutStep.ChannelNum;
                     try
                     {
+                        //检查切换通道
+                        if (cutStep.ChannelNum != currentChannelNum)
+                        {
+                            if (cutStep.IsAbsolute)
+                            {
+                                workpiece.Reset(cutStep.ChannelStartY);
+                            }
+                            else
+                            {
+                                workpiece.Reset(workpiece.CalculateCutY() + cutStep.ChannelStartY);
+                            }
+                        }
+                        currentChannelNum = cutStep.ChannelNum;
+                        //检测工件是否切完
+                        if (!workpiece.CheckCutDistance(_cutDirection, cutStep.NextStepDistance) && !_isContinueBeyondWorkpiece)
+                        {
+                            RemindReplaceWafer?.Invoke();
+                            (RunResult runResult, usingPauseToken) = await WaitContinueAsync(preLine ?? line, workpiece, currentKnifeRemainTime, "下一刀将超出工件！");
+                            if (!runResult.IsSuccess)
+                            {
+                                return runResult;
+                            }
+                            _isContinueBeyondWorkpiece = true;
+                        }
+                        // 更新切割步骤的NextStepDistance为0，防止累加
+                        cutSteps[cutTime] = cutStep with { NextStepDistance = 0 };
                         //检查是否暂停
                         if (usingPauseToken.IsCancellationRequested)
                         {
