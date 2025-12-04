@@ -92,7 +92,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         {
             if (AlarmConfig.Instance.HasActiveErrorAlarm())
             {
-                MaterialSnack("有未处理报警！", SnackType.WARNING);
+                MaterialSnackUtils.MaterialSnack(AlarmConfig.HasErrorAlarmMessage, SnackType.WARNING);
                 return;
             }
             if (Appsettings.BladeOuterDiameter is null)
@@ -137,6 +137,10 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             spindleRev.Text = BmSetupData.Instance.SpindleRev.ToString();
             heightMeasureTimes.Text = BmSetupData.Instance.HeightMeasureTimes.ToString();
             isAutomHeightMeasureBeforeCutting.IsChecked = BmSetupData.Instance.IsAutomHeightMeasureBeforeCutting;
+            thetaMovementAngle.Text = BmSetupData.Instance.ThetaMovementAngle.ToString();
+            thetaStartingToMovePosition.Text = BmSetupData.Instance.ThetaStartingToMovePosition.ToString();
+            thetaEndingToMovePosition.Text = BmSetupData.Instance.ThetaEndingToMovePosition.ToString();
+            thetaCurrentLocation.Text = BmSetupData.Instance.ThetaCurrentLocation.ToString();
         }
 
         private void BtnSure_RightClicked(object? sender, bool e)
@@ -149,6 +153,10 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             BmSetupData.Instance.SpindleRev = spindleRev.Text.ToInt();
             BmSetupData.Instance.HeightMeasureTimes = heightMeasureTimes.Text.ToInt();
             BmSetupData.Instance.IsAutomHeightMeasureBeforeCutting = isAutomHeightMeasureBeforeCutting.IsChecked ?? false;
+            BmSetupData.Instance.ThetaMovementAngle = thetaMovementAngle.Text.ToFloat();
+            BmSetupData.Instance.ThetaStartingToMovePosition = thetaStartingToMovePosition.Text.ToFloat();
+            BmSetupData.Instance.ThetaEndingToMovePosition = thetaEndingToMovePosition.Text.ToFloat();
+            BmSetupData.Instance.ThetaCurrentLocation = thetaCurrentLocation.Text.ToFloat();
             MaterialSnack("测高参数已确认!", SnackType.SUCCESS);
         }
 

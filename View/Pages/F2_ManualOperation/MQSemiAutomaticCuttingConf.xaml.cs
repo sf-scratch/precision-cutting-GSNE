@@ -139,6 +139,11 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         // 开始切割
         private void StartCut(object? sender, bool e)
         {
+            if (AlarmConfig.Instance.HasActiveErrorAlarm())
+            {
+                MaterialSnackUtils.MaterialSnack(AlarmConfig.HasErrorAlarmMessage, SnackType.WARNING);
+                return;
+            }
             if (WarmUpHelper.IsRuning)
             {
                 MaterialSnack("请先结束暖机再开始切割！", SnackType.WARNING);

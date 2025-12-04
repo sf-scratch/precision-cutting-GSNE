@@ -16,7 +16,7 @@
         <!--  定义公共样式  -->
         <Style x:Key="CommonLabelStyle" TargetType="Label">
             <Setter Property="Width" Value="155" />
-            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontSize" Value="18" />
             <Setter Property="HorizontalContentAlignment" Value="Right" />
             <Setter Property="Margin" Value="0,10,0,0" />
             <Setter Property="FontWeight" Value="Bold" />
@@ -52,8 +52,14 @@
                     <StackPanel Orientation="Horizontal">
                         <Label Content="刀片类型：" Style="{StaticResource CommonLabelStyle}" />
                         <ListBox Margin="0,5,0,0" Style="{StaticResource MaterialDesignChoiceChipOutlineListBox}">
-                            <ListBoxItem x:Name="hardKnife" Content="硬刀" />
-                            <ListBoxItem Content="软刀" IsSelected="True" />
+                            <ListBoxItem
+                                x:Name="hardKnife"
+                                Content="硬刀"
+                                FontSize="18" />
+                            <ListBoxItem
+                                Content="软刀"
+                                FontSize="18"
+                                IsSelected="True" />
                         </ListBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.common;
+using 精密切割系统.Model.plc;
 using 精密切割系统.PubSubEvent;
 using 精密切割系统.View.Pages.common;
 using 精密切割系统.ViewModel;
@@ -134,7 +135,7 @@ namespace 精密切割系统.Model.cut
         private static async Task SafeStopAxis()
         {
             await PlcControl.tagControl.Z2axis.StopJogAsync();
-            await PlcControl.tagControl.Z2axis.SetHighSpeedAsync(0);
+            SpeedManager.IsHighSpeed = false;
         }
 
         private static void LogMessage(IEventAggregator? eventAggregator, string message)

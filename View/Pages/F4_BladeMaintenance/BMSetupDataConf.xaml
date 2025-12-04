@@ -41,50 +41,43 @@
             ChildMargin="5"
             Columns="3*,2*,*"
             RowCount="10">
-            <Label
-                Height="35"
-                Content="旋转轴转速"
-                FontSize="16"
-                FontWeight="Bold" />
-            <Controls:InputTextBox
-                x:Name="spindleRev"
-                Width="200"
-                Height="35"
-                InputType="Numeral"
-                MaxLength="20"
-                TextWrapping="Wrap" />
-            <Label
-                Height="35"
-                Content="/min"
-                FontSize="16"
-                FontWeight="Bold" />
-            <Label
-                Height="35"
-                Content="测高次数"
-                FontSize="16"
-                FontWeight="Bold" />
-            <Controls:InputTextBox
-                x:Name="heightMeasureTimes"
-                Width="200"
-                Height="35"
-                InputType="Numeral"
-                MaxLength="20"
-                TextWrapping="Wrap"
-                XMax="20" />
-            <Label
-                Height="35"
-                Content="次"
-                FontSize="16"
-                FontWeight="Bold" />
-            <Label
-                Height="35"
-                Content="每次切割前测高"
-                FontSize="16"
-                FontWeight="Bold" />
+            <auto:AutoGrid.Resources>
+                <Style TargetType="Label">
+                    <Setter Property="FontSize" Value="18" />
+                    <Setter Property="Height" Value="35" />
+                    <Setter Property="FontWeight" Value="Bold" />
+                </Style>
+                <Style BasedOn="{StaticResource InputTextStyle}" TargetType="Controls:InputTextBox">
+                    <Setter Property="Width" Value="150" />
+                    <Setter Property="Height" Value="35" />
+                    <Setter Property="InputType" Value="Numeral" />
+                    <Setter Property="TextWrapping" Value="Wrap" />
+                </Style>
+            </auto:AutoGrid.Resources>
+            <Label Content="旋转轴转速" />
+            <Controls:InputTextBox x:Name="spindleRev" XMax="30000" />
+            <Label Content="/min" />
+            <Label Content="测高次数" />
+            <Controls:InputTextBox x:Name="heightMeasureTimes" XMax="3" />
+            <Label Content="次" />
+            <Label Content="θ轴移动角度" />
+            <Controls:InputTextBox x:Name="thetaMovementAngle" XMax="90" />
+            <Label Content="deg" />
+            <Label Content="θ轴开始移动位置" />
+            <Controls:InputTextBox x:Name="thetaStartingToMovePosition" />
+            <Label Content="deg" />
+            <Label Content="θ轴移动结束位置" />
+            <Controls:InputTextBox x:Name="thetaEndingToMovePosition" />
+            <Label Content="deg" />
+            <Label Content="θ轴现在的位置" />
+            <Controls:InputTextBox x:Name="thetaCurrentLocation" />
+            <Label Content="deg" />
+            <Label Content="每次切割前测高" />
             <CheckBox
                 x:Name="isAutomHeightMeasureBeforeCutting"
                 Grid.ColumnSpan="2"
                 Content="自动测高"
+                FontSize="18"
                 IsChecked="True"
                 Style="{StaticResource MaterialDesignFilterChipCheckBox}" />
         </auto:AutoGrid>

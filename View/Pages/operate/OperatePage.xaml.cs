@@ -425,14 +425,7 @@ namespace 精密切割系统.View.Pages.operate
         // CT 真空
         private async Task VacuumOperateAsync()
         {
-            if (await PlcControl.tagControl.wholeDevice.IsOpenVacuumSwitchAsync())
-            {
-                await PlcControl.tagControl.wholeDevice.CloseVacuumSwitchAsync();
-            }
-            else
-            {
-                await PlcControl.tagControl.wholeDevice.OpenVacuumSwitchAsync();
-            }
+            await PlcControl.tagControl.wholeDevice.TriggerVacuumSwitchAsync();
         }
 
         /// <summary>

@@ -1,29 +1,43 @@
-﻿<GroupBox x:Class="精密切割系统.View.Controls.RealTimeInfoBox"
-          xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-          xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-          xmlns:local="clr-namespace:精密切割系统.View.Controls"
-          xmlns:custom="clr-namespace:精密切割系统.CustomControls"
-          xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-          mc:Ignorable="d" >
+﻿<GroupBox
+    x:Class="精密切割系统.View.Controls.RealTimeInfoBox"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:custom="clr-namespace:精密切割系统.CustomControls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:精密切割系统.View.Controls"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
     <GroupBox.Resources>
-        <ResourceDictionary Source="pack://application:,,,/精密切割系统;component/Themes/MaterialDesignResources.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/精密切割系统;component/Themes/MaterialDesignResources.xaml" />
     </GroupBox.Resources>
     <GroupBox.HeaderTemplate>
         <DataTemplate>
             <StackPanel Orientation="Horizontal">
-                <materialDesign:PackIcon Width="32" Height="32" VerticalAlignment="Center" Kind="InformationSlabBox" />
-                <TextBlock Margin="8,0,0,0" VerticalAlignment="Center" Style="{StaticResource MaterialDesignSubtitle1TextBlock}" FontSize="18" Text="实时信息" FontWeight="Bold"/>
+                <materialDesign:PackIcon
+                    Width="32"
+                    Height="32"
+                    VerticalAlignment="Center"
+                    Kind="InformationSlabBox" />
+                <TextBlock
+                    Margin="8,0,0,0"
+                    VerticalAlignment="Center"
+                    FontSize="22"
+                    FontWeight="Bold"
+                    Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                    Text="实时信息" />
             </StackPanel>
         </DataTemplate>
     </GroupBox.HeaderTemplate>
-    <custom:ShowLastListBox ItemsSource="{Binding Messages, RelativeSource={RelativeSource AncestorType=local:RealTimeInfoBox}}" d:ItemsSource="{d:SampleData ItemCount=20}" Style="{StaticResource MaterialDesignListBox}">
+    <custom:ShowLastListBox
+        d:ItemsSource="{d:SampleData ItemCount=20}"
+        ItemsSource="{Binding Messages, RelativeSource={RelativeSource AncestorType=local:RealTimeInfoBox}}"
+        Style="{StaticResource MaterialDesignListBox}">
         <custom:ShowLastListBox.ItemContainerStyle>
-            <Style TargetType="ListBoxItem" BasedOn="{StaticResource MaterialDesignListBoxItem}">
-                <Setter Property="Margin" Value="0,0,0,1"/>
-                <Setter Property="Padding" Value="0"/>
-                <Setter Property="materialDesign:ListBoxItemAssist.ShowSelection" Value="False"/>
+            <Style BasedOn="{StaticResource MaterialDesignListBoxItem}" TargetType="ListBoxItem">
+                <Setter Property="Margin" Value="0,0,0,1" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="materialDesign:ListBoxItemAssist.ShowSelection" Value="False" />
             </Style>
         </custom:ShowLastListBox.ItemContainerStyle>
         <custom:ShowLastListBox.ItemTemplate>
@@ -31,11 +45,16 @@
                 <Border>
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
+                            <ColumnDefinition />
                         </Grid.ColumnDefinitions>
                         <StackPanel>
-                            <TextBlock FontSize="12" Text="{Binding Time}" />
-                            <TextBlock FontSize="15" TextWrapping="Wrap" FontWeight="Bold" Text="{Binding Message}" d:Text="9999999999999999999999999999999999999999999998888888888888"/>
+                            <TextBlock FontSize="16" Text="{Binding Time}" />
+                            <TextBlock
+                                d:Text="9999999999999999999999999999999999999999999998888888888888"
+                                FontSize="18"
+                                FontWeight="Bold"
+                                Text="{Binding Message}"
+                                TextWrapping="Wrap" />
                         </StackPanel>
                     </Grid>
                 </Border>

@@ -15,6 +15,9 @@
     mc:Ignorable="d">
     <Page.Resources>
         <convert:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <Style TargetType="Label">
+            <Setter Property="FontSize" Value="18" />
+        </Style>
     </Page.Resources>
     <Page.DataContext>
         <local:F5_3_1_OperationDataViewModel />
@@ -53,7 +56,6 @@
                     Width="180"
                     Height="35"
                     Content="扫描速度"
-                    FontSize="16"
                     FontWeight="Bold" />
             </StackPanel>
             <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
@@ -61,7 +63,6 @@
                     Width="100"
                     Height="35"
                     Content="X轴"
-                    FontSize="16"
                     FontWeight="Bold" />
                 <Controls:InputTextBox
                     Width="150"
@@ -76,7 +77,6 @@
                     Width="160"
                     Height="35"
                     Content="mm/s"
-                    FontSize="16"
                     FontWeight="Bold" />
                 <Controls:InputTextBox
                     Width="150"
@@ -91,7 +91,6 @@
                     Width="60"
                     Height="35"
                     Content="mm"
-                    FontSize="16"
                     FontWeight="Bold" />
             </StackPanel>
             <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
@@ -99,7 +98,6 @@
                     Width="100"
                     Height="35"
                     Content="Y轴"
-                    FontSize="16"
                     FontWeight="Bold" />
                 <Controls:InputTextBox
                     Width="150"
@@ -114,7 +112,6 @@
                     Width="160"
                     Height="35"
                     Content="mm/s"
-                    FontSize="16"
                     FontWeight="Bold" />
                 <Controls:InputTextBox
                     Width="150"
@@ -129,7 +126,6 @@
                     Width="60"
                     Height="35"
                     Content="mm"
-                    FontSize="16"
                     FontWeight="Bold" />
             </StackPanel>
             <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
@@ -137,7 +133,6 @@
                     Width="100"
                     Height="35"
                     Content="Z轴"
-                    FontSize="16"
                     FontWeight="Bold" />
                 <Controls:InputTextBox
                     Width="150"
@@ -152,7 +147,6 @@
                     Width="160"
                     Height="35"
                     Content="mm/s"
-                    FontSize="16"
                     FontWeight="Bold" />
                 <Controls:InputTextBox
                     Width="150"
@@ -167,7 +161,6 @@
                     Width="60"
                     Height="35"
                     Content="mm"
-                    FontSize="16"
                     FontWeight="Bold" />
             </StackPanel>
             <StackPanel
@@ -178,7 +171,6 @@
                     Width="100"
                     Height="35"
                     Content="θ轴"
-                    FontSize="16"
                     FontWeight="Bold" />
                 <Controls:InputTextBox
                     Width="150"
@@ -193,7 +185,6 @@
                     Width="160"
                     Height="35"
                     Content="度/s"
-                    FontSize="16"
                     FontWeight="Bold" />
                 <Controls:InputTextBox
                     Width="150"
@@ -208,7 +199,6 @@
                     Width="60"
                     Height="35"
                     Content="度"
-                    FontSize="16"
                     FontWeight="Bold" />
             </StackPanel>
             <!--<StackPanel Orientation="Horizontal" Margin="0,5,0,0">

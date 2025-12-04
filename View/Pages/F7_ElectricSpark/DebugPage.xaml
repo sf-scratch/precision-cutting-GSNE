@@ -77,7 +77,7 @@
                             <Style BasedOn="{StaticResource MaterialDesignFloatingHintTextBox}" TargetType="TextBox">
                                 <Setter Property="Width" Value="200" />
                                 <Setter Property="Margin" Value="10" />
-                                <Setter Property="FontSize" Value="18" />
+                                <Setter Property="FontSize" Value="20" />
                             </Style>
                         </auto:AutoGrid.Resources>
                         <CheckBox
@@ -85,7 +85,7 @@
                             Width="220"
                             HorizontalAlignment="Center"
                             Content="{Binding ItemName}"
-                            FontSize="20"
+                            FontSize="22"
                             FontWeight="Bold"
                             IsChecked="{Binding IsChecked}"
                             Style="{StaticResource MaterialDesignChoiceChipSecondaryRadioButton}" />
@@ -102,7 +102,8 @@
                         <Button
                             Grid.ColumnSpan="2"
                             Command="{Binding SetCurrentPositionCommand}"
-                            Content="设置为当前位置" />
+                            Content="设置为当前位置"
+                            FontSize="18" />
                     </auto:AutoGrid>
                 </DataTemplate>
             </ListBox.ItemTemplate>

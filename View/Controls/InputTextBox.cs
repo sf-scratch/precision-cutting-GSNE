@@ -10,6 +10,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using 精密切割系统.Helpers;
 using 精密切割系统.Utils;
+using static MaterialDesignThemes.Wpf.Theme;
 
 namespace 精密切割系统.View.Controls
 {
@@ -64,7 +65,7 @@ namespace 精密切割系统.View.Controls
             //this.Width = 300;
             //默认垂直居中
             //this.Height = 35;
-            this.FontSize = 16;
+            this.FontSize = 18;
             this.Padding = new Thickness(5, 0, 5, 0);
             this.VerticalContentAlignment = VerticalAlignment.Center;
             //事件
@@ -72,7 +73,7 @@ namespace 精密切割系统.View.Controls
             // this.LostFocus -= new RoutedEventHandler(XTextBox_LostFocus);
             this.LostFocus += new RoutedEventHandler(XTextBox_LostFocus);
             // this.GotFocus -= new RoutedEventHandler(XTextBox_GotFocus);
-            // this.GotFocus += new RoutedEventHandler(XTextBox_GotFocus);
+            this.GotFocus += new RoutedEventHandler(XTextBox_GotFocus);
             // this.TouchDown -= new EventHandler<TouchEventArgs>(InputTextBox_TouchDown);
             this.TouchDown += new EventHandler<TouchEventArgs>(InputTextBox_TouchDown);
             this.PreviewMouseDown += new MouseButtonEventHandler(XTextBox_PreviewMouseDown);
@@ -96,7 +97,6 @@ namespace 精密切割系统.View.Controls
 
         private void InputTextBox_TouchDown(object? sender, TouchEventArgs e)
         {
-            this.SelectAll();
             mainWindow?.ShowKeyboardPage(1);
         }
 
@@ -220,7 +220,11 @@ namespace 精密切割系统.View.Controls
         /// <param name="e"></param>
         private void XTextBox_GotFocus(object sender, RoutedEventArgs e)
         {
-            this.SelectAll();
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                this.Focus();
+                this.SelectAll();
+            }), System.Windows.Threading.DispatcherPriority.Render);
             mainWindow?.ShowKeyboardPage(1);
         }
 
@@ -231,16 +235,6 @@ namespace 精密切割系统.View.Controls
         /// <param name="e"></param>
         private void XTextBox_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            //if (this.IsFocused == false)
-            //{
-            //    //TextBox textBox = e.Source as TextBox;
-            //    InputTextBox? textBox2 = sender as InputTextBox;
-            //    if (textBox2 != null) {
-            //        textBox2.Focus();
-            //    }
-            //    e.Handled = true;
-            //}
-            this.SelectAll();
             mainWindow?.ShowKeyboardPage(1);
         }
 

@@ -135,25 +135,15 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             }
             // 根据当前的切割面，设置开始切割位置
             _operateType = 1;
-            await SetLowSpeedAsync();
+            SpeedManager.IsHighSpeed = false;
             ToNextPage();
         }
 
         private async void BackClickHandle(object? sender, bool e)
         {
             _cts.Cancel();
-            await SetLowSpeedAsync();
+            SpeedManager.IsHighSpeed = false;
             ToNextPage();
-        }
-
-        private async Task SetLowSpeedAsync()
-        {
-            // 设置为低速
-            await PlcControl.tagControl.Xaxis.SetHighSpeedAsync(0);
-            await PlcControl.tagControl.Yaxis.SetHighSpeedAsync(0);
-            await PlcControl.tagControl.Z1axis.SetHighSpeedAsync(0);
-            await PlcControl.tagControl.Z2axis.SetHighSpeedAsync(0);
-            await PlcControl.tagControl.ThetaAxis.SetHighSpeedAsync(0);
         }
 
         private void ToNextPage()

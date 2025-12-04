@@ -20,8 +20,8 @@
             x:Key="ArrowButton"
             BasedOn="{StaticResource MaterialDesignFloatingActionLightButton}"
             TargetType="Button">
-            <Setter Property="Height" Value="70" />
-            <Setter Property="Width" Value="70" />
+            <Setter Property="Height" Value="82" />
+            <Setter Property="Width" Value="82" />
             <Setter Property="Background" Value="#5087Cb" />
             <Setter Property="Foreground" Value="White" />
             <Setter Property="BorderBrush" Value="#5087Cb" />
@@ -29,7 +29,7 @@
         <Style BasedOn="{StaticResource MaterialDesignFlatLightBgButton}" TargetType="Button">
             <Setter Property="Height" Value="50" />
             <Setter Property="Width" Value="100" />
-            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontSize" Value="20" />
             <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="Background" Value="#5087Cb" />
             <Setter Property="Foreground" Value="White" />
@@ -89,7 +89,7 @@
                             <TextBlock
                                 Margin="0,10,0,0"
                                 HorizontalAlignment="Center"
-                                FontSize="18"
+                                FontSize="20"
                                 FontWeight="Bold"
                                 Text="高速" />
                         </StackPanel>
@@ -103,7 +103,7 @@
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="0" Margin="0,10,0,0">
                         <Grid.RowDefinitions>
-                            <RowDefinition />
+                            <RowDefinition Height="1.5*" />
                             <RowDefinition />
                             <RowDefinition />
                         </Grid.RowDefinitions>
@@ -111,7 +111,7 @@
                             x:Name="scanLeftBottomBtn"
                             VerticalAlignment="Center"
                             Content="{materialDesign:PackIcon ArrowDownLeftBold,
-                                                              Size=40}"
+                                                              Size=50}"
                             Style="{StaticResource ArrowButton}"
                             Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}">
                             <behaviors:Interaction.Behaviors>
@@ -152,7 +152,7 @@
                                 x:Name="scanTopBtn"
                                 VerticalAlignment="Top"
                                 Content="{materialDesign:PackIcon ArrowTopThick,
-                                                                  Size=40}"
+                                                                  Size=50}"
                                 Style="{StaticResource ArrowButton}">
                                 <behaviors:Interaction.Behaviors>
                                     <behav:DualInputBehavior
@@ -175,7 +175,7 @@
                                     x:Name="scanLeftBtn"
                                     VerticalAlignment="Top"
                                     Content="{materialDesign:PackIcon ArrowLeftThick,
-                                                                      Size=40}"
+                                                                      Size=50}"
                                     Style="{StaticResource ArrowButton}">
                                     <behaviors:Interaction.Behaviors>
                                         <behav:DualInputBehavior
@@ -193,7 +193,7 @@
                                     x:Name="scanRightBtn"
                                     VerticalAlignment="Center"
                                     Content="{materialDesign:PackIcon ArrowRightThick,
-                                                                      Size=40}"
+                                                                      Size=50}"
                                     Style="{StaticResource ArrowButton}">
                                     <behaviors:Interaction.Behaviors>
                                         <behav:DualInputBehavior
@@ -212,7 +212,7 @@
                                 x:Name="scanBottomBtn"
                                 VerticalAlignment="Top"
                                 Content="{materialDesign:PackIcon ArrowBottomThick,
-                                                                  Size=40}"
+                                                                  Size=50}"
                                 Style="{StaticResource ArrowButton}">
                                 <behaviors:Interaction.Behaviors>
                                     <behav:DualInputBehavior
@@ -225,7 +225,7 @@
                     </Grid>
                     <Grid Grid.Column="2" Margin="0,10,0,0">
                         <Grid.RowDefinitions>
-                            <RowDefinition />
+                            <RowDefinition Height="1.5*" />
                             <RowDefinition />
                             <RowDefinition />
                         </Grid.RowDefinitions>
@@ -233,7 +233,7 @@
                             x:Name="scanRightBottomBtn"
                             VerticalAlignment="Center"
                             Content="{materialDesign:PackIcon ArrowDownRightBold,
-                                                              Size=40}"
+                                                              Size=50}"
                             Style="{StaticResource ArrowButton}"
                             Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}">
                             <behaviors:Interaction.Behaviors>

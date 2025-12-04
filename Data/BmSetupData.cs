@@ -34,5 +34,29 @@ namespace 精密切割系统.Data
             get => GetValue();
             set => UpdateAppSettings(value);
         }
+
+        public float ThetaMovementAngle
+        {
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
+        }
+
+        public float ThetaStartingToMovePosition
+        {
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
+        }
+
+        public float ThetaEndingToMovePosition
+        {
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
+        }
+
+        public float ThetaCurrentLocation
+        {
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
+        }
     }
 }

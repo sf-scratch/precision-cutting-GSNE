@@ -24,15 +24,15 @@
         <Style TargetType="TextBlock">
             <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="FontSize" Value="18" />
-            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
         <Style
             x:Key="ArrowButton"
             BasedOn="{StaticResource MaterialDesignFloatingActionLightButton}"
             TargetType="Button">
-            <Setter Property="Height" Value="70" />
-            <Setter Property="Width" Value="70" />
+            <Setter Property="Height" Value="82" />
+            <Setter Property="Width" Value="82" />
         </Style>
     </UserControl.Resources>
     <UserControl.DataContext>
@@ -58,7 +58,7 @@
                 <auto:AutoGrid
                     Margin="10"
                     ChildMargin="5"
-                    Columns="auto,*,*,*"
+                    Columns="auto,auto,*,*,*"
                     RowCount="5">
                     <auto:AutoGrid.Resources>
                         <ResourceDictionary>
@@ -67,13 +67,13 @@
                             </ResourceDictionary.MergedDictionaries>
                         </ResourceDictionary>
                     </auto:AutoGrid.Resources>
-                    <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" Text="X" />
+                    <TextBlock Text="X" />
                     <!--<TextBox materialDesign:HintAssist.Hint="当前Jog速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedX}" />
                     <TextBox materialDesign:HintAssist.Hint="当前速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedX}" />-->
+                    <TextBlock Text="当前位置" />
                     <TextBox
-                        materialDesign:HintAssist.Hint="当前位置mm"
+                        FontSize="18"
                         IsEnabled="False"
-                        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                         Text="{Binding CurrentPositionX}" />
                     <!--<TextBox materialDesign:HintAssist.Hint="运动速度mm/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedX}" />-->
                     <!--<TextBox
@@ -95,18 +95,20 @@
                     <Button
                         Command="{Binding StartHomingXCommand}"
                         Content="原点"
+                        FontSize="18"
                         Style="{StaticResource MaterialDesignOutlinedLightButton}" />
                     <Button
                         Command="{Binding RelaxXCommand}"
                         Content="放松"
+                        FontSize="18"
                         Style="{StaticResource MaterialDesignOutlinedLightButton}" />
-                    <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" Text="Y" />
+                    <TextBlock Text="Y" />
                     <!--<TextBox materialDesign:HintAssist.Hint="当前Jog速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedY}" />
                     <TextBox materialDesign:HintAssist.Hint="当前速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedY}" />-->
+                    <TextBlock Text="当前位置" />
                     <TextBox
-                        materialDesign:HintAssist.Hint="当前位置mm"
+                        FontSize="18"
                         IsEnabled="False"
-                        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                         Text="{Binding CurrentPositionY}" />
                     <!--<TextBox materialDesign:HintAssist.Hint="运动速度mm/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedY}" />-->
                     <!--<TextBox
@@ -128,18 +130,20 @@
                     <Button
                         Command="{Binding StartHomingYCommand}"
                         Content="原点"
+                        FontSize="18"
                         Style="{StaticResource MaterialDesignOutlinedLightButton}" />
                     <Button
                         Command="{Binding RelaxYCommand}"
                         Content="放松"
+                        FontSize="18"
                         Style="{StaticResource MaterialDesignOutlinedLightButton}" />
-                    <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" Text="Z1" />
+                    <TextBlock Text="Z1" />
                     <!--<TextBox materialDesign:HintAssist.Hint="当前Jog速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedZ1}" />
                     <TextBox materialDesign:HintAssist.Hint="当前速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedZ1}" />-->
+                    <TextBlock Text="当前位置" />
                     <TextBox
-                        materialDesign:HintAssist.Hint="当前位置mm"
+                        FontSize="18"
                         IsEnabled="False"
-                        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                         Text="{Binding CurrentPositionZ1}" />
                     <!--<TextBox materialDesign:HintAssist.Hint="运动速度mm/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedZ1}" />-->
                     <!--<TextBox
@@ -161,18 +165,20 @@
                     <Button
                         Command="{Binding StartHomingZ1Command}"
                         Content="原点"
+                        FontSize="18"
                         Style="{StaticResource MaterialDesignOutlinedLightButton}" />
                     <Button
                         Command="{Binding RelaxZ1Command}"
                         Content="放松"
+                        FontSize="18"
                         Style="{StaticResource MaterialDesignOutlinedLightButton}" />
-                    <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" Text="Z2" />
+                    <TextBlock Text="Z2" />
                     <!--<TextBox materialDesign:HintAssist.Hint="当前Jog速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedZ2}" />
                     <TextBox materialDesign:HintAssist.Hint="当前速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedZ2}" />-->
+                    <TextBlock Text="当前位置" />
                     <TextBox
-                        materialDesign:HintAssist.Hint="当前位置mm"
+                        FontSize="18"
                         IsEnabled="False"
-                        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                         Text="{Binding CurrentPositionZ2}" />
                     <!--<TextBox materialDesign:HintAssist.Hint="运动速度mm/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedZ2}" />-->
                     <!--<TextBox
@@ -194,21 +200,20 @@
                     <Button
                         Command="{Binding StartHomingZ2Command}"
                         Content="原点"
+                        FontSize="18"
                         Style="{StaticResource MaterialDesignOutlinedLightButton}" />
                     <Button
                         Command="{Binding RelaxZ2Command}"
                         Content="放松"
+                        FontSize="18"
                         Style="{StaticResource MaterialDesignOutlinedLightButton}" />
-                    <TextBlock
-                        Style="{StaticResource MaterialDesignBody1TextBlock}"
-                        Text="θ"
-                        Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <TextBlock Text="θ" Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
                     <!--<TextBox materialDesign:HintAssist.Hint="当前Jog速度deg/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedTheta}" />
                     <TextBox materialDesign:HintAssist.Hint="当前速度deg/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedTheta}" />-->
+                    <TextBlock Text="当前位置" />
                     <TextBox
-                        materialDesign:HintAssist.Hint="当前位置deg"
+                        FontSize="18"
                         IsEnabled="False"
-                        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                         Text="{Binding CurrentPositionTheta}"
                         Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
                     <!--<TextBox materialDesign:HintAssist.Hint="运动速度deg/s" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding SpeedTheta}" />-->
@@ -231,11 +236,13 @@
                     <Button
                         Command="{Binding StartHomingThetaCommand}"
                         Content="原点"
+                        FontSize="18"
                         Style="{StaticResource MaterialDesignOutlinedLightButton}"
                         Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
                     <Button
                         Command="{Binding RelaxThetaCommand}"
                         Content="放松"
+                        FontSize="18"
                         Style="{StaticResource MaterialDesignOutlinedLightButton}"
                         Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
                 </auto:AutoGrid>
@@ -304,7 +311,7 @@
                                 <TextBlock
                                     Margin="0,10,0,0"
                                     HorizontalAlignment="Center"
-                                    FontSize="18"
+                                    FontSize="20"
                                     FontWeight="Bold"
                                     Text="高速" />
                             </StackPanel>
@@ -329,7 +336,7 @@
                         </Grid.ColumnDefinitions>
                         <Grid Grid.Column="0" Margin="0,10,0,0">
                             <Grid.RowDefinitions>
-                                <RowDefinition />
+                                <RowDefinition Height="1.5*" />
                                 <RowDefinition />
                                 <RowDefinition />
                             </Grid.RowDefinitions>
@@ -338,7 +345,7 @@
                                 VerticalAlignment="Center"
                                 Background="#5087Cb"
                                 Content="{materialDesign:PackIcon ArrowDownLeftBold,
-                                                                  Size=40}"
+                                                                  Size=50}"
                                 Foreground="White"
                                 Style="{StaticResource ArrowButton}"
                                 Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}">
@@ -355,6 +362,7 @@
                                 Height="40"
                                 Background="#5087Cb"
                                 Content="Z1抬起"
+                                FontSize="20"
                                 Foreground="White">
                                 <behaviors:Interaction.Behaviors>
                                     <behav:DualInputBehavior
@@ -369,6 +377,7 @@
                                 Height="40"
                                 Background="#5087Cb"
                                 Content="Z1下降"
+                                FontSize="20"
                                 Foreground="White">
                                 <behaviors:Interaction.Behaviors>
                                     <behav:DualInputBehavior
@@ -393,7 +402,7 @@
                                     VerticalAlignment="Top"
                                     Background="#5087Cb"
                                     Content="{materialDesign:PackIcon ArrowTopThick,
-                                                                      Size=40}"
+                                                                      Size=50}"
                                     Foreground="White"
                                     Style="{StaticResource ArrowButton}">
                                     <behaviors:Interaction.Behaviors>
@@ -418,7 +427,7 @@
                                         VerticalAlignment="Top"
                                         Background="#5087Cb"
                                         Content="{materialDesign:PackIcon ArrowLeftThick,
-                                                                          Size=40}"
+                                                                          Size=50}"
                                         Foreground="White"
                                         Style="{StaticResource ArrowButton}">
                                         <behaviors:Interaction.Behaviors>
@@ -438,7 +447,7 @@
                                         VerticalAlignment="Center"
                                         Background="#5087Cb"
                                         Content="{materialDesign:PackIcon ArrowRightThick,
-                                                                          Size=40}"
+                                                                          Size=50}"
                                         Foreground="White"
                                         Style="{StaticResource ArrowButton}">
                                         <behaviors:Interaction.Behaviors>
@@ -459,7 +468,7 @@
                                     VerticalAlignment="Top"
                                     Background="#5087Cb"
                                     Content="{materialDesign:PackIcon ArrowBottomThick,
-                                                                      Size=40}"
+                                                                      Size=50}"
                                     Foreground="White"
                                     Style="{StaticResource ArrowButton}">
                                     <behaviors:Interaction.Behaviors>
@@ -473,7 +482,7 @@
                         </Grid>
                         <Grid Grid.Column="2" Margin="0,10,0,0">
                             <Grid.RowDefinitions>
-                                <RowDefinition />
+                                <RowDefinition Height="1.5*" />
                                 <RowDefinition />
                                 <RowDefinition />
                             </Grid.RowDefinitions>
@@ -482,7 +491,7 @@
                                 VerticalAlignment="Center"
                                 Background="#5087Cb"
                                 Content="{materialDesign:PackIcon ArrowDownRightBold,
-                                                                  Size=40}"
+                                                                  Size=50}"
                                 Foreground="White"
                                 Style="{StaticResource ArrowButton}"
                                 Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}">
@@ -499,6 +508,7 @@
                                 Height="40"
                                 Background="#5087Cb"
                                 Content="Z2抬起"
+                                FontSize="20"
                                 Foreground="White">
                                 <behaviors:Interaction.Behaviors>
                                     <behav:DualInputBehavior
@@ -513,6 +523,7 @@
                                 Height="40"
                                 Background="#5087Cb"
                                 Content="Z2下降"
+                                FontSize="20"
                                 Foreground="White">
                                 <behaviors:Interaction.Behaviors>
                                     <behav:DualInputBehavior

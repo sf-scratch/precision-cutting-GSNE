@@ -1948,7 +1948,7 @@ namespace 精密切割系统.Driver
             ConfirmParams();
         }
 
-        public async Task SetBladeSetuInitPositionAsync(string initX, string initY, int? initTheta = null)
+        public async Task SetBladeSetuInitPositionAsync(string initX, string initY, float? initTheta = null)
         {
             xHeightSet.writeValue = initX.ToString();
             await keyencePlc.WriteTagAsync(xHeightSet);
@@ -2473,15 +2473,23 @@ namespace 精密切割系统.Driver
             return await keyencePlc.ReadDataAsync(vacuumState.addr) == true;
         }
 
-        public async Task OpenVacuumSwitchAsync()
-        {
-            vacuumSwitch.writeValue = "1";
-            await keyencePlc.WriteTagAsync(vacuumSwitch);
-        }
+        //public async Task OpenVacuumSwitchAsync()
+        //{
+        //    vacuumSwitch.writeValue = "1";
+        //    await keyencePlc.WriteTagAsync(vacuumSwitch);
+        //}
 
-        public async Task CloseVacuumSwitchAsync()
+        //public async Task CloseVacuumSwitchAsync()
+        //{
+        //    vacuumSwitch.writeValue = "0";
+        //    await keyencePlc.WriteTagAsync(vacuumSwitch);
+        //}
+
+        public async Task TriggerVacuumSwitchAsync()
         {
             vacuumSwitch.writeValue = "0";
+            await keyencePlc.WriteTagAsync(vacuumSwitch);
+            vacuumSwitch.writeValue = "1";
             await keyencePlc.WriteTagAsync(vacuumSwitch);
         }
 

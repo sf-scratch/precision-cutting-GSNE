@@ -102,6 +102,11 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 
         private async void BtnCutStart_RightClicked(object? sender, bool e)
         {
+            if (AlarmConfig.Instance.HasActiveErrorAlarm())
+            {
+                MaterialSnackUtils.MaterialSnack(AlarmConfig.HasErrorAlarmMessage, SnackType.WARNING);
+                return;
+            }
             if (Appsettings.BladeOuterDiameter is null)
             {
                 MaterialSnack("未设置刀片外径！", SnackType.WARNING);

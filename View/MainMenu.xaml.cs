@@ -317,11 +317,11 @@ namespace 精密切割系统.View
                         mainWindow.NavigateToPage(bean.PageUrl);
                         break;
                     }
-                    //if (AlarmConfig.Instance.HasActiveErrorAlarm())
-                    //{
-                    //    MaterialSnackUtils.MaterialSnack(AlarmConfig.HasErrorAlarmMessage, SnackType.WARNING);
-                    //    break;
-                    //}
+                    if (AlarmConfig.Instance.HasActiveErrorAlarm())
+                    {
+                        MaterialSnackUtils.MaterialSnack(AlarmConfig.HasErrorAlarmMessage, SnackType.WARNING);
+                        break;
+                    }
                     InitialPositionModel? initPos = await AutoCutUtils.GetInitialPositionAsync();
                     if (initPos is null)
                     {
@@ -332,13 +332,12 @@ namespace 精密切割系统.View
                     try
                     {
                         mainWindow.IsEnabled = false;
-                        //await Task.WhenAll(
-                        //    PlcControl.tagControl.Z1axis.StartAbsoluteAsync(initPos.AlignInitZ1.ToFloat(), default, default)
-                        //);
-                        //await Task.WhenAll(
-                        //    PlcControl.tagControl.Xaxis.StartAbsoluteAsync(initPos.AlignInitX.ToFloat(), default, default),
-                        //    PlcControl.tagControl.Yaxis.StartAbsoluteAsync(initPos.AlignInitY.ToFloat(), default, default)
-                        //);
+                        await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, default);
+                        await Task.WhenAll(
+                            PlcControl.tagControl.Xaxis.StartAbsoluteAsync(initPos.AlignInitX.ToFloat(), default, default),
+                            PlcControl.tagControl.Yaxis.StartAbsoluteAsync(initPos.AlignInitY.ToFloat(), default, default)
+                        );
+                        await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(initPos.AlignInitZ1.ToFloat(), default, default);
                     }
                     finally
                     {

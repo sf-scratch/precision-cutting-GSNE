@@ -165,15 +165,6 @@ namespace 精密切割系统.Helpers
         }
 
         /// <summary>
-        /// 测高位置theta角度
-        /// </summary>
-        public static int? ContactHeightMeasurementThetaDeg
-        {
-            get => GetValue<int>();
-            set => UpdateAppSettings(value);
-        }
-
-        /// <summary>
         /// 自更换刀片起刀片切了几道
         /// </summary>
         public static int? AfterReplaceBladeCutTimes

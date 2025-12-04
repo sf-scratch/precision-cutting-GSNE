@@ -14,6 +14,7 @@ using 精密切割系统.Driver;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut;
+using 精密切割系统.Model.plc;
 using 精密切割系统.Model.position;
 using 精密切割系统.PubSubEvent;
 using 精密切割系统.View.common;
@@ -100,7 +101,7 @@ namespace 精密切割系统.ViewModel
             var selectedAxis = AxisOperationList.FirstOrDefault(a => a.IsChecked);
             if (selectedAxis != null)
             {
-                await selectedAxis.AxisObject.SetHighSpeedAsync(0);
+                SpeedManager.IsHighSpeed = false;
                 await selectedAxis.AxisObject.StartJogAsync(isPositive ? 0 : 1);
             }
         }
@@ -110,7 +111,7 @@ namespace 精密切割系统.ViewModel
             var selectedAxis = AxisOperationList.FirstOrDefault(a => a.IsChecked);
             if (selectedAxis != null)
             {
-                await selectedAxis.AxisObject.SetHighSpeedAsync(1);
+                SpeedManager.IsHighSpeed = true;
                 await selectedAxis.AxisObject.SetJogRelativeSpeedAsync(selectedAxis.AxisSpeed.ToFloat());
                 await selectedAxis.AxisObject.StartJogAsync(isPositive ? 0 : 1);
             }
@@ -170,13 +171,7 @@ namespace 精密切割系统.ViewModel
 
         private async Task SetLowSpeedAsync()
         {
-            // 设置为低速
-            Task x = PlcControl.tagControl.Xaxis.SetHighSpeedAsync(0);
-            Task y = PlcControl.tagControl.Yaxis.SetHighSpeedAsync(0);
-            Task z1 = PlcControl.tagControl.Z1axis.SetHighSpeedAsync(0);
-            Task z2 = PlcControl.tagControl.Z2axis.SetHighSpeedAsync(0);
-            Task theta = PlcControl.tagControl.ThetaAxis.SetHighSpeedAsync(0);
-            await Task.WhenAll(x, y, z1, z2, theta);
+            SpeedManager.IsHighSpeed = false;
         }
 
         public override void OnNavigatedTo(NavigationContext navigationContext)

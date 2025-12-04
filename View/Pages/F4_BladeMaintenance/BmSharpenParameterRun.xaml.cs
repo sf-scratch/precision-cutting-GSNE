@@ -73,6 +73,11 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             {
                 return;
             }
+            if (AlarmConfig.Instance.HasActiveErrorAlarm())
+            {
+                MaterialSnackUtils.MaterialSnack(AlarmConfig.HasErrorAlarmMessage, SnackType.WARNING);
+                return;
+            }
             if (!_semiAutoCutService.IsReady)
             {
                 return;

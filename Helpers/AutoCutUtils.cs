@@ -224,6 +224,7 @@ namespace 精密切割系统.Helpers
         /// <returns></returns>
         public static async Task<CommonResult<float>> ProcessMeasureHeightAsync(HeightMeasurementMode mode, IDialogService? dialogService, IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
+            await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, token);
             SpeedManager.IsHighSpeed = false;
             InitialPositionModel? initPos = await GetInitialPositionAsync();
             if (initPos is null) return CommonResult<float>.Failure("获取初始化位置信息失败！");
@@ -231,14 +232,14 @@ namespace 精密切割系统.Helpers
             {
                 //接触测高
                 case HeightMeasurementMode.Contact:
-                    int? thetaDeg = Appsettings.ContactHeightMeasurementThetaDeg;
-                    if (thetaDeg == null)
+                    float nextThetaDeg = BmSetupData.Instance.ThetaCurrentLocation + BmSetupData.Instance.ThetaMovementAngle;
+                    if (BmSetupData.Instance.ThetaMovementAngle > 0 && nextThetaDeg > BmSetupData.Instance.ThetaEndingToMovePosition ||
+                        BmSetupData.Instance.ThetaMovementAngle < 0 && nextThetaDeg < BmSetupData.Instance.ThetaEndingToMovePosition)
                     {
-                        return CommonResult<float>.Failure("接触测高配置文件异常！");
+                        nextThetaDeg = BmSetupData.Instance.ThetaStartingToMovePosition;
                     }
-                    //Appsettings.ContactHeightMeasurementThetaDeg = thetaDeg.Value + 1;
-                    Appsettings.ContactHeightMeasurementThetaDeg = 0;
-                    await PlcControl.tagControl.bladeMantance.SetBladeSetuInitPositionAsync(initPos.BladeSetupInitX, initPos.BladeSetupInitY, thetaDeg.Value);
+                    BmSetupData.Instance.ThetaCurrentLocation = nextThetaDeg;
+                    await PlcControl.tagControl.bladeMantance.SetBladeSetuInitPositionAsync(initPos.BladeSetupInitX, initPos.BladeSetupInitY, BmSetupData.Instance.ThetaCurrentLocation);
                     await PlcControl.tagControl.bladeMantance.StartContactHeightMeasurement();
                     break;
                 //非接触测高
