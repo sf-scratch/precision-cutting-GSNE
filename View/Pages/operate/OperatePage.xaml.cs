@@ -528,7 +528,7 @@ namespace 精密切割系统.View.Pages.operate
             }
             else
             {
-                Task cameraSecurityDoorTask = PlcControl.tagControl.wholeDevice.CloseCameraSecurityDoorAsync();
+                Task cameraSecurityDoorTask = PlcControl.tagControl.wholeDevice.LockCameraSecurityDoorAsync();
                 Task cutSecurityDoorTask = PlcControl.tagControl.wholeDevice.OpenCutSecurityDoorAsync();
                 await Task.WhenAll(cameraSecurityDoorTask, cutSecurityDoorTask);
             }
@@ -541,12 +541,12 @@ namespace 精密切割系统.View.Pages.operate
         {
             if (await PlcControl.tagControl.wholeDevice.GetCameraSecurityDoorAddressAsync())
             {
-                await PlcControl.tagControl.wholeDevice.CloseCameraSecurityDoorAsync();
+                await PlcControl.tagControl.wholeDevice.LockCameraSecurityDoorAsync();
             }
             else
             {
                 Task cutSecurityDoorTask = PlcControl.tagControl.wholeDevice.CloseCutSecurityDoorAsync();
-                Task cameraSecurityDoorTask = PlcControl.tagControl.wholeDevice.OpenCameraSecurityDoorAsync();
+                Task cameraSecurityDoorTask = PlcControl.tagControl.wholeDevice.UnlockCameraSecurityDoorAsync();
                 await Task.WhenAll(cameraSecurityDoorTask, cutSecurityDoorTask);
             }
         }

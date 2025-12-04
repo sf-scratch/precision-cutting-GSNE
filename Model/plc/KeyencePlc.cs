@@ -2452,20 +2452,15 @@ namespace 精密切割系统.Driver
             return await keyencePlc.ReadDataAsync(cameraSecurityDoor.addr) == false;
         }
 
-        public async Task OpenCameraSecurityDoorAsync()
+        public async Task UnlockCameraSecurityDoorAsync()
         {
-            if (await GetSpindleSpeedAsync() != 0)
-            {
-                MaterialSnackUtils.MaterialSnack("打开安全门失败，主轴未停止！", MaterialSnackUtils.SnackType.WARNING, 0);
-                return;
-            }
-            cameraSecurityDoor.writeValue = "0";
+            cameraSecurityDoor.writeValue = "1";
             await keyencePlc.WriteTagAsync(cameraSecurityDoor);
         }
 
-        public async Task CloseCameraSecurityDoorAsync()
+        public async Task LockCameraSecurityDoorAsync()
         {
-            cameraSecurityDoor.writeValue = "1";
+            cameraSecurityDoor.writeValue = "0";
             await keyencePlc.WriteTagAsync(cameraSecurityDoor);
         }
 
