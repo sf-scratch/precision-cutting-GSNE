@@ -5,11 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using 精密切割系统.database.db.modle;
+using 精密切割系统.Helpers;
 using 精密切割系统.Utils;
 
 namespace 精密切割系统.ViewModel
 {
-    internal class F5_3_1_OperationDataViewModel : INotifyPropertyChanged
+    internal class F5_3_1_OperationDataViewModel : BindableBase
     {
         public OperationParametersModel operationParameter = null;
 
@@ -26,7 +27,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.XScanSpeed != value)
                 {
                     operationParameter.XScanSpeed = value;
-                    OnPropertyChanged("XScanSpeed");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -39,7 +40,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.XSscanDistance != value)
                 {
                     operationParameter.XSscanDistance = value;
-                    OnPropertyChanged("XSscanDistance");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -52,7 +53,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.YScanSpeed != value)
                 {
                     operationParameter.YScanSpeed = value;
-                    OnPropertyChanged("YScanSpeed");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -65,7 +66,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.YSscanDistance != value)
                 {
                     operationParameter.YSscanDistance = value;
-                    OnPropertyChanged("YSscanDistance");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -78,7 +79,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.ZScanSpeed != value)
                 {
                     operationParameter.ZScanSpeed = value;
-                    OnPropertyChanged("ZScanSpeed");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -91,7 +92,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.ZSscanDistance != value)
                 {
                     operationParameter.ZSscanDistance = value;
-                    OnPropertyChanged("ZSscanDistance");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -104,7 +105,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.RScanSpeed != value)
                 {
                     operationParameter.RScanSpeed = value;
-                    OnPropertyChanged("RScanSpeed");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -117,7 +118,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.RSscanDistance != value)
                 {
                     operationParameter.RSscanDistance = value;
-                    OnPropertyChanged("RSscanDistance");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -130,7 +131,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.MoveLowTime != value)
                 {
                     operationParameter.MoveLowTime = value;
-                    OnPropertyChanged("MoveLowTime");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -143,7 +144,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.MoveHighTime != value)
                 {
                     operationParameter.MoveHighTime = value;
-                    OnPropertyChanged("MoveHighTime");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -156,7 +157,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.XScreenIndex != value)
                 {
                     operationParameter.XScreenIndex = value;
-                    OnPropertyChanged("XScreenIndex");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -169,7 +170,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.YScreenIndex != value)
                 {
                     operationParameter.YScreenIndex = value;
-                    OnPropertyChanged("YScreenIndex");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -182,7 +183,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.EscapeRate != value)
                 {
                     operationParameter.EscapeRate = value;
-                    OnPropertyChanged("EscapeRate");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -195,7 +196,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.ExtraEscapeRate != value)
                 {
                     operationParameter.ExtraEscapeRate = value;
-                    OnPropertyChanged("ExtraEscapeRate");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -208,7 +209,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.MStopElectrical != value)
                 {
                     operationParameter.MStopElectrical = value;
-                    OnPropertyChanged("MStopElectrical");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -221,7 +222,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.MStopTime != value)
                 {
                     operationParameter.MStopTime = value;
-                    OnPropertyChanged("MStopTime");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -234,7 +235,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.ZStopElectrical != value)
                 {
                     operationParameter.ZStopElectrical = value;
-                    OnPropertyChanged("ZStopElectrical");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -247,7 +248,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.ZStopTime != value)
                 {
                     operationParameter.ZStopTime = value;
-                    OnPropertyChanged("ZStopTime");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -260,7 +261,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.ZStopAfterSeq != value)
                 {
                     operationParameter.ZStopAfterSeq = value;
-                    OnPropertyChanged("ZStopAfterSeq");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -273,7 +274,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.XStartClearance != value)
                 {
                     operationParameter.XStartClearance = value;
-                    OnPropertyChanged("XStartClearance");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -286,7 +287,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.XEndClearance != value)
                 {
                     operationParameter.XEndClearance = value;
-                    OnPropertyChanged("XEndClearance");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -299,7 +300,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.YClearance != value)
                 {
                     operationParameter.YClearance = value;
-                    OnPropertyChanged("YClearance");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -312,7 +313,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.AutoFocusCheckLimit != value)
                 {
                     operationParameter.AutoFocusCheckLimit = value;
-                    OnPropertyChanged("AutoFocusCheckLimit");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -325,7 +326,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.AirCurtainStroke != value)
                 {
                     operationParameter.AirCurtainStroke = value;
-                    OnPropertyChanged("AirCurtainStroke");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -338,7 +339,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.VaccumWorkLowerLimit != value)
                 {
                     operationParameter.VaccumWorkLowerLimit = value;
-                    OnPropertyChanged("VaccumWorkLowerLimit");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -351,7 +352,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.VaccumPumpLowerLimitOther != value)
                 {
                     operationParameter.VaccumPumpLowerLimitOther = value;
-                    OnPropertyChanged("VaccumPumpLowerLimitOther");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -364,7 +365,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.LimitDuringCutting != value)
                 {
                     operationParameter.LimitDuringCutting = value;
-                    OnPropertyChanged("LimitDuringCutting");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -377,7 +378,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.VaccumPumpLowerLimit != value)
                 {
                     operationParameter.VaccumPumpLowerLimit = value;
-                    OnPropertyChanged("VaccumPumpLowerLimit");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -390,7 +391,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.xPanelJogDistance != value)
                 {
                     operationParameter.xPanelJogDistance = value;
-                    OnPropertyChanged("xPanelJogDistance");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -403,7 +404,7 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.yPanelJogDistance != value)
                 {
                     operationParameter.yPanelJogDistance = value;
-                    OnPropertyChanged("yPanelJogDistance");
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -416,10 +417,11 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.zPanelJogDistance != value)
                 {
                     operationParameter.zPanelJogDistance = value;
-                    OnPropertyChanged("zPanelJogDistance");
+                    RaisePropertyChanged();
                 }
             }
         }
+
         public int zAxisCompNum
         {
             get { return operationParameter.zAxisCompNum; }
@@ -428,10 +430,11 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.zAxisCompNum != value)
                 {
                     operationParameter.zAxisCompNum = value;
-                    OnPropertyChanged("zAxisCompNum");
+                    RaisePropertyChanged();
                 }
             }
         }
+
         public string zAxisCompValue
         {
             get { return operationParameter.zAxisCompValue; }
@@ -440,10 +443,11 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.zAxisCompValue != value)
                 {
                     operationParameter.zAxisCompValue = value;
-                    OnPropertyChanged("zAxisCompValue");
+                    RaisePropertyChanged();
                 }
             }
         }
+
         public int cutXAxisBackSpeed
         {
             get { return operationParameter.cutXAxisBackSpeed; }
@@ -452,15 +456,89 @@ namespace 精密切割系统.ViewModel
                 if (operationParameter.cutXAxisBackSpeed != value)
                 {
                     operationParameter.cutXAxisBackSpeed = value;
-                    OnPropertyChanged("cutXAxisBackSpeed");
+                    RaisePropertyChanged();
                 }
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void OnPropertyChanged(string propertyName)
+        private string _positiveLimitPositionX;
+
+        public string PositiveLimitPositionX
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            get { return _positiveLimitPositionX; }
+            set { SetProperty(ref _positiveLimitPositionX, value); }
+        }
+
+        private string _negativeLimitPositionX;
+
+        public string NegativeLimitPositionX
+        {
+            get { return _negativeLimitPositionX; }
+            set { SetProperty(ref _negativeLimitPositionX, value); }
+        }
+
+        private string _positiveLimitPositionY;
+
+        public string PositiveLimitPositionY
+        {
+            get { return _positiveLimitPositionY; }
+            set { SetProperty(ref _positiveLimitPositionY, value); }
+        }
+
+        private string _negativeLimitPositionY;
+
+        public string NegativeLimitPositionY
+        {
+            get { return _negativeLimitPositionY; }
+            set { SetProperty(ref _negativeLimitPositionY, value); }
+        }
+
+        private string _positiveLimitPositionZ1;
+
+        public string PositiveLimitPositionZ1
+        {
+            get { return _positiveLimitPositionZ1; }
+            set { SetProperty(ref _positiveLimitPositionZ1, value); }
+        }
+
+        private string _negativeLimitPositionZ1;
+
+        public string NegativeLimitPositionZ1
+        {
+            get { return _negativeLimitPositionZ1; }
+            set { SetProperty(ref _negativeLimitPositionZ1, value); }
+        }
+
+        private string _positiveLimitPositionZ2;
+
+        public string PositiveLimitPositionZ2
+        {
+            get { return _positiveLimitPositionZ2; }
+            set { SetProperty(ref _positiveLimitPositionZ2, value); }
+        }
+
+        private string _negativeLimitPositionZ2;
+
+        public string NegativeLimitPositionZ2
+        {
+            get { return _negativeLimitPositionZ2; }
+            set { SetProperty(ref _negativeLimitPositionZ2, value); }
+        }
+
+        private string _positiveLimitPositionTheta;
+
+        public string PositiveLimitPositionTheta
+        {
+            get { return _positiveLimitPositionTheta; }
+            set { SetProperty(ref _positiveLimitPositionTheta, value); }
+        }
+
+        private string _negativeLimitPositionTheta;
+
+        public string NegativeLimitPositionTheta
+        {
+            get { return _negativeLimitPositionTheta; }
+            set { SetProperty(ref _negativeLimitPositionTheta, value); }
         }
     }
 }

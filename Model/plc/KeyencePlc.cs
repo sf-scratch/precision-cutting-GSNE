@@ -1109,6 +1109,28 @@ namespace 精密切割系统.Driver
         // 轴软负限位F
         public Tag softLowerLimit { get; set; }
 
+        /// <summary>
+        /// 设置软正限位
+        /// </summary>
+        /// <param name="limitPosition"></param>
+        /// <returns></returns>
+        public async Task SetSoftUpperLimit(float limitPosition)
+        {
+            softUpperLimit.writeValue = limitPosition.ToString("F3");
+            await keyencePlc.WriteTagAsync(softUpperLimit);
+        }
+
+        /// <summary>
+        /// 设置软负限位
+        /// </summary>
+        /// <param name="limitPosition"></param>
+        /// <returns></returns>
+        public async Task SetSoftLowerLimit(float limitPosition)
+        {
+            softLowerLimit.writeValue = limitPosition.ToString("F3");
+            await keyencePlc.WriteTagAsync(softLowerLimit);
+        }
+
         public bool IsReady()
         {
             if (AlarmConfig.Instance.HasActiveErrorAlarm())

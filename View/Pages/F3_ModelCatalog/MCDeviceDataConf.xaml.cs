@@ -64,7 +64,8 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
         private int id;
         private bool lookState = false;
         private FunctionSelectionModel _functionModel;
-        string cutWay = "高度";
+        private string cutWay = "高度";
+
         public MCDeviceDataConf()
         {
             InitializeComponent();
@@ -131,7 +132,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             }
         }
 
-        private void Operate_Click(object sender, int code)
+        private async void Operate_Click(object sender, int code)
         {
             switch (code)
             {
@@ -139,7 +140,6 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                     if (chName.Equals(GlobalParams.CH1))
                     {
                         chName = GlobalParams.CH2;
-
                     }
                     else if (chName.Equals(GlobalParams.CH2))
                     {
@@ -158,13 +158,14 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                     if (this.FormSuccess())
                     {
                         _ = updataChData();
-                        saveData();
+                        await SaveDataAsync();
                     }
                     else
                     {
                         MaterialSnackUtils.MaterialSnack("数据异常", MaterialSnackUtils.SnackType.ERROR);
                     }
                     break;
+
                 case 3002:
                     string PrecutNo = inputPrecutProcessNo.Text;
                     if (string.IsNullOrEmpty(PrecutNo))
@@ -181,10 +182,12 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                             , $"PrecutNo={precutList[0].PrecutNo}&RePage={RePage}&RePageId={RePageId}&RePageUrl={QueryUtils.GetValueFromQueryParams(this, "url")}");
                     }
                     break;
+
                 case 3003://功能选择
                     string paramsData = Uri.UnescapeDataString($"id={id}&look={lookState}");
                     mainWindow.NavigateToPage("Pages/F3_ModelCatalog/MCFunctionSelectionConf", paramsData);
                     break;
+
                 case 3004://导入数据
                     OpenFileDialog openFileDialog = new OpenFileDialog();
                     openFileDialog.Filter = "xls文件 |*.xls";
@@ -194,19 +197,19 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                         readExcle(openFileDialog.FileName);
                     }
                     break;
+
                 case 3005://导入数据
                     exportExcle();
                     break;
+
                 case 5002://校准参数
                     mainWindow.NavigateToPage("Pages/F3_ModelCatalog/MCCalibrationParameters", Uri.UnescapeDataString($"id={id}&look={lookState}"));
                     break;
             }
         }
 
-
         private async void exportExcle()
         {
-
             // 获取桌面路径
             long timeStampMilliseconds = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
@@ -247,11 +250,9 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             }
         }
 
-
         //填充表格
         private void updateSheet(ISheet sheetCh1, FileTableItemChModel model, ICellStyle style)
         {
-
             IRow row1 = sheetCh1.CreateRow(0);
             NPOI.SS.UserModel.ICell cell01 = row1.CreateCell(0);
             cell01.CellStyle = style; // 将样式应用到单元格
@@ -352,9 +353,6 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             }
         }
 
-
-
-
         //解析xls
         private async Task readExcle(string path)
         {
@@ -384,8 +382,6 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                                         NPOI.SS.UserModel.ICell icell = currentRow.GetCell(cellRow);
                                         addBaseChModel(chModelData, cellRow, icell.ToString());
                                     }
-
-
                                 }
                             }
                             if (row > 2)//具体数据
@@ -405,7 +401,6 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                                     mapDictionary.Add(currentRow.GetCell(0).ToString(), itemStrs);
 
                                     //addChModel(chModelData, row, string.Join(",", itemStrs));
-
                                 }
                             }
                         }
@@ -421,7 +416,6 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             {
                 MaterialSnackUtils.MaterialSnack("文件异常或被占用，请重新选择文件！", MaterialSnackUtils.SnackType.ERROR);
             }
-
         }
 
         private async Task<FileTableItemChModel> getChModel(int sheetRow)
@@ -566,13 +560,12 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             }
         }
 
-
-        private void SureOk(object sender, bool code)
+        private async void SureOk(object sender, bool code)
         {
             //执行数据库数据保存。
             if (this.FormSuccess())
             {
-                saveData();
+                await SaveDataAsync();
                 CurrentConfigurationModel currentConfigurationModel = CurrentUtils.GetCurrentConfiguration();
                 currentConfigurationModel.DeviceDataId = currentModel.Id;
                 currentConfigurationModel.ChannelNum = GlobalParams.CH1;
@@ -584,7 +577,6 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             {
                 MaterialSnackUtils.MaterialSnack("数据异常", MaterialSnackUtils.SnackType.ERROR);
             }
-
         }
 
         private async Task initView()
@@ -641,7 +633,6 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 onlyLook();
             }
         }
-
 
         //只限查看
         private void onlyLook()
@@ -728,18 +719,15 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 else
                 {
                     defnName = GlobalParams.CH1;
-
                 }
                 operateText.Text = defnName;
                 GlobalParams.currentOperateBeanList[0].Title = defnName;
-
             }));
         }
 
         //初始化右侧元素
         private void UpdateGridDataAsync()
         {
-
             ColList.Clear();
             //绑定数据
             List<ChBean> list = new List<ChBean>();
@@ -788,7 +776,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 }
                 for (int n = 0; n < strs.Length; n++)
                 {
-                    // 格式化文本 
+                    // 格式化文本
                     string formattedValue = strs[n];
                     // 如果cutWay为深度模式，且是刀片高度，则要换算值
                     if (cutWay.Equals("深度") && bean.type == 1 && Tools.GetDoubleStringValue(formattedValue) != 0)
@@ -859,7 +847,6 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 dataGridView.Columns.Add(column);
             }
         }
-
 
         public void SetPropertyValue(object obj, string propertyName, object value)
         {
@@ -977,8 +964,6 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             public string Column99 { get; set; }
         }
 
-
-
         private void RabSquare_Checked(object sender, RoutedEventArgs e)
         {
             inputSquareCh1.IsEnabled = true;
@@ -991,9 +976,6 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             {
                 currentModel.WorkShape = 2;
             }
-
-
-
         }
 
         private void RabRound_Checked(object sender, RoutedEventArgs e)
@@ -1008,12 +990,10 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             {
                 currentModel.WorkShape = 1;
             }
-
         }
 
-
         //保存数据
-        private async Task saveData()
+        private async Task SaveDataAsync()
         {
             updateOperateLabel();
             //tableItem信息
@@ -1159,7 +1139,6 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             return !FormError();
         }
 
-
         private class ChBean()
         {
             public int type { get; set; } = 0;
@@ -1168,7 +1147,6 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
 
         private void ComBoxCutMethod_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
             ChangeCutMethod(ComBoxCutMethod.Text);
         }
 
@@ -1196,8 +1174,4 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             }
         }
     }
-
-
-
-
 }

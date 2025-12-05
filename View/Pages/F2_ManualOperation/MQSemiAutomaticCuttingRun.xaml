@@ -176,14 +176,14 @@
                 <Grid>
                     <Label
                         Margin="30,5,0,0"
-                        Content="切割数据"
+                        Content="轴绝对位置"
                         FontSize="22"
                         FontWeight="Bold" />
                 </Grid>
                 <auto:AutoGrid
-                    Margin="10"
-                    ChildMargin="5"
-                    Columns="2*,3*,2*,2*,3*,2*,2*,3*,2*"
+                    Margin="15,10,10,10"
+                    ChildMargin="0,5,0,5"
+                    Columns="1.5*,3*,1.5*,1.5*,3*,1.5*,1.5*,3*,1.5*"
                     RowCount="7">
                     <Label
                         Content="X轴"
@@ -196,7 +196,6 @@
                         XPrecision="3" />
                     <Label Content="mm" FontSize="16" />
                     <Label
-                        Margin="10,0,0,0"
                         Content="Y轴"
                         FontSize="18"
                         FontWeight="Bold" />
@@ -207,8 +206,7 @@
                         XPrecision="3" />
                     <Label Content="mm" FontSize="16" />
                     <Label
-                        Margin="10,0,0,0"
-                        Content="Z轴"
+                        Content="Z1轴"
                         FontSize="18"
                         FontWeight="Bold" />
                     <Controls:InputTextBox
@@ -218,7 +216,6 @@
                         XPrecision="3" />
                     <Label Content="mm" FontSize="16" />
                     <Label
-                        Margin="10,0,0,0"
                         Content="Z2轴"
                         FontSize="18"
                         FontWeight="Bold" />
@@ -229,7 +226,6 @@
                         XPrecision="3" />
                     <Label Content="mm" FontSize="16" />
                     <Label
-                        Margin="10,0,0,0"
                         Content="θ轴"
                         FontSize="18"
                         FontWeight="Bold"
@@ -258,7 +254,7 @@
                 <Controls:RealTimeInfoBox
                     Grid.Row="2"
                     Height="150"
-                    Margin="30,5,30,30"
+                    Margin="0,5,30,30"
                     Messages="{Binding MessageList}" />
             </StackPanel>
         </Grid>

@@ -71,11 +71,8 @@
                     <common:CommonDimming />
                 </Grid>
             </StackPanel>
-            <Grid
-                x:Name="directionGrid"
-                Grid.Row="1"
-                Margin="0,30,60,60">
-                <common:SimpleDirectOperate />
+            <Grid x:Name="directionGrid" Grid.Row="1">
+                <common:SimpleDirectOperate Width="600" Height="300" />
             </Grid>
         </Grid>
     </Grid>

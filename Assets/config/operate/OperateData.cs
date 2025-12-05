@@ -33,7 +33,7 @@ namespace 精密切割系统.Assets.config.buttom
                 list.Add(new OperateBean(12, "刀片测高", "ArrowUpDownBoldOutline", "Pages/F4_BladeMaintenance/BMSetupDataConf"));
                 list.Add(new OperateBean(13, "型号参数", "/Assets/icon/tab_0/tab_02.png", "Pages/F3_ModelCatalog/MCDeviceDataListConf"));
                 list.Add(new OperateBean(7, "相机镜头盖", "DoorSliding"));
-                list.Add(new OperateBean(11, "换工件", "Square"));
+                list.Add(new OperateBean(11, "工件更换", "/Assets/icon/tab_0/replace_workspace.png.png"));
                 list.Add(new OperateBean(6, "系统初始化", "RotateRight"));
                 list.Add(new OperateBean(8, "主轴电机", "HorizontalRotateClockwise"));
                 list.Add(new OperateBean(5, "切割水", "WaterThermometerOutline"));
@@ -238,6 +238,7 @@ namespace 精密切割系统.Assets.config.buttom
                 list.Add(new OperateBean(2445, "对焦确认", "/Assets/icon/tab_1/03/tab_01.png"));
                 list.Add(new OperateBean(2407, "基准线调窄", "UnfoldLessHorizontal"));
                 list.Add(new OperateBean(2443, "θ轴竖向校正", "/Assets/icon/tab_1/03/theta-align-vertical.png"));
+                list.Add(new OperateBean(-1, "", ""));
                 list.Add(new OperateBean(2433, "刀痕识别", "TextRecognition"));
                 //list.Add(new OperateBean(2442, "精细对焦", "FocusAuto"));
                 list.Add(new OperateBean(2050, "测量", "/Assets/icon/tab_1/03/tab_03.png"));
@@ -453,7 +454,7 @@ namespace 精密切割系统.Assets.config.buttom
         {
             var list = new List<OperateBean>();
             list.Add(new OperateBean(5300, "设置时日", "/Assets/icon/tab_5/tab_04.png"));
-            list.Add(new OperateBean(5301, "工作盘真空", "/Assets/icon/tab_5/tab_04.png"));
+            list.Add(new OperateBean(5301, "工作盘真空", "VacuumOutline"));
             list.Add(new OperateBean(2407, "暖机", "/Assets/icon/menu_2/menu_2_3_white.png"));
             return list;
         }

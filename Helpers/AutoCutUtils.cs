@@ -1879,23 +1879,6 @@ namespace 精密切割系统.Helpers
             // 解码字节数组为 Mat
             return Cv2.ImDecode(jpegBytes, ImreadModes.Color);
         }
-
-        public void AddTextWithOpenCV(string imagePath, string outputPath, string text)
-        {
-            using (var mat = Cv2.ImRead(imagePath))
-            {
-                Cv2.PutText(
-                    mat,
-                    text,
-                    new OpenCvSharp.Point(10, 50),
-                    HersheyFonts.HersheyComplex,
-                    1.0,
-                    Scalar.Red,
-                    2);
-
-                Cv2.ImWrite(outputPath, mat);
-            }
-        }
     }
 
     public record class AxisPosition(float? X, float? Y, float? Z1, float? Z2, float? Theta);

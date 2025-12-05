@@ -11,13 +11,13 @@
     d:DesignWidth="1448"
     mc:Ignorable="d">
     <Page.Resources>
-        <!-- 横向滚动条样式 -->
-        <Style TargetType="ScrollBar" x:Key="HorizontalScrollBarStyle">
-            <Setter Property="Height" Value="50"/>
-            <Setter Property="Orientation" Value="Horizontal"/>
+        <!--  横向滚动条样式  -->
+        <Style x:Key="HorizontalScrollBarStyle" TargetType="ScrollBar">
+            <Setter Property="Height" Value="50" />
+            <Setter Property="Orientation" Value="Horizontal" />
         </Style>
     </Page.Resources>
-    <Grid Margin="30 30 30 10">
+    <Grid Margin="30,30,30,10">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
@@ -265,27 +265,28 @@
                             Grid.Row="2"
                             Grid.Column="1"
                             Margin="0,0,0,10"
-                            VerticalContentAlignment="Center">
+                            VerticalContentAlignment="Center"
+                            FontSize="18">
                             <ComboBoxItem Height="35" Content="A" />
                             <ComboBoxItem Height="35" Content="B_ZKEEP" />
                         </ComboBox>
                         <!--  列数据  -->
                         <Label
-                            Visibility="Collapsed"
                             Grid.Row="3"
                             Grid.Column="0"
                             Margin="0,0,0,10"
                             HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center"
                             Content="切割方向"
-                            FontSize="16" />
+                            FontSize="16"
+                            Visibility="Collapsed" />
                         <ComboBox
-                            Visibility="Collapsed"
                             x:Name="ComBoxCutDir"
                             Grid.Row="3"
                             Grid.Column="1"
                             Margin="0,0,0,10"
-                            VerticalContentAlignment="Center">
+                            VerticalContentAlignment="Center"
+                            Visibility="Collapsed">
                             <ComboBoxItem Height="35" Content="FRONT" />
                             <ComboBoxItem Height="35" Content="REAR" />
                         </ComboBox>
@@ -303,7 +304,9 @@
                             Grid.Row="3"
                             Grid.Column="1"
                             Margin="0,0,0,10"
-                            VerticalContentAlignment="Center" SelectionChanged="ComBoxCutMethod_SelectionChanged">
+                            VerticalContentAlignment="Center"
+                            FontSize="18"
+                            SelectionChanged="ComBoxCutMethod_SelectionChanged">
                             <ComboBoxItem Height="35" Content="相对" />
                             <ComboBoxItem Height="35" Content="绝对" />
                         </ComboBox>
@@ -335,38 +338,38 @@
                             FontSize="16" />
                         <!--  列数据  -->
                         <Label
+                            x:Name="absoluteCutPositionLabel"
                             Grid.Row="4"
                             Grid.Column="0"
                             Margin="0,0,0,8"
-                            x:Name="absoluteCutPositionLabel"
-                            Visibility="Collapsed"
                             HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center"
                             Content="绝对切割位置"
-                            FontSize="16" />
+                            FontSize="16"
+                            Visibility="Collapsed" />
                         <Controls:InputTextBox
                             x:Name="absoluteCutPosition"
                             Grid.Row="4"
                             Grid.Column="1"
-                            Visibility="Collapsed"
                             Margin="0,0,0,8"
-                            XAllowNull="true"
-                            InputType="Decimal" />
+                            InputType="Decimal"
+                            Visibility="Collapsed"
+                            XAllowNull="true" />
                         <Label
+                            x:Name="absoluteCutPositionUnit"
                             Grid.Row="4"
                             Grid.Column="3"
                             Margin="0,0,0,8"
-                            x:Name="absoluteCutPositionUnit"
-                            Visibility="Collapsed"
                             HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center"
                             Content="mm"
-                            FontSize="16" />
+                            FontSize="16"
+                            Visibility="Collapsed" />
                         <!--  列数据  -->
                         <Label
+                            x:Name="CutRelativeFirstOffsetLabel"
                             Grid.Row="4"
                             Grid.Column="0"
-                            x:Name="CutRelativeFirstOffsetLabel"
                             Margin="0,0,0,10"
                             HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center"
@@ -511,10 +514,10 @@
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
                                 <Label
+                                    x:Name="cutHeightLabel"
                                     Grid.Row="1"
                                     Grid.Column="0"
                                     Margin="0,0,10,10"
-                                    x:Name="cutHeightLabel"
                                     HorizontalContentAlignment="Right"
                                     VerticalContentAlignment="Center"
                                     Content="刀片高度"
@@ -603,8 +606,8 @@
                                         ItemsSource="{Binding ColList}"
                                         Loaded="lvDataView_Loaded">
                                         <ListView.Resources>
-                                            <!-- 应用到所有横向滚动条 -->
-                                            <Style TargetType="ScrollBar" BasedOn="{StaticResource HorizontalScrollBarStyle}" />
+                                            <!--  应用到所有横向滚动条  -->
+                                            <Style BasedOn="{StaticResource HorizontalScrollBarStyle}" TargetType="ScrollBar" />
                                         </ListView.Resources>
                                         <ListView.View>
                                             <GridView x:Name="dataGridView" />

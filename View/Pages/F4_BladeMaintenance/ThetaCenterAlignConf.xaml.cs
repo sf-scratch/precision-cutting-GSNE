@@ -112,6 +112,11 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 MaterialSnack("未设置刀片外径！", SnackType.WARNING);
                 return;
             }
+            if (Appsettings.MeasureHeightLast is null)
+            {
+                MaterialSnack("刀具未测高，请先测高！", SnackType.WARNING);
+                return;
+            }
             if (!await _thetaCenterAlignSemaphore.WaitAsync(TimeSpan.Zero))
             {
                 MaterialSnackUtils.MaterialSnack("theta中心校准运行中，请勿重复点击！", MaterialSnackUtils.SnackType.WARNING);
@@ -320,7 +325,28 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             switch (code)
             {
                 case 44002:
-                    await AutoCutUtils.AutoFocusAsync();
+                    if (_stopCts is null) return;
+                    try
+                    {
+                        await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(120), _stopCts.Token);
+                        var result = await AutoCutUtils.AutoFocusAsync(default, timeoutToken.Token);
+                        if (!result.IsSuccess)
+                        {
+                            MaterialSnack(result.Message, SnackType.WARNING, default);
+                            return;
+                        }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        if (_stopCts.IsCancellationRequested)
+                        {
+                            MaterialSnack("对焦已取消！", SnackType.WARNING, default);
+                        }
+                        else
+                        {
+                            MaterialSnack("对焦超时！", SnackType.WARNING, default);
+                        }
+                    }
                     break;
 
                 default:

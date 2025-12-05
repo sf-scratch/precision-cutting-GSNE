@@ -48,7 +48,7 @@
         <Style BasedOn="{StaticResource MaterialDesignFloatingHintTextBox}" TargetType="TextBox">
             <Setter Property="Width" Value="152" />
             <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontSize" Value="22" />
         </Style>
     </UserControl.Resources>
     <Grid Margin="30">

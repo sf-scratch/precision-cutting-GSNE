@@ -33,6 +33,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
         private RightPage? rightPage;
         private ObservableCollection<FileTableModel> commList { get; set; } = new ObservableCollection<FileTableModel>();
         private FileTableItemModel currentModel;//当前配置
+
         public MCCopyDeviceDirectoryConf()
         {
             InitializeComponent();
@@ -51,7 +52,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             rightPage.btnSure.GlobalRunOperateFlag = true;
             rightPage.btnBack.GlobalRunOperateFlag = true;
             mainWindow.UpdateOperatePage([], null);
-            _ =initView();
+            _ = initView();
         }
 
         private void BtnBack_RightClicked(object? sender, bool e)
@@ -61,7 +62,6 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
 
         private async Task initView()
         {
-
             int id = int.Parse(QueryUtils.getQuery(this)["id"]);
 
             //查询数据
@@ -72,6 +72,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             {
                 currentModel = tableList[0];
                 labDeviceDataNo.Text = tableList[0].DeviceDataNo;
+                inputDeviceDataNo.Text = tableList[0].DeviceDataNo;
                 initFileView(tableList[0].DirectoryId);
             }
         }
@@ -85,7 +86,8 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             }
 
             List<FileTableModel> list = await SqlHelper.TableAsync<FileTableModel>().ToListAsync();
-            for (int i = 0; i < list.Count; i++) {
+            for (int i = 0; i < list.Count; i++)
+            {
                 commList.Add(list[i]);
             }
             comboDirectory.ItemsSource = commList;
@@ -93,8 +95,6 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             comboDirectory.SelectedValuePath = "Id";
             comboDirectory.SelectedIndex = 0;
         }
-
-
 
         private void BtnSure_RightClicked(object? sender, bool e)
         {
@@ -108,19 +108,18 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 }
                 else
                 {
-
                     long tabModelId = -1;
-                    if (currentModel!=null)
+                    if (currentModel != null)
                     {
                         tabModelId = currentModel.Id;
                         long fileId = long.Parse(comboDirectory.SelectedValue.ToString());
                         currentModel.DeviceDataNo = inputDeviceDataNo.Text;
                         currentModel.DirectoryId = fileId;
-                        int count =  SqlHelper.Add(currentModel);
-                        if (count>0)
+                        int count = SqlHelper.Add(currentModel);
+                        if (count > 0)
                         {
                             //复制对应配置Ch文件；需要找到前面一条新生成的数据ID
-                            var listCh =  SqlHelper.Table<FileTableItemChModel>().Where(t => t.ItemId == tabModelId).ToList();
+                            var listCh = SqlHelper.Table<FileTableItemChModel>().Where(t => t.ItemId == tabModelId).ToList();
                             foreach (FileTableItemChModel tableCh in listCh)
                             {
                                 tableCh.ItemId = currentModel.Id;

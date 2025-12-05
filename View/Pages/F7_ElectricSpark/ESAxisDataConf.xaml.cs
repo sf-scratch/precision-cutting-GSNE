@@ -44,18 +44,20 @@ namespace 精密切割系统.View.F7_ElectricSpark
 
         private PositionCompensationModel? _model;
         private List<PositionCompensationModel> list;
+
         //3列数据展示
-        ObservableCollection<PositionCompensationModel> Col0_99 { get; set; } = new ObservableCollection<PositionCompensationModel>();
-        ObservableCollection<PositionCompensationModel> Col100_199 { get; set; } = new ObservableCollection<PositionCompensationModel>();
-        ObservableCollection<PositionCompensationModel> Col200_299 { get; set; } = new ObservableCollection<PositionCompensationModel>();
-        ObservableCollection<string> AxisTypeList { get; set; } = [];
+        private ObservableCollection<PositionCompensationModel> Col0_99 { get; set; } = new ObservableCollection<PositionCompensationModel>();
+
+        private ObservableCollection<PositionCompensationModel> Col100_199 { get; set; } = new ObservableCollection<PositionCompensationModel>();
+        private ObservableCollection<PositionCompensationModel> Col200_299 { get; set; } = new ObservableCollection<PositionCompensationModel>();
+        private ObservableCollection<string> AxisTypeList { get; set; } = [];
 
         public ESAxisDataConf()
         {
             InitializeComponent();
-            pre_listView.ItemsSource = Col0_99;//将数据绑定到列表 
-            pre_listView1.ItemsSource = Col100_199;//将数据绑定到列表 
-            pre_listView2.ItemsSource = Col200_299;//将数据绑定到列表 
+            pre_listView.ItemsSource = Col0_99;//将数据绑定到列表
+            pre_listView1.ItemsSource = Col100_199;//将数据绑定到列表
+            pre_listView2.ItemsSource = Col200_299;//将数据绑定到列表
             AxisTypeList.Add("X轴");
             AxisTypeList.Add("Y轴");
             AxisTypeList.Add("Z1轴");
@@ -69,8 +71,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            
-            mainWindow = Application.Current.MainWindow as MainWindow; 
+            mainWindow = Application.Current.MainWindow as MainWindow;
             rightPage = mainWindow.rightFrame.Content as RightPage;
             operatePage = mainWindow.operateFrame.Content as OperatePage;
             operatePage.UpdateOperate([]);
@@ -87,14 +88,15 @@ namespace 精密切割系统.View.F7_ElectricSpark
             //string AxisType = cbbAxis.SelectedItem.ToString();
             //_ = initData(AxisType);
         }
+
         //private void BtnSure_RightClicked(object? sender, bool e)
         //{
-
         //}
         private void BtnBack_RightClicked(object? sender, bool e)
         {
             mainWindow.NavigateToPage("MainMenu");
         }
+
         private async Task initData(string AxisType)
         {
             //string AxisType = cbbAxis.Text;
@@ -111,9 +113,10 @@ namespace 精密切割系统.View.F7_ElectricSpark
                     }
                 }
             }
-            else {
+            else
+            {
                 _model = null;
-            }            
+            }
             initView();
         }
 
@@ -136,7 +139,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
             for (int i = 0; i < 500; i++)
             {
                 PositionCompensationModel temp = new PositionCompensationModel();
-                temp.Id = i;    
+                temp.Id = i;
                 string AxisPosition = _model != null && pos != null && (pos.Length) > i ? pos[i] : "0.0000";        // _model.AxisPosition;
                 string AxisCompensate = _model != null && comp != null && (comp.Length) > i ? comp[i] : "0.0000";    // _model.AxisCompensate;
                 string AxisGratingRuler = _model != null && gratingRuler != null && (gratingRuler.Length) > i ? gratingRuler[i] : "0.0000";    //  _model.AxisGratingRuler;
@@ -180,7 +183,6 @@ namespace 精密切割系统.View.F7_ElectricSpark
                     //}
                     Col200_299.Add(temp);
                 }
-                
             }
         }
 
@@ -199,13 +201,13 @@ namespace 精密切割系统.View.F7_ElectricSpark
             {
                 _ = initData(AxisType);
             }
-           
         }
 
         /// <summary>
         /// 页面3列表格数据合并到新的list
         /// </summary>
-        private void getViewList() {
+        private void getViewList()
+        {
             //
             list = new List<PositionCompensationModel>();
             for (int i = 0; i < Col0_99.Count; i++)
@@ -221,6 +223,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 list.Add(Col200_299[i]);
             }
         }
+
         /// <summary>
         /// 保存按钮
         /// </summary>
@@ -229,7 +232,8 @@ namespace 精密切割系统.View.F7_ElectricSpark
         private async void btnSave10_Click(object sender, RoutedEventArgs e)
         {
             string AxisType = cbbAxis.Text;
-            if (string.IsNullOrEmpty(AxisType)) {
+            if (string.IsNullOrEmpty(AxisType))
+            {
                 MaterialSnackUtils.MaterialSnack("请选择运动轴", MaterialSnackUtils.SnackType.ERROR);
                 return;
             }
@@ -239,7 +243,8 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 MaterialSnackUtils.MaterialSnack("数据异常", MaterialSnackUtils.SnackType.ERROR);
                 return;
             }
-            if (_model == null) {
+            if (_model == null)
+            {
                 _model = new PositionCompensationModel();
             }
             _model.AxisType = AxisType;
@@ -251,7 +256,8 @@ namespace 精密切割系统.View.F7_ElectricSpark
             //获取页面数据
             this.getViewList();
             //
-            for (int i = 0; i < list.Count; i++) {
+            for (int i = 0; i < list.Count; i++)
+            {
                 pos[i] = list[i].AxisPosition;
                 comp[i] = list[i].AxisCompensate;
                 gratingRuler[i] = list[i].AxisGratingRuler;
@@ -263,7 +269,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
             {
                 await SqlHelper.UpdateAsync(_model);
             }
-            else 
+            else
             {
                 await SqlHelper.AddAsync(_model);
             }
@@ -298,7 +304,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
 
         //将页面数据导出
         private void btnExport_Click_1(object sender, RoutedEventArgs e)
-        { 
+        {
             string AxisType = cbbAxis.Text;
             if (string.IsNullOrEmpty(AxisType))
             {
@@ -310,7 +316,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 //调用示例：“Report.xls”：文件名，reportDatas：数据列表List集合，propetryDic：属性名对应的中文名字典
                 //获取页面数据
                 this.getViewList();
-                if (list.Count<=0)
+                if (list.Count <= 0)
                 {
                     MaterialSnackUtils.MaterialSnack("没有数据可导出", MaterialSnackUtils.SnackType.ERROR);
                     return;
@@ -358,7 +364,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
             }
         }
 
-        static public void DirectoryPathExists(string path)
+        public static void DirectoryPathExists(string path)
         {
             if (Directory.Exists(path))
             {
@@ -366,6 +372,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
             }
             Directory.CreateDirectory(path);
         }
+
         private static bool isDoing = false;
 
         private void btnImport_Click_1(object sender, RoutedEventArgs e)
@@ -400,7 +407,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
                         string msg = "";
                         for (int i = 0; i < reportDatas.Count; i++)
                         {
-                            ExportDataVo  item = reportDatas[i];
+                            ExportDataVo item = reportDatas[i];
                             if (item == null)
                             {
                                 checkSucess = false;
@@ -483,15 +490,15 @@ namespace 精密切割系统.View.F7_ElectricSpark
                                     Col200_299[i - 334].AxisCompensate = _Value2;
                                     Col200_299[i - 334].AxisGratingRuler = _Value3;
                                 }
-                                ct++;                                
+                                ct++;
                             }
-                            pre_listView.ItemsSource = new ObservableCollection<PositionCompensationModel>();                            
-                            pre_listView1.ItemsSource = new ObservableCollection<PositionCompensationModel>();                            
+                            pre_listView.ItemsSource = new ObservableCollection<PositionCompensationModel>();
+                            pre_listView1.ItemsSource = new ObservableCollection<PositionCompensationModel>();
                             pre_listView2.ItemsSource = new ObservableCollection<PositionCompensationModel>();
 
-                            pre_listView.ItemsSource = Col0_99;//将数据绑定到列表 
-                            pre_listView1.ItemsSource = Col100_199;//将数据绑定到列表 
-                            pre_listView2.ItemsSource = Col200_299;//将数据绑定到列表 
+                            pre_listView.ItemsSource = Col0_99;//将数据绑定到列表
+                            pre_listView1.ItemsSource = Col100_199;//将数据绑定到列表
+                            pre_listView2.ItemsSource = Col200_299;//将数据绑定到列表
 
                             MaterialSnackUtils.MaterialSnack("导入成功,共" + ct + "条", MaterialSnackUtils.SnackType.SUCCESS);
                         }
@@ -499,7 +506,6 @@ namespace 精密切割系统.View.F7_ElectricSpark
                         {
                             MaterialSnackUtils.MaterialSnack("导入失败", MaterialSnackUtils.SnackType.ERROR);
                         }
-
                     }
                 }
             }
@@ -512,7 +518,6 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 isDoing = false;
             }
         }
-
 
         /// <summary>
         /// 表单内容是否错误  false是正常 true是出错了
@@ -547,13 +552,12 @@ namespace 精密切割系统.View.F7_ElectricSpark
             return !FormError();
         }
 
-        public class ExportDataVo 
+        public class ExportDataVo
         {
             public string AxisType { get; set; }
             public string AxisPosition { get; set; }
             public string AxisCompensate { get; set; }
             public string AxisGratingRuler { get; set; }
         }
-
     }
 }

@@ -164,6 +164,66 @@ namespace 精密切割系统.Helpers
             set => UpdateAppSettings(value);
         }
 
+        public static float? PositiveLimitPositionX
+        {
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
+        }
+
+        public static float? NegativeLimitPositionX
+        {
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
+        }
+
+        public static float? PositiveLimitPositionY
+        {
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
+        }
+
+        public static float? NegativeLimitPositionY
+        {
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
+        }
+
+        public static float? PositiveLimitPositionZ1
+        {
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
+        }
+
+        public static float? NegativeLimitPositionZ1
+        {
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
+        }
+
+        public static float? PositiveLimitPositionZ2
+        {
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
+        }
+
+        public static float? NegativeLimitPositionZ2
+        {
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
+        }
+
+        public static float? PositiveLimitPositionTheta
+        {
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
+        }
+
+        public static float? NegativeLimitPositionTheta
+        {
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
+        }
+
         /// <summary>
         /// 自更换刀片起刀片切了几道
         /// </summary>

@@ -15,6 +15,16 @@
         <Grid.Resources>
             <Style TargetType="Label">
                 <Setter Property="FontSize" Value="18" />
+                <Setter Property="FontWeight" Value="Bold" />
+                <Setter Property="Height" Value="35" />
+                <Setter Property="Margin" Value="0,10,0,0" />
+            </Style>
+            <Style BasedOn="{StaticResource InputTextStyle}" TargetType="Controls:InputTextBox">
+                <Setter Property="Width" Value="300" />
+                <Setter Property="Height" Value="35" />
+                <Setter Property="InputType" Value="Decimal" />
+                <Setter Property="TextWrapping" Value="Wrap" />
+                <Setter Property="XPrecision" Value="3" />
             </Style>
         </Grid.Resources>
         <Grid.RowDefinitions>
@@ -22,8 +32,9 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="400" />
-            <ColumnDefinition Width="400" />
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="auto" />
             <ColumnDefinition Width="auto" />
         </Grid.ColumnDefinitions>
         <!--  位置校准 原6.5  -->
@@ -32,6 +43,7 @@
             Grid.Row="0"
             Grid.Column="0"
             Grid.ColumnSpan="2"
+            Height="auto"
             Margin="30,30,0,0"
             Content="位置校准(4.2)"
             FontSize="30"
@@ -58,14 +70,9 @@
                 FontWeight="Bold" />
             <Controls:InputTextBox
                 x:Name="inputThetaCenterLocationX"
-                Width="300"
-                Height="35"
-                InputType="Decimal"
                 IsEnabled="False"
-                TextWrapping="Wrap"
                 XMax="295"
-                XMin="-45"
-                XPrecision="3" />
+                XMin="-45" />
 
             <Label
                 x:Name="labThetaCenterLocationY"
@@ -75,14 +82,9 @@
                 FontWeight="Bold" />
             <Controls:InputTextBox
                 x:Name="inputThetaCenterLocationY"
-                Width="300"
-                Height="35"
-                InputType="Decimal"
                 IsEnabled="False"
-                TextWrapping="Wrap"
                 XMax="135"
-                XMin="-15"
-                XPrecision="3" />
+                XMin="-15" />
 
             <Label
                 x:Name="labThetaCameraLocationX"
@@ -92,13 +94,8 @@
                 FontWeight="Bold" />
             <Controls:InputTextBox
                 x:Name="inputThetaCameraLocationX"
-                Width="300"
-                Height="35"
-                InputType="Decimal"
-                TextWrapping="Wrap"
                 XMax="295"
-                XMin="-45"
-                XPrecision="3" />
+                XMin="-45" />
 
             <Label
                 x:Name="labThetaCameraLocationY"
@@ -108,19 +105,14 @@
                 FontWeight="Bold" />
             <Controls:InputTextBox
                 x:Name="inputThetaCameraLocationY"
-                Width="300"
-                Height="35"
-                InputType="Decimal"
-                TextWrapping="Wrap"
                 XMax="135"
-                XMin="-45"
-                XPrecision="3" />
+                XMin="-45" />
         </StackPanel>
         <StackPanel
             x:Name="sp2"
             Grid.Row="1"
             Grid.Column="1"
-            Margin="0,0,0,0"
+            Margin="30,0,0,0"
             HorizontalAlignment="Left">
             <Label
                 x:Name="labCutGroup"
@@ -135,13 +127,7 @@
                 Margin="0,10,0,0"
                 Content="切割位置和相机位置的X轴偏移量"
                 FontWeight="Bold" />
-            <Controls:InputTextBox
-                x:Name="inputCameraToCutXOffset"
-                Width="300"
-                Height="35"
-                InputType="Decimal"
-                TextWrapping="Wrap"
-                XPrecision="3" />
+            <Controls:InputTextBox x:Name="inputCameraToCutXOffset" />
 
             <Label
                 x:Name="labCameraToCutYOffset"
@@ -149,13 +135,7 @@
                 Margin="0,10,0,0"
                 Content="切割位置和相机位置的Y轴偏移量"
                 FontWeight="Bold" />
-            <Controls:InputTextBox
-                x:Name="inputCameraToCutYOffset"
-                Width="300"
-                Height="35"
-                InputType="Decimal"
-                TextWrapping="Wrap"
-                XPrecision="3" />
+            <Controls:InputTextBox x:Name="inputCameraToCutYOffset" />
 
             <Label
                 x:Name="labCutZ1MaxLocation"
@@ -165,13 +145,8 @@
                 FontWeight="Bold" />
             <Controls:InputTextBox
                 x:Name="inputCutZ1MaxLocation"
-                Width="300"
-                Height="35"
-                InputType="Decimal"
-                TextWrapping="Wrap"
                 XMax="50"
-                XMin="-5"
-                XPrecision="3" />
+                XMin="-5" />
 
             <!--<Label
                 x:Name="labCameraOffsetX"
@@ -207,7 +182,10 @@
                 XMin="-15"
                 XPrecision="3" />-->
         </StackPanel>
-        <StackPanel Grid.Row="1" Grid.Column="2">
+        <StackPanel
+            Grid.Row="1"
+            Grid.Column="2"
+            Margin="30,0,0,0">
             <Label
                 x:Name="labCameraGroup"
                 Height="35"
@@ -270,10 +248,6 @@
                 FontWeight="Bold" />
             <Controls:InputTextBox
                 x:Name="inputWorkDiscFocusPosition"
-                Width="300"
-                Height="35"
-                InputType="Decimal"
-                TextWrapping="Wrap"
                 XMax="40"
                 XMin="-10"
                 XPrecision="4" />

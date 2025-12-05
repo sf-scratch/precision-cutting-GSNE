@@ -189,6 +189,7 @@
         <common:SimpleDirectOperate
             Grid.Row="1"
             Grid.Column="1"
-            Margin="0,60,60,60" />
+            Width="600"
+            Height="300" />
     </Grid>
 </UserControl>
