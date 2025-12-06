@@ -210,7 +210,9 @@ namespace 精密切割系统.Assets.config.buttom
         public static List<OperateBean> GetThetaCenterAlignConfOperate()
         {
             var list = new List<OperateBean>();
-            list.Add(new OperateBean(44002, "对焦", "/Assets/icon/tab_0/tab_02.png"));
+            list.Add(new OperateBean(44002, "对焦", "FocusAuto"));
+            list.Add(new OperateBean(44003, "实时测量", "PlayCircleOutline"));
+            list.Add(new OperateBean(44004, "不切割", "DebugStepOver"));
             return list;
         }
 

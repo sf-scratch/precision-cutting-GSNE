@@ -26,13 +26,14 @@ namespace 精密切割系统.View.Pages.F8_ElectricalDischargeTruing
         private OperatePage? operatePage;
 
         // 运行状态 0 未运行 1 运行中 2 暂停中
-        static int _runFlag = 0;
-        ElectricalDischargeTruingViewModel model;
+        private static int _runFlag = 0;
+
+        private ElectricalDischargeTruingViewModel model;
 
         public ElectricalDischargeTruing()
         {
             InitializeComponent();
-            
+
             mainWindow = Application.Current.MainWindow as MainWindow;
         }
 
@@ -138,6 +139,7 @@ namespace 精密切割系统.View.Pages.F8_ElectricalDischargeTruing
             GlobalParams.globalRunFlag = false;
             mainWindow.NavigateToPage("MainMenu");
         }
+
         /// <summary>
         /// 暂停修刀
         /// </summary>
@@ -177,7 +179,9 @@ namespace 精密切割系统.View.Pages.F8_ElectricalDischargeTruing
                 stopRunFlag = false;
             });
         }
-        bool startRunFlag = false;
+
+        private bool startRunFlag = false;
+
         private void BtnElectricalStart_RightClicked(object? sender, bool e)
         {
             // 判断是否已点击过
@@ -189,13 +193,15 @@ namespace 精密切割系统.View.Pages.F8_ElectricalDischargeTruing
             startRunFlag = true;
             btnStart();
         }
-        bool stopRunFlag = false;
+
+        private bool stopRunFlag = false;
+
         private void OperatePage_onClicked(object? sender, int code)
         {
             switch (code)
             {
                 case 8001:
-                    if (_runFlag == 0 && (stopRunFlag || !startRunFlag) )
+                    if (_runFlag == 0 && (stopRunFlag || !startRunFlag))
                     {
                         return;
                     }
@@ -210,6 +216,7 @@ namespace 精密切割系统.View.Pages.F8_ElectricalDischargeTruing
                         Finish();
                     });
                     break;
+
                 case 8002:
                     if (_runFlag != 0)
                     {
@@ -224,9 +231,10 @@ namespace 精密切割系统.View.Pages.F8_ElectricalDischargeTruing
                     string yFrontLocation = PlcControl.plc.GetPlcValueString(DeviceKey.yCurLocationKey);
                     model.YBladeFrontLocation = Tools.FormatDecimalString(yFrontLocation, 4);
                     // 移动Z轴到初始位置
-                    PlcControl.tagControl.Z1axis.StartAbsolute( "10", model.ZSetPosition);
+                    PlcControl.tagControl.Z1axis.StartAbsolute("10", model.ZSetPosition);
                     save();
                     break;
+
                 case 8003:
                     if (_runFlag != 0)
                     {
@@ -243,11 +251,12 @@ namespace 精密切割系统.View.Pages.F8_ElectricalDischargeTruing
                     model.YBladeBackLocation = Tools.FormatDecimalString(yBackLocation, 4);
                     Debug.WriteLine("model.YBladeBackLocation:" + model.YBladeBackLocation);
                     // 移动Z轴到初始位置
-                    PlcControl.tagControl.Z1axis.StartAbsolute( "10", model.ZSetPosition);
+                    PlcControl.tagControl.Z1axis.StartAbsolute("10", model.ZSetPosition);
 
                     save();
 
                     break;
+
                 case 8004:
                     if (_runFlag != 0)
                     {
@@ -258,6 +267,7 @@ namespace 精密切割系统.View.Pages.F8_ElectricalDischargeTruing
                     PlcControl.tagControl.wholeDevice.SetPanelButtonsStauts(panelStatus ? 0 : 1);
                     OperatePage.isSwitchOpen(!panelStatus, 8004);
                     break;
+
                 case 8005:
                     if (_runFlag != 0)
                     {
@@ -267,6 +277,7 @@ namespace 精密切割系统.View.Pages.F8_ElectricalDischargeTruing
                     model.ClearDressersNum = 0;
                     MaterialSnack("清零成功！", SnackType.SUCCESS);
                     break;
+
                 case 8006:
                     if (_runFlag != 0)
                     {
@@ -278,10 +289,12 @@ namespace 精密切割系统.View.Pages.F8_ElectricalDischargeTruing
                     PlcControl.tagControl.Z1axis.StartAbsolute("10", model.ZSetPosition);
                     save();
                     break;
+
                 default:
                     break;
             }
         }
+
         /// <summary>
         /// 检查异常状态 急停后，要全部重新标定一次
         /// </summary>
@@ -302,6 +315,7 @@ namespace 精密切割系统.View.Pages.F8_ElectricalDischargeTruing
             thread.IsBackground = true;
             thread.Start();
         }
+
         private void BtnSure_RightClicked(object sender, bool e)
         {
             //执行数据库数据保存。
@@ -315,7 +329,9 @@ namespace 精密切割系统.View.Pages.F8_ElectricalDischargeTruing
                 MaterialSnack("数据异常", SnackType.ERROR);
             }
         }
-        int tipsFlag = 0;
+
+        private int tipsFlag = 0;
+
         private void btnStart()
         {
             // 如果有异常，则不能进行操作
@@ -342,7 +358,7 @@ namespace 精密切割系统.View.Pages.F8_ElectricalDischargeTruing
                 GlobalParams.globalRunFlag = false;
                 startRunFlag = false;
                 return;
-            }            
+            }
             // 判断状态是否准备好
             if (!CommonCheck.TruingStatusCheck())
             {
@@ -411,7 +427,7 @@ namespace 精密切割系统.View.Pages.F8_ElectricalDischargeTruing
             double ZSetPosition = double.Parse(model.ZSetPosition);
             // 获取刀片角度
             double bladeAngle = (180 - double.Parse(model.BladeAngle)) / 2;
-            // 获取Z0的位置 41.321 - 5 
+            // 获取Z0的位置 41.321 - 5
 
             // 根据y0+z轴初始位置和角度，计算z0坐标
             double[] A = { y0, ZSetPosition };
@@ -443,7 +459,6 @@ namespace 精密切割系统.View.Pages.F8_ElectricalDischargeTruing
                 , model.ZCuttingAmount, model.RepeatCount, model.BladeCorrectionSpeed, model.SpindleSpeed, model.ZLimitPosition);*/
             // 启动修刀
             PlcControl.tagControl.sparkRepairKnife.ToggleKnifeSharpening(0);
-            GlobalParams.globalRunFlag = true;
             PlcControl.tagControl.wholeDevice.SetPanelButtonsStauts(0);
             rightPage.btnElectricalStart.Visibility = Visibility.Collapsed;
             rightPage.btnElectricalPause.Visibility = Visibility.Visible;
@@ -455,6 +470,7 @@ namespace 精密切割系统.View.Pages.F8_ElectricalDischargeTruing
             _thread.IsBackground = true;
             _thread.Start();
         }
+
         /// <summary>
         /// 检查修刀进度
         /// </summary>
@@ -464,7 +480,7 @@ namespace 精密切割系统.View.Pages.F8_ElectricalDischargeTruing
             String currentCountStr = PlcControl.plc.GetPlcValueString(DeviceKey.currentCountKey);
             while (!repeatCount.Equals(currentCountStr) && _runFlag != 0)
             {
-                if (AlarmConfig.Instance.HasActiveErrorAlarm()) 
+                if (AlarmConfig.Instance.HasActiveErrorAlarm())
                 {
                     _runFlag = 0;
                     break;
@@ -486,14 +502,12 @@ namespace 精密切割系统.View.Pages.F8_ElectricalDischargeTruing
                         model.ClearDressersNum = GlobalParams.clearDressersNum;
                         model.AllDressersNum = GlobalParams.allDressersNum;
                     }
-                    
                 }
                 Thread.Sleep(100);
             }
             Finish();
-
         }
-        
+
         public void Finish()
         {
             startRunFlag = false;
@@ -506,7 +520,7 @@ namespace 精密切割系统.View.Pages.F8_ElectricalDischargeTruing
                 double zAmount = double.Parse(model.ZCuttingAmount);
                 // 如果大于0 则根据修刀次数 * 每次下降量
                 double sumDistance = model.CurrentRepairNum * zAmount;
-                
+
                 model.Z0BasePosition = Tools.FormatDecimalString((Tools.GetDoubleStringValue(model.Z0BasePosition) + sumDistance) + "", 3);
                 Application.Current.Dispatcher.Invoke(() =>
                 {
@@ -518,10 +532,10 @@ namespace 精密切割系统.View.Pages.F8_ElectricalDischargeTruing
                 rightPage.btnElectricalStart.Visibility = Visibility.Visible;
                 rightPage.btnElectricalPause.Visibility = Visibility.Collapsed;
             });
-            GlobalParams.globalRunFlag = false;
             PlcControl.tagControl.wholeDevice.SetPanelButtonsStauts(1);
             MaterialSnack("修刀完成！！", SnackType.SUCCESS);
         }
+
         private void save(bool showTips = true)
         {
             ElectricalDischargeTruingViewModel viewModel = (ElectricalDischargeTruingViewModel)this.DataContext; // 获取当前窗口的DataContext
@@ -590,6 +604,7 @@ namespace 精密切割系统.View.Pages.F8_ElectricalDischargeTruing
                 }
             }
         }
+
         /// <summary>
         /// 设置单元格状态
         /// </summary>

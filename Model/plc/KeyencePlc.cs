@@ -1202,6 +1202,7 @@ namespace 精密切割系统.Driver
 
         public async Task<float?> GetCurrentLocationWaitAsync(CancellationToken token)
         {
+            if (!GlobalParams.OnlineFlag) return null;
             await WaitAxisStopAsync(token);
             return await GetCurrentLocationAsync();
         }
@@ -1422,10 +1423,8 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task StartAbsoluteAsync(float location, float? speed, CancellationToken token)
         {
-            if (!GlobalParams.HasTheta && axisName == AxisNameType.Theta)
-            {
-                return;
-            }
+            if (!GlobalParams.OnlineFlag) return;
+            if (!GlobalParams.HasTheta && axisName == AxisNameType.Theta) return;
             await WaitStopJogAsync(token.WithDefaultTimeout());
             // 等待轴准备好
             await WaitAxisReadyAsync(token.WithDefaultTimeout());
@@ -1433,7 +1432,7 @@ namespace 精密切割系统.Driver
             absoluteLocation.writeValue = location.ToString();
             await keyencePlc.WriteTagAsync(absoluteLocation);
             // 最大移动距离
-            int maxDistance = 200;
+            int maxDistance = 400;
             int waitTime;
             if (speed != null)
             {
@@ -2843,6 +2842,7 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public async Task RunMotionAsync(float xInterpolationMotionValue, float yInterpolationMotionValue, CancellationToken token)
         {
+            if (!GlobalParams.OnlineFlag) return;
             CancellationToken useToken = token.WithDefaultTimeout();
             Task waitX = PlcControl.tagControl.Xaxis.WaitAxisStopAsync(useToken);
             Task waitY = PlcControl.tagControl.Yaxis.WaitAxisStopAsync(useToken);
@@ -3259,12 +3259,12 @@ namespace 精密切割系统.Driver
         public async Task SetCutParamsAsync(float feedSpeedValue, float zEndLocation, float zStartLocation, float xStartLoaction, float xEndLocation,
             float yCutLocation, string checkStatus, float thetaDeg, int spindleRevValue, bool isCompensate = false)
         {
-            float xSoftUpperLimit = float.Parse(PlcControl.tagControl.Xaxis.softUpperLimit.defaultValue);
+            float xSoftUpperLimit = Appsettings.PositiveLimitPositionX ?? 0;
             if (xEndLocation > xSoftUpperLimit)
             {
                 xEndLocation = xSoftUpperLimit;
             }
-            float ySoftUpperLimit = float.Parse(PlcControl.tagControl.Yaxis.softUpperLimit.defaultValue);
+            float ySoftUpperLimit = Appsettings.PositiveLimitPositionY ?? 0;
             if (yCutLocation > ySoftUpperLimit)
             {
                 yCutLocation = ySoftUpperLimit;

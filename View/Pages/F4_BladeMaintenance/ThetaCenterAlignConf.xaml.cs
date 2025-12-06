@@ -23,6 +23,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using 精密切割系统.Assets.config.buttom;
+using 精密切割系统.Data;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
 using 精密切割系统.Extensions;
@@ -87,8 +88,8 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             _rightPage.btnBack.Visibility = Visibility.Visible;
             _rightPage.btnBack.BackFlag = false;
             _rightPage.btnSure.SetRightClickedHandler(BtnSure_RightClicked);
-            _rightPage.btnSave.SetRightClickedHandler(BtnSave_RightClicked);
-            _rightPage.btnSave.Visibility = Visibility.Visible;
+            //_rightPage.btnSave.SetRightClickedHandler(BtnSave_RightClicked);
+            //_rightPage.btnSave.Visibility = Visibility.Visible;
             _rightPage.btnCutStart.SetRightClickedHandler(BtnCutStart_RightClicked);
             _rightPage.btnCutStart.Visibility = Visibility.Visible;
             _mainWindow.UpdateOperatePage(OperateData.GetThetaCenterAlignConfOperate(), OperateClickHandler);
@@ -128,14 +129,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 _startX = await PlcControl.tagControl.Xaxis.GetCurrentLocationWaitAsync(_stopCts.Token) ?? 0;
                 _endX = _startX + _viewModel.WorkSize.ToFloat();
                 _startY = await PlcControl.tagControl.Yaxis.GetCurrentLocationWaitAsync(_stopCts.Token) ?? 0;
-                CommonResult<float> curHeightResult = await AutoCutUtils.ProcessCombineMeasureHeightAsync(default, _stopCts.Token);
-                // 开始测高
-                if (!curHeightResult.IsSuccess)
-                {
-                    MaterialSnackUtils.MaterialSnack(curHeightResult.Message, MaterialSnackUtils.SnackType.WARNING, 0);
-                    return;
-                }
-                _measureHeigthY = curHeightResult.Data;
+                _measureHeigthY = Appsettings.MeasureHeightLast.Value;
                 await RunCutLineByThetaDegAsync([FirstCutThetaDeg, SecondCutThetaDeg], _startY, _stopCts.Token);
                 thetaCenterParamsGrid.IsEnabled = false;
                 _rightPage.btnCutStart.Visibility = Visibility.Collapsed;
@@ -258,6 +252,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 
         private async Task RunCutLineByThetaDegAsync(List<float> thetaDegs, float startY, CancellationToken token)
         {
+            if (!GlobalParams.OnlineFlag) return;
             if (_monitorCts is null || _monitorCts.IsCancellationRequested)
             {
                 _monitorCts = new CancellationTokenSource();
@@ -320,33 +315,73 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             _mainWindow.NavigateToPage("MainMenu");
         }
 
+        private bool _isPositive = true;
+
         private async void OperateClickHandler(object? sender, int code)
         {
+            if (AlarmConfig.Instance.HasActiveErrorAlarm())
+            {
+                MaterialSnack(AlarmConfig.HasErrorAlarmMessage, SnackType.WARNING);
+                return;
+            }
             switch (code)
             {
                 case 44002:
                     if (_stopCts is null) return;
-                    try
+                    await _thetaCenterAlignSemaphore.ExecuteAsync(async () =>
                     {
-                        await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(120), _stopCts.Token);
-                        var result = await AutoCutUtils.AutoFocusAsync(default, timeoutToken.Token);
-                        if (!result.IsSuccess)
+                        try
                         {
-                            MaterialSnack(result.Message, SnackType.WARNING, default);
-                            return;
+                            await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(120), _stopCts.Token);
+                            var result = await AutoCutUtils.AutoFocusAsync(default, timeoutToken.Token);
+                            if (!result.IsSuccess)
+                            {
+                                MaterialSnack(result.Message, SnackType.WARNING, default);
+                                return;
+                            }
                         }
-                    }
-                    catch (OperationCanceledException)
+                        catch (OperationCanceledException)
+                        {
+                            if (_stopCts.IsCancellationRequested)
+                            {
+                                MaterialSnack("对焦已取消！", SnackType.WARNING, default);
+                            }
+                            else
+                            {
+                                MaterialSnack("对焦超时！", SnackType.WARNING, default);
+                            }
+                        }
+                    }, "对焦");
+                    break;
+
+                case 44003:
+                    if (_stopCts is null) return;
+                    await _thetaCenterAlignSemaphore.ExecuteAsync(async () =>
                     {
-                        if (_stopCts.IsCancellationRequested)
+                        try
                         {
-                            MaterialSnack("对焦已取消！", SnackType.WARNING, default);
+                            await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(_isPositive ? 90 : -90, default, _stopCts.Token);
                         }
-                        else
+                        catch (OperationCanceledException)
                         {
-                            MaterialSnack("对焦超时！", SnackType.WARNING, default);
+                            MaterialSnack("实时测量已取消！", SnackType.WARNING);
                         }
-                    }
+                    }, "实时测量");
+                    break;
+
+                case 44004:
+                    if (_stopCts is null) return;
+                    await _thetaCenterAlignSemaphore.ExecuteAsync(async () =>
+                    {
+                        try
+                        {
+                            await PlcControl.tagControl.cutting.RunMotionAsync(Appsettings.CameraThetaCenterPoint.X, Appsettings.CameraThetaCenterPoint.Y, _stopCts.Token);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            MaterialSnack("不切割操作已取消！", SnackType.WARNING);
+                        }
+                    }, "不切割");
                     break;
 
                 default:
@@ -392,22 +427,22 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             [Description("请开始校准")]
             None,
 
-            [Description("请完成第一次确认交点")]
+            [Description("请完成第一次确认交点")] // 十字中心点确认
             FindFirstIntersection,
 
-            [Description("请完成第二次确认交点")]
+            [Description("请完成第二次确认交点")] // 旋转后的十字中心点确认
             FindSecondIntersection,
 
-            [Description("请完成第三次确认交点")]
+            [Description("请完成第三次确认交点")] // 第二个十字中心点确认
             FindThirdIntersection,
 
-            [Description("请确认中心交点")]
+            [Description("请确认中心交点")] // 圆盘中心点确认
             FindCenterIntersection,
 
-            [Description("请刀痕线段右侧端点")]
+            [Description("请确认刀痕线段右侧端点")] // 当前刀痕线段右侧端点确认
             FindRightEndpoint,
 
-            [Description("请刀痕线段左侧端点")]
+            [Description("请确认刀痕线段左侧端点")] // 当前刀痕线段左侧端点确认
             FindLeftEndpoint,
 
             [Description("已完成校准！")]

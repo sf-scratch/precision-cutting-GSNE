@@ -207,7 +207,7 @@ namespace 精密切割系统
 
         private PlcControl mainPlc;
 
-        private void InitDevice()
+        private async void InitDevice()
         {
             if (!KeyboardSimulator.CapsLockStatus)
             {
@@ -215,10 +215,8 @@ namespace 精密切割系统
             }
             if (!GlobalParams.OnlineFlag)
             {
-                GlobalParams.globalRunFlag = false;
                 return;
             }
-            GlobalParams.globalRunFlag = true;
             var taskStartTime = DateTime.Now;
             // 设备初始化重试3分钟
             var maxExecutionTime = TimeSpan.FromMinutes(3);
@@ -238,7 +236,7 @@ namespace 精密切割系统
                         if (!res)
                         {
                             MaterialSnackUtils.MaterialSnack("PLC连接失败，重试中...", MaterialSnackUtils.SnackType.WARNING, 0);
-                            Thread.Sleep(2000);
+                            await Task.Delay(2000);
                         }
                     }
                     if (!CameraUtils.BDeviceOpened)
@@ -248,7 +246,7 @@ namespace 精密切割系统
                         if (!CameraUtils.BDeviceOpened)
                         {
                             MaterialSnackUtils.MaterialSnack($"相机连接失败: {CameraUtils.errorMessage}", MaterialSnackUtils.SnackType.WARNING);
-                            Thread.Sleep(2000);
+                            await Task.Delay(2000);
                         }
                     }
                     if (!CameraUtils.l_lightConnectStatus)
@@ -258,7 +256,7 @@ namespace 精密切割系统
                         if (!CameraUtils.l_lightConnectStatus)
                         {
                             MaterialSnackUtils.MaterialSnack("光源连接失败，重试中..." + CameraUtils.l_errorMessage, MaterialSnackUtils.SnackType.WARNING);
-                            Thread.Sleep(2000);
+                            await Task.Delay(2000);
                         }
                     }
                     // if (PlcControl.connectionStatus && CameraUtils._bDeviceOpened && CameraUtils.l_lightConnectStatus)
@@ -270,7 +268,7 @@ namespace 精密切割系统
                     else
                     {
                         MaterialSnackUtils.MaterialSnack("设备加载失败，重试中...", MaterialSnackUtils.SnackType.SUCCESS);
-                        Thread.Sleep(2000);
+                        await Task.Delay(2000);
                     }
                 }
                 catch (Exception ex)
@@ -278,22 +276,18 @@ namespace 精密切割系统
                     // 模拟重试逻辑
                     MaterialSnackUtils.MaterialSnack($"设备连接异常: {ex.Message}", MaterialSnackUtils.SnackType.ERROR);
                     Tools.LogError($"设备连接异常: {ex.Message}");
-                    Thread.Sleep(2000); // 等待2秒后重试
+                    await Task.Delay(2000);
                 }
             }
             // 退出所有模式
             PlcControl.plc.exitAllModel();
-            GlobalParams.globalRunFlag = false;
-
-            Thread.Sleep(1000);
-            CurrentUtils.initPlcPosition();
+            await Task.Delay(1000);
+            await CurrentUtils.InitPlcDataAsync();
             BunkeringHandler.AddBunkeringRecord();
             // 设置面板禁用
             PlcControl.tagControl.wholeDevice.SetPanelButtonsStauts(0);
-
             // 关闭Y轴光栅尺校准
             PlcControl.tagControl.cutting.SetYAxisCompStatus(0);
-
             // 记录异常日志
             //PlcControl.AddAlarmLog();
         }

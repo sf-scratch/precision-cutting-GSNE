@@ -188,6 +188,7 @@ namespace 精密切割系统.Helpers
 
         public static async Task<CommonResult<float>> ProcessCombineMeasureHeightAsync(IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
+            if (!GlobalParams.OnlineFlag) return CommonResult<float>.Success(0);
             await PlcControl.tagControl.cutting.SetSpindleSpeedAsync(BmSetupData.Instance.SpindleRev);
             await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
             CommonResult<float> curHeightZ;
@@ -1878,6 +1879,20 @@ namespace 精密切割系统.Helpers
 
             // 解码字节数组为 Mat
             return Cv2.ImDecode(jpegBytes, ImreadModes.Color);
+        }
+
+        public static async Task SetSoftLimit()
+        {
+            await PlcControl.tagControl.Xaxis.SetSoftUpperLimit(Appsettings.PositiveLimitPositionX ?? 0);
+            await PlcControl.tagControl.Xaxis.SetSoftLowerLimit(Appsettings.NegativeLimitPositionX ?? 0);
+            await PlcControl.tagControl.Yaxis.SetSoftUpperLimit(Appsettings.PositiveLimitPositionY ?? 0);
+            await PlcControl.tagControl.Yaxis.SetSoftLowerLimit(Appsettings.NegativeLimitPositionY ?? 0);
+            await PlcControl.tagControl.Z1axis.SetSoftUpperLimit(Appsettings.PositiveLimitPositionZ1 ?? 0);
+            await PlcControl.tagControl.Z1axis.SetSoftLowerLimit(Appsettings.NegativeLimitPositionZ1 ?? 0);
+            await PlcControl.tagControl.Z2axis.SetSoftUpperLimit(Appsettings.PositiveLimitPositionZ2 ?? 0);
+            await PlcControl.tagControl.Z2axis.SetSoftLowerLimit(Appsettings.NegativeLimitPositionZ2 ?? 0);
+            await PlcControl.tagControl.ThetaAxis.SetSoftUpperLimit(Appsettings.PositiveLimitPositionTheta ?? 0);
+            await PlcControl.tagControl.ThetaAxis.SetSoftLowerLimit(Appsettings.NegativeLimitPositionTheta ?? 0);
         }
     }
 

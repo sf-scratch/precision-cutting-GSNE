@@ -117,15 +117,15 @@
     },
     "softUpperLimit": {
       "defaultValue": "300",
-      "valueType": "float",
-      "addr": "DM1132",
+      "valueType": "double",
+      "addr": "DM1100",
       "name": "X轴软正限位",
       "describe": "X轴软正限位标志，到软正限位后无法继续正向移动"
     },
     "softLowerLimit": {
       "defaultValue": "0",
-      "valueType": "float",
-      "addr": "DM1136",
+      "valueType": "double",
+      "addr": "DM1104",
       "name": "X轴软负限位",
       "describe": "X轴软负限位，到软负限位后无法继续负向运动"
     },
@@ -259,14 +259,14 @@
     },
     "softUpperLimit": {
       "defaultValue": "125",
-      "valueType": "float",
+      "valueType": "double",
       "addr": "DM1108",
       "name": "Y轴软正限位",
       "describe": "Y轴软正限位标志，到软正限位后无法继续正向移动"
     },
     "softLowerLimit": {
       "defaultValue": "0",
-      "valueType": "float",
+      "valueType": "double",
       "addr": "DM1112",
       "name": "Y轴软负限位",
       "describe": "Y轴软负限位，到软负限位后无法继续负向运动"
@@ -401,14 +401,14 @@
     },
     "softUpperLimit": {
       "defaultValue": "45.1",
-      "valueType": "float",
+      "valueType": "double",
       "addr": "DM1116",
       "name": "Z1轴软正限位",
       "describe": "Z1轴软正限位标志，到软正限位后无法继续正向移动"
     },
     "softLowerLimit": {
       "defaultValue": "0",
-      "valueType": "float",
+      "valueType": "double",
       "addr": "DM1120",
       "name": "Z1轴软负限位",
       "describe": "Z1轴软负限位，到软负限位后无法继续负向运动"
@@ -537,14 +537,14 @@
     },
     "softUpperLimit": {
       "defaultValue": "18",
-      "valueType": "float",
+      "valueType": "double",
       "addr": "DM1124",
       "name": "Z2轴软正限位",
       "describe": "Z2轴软正限位标志，到软正限位后无法继续正向移动"
     },
     "softLowerLimit": {
       "defaultValue": "0",
-      "valueType": "float",
+      "valueType": "double",
       "addr": "DM1128",
       "name": "Z2轴软负限位",
       "describe": "Z2轴软负限位，到软负限位后无法继续负向运动"
@@ -665,14 +665,14 @@
     },
     "softUpperLimit": {
       "defaultValue": "18",
-      "valueType": "float",
+      "valueType": "double",
       "addr": "DM1132",
       "name": "Theta轴软正限位",
       "describe": "Theta轴软正限位标志，到软正限位后无法继续正向移动"
     },
     "softLowerLimit": {
       "defaultValue": "0",
-      "valueType": "float",
+      "valueType": "double",
       "addr": "DM1136",
       "name": "Theta轴软负限位",
       "describe": "Theta轴软负限位，到软负限位后无法继续负向运动"

@@ -339,6 +339,10 @@ namespace 精密切割系统.View
                         );
                         await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(initPos.AlignInitZ1.ToFloat(), default, default);
                     }
+                    catch (Exception)
+                    {
+                        MaterialSnackUtils.MaterialSnack("移动到初始位置超时！", SnackType.WARNING);
+                    }
                     finally
                     {
                         mainWindow.IsEnabled = true;

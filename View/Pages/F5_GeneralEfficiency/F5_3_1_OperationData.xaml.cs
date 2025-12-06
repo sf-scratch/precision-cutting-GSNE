@@ -135,16 +135,7 @@ namespace 精密切割系统.View.Pages
             Appsettings.NegativeLimitPositionZ2 = f531.NegativeLimitPositionZ2.ToFloat();
             Appsettings.PositiveLimitPositionTheta = f531.PositiveLimitPositionTheta.ToFloat();
             Appsettings.NegativeLimitPositionTheta = f531.NegativeLimitPositionTheta.ToFloat();
-            await PlcControl.tagControl.Xaxis.SetSoftUpperLimit(f531.PositiveLimitPositionX.ToFloat());
-            await PlcControl.tagControl.Xaxis.SetSoftLowerLimit(f531.NegativeLimitPositionX.ToFloat());
-            await PlcControl.tagControl.Yaxis.SetSoftUpperLimit(f531.PositiveLimitPositionY.ToFloat());
-            await PlcControl.tagControl.Yaxis.SetSoftLowerLimit(f531.NegativeLimitPositionY.ToFloat());
-            await PlcControl.tagControl.Z1axis.SetSoftUpperLimit(f531.PositiveLimitPositionZ1.ToFloat());
-            await PlcControl.tagControl.Z1axis.SetSoftLowerLimit(f531.NegativeLimitPositionZ1.ToFloat());
-            await PlcControl.tagControl.Z2axis.SetSoftUpperLimit(f531.PositiveLimitPositionZ2.ToFloat());
-            await PlcControl.tagControl.Z2axis.SetSoftLowerLimit(f531.NegativeLimitPositionZ2.ToFloat());
-            await PlcControl.tagControl.ThetaAxis.SetSoftUpperLimit(f531.PositiveLimitPositionTheta.ToFloat());
-            await PlcControl.tagControl.ThetaAxis.SetSoftLowerLimit(f531.NegativeLimitPositionTheta.ToFloat());
+            await AutoCutUtils.SetSoftLimit();
         }
 
         public void initTbNumber()

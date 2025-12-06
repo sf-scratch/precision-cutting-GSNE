@@ -59,7 +59,7 @@ namespace 精密切割系统.Utils
             positionAlignmentModel = GetPositionAlignmentModel();
         }
 
-        public static void initPlcPosition()
+        public static async Task InitPlcDataAsync()
         {
             // 各轴运动速度 点动高速/低速速度  绝对运动速度
             InitAxisSpeedIndex(operationParametersModel);
@@ -68,6 +68,7 @@ namespace 精密切割系统.Utils
             InitInitialPositionModel(initialPositionModel);
             // 初始化测高数据
             InitSetupDate();
+            await AutoCutUtils.SetSoftLimit();
         }
 
         public static void InitSetupDate()
