@@ -161,8 +161,14 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
                 //_model.RingLightIntensityChannel = Tools.GetIntStringValue(inputRingLightIntensityChannel.Text);
                 _model.WorkDiscFocusPosition = Tools.GetFloatStringValue(inputWorkDiscFocusPosition.Text);
                 Appsettings.FocusClearZ = inputWorkDiscFocusPosition.Text.ToFloat();
-                Appsettings.CameraThetaCenterPoint = new DataPoint<float>(inputThetaCameraLocationX.Text.ToFloat(), inputThetaCameraLocationY.Text.ToFloat());
-                Appsettings.CameraRelativeBladePosition = new DataPoint<float>(inputCameraToCutXOffset.Text.ToFloat(), inputCameraToCutYOffset.Text.ToFloat());
+                float thetaCameraX = inputThetaCameraLocationX.Text.ToFloat();
+                float thetaCameraY = inputThetaCameraLocationY.Text.ToFloat();
+                float thetaCenterX = inputThetaCenterLocationX.Text.ToFloat();
+                float thetaCenterY = inputThetaCenterLocationY.Text.ToFloat();
+                Appsettings.CameraThetaCenterPoint = new DataPoint<float>(thetaCameraX, thetaCameraY);
+                Appsettings.CameraRelativeBladePosition = new DataPoint<float>(thetaCameraX - thetaCenterX, thetaCameraY - thetaCenterY);
+                inputCameraToCutXOffset.Text = Appsettings.CameraRelativeBladePosition.X.ToString();
+                inputCameraToCutYOffset.Text = Appsettings.CameraRelativeBladePosition.Y.ToString();
                 await SqlHelper.UpdateAsync(_model);
                 CurrentUtils.InitPositionAlignment(_model);
             }

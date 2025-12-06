@@ -54,6 +54,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         private ThetaCenterAlignConfViewModel _viewModel;
         private CancellationTokenSource? _stopCts;
         private CancellationTokenSource? _monitorCts;
+        private CancellationTokenSource? _dataShowsCts;
         private ThetaCenterAlignStep _step;
         private PointF? _firstIntersection;
         private PointF? _secondIntersection;
@@ -64,7 +65,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         private float _endX;
         private float _startY;
         private float _measureHeigthY;
-        private SemaphoreSlim _thetaCenterAlignSemaphore;
+        private SemaphoreSlim _thetaCenterAlignSemaphore = new SemaphoreSlim(1, 1);
 
         public ThetaCenterAlignConf()
         {
@@ -74,25 +75,57 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             ThetaCenterAlignModel model = list.Count > 0 ? list[0] : new ThetaCenterAlignModel();
             _viewModel = MapperConfig.Mapper.Map<ThetaCenterAlignConfViewModel>(model);
             DataContext = _viewModel;
-            _thetaCenterAlignSemaphore = new SemaphoreSlim(1, 1);
+            thetaCenterX.Text = Appsettings.CameraThetaCenterPoint.X.ToString();
+            thetaCenterY.Text = Appsettings.CameraThetaCenterPoint.Y.ToString();
         }
-
-        // 当前状态，0 参数设置 1 切割中 2 切割完成，确认中
-        private int status = 0;
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            _dataShowsCts = new CancellationTokenSource();
             _rightPage = _mainWindow.rightFrame.Content as RightPage ?? new RightPage();
             _rightPage.PanelAction.Visibility = Visibility.Visible;
             _rightPage.btnBack.SetRightClickedHandler(BtnBack_RightClicked);
             _rightPage.btnBack.Visibility = Visibility.Visible;
             _rightPage.btnBack.BackFlag = false;
             _rightPage.btnSure.SetRightClickedHandler(BtnSure_RightClicked);
+            _rightPage.btnSure.Visibility = Visibility.Visible;
             //_rightPage.btnSave.SetRightClickedHandler(BtnSave_RightClicked);
             //_rightPage.btnSave.Visibility = Visibility.Visible;
             _rightPage.btnCutStart.SetRightClickedHandler(BtnCutStart_RightClicked);
             _rightPage.btnCutStart.Visibility = Visibility.Visible;
             _mainWindow.UpdateOperatePage(OperateData.GetThetaCenterAlignConfOperate(), OperateClickHandler);
+            StartGetAxisInfo();
+        }
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            _dataShowsCts?.Cancel();
+        }
+
+        public void StartGetAxisInfo()
+        {
+            if (_dataShowsCts is null || _dataShowsCts.IsCancellationRequested)
+            {
+                _dataShowsCts = new CancellationTokenSource();
+            }
+            CancellationToken token = _dataShowsCts.Token;
+            _ = Task.Run(async () =>
+            {
+                while (!token.IsCancellationRequested)
+                {
+                    try
+                    {
+                        var axisPostion = await AutoCutUtils.GetAxisPositionAsync();
+                        currentX.Text = axisPostion.X?.ToString(GlobalParams.DecimalStringFormat);
+                        currentY.Text = axisPostion.Y?.ToString(GlobalParams.DecimalStringFormat);
+                    }
+                    catch (Exception ex)
+                    {
+                        Tools.LogError($"StartGetAxisInfo()报警监控异常: {ex.Message}");
+                    }
+                    await Task.Delay(200);
+                }
+            });
         }
 
         private void Stop()
@@ -164,10 +197,11 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 switch (_step)
                 {
                     case ThetaCenterAlignStep.FindFirstIntersection:
+                        MaterialSnackUtils.MaterialSnack("第一次确认交点中...", MaterialSnackUtils.SnackType.WARNING, 0);
                         _firstIntersection = new PointF(x, y);
-                        _step = ThetaCenterAlignStep.FindSecondIntersection;
                         Appsettings.CameraRelativeBladePosition = new DataPoint<float>(relativePostion.X, y - _startY);
                         await PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(SecondCutThetaDeg, default, _stopCts.Token);
+                        _step = ThetaCenterAlignStep.FindSecondIntersection;
                         break;
 
                     case ThetaCenterAlignStep.FindSecondIntersection:
@@ -176,9 +210,10 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                             MaterialSnackUtils.MaterialSnack("未第一次确认交点！", MaterialSnackUtils.SnackType.WARNING, 0);
                             return;
                         }
+                        MaterialSnackUtils.MaterialSnack("第二次确认交点中...", MaterialSnackUtils.SnackType.WARNING, 0);
                         _secondIntersection = new PointF(x, y);
-                        _step = ThetaCenterAlignStep.FindThirdIntersection;
                         await PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(ThirdCutThetaDeg, default, _stopCts.Token);
+                        _step = ThetaCenterAlignStep.FindThirdIntersection;
                         break;
 
                     case ThetaCenterAlignStep.FindThirdIntersection:
@@ -187,6 +222,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                             MaterialSnackUtils.MaterialSnack("未第二次确认交点！", MaterialSnackUtils.SnackType.WARNING, 0);
                             return;
                         }
+                        MaterialSnackUtils.MaterialSnack("第三次确认交点中...", MaterialSnackUtils.SnackType.WARNING, 0);
                         _thirdIntersection = new PointF(x, y);
                         float distanceY = y - _secondIntersection.Value.Y;
                         await RunCutLineByThetaDegAsync([FirstCutThetaDeg, SecondCutThetaDeg], _startY + (distanceY / 2), _stopCts.Token);
@@ -199,17 +235,21 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                             MaterialSnackUtils.MaterialSnack("未第三次确认交点！", MaterialSnackUtils.SnackType.WARNING, 0);
                             return;
                         }
+                        MaterialSnackUtils.MaterialSnack("确认中心交点中...", MaterialSnackUtils.SnackType.WARNING, 0);
                         Appsettings.CameraThetaCenterPoint = new DataPoint<float>(x, y);
-                        await PlcControl.tagControl.cutting.RunMotionAsync(x.ToActualX(), y.ToActualY() + 10, _stopCts.Token);
-                        float startY = _measureHeigthY - _viewModel.WorkThickness.ToFloat() - _viewModel.TapeThickness.ToFloat() - 0.2f;
-                        await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(startY, default, _stopCts.Token);
-                        float endY = _measureHeigthY - _viewModel.WorkThickness.ToFloat() - _viewModel.TapeThickness.ToFloat() + 0.1f;
-                        await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
-                        await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(endY, 0.001f, _stopCts.Token);
-                        await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
-                        await AutoCutUtils.WorkpieceBlowingAsync(default, default, _stopCts.Token);
-                        await PlcControl.tagControl.cutting.RunMotionAsync(x.ToCameraX(), y.ToCameraY(), _stopCts.Token);
-                        _step = ThetaCenterAlignStep.FindRightEndpoint;
+                        thetaCenterX.Text = x.ToString();
+                        thetaCenterY.Text = y.ToString();
+                        _step = ThetaCenterAlignStep.Completed;
+                        //await PlcControl.tagControl.cutting.RunMotionAsync(x.ToActualX(), y.ToActualY() + 10, _stopCts.Token);
+                        //float startY = _measureHeigthY - _viewModel.WorkThickness.ToFloat() - _viewModel.TapeThickness.ToFloat() - 0.2f;
+                        //await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(startY, default, _stopCts.Token);
+                        //float endY = _measureHeigthY - _viewModel.WorkThickness.ToFloat() - _viewModel.TapeThickness.ToFloat() + 0.1f;
+                        //await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
+                        //await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(endY, 0.001f, _stopCts.Token);
+                        //await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
+                        //await AutoCutUtils.WorkpieceBlowingAsync(default, default, _stopCts.Token);
+                        //await PlcControl.tagControl.cutting.RunMotionAsync(x.ToCameraX(), y.ToCameraY(), _stopCts.Token);
+                        //_step = ThetaCenterAlignStep.FindRightEndpoint;
                         break;
 
                     case ThetaCenterAlignStep.FindRightEndpoint:
@@ -230,14 +270,21 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                         break;
 
                     default:
+                        Save();
                         break;
                 }
+                NotifyOperation();
                 if (_step == ThetaCenterAlignStep.Completed)
                 {
-                    _step = ThetaCenterAlignStep.Completed;
+                    _firstIntersection = null;
+                    _secondIntersection = null;
+                    _thirdIntersection = null;
+                    _rightPoint = null;
+                    _leftPoint = null;
+                    _step = ThetaCenterAlignStep.None;
                     thetaCenterParamsGrid.IsEnabled = true;
+                    _rightPage.btnCutStart.Visibility = Visibility.Visible;
                 }
-                NotifyOperation();
             }
             finally
             {
@@ -247,7 +294,18 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 
         private void NotifyOperation()
         {
-            MaterialSnackUtils.MaterialSnack(_step.GetEnumDescription(), MaterialSnackUtils.SnackType.WARNING, 0);
+            if (_step == ThetaCenterAlignStep.None)
+            {
+                return;
+            }
+            if (_step == ThetaCenterAlignStep.Completed)
+            {
+                MaterialSnackUtils.MaterialSnack(_step.GetEnumDescription(), MaterialSnackUtils.SnackType.SUCCESS, 0);
+            }
+            else
+            {
+                MaterialSnackUtils.MaterialSnack(_step.GetEnumDescription(), MaterialSnackUtils.SnackType.WARNING, 0);
+            }
         }
 
         private async Task RunCutLineByThetaDegAsync(List<float> thetaDegs, float startY, CancellationToken token)
@@ -294,8 +352,9 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             }
         }
 
-        private void BtnSave_RightClicked(object? sender, bool e)
+        private void Save()
         {
+            MaterialSnackUtils.MaterialSnack("参数保存中...", MaterialSnackUtils.SnackType.SUCCESS);
             Keyboard.ClearFocus();
             ThetaCenterAlignModel model = MapperConfig.Mapper.Map<ThetaCenterAlignModel>(_viewModel);
             if (model.Id != 1)
@@ -306,6 +365,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             {
                 SqlHelper.Update(model);
             }
+            Appsettings.CameraThetaCenterPoint = new DataPoint<float>(thetaCenterX.Text.ToFloat(), thetaCenterY.Text.ToFloat());
             MaterialSnackUtils.MaterialSnack("保存成功！", MaterialSnackUtils.SnackType.SUCCESS);
         }
 
@@ -387,39 +447,6 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 default:
                     break;
             }
-            DisposeStatus();
-        }
-
-        private void DisposeStatus()
-        {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                switch (status)
-                {
-                    case 0:
-                        thetaCenterParamsGrid.Visibility = Visibility.Visible;
-                        dimmingGrid.Visibility = Visibility.Collapsed;
-                        directionGrid.Visibility = Visibility.Collapsed;
-                        centerPanel.Visibility = Visibility.Collapsed;
-                        break;
-
-                    case 1:
-                        thetaCenterParamsGrid.Visibility = Visibility.Visible;
-                        dimmingGrid.Visibility = Visibility.Collapsed;
-                        directionGrid.Visibility = Visibility.Collapsed;
-                        break;
-
-                    case 2:
-                        thetaCenterParamsGrid.Visibility = Visibility.Collapsed;
-                        centerPanel.Visibility = Visibility.Visible;
-                        dimmingGrid.Visibility = Visibility.Visible;
-                        directionGrid.Visibility = Visibility.Visible;
-                        break;
-
-                    default:
-                        break;
-                }
-            });
         }
 
         private enum ThetaCenterAlignStep
