@@ -387,22 +387,23 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             switch (code)
             {
                 case 44002:
-                    if (_stopCts is null) return;
+                    if (_dataShowsCts is null) return;
                     await _thetaCenterAlignSemaphore.ExecuteAsync(async () =>
                     {
                         try
                         {
-                            await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(120), _stopCts.Token);
-                            var result = await AutoCutUtils.AutoFocusAsync(default, timeoutToken.Token);
-                            if (!result.IsSuccess)
+                            await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(120));
+                            CommonResult<float> focusRusult = await AutoFocusService.GlobalFocusAsync(default, timeoutToken.Token);
+                            if (!focusRusult.IsSuccess)
                             {
-                                MaterialSnack(result.Message, SnackType.WARNING, default);
+                                MaterialSnackUtils.MaterialSnack(focusRusult.Message, MaterialSnackUtils.SnackType.WARNING);
                                 return;
                             }
+                            await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(focusRusult.Data, default, timeoutToken.Token);
                         }
                         catch (OperationCanceledException)
                         {
-                            if (_stopCts.IsCancellationRequested)
+                            if (_dataShowsCts.IsCancellationRequested)
                             {
                                 MaterialSnack("对焦已取消！", SnackType.WARNING, default);
                             }
@@ -415,12 +416,13 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                     break;
 
                 case 44003:
-                    if (_stopCts is null) return;
+                    if (_dataShowsCts is null) return;
                     await _thetaCenterAlignSemaphore.ExecuteAsync(async () =>
                     {
                         try
                         {
-                            await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(_isPositive ? 90 : -90, default, _stopCts.Token);
+                            await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(120), _dataShowsCts.Token);
+                            await PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(_isPositive ? 90 : 0, default, timeoutToken.Token);
                         }
                         catch (OperationCanceledException)
                         {

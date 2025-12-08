@@ -164,6 +164,24 @@ namespace 精密切割系统.Helpers
             set => UpdateAppSettings(value);
         }
 
+        /// <summary>
+        /// 横向拉直行程
+        /// </summary>
+        public static float? HorizontalStraighteningStroke
+        {
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
+        }
+
+        /// <summary>
+        /// 竖向拉直行程
+        /// </summary>
+        public static float? VerticalStraighteningStroke
+        {
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
+        }
+
         public static float? PositiveLimitPositionX
         {
             get => GetValue<float>();

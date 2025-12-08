@@ -94,7 +94,7 @@ namespace 精密切割系统.Model.cut
                         xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationWaitAsync(token) ?? 0;
                         yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationWaitAsync(token) ?? 0;
                         _pointA = new PointF(xLocation, yLocation);
-                        await PlcControl.tagControl.Xaxis.StartRelativeAsync(AlignDefaultMoveDistance, 80, default);
+                        await PlcControl.tagControl.Xaxis.StartRelativeAsync(Appsettings.HorizontalStraighteningStroke ?? AlignDefaultMoveDistance, 80, default);
                         _currentThetaAlignStatus = ThetaAlignStatus.Horizontal;
                         MaterialSnackUtils.MaterialSnack("请继续横向拉直第二点", MaterialSnackUtils.SnackType.SUCCESS);
                         break;
@@ -158,7 +158,7 @@ namespace 精密切割系统.Model.cut
                         xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationWaitAsync(token) ?? 0;
                         yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationWaitAsync(token) ?? 0;
                         _pointA = new PointF(xLocation, yLocation);
-                        await PlcControl.tagControl.Yaxis.StartRelativeAsync(-AlignDefaultMoveDistance, 60, default);
+                        await PlcControl.tagControl.Yaxis.StartRelativeAsync(-Appsettings.VerticalStraighteningStroke ?? -AlignDefaultMoveDistance, 60, default);
                         _currentThetaAlignStatus = ThetaAlignStatus.Vertical;
                         MaterialSnackUtils.MaterialSnack("请继续竖向拉直第二点", MaterialSnackUtils.SnackType.SUCCESS);
                         break;
