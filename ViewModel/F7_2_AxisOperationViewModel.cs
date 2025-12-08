@@ -53,15 +53,16 @@ namespace 精密切割系统.ViewModel
         private void InitBottomButton()
         {
             BottomButtonCollection.Clear();
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("低速尺寸", "Plus", () => SlowRelativeMotionAsync(true)));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("尺寸", "Plus", () => RelativeMotionAsync(true)));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("低速点动", "Plus", null, () => SlowJogAsync(true), StopJogAsync));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("点动", "Plus", null, () => JogAsync(true), StopJogAsync));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("", "", () => { }, buttonVisibility: System.Windows.Visibility.Hidden));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("原点", "RotateRight", StartHomingAsync));
             BottomButtonCollection.Add(RightButtonParams.BlueButton("低速尺寸", "Minus", () => SlowRelativeMotionAsync(false)));
             BottomButtonCollection.Add(RightButtonParams.BlueButton("尺寸", "Minus", () => RelativeMotionAsync(false)));
             BottomButtonCollection.Add(RightButtonParams.BlueButton("低速点动", "Minus", null, () => SlowJogAsync(false), StopJogAsync));
             BottomButtonCollection.Add(RightButtonParams.BlueButton("点动", "Minus", null, () => JogAsync(false), StopJogAsync));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("放松", "HandFrontLeft", RelaxAxisAsync));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("低速尺寸", "Plus", () => SlowRelativeMotionAsync(true)));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("尺寸", "Plus", () => RelativeMotionAsync(true)));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("低速点动", "Plus", null, () => SlowJogAsync(true), StopJogAsync));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("点动", "Plus", null, () => JogAsync(true), StopJogAsync));
         }
 
         private void Sure()
@@ -83,6 +84,24 @@ namespace 精密切割系统.ViewModel
         private void Back()
         {
             NavigateUtils.NavigateToPage("MainMenu");
+        }
+
+        private async Task StartHomingAsync()
+        {
+            var selectedAxis = AxisOperationList.FirstOrDefault(a => a.IsChecked);
+            if (selectedAxis != null)
+            {
+                await selectedAxis.AxisObject.StartHomingAsync();
+            }
+        }
+
+        private async Task RelaxAxisAsync()
+        {
+            var selectedAxis = AxisOperationList.FirstOrDefault(a => a.IsChecked);
+            if (selectedAxis != null)
+            {
+                await selectedAxis.AxisObject.RelaxAxisAsync();
+            }
         }
 
         private async Task SlowRelativeMotionAsync(bool isPositive)

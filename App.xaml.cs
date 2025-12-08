@@ -3,6 +3,8 @@ using System.Data;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using 精密切割系统.Data;
+using 精密切割系统.Helpers;
 using 精密切割系统.Utils;
 using 精密切割系统.View.Controls;
 using 精密切割系统.View.Dialogs;
@@ -35,6 +37,14 @@ namespace 精密切割系统
             }
             // 为所有TextBox注册焦点事件
             EventManager.RegisterClassHandler(typeof(TextBox), TextBox.GotFocusEvent, new RoutedEventHandler(OnTextBoxGotFocus));
+            // 订阅应用程序退出事件
+            Application.Current.Exit += OnApplicationExit;
+        }
+
+        private void OnApplicationExit(object sender, ExitEventArgs e)
+        {
+            Appsettings.MeasureHeightFirst = null;
+            Appsettings.MeasureHeightLast = null;
         }
 
         private void OnTextBoxGotFocus(object sender, RoutedEventArgs e)

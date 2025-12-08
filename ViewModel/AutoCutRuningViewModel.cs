@@ -277,11 +277,8 @@ namespace 精密切割系统.ViewModel
                 // 设置测高参数
                 await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
                 await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(caculateResult.Data - 0.15f);
-                Task zAxisTask = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(Appsettings.FocusClearZ ?? 0, 1, _pauseCts.Token);
-                Task<CommonResult<float>> measureHeightTask = AutoCutUtils.ProcessMeasureHeightAsync(heightMeasurementMode, _dialogService, _eventAggregator, _pauseCts.Token);
-                await Task.WhenAll(zAxisTask, measureHeightTask);
                 // 开始测高
-                CommonResult<float> firstHeightMeasurementZ = measureHeightTask.Result;
+                CommonResult<float> firstHeightMeasurementZ = await AutoCutUtils.ProcessMeasureHeightAsync(heightMeasurementMode, _dialogService, _eventAggregator, _pauseCts.Token);
                 if (!firstHeightMeasurementZ.IsSuccess)
                 {
                     MaterialSnackUtils.MaterialSnack(firstHeightMeasurementZ.Message, MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
@@ -739,9 +736,7 @@ namespace 精密切割系统.ViewModel
                         if (line != null && !AlarmConfig.Instance.HasAxisErrorAlarms())
                         {
                             // 执行默认动作
-                            Task z1Task = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, cts.Token);
-                            Task z2Task = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(Appsettings.FocusClearZ ?? 0, default, cts.Token);
-                            await Task.WhenAll(z1Task, z2Task);
+                            await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, cts.Token);
                             await AutoCutUtils.WorkpieceBlowingAsync(default, _eventAggregator, cts.Token);
                             await PlcControl.tagControl.cutting.RunMotionAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), line.StartPoint.Y.ToCameraY(), cts.Token);
                             await AutoFocusService.GlobalFocusAsync(_eventAggregator, cts.Token);

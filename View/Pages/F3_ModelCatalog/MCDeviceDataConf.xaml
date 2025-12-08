@@ -8,7 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="MCDeviceDataConf"
     d:DesignHeight="676"
-    d:DesignWidth="1448"
+    d:DesignWidth="1600"
     mc:Ignorable="d">
     <Page.Resources>
         <!--  横向滚动条样式  -->
@@ -34,7 +34,7 @@
             Loaded="Label_Loaded" />
         <Grid Grid.Row="1" Margin="10,0,10,10">
             <Grid.RowDefinitions>
-                <RowDefinition Height="50" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
@@ -134,7 +134,7 @@
                         Margin="0,0,10,0"
                         VerticalContentAlignment="Center"
                         Checked="RabRound_Checked"
-                        Content="圆形切割尺寸"
+                        Content="圆形尺寸"
                         FontSize="14"
                         GroupName="size" />
                     <Controls:InputTextBox
@@ -147,7 +147,7 @@
                         Margin="10,0,10,0"
                         VerticalContentAlignment="Center"
                         Checked="RabSquare_Checked"
-                        Content="长方形切割尺寸"
+                        Content="长方形尺寸"
                         FontSize="14"
                         GroupName="size" />
                     <Label
@@ -160,7 +160,7 @@
                         InputType="Decimal" />
                     <Label Content="mm" FontSize="14" />
                     <Label
-                        Margin="20,0,0,0"
+                        Margin="10,0,0,0"
                         Content="Ch2"
                         FontSize="14" />
                     <Controls:InputTextBox
@@ -169,7 +169,7 @@
                         InputType="Decimal" />
                     <Label Content="mm" FontSize="14" />
                     <Label
-                        Margin="30,0,0,0"
+                        Margin="10,0,0,0"
                         Content="晶片厚度"
                         FontSize="14" />
                     <Controls:InputTextBox
@@ -179,7 +179,10 @@
                         XMax="1000"
                         XMin="-1000" />
                     <Label Content="mm" FontSize="14" />
-                    <Label Content="胶片厚度" FontSize="14" />
+                    <Label
+                        Margin="10,0,0,0"
+                        Content="胶片厚度"
+                        FontSize="14" />
                     <Controls:InputTextBox
                         x:Name="inputTapeThickness"
                         Width="120"
@@ -187,6 +190,16 @@
                         XMax="1000"
                         XMin="-1000" />
                     <Label Content="mm" FontSize="14" />
+                    <Label
+                        Margin="10,0,0,0"
+                        Content="总刀数"
+                        FontSize="14" />
+                    <Controls:InputTextBox
+                        x:Name="totalCutNum"
+                        Width="120"
+                        InputType="Decimal"
+                        IsEnabled="False" />
+                    <Label Content="刀" FontSize="14" />
                 </StackPanel>
             </StackPanel>
             <!--  第四节  -->
@@ -408,9 +421,9 @@
                             Content="°"
                             FontSize="16" />
                         <!--列数据
-                        <Label Grid.Row="7" Grid.Column="0" Margin="0,0,0,10" FontSize="16" Content="切割禁止R"  VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
-                        <Controls:InputTextBox x:Name="inputMoncutR" Grid.Row="7" Margin="0,0,0,8" Grid.Column="1" InputType="Decimal"/>
-                        <Label Grid.Row="7" Grid.Column="3" Margin="0,0,0,8" FontSize="16" Content="mm"  VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                        <Label Grid.Row="7" Grid.Column="0" Margin="0,0,0,10" FontSize="16" Content="切割禁止R"  VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                        <Controls:InputTextBox x:Name="inputMoncutR" Grid.Row="7" Margin="0,0,0,8" Grid.Column="1" InputType="Decimal" />
+                        <Label Grid.Row="7" Grid.Column="3" Margin="0,0,0,8" FontSize="16" Content="mm"  VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
                         -->
                         <!--  列数据  -->
                         <Label
@@ -501,13 +514,13 @@
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="105" />
-                                    <RowDefinition Height="45" />
-                                    <RowDefinition Height="45" />
-                                    <RowDefinition Height="45" />
-                                    <RowDefinition Height="45" />
-                                    <RowDefinition Height="45" />
-                                    <RowDefinition Height="45" />
-                                    <RowDefinition Height="45" />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="150" />
@@ -517,7 +530,6 @@
                                     x:Name="cutHeightLabel"
                                     Grid.Row="1"
                                     Grid.Column="0"
-                                    Margin="0,0,10,10"
                                     HorizontalContentAlignment="Right"
                                     VerticalContentAlignment="Center"
                                     Content="刀片高度"
@@ -525,7 +537,7 @@
                                 <Label
                                     Grid.Row="2"
                                     Grid.Column="0"
-                                    Margin="0,0,10,10"
+                                    Margin="0,21,0,0"
                                     HorizontalContentAlignment="Right"
                                     VerticalContentAlignment="Center"
                                     Content="进刀速度"
@@ -533,7 +545,7 @@
                                 <Label
                                     Grid.Row="3"
                                     Grid.Column="0"
-                                    Margin="0,0,10,10"
+                                    Margin="0,21,0,0"
                                     HorizontalContentAlignment="Right"
                                     VerticalContentAlignment="Center"
                                     Content="Y移动量"
@@ -541,7 +553,7 @@
                                 <Label
                                     Grid.Row="4"
                                     Grid.Column="0"
-                                    Margin="0,0,10,10"
+                                    Margin="0,21,0,0"
                                     HorizontalContentAlignment="Right"
                                     VerticalContentAlignment="Center"
                                     Content="刀数"
@@ -550,7 +562,7 @@
                                     x:Name="deptSetLabel"
                                     Grid.Row="5"
                                     Grid.Column="0"
-                                    Margin="0,0,10,10"
+                                    Margin="0,21,0,0"
                                     HorizontalContentAlignment="Right"
                                     VerticalContentAlignment="Center"
                                     Content="第一次切割深度"
@@ -559,7 +571,7 @@
                                     x:Name="loopLabel"
                                     Grid.Row="6"
                                     Grid.Column="0"
-                                    Margin="0,0,10,10"
+                                    Margin="0,21,0,0"
                                     HorizontalContentAlignment="Right"
                                     VerticalContentAlignment="Center"
                                     Content="循环"
@@ -598,7 +610,7 @@
                                 <StackPanel
                                     Grid.Row="1"
                                     Grid.Column="0"
-                                    Height="372.88">
+                                    Height="450.88">
                                     <ListView
                                         Name="lvDataView"
                                         Background="Transparent"

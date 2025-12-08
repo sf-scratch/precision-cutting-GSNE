@@ -96,12 +96,14 @@
                         Command="{Binding StartHomingXCommand}"
                         Content="原点"
                         FontSize="18"
-                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}"
+                        Visibility="Hidden" />
                     <Button
                         Command="{Binding RelaxXCommand}"
                         Content="放松"
                         FontSize="18"
-                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}"
+                        Visibility="Hidden" />
                     <TextBlock Text="Y" />
                     <!--<TextBox materialDesign:HintAssist.Hint="当前Jog速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedY}" />
                     <TextBox materialDesign:HintAssist.Hint="当前速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedY}" />-->
@@ -131,12 +133,14 @@
                         Command="{Binding StartHomingYCommand}"
                         Content="原点"
                         FontSize="18"
-                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}"
+                        Visibility="Hidden" />
                     <Button
                         Command="{Binding RelaxYCommand}"
                         Content="放松"
                         FontSize="18"
-                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}"
+                        Visibility="Hidden" />
                     <TextBlock Text="Z1" />
                     <!--<TextBox materialDesign:HintAssist.Hint="当前Jog速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedZ1}" />
                     <TextBox materialDesign:HintAssist.Hint="当前速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedZ1}" />-->
@@ -166,12 +170,14 @@
                         Command="{Binding StartHomingZ1Command}"
                         Content="原点"
                         FontSize="18"
-                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}"
+                        Visibility="Hidden" />
                     <Button
                         Command="{Binding RelaxZ1Command}"
                         Content="放松"
                         FontSize="18"
-                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}"
+                        Visibility="Hidden" />
                     <TextBlock Text="Z2" />
                     <!--<TextBox materialDesign:HintAssist.Hint="当前Jog速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedZ2}" />
                     <TextBox materialDesign:HintAssist.Hint="当前速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedZ2}" />-->
@@ -201,12 +207,14 @@
                         Command="{Binding StartHomingZ2Command}"
                         Content="原点"
                         FontSize="18"
-                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}"
+                        Visibility="Hidden" />
                     <Button
                         Command="{Binding RelaxZ2Command}"
                         Content="放松"
                         FontSize="18"
-                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                        Style="{StaticResource MaterialDesignOutlinedLightButton}"
+                        Visibility="Hidden" />
                     <TextBlock Text="θ" Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
                     <!--<TextBox materialDesign:HintAssist.Hint="当前Jog速度deg/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedTheta}" />
                     <TextBox materialDesign:HintAssist.Hint="当前速度deg/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedTheta}" />-->
@@ -233,7 +241,7 @@
                         Content="开始"
                         IsEnabled="{Binding IsReadyTheta}"
                         Style="{StaticResource MaterialDesignOutlinedLightButton}" />-->
-                    <Button
+                    <!--<Button
                         Command="{Binding StartHomingThetaCommand}"
                         Content="原点"
                         FontSize="18"
@@ -244,7 +252,7 @@
                         Content="放松"
                         FontSize="18"
                         Style="{StaticResource MaterialDesignOutlinedLightButton}"
-                        Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
+                        Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />-->
                 </auto:AutoGrid>
             </Border>
             <Border

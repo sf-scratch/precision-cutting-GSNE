@@ -243,7 +243,7 @@
                 x:Name="labWorkDiscFocusPosition"
                 Height="35"
                 Margin="0,10,0,0"
-                Content="相机聚焦位置"
+                Content="相机与工作盘聚焦位置"
                 FontWeight="Bold" />
             <Controls:InputTextBox
                 x:Name="inputWorkDiscFocusPosition"

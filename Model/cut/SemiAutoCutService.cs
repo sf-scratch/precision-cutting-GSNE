@@ -48,7 +48,18 @@ namespace 精密切割系统.Model.cut
         public bool IsReady
         {
             get { return _isReady; }
-            set { _isReady = value; }
+            private set { _isReady = value; }
+        }
+
+        private bool _isRuning;
+
+        /// <summary>
+        /// 是否运行中
+        /// </summary>
+        public bool IsRuning
+        {
+            get { return _isRuning; }
+            private set { _isRuning = value; }
         }
 
         private float _depthCompensationValue;
@@ -118,7 +129,7 @@ namespace 精密切割系统.Model.cut
 
         private SemiAutoCutService()
         {
-            IsReady = true;
+            _isReady = true;
             _isContinueBeyondWorkpiece = false;
             _alignService = ThetaAlignService.Instance;
             _cutDirection = CutDirection.Backward;
@@ -166,7 +177,8 @@ namespace 精密切割系统.Model.cut
             Stopwatch stopwatch = new();
             try
             {
-                IsReady = false;
+                _isReady = false;
+                _isRuning = true;
                 PathCalculator pathCalculator = new(cutSteps.Select(p => p.Speed).ToList());
                 //打开切割水
                 await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
@@ -328,7 +340,8 @@ namespace 精密切割系统.Model.cut
             }
             finally
             {
-                IsReady = true;
+                _isReady = true;
+                _isRuning = false;
                 _isContinueBeyondWorkpiece = false;
                 //退出全自动切割模式
                 await PlcControl.tagControl.cutting.ExitCuttingModeAsync(default);
@@ -357,6 +370,7 @@ namespace 精密切割系统.Model.cut
 
         private async Task<(RunResult, CancellationToken)> WaitContinueAsync(LineSegment? line, IWorkpieces workpieces, float currentKnifeRemainTime, string? message = null)
         {
+            _isRuning = false;
             CutServicePaused?.Invoke(line, message, currentKnifeRemainTime);
             _continueTcs = new TaskCompletionSource<ServicePauseResult>();
             ServicePauseResult result = await _continueTcs.Task;

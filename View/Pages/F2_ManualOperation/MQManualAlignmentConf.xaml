@@ -236,12 +236,11 @@
                 Grid.Row="2"
                 Margin="30"
                 Visibility="Collapsed" />
-
             <common:SimpleDirectOperate
                 Grid.Row="2"
                 Grid.Column="1"
                 Width="600"
-                Height="260" />
+                Height="220" />
         </Grid>
     </Grid>
 </Page>

@@ -111,21 +111,6 @@ namespace 精密切割系统.ViewModel
             catch (OperationCanceledException) { }
         }
 
-        private async Task FocusAuto()
-        {
-            try
-            {
-                CommonResult<float> focusRusult = await AutoCutUtils.AutoFocusAsync(_eventAggregator, _operatCts.Token);
-                if (!focusRusult.IsSuccess)
-                {
-                    MaterialSnackUtils.MaterialSnack(focusRusult.Message, MaterialSnackUtils.SnackType.WARNING);
-                    return;
-                }
-                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(focusRusult.Data, default, _operatCts.Token);
-            }
-            catch (OperationCanceledException) { }
-        }
-
         private void StopUpdateCameraCommonLine()
         {
             _intervalTimer.Stop();
@@ -172,7 +157,6 @@ namespace 精密切割系统.ViewModel
             float offsetX = _originPoint.X - curPoint.X;
             float offsetY = _originPoint.Y - curPoint.Y;
             Appsettings.CameraRelativeBladePosition = new DataPoint<float>(relativePostion.X, relativePostion.Y - offsetY);
-            Appsettings.FocusClearZ = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync();
             _originPoint = curPoint;
             MaterialSnackUtils.MaterialSnack($"基准线校准完成", MaterialSnackUtils.SnackType.SUCCESS, 0);
         }

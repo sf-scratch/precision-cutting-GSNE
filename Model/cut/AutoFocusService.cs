@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using 精密切割系统.database.db.modle;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.plc;
@@ -28,7 +29,15 @@ namespace 精密切割系统.Model.cut
             try
             {
                 eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始相机对焦..."));
-                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(Appsettings.FocusClearZ ?? 0, default, token);
+                CommonResult<FileTableItemModel> fileTableItemResult = await AutoCutUtils.GetFileTableItemModelAsync();
+                if (!fileTableItemResult.IsSuccess || fileTableItemResult.Data is null)
+                {
+                    return CommonResult<float>.Failure(fileTableItemResult.Message);
+                }
+                FileTableItemModel fileTableItem = fileTableItemResult.Data;
+                float workThickness = fileTableItem.WorkThickness.ToFloat();
+                float tapeThickness = fileTableItem.TapeThickness.ToFloat();
+                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(Appsettings.FocusClearZ - workThickness - tapeThickness ?? 0, default, token);
                 int direction = 1;
                 // 阶段1：快速粗调（正向扫描）
                 var coarseResult = await FindOptimalFocus(
@@ -58,15 +67,7 @@ namespace 精密切割系统.Model.cut
                     isCoarseScan: false,
                     eventAggregator,
                     token);
-                if (result.IsSuccess)
-                {
-                    Appsettings.FocusClearZ = result.Data;
-                    await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(result.Data, default, token);
-                }
-                else
-                {
-                    Appsettings.FocusClearZ = 0;
-                }
+                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(result.Data, default, token);
                 return result;
             }
             finally

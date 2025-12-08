@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace 精密切割系统.database.db.modle
 {
     [Table("file_table_item")]
-    internal class FileTableItemModel
+    public class FileTableItemModel
     {
         [PrimaryKey, AutoIncrement]
         [Column("id")]

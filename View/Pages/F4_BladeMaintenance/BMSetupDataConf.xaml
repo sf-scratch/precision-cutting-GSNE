@@ -6,8 +6,12 @@
     xmlns:auto="clr-namespace:WpfAutoGrid;assembly=WpfAutoGrid.Core"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:精密切割系统.ViewModel"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
     Title="BMSetupDataConf"
+    d:DataContext="{d:DesignInstance viewModel:BMSetupDataConfViewModel,
+                                     IsDesignTimeCreatable=True}"
     d:DesignHeight="676"
     d:DesignWidth="1448"
     Loaded="Page_Loaded"
@@ -17,11 +21,26 @@
         <local:BladeHeightViewModel />
     </Page.DataContext>
     <Grid Margin="30,30,0,0">
+        <Grid.Resources>
+            <Style BasedOn="{StaticResource InputTextStyle}" TargetType="Controls:InputTextBox">
+                <Setter Property="Width" Value="150" />
+                <Setter Property="Height" Value="35" />
+                <Setter Property="InputType" Value="Numeral" />
+                <Setter Property="TextWrapping" Value="Wrap" />
+            </Style>
+            <Style TargetType="Label">
+                <Setter Property="FontSize" Value="18" />
+                <Setter Property="Height" Value="35" />
+                <Setter Property="FontWeight" Value="Bold" />
+            </Style>
+        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="60" />
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
@@ -30,6 +49,7 @@
             Grid.Row="0"
             Grid.Column="0"
             Grid.ColumnSpan="3"
+            Height="auto"
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
             Content="测高参数(3.3)"
@@ -41,24 +61,14 @@
             ChildMargin="5"
             Columns="3*,2*,*"
             RowCount="10">
-            <auto:AutoGrid.Resources>
-                <Style TargetType="Label">
-                    <Setter Property="FontSize" Value="18" />
-                    <Setter Property="Height" Value="35" />
-                    <Setter Property="FontWeight" Value="Bold" />
-                </Style>
-                <Style BasedOn="{StaticResource InputTextStyle}" TargetType="Controls:InputTextBox">
-                    <Setter Property="Width" Value="150" />
-                    <Setter Property="Height" Value="35" />
-                    <Setter Property="InputType" Value="Numeral" />
-                    <Setter Property="TextWrapping" Value="Wrap" />
-                </Style>
-            </auto:AutoGrid.Resources>
             <Label Content="旋转轴转速" />
             <Controls:InputTextBox x:Name="spindleRev" XMax="30000" />
             <Label Content="/min" />
             <Label Content="测高次数" />
-            <Controls:InputTextBox x:Name="heightMeasureTimes" XMax="3" />
+            <Controls:InputTextBox
+                x:Name="heightMeasureTimes"
+                TextChanged="heightMeasureTimes_TextChanged"
+                XMax="3" />
             <Label Content="次" />
             <Label Content="θ轴移动角度" />
             <Controls:InputTextBox x:Name="thetaMovementAngle" XMax="90" />
@@ -266,8 +276,35 @@
         <Controls:RealTimeInfoBox
             x:Name="RealTimeInfo"
             Grid.Row="1"
-            Grid.Column="3"
+            Grid.Column="1"
             Width="400"
-            Margin="50,0,0,0" />
+            Margin="50,0,0,20" />
+        <ListBox
+            Grid.Row="1"
+            Grid.Column="2"
+            Margin="50,0,0,20"
+            d:ItemsSource="{d:SampleData}"
+            ItemsSource="{Binding BladeMeasureList}">
+            <ListBox.ItemContainerStyle>
+                <Style BasedOn="{StaticResource MaterialDesignListBoxItem}" TargetType="ListBoxItem">
+                    <Setter Property="Margin" Value="0,0,0,1" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="materialDesign:ListBoxItemAssist.ShowSelection" Value="False" />
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Margin="5" Orientation="Horizontal">
+                        <Label
+                            Margin="0,0,10,0"
+                            Content="{Binding FieldName}"
+                            FontSize="18"
+                            FontWeight="Bold" />
+                        <Controls:InputTextBox IsEnabled="False" Text="{Binding FieldValue}" />
+                        <Label Content="mm" FontSize="18" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
     </Grid>
 </Page>

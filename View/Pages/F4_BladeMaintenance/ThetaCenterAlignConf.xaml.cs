@@ -423,6 +423,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                         {
                             await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(120), _dataShowsCts.Token);
                             await PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(_isPositive ? 90 : 0, default, timeoutToken.Token);
+                            _isPositive = !_isPositive;
                         }
                         catch (OperationCanceledException)
                         {
@@ -432,12 +433,12 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                     break;
 
                 case 44004:
-                    if (_stopCts is null) return;
+                    if (_dataShowsCts is null) return;
                     await _thetaCenterAlignSemaphore.ExecuteAsync(async () =>
                     {
                         try
                         {
-                            await PlcControl.tagControl.cutting.RunMotionAsync(Appsettings.CameraThetaCenterPoint.X, Appsettings.CameraThetaCenterPoint.Y, _stopCts.Token);
+                            await PlcControl.tagControl.cutting.RunMotionAsync(Appsettings.CameraThetaCenterPoint.X, Appsettings.CameraThetaCenterPoint.Y, _dataShowsCts.Token);
                         }
                         catch (OperationCanceledException)
                         {

@@ -71,7 +71,6 @@ namespace 精密切割系统.ViewModel
             BottomButtonCollection.Add(RightButtonParams.BlueButton("V槽相机参数", "CameraFlipOutline", CameraUtils.SetCameraDeviceVCaoParams));
             BottomButtonCollection.Add(RightButtonParams.BlueButton("自动曝光参数", "CameraFlipOutline", CameraUtils.SetCameraExposureAutoContinus));
             BottomButtonCollection.Add(RightButtonParams.BlueButton("工件吹气", "WeatherWindy", () => _semaph.ExecuteAsync(WorkpieceBlowing, "工件吹气")));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("精细对焦", "FocusAuto", () => _semaph.ExecuteAsync(FocusAuto, "精细对焦")));
             BottomButtonCollection.Add(RightButtonParams.BlueButton("对焦", "FocusAuto", () => _semaph.ExecuteAsync(GlobalFocus, "对焦")));
         }
 
@@ -80,21 +79,6 @@ namespace 精密切割系统.ViewModel
             try
             {
                 CommonResult<float> focusRusult = await AutoFocusService.GlobalFocusAsync(default, _cts?.Token ?? default);
-                if (!focusRusult.IsSuccess)
-                {
-                    MaterialSnackUtils.MaterialSnack(focusRusult.Message, MaterialSnackUtils.SnackType.WARNING);
-                    return;
-                }
-                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(focusRusult.Data, default, default);
-            }
-            catch (OperationCanceledException) { }
-        }
-
-        private async Task FocusAuto()
-        {
-            try
-            {
-                CommonResult<float> focusRusult = await AutoCutUtils.AutoFocusAsync(token: _cts?.Token ?? default);
                 if (!focusRusult.IsSuccess)
                 {
                     MaterialSnackUtils.MaterialSnack(focusRusult.Message, MaterialSnackUtils.SnackType.WARNING);

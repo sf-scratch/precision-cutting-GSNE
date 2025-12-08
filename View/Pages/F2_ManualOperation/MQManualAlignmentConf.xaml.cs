@@ -188,35 +188,6 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         {
             switch (code)
             {
-                case 2442:
-                    {
-                        await _semaphore.ExecuteAsync(async () =>
-                        {
-                            try
-                            {
-                                await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(120), _cts.Token);
-                                var result = await AutoCutUtils.AutoFocusAsync(_eventAggregator, timeoutToken.Token);
-                                if (!result.IsSuccess)
-                                {
-                                    MaterialSnack(result.Message, SnackType.WARNING, default, _eventAggregator);
-                                    return;
-                                }
-                            }
-                            catch (OperationCanceledException)
-                            {
-                                if (_cts.IsCancellationRequested)
-                                {
-                                    MaterialSnack("精细对焦已取消！", SnackType.WARNING, default, _eventAggregator);
-                                }
-                                else
-                                {
-                                    MaterialSnack("精细对焦超时！", SnackType.WARNING, default, _eventAggregator);
-                                }
-                            }
-                        }, "精细对焦");
-                    }
-                    break;
-
                 case 2441:
                     {
                         await _semaphore.ExecuteAsync(async () =>

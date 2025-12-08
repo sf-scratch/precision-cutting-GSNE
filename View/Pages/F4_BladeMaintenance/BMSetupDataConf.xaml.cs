@@ -43,10 +43,10 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         private MainWindow _mainWindow;
         private RightPage _rightPage;
         private OperatePage _operatePage;
-        private BladeHeightViewModel _viewModel;
-        private BladeHeightModel _bladeHeightModel;
         private CancellationTokenSource _measureHeightCts;
         private CancellationTokenSource _monitorCts;
+
+        private BMSetupDataConfViewModel? ViewModel => DataContext as BMSetupDataConfViewModel;
 
         public BMSetupDataConf()
         {
@@ -73,6 +73,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             _rightPage.btnStartSetup.BackFlag = false;
             _rightPage.btnStartSetup.SetRightClickedHandler(BtnStartSetup_RightClicked);
             _rightPage.btnCutStop.SetRightClickedHandler(BtnCutStop_RightClicked);
+            DataContext = new BMSetupDataConfViewModel();
             LoadDBData();
             RealTimeInfo.Messages.Add(MessageModel.Create("进入测高界面..."));
         }
@@ -90,6 +91,11 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 
         private async void BtnStartSetup_RightClicked(object? sender, bool e)
         {
+            if (this.HasFormError())
+            {
+                MaterialSnack("表单填写有误，请检查!", SnackType.ERROR);
+                return;
+            }
             if (AlarmConfig.Instance.HasActiveErrorAlarm())
             {
                 MaterialSnackUtils.MaterialSnack(AlarmConfig.HasErrorAlarmMessage, SnackType.WARNING);
@@ -129,6 +135,14 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 
         private void OnMessageReceived(MessageModel model)
         {
+            var (success, Index, Value) = AutoCutUtils.ExtractNumbersPrecise(model.Message);
+            if (success)
+            {
+                if (ViewModel is not null && Index - 1 < ViewModel.BladeMeasureList.Count && Index - 1 >= 0)
+                {
+                    ViewModel.BladeMeasureList[Index - 1].FieldValue = (float)Value;
+                }
+            }
             RealTimeInfo.Messages.Add(model);
         }
 
@@ -170,6 +184,26 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 return;
             }
             _mainWindow.NavigateToPage("MainMenu");
+        }
+
+        private void heightMeasureTimes_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (this.HasFormError())
+            {
+                return;
+            }
+            if (ViewModel is not null)
+            {
+                ViewModel.BladeMeasureList.Clear();
+                for (int i = 0; i < heightMeasureTimes.Text.ToInt(); i++)
+                {
+                    ViewModel.BladeMeasureList.Add(new BladeMeasureData()
+                    {
+                        FieldName = $"第{i + 1}次测高",
+                        FieldValue = 0
+                    });
+                }
+            }
         }
     }
 }

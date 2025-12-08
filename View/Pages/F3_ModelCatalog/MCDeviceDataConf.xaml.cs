@@ -36,6 +36,7 @@ using 精密切割系统.Assets.config.buttom;
 using 精密切割系统.Assets.config.menu;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Helpers;
+using 精密切割系统.Model.cut;
 using 精密切割系统.Utils;
 using 精密切割系统.View.Controls;
 using 精密切割系统.View.page.right;
@@ -72,7 +73,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             mainWindow = System.Windows.Application.Current.MainWindow as MainWindow;
         }
 
-        private void Label_Loaded(object sender, RoutedEventArgs e)
+        private async void Label_Loaded(object sender, RoutedEventArgs e)
         {
             rightPage = mainWindow.rightFrame.Content as RightPage;
             rightPage.PanelAction.Visibility = Visibility.Visible;
@@ -112,6 +113,8 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 CutUtils.UpdateGlobalRunFlag(OperateData.GetMCDeviceDataOperate());
             }
             initGridView();
+            //更新界面数据
+            await UpdateTotalCutNumAsync();
         }
 
         private async void initFunctionSelection()
@@ -823,12 +826,10 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 factory.SetValue(Label.ContentProperty, "SEQ" + (i + 1));
                 headerTemplate.VisualTree = factory;
                 column.HeaderTemplate = headerTemplate;
-                //END
                 //内容布局
-
                 FrameworkElementFactory inputFactory = new FrameworkElementFactory(typeof(InputTextBox));
                 inputFactory.SetValue(InputTextBox.WidthProperty, 135.0);
-                inputFactory.SetValue(InputTextBox.HeightProperty, 30.0);
+                inputFactory.SetValue(InputTextBox.HeightProperty, 33.0);
                 inputFactory.SetValue(InputTextBox.MarginProperty, new Thickness(0, 0, 0, 0));
                 inputFactory.SetValue(InputTextBox.PaddingProperty, new Thickness(0));
                 inputFactory.SetBinding(InputTextBox.TextProperty, new Binding("Column" + i));
@@ -1091,7 +1092,20 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 }
                 await SqlHelper.UpdateAsync(currentModel);
                 await SqlHelper.UpdateAsync(_chModel);
+                //更新界面数据
+                await UpdateTotalCutNumAsync();
             }
+        }
+
+        private async Task UpdateTotalCutNumAsync()
+        {
+            CommonResult<List<CutStep>> cutStepResult = await AutoCutUtils.GenerateCutStepListAsync(false);
+            if (!cutStepResult.IsSuccess || cutStepResult.Data is null)
+            {
+                MaterialSnackUtils.MaterialSnack(cutStepResult.Message, MaterialSnackUtils.SnackType.ERROR);
+                return;
+            }
+            totalCutNum.Text = cutStepResult.Data.Count.ToString();
         }
 
         private void lvDataView_Loaded(object sender, RoutedEventArgs e)

@@ -16,6 +16,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
@@ -194,7 +195,7 @@ namespace 精密切割系统.Helpers
             CommonResult<float> curHeightZ;
             if (Appsettings.MeasureHeightLast == null)
             {
-                if (Appsettings.BladeOuterDiameter == null)
+                if (Appsettings.BladeOuterDiameter == null || Appsettings.BladeOuterDiameter.Value == 0)
                 {
                     return CommonResult<float>.Failure("未设置刀片外径，无法测高！");
                 }
@@ -378,6 +379,18 @@ namespace 精密切割系统.Helpers
                 await PlcControl.tagControl.bladeMantance.StartNoContactHeightMeasurement();
             }
             return CommonResult<float>.Failure("测高失败次数过多！");
+        }
+
+        public static (bool success, int Index, double Value) ExtractNumbersPrecise(string input)
+        {
+            // 直接匹配 "第数字次" 和 "数字.数字" 格式
+            var indexMatch = Regex.Match(input, @"第(\d+)次");
+            var valueMatch = Regex.Match(input, @"(\d+\.?\d*)$"); // 末尾的数字
+
+            int index = indexMatch.Success ? int.Parse(indexMatch.Groups[1].Value) : 1;
+            double value = valueMatch.Success ? double.Parse(valueMatch.Groups[1].Value) : 0.0;
+
+            return (indexMatch.Success && valueMatch.Success, index, value);
         }
 
         public static CommonResult<float> CaculateZAxisMaxDistance(float bladeOuterDiameter)
@@ -780,46 +793,46 @@ namespace 精密切割系统.Helpers
             await Task.WhenAll(focusxyTask, focusThetaTask);
         }
 
-        public static async Task<CommonResult<float>> AutoFocusAsync(IEventAggregator? eventAggregator = null, CancellationToken token = default)
-        {
-            eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始相机精细对焦..."));
-            CameraCommon? cameraCommon = GetCameraCommon();
-            if (cameraCommon is null)
-            {
-                return CommonResult<float>.Failure("相机获取失败！");
-            }
-            float focusClearZ = Appsettings.FocusClearZ ?? 0;
-            await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(focusClearZ, 2, token);
-            // 模糊度大于200时，直接返回清晰位置
-            //if (cameraCommon.localBitmap != null)
-            //{
-            //    double tenengradBlurriness = VisualUtils.CalculateTenengrad2(cameraCommon.localBitmap);
-            //    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"当前位置：{focusClearZ} 当前模糊度：{tenengradBlurriness}"));
-            //    if (tenengradBlurriness > 200)
-            //    {
-            //        eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"图像已清晰无需再次聚焦"));
-            //        Appsettings.IsNeedCheckBaseLine = false;
-            //        return CommonResult<float>.Success(focusClearZ);
-            //    }
-            //}
-            //Appsettings.IsNeedCheckBaseLine = true;
-            CommonResult<float> roughFocusPosition = await AutoFocusAsync(cameraCommon, focusClearZ, 0.2f, 0.02f, token, eventAggregator);
-            if (!roughFocusPosition.IsSuccess)
-            {
-                roughFocusPosition = await AutoFocusService.GlobalFocusAsync(eventAggregator, token);
-                if (!roughFocusPosition.IsSuccess)
-                {
-                    return CommonResult<float>.Failure("聚焦失败，请检查硅片位置！");
-                }
-            }
-            // 进行精调聚焦
-            CommonResult<float> result = await AutoFocusAsync(cameraCommon, roughFocusPosition.Data, 0.018f, 0.002f, token, eventAggregator);
-            if (result.IsSuccess)
-            {
-                Appsettings.FocusClearZ = result.Data;
-            }
-            return result;
-        }
+        //public static async Task<CommonResult<float>> AutoFocusAsync(IEventAggregator? eventAggregator = null, CancellationToken token = default)
+        //{
+        //    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始相机精细对焦..."));
+        //    CameraCommon? cameraCommon = GetCameraCommon();
+        //    if (cameraCommon is null)
+        //    {
+        //        return CommonResult<float>.Failure("相机获取失败！");
+        //    }
+        //    float focusClearZ = Appsettings.FocusClearZ ?? 0;
+        //    await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(focusClearZ, 2, token);
+        //    // 模糊度大于200时，直接返回清晰位置
+        //    //if (cameraCommon.localBitmap != null)
+        //    //{
+        //    //    double tenengradBlurriness = VisualUtils.CalculateTenengrad2(cameraCommon.localBitmap);
+        //    //    eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"当前位置：{focusClearZ} 当前模糊度：{tenengradBlurriness}"));
+        //    //    if (tenengradBlurriness > 200)
+        //    //    {
+        //    //        eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"图像已清晰无需再次聚焦"));
+        //    //        Appsettings.IsNeedCheckBaseLine = false;
+        //    //        return CommonResult<float>.Success(focusClearZ);
+        //    //    }
+        //    //}
+        //    //Appsettings.IsNeedCheckBaseLine = true;
+        //    CommonResult<float> roughFocusPosition = await AutoFocusAsync(cameraCommon, focusClearZ, 0.2f, 0.02f, token, eventAggregator);
+        //    if (!roughFocusPosition.IsSuccess)
+        //    {
+        //        roughFocusPosition = await AutoFocusService.GlobalFocusAsync(eventAggregator, token);
+        //        if (!roughFocusPosition.IsSuccess)
+        //        {
+        //            return CommonResult<float>.Failure("聚焦失败，请检查硅片位置！");
+        //        }
+        //    }
+        //    // 进行精调聚焦
+        //    CommonResult<float> result = await AutoFocusAsync(cameraCommon, roughFocusPosition.Data, 0.018f, 0.002f, token, eventAggregator);
+        //    if (result.IsSuccess)
+        //    {
+        //        //Appsettings.FocusClearZ = result.Data;
+        //    }
+        //    return result;
+        //}
 
         private static async Task<CommonResult<float>> AutoFocusAsync(CameraCommon cameraCommon, float startPositionZ2, float margin, float singleMoveDistance, CancellationToken token, IEventAggregator? eventAggregator = null)
         {
@@ -1893,6 +1906,156 @@ namespace 精密切割系统.Helpers
             await PlcControl.tagControl.Z2axis.SetSoftLowerLimit(Appsettings.NegativeLimitPositionZ2 ?? 0);
             await PlcControl.tagControl.ThetaAxis.SetSoftUpperLimit(Appsettings.PositiveLimitPositionTheta ?? 0);
             await PlcControl.tagControl.ThetaAxis.SetSoftLowerLimit(Appsettings.NegativeLimitPositionTheta ?? 0);
+        }
+
+        public static async Task<CommonResult<List<CutStep>>> GenerateCutStepListAsync(bool isOpenPrecut)
+        {
+            //获取功能选择数据
+            var selectionModels = await SqlHelper.TableAsync<FunctionSelectionModel>().Where(t => t.Id == 1).ToListAsync();
+            if (selectionModels.Count <= 0)
+            {
+                return CommonResult<List<CutStep>>.Failure("功能选择配置异常！");
+            }
+            FunctionSelectionModel functionModel = selectionModels[0];
+            bool isDeep = functionModel.DepthStepsFunction;
+            bool isLoop = functionModel.LoopFunction;
+            CommonResult<FileTableItemModel> fileTableItemResult = await GetFileTableItemModelAsync();
+            if (!fileTableItemResult.IsSuccess || fileTableItemResult.Data is null)
+            {
+                return CommonResult<List<CutStep>>.Failure(fileTableItemResult.Message);
+            }
+            FileTableItemModel fileTableItem = fileTableItemResult.Data;
+            string cuttingChSeq = fileTableItem.CuttingChSeq;
+            // 参数校验
+            if (fileTableItem.SpindleRev == 0 || fileTableItem.SpindleRev > 30000)
+            {
+                return CommonResult<List<CutStep>>.Failure("切割转速配置错误！");
+            }
+            List<CutStep> cutSteps = [];
+            // 查询通道信息
+            List<FileTableItemChModel> chModels = await SqlHelper.TableAsync<FileTableItemChModel>().Where(t => t.ItemId == fileTableItem.Id).ToListAsync();
+            int[] chSeqs = Tools.StringToIntegerArray(cuttingChSeq);
+            foreach (int chSeq in chSeqs)
+            {
+                FileTableItemChModel ch = chModels[chSeq - 1];
+                float[] setBladeHeight = Tools.StringToFloatArray(ch.BladeHeight);// 设置的刀片高度
+                float[] feedSpeeds = Tools.StringToFloatArray(ch.FeedSpeed); // 获取进给速度
+                float[] yIndexs = Tools.StringToFloatArray(ch.YIndex);       // 获取Y轴偏移
+                float[] repeatTimes = Tools.StringToFloatArray(ch.RepeatTimes); // 获取重复次数
+                float[] cutDepths = Tools.StringToFloatArray(ch.DepthSteps); // 获取切割深度
+                string[] loops = Tools.StringToStringArray(ch.Loop);         // 获取循环控制信息
+                // 检查索引是否连续
+                int maxIndex = AreIndexesContinuous(setBladeHeight, feedSpeeds, yIndexs, repeatTimes);
+                if (maxIndex == -1)
+                {
+                    return CommonResult<List<CutStep>>.Failure("切割参数错误！");
+                }
+                if (cutDepths.Length <= maxIndex)
+                {
+                    return CommonResult<List<CutStep>>.Failure("切割深度参数错误！");
+                }
+                // 生成子序列
+                List<string> repetitions = [.. loops];
+                List<int> sequences = [.. Enumerable.Range(0, maxIndex + 1)];
+                List<int> newSeq = isLoop ? CutUtils.CombineSequences(sequences, repetitions) : sequences;
+                List<CutStep> tempCutSteps = [];
+                foreach (int index in newSeq)
+                {
+                    for (int i = 0; i < repeatTimes[index]; i++)
+                    {
+                        float cutHeight = setBladeHeight[index];
+                        float speed = feedSpeeds[index];
+                        float offsetY = yIndexs[index];
+                        float thetaDeg = float.Parse(ch.ThetaDeg);
+                        bool isAbsolute = ch.ComBoxCutMethod.Equals("绝对");
+                        float channelStartY = isAbsolute ? ch.AbsoluteCutPosition.ToFloat() : 0;
+                        float offsetX = ch.OffsetX.ToFloat();
+                        bool isAlternatingCuttingStroke = ch.CutMode == CutOperateUtils.B_ZKEEP;
+                        int channelNum = chSeq;
+                        float? singleCutDeep = isDeep ? cutDepths[index] : null;
+                        tempCutSteps.Add(new CutStep(cutHeight, speed, offsetY, thetaDeg, isAbsolute, channelStartY, offsetX, isAlternatingCuttingStroke, channelNum, singleCutDeep));
+                    }
+                }
+                int chCutLines = Tools.GetIntStringValue(ch.CutLine);
+                if (chCutLines == 0)
+                {
+                    cutSteps.AddRange(tempCutSteps);
+                }
+                else if (chCutLines > tempCutSteps.Count)
+                {
+                    cutSteps.AddRange(Enumerable.Range(0, chCutLines).Select(i => tempCutSteps[i % tempCutSteps.Count]));
+                }
+                else
+                {
+                    cutSteps.AddRange(tempCutSteps.GetRange(0, chCutLines));
+                }
+            }
+            if (isOpenPrecut)
+            {
+                CommonResult<List<float>> preCutSpeedResult = AutoCutUtils.GetPreCutSpeedList();
+                if (!preCutSpeedResult.IsSuccess || preCutSpeedResult.Data is null)
+                {
+                    return CommonResult<List<CutStep>>.Failure(preCutSpeedResult.Message);
+                }
+                List<float> speeds = preCutSpeedResult.Data;
+                if (speeds.Count > cutSteps.Count)
+                {
+                    speeds = speeds.GetRange(0, cutSteps.Count);
+                }
+                for (int i = 0; i < speeds.Count; i++)
+                {
+                    if (speeds[i] < cutSteps[i].Speed)
+                    {
+                        cutSteps[i] = cutSteps[i] with { Speed = speeds[i] };
+                    }
+                }
+            }
+            if (cutSteps.Count == 0)
+            {
+                return CommonResult<List<CutStep>>.Failure("未生成有效切割步骤！");
+            }
+            //第一刀不跳步进
+            cutSteps[0] = cutSteps[0] with { NextStepDistance = 0 };
+            return CommonResult<List<CutStep>>.Success(cutSteps);
+        }
+
+        public static async Task<CommonResult<FileTableItemModel>> GetFileTableItemModelAsync()
+        {
+            long id = CurrentUtils.GetCurrentConfiguration().DeviceDataId;
+            // 判断是否确认配置信息
+            if (id == 0)
+            {
+                return CommonResult<FileTableItemModel>.Failure("未确认配置信息！");
+            }
+            // 查询配置信息
+            List<FileTableItemModel> listConf = await SqlHelper.TableAsync<FileTableItemModel>().Where(t => t.Id == id).ToListAsync();
+            if (listConf.Count == 0)
+            {
+                return CommonResult<FileTableItemModel>.Failure("未确认配置信息！");
+            }
+            FileTableItemModel fileTableItem = listConf[0];
+            return CommonResult<FileTableItemModel>.Success(fileTableItem);
+        }
+
+        public static int AreIndexesContinuous(float[] setBladeHeight, float[] feedSpeeds, float[] yIndexs, float[] repeatTimes)
+        {
+            // 获取满足条件的索引
+            var validIndexes = setBladeHeight
+                .Select((value, index) => new { Value = value, Index = index })
+                .Where(x => x.Value > 0 && feedSpeeds[x.Index] > 0 && yIndexs[x.Index] != 0 && repeatTimes[x.Index] > 0)
+                .Select(x => x.Index)
+                .OrderBy(x => x)
+                .ToList();
+            // 检查是否有有效的索引
+            if (!validIndexes.Any())
+            {
+                return 0; // 没有符合条件的索引
+            }
+            // 检查索引是否连续
+            bool areIndexesContinuous = validIndexes.Zip(validIndexes.Skip(1), (current, next) => next - current == 1).All(x => x);
+
+            // 如果有效索引是连续的，返回最大索引，否则返回0
+            return areIndexesContinuous ? validIndexes.Max() : -1;
         }
     }
 
