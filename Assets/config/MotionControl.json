@@ -1074,8 +1074,8 @@
     "buzzer": {
       "valueType": "bool",
       "addr": "MR48001",
-      "name": "蜂鸣",
-      "describe": "蜂鸣"
+      "name": "蜂鸣器",
+      "describe": "蜂鸣器"
     },
     "greenLightFlash": {
       "valueType": "bool",

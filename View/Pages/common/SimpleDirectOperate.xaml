@@ -26,7 +26,7 @@
             <Setter Property="Foreground" Value="White" />
             <Setter Property="BorderBrush" Value="#5087Cb" />
         </Style>
-        <Style BasedOn="{StaticResource MaterialDesignFlatLightBgButton}" TargetType="Button">
+        <!--<Style BasedOn="{StaticResource MaterialDesignFlatLightBgButton}" TargetType="Button">
             <Setter Property="Height" Value="50" />
             <Setter Property="Width" Value="100" />
             <Setter Property="FontSize" Value="18" />
@@ -34,6 +34,64 @@
             <Setter Property="Background" Value="#5087Cb" />
             <Setter Property="Foreground" Value="White" />
             <Setter Property="BorderBrush" Value="#5087Cb" />
+        </Style>-->
+
+        <Style TargetType="Button">
+            <Setter Property="BorderBrush" Value="{x:Null}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1.0" ScaleY="1.0" />
+                </Setter.Value>
+            </Setter>
+
+            <!--  按下效果触发器  -->
+            <Style.Triggers>
+                <!--  鼠标按下时效果  -->
+                <Trigger Property="IsPressed" Value="True">
+
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <ScaleTransform ScaleX="0.95" ScaleY="0.95" />
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="BorderBrush" Value="DarkGray" />
+                </Trigger>
+
+                <!--  动态恢复效果：动画从按下状态回到正常状态  -->
+                <Trigger Property="IsPressed" Value="False">
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation
+                                    Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleX)"
+                                    To="1.0"
+                                    Duration="0:0:0.1" />
+                                <DoubleAnimation
+                                    Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleY)"
+                                    To="1.0"
+                                    Duration="0:0:0.1" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+                    <!--  松开时移除边框  -->
+                    <Setter Property="BorderBrush" Value="Transparent" />
+                </Trigger>
+            </Style.Triggers>
         </Style>
     </UserControl.Resources>
     <UserControl.DataContext>
@@ -56,7 +114,11 @@
                         <RowDefinition />
                     </Grid.RowDefinitions>
                     <Grid Grid.Row="0">
-                        <Grid Width="100" Height="100">
+                        <Grid
+                            Width="100"
+                            Height="100"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
                             <StackPanel Orientation="Vertical">
                                 <Border
                                     Width="70"
@@ -76,7 +138,10 @@
                         </Grid>
                     </Grid>
                     <Grid Grid.Row="1">
-                        <StackPanel VerticalAlignment="Center" Orientation="Vertical">
+                        <StackPanel
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Orientation="Vertical">
                             <ToggleButton
                                 Width="65"
                                 Height="65"
@@ -106,18 +171,20 @@
                             Grid.Row="0"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center">
-                            <Button
-                                x:Name="scanTopBtn"
-                                VerticalAlignment="Top"
-                                Content="{materialDesign:PackIcon ArrowTopThick,
-                                                                  Size=50}"
-                                Style="{StaticResource ArrowButton}">
+                            <Button x:Name="scanTopBtn" VerticalAlignment="Top">
                                 <behaviors:Interaction.Behaviors>
                                     <behav:DualInputBehavior
                                         PromptCommand="{Binding YRelativeNegativeCommand}"
                                         StartCommand="{Binding StartYReversalCommand}"
                                         StopCommand="{Binding StopJogYCommand}" />
                                 </behaviors:Interaction.Behaviors>
+                                <Button.Content>
+                                    <Image
+                                        x:Name="scanTopIcon"
+                                        Width="89"
+                                        Height="52"
+                                        Source="/Assets/picture/scan_top.png" />
+                                </Button.Content>
                             </Button>
                         </Grid>
                         <Grid Grid.Row="1">
@@ -129,36 +196,40 @@
                                 Grid.Column="0"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center">
-                                <Button
-                                    x:Name="scanLeftBtn"
-                                    VerticalAlignment="Top"
-                                    Content="{materialDesign:PackIcon ArrowLeftThick,
-                                                                      Size=50}"
-                                    Style="{StaticResource ArrowButton}">
+                                <Button x:Name="scanLeftBtn" VerticalAlignment="Top">
                                     <behaviors:Interaction.Behaviors>
                                         <behav:DualInputBehavior
                                             PromptCommand="{Binding XRelativePositiveCommand}"
                                             StartCommand="{Binding StartXCorotationCommand}"
                                             StopCommand="{Binding StopJogXCommand}" />
                                     </behaviors:Interaction.Behaviors>
+                                    <Button.Content>
+                                        <Image
+                                            x:Name="scanLeftIcon"
+                                            Width="89"
+                                            Height="52"
+                                            Source="/Assets/picture/scan_left.png" />
+                                    </Button.Content>
                                 </Button>
                             </Grid>
                             <Grid
                                 Grid.Column="1"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center">
-                                <Button
-                                    x:Name="scanRightBtn"
-                                    VerticalAlignment="Center"
-                                    Content="{materialDesign:PackIcon ArrowRightThick,
-                                                                      Size=50}"
-                                    Style="{StaticResource ArrowButton}">
+                                <Button x:Name="scanRightBtn" VerticalAlignment="Center">
                                     <behaviors:Interaction.Behaviors>
                                         <behav:DualInputBehavior
                                             PromptCommand="{Binding XRelativeNegativeCommand}"
                                             StartCommand="{Binding StartXReversalCommand}"
                                             StopCommand="{Binding StopJogXCommand}" />
                                     </behaviors:Interaction.Behaviors>
+                                    <Button.Content>
+                                        <Image
+                                            x:Name="scanRightIcon"
+                                            Width="89"
+                                            Height="52"
+                                            Source="/Assets/picture/scan_right.png" />
+                                    </Button.Content>
                                 </Button>
                             </Grid>
                         </Grid>
@@ -166,18 +237,20 @@
                             Grid.Row="2"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center">
-                            <Button
-                                x:Name="scanBottomBtn"
-                                VerticalAlignment="Top"
-                                Content="{materialDesign:PackIcon ArrowBottomThick,
-                                                                  Size=50}"
-                                Style="{StaticResource ArrowButton}">
+                            <Button x:Name="scanBottomBtn" VerticalAlignment="Top">
                                 <behaviors:Interaction.Behaviors>
                                     <behav:DualInputBehavior
                                         PromptCommand="{Binding YRelativePositiveCommand}"
                                         StartCommand="{Binding StartYCorotationCommand}"
                                         StopCommand="{Binding StopJogYCommand}" />
                                 </behaviors:Interaction.Behaviors>
+                                <Button.Content>
+                                    <Image
+                                        x:Name="scanBottomIcon"
+                                        Width="89"
+                                        Height="55"
+                                        Source="/Assets/picture/scan_bottom.png" />
+                                </Button.Content>
                             </Button>
                         </Grid>
                     </Grid>

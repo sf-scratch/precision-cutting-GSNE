@@ -25,6 +25,7 @@ namespace 精密切割系统.Driver
     //基恩士PLC各个点位和变量的读取及写入
     public class KeyencePlc
     {
+        private const int MinDelayMs = 50; // 基础延迟
         public static string plcIP = "192.168.10.10";
         private static KeyencePlc? plc = null;
         private static readonly object _Object = new object();
@@ -36,7 +37,7 @@ namespace 精密切割系统.Driver
         static KeyencePlc()
         {
             _keyence_async_net.ConnectTimeOut = 1000;
-            _keyence_async_net.ReceiveTimeOut = 50;
+            _keyence_async_net.ReceiveTimeOut = MinDelayMs;
         }
 
         private KeyencePlc(string ip)
@@ -224,7 +225,6 @@ namespace 精密切割系统.Driver
             if (!GlobalParams.OnlineFlag) return "";
 
             const int maxRetries = 3;
-            const int retryDelayMs = 100;
 
             for (int attempt = 1; attempt <= maxRetries; attempt++)
             {
@@ -362,7 +362,7 @@ namespace 精密切割系统.Driver
                     if (attempt < maxRetries)
                     {
                         Tools.LogWarning($"读取PLC数据失败，地址：{plcAddr}，类型：{dataType}，尝试第{attempt}次重试");
-                        System.Threading.Thread.Sleep(retryDelayMs);
+                        System.Threading.Thread.Sleep(MinDelayMs);
                     }
                 }
                 catch (Exception ex)
@@ -370,7 +370,7 @@ namespace 精密切割系统.Driver
                     Tools.LogError($"读取PLC异常：地址 {plcAddr}，类型 {dataType}，尝试 {attempt}/{maxRetries}，异常：{ex.Message}");
                     if (attempt < maxRetries)
                     {
-                        System.Threading.Thread.Sleep(retryDelayMs);
+                        System.Threading.Thread.Sleep(MinDelayMs);
                     }
                 }
             }
@@ -393,7 +393,6 @@ namespace 精密切割系统.Driver
         {
             if (!GlobalParams.OnlineFlag) return null;
             const int maxRetries = 3;
-            const int retryDelayMs = 100;
             for (int attempt = 1; attempt <= maxRetries; attempt++)
             {
                 try
@@ -411,7 +410,7 @@ namespace 精密切割系统.Driver
                     if (attempt < maxRetries)
                     {
                         Tools.LogWarning($"读取PLC数据失败，地址：{plcAddr}，类型：{typeof(bool)}，尝试第{attempt}次重试");
-                        await Task.Delay(retryDelayMs);
+                        await Task.Delay(MinDelayMs);
                     }
                 }
                 catch (Exception ex)
@@ -419,7 +418,7 @@ namespace 精密切割系统.Driver
                     Tools.LogError($"读取PLC异常：地址 {plcAddr}，类型 {typeof(bool)}，尝试 {attempt}/{maxRetries}，异常：{ex.Message}");
                     if (attempt < maxRetries)
                     {
-                        await Task.Delay(retryDelayMs);
+                        await Task.Delay(MinDelayMs);
                     }
                 }
             }
@@ -442,7 +441,6 @@ namespace 精密切割系统.Driver
             Type type = typeof(T);
             if (!type.IsPrimitive) return null;
             const int maxRetries = 3;
-            const int retryDelayMs = 100;
             for (int attempt = 1; attempt <= maxRetries; attempt++)
             {
                 try
@@ -518,24 +516,24 @@ namespace 精密切割系统.Driver
                     }
                     else
                     {
-                        throw new ArgumentException($"不支持的数据类型：{type}");
+                        throw new ArgumentException($"不支持的数据类型：{type.Name}");
                     }
                     if (attempt < maxRetries)
                     {
-                        Tools.LogWarning($"读取PLC数据失败，地址：{plcAddr}，类型：{type}，尝试第{attempt}次重试");
-                        await Task.Delay(retryDelayMs);
+                        Tools.LogWarning($"读取PLC数据失败，地址：{plcAddr}，类型：{type.Name}，尝试第{attempt}次重试");
+                        await Task.Delay(MinDelayMs);
                     }
                 }
                 catch (Exception ex)
                 {
-                    Tools.LogError($"读取PLC异常：地址 {plcAddr}，类型 {type}，尝试 {attempt}/{maxRetries}，异常：{ex.Message}");
+                    Tools.LogError($"读取PLC异常：地址 {plcAddr}，类型 {type.Name}，尝试 {attempt}/{maxRetries}，异常：{ex.Message}");
                     if (attempt < maxRetries)
                     {
-                        await Task.Delay(retryDelayMs);
+                        await Task.Delay(MinDelayMs);
                     }
                 }
             }
-            Tools.LogError($"读取PLC失败：地址 {plcAddr}，类型 {type}，所有尝试均失败");
+            Tools.LogError($"读取PLC失败：地址 {plcAddr}，类型 {type.Name}，所有尝试均失败");
             return null;
         }
 

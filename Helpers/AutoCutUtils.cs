@@ -53,24 +53,22 @@ namespace 精密切割系统.Helpers
 
         public static async Task<AxisPosition> GetAxisPositionAsync()
         {
-            var positions = await Task.WhenAll(
-                        PlcControl.tagControl.Xaxis.GetCurrentLocationAsync(),
-                        PlcControl.tagControl.Yaxis.GetCurrentLocationAsync(),
-                        PlcControl.tagControl.Z1axis.GetCurrentLocationAsync(),
-                        PlcControl.tagControl.Z2axis.GetCurrentLocationAsync(),
-                        PlcControl.tagControl.ThetaAxis.GetCurrentLocationAsync());
-            return new AxisPosition(positions[0], positions[1], positions[2], positions[3], positions[4]);
+            var curX = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync();
+            var curY = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync();
+            var curZ1 = await PlcControl.tagControl.Z1axis.GetCurrentLocationAsync();
+            var curZ2 = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync();
+            var curTheta = await PlcControl.tagControl.ThetaAxis.GetCurrentLocationAsync();
+            return new AxisPosition(curX, curY, curZ1, curZ2, curTheta);
         }
 
         public static async Task<AxisState> GetAxisStateAsync()
         {
-            var states = await Task.WhenAll(
-                        PlcControl.tagControl.Xaxis.IsReadyAsync(),
-                        PlcControl.tagControl.Yaxis.IsReadyAsync(),
-                        PlcControl.tagControl.Z1axis.IsReadyAsync(),
-                        PlcControl.tagControl.Z2axis.IsReadyAsync(),
-                        PlcControl.tagControl.ThetaAxis.IsReadyAsync());
-            return new AxisState(states[0], states[1], states[2], states[3], states[4]);
+            var isReadyX = await PlcControl.tagControl.Xaxis.IsReadyAsync();
+            var isReadyY = await PlcControl.tagControl.Yaxis.IsReadyAsync();
+            var isReadyZ1 = await PlcControl.tagControl.Z1axis.IsReadyAsync();
+            var isReadyZ2 = await PlcControl.tagControl.Z2axis.IsReadyAsync();
+            var isReadyTheta = await PlcControl.tagControl.ThetaAxis.IsReadyAsync();
+            return new AxisState(isReadyX, isReadyY, isReadyZ1, isReadyZ2, isReadyTheta);
         }
 
         /// <summary>
@@ -157,20 +155,16 @@ namespace 精密切割系统.Helpers
         {
             try
             {
-                MaterialSnackUtils.MaterialSnack("请准备更换硅片,轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
-                //await PlcControl.tagControl.wholeDevice.StopSpindleAsync();
-                Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, token);
-                Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, default, token);
-                await Task.WhenAll(taskZ1, taskZ2);
+                MaterialSnackUtils.MaterialSnack("请准备更换工件,轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+                await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, token);
                 Task taskXY = PlcControl.tagControl.cutting.RunMotionAsync(0, 0, token);
                 Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0, default, token);
-                //Task speedZero = PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync(token);
                 await Task.WhenAll(taskXY, taskTheta);
                 MaterialSnackUtils.MaterialSnack("请打开相机安全门，更换硅片！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
             }
             catch (OperationCanceledException)
             {
-                MaterialSnackUtils.MaterialSnack("更换硅片操作失败！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+                MaterialSnackUtils.MaterialSnack("更换工件操作失败！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
             }
         }
 
@@ -375,6 +369,8 @@ namespace 精密切割系统.Helpers
                 repeatMeasureCts.Dispose();
                 linkedCts.Cancel();
                 linkedCts.Dispose();
+                //结束测高
+                await PlcControl.tagControl.bladeMantance.HeightMeasurementEarlyEndAsync();
                 // 关闭接触测高
                 await PlcControl.tagControl.bladeMantance.StartNoContactHeightMeasurement();
             }

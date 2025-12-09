@@ -59,14 +59,20 @@ namespace 精密切割系统.Model.cut
                 CancellationToken token = cts.Token;
                 DataPoint<float> cameraThetaCenterPoint = Appsettings.CameraThetaCenterPoint;
                 PointF center = new PointF(cameraThetaCenterPoint.X, cameraThetaCenterPoint.Y);
-                float xLocation, yLocation;
+                float? xLocation, yLocation;
                 switch (_currentThetaAlignStatus)
                 {
                     case ThetaAlignStatus.Horizontal:
                         MaterialSnackUtils.MaterialSnack("横向拉直中！", MaterialSnackUtils.SnackType.SUCCESS, 0);
-                        xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationWaitAsync(token) ?? 0;
-                        yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationWaitAsync(token) ?? 0;
-                        PointF pointB = new PointF(xLocation, yLocation);
+                        xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationWaitAsync(token);
+                        yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationWaitAsync(token);
+                        var curTheta = await PlcControl.tagControl.ThetaAxis.GetCurrentLocationWaitAsync(token);
+                        if (xLocation == null || yLocation == null || curTheta == null)
+                        {
+                            MaterialSnackUtils.MaterialSnack("获取当前位置失败，请重试！", MaterialSnackUtils.SnackType.WARNING);
+                            return;
+                        }
+                        PointF pointB = new PointF(xLocation.Value, yLocation.Value);
                         float angle = CalculateAngleToHorizontal(_pointA, pointB);
                         float distance = -CalculateSignedDistance(_pointA, pointB, center);
                         PointF rotatePointA = RotatePointAroundCenter(_pointA, center, angle);
@@ -75,13 +81,11 @@ namespace 精密切割系统.Model.cut
                         Tools.LogInfo($"center X:{center.X} Y:{center.Y}");
                         Tools.LogInfo($"校正角度:{angle}");
                         Tools.LogInfo($"返回A位置:{rotatePointA.X}  {center.Y + distance}");
-                        Task thetaTask = PlcControl.tagControl.ThetaAxis.StartRelativeAsync(angle, default, token);
-                        Task xTask = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(rotatePointA.X, 80, token);
-                        Task yTask = PlcControl.tagControl.Yaxis.StartAbsoluteAsync(center.Y + distance, default, token);
-                        await Task.WhenAll(thetaTask, xTask, yTask);
+                        await PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(curTheta.Value + angle, default, token);
+                        await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(center.Y + distance, default, token);
+                        await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(rotatePointA.X, 80, token);
+                        _thetaAlignCompletedDeg = curTheta.Value + angle;
                         _currentThetaAlignStatus = ThetaAlignStatus.Completed;
-                        //SetCalibrationAngle();
-                        _thetaAlignCompletedDeg = await PlcControl.tagControl.ThetaAxis.GetCurrentLocationAsync() ?? 0;
                         MaterialSnackUtils.MaterialSnack("横向拉直完成！", MaterialSnackUtils.SnackType.SUCCESS);
                         break;
 
@@ -91,9 +95,14 @@ namespace 精密切割系统.Model.cut
                         break;
 
                     default:
-                        xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationWaitAsync(token) ?? 0;
-                        yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationWaitAsync(token) ?? 0;
-                        _pointA = new PointF(xLocation, yLocation);
+                        xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationWaitAsync(token);
+                        yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationWaitAsync(token);
+                        if (xLocation == null || yLocation == null)
+                        {
+                            MaterialSnackUtils.MaterialSnack("获取当前位置失败，请重试！", MaterialSnackUtils.SnackType.WARNING);
+                            return;
+                        }
+                        _pointA = new PointF(xLocation.Value, yLocation.Value);
                         await PlcControl.tagControl.Xaxis.StartRelativeAsync(Appsettings.HorizontalStraighteningStroke ?? AlignDefaultMoveDistance, 80, default);
                         _currentThetaAlignStatus = ThetaAlignStatus.Horizontal;
                         MaterialSnackUtils.MaterialSnack("请继续横向拉直第二点", MaterialSnackUtils.SnackType.SUCCESS);
@@ -123,7 +132,7 @@ namespace 精密切割系统.Model.cut
                 CancellationToken token = cts.Token;
                 DataPoint<float> cameraThetaCenterPoint = Appsettings.CameraThetaCenterPoint;
                 PointF center = new PointF(cameraThetaCenterPoint.X, cameraThetaCenterPoint.Y);
-                float xLocation, yLocation;
+                float? xLocation, yLocation;
                 switch (_currentThetaAlignStatus)
                 {
                     case ThetaAlignStatus.Horizontal:
@@ -133,9 +142,15 @@ namespace 精密切割系统.Model.cut
 
                     case ThetaAlignStatus.Vertical:
                         MaterialSnackUtils.MaterialSnack("竖向拉直中！", MaterialSnackUtils.SnackType.SUCCESS, 0);
-                        xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationWaitAsync(token) ?? 0;
-                        yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationWaitAsync(token) ?? 0;
-                        PointF pointB = new PointF(xLocation, yLocation);
+                        xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationWaitAsync(token);
+                        yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationWaitAsync(token);
+                        var curTheta = await PlcControl.tagControl.ThetaAxis.GetCurrentLocationWaitAsync(token);
+                        if (xLocation == null || yLocation == null || curTheta == null)
+                        {
+                            MaterialSnackUtils.MaterialSnack("获取当前位置失败，请重试！", MaterialSnackUtils.SnackType.WARNING);
+                            return;
+                        }
+                        PointF pointB = new PointF(xLocation.Value, yLocation.Value);
                         float angle = CalculateAngleToVertical(_pointA, pointB);
                         float distance = -CalculateSignedDistance(_pointA, pointB, center);
                         PointF rotatePointA = RotatePointAroundCenter(_pointA, center, angle);
@@ -144,20 +159,23 @@ namespace 精密切割系统.Model.cut
                         Tools.LogInfo($"center X:{center.X} Y:{center.Y}");
                         Tools.LogInfo($"校正角度:{angle}");
                         Tools.LogInfo($"返回A位置:{center.X + distance}  {rotatePointA.Y}");
-                        Task thetaTask = PlcControl.tagControl.ThetaAxis.StartRelativeAsync(angle, default, token);
-                        Task xTask = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(center.X + distance, default, token);
-                        Task yTask = PlcControl.tagControl.Yaxis.StartAbsoluteAsync(rotatePointA.Y, 60, token);
-                        await Task.WhenAll(thetaTask, xTask, yTask);
+                        await PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(curTheta.Value + angle, default, token);
+                        await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(center.X + distance, default, token);
+                        await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(rotatePointA.Y, 60, token);
+                        _thetaAlignCompletedDeg = curTheta.Value + angle;
                         _currentThetaAlignStatus = ThetaAlignStatus.Completed;
-                        //SetCalibrationAngle();
-                        _thetaAlignCompletedDeg = await PlcControl.tagControl.ThetaAxis.GetCurrentLocationAsync() ?? 0;
                         MaterialSnackUtils.MaterialSnack("竖向拉直完成！", MaterialSnackUtils.SnackType.SUCCESS);
                         break;
 
                     default:
-                        xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationWaitAsync(token) ?? 0;
-                        yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationWaitAsync(token) ?? 0;
-                        _pointA = new PointF(xLocation, yLocation);
+                        xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationWaitAsync(token);
+                        yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationWaitAsync(token);
+                        if (xLocation == null || yLocation == null)
+                        {
+                            MaterialSnackUtils.MaterialSnack("获取当前位置失败，请重试！", MaterialSnackUtils.SnackType.WARNING);
+                            return;
+                        }
+                        _pointA = new PointF(xLocation.Value, yLocation.Value);
                         await PlcControl.tagControl.Yaxis.StartRelativeAsync(-Appsettings.VerticalStraighteningStroke ?? -AlignDefaultMoveDistance, 60, default);
                         _currentThetaAlignStatus = ThetaAlignStatus.Vertical;
                         MaterialSnackUtils.MaterialSnack("请继续竖向拉直第二点", MaterialSnackUtils.SnackType.SUCCESS);

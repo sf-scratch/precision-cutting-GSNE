@@ -476,6 +476,7 @@ namespace 精密切割系统
             ShortcutBtnClick();
             if (shortcutTopBtnSel)
             {
+                SpeedManager.IsHighSpeed = true;
                 // 显示方向界面
                 operatePage.SetOperateShowType(1);
             }

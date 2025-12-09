@@ -230,7 +230,8 @@ namespace 精密切割系统.Model.cut
                             }
                         }
                         line = workpiece.CalculateCuttingLine();
-                        float targetEndZ = bladeContactWorkingDiscZ1 - cutStep.CutHeight - _depthCompensationValue;
+                        float actualCutHeight = cutStep.CutHeight + _depthCompensationValue;
+                        float targetEndZ = bladeContactWorkingDiscZ1 - actualCutHeight;
                         float startZ = bladeContactWorkingDiscZ1 - workpiece.WorkThickness - workpiece.TapeThickness - bladeLiftingHeight;
                         float cutLength = MathF.Abs(line.EndPoint.X - line.StartPoint.X);
                         float cutSpeed = cutStep.Speed + _feedSpeedCompCompensationValue;
@@ -267,7 +268,7 @@ namespace 精密切割系统.Model.cut
                         foreach (float endZ in endZList)
                         {
                             //触发切割进度更新事件
-                            CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, cutSteps.Count, cutTime));
+                            CutServiceProcessChanged?.Invoke(new CutServiceProcess(actualCutHeight, cutTime <= 0 ? cutSpeed : cutSteps[cutTime - 1].Speed, cutSteps.Count, cutTime));
                             stopwatch.Restart();
                             await PlcControl.tagControl.ThetaAxis.SetAbsoluteSpeedAsync(GlobalParams.ThetaDefaultSpeed);
                             var compensateY = await PlcControl.GetCompensateAsync(PlcControl.tagControl.Yaxis, line.StartPoint.Y);
@@ -321,7 +322,7 @@ namespace 精密切割系统.Model.cut
                         }
                         cutTime++;
                         //触发切割进度更新事件
-                        CutServiceProcessChanged?.Invoke(new CutServiceProcess(targetEndZ, cutSpeed, cutSteps.Count, cutTime, cutLength, cutStep.ChannelNum, pathCalculator.EstimateRemainingTime(), true));
+                        CutServiceProcessChanged?.Invoke(new CutServiceProcess(actualCutHeight, cutTime <= 0 ? cutSpeed : cutSteps[cutTime - 1].Speed, cutSteps.Count, cutTime, cutLength, cutStep.ChannelNum, pathCalculator.EstimateRemainingTime(), true));
                         preLine = line;
                     }
                     catch (OperationCanceledException)

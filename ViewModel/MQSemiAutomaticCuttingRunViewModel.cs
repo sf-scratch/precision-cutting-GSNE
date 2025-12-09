@@ -233,11 +233,7 @@ namespace 精密切割系统.ViewModel
                 CutStep firtStep = cutSteps.First();
                 float cutY = firtStep.IsAbsolute ? firtStep.ChannelStartY : (await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0).ToActualY();
                 float measureHeightZ = 0;
-                if (!BmSetupData.Instance.IsAutomHeightMeasureBeforeCutting && Appsettings.MeasureHeightLast is not null)
-                {
-                    measureHeightZ = Appsettings.MeasureHeightLast.Value;
-                }
-                else
+                if (BmSetupData.Instance.IsAutomHeightMeasureBeforeCutting)
                 {
                     CommonResult<float> curHeightZ = await AutoCutUtils.ProcessCombineMeasureHeightAsync(_eventAggregator, _pauseCts.Token);
                     if (!curHeightZ.IsSuccess)
@@ -246,6 +242,15 @@ namespace 精密切割系统.ViewModel
                         return;
                     }
                     measureHeightZ = curHeightZ.Data;
+                }
+                else if (Appsettings.MeasureHeightLast is not null)
+                {
+                    measureHeightZ = Appsettings.MeasureHeightLast.Value;
+                }
+                else
+                {
+                    ShowWarnMessageNavigateHome("未进行测高，请先测高！");
+                    return;
                 }
                 Stopwatch stopwatch = Stopwatch.StartNew();
                 try
@@ -264,6 +269,8 @@ namespace 精密切割系统.ViewModel
                     stopwatch.Stop();
                     TimeSpan timeSpan = TimeSpan.FromSeconds(stopwatch.Elapsed.TotalSeconds);
                     string formattedTime = $"{timeSpan.Hours:D2}:{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}";
+                    await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(Appsettings.ThetaCenterPoint.X, default, _pauseCts.Token);
+                    _ = PlcControl.tagControl.wholeDevice.OpenBuzzerAsync(5);
                     MaterialSnack($"切割完成！ 总用时：{formattedTime}", SnackType.SUCCESS, 0);
                 }
                 catch (Exception ex)

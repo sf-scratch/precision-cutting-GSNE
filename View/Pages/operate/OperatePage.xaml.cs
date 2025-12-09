@@ -182,31 +182,44 @@ namespace 精密切割系统.View.Pages.operate
         /// <param name="type">0 操作菜单 1 方向操作菜单 2 自定义键盘</param>
         public void SetOperateShowType(int type)
         {
-            // 设置可见性
-            OperateGrid.Visibility = type == 0 ? Visibility.Visible : Visibility.Collapsed;
-            commonDirection.Visibility = type == 1 ? Visibility.Visible : Visibility.Collapsed;
-            costomKeyboardGrid.Visibility = type == 2 ? Visibility.Visible : Visibility.Collapsed;
-            OperateButtonListBox.Visibility = type == 3 ? Visibility.Visible : Visibility.Collapsed;
-
-            Task.Run(() =>
+            // 延时释放触控设备
+            Dispatcher.InvokeAsync(() =>
             {
-                Thread.Sleep(500);
-                // 延时释放触控设备
-                Dispatcher.InvokeAsync(() =>
-                {
-                    // 设置触控响应
-                    OperateGrid.IsHitTestVisible = type == 0;
-                    commonDirection.IsHitTestVisible = type == 1;
-                    costomKeyboardGrid.IsHitTestVisible = type == 2;
-                    OperateButtonListBox.IsHitTestVisible = type == 3;
+                // 设置可见性
+                OperateGrid.Visibility = type == 0 ? Visibility.Visible : Visibility.Collapsed;
+                commonDirection.Visibility = type == 1 ? Visibility.Visible : Visibility.Collapsed;
+                costomKeyboardGrid.Visibility = type == 2 ? Visibility.Visible : Visibility.Collapsed;
+                OperateButtonListBox.Visibility = type == 3 ? Visibility.Visible : Visibility.Collapsed;
+                // 设置触控响应
+                OperateGrid.IsHitTestVisible = type == 0;
+                commonDirection.IsHitTestVisible = type == 1;
+                costomKeyboardGrid.IsHitTestVisible = type == 2;
+                OperateButtonListBox.IsHitTestVisible = type == 3;
+                // 设置 ZIndex
+                Panel.SetZIndex(OperateGrid, type == 0 ? 1 : 0);
+                Panel.SetZIndex(commonDirection, type == 1 ? 1 : 0);
+                Panel.SetZIndex(costomKeyboardGrid, type == 2 ? 1 : 0);
+                Panel.SetZIndex(OperateButtonListBox, type == 3 ? 1 : 0);
+            }, System.Windows.Threading.DispatcherPriority.Background);
+            //Task.Run(() =>
+            //{
+            //    Thread.Sleep(500);
+            //    // 延时释放触控设备
+            //    Dispatcher.InvokeAsync(() =>
+            //    {
+            //        // 设置触控响应
+            //        OperateGrid.IsHitTestVisible = type == 0;
+            //        commonDirection.IsHitTestVisible = type == 1;
+            //        costomKeyboardGrid.IsHitTestVisible = type == 2;
+            //        OperateButtonListBox.IsHitTestVisible = type == 3;
 
-                    // 设置 ZIndex
-                    Panel.SetZIndex(OperateGrid, type == 0 ? 1 : 0);
-                    Panel.SetZIndex(commonDirection, type == 1 ? 1 : 0);
-                    Panel.SetZIndex(costomKeyboardGrid, type == 2 ? 1 : 0);
-                    Panel.SetZIndex(OperateButtonListBox, type == 3 ? 1 : 0);
-                }, System.Windows.Threading.DispatcherPriority.Background);
-            });
+            //        // 设置 ZIndex
+            //        Panel.SetZIndex(OperateGrid, type == 0 ? 1 : 0);
+            //        Panel.SetZIndex(commonDirection, type == 1 ? 1 : 0);
+            //        Panel.SetZIndex(costomKeyboardGrid, type == 2 ? 1 : 0);
+            //        Panel.SetZIndex(OperateButtonListBox, type == 3 ? 1 : 0);
+            //    }, System.Windows.Threading.DispatcherPriority.Background);
+            //});
         }
 
         //动态创建多个菜单
@@ -323,6 +336,15 @@ namespace 精密切割系统.View.Pages.operate
                     break;
 
                 case 3:
+                    if (!GlobalParams.OnlineFlag)
+                    {
+                        return;
+                    }
+                    if (SemiAutoCutService.Instance.IsRuning)
+                    {
+                        MaterialSnackUtils.MaterialSnack("半自动切割运行中，无法操作CT真空！", MaterialSnackUtils.SnackType.WARNING);
+                        return;
+                    }
                     // CT 真空
                     await VacuumOperateAsync();
                     break;
@@ -332,6 +354,15 @@ namespace 精密切割系统.View.Pages.operate
                     break;
 
                 case 5:
+                    if (!GlobalParams.OnlineFlag)
+                    {
+                        return;
+                    }
+                    if (SemiAutoCutService.Instance.IsRuning)
+                    {
+                        MaterialSnackUtils.MaterialSnack("半自动切割运行中，无法操作切割水！", MaterialSnackUtils.SnackType.WARNING);
+                        return;
+                    }
                     // 切割水
                     await CutWaterOperateAsync();
                     break;
@@ -339,6 +370,11 @@ namespace 精密切割系统.View.Pages.operate
                 case 6:
                     if (!GlobalParams.OnlineFlag)
                     {
+                        return;
+                    }
+                    if (SemiAutoCutService.Instance.IsRuning)
+                    {
+                        MaterialSnackUtils.MaterialSnack("半自动切割运行中，无法初始化系统！", MaterialSnackUtils.SnackType.WARNING);
                         return;
                     }
                     // 系统初始化
@@ -350,15 +386,38 @@ namespace 精密切割系统.View.Pages.operate
                     {
                         return;
                     }
-                    // 操作切割安全门
+                    if (SemiAutoCutService.Instance.IsRuning)
+                    {
+                        MaterialSnackUtils.MaterialSnack("半自动切割运行中，无法操作相机镜头盖！", MaterialSnackUtils.SnackType.WARNING);
+                        return;
+                    }
+                    // 操作相机镜头盖
                     await OperateCutSecurityDoorAsync();
                     break;
 
                 case 8:
+                    if (!GlobalParams.OnlineFlag)
+                    {
+                        return;
+                    }
+                    if (SemiAutoCutService.Instance.IsRuning)
+                    {
+                        MaterialSnackUtils.MaterialSnack("半自动切割运行中，无法操作主轴！", MaterialSnackUtils.SnackType.WARNING);
+                        return;
+                    }
                     await SpindleManuallyRunAsync();
                     break;
 
                 case 9:
+                    if (!GlobalParams.OnlineFlag)
+                    {
+                        return;
+                    }
+                    if (SemiAutoCutService.Instance.IsRuning)
+                    {
+                        MaterialSnackUtils.MaterialSnack("半自动切割运行中，无法操作相机吹气！", MaterialSnackUtils.SnackType.WARNING);
+                        return;
+                    }
                     // 相机吹气
                     await CameraBlowingOperateAsync();
                     break;
@@ -376,6 +435,11 @@ namespace 精密切割系统.View.Pages.operate
                     if (AlarmConfig.Instance.HasActiveErrorAlarm())
                     {
                         MaterialSnackUtils.MaterialSnack("存在未处理报警，无法更换工件！", MaterialSnackUtils.SnackType.WARNING);
+                        return;
+                    }
+                    if (SemiAutoCutService.Instance.IsRuning)
+                    {
+                        MaterialSnackUtils.MaterialSnack("半自动切割运行中，无法更换工件！", MaterialSnackUtils.SnackType.WARNING);
                         return;
                     }
                     TimeoutToken timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(120));
@@ -478,6 +542,8 @@ namespace 精密切割系统.View.Pages.operate
         /// </summary>
         private async Task SystemInitOperateAsync()
         {
+            await PlcControl.tagControl.wholeDevice.AlarmResetAsync();
+            await PlcControl.tagControl.wholeDevice.AlarmResetAsync();
             await PlcControl.tagControl.wholeDevice.AlarmResetAsync();
             if (await PlcControl.tagControl.wholeDevice.IsSystemInitingAsync())
             {

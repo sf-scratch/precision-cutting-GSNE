@@ -37,14 +37,6 @@ namespace 精密切割系统
             }
             // 为所有TextBox注册焦点事件
             EventManager.RegisterClassHandler(typeof(TextBox), TextBox.GotFocusEvent, new RoutedEventHandler(OnTextBoxGotFocus));
-            // 订阅应用程序退出事件
-            Application.Current.Exit += OnApplicationExit;
-        }
-
-        private void OnApplicationExit(object sender, ExitEventArgs e)
-        {
-            Appsettings.MeasureHeightFirst = null;
-            Appsettings.MeasureHeightLast = null;
         }
 
         private void OnTextBoxGotFocus(object sender, RoutedEventArgs e)

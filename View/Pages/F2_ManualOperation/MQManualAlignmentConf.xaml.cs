@@ -31,7 +31,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         private readonly IEventAggregator? _eventAggregator = PrismUtils.GetEventAggregator();
         private readonly ThetaAlignService _alignService = ThetaAlignService.Instance;
         private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1); // 确保线程安全
-        private readonly DynamicIntervalTimer _intervalTimer = new DynamicIntervalTimer(TimeSpan.FromMilliseconds(500), TimeSpan.FromMilliseconds(100));
+        private DynamicIntervalTimer _intervalTimer;
         private MainWindow _mainWindow;
         private RightPage _rightPage;
 
@@ -64,6 +64,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            _intervalTimer = new DynamicIntervalTimer(TimeSpan.FromMilliseconds(500), TimeSpan.FromMilliseconds(100));
             if (_cts.IsCancellationRequested)
             {
                 _cts = new CancellationTokenSource();

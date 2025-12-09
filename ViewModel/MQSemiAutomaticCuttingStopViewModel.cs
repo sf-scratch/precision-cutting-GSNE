@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using 精密切割系统.Driver;
 using 精密切割系统.Extensions;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.common;
@@ -22,12 +23,14 @@ namespace 精密切割系统.ViewModel
         private readonly IRegionManager _regionManager;
         private readonly IEventAggregator _eventAggregator;
         private readonly SemiAutoCutService _semiAutoCutService = SemiAutoCutService.Instance;
-        private readonly DynamicIntervalTimer _intervalTimer = new DynamicIntervalTimer(TimeSpan.FromMilliseconds(500), TimeSpan.FromMilliseconds(100));
+        private DynamicIntervalTimer _intervalTimer;
         private static CameraCommon? _cameraCommon;
         private MQSemiAutomaticCuttingRunViewModel _semiAutomaticCuttingRunViewModel;
         private DataPoint<float>? _originPoint;
         private SemaphoreSlim _semaph = new SemaphoreSlim(1, 1);
         private CancellationTokenSource _operatCts;
+        private float _countingClearX = 0;
+        private float _countingClearY = 0;
 
         private DelegateCommand _loadedCommand;
 
@@ -45,6 +48,22 @@ namespace 精密切割系统.ViewModel
         {
             get { return _cutParam; }
             set { SetProperty(ref _cutParam, value); }
+        }
+
+        private string _afterCountingClearX;
+
+        public string AfterCountingClearX
+        {
+            get { return _afterCountingClearX; }
+            set { SetProperty(ref _afterCountingClearX, value); }
+        }
+
+        private string _afterCountingClearY;
+
+        public string AfterCountingClearY
+        {
+            get { return _afterCountingClearY; }
+            set { SetProperty(ref _afterCountingClearY, value); }
         }
 
         public MQSemiAutomaticCuttingStopViewModel()
@@ -75,9 +94,40 @@ namespace 精密切割系统.ViewModel
             BottomButtonCollection.Add(RightButtonParams.BlueButton("工件吹气", "WeatherWindy", () => _semaph.ExecuteAsync(WorkpieceBlowing, "工件吹气")));
             //BottomButtonCollection.Add(RightButtonParams.BlueButton("精细对焦", "FocusAuto", () => _semaph.ExecuteAsync(FocusAuto, "精细对焦")));
             BottomButtonCollection.Add(RightButtonParams.BlueButton("对焦", "FocusAuto", () => _semaph.ExecuteAsync(GlobalFocus, "对焦")));
+            BottomButtonCollection.Add(RightButtonParams.BlueButton("位置清零", "Numeric0BoxOutline", CountingClearAsync));
             BottomButtonCollection.Add(RightButtonParams.BlueButton("基准线校准", "CrosshairsGps", () => _semaph.ExecuteAsync(BaselineCalibration, "基准线校准")));
             BottomButtonCollection.Add(RightButtonParams.BlueButton("基准线调窄", "UnfoldLessHorizontal", null, BaselineNarrowing, StopUpdateCameraCommonLine));
             BottomButtonCollection.Add(RightButtonParams.BlueButton("基准线调宽", "UnfoldMoreHorizontal", null, BaselineWidening, StopUpdateCameraCommonLine));
+        }
+
+        private async Task CountingClearAsync()
+        {
+            _countingClearX = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0;
+            _countingClearY = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0;
+        }
+
+        public void StartGetAxisInfo()
+        {
+            CancellationToken token = _operatCts.Token;
+            _ = Task.Run(async () =>
+            {
+                while (!token.IsCancellationRequested)
+                {
+                    try
+                    {
+                        var curX = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync();
+                        var curY = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync();
+                        if (curX == null || curY == null) continue;
+                        AfterCountingClearX = (curX.Value - _countingClearX).ToString();
+                        AfterCountingClearY = (curY.Value - _countingClearY).ToString();
+                    }
+                    catch (Exception ex)
+                    {
+                        Tools.LogError($"StartGetAxisInfo()报警监控异常: {ex.Message}");
+                    }
+                    await Task.Delay(200);
+                }
+            });
         }
 
         private void SetDepthCompensation()
@@ -200,6 +250,7 @@ namespace 精密切割系统.ViewModel
         public override async void OnNavigatedTo(NavigationContext navigationContext)
         {
             base.OnNavigatedTo(navigationContext);
+            _intervalTimer = new DynamicIntervalTimer(TimeSpan.FromMilliseconds(500), TimeSpan.FromMilliseconds(100));
             _operatCts = new CancellationTokenSource();
             InitBottomButton();
             InitRightButton();
@@ -225,6 +276,7 @@ namespace 精密切割系统.ViewModel
             {
                 await PlcControl.tagControl.wholeDevice.OpenCameraLensCapAsync();
             }
+            StartGetAxisInfo();
         }
 
         public override async void OnNavigatedFrom(NavigationContext navigationContext)

@@ -183,6 +183,27 @@
                         Text="{Binding Path=CutParam.ExpectedProcessingEndTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         TextWrapping="Wrap" />
                     <Label Content="" FontSize="16" />
+                    <Label
+                        Content="自计数清零后"
+                        FontSize="18"
+                        FontWeight="Bold" />
+                    <StackPanel Grid.ColumnSpan="5" Orientation="Horizontal">
+                        <Label Content="X" FontSize="16" />
+                        <Controls:InputTextBox
+                            IsEnabled="False"
+                            Text="{Binding Path=AfterCountingClearX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            TextWrapping="Wrap" />
+                        <Label Content="mm" FontSize="16" />
+                        <Label
+                            Margin="10,0,0,0"
+                            Content="Y"
+                            FontSize="16" />
+                        <Controls:InputTextBox
+                            IsEnabled="False"
+                            Text="{Binding Path=AfterCountingClearY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            TextWrapping="Wrap" />
+                        <Label Content="mm" FontSize="16" />
+                    </StackPanel>
                 </auto:AutoGrid>
             </StackPanel>
         </Grid>

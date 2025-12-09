@@ -116,8 +116,11 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                     try
                     {
                         var axisPostion = await AutoCutUtils.GetAxisPositionAsync();
-                        currentX.Text = axisPostion.X?.ToString(GlobalParams.DecimalStringFormat);
-                        currentY.Text = axisPostion.Y?.ToString(GlobalParams.DecimalStringFormat);
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            currentX.Text = axisPostion.X?.ToString(GlobalParams.DecimalStringFormat);
+                            currentY.Text = axisPostion.Y?.ToString(GlobalParams.DecimalStringFormat);
+                        });
                     }
                     catch (Exception ex)
                     {
@@ -285,6 +288,10 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                     thetaCenterParamsGrid.IsEnabled = true;
                     _rightPage.btnCutStart.Visibility = Visibility.Visible;
                 }
+            }
+            catch (Exception ex)
+            {
+                MaterialSnackUtils.MaterialSnack($"确认交点异常：{ex.Message}", MaterialSnackUtils.SnackType.ERROR);
             }
             finally
             {
