@@ -1,4 +1,5 @@
-﻿using ScottPlot.TickGenerators.TimeUnits;
+﻿using MaterialDesignThemes.Wpf;
+using ScottPlot.TickGenerators.TimeUnits;
 using System.Diagnostics;
 using 精密切割系统.Driver;
 using 精密切割系统.Helpers;
@@ -115,6 +116,28 @@ namespace 精密切割系统.Model.cut
         {
             get { return _spindleRev; }
             set { _spindleRev = value; }
+        }
+
+        private bool _isOpenCutWaterAfterCuttingCompleted;
+
+        /// <summary>
+        /// 切割结束后切割水状态
+        /// </summary>
+        public bool IsOpenCutWaterAfterCuttingCompleted
+        {
+            get { return _isOpenCutWaterAfterCuttingCompleted; }
+            set { _isOpenCutWaterAfterCuttingCompleted = value; }
+        }
+
+        private bool _hasNotTakenOutWorkpiecesAfterCuttingCompleted = false;
+
+        /// <summary>
+        /// 切割结束后是否有未取出的工件
+        /// </summary>
+        public bool HasNotTakenOutWorkpiecesAfterCuttingCompleted
+        {
+            get { return _hasNotTakenOutWorkpiecesAfterCuttingCompleted; }
+            set { _hasNotTakenOutWorkpiecesAfterCuttingCompleted = value; }
         }
 
         /// <summary>
@@ -346,6 +369,15 @@ namespace 精密切割系统.Model.cut
                 _isContinueBeyondWorkpiece = false;
                 //退出全自动切割模式
                 await PlcControl.tagControl.cutting.ExitCuttingModeAsync(default);
+                if (IsOpenCutWaterAfterCuttingCompleted)
+                {
+                    await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
+                }
+                else
+                {
+                    await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
+                }
+                HasNotTakenOutWorkpiecesAfterCuttingCompleted = true;
                 stopwatch.Stop();
             }
             return RunResult.Success();

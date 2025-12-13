@@ -167,6 +167,41 @@
                     Content="mm"
                     FontWeight="Bold" />
             </StackPanel>
+            <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                <Label
+                    Width="100"
+                    Height="35"
+                    Content="Z2轴"
+                    FontWeight="Bold" />
+                <Controls:InputTextBox
+                    Width="150"
+                    Height="35"
+                    InputType="Decimal"
+                    Text="{Binding Path=Z2ScanSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    TextWrapping="Wrap"
+                    XAllowNull="False"
+                    XMin="0"
+                    XPrecision="3" />
+                <Label
+                    Width="160"
+                    Height="35"
+                    Content="mm/s"
+                    FontWeight="Bold" />
+                <Controls:InputTextBox
+                    Width="150"
+                    Height="35"
+                    InputType="Decimal"
+                    Text="{Binding Path=Z2SscanDistance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    TextWrapping="Wrap"
+                    XAllowNull="False"
+                    XMin="0"
+                    XPrecision="4" />
+                <Label
+                    Width="60"
+                    Height="35"
+                    Content="mm"
+                    FontWeight="Bold" />
+            </StackPanel>
             <StackPanel
                 Margin="0,5,0,0"
                 Orientation="Horizontal"
@@ -646,48 +681,73 @@
                 </StackPanel>
             </StackPanel>
         </StackPanel>
-        <StackPanel Grid.Row="2" Margin="0,5,0,0">
+        <StackPanel
+            Grid.Row="2"
+            Grid.ColumnSpan="2"
+            Margin="0,5,0,0">
             <Label
                 Height="35"
                 Margin="30,5,0,0"
-                Content="轴软限位"
+                Content="轴设置"
                 FontSize="22"
                 FontWeight="Bold" />
             <auto:AutoGrid
                 Grid.RowSpan="8"
+                Width="1100"
                 Margin="20,0,0,0"
+                HorizontalAlignment="Left"
                 ChildMargin="5"
-                Columns="3*,2*,*,3*,2*,*"
+                Columns="80,120,*,*,120,*,*,100,*,*"
                 RowCount="10">
-                <Label Content="X轴正限位位置" />
+                <Label Content="X轴" />
+                <Label Content="正限位位置" />
                 <Controls:InputTextBox x:Name="PositiveLimitPositionX" Text="{Binding Path=PositiveLimitPositionX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 <Label HorizontalAlignment="Left" Content="mm" />
-                <Label Content="X轴负限位位置" />
+                <Label Content="负限位位置" />
                 <Controls:InputTextBox x:Name="NegativeLimitPositionX" Text="{Binding Path=NegativeLimitPositionX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 <Label HorizontalAlignment="Left" Content="mm" />
-                <Label Content="Y轴正限位位置" />
+                <Label Content="原点补偿" />
+                <Controls:InputTextBox Text="{Binding Path=OriginCompensationX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Label HorizontalAlignment="Left" Content="mm" />
+                <Label Content="Y轴" />
+                <Label Content="正限位位置" />
                 <Controls:InputTextBox x:Name="PositiveLimitPositionY" Text="{Binding Path=PositiveLimitPositionY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 <Label HorizontalAlignment="Left" Content="mm" />
-                <Label Content="Y轴负限位位置" />
+                <Label Content="负限位位置" />
                 <Controls:InputTextBox x:Name="NegativeLimitPositionY" Text="{Binding Path=NegativeLimitPositionY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 <Label HorizontalAlignment="Left" Content="mm" />
-                <Label Content="Z1轴正限位位置" />
+                <Label Content="原点补偿" />
+                <Controls:InputTextBox Text="{Binding Path=OriginCompensationY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Label HorizontalAlignment="Left" Content="mm" />
+                <Label Content="Z1轴" />
+                <Label Content="正限位位置" />
                 <Controls:InputTextBox x:Name="PositiveLimitPositionZ1" Text="{Binding Path=PositiveLimitPositionZ1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 <Label HorizontalAlignment="Left" Content="mm" />
-                <Label Content="Z1轴负限位位置" />
+                <Label Content="负限位位置" />
                 <Controls:InputTextBox x:Name="NegativeLimitPositionZ1" Text="{Binding Path=NegativeLimitPositionZ1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 <Label HorizontalAlignment="Left" Content="mm" />
-                <Label Content="Z2轴正限位位置" />
+                <Label Content="原点补偿" />
+                <Controls:InputTextBox Text="{Binding Path=OriginCompensationZ1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Label HorizontalAlignment="Left" Content="mm" />
+                <Label Content="Z2轴" />
+                <Label Content="正限位位置" />
                 <Controls:InputTextBox x:Name="PositiveLimitPositionZ2" Text="{Binding Path=PositiveLimitPositionZ2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 <Label HorizontalAlignment="Left" Content="mm" />
-                <Label Content="Z2轴负限位位置" />
+                <Label Content="负限位位置" />
                 <Controls:InputTextBox x:Name="NegativeLimitPositionZ2" Text="{Binding Path=NegativeLimitPositionZ2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 <Label HorizontalAlignment="Left" Content="mm" />
-                <Label Content="θ轴正限位位置" />
+                <Label Content="原点补偿" />
+                <Controls:InputTextBox Text="{Binding Path=OriginCompensationZ2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Label HorizontalAlignment="Left" Content="mm" />
+                <Label Content="θ轴" />
+                <Label Content="正限位位置" />
                 <Controls:InputTextBox x:Name="PositiveLimitPositionTheta" Text="{Binding Path=PositiveLimitPositionTheta, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 <Label HorizontalAlignment="Left" Content="mm" />
-                <Label Content="θ轴负限位位置" />
+                <Label Content="负限位位置" />
                 <Controls:InputTextBox x:Name="NegativeLimitPositionTheta" Text="{Binding Path=NegativeLimitPositionTheta, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Label HorizontalAlignment="Left" Content="mm" />
+                <Label Content="原点补偿" />
+                <Controls:InputTextBox Text="{Binding Path=OriginCompensationTheta, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 <Label HorizontalAlignment="Left" Content="mm" />
             </auto:AutoGrid>
         </StackPanel>

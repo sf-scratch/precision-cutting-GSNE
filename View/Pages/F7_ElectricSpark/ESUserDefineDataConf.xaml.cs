@@ -89,6 +89,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 viewModel.AdditionalMargin = Appsettings.AdditionalMargin?.ToString("F3") ?? string.Empty;
                 viewModel.HorizontalStraighteningStroke = Appsettings.HorizontalStraighteningStroke?.ToString("F3") ?? string.Empty;
                 viewModel.VerticalStraighteningStroke = Appsettings.VerticalStraighteningStroke?.ToString("F3") ?? string.Empty;
+                viewModel.SafetyMarginZ1 = Appsettings.SafetyMarginZ1?.ToString("F3") ?? string.Empty;
                 DataContext = viewModel;
             }
             else
@@ -102,7 +103,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
             rightPage.btnBack.SetRightClickedHandler(BtnBack_RightClicked);
             rightPage.btnSure.Visibility = Visibility.Visible;
             rightPage.btnSure.BackFlag = false;
-            rightPage.btnSure.SetRightClickedHandler(save);
+            rightPage.btnSure.SetRightClickedHandler(Save);
             //底部操作按钮
             mainWindow.UpdateOperatePage(OperateData.GetTab53Operate(), OperatePage_onClicked);
             //如果是空或者小数位数不足-小数初始化为0
@@ -169,7 +170,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
             mainWindow.NavigateToPage("MainMenu");
         }
 
-        private void save(object sender, bool e)
+        private void Save(object? sender, bool e)
         {
             var success = this.FormSuccess();
             if (!success)
@@ -223,6 +224,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
             Appsettings.AdditionalMargin = viewModel.AdditionalMargin.ToFloat();
             Appsettings.HorizontalStraighteningStroke = viewModel.HorizontalStraighteningStroke.ToFloat();
             Appsettings.VerticalStraighteningStroke = viewModel.VerticalStraighteningStroke.ToFloat();
+            Appsettings.SafetyMarginZ1 = viewModel.SafetyMarginZ1.ToFloat();
             if (list.Count > 0)
             {
                 UserDefineDataModel originUserDefineData = list[0];

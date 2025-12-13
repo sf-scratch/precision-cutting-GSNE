@@ -312,36 +312,72 @@ namespace 精密切割系统.View
                     {
                         MaterialSnackUtils.MaterialSnack("进入校准模式中...", SnackType.WARNING, 0);
                         mainWindow.IsEnabled = false;
-                        await Task.Delay(2000);
+                        await Task.Delay(500);
                         mainWindow.IsEnabled = true;
                         mainWindow.NavigateToPage(bean.PageUrl);
-                        break;
-                    }
-                    if (AlarmConfig.Instance.HasActiveErrorAlarm())
-                    {
-                        MaterialSnackUtils.MaterialSnack(AlarmConfig.HasErrorAlarmMessage, SnackType.WARNING);
                         break;
                     }
                     InitialPositionModel? initPos = await AutoCutUtils.GetInitialPositionAsync();
                     if (initPos is null)
                     {
-                        MaterialSnackUtils.MaterialSnack("获取初始位置失败，请检查初始位置配置！", SnackType.WARNING, 0);
+                        MaterialSnackUtils.MaterialSnack("获取各模式参数失败，请检查各模式参数配置！", SnackType.WARNING);
+                        break;
+                    }
+                    CommonResult<FileTableItemChModel> fileTableItemResult = await AutoCutUtils.GetFirstFileTableItemChModelAsync();
+                    if (!fileTableItemResult.IsSuccess || fileTableItemResult.Data is null)
+                    {
+                        MaterialSnackUtils.MaterialSnack(fileTableItemResult.Message, SnackType.WARNING);
+                        break;
+                    }
+                    FileTableItemChModel fileTableItemCh = fileTableItemResult.Data;
+                    bool isReady =
+                        await PlcControl.tagControl.Xaxis.IsReadyAsync() &&
+                        await PlcControl.tagControl.Yaxis.IsReadyAsync() &&
+                        await PlcControl.tagControl.Z1axis.IsReadyAsync() &&
+                        (await PlcControl.tagControl.ThetaAxis.IsReadyAsync());
+                    if (!isReady)
+                    {
+                        MaterialSnackUtils.MaterialSnack("轴未准备好，请检查轴状态！", SnackType.WARNING);
                         break;
                     }
                     MaterialSnackUtils.MaterialSnack("进入校准模式中...", SnackType.WARNING, 0);
                     try
                     {
                         mainWindow.IsEnabled = false;
-                        await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, default);
-                        await Task.WhenAll(
-                            PlcControl.tagControl.Xaxis.StartAbsoluteAsync(initPos.AlignInitX.ToFloat(), default, default),
-                            PlcControl.tagControl.Yaxis.StartAbsoluteAsync(initPos.AlignInitY.ToFloat(), default, default)
-                        );
-                        await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(initPos.AlignInitZ1.ToFloat(), default, default);
+                        float speedX = initPos.AlignInitSpeedX.ToFloat();
+                        float speedY = initPos.AlignInitSpeedY.ToFloat();
+                        float speedZ1 = initPos.AlignInitSpeedZ1.ToFloat();
+                        float speedTheta = initPos.AlignInitSpeedTheta.ToFloat();
+                        TimeoutToken timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(120));
+                        await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, speedZ1, timeoutToken.Token);
+                        if (!float.TryParse(fileTableItemCh.AlignX, out float moveX) || !float.TryParse(fileTableItemCh.AlignY, out float moveY))
+                        {
+                            moveX = initPos.AlignInitX.ToFloat();
+                            moveY = initPos.AlignInitY.ToFloat();
+                        }
+                        if (Appsettings.FocusClearZ is null)
+                        {
+                            await Task.WhenAll(
+                                PlcControl.tagControl.Xaxis.StartAbsoluteAsync(moveX, speedX, timeoutToken.Token),
+                                PlcControl.tagControl.Yaxis.StartAbsoluteAsync(moveY, speedY, timeoutToken.Token),
+                                PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(initPos.AlignInitTheta.ToFloat(), speedTheta, timeoutToken.Token));
+                        }
+                        else
+                        {
+                            await Task.WhenAll(
+                                PlcControl.tagControl.Xaxis.StartAbsoluteAsync(moveX, speedX, timeoutToken.Token),
+                                PlcControl.tagControl.Yaxis.StartAbsoluteAsync(moveY, speedY, timeoutToken.Token),
+                                PlcControl.tagControl.Z2axis.StartAbsoluteAsync(Appsettings.FocusClearZ.Value, default, timeoutToken.Token),
+                                PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(initPos.AlignInitTheta.ToFloat(), speedTheta, timeoutToken.Token));
+                        }
                     }
-                    catch (Exception)
+                    catch (OperationCanceledException)
                     {
-                        MaterialSnackUtils.MaterialSnack("移动到初始位置超时！", SnackType.WARNING);
+                        MaterialSnackUtils.MaterialSnack("移动到校准位置超时！", SnackType.WARNING);
+                    }
+                    catch (Exception ex)
+                    {
+                        MaterialSnackUtils.MaterialSnack("移动到校准位置失败！" + ex.Message, SnackType.WARNING);
                     }
                     finally
                     {
@@ -349,9 +385,7 @@ namespace 精密切割系统.View
                     }
                     mainWindow.NavigateToPage(bean.PageUrl);
                     break;
-                //case 401:
-                //    ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(FullyAutomatic));
-                //    break;
+
                 case 409:
                     mainWindow.NavigateToPage(bean.PageUrl);
                     break;

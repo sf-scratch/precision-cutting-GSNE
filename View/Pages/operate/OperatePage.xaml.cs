@@ -345,6 +345,10 @@ namespace 精密切割系统.View.Pages.operate
                         MaterialSnackUtils.MaterialSnack("半自动切割运行中，无法操作CT真空！", MaterialSnackUtils.SnackType.WARNING);
                         return;
                     }
+                    if (SemiAutoCutService.Instance.HasNotTakenOutWorkpiecesAfterCuttingCompleted)
+                    {
+                        await AutoCutUtils.ReplaceWaferAsync(default, TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(120)).Token);
+                    }
                     // CT 真空
                     await VacuumOperateAsync();
                     break;
@@ -403,6 +407,11 @@ namespace 精密切割系统.View.Pages.operate
                     if (SemiAutoCutService.Instance.IsRuning)
                     {
                         MaterialSnackUtils.MaterialSnack("半自动切割运行中，无法操作主轴！", MaterialSnackUtils.SnackType.WARNING);
+                        return;
+                    }
+                    if (AlarmConfig.Instance.HasSpindleCoolingWaterAlarm())
+                    {
+                        MaterialSnackUtils.MaterialSnack("主轴冷却水报警中，无法操作主轴！", MaterialSnackUtils.SnackType.WARNING);
                         return;
                     }
                     await SpindleManuallyRunAsync();

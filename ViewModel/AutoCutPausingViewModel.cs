@@ -227,25 +227,25 @@ namespace 精密切割系统.ViewModel
 
         private void BaselineWidening()
         {
-            _cameraCommon?.SetCutMarkWidth(1, 2);
+            _cameraCommon?.SetCutMarkWidth(CameraOperateUtils.DatumLineChangeStep, 2);
             UpdateBaselineWidth();
         }
 
         private void BaselineNarrowing()
         {
-            _cameraCommon?.SetCutMarkWidth(-1, 2);
+            _cameraCommon?.SetCutMarkWidth(-CameraOperateUtils.DatumLineChangeStep, 2);
             UpdateBaselineWidth();
         }
 
         private void BrokenEdgeWidening()
         {
-            _cameraCommon?.SetEdgeWidth(1, 2);
+            _cameraCommon?.SetEdgeWidth(CameraOperateUtils.DatumLineChangeStep, 2);
             UpdateBrokenEdgeWidth();
         }
 
         private void BrokenEdgeNarrowing()
         {
-            _cameraCommon?.SetEdgeWidth(-1, 2);
+            _cameraCommon?.SetEdgeWidth(-CameraOperateUtils.DatumLineChangeStep, 2);
             UpdateBrokenEdgeWidth();
         }
 

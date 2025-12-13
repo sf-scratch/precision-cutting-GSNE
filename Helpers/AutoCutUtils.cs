@@ -40,6 +40,7 @@ using 精密切割系统.View.Dialogs;
 using 精密切割系统.View.Pages.common;
 using 精密切割系统.ViewModel;
 using static SQLite.SQLite3;
+using static 精密切割系统.Helpers.MaterialSnackUtils;
 using ImageData = 精密切割系统.Model.cut.ImageData;
 using LineSegment = 精密切割系统.Model.cut.LineSegment;
 using Point = OpenCvSharp.Point;
@@ -86,15 +87,24 @@ namespace 精密切割系统.Helpers
                     return;
                 }
                 UserDefineDataModel userDefineData = list.First();
-                MaterialSnackUtils.MaterialSnack("请准备更换刀片,轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+                MaterialSnackUtils.MaterialSnack("准备更换刀片,轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+                InitialPositionModel? initPos = await AutoCutUtils.GetInitialPositionAsync();
+                if (initPos is null)
+                {
+                    MaterialSnackUtils.MaterialSnack("获取各模式参数失败，请检查各模式参数配置！", SnackType.WARNING);
+                    return;
+                }
+                float posX = initPos.CutReplaceInitX.ToFloat();
+                float posY = initPos.CutReplaceInitY.ToFloat();
+                float speedX = initPos.CutReplaceInitSpeedX.ToFloat();
+                float speedY = initPos.CutReplaceInitSpeedY.ToFloat();
+                float speedZ1 = initPos.CutReplaceInitSpeedZ1.ToFloat();
                 await PlcControl.tagControl.wholeDevice.StopSpindleAsync();
-                Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, token);
-                Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, default, token);
-                await Task.WhenAll(taskZ1, taskZ2);
-                Task taskXY = PlcControl.tagControl.cutting.RunMotionAsync(0, userDefineData.BladeExchangeYPos.ToFloat(), token);
-                Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0, default, token);
+                await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, speedZ1, token);
+                Task taskX = PlcControl.tagControl.Xaxis.StartAbsoluteAsync(posX, speedX, token);
+                Task taskY = PlcControl.tagControl.Yaxis.StartAbsoluteAsync(posY, speedY, token);
                 Task speedZero = PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync(token);
-                await Task.WhenAll(taskXY, taskTheta, speedZero);
+                await Task.WhenAll(taskX, taskY, speedZero);
                 Appsettings.AfterReplaceBladeCutTimes = 0;
                 Appsettings.AfterReplaceBladeCutLength = 0;
                 Appsettings.BladeOuterDiameter = null;
@@ -160,7 +170,8 @@ namespace 精密切割系统.Helpers
                 Task taskXY = PlcControl.tagControl.cutting.RunMotionAsync(0, 0, token);
                 Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0, default, token);
                 await Task.WhenAll(taskXY, taskTheta);
-                MaterialSnackUtils.MaterialSnack("请打开相机安全门，更换硅片！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
+                SemiAutoCutService.Instance.HasNotTakenOutWorkpiecesAfterCuttingCompleted = false;
+                MaterialSnackUtils.MaterialSnack("请打开安全门，更换工件！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
             }
             catch (OperationCanceledException)
             {
@@ -220,10 +231,11 @@ namespace 精密切割系统.Helpers
         /// <returns></returns>
         public static async Task<CommonResult<float>> ProcessMeasureHeightAsync(HeightMeasurementMode mode, IDialogService? dialogService, IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
-            await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, token);
             SpeedManager.IsHighSpeed = false;
             InitialPositionModel? initPos = await GetInitialPositionAsync();
-            if (initPos is null) return CommonResult<float>.Failure("获取初始化位置信息失败！");
+            if (initPos is null) return CommonResult<float>.Failure("获取各模式参数失败，请检查各模式参数配置！");
+            float speedZ1 = initPos.BladeSetupInitSppedZ1.ToFloat();
+            await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, speedZ1, token);
             switch (mode)
             {
                 //接触测高
@@ -235,12 +247,12 @@ namespace 精密切割系统.Helpers
                         nextThetaDeg = BmSetupData.Instance.ThetaStartingToMovePosition;
                     }
                     BmSetupData.Instance.ThetaCurrentLocation = nextThetaDeg;
-                    await PlcControl.tagControl.bladeMantance.SetBladeSetuInitPositionAsync(initPos.BladeSetupInitX, initPos.BladeSetupInitY, BmSetupData.Instance.ThetaCurrentLocation);
+                    await PlcControl.tagControl.bladeMantance.SetBladeSetuInitPositionAsync(initPos.BladeSetupInitX, initPos.BladeSetupInitY, initPos.BladeSetupInitZ1, BmSetupData.Instance.ThetaCurrentLocation);
                     await PlcControl.tagControl.bladeMantance.StartContactHeightMeasurement();
                     break;
                 //非接触测高
                 case HeightMeasurementMode.NoContact:
-                    await PlcControl.tagControl.bladeMantance.SetBladeSetuInitPositionAsync(initPos.NoContactBladeSetupInitX, initPos.NoContactBladeSetupInitY);
+                    await PlcControl.tagControl.bladeMantance.SetBladeSetuInitPositionAsync(initPos.NoContactBladeSetupInitX, initPos.NoContactBladeSetupInitY, initPos.BladeSetupInitZ1);
                     await PlcControl.tagControl.bladeMantance.StartNoContactHeightMeasurement();
                     break;
 
@@ -1902,6 +1914,29 @@ namespace 精密切割系统.Helpers
             await PlcControl.tagControl.Z2axis.SetSoftLowerLimit(Appsettings.NegativeLimitPositionZ2 ?? 0);
             await PlcControl.tagControl.ThetaAxis.SetSoftUpperLimit(Appsettings.PositiveLimitPositionTheta ?? 0);
             await PlcControl.tagControl.ThetaAxis.SetSoftLowerLimit(Appsettings.NegativeLimitPositionTheta ?? 0);
+        }
+
+        public static async Task<CommonResult<FileTableItemChModel>> GetFirstFileTableItemChModelAsync()
+        {
+            CommonResult<FileTableItemModel> fileTableItemResult = await GetFileTableItemModelAsync();
+            if (!fileTableItemResult.IsSuccess || fileTableItemResult.Data is null)
+            {
+                return CommonResult<FileTableItemChModel>.Failure(fileTableItemResult.Message);
+            }
+            FileTableItemModel fileTableItem = fileTableItemResult.Data;
+            List<FileTableItemChModel> chModels = await SqlHelper.TableAsync<FileTableItemChModel>().Where(t => t.ItemId == fileTableItem.Id).ToListAsync();
+            string cuttingChSeq = fileTableItem.CuttingChSeq;
+            int[] chSeqs = Tools.StringToIntegerArray(cuttingChSeq);
+            if (chSeqs.Length == 0)
+            {
+                return CommonResult<FileTableItemChModel>.Failure("通道序号配置错误！");
+            }
+            int chSeq = chSeqs[0];
+            if (chSeq <= 0)
+            {
+                return CommonResult<FileTableItemChModel>.Failure("通道序号配置错误！");
+            }
+            return CommonResult<FileTableItemChModel>.Success(chModels[chSeq - 1]);
         }
 
         public static async Task<CommonResult<List<CutStep>>> GenerateCutStepListAsync(bool isOpenPrecut)

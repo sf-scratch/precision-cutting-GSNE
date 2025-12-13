@@ -70,6 +70,9 @@
                 TextChanged="heightMeasureTimes_TextChanged"
                 XMax="3" />
             <Label Content="次" />
+            <Label Content="Z1测高极限位置" />
+            <Controls:InputTextBox x:Name="heightMeasurementMaxZ1Pos" />
+            <Label Content="mm" />
             <Label Content="θ轴移动角度" />
             <Controls:InputTextBox x:Name="thetaMovementAngle" XMax="90" />
             <Label Content="deg" />

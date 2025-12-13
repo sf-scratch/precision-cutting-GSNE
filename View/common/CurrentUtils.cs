@@ -359,11 +359,11 @@ namespace 精密切割系统.Utils
             return _model;
         }
 
-        public static OperationParametersModel GetOperationParametersModel()
+        public static OperationParametersModel? GetOperationParametersModel()
         {
             long id = 1;
             var listConf = SqlHelper.Table<OperationParametersModel>().Where(t => t.Id == id).ToList();
-            OperationParametersModel _model = null;
+            OperationParametersModel? _model = null;
             if (listConf.Count() > 0)
             {
                 _model = listConf[0];

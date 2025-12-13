@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Helpers;
+using 精密切割系统.Utils;
 using 精密切割系统.ViewModel;
 
 namespace 精密切割系统.Model.plc
@@ -36,9 +37,7 @@ namespace 精密切割系统.Model.plc
         {
             if (isHighSpeed)
             {
-                var list = SqlHelper.Table<OperationParametersModel>().Where(t => t.Id == 1).ToList();
-                if (list.Count < 1) return;
-                var operationParam = list.FirstOrDefault();
+                var operationParam = CurrentUtils.GetOperationParametersModel();
                 if (operationParam is null) return;
                 await Task.Run(async () =>
                 {
@@ -50,7 +49,7 @@ namespace 精密切割系统.Model.plc
                     await PlcControl.tagControl.Z1axis.SetHighSpeedAsync(1);
                     await PlcControl.tagControl.Z1axis.SetJogRelativeSpeedAsync(operationParam.ZScanSpeed.ToFloat());
                     await PlcControl.tagControl.Z2axis.SetHighSpeedAsync(1);
-                    await PlcControl.tagControl.Z2axis.SetJogRelativeSpeedAsync(2);
+                    await PlcControl.tagControl.Z2axis.SetJogRelativeSpeedAsync(operationParam.Z2ScanSpeed.ToFloat());
                     await PlcControl.tagControl.ThetaAxis.SetHighSpeedAsync(1);
                     await PlcControl.tagControl.ThetaAxis.SetJogRelativeSpeedAsync(operationParam.RScanSpeed.ToFloat());
                 });

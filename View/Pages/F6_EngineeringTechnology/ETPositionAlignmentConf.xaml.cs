@@ -127,7 +127,8 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
             //inputLightIntensityChannel.Text = _model.LightIntensityChannel + "";
             //inputLowLightIntensityChannel.Text = _model.LowLightIntensityChannel + "";
             //inputRingLightIntensityChannel.Text = _model.RingLightIntensityChannel + "";
-            inputWorkDiscFocusPosition.Text = (Appsettings.FocusClearZ ?? 0).ToString();
+            inputWorkDiscFocusPosition.Text = (Appsettings.FocusWorkpiecesClearZ ?? 0).ToString();
+            inputFocusClearZPosition.Text = (Appsettings.FocusClearZ ?? 0).ToString();
 
             //如果是空或者小数位数不足-小数初始化为0
             initTbNumber();
@@ -160,7 +161,8 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
                 //_model.LowLightIntensityChannel = Tools.GetIntStringValue(inputLowLightIntensityChannel.Text);
                 //_model.RingLightIntensityChannel = Tools.GetIntStringValue(inputRingLightIntensityChannel.Text);
                 _model.WorkDiscFocusPosition = Tools.GetFloatStringValue(inputWorkDiscFocusPosition.Text);
-                Appsettings.FocusClearZ = inputWorkDiscFocusPosition.Text.ToFloat();
+                Appsettings.FocusWorkpiecesClearZ = inputWorkDiscFocusPosition.Text.ToFloat();
+                Appsettings.FocusClearZ = inputFocusClearZPosition.Text.ToFloat();
                 float thetaCameraX = inputThetaCameraLocationX.Text.ToFloat();
                 float thetaCameraY = inputThetaCameraLocationY.Text.ToFloat();
                 float thetaCenterX = inputThetaCenterLocationX.Text.ToFloat();

@@ -17,6 +17,7 @@ using 精密切割系统.Model.cut;
 using 精密切割系统.Model.plc;
 using 精密切割系统.Model.position;
 using 精密切割系统.PubSubEvent;
+using 精密切割系统.Utils;
 using 精密切割系统.View.common;
 using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.operate;
@@ -32,6 +33,8 @@ namespace 精密切割系统.ViewModel
 
         public F7_2_AxisOperationViewModel()
         {
+            var operationParam = CurrentUtils.GetOperationParametersModel();
+            if (operationParam is null) return;
             AxisOperationList.AddRange([
                 new AxisOperationModel(PlcControl.tagControl.Xaxis, async (a,b) => { if(!b) await a.AxisObject.StopJogAsync();}){IsChecked = true, AxisSlowSpeed = "0", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", Unit = "mm", SpeedUnit = "mm/s"},
                 new AxisOperationModel(PlcControl.tagControl.Yaxis, async (a,b) => { if(!b) await a.AxisObject.StopJogAsync();}){AxisSlowSpeed = "0", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", Unit = "mm", SpeedUnit = "mm/s"},
@@ -109,8 +112,7 @@ namespace 精密切割系统.ViewModel
             var selectedAxis = AxisOperationList.FirstOrDefault(a => a.IsChecked);
             if (selectedAxis != null)
             {
-                await selectedAxis.AxisObject.SetAbsoluteSpeedAsync(5);
-                await selectedAxis.AxisObject.StartRelativeAsync(isPositive ? selectedAxis.RelativeDistance.ToFloat() : -selectedAxis.RelativeDistance.ToFloat(), selectedAxis.AxisSlowSpeed.ToFloat(), _cts.Token);
+                await selectedAxis.AxisObject.StartRelativeAsync(isPositive ? 5 : -5, selectedAxis.AxisSlowSpeed.ToFloat(), _cts.Token);
             }
         }
 
@@ -119,7 +121,6 @@ namespace 精密切割系统.ViewModel
             var selectedAxis = AxisOperationList.FirstOrDefault(a => a.IsChecked);
             if (selectedAxis != null)
             {
-                await selectedAxis.AxisObject.SetAbsoluteSpeedAsync(selectedAxis.AxisSpeed.ToFloat());
                 await selectedAxis.AxisObject.StartRelativeAsync(isPositive ? selectedAxis.RelativeDistance.ToFloat() : -selectedAxis.RelativeDistance.ToFloat(), selectedAxis.AxisSpeed.ToFloat(), _cts.Token);
             }
         }

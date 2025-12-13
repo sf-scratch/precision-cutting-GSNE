@@ -146,7 +146,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             RealTimeInfo.Messages.Add(model);
         }
 
-        public void LoadDBData()
+        public async void LoadDBData()
         {
             spindleRev.Text = BmSetupData.Instance.SpindleRev.ToString();
             heightMeasureTimes.Text = BmSetupData.Instance.HeightMeasureTimes.ToString();
@@ -155,9 +155,14 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             thetaStartingToMovePosition.Text = BmSetupData.Instance.ThetaStartingToMovePosition.ToString();
             thetaEndingToMovePosition.Text = BmSetupData.Instance.ThetaEndingToMovePosition.ToString();
             thetaCurrentLocation.Text = BmSetupData.Instance.ThetaCurrentLocation.ToString();
+            InitialPositionModel? initPos = await AutoCutUtils.GetInitialPositionAsync();
+            if (initPos is not null)
+            {
+                heightMeasurementMaxZ1Pos.Text = initPos.BladeSetupInitZ1;
+            }
         }
 
-        private void BtnSure_RightClicked(object? sender, bool e)
+        private async void BtnSure_RightClicked(object? sender, bool e)
         {
             if (this.HasFormError())
             {
@@ -171,6 +176,12 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             BmSetupData.Instance.ThetaStartingToMovePosition = thetaStartingToMovePosition.Text.ToFloat();
             BmSetupData.Instance.ThetaEndingToMovePosition = thetaEndingToMovePosition.Text.ToFloat();
             BmSetupData.Instance.ThetaCurrentLocation = thetaCurrentLocation.Text.ToFloat();
+            InitialPositionModel? initPos = await AutoCutUtils.GetInitialPositionAsync();
+            if (initPos is not null)
+            {
+                initPos.BladeSetupInitZ1 = heightMeasurementMaxZ1Pos.Text;
+                await SqlHelper.UpdateAsync(initPos);
+            }
             MaterialSnack("测高参数已确认!", SnackType.SUCCESS);
         }
 

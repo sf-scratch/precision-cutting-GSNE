@@ -104,7 +104,7 @@ namespace 精密切割系统.Assets.config.menu
             //list.Add(new MenuBean(502, "测量维护", "/Assets/icon/menu_5/menu_5_2.png", "/Assets/icon/menu_5/menu_5_2_white.png"));
             list.Add(new MenuBean(503, "功能参数维护", "/Assets/icon/menu_5/menu_5_3.png", "/Assets/icon/menu_5/menu_5_3_white.png", 2, "Pages/F5_GeneralEfficiency/F5_3_1_OperationData"));
             list.Add(new MenuBean(605, "位置校准", "/Assets/icon/menu_6/menu_6_5.png", "/Assets/icon/menu_6/menu_6_5_white.png", 2, "Pages/F6_EngineeringTechnology/ETPositionAlignmentConf"));
-            list.Add(new MenuBean(606, "各模式初始位置", "/Assets/icon/menu_6/menu_6_6.png", "/Assets/icon/menu_6/menu_6_6_white.png", 2, "Pages/F6_EngineeringTechnology/ETInitialPositionConf"));
+            list.Add(new MenuBean(606, "各模式参数设置", "/Assets/icon/menu_6/menu_6_6.png", "/Assets/icon/menu_6/menu_6_6_white.png", 2, "Pages/F6_EngineeringTechnology/ETInitialPositionConf"));
             list.Add(new MenuBean(520, "轴空运行", "/Assets/icon/menu_5/menu_5_2.png", "/Assets/icon/menu_5/menu_5_2_white.png", 3, ""));
             if (GlobalParams.HasTheta)
             {
@@ -123,7 +123,6 @@ namespace 精密切割系统.Assets.config.menu
             //list.Add(new MenuBean(603, "强制维护", "/Assets/icon/menu_6/menu_6_3.png", "/Assets/icon/menu_6/menu_6_3_white.png"));
             //list.Add(new MenuBean(604, "速度设置", "/Assets/icon/menu_6/menu_6_4.png", "/Assets/icon/menu_6/menu_6_4_white.png"));
             //list.Add(new MenuBean(605, "位置校准", "/Assets/icon/menu_6/menu_6_5.png", "/Assets/icon/menu_6/menu_6_5_white.png", 2, "Pages/F6_EngineeringTechnology/ETPositionAlignmentConf"));
-            //list.Add(new MenuBean(606, "各模式初始位置", "/Assets/icon/menu_6/menu_6_6.png", "/Assets/icon/menu_6/menu_6_6_white.png", 2, "Pages/F6_EngineeringTechnology/ETInitialPositionConf"));
             return list;
         }
 

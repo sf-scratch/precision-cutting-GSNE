@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
+    xmlns:Converters="clr-namespace:精密切割系统.Converters"
     xmlns:common="clr-namespace:精密切割系统.View.Pages.common"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:精密切割系统.View.Pages.F2_ManualOperation"
@@ -13,9 +14,12 @@
     d:DesignWidth="1570"
     Loaded="Page_Loaded"
     mc:Ignorable="d">
-    <Page.DataContext>
-        <viewModel:MQSemiAutomaticCuttingConfViewModel />
-    </Page.DataContext>
+    <Page.Resources>
+        <Converters:BoolToValueConverter
+            x:Key="BoolToStringConverter"
+            FalseValue="关闭"
+            TrueValue="开启" />
+    </Page.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="50*" />
@@ -189,6 +193,22 @@
                                 Text="{Binding Path=SpindleRev, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 TextWrapping="Wrap" />
                             <Label Content="/min" FontSize="16" />
+                        </StackPanel>
+                        <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
+                            <Label
+                                Width="200"
+                                VerticalAlignment="Center"
+                                Content="结束后切割水状态"
+                                FontSize="18"
+                                FontWeight="Bold" />
+                            <CheckBox
+                                x:Name="cutWater"
+                                VerticalAlignment="Center"
+                                FontSize="18"
+                                IsChecked="{Binding IsOpenCutWaterAfterCuttingCompleted}"
+                                Style="{StaticResource MaterialDesignFilterChipSecondaryCheckBox}">
+                                <TextBlock Text="{Binding ElementName=cutWater, Path=IsChecked, Converter={StaticResource BoolToStringConverter}}" />
+                            </CheckBox>
                         </StackPanel>
                         <StackPanel
                             Margin="0,10,0,0"

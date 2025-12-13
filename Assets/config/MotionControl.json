@@ -134,6 +134,12 @@
       "addr": "DM016",
       "name": "X按钮模式相对移动距离",
       "describe": "x按钮模式相对移动距离"
+    },
+    "originCompensation": {
+      "valueType": "float",
+      "addr": "DM1200",
+      "name": "X轴原点补偿",
+      "describe": "X轴原点补偿"
     }
   },
   "Yaxis": {
@@ -276,6 +282,12 @@
       "addr": "DM116",
       "name": "Y按钮模式相对移动距离",
       "describe": "Y按钮模式相对移动距离"
+    },
+    "originCompensation": {
+      "valueType": "float",
+      "addr": "DM1202",
+      "name": "Y轴原点补偿",
+      "describe": "Y轴原点补偿"
     }
   },
   "Z1axis": {
@@ -418,6 +430,12 @@
       "addr": "DM216",
       "name": "Z1按钮模式相对移动距离",
       "describe": "Z1按钮模式相对移动距离"
+    },
+    "originCompensation": {
+      "valueType": "float",
+      "addr": "DM1204",
+      "name": "Z1轴原点补偿",
+      "describe": "Z1轴原点补偿"
     }
   },
   "Z2axis": {
@@ -548,6 +566,12 @@
       "addr": "DM1128",
       "name": "Z2轴软负限位",
       "describe": "Z2轴软负限位，到软负限位后无法继续负向运动"
+    },
+    "originCompensation": {
+      "valueType": "float",
+      "addr": "DM1206",
+      "name": "Z2轴原点补偿",
+      "describe": "Z2轴原点补偿"
     }
   },
   "ThetaAxis": {
@@ -676,6 +700,12 @@
       "addr": "DM1136",
       "name": "Theta轴软负限位",
       "describe": "Theta轴软负限位，到软负限位后无法继续负向运动"
+    },
+    "originCompensation": {
+      "valueType": "float",
+      "addr": "DM1208",
+      "name": "Theta轴原点补偿",
+      "describe": "Theat轴原点补偿"
     }
   },
   "bladeMantance": {

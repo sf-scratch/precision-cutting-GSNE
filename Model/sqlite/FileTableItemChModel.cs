@@ -10,7 +10,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace 精密切割系统.database.db.modle
 {
     [Table("file_table_item_ch")]
-    internal class FileTableItemChModel
+    public class FileTableItemChModel
     {
         [PrimaryKey, AutoIncrement]
         [Column("id")]
@@ -28,7 +28,7 @@ namespace 精密切割系统.database.db.modle
         [Column("cut_mode")]//切割方式
         public string CutMode { get; set; } = "A";
 
-        [Column("cut_dir")]//切割方向 
+        [Column("cut_dir")]//切割方向
         public string CutDir { get; set; } = "FRONT";
 
         [Column("com_box_cut_method")]//切割方法
@@ -37,28 +37,28 @@ namespace 精密切割系统.database.db.modle
         [Column("cut_relative_first_offset")]// 第一刀是否偏移
         public string CutRelativeFirstOffset { get; set; } = "否";
 
-        [Column("cut_line")]//切割刀数 
+        [Column("cut_line")]//切割刀数
         public string CutLine { get; set; } = "0";
 
-        [Column("offset_y")]//校准 
+        [Column("offset_y")]//校准
         public string OffsetY { get; set; } = "0";
 
         [Column("absolute_cut_position")] //绝对切割位置
         public string AbsoluteCutPosition { get; set; }
 
-        [Column("moncut_f")]//切割停止F 
+        [Column("moncut_f")]//切割停止F
         public string MoncutF { get; set; } = "0";
 
-        [Column("moncut_r")]//切割停止R 
+        [Column("moncut_r")]//切割停止R
         public string MoncutR { get; set; } = "0";
 
         [Column("blade_angle")]//刀片角度
         public string BladeAngle { get; set; } = "60";
 
-        [Column("offset_x")]//x轴偏移量 
+        [Column("offset_x")]//x轴偏移量
         public string OffsetX { get; set; } = "0";
 
-        [Column("offset_theta")]//θ轴偏移量 
+        [Column("offset_theta")]//θ轴偏移量
         public string OffsetTheta { get; set; } = "0";
 
         [Column("align_x")] // 校准时X轴位置
@@ -88,7 +88,6 @@ namespace 精密切割系统.database.db.modle
         [Column("z_down_speed")]//SEQ1-Z轴下降速度
         public string ZDownSpeed { get; set; } = getDefault("ZDownSpeed").ToString();
 
-
         //设置默认值；共30个
         private static string getDefault(string name)
         {
@@ -116,7 +115,5 @@ namespace 精密切割系统.database.db.modle
             string result = string.Join(",", defData);
             return result;
         }
-
-
     }
 }

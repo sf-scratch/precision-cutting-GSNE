@@ -20,6 +20,8 @@ namespace 精密切割系统.ViewModel
         private static readonly float RelativeDeg = 0.1f; // 相对角度
         private static readonly float RelativeSpeed = 0.2f; // 相对移动速度
         private CancellationTokenSource _cancelGetAxisInfoCts;
+        private CancellationTokenSource? _cancelScrOrIdxCts;
+        private SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
         private DelegateCommand _startXCommand;
 
@@ -847,6 +849,271 @@ namespace 精密切割系统.ViewModel
             }
         }
 
+        /// SCR
+        /// IDX
+        /// 执行轴运动
+
+        private DelegateCommand _startXCorotationScrOrIdxCommand;
+
+        public DelegateCommand StartXCorotationScrOrIdxCommand => _startXCorotationScrOrIdxCommand ??= new DelegateCommand(ExecuteStartXCorotationScrOrIdxCommand);
+
+        private async void ExecuteStartXCorotationScrOrIdxCommand()
+        {
+            if (!await PlcControl.tagControl.Xaxis.IsReadyAsync())
+            {
+                return;
+            }
+            _cancelScrOrIdxCts?.Cancel();
+            if (IsScan)
+            {
+                _cancelScrOrIdxCts = new CancellationTokenSource();
+                CancellationToken token = _cancelScrOrIdxCts.Token;
+                while (!token.IsCancellationRequested)
+                {
+                    try
+                    {
+                        await PlcControl.tagControl.Xaxis.StartRelativeAsync(1, default, token);
+                    }
+                    catch (OperationCanceledException) { }
+                }
+            }
+            else
+            {
+                if (!await _semaphore.WaitAsync(TimeSpan.Zero))
+                {
+                    return;
+                }
+                try
+                {
+                    await PlcControl.tagControl.Xaxis.StartRelativeAsync(10, default, default);
+                }
+                catch (OperationCanceledException) { }
+                finally
+                {
+                    _semaphore.Release();
+                }
+            }
+        }
+
+        private DelegateCommand _startXReversalScrOrIdxCommand;
+
+        public DelegateCommand StartXReversalScrOrIdxCommand => _startXReversalScrOrIdxCommand ??= new DelegateCommand(ExecuteStartXReversalScrOrIdxCommand);
+
+        private async void ExecuteStartXReversalScrOrIdxCommand()
+        {
+            if (!await PlcControl.tagControl.Xaxis.IsReadyAsync())
+            {
+                return;
+            }
+            _cancelScrOrIdxCts?.Cancel();
+            if (IsScan)
+            {
+                _cancelScrOrIdxCts = new CancellationTokenSource();
+                CancellationToken token = _cancelScrOrIdxCts.Token;
+                while (!token.IsCancellationRequested)
+                {
+                    try
+                    {
+                        await PlcControl.tagControl.Xaxis.StartRelativeAsync(-1, default, token);
+                    }
+                    catch (OperationCanceledException) { }
+                }
+            }
+            else
+            {
+                if (!await _semaphore.WaitAsync(TimeSpan.Zero))
+                {
+                    return;
+                }
+                try
+                {
+                    await PlcControl.tagControl.Xaxis.StartRelativeAsync(-10, default, default);
+                }
+                catch (OperationCanceledException) { }
+                finally
+                {
+                    _semaphore.Release();
+                }
+            }
+        }
+
+        private DelegateCommand _startYCorotationScrOrIdxCommand;
+
+        public DelegateCommand StartYCorotationScrOrIdxCommand => _startYCorotationScrOrIdxCommand ??= new DelegateCommand(ExecuteStartYCorotationScrOrIdxCommand);
+
+        private async void ExecuteStartYCorotationScrOrIdxCommand()
+        {
+            if (!await PlcControl.tagControl.Yaxis.IsReadyAsync())
+            {
+                return;
+            }
+            _cancelScrOrIdxCts?.Cancel();
+            if (IsScan)
+            {
+                _cancelScrOrIdxCts = new CancellationTokenSource();
+                CancellationToken token = _cancelScrOrIdxCts.Token;
+                while (!token.IsCancellationRequested)
+                {
+                    try
+                    {
+                        await PlcControl.tagControl.Yaxis.StartRelativeAsync(1, default, token);
+                    }
+                    catch (OperationCanceledException) { }
+                }
+            }
+            else
+            {
+                if (!await _semaphore.WaitAsync(TimeSpan.Zero))
+                {
+                    return;
+                }
+                try
+                {
+                    await PlcControl.tagControl.Yaxis.StartRelativeAsync(10, default, default);
+                }
+                catch (OperationCanceledException) { }
+                finally
+                {
+                    _semaphore.Release();
+                }
+            }
+        }
+
+        private DelegateCommand _startYReversalScrOrIdxCommand;
+
+        public DelegateCommand StartYReversalScrOrIdxCommand => _startYReversalScrOrIdxCommand ??= new DelegateCommand(ExecuteStartYReversalScrOrIdxCommand);
+
+        private async void ExecuteStartYReversalScrOrIdxCommand()
+        {
+            if (!await PlcControl.tagControl.Yaxis.IsReadyAsync())
+            {
+                return;
+            }
+            _cancelScrOrIdxCts?.Cancel();
+            if (IsScan)
+            {
+                _cancelScrOrIdxCts = new CancellationTokenSource();
+                CancellationToken token = _cancelScrOrIdxCts.Token;
+                while (!token.IsCancellationRequested)
+                {
+                    try
+                    {
+                        await PlcControl.tagControl.Yaxis.StartRelativeAsync(-1, default, token);
+                    }
+                    catch (OperationCanceledException) { }
+                }
+            }
+            else
+            {
+                if (!await _semaphore.WaitAsync(TimeSpan.Zero))
+                {
+                    return;
+                }
+                try
+                {
+                    await PlcControl.tagControl.Yaxis.StartRelativeAsync(-10, default, default);
+                }
+                catch (OperationCanceledException) { }
+                finally
+                {
+                    _semaphore.Release();
+                }
+            }
+        }
+
+        private DelegateCommand _startThetaCorotationScrOrIdxCommand;
+
+        public DelegateCommand StartThetaCorotationScrOrIdxCommand => _startThetaCorotationScrOrIdxCommand ??= new DelegateCommand(ExecuteStartThetaCorotationScrOrIdxCommand);
+
+        private async void ExecuteStartThetaCorotationScrOrIdxCommand()
+        {
+            if (!await PlcControl.tagControl.ThetaAxis.IsReadyAsync())
+            {
+                return;
+            }
+            _cancelScrOrIdxCts?.Cancel();
+            if (IsScan)
+            {
+                _cancelScrOrIdxCts = new CancellationTokenSource();
+                CancellationToken token = _cancelScrOrIdxCts.Token;
+                while (!token.IsCancellationRequested)
+                {
+                    try
+                    {
+                        await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(1, default, token);
+                    }
+                    catch (OperationCanceledException) { }
+                }
+            }
+            else
+            {
+                if (!await _semaphore.WaitAsync(TimeSpan.Zero))
+                {
+                    return;
+                }
+                try
+                {
+                    await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(90, default, default);
+                }
+                catch (OperationCanceledException) { }
+                finally
+                {
+                    _semaphore.Release();
+                }
+            }
+        }
+
+        private DelegateCommand _startThetaReversalScrOrIdxCommand;
+
+        public DelegateCommand StartThetaReversalScrOrIdxCommand => _startThetaReversalScrOrIdxCommand ??= new DelegateCommand(ExecuteStartThetaReversalScrOrIdxCommand);
+
+        private async void ExecuteStartThetaReversalScrOrIdxCommand()
+        {
+            if (!await PlcControl.tagControl.ThetaAxis.IsReadyAsync())
+            {
+                return;
+            }
+            _cancelScrOrIdxCts?.Cancel();
+            if (IsScan)
+            {
+                _cancelScrOrIdxCts = new CancellationTokenSource();
+                CancellationToken token = _cancelScrOrIdxCts.Token;
+                while (!token.IsCancellationRequested)
+                {
+                    try
+                    {
+                        await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(-1, default, token);
+                    }
+                    catch (OperationCanceledException) { }
+                }
+            }
+            else
+            {
+                if (!await _semaphore.WaitAsync(TimeSpan.Zero))
+                {
+                    return;
+                }
+                try
+                {
+                    await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(-90, default, default);
+                }
+                catch (OperationCanceledException) { }
+                finally
+                {
+                    _semaphore.Release();
+                }
+            }
+        }
+
+        private DelegateCommand _stopScrOrIdxCommand;
+
+        public DelegateCommand StopScrOrIdxCommand => _stopScrOrIdxCommand ??= new DelegateCommand(ExecuteStopScrOrIdxCommand);
+
+        private async void ExecuteStopScrOrIdxCommand()
+        {
+            _cancelScrOrIdxCts?.Cancel();
+        }
+
         private bool _isHighSpeed = SpeedManager.IsHighSpeed;
 
         public bool IsHighSpeed
@@ -857,6 +1124,14 @@ namespace 精密切割系统.ViewModel
                 SetProperty(ref _isHighSpeed, value);
                 SpeedManager.IsHighSpeed = value;
             }
+        }
+
+        private bool _isScan = true;
+
+        public bool IsScan
+        {
+            get { return _isScan; }
+            set { SetProperty(ref _isScan, value); }
         }
 
         public DirectOperateViewModel()

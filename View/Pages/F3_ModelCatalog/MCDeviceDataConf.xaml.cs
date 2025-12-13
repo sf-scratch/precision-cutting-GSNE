@@ -993,10 +993,21 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             }
         }
 
+        private async Task UpdateFocusClearZAsync()
+        {
+            float originCombineThickness = currentModel.WorkThickness.ToFloat() + currentModel.TapeThickness.ToFloat();
+            float newCombineThickness = inputWorkThickness.Text.ToFloat() + inputTapeThickness.Text.ToFloat();
+            if (originCombineThickness != newCombineThickness && Appsettings.FocusClearZ is not null)
+            {
+                Appsettings.FocusClearZ += originCombineThickness - newCombineThickness;
+            }
+        }
+
         //保存数据
         private async Task SaveDataAsync()
         {
             updateOperateLabel();
+            await UpdateFocusClearZAsync();
             //tableItem信息
             currentModel.DeviceDataId = inputDeviceDataId.Text;
             currentModel.DeviceDataNo = labDeviceDataNo.Text;

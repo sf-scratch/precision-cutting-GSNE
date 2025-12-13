@@ -161,6 +161,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             }
             _semiAutoCutService.CutLine = _viewModel.CutLine;
             _semiAutoCutService.SpindleRev = _viewModel.SpindleRev;
+            _semiAutoCutService.IsOpenCutWaterAfterCuttingCompleted = _viewModel.IsOpenCutWaterAfterCuttingCompleted;
             ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(MQSemiAutomaticCuttingRun));
         }
 
@@ -169,6 +170,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             // 回复切割面到Ch 1
             //CurrentUtils.InitCutCh();
             WarmUpHelper.StopWarmUp();
+            SemiAutoCutService.Instance.HasNotTakenOutWorkpiecesAfterCuttingCompleted = false;
             mainWindow.NavigateToPage("MainMenu");
         }
 
@@ -211,6 +213,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             _viewModel.DepthCompensation = _semiAutoCutService.DepthCompensationValue.ToString();
             _viewModel.CutDirection = "----";
             _viewModel.SpindleRev = _model.SpindleRev;
+            _viewModel.IsOpenCutWaterAfterCuttingCompleted = _semiAutoCutService.IsOpenCutWaterAfterCuttingCompleted;
             DataContext = _viewModel;
             // 设置切割初始参数
             CutOperateUtils.InitParams(1, mainWindow);

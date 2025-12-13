@@ -102,8 +102,9 @@
     <Grid>
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition />
+                <ColumnDefinition Width="210" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <Border
                 Margin="20,0,0,0"
@@ -118,8 +119,8 @@
                 </Border.Effect>
                 <auto:AutoGrid
                     Margin="10"
-                    ChildMargin="5"
-                    Columns="auto,auto,*,*,*"
+                    ChildMargin="0,5"
+                    Columns="30,auto,*"
                     RowCount="5">
                     <auto:AutoGrid.Resources>
                         <ResourceDictionary>
@@ -131,8 +132,9 @@
                     <TextBlock Text="X" />
                     <!--<TextBox materialDesign:HintAssist.Hint="当前Jog速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedX}" />
                     <TextBox materialDesign:HintAssist.Hint="当前速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedX}" />-->
-                    <TextBlock Text="当前位置" />
+                    <TextBlock Text="位置 " />
                     <TextBox
+                        d:Text="100.33333"
                         FontSize="18"
                         IsEnabled="False"
                         Text="{Binding CurrentPositionX}" />
@@ -153,7 +155,7 @@
                         Content="开始"
                         IsEnabled="{Binding IsReadyX}"
                         Style="{StaticResource MaterialDesignOutlinedLightButton}" />-->
-                    <Button
+                    <!--<Button
                         Command="{Binding StartHomingXCommand}"
                         Content="原点"
                         FontSize="18"
@@ -164,11 +166,11 @@
                         Content="放松"
                         FontSize="18"
                         Style="{StaticResource MaterialDesignOutlinedLightButton}"
-                        Visibility="Hidden" />
+                        Visibility="Hidden" />-->
                     <TextBlock Text="Y" />
                     <!--<TextBox materialDesign:HintAssist.Hint="当前Jog速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedY}" />
                     <TextBox materialDesign:HintAssist.Hint="当前速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedY}" />-->
-                    <TextBlock Text="当前位置" />
+                    <TextBlock Text="位置 " />
                     <TextBox
                         FontSize="18"
                         IsEnabled="False"
@@ -190,7 +192,7 @@
                         Content="开始"
                         IsEnabled="{Binding IsReadyY}"
                         Style="{StaticResource MaterialDesignOutlinedLightButton}" />-->
-                    <Button
+                    <!--<Button
                         Command="{Binding StartHomingYCommand}"
                         Content="原点"
                         FontSize="18"
@@ -201,11 +203,11 @@
                         Content="放松"
                         FontSize="18"
                         Style="{StaticResource MaterialDesignOutlinedLightButton}"
-                        Visibility="Hidden" />
+                        Visibility="Hidden" />-->
                     <TextBlock Text="Z1" />
                     <!--<TextBox materialDesign:HintAssist.Hint="当前Jog速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedZ1}" />
                     <TextBox materialDesign:HintAssist.Hint="当前速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedZ1}" />-->
-                    <TextBlock Text="当前位置" />
+                    <TextBlock Text="位置 " />
                     <TextBox
                         FontSize="18"
                         IsEnabled="False"
@@ -227,7 +229,7 @@
                         Content="开始"
                         IsEnabled="{Binding IsReadyZ1}"
                         Style="{StaticResource MaterialDesignOutlinedLightButton}" />-->
-                    <Button
+                    <!--<Button
                         Command="{Binding StartHomingZ1Command}"
                         Content="原点"
                         FontSize="18"
@@ -238,11 +240,11 @@
                         Content="放松"
                         FontSize="18"
                         Style="{StaticResource MaterialDesignOutlinedLightButton}"
-                        Visibility="Hidden" />
+                        Visibility="Hidden" />-->
                     <TextBlock Text="Z2" />
                     <!--<TextBox materialDesign:HintAssist.Hint="当前Jog速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedZ2}" />
                     <TextBox materialDesign:HintAssist.Hint="当前速度mm/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedZ2}" />-->
-                    <TextBlock Text="当前位置" />
+                    <TextBlock Text="位置 " />
                     <TextBox
                         FontSize="18"
                         IsEnabled="False"
@@ -264,7 +266,7 @@
                         Content="开始"
                         IsEnabled="{Binding IsReadyZ2}"
                         Style="{StaticResource MaterialDesignOutlinedLightButton}" />-->
-                    <Button
+                    <!--<Button
                         Command="{Binding StartHomingZ2Command}"
                         Content="原点"
                         FontSize="18"
@@ -275,11 +277,11 @@
                         Content="放松"
                         FontSize="18"
                         Style="{StaticResource MaterialDesignOutlinedLightButton}"
-                        Visibility="Hidden" />
+                        Visibility="Hidden" />-->
                     <TextBlock Text="θ" Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
                     <!--<TextBox materialDesign:HintAssist.Hint="当前Jog速度deg/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedTheta}" />
                     <TextBox materialDesign:HintAssist.Hint="当前速度deg/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedTheta}" />-->
-                    <TextBlock Text="当前位置" />
+                    <TextBlock Text="位置 " />
                     <TextBox
                         FontSize="18"
                         IsEnabled="False"
@@ -331,16 +333,312 @@
                 </Border.Effect>
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="20*" />
-                        <ColumnDefinition Width="80*" />
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="5*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid HorizontalAlignment="Center">
+                        <Grid.Resources>
+                            <ResourceDictionary>
+                                <ResourceDictionary.MergedDictionaries>
+                                    <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
+                                </ResourceDictionary.MergedDictionaries>
+                            </ResourceDictionary>
+                        </Grid.Resources>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <StackPanel VerticalAlignment="Center" Orientation="Vertical">
+                            <RadioButton
+                                Width="70"
+                                Height="70"
+                                HorizontalAlignment="Center"
+                                Background="#5087Cb"
+                                Foreground="Black"
+                                GroupName="ArrowChip"
+                                Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}">
+                                <Image
+                                    Width="52"
+                                    Height="52"
+                                    Source="/Assets/picture/IDX_icon_sel.png" />
+                            </RadioButton>
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                FontSize="18"
+                                FontWeight="Bold"
+                                Text="IDX" />
+                        </StackPanel>
+                        <StackPanel
+                            Grid.Row="1"
+                            VerticalAlignment="Center"
+                            Orientation="Vertical">
+                            <RadioButton
+                                Width="70"
+                                Height="70"
+                                HorizontalAlignment="Center"
+                                Background="#5087Cb"
+                                Foreground="Black"
+                                GroupName="ArrowChip"
+                                IsChecked="{Binding IsScan}"
+                                Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}">
+                                <Image
+                                    Width="52"
+                                    Height="52"
+                                    Source="/Assets/picture/SCAN_icon.png" />
+                            </RadioButton>
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                FontSize="18"
+                                FontWeight="Bold"
+                                Text="SCR" />
+                        </StackPanel>
+                    </Grid>
+                    <Grid Grid.Column="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="20*" />
+                            <ColumnDefinition Width="60*" />
+                            <ColumnDefinition Width="20*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="0" Margin="0,10,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="1.5*" />
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Button
+                                x:Name="scanLeftBottomBtn"
+                                VerticalAlignment="Center"
+                                Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <behaviors:Interaction.Behaviors>
+                                    <behav:DualInputBehavior
+                                        PromptCommand="{Binding ThetaRelativeNegativeCommand}"
+                                        StartCommand="{Binding StartThetaReversalScrOrIdxCommand}"
+                                        StopCommand="{Binding StopScrOrIdxCommand}" />
+                                </behaviors:Interaction.Behaviors>
+                                <Button.Content>
+                                    <Image
+                                        x:Name="scanLeftBottomIcon"
+                                        Width="80"
+                                        Height="80"
+                                        HorizontalAlignment="Left"
+                                        Source="/Assets/picture/idx_left_bottom.png" />
+                                </Button.Content>
+                            </Button>
+                            <!--<Button
+                                Grid.Row="1"
+                                Width="90"
+                                Height="40"
+                                HorizontalAlignment="Left"
+                                Background="#5087Cb"
+                                Content="Z1抬起"
+                                Foreground="White"
+                                Style="{StaticResource TextButton}">
+                                <behaviors:Interaction.Behaviors>
+                                    <behav:DualInputBehavior
+                                        PromptCommand="{Binding Z1RelativeNegativeCommand}"
+                                        StartCommand="{Binding StartRaiseZ1Command}"
+                                        StopCommand="{Binding StopJogZ1Command}" />
+                                </behaviors:Interaction.Behaviors>
+                            </Button>
+                            <Button
+                                Grid.Row="2"
+                                Width="90"
+                                Height="40"
+                                HorizontalAlignment="Left"
+                                Background="#5087Cb"
+                                Content="Z1下降"
+                                Foreground="White"
+                                Style="{StaticResource TextButton}">
+                                <behaviors:Interaction.Behaviors>
+                                    <behav:DualInputBehavior
+                                        PromptCommand="{Binding Z1RelativePositiveCommand}"
+                                        StartCommand="{Binding StartDropZ1Command}"
+                                        StopCommand="{Binding StopJogZ1Command}" />
+                                </behaviors:Interaction.Behaviors>
+                            </Button>-->
+                        </Grid>
+                        <Grid Grid.Column="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Grid
+                                Grid.Row="0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                                <Button x:Name="scanTopBtn" VerticalAlignment="Top">
+                                    <behaviors:Interaction.Behaviors>
+                                        <behav:DualInputBehavior
+                                            PromptCommand="{Binding YRelativeNegativeCommand}"
+                                            StartCommand="{Binding StartYReversalScrOrIdxCommand}"
+                                            StopCommand="{Binding StopScrOrIdxCommand}" />
+                                    </behaviors:Interaction.Behaviors>
+                                    <Button.Content>
+                                        <Image
+                                            x:Name="scanTopIcon"
+                                            Width="89"
+                                            Height="52"
+                                            Source="/Assets/picture/idx_top.png" />
+                                    </Button.Content>
+                                </Button>
+                            </Grid>
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Grid
+                                    Grid.Column="0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center">
+                                    <Button x:Name="scanLeftBtn" VerticalAlignment="Top">
+                                        <behaviors:Interaction.Behaviors>
+                                            <behav:DualInputBehavior
+                                                PromptCommand="{Binding XRelativePositiveCommand}"
+                                                StartCommand="{Binding StartXCorotationScrOrIdxCommand}"
+                                                StopCommand="{Binding StopScrOrIdxCommand}" />
+                                        </behaviors:Interaction.Behaviors>
+                                        <Button.Content>
+                                            <Image
+                                                x:Name="scanLeftIcon"
+                                                Width="89"
+                                                Height="52"
+                                                Source="/Assets/picture/idx_left.png" />
+                                        </Button.Content>
+                                    </Button>
+                                </Grid>
+                                <Grid
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center">
+                                    <Button x:Name="scanRightBtn" VerticalAlignment="Center">
+                                        <behaviors:Interaction.Behaviors>
+                                            <behav:DualInputBehavior
+                                                PromptCommand="{Binding XRelativeNegativeCommand}"
+                                                StartCommand="{Binding StartXReversalScrOrIdxCommand}"
+                                                StopCommand="{Binding StopScrOrIdxCommand}" />
+                                        </behaviors:Interaction.Behaviors>
+                                        <Button.Content>
+                                            <Image
+                                                x:Name="scanRightIcon"
+                                                Width="89"
+                                                Height="52"
+                                                Source="/Assets/picture/idx_right.png" />
+                                        </Button.Content>
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                            <Grid
+                                Grid.Row="2"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                                <Button x:Name="scanBottomBtn" VerticalAlignment="Top">
+                                    <behaviors:Interaction.Behaviors>
+                                        <behav:DualInputBehavior
+                                            PromptCommand="{Binding YRelativePositiveCommand}"
+                                            StartCommand="{Binding StartYCorotationScrOrIdxCommand}"
+                                            StopCommand="{Binding StopScrOrIdxCommand}" />
+                                    </behaviors:Interaction.Behaviors>
+                                    <Button.Content>
+                                        <Image
+                                            x:Name="scanBottomIcon"
+                                            Width="89"
+                                            Height="55"
+                                            Source="/Assets/picture/idx_bottom.png" />
+                                    </Button.Content>
+                                </Button>
+                            </Grid>
+                        </Grid>
+                        <Grid Grid.Column="2" Margin="0,10,10,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="1.5*" />
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Button
+                                x:Name="scanRightBottomBtn"
+                                VerticalAlignment="Center"
+                                Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <behaviors:Interaction.Behaviors>
+                                    <behav:DualInputBehavior
+                                        PromptCommand="{Binding ThetaRelativePositiveCommand}"
+                                        StartCommand="{Binding StartThetaCorotationScrOrIdxCommand}"
+                                        StopCommand="{Binding StopScrOrIdxCommand}" />
+                                </behaviors:Interaction.Behaviors>
+                                <Button.Content>
+                                    <Image
+                                        x:Name="scanRightBottomIcon"
+                                        Width="80"
+                                        Height="80"
+                                        HorizontalAlignment="Right"
+                                        Source="/Assets/picture/idx_right_bottom.png" />
+                                </Button.Content>
+                            </Button>
+                            <!--<Button
+                                Grid.Row="1"
+                                Width="90"
+                                Height="40"
+                                HorizontalAlignment="Right"
+                                Background="#5087Cb"
+                                Content="Z2抬起"
+                                Foreground="White"
+                                Style="{StaticResource TextButton}">
+                                <behaviors:Interaction.Behaviors>
+                                    <behav:DualInputBehavior
+                                        PromptCommand="{Binding Z2RelativeNegativeCommand}"
+                                        StartCommand="{Binding StartRaiseZ2Command}"
+                                        StopCommand="{Binding StopJogZ2Command}" />
+                                </behaviors:Interaction.Behaviors>
+                            </Button>
+                            <Button
+                                Grid.Row="2"
+                                Width="90"
+                                Height="40"
+                                HorizontalAlignment="Right"
+                                Background="#5087Cb"
+                                Content="Z2下降"
+                                Foreground="White"
+                                Style="{StaticResource TextButton}">
+                                <behaviors:Interaction.Behaviors>
+                                    <behav:DualInputBehavior
+                                        PromptCommand="{Binding Z2RelativePositiveCommand}"
+                                        StartCommand="{Binding StartDropZ2Command}"
+                                        StopCommand="{Binding StopJogZ2Command}" />
+                                </behaviors:Interaction.Behaviors>
+                            </Button>-->
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Border>
+            <Border
+                Grid.Column="2"
+                Margin="10,0,5,0"
+                Background="#E9FDFF"
+                CornerRadius="10"
+                Visibility="{Binding IsShowKeyboard, Converter={StaticResource BoolToVisibilityConverter}}">
+                <Border.Effect>
+                    <DropShadowEffect
+                        BlurRadius="10"
+                        Direction="315"
+                        ShadowDepth="5"
+                        Color="#4DC9EBF7" />
+                </Border.Effect>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="5*" />
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="0">
                         <Grid.RowDefinitions>
                             <RowDefinition />
                             <RowDefinition />
                         </Grid.RowDefinitions>
-                        <!--<Grid Grid.Row="0">
-                            <Grid Width="100" Height="100">
+                        <Grid Grid.Row="0">
+                            <Grid
+                                Width="100"
+                                Height="100"
+                                HorizontalAlignment="Center">
                                 <StackPanel Orientation="Vertical">
                                     <Border
                                         Width="66"
@@ -358,7 +656,7 @@
                                         Text="Scan" />
                                 </StackPanel>
                             </Grid>
-                        </Grid>-->
+                        </Grid>
                         <Grid Grid.Row="1">
                             <Grid.Resources>
                                 <ResourceDictionary>
@@ -398,10 +696,7 @@
                                 <RowDefinition />
                                 <RowDefinition />
                             </Grid.RowDefinitions>
-                            <Button
-                                x:Name="scanLeftBottomBtn"
-                                VerticalAlignment="Center"
-                                Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <Button VerticalAlignment="Center" Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}">
                                 <behaviors:Interaction.Behaviors>
                                     <behav:DualInputBehavior
                                         PromptCommand="{Binding ThetaRelativeNegativeCommand}"
@@ -410,19 +705,19 @@
                                 </behaviors:Interaction.Behaviors>
                                 <Button.Content>
                                     <Image
-                                        x:Name="scanLeftBottomIcon"
-                                        Width="89"
-                                        Height="89"
-                                        Source="/Assets/picture/scan_left_bottom.png" HorizontalAlignment="Left" />
+                                        Width="80"
+                                        Height="80"
+                                        HorizontalAlignment="Left"
+                                        Source="/Assets/picture/scan_left_bottom.png" />
                                 </Button.Content>
                             </Button>
                             <Button
                                 Grid.Row="1"
                                 Width="90"
                                 Height="40"
+                                HorizontalAlignment="Left"
                                 Background="#5087Cb"
                                 Content="Z1抬起"
-                                HorizontalAlignment="Left"
                                 Foreground="White"
                                 Style="{StaticResource TextButton}">
                                 <behaviors:Interaction.Behaviors>
@@ -436,9 +731,9 @@
                                 Grid.Row="2"
                                 Width="90"
                                 Height="40"
+                                HorizontalAlignment="Left"
                                 Background="#5087Cb"
                                 Content="Z1下降"
-                                HorizontalAlignment="Left"
                                 Foreground="White"
                                 Style="{StaticResource TextButton}">
                                 <behaviors:Interaction.Behaviors>
@@ -459,7 +754,7 @@
                                 Grid.Row="0"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center">
-                                <Button x:Name="scanTopBtn" VerticalAlignment="Top">
+                                <Button VerticalAlignment="Top">
                                     <behaviors:Interaction.Behaviors>
                                         <behav:DualInputBehavior
                                             PromptCommand="{Binding YRelativeNegativeCommand}"
@@ -468,7 +763,6 @@
                                     </behaviors:Interaction.Behaviors>
                                     <Button.Content>
                                         <Image
-                                            x:Name="scanTopIcon"
                                             Width="89"
                                             Height="52"
                                             Source="/Assets/picture/scan_top.png" />
@@ -484,7 +778,7 @@
                                     Grid.Column="0"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center">
-                                    <Button x:Name="scanLeftBtn" VerticalAlignment="Top">
+                                    <Button VerticalAlignment="Top">
                                         <behaviors:Interaction.Behaviors>
                                             <behav:DualInputBehavior
                                                 PromptCommand="{Binding XRelativePositiveCommand}"
@@ -493,7 +787,6 @@
                                         </behaviors:Interaction.Behaviors>
                                         <Button.Content>
                                             <Image
-                                                x:Name="scanLeftIcon"
                                                 Width="89"
                                                 Height="52"
                                                 Source="/Assets/picture/scan_left.png" />
@@ -504,7 +797,7 @@
                                     Grid.Column="1"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center">
-                                    <Button x:Name="scanRightBtn" VerticalAlignment="Center">
+                                    <Button VerticalAlignment="Center">
                                         <behaviors:Interaction.Behaviors>
                                             <behav:DualInputBehavior
                                                 PromptCommand="{Binding XRelativeNegativeCommand}"
@@ -513,7 +806,6 @@
                                         </behaviors:Interaction.Behaviors>
                                         <Button.Content>
                                             <Image
-                                                x:Name="scanRightIcon"
                                                 Width="89"
                                                 Height="52"
                                                 Source="/Assets/picture/scan_right.png" />
@@ -525,7 +817,7 @@
                                 Grid.Row="2"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center">
-                                <Button x:Name="scanBottomBtn" VerticalAlignment="Top">
+                                <Button VerticalAlignment="Top">
                                     <behaviors:Interaction.Behaviors>
                                         <behav:DualInputBehavior
                                             PromptCommand="{Binding YRelativePositiveCommand}"
@@ -534,7 +826,6 @@
                                     </behaviors:Interaction.Behaviors>
                                     <Button.Content>
                                         <Image
-                                            x:Name="scanBottomIcon"
                                             Width="89"
                                             Height="55"
                                             Source="/Assets/picture/scan_bottom.png" />
@@ -548,10 +839,7 @@
                                 <RowDefinition />
                                 <RowDefinition />
                             </Grid.RowDefinitions>
-                            <Button
-                                x:Name="scanRightBottomBtn"
-                                VerticalAlignment="Center"
-                                Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <Button VerticalAlignment="Center" Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}">
                                 <behaviors:Interaction.Behaviors>
                                     <behav:DualInputBehavior
                                         PromptCommand="{Binding ThetaRelativePositiveCommand}"
@@ -560,9 +848,8 @@
                                 </behaviors:Interaction.Behaviors>
                                 <Button.Content>
                                     <Image
-                                        x:Name="scanRightBottomIcon"
-                                        Width="89"
-                                        Height="89"
+                                        Width="80"
+                                        Height="80"
                                         HorizontalAlignment="Right"
                                         Source="/Assets/picture/scan_right_bottom.png" />
                                 </Button.Content>
@@ -571,9 +858,9 @@
                                 Grid.Row="1"
                                 Width="90"
                                 Height="40"
+                                HorizontalAlignment="Right"
                                 Background="#5087Cb"
                                 Content="Z2抬起"
-                                HorizontalAlignment="Right"
                                 Foreground="White"
                                 Style="{StaticResource TextButton}">
                                 <behaviors:Interaction.Behaviors>
@@ -587,10 +874,10 @@
                                 Grid.Row="2"
                                 Width="90"
                                 Height="40"
+                                HorizontalAlignment="Right"
                                 Background="#5087Cb"
                                 Content="Z2下降"
                                 Foreground="White"
-                                HorizontalAlignment="Right"
                                 Style="{StaticResource TextButton}">
                                 <behaviors:Interaction.Behaviors>
                                     <behav:DualInputBehavior

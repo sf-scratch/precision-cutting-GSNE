@@ -3,9 +3,9 @@
 namespace 精密切割系统.ViewModel;
 
 /// <summary>
-/// 
+///
 /// </summary>
-public class MQSemiAutomaticCuttingConfViewModel: INotifyPropertyChanged
+public class MQSemiAutomaticCuttingConfViewModel : BindableBase
 {
     private string _directoryId;
     private string _deviceDataNo;
@@ -20,175 +20,94 @@ public class MQSemiAutomaticCuttingConfViewModel: INotifyPropertyChanged
     private string _cutDirection;
     private string _changeFeedSpeed;
 
-    
     public string DirectoryId
     {
         get { return _directoryId; }
-        set
-        {
-            if (_directoryId != value)
-            {
-                _directoryId = value;
-                OnPropertyChanged("DirectoryId");
-            }
-        }
+        set { SetProperty(ref _directoryId, value); }
     }
+
     // DeviceDataNo
     public string DeviceDataNo
     {
         get { return _deviceDataNo; }
-        set
-        {
-            if (_deviceDataNo != value)
-            {
-                _deviceDataNo = value;
-                OnPropertyChanged("DeviceDataNo");
-            }
-        }
+        set { SetProperty(ref _deviceDataNo, value); }
     }
 
     // DeviceDataId
     public string DeviceDataId
     {
         get { return _deviceDataId; }
-        set
-        {
-            if (_deviceDataId != value)
-            {
-                _deviceDataId = value;
-                OnPropertyChanged("DeviceDataId");
-            }
-        }
+        set { SetProperty(ref _deviceDataId, value); }
     }
+
     // DepthCompensation
     public string DepthCompensation
     {
         get { return _depthCompensation; }
-        set
-        {
-            if (_depthCompensation != value)
-            {
-                _depthCompensation = value;
-                OnPropertyChanged("DepthCompensation");
-            }
-        }
+        set { SetProperty(ref _depthCompensation, value); }
     }
 
     // ChannelNum
     public string ChannelNum
     {
         get { return _channelNum; }
-        set
-        {
-            if (_channelNum != value)
-            {
-                _channelNum = value;
-                OnPropertyChanged("ChannelNum");
-            }
-        }
+        set { SetProperty(ref _channelNum, value); }
     }
 
     // BladeHeight
     public string BladeHeight
     {
         get { return _bladeHeight; }
-        set
-        {
-            if (_bladeHeight != value)
-            {
-                _bladeHeight = value;
-                OnPropertyChanged("BladeHeight");
-            }
-        }
+        set { SetProperty(ref _bladeHeight, value); }
     }
 
     // FeedSpeed
     public string FeedSpeed
     {
         get { return _feedSpeed; }
-        set
-        {
-            if (_feedSpeed != value)
-            {
-                _feedSpeed = value;
-                OnPropertyChanged("FeedSpeed");
-            }
-        }
+        set { SetProperty(ref _feedSpeed, value); }
     }
 
     // SpindleRev
     public int SpindleRev
     {
         get { return _spindleRev; }
-        set
-        {
-            if (_spindleRev != value)
-            {
-                _spindleRev = value;
-                OnPropertyChanged("SpindleRev");
-            }
-        }
+        set { SetProperty(ref _spindleRev, value); }
     }
 
     // CutLine
     public int CutLine
     {
         get { return _cutLine; }
-        set
-        {
-            if (_cutLine != value)
-            {
-                _cutLine = value;
-                OnPropertyChanged("CutLine");
-            }
-        }
+        set { SetProperty(ref _cutLine, value); }
     }
 
     // CutDepthOffset
     public string CutDepthOffset
     {
         get { return _cutDepthOffset; }
-        set
-        {
-            if (_cutDepthOffset != value)
-            {
-                _cutDepthOffset = value;
-                OnPropertyChanged("CutDepthOffset");
-            }
-        }
+        set { SetProperty(ref _cutDepthOffset, value); }
     }
 
     // CutDirection
     public string CutDirection
     {
         get { return _cutDirection; }
-        set
-        {
-            if (_cutDirection != value)
-            {
-                _cutDirection = value;
-                OnPropertyChanged("CutDirection");
-            }
-        }
+        set { SetProperty(ref _cutDirection, value); }
     }
 
     // ChangeFeedSpeed
     public string ChangeFeedSpeed
     {
         get { return _changeFeedSpeed; }
-        set
-        {
-            if (_changeFeedSpeed != value)
-            {
-                _changeFeedSpeed = value;
-                OnPropertyChanged("ChangeFeedSpeed");
-            }
-        }
+        set { SetProperty(ref _changeFeedSpeed, value); }
     }
-    
-    public event PropertyChangedEventHandler PropertyChanged;
-    protected virtual void OnPropertyChanged(string propertyName)
+
+    private bool _isOpenCutWaterAfterCuttingCompleted;
+
+    public bool IsOpenCutWaterAfterCuttingCompleted
     {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        get { return _isOpenCutWaterAfterCuttingCompleted; }
+        set { SetProperty(ref _isOpenCutWaterAfterCuttingCompleted, value); }
     }
 }

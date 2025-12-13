@@ -1108,6 +1108,11 @@ namespace 精密切割系统.Driver
         public Tag softLowerLimit { get; set; }
 
         /// <summary>
+        /// 原点补偿
+        /// </summary>
+        public Tag originCompensation { get; set; }
+
+        /// <summary>
         /// 设置软正限位
         /// </summary>
         /// <param name="limitPosition"></param>
@@ -1127,6 +1132,17 @@ namespace 精密切割系统.Driver
         {
             softLowerLimit.writeValue = limitPosition.ToString("F3");
             await keyencePlc.WriteTagAsync(softLowerLimit);
+        }
+
+        /// <summary>
+        /// 设置原点补偿
+        /// </summary>
+        /// <param name="compenstation"></param>
+        /// <returns></returns>
+        public async Task SetOriginCompensation(float compenstation)
+        {
+            originCompensation.writeValue = compenstation.ToString("F3");
+            await keyencePlc.WriteTagAsync(originCompensation);
         }
 
         public bool IsReady()
@@ -1967,12 +1983,14 @@ namespace 精密切割系统.Driver
             ConfirmParams();
         }
 
-        public async Task SetBladeSetuInitPositionAsync(string initX, string initY, float? initTheta = null)
+        public async Task SetBladeSetuInitPositionAsync(string initX, string initY, string initZ1, float? initTheta = null)
         {
             xHeightSet.writeValue = initX.ToString();
             await keyencePlc.WriteTagAsync(xHeightSet);
             yHeightSet.writeValue = initY.ToString();
             await keyencePlc.WriteTagAsync(yHeightSet);
+            z1HeightSet.writeValue = initZ1.ToString();
+            await keyencePlc.WriteTagAsync(z1HeightSet);
             if (initTheta is not null)
             {
                 thetaSet.writeValue = initTheta.Value.ToString();
@@ -2246,15 +2264,6 @@ namespace 精密切割系统.Driver
         {
             systemReset.writeValue = "1";
             keyencePlc.writeTag(systemReset);
-        }
-
-        /// <summary>
-        /// 主轴运行状态修改
-        /// </summary>
-        public void SetSpindleManuallyRunStatus(int status)
-        {
-            spindleManuallyRun.writeValue = status + "";
-            keyencePlc.writeTag(spindleManuallyRun);
         }
 
         /// <summary>

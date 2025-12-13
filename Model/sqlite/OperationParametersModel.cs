@@ -32,6 +32,12 @@ namespace 精密切割系统.database.db.modle
         [Column("op_z_scan_distance")]//z轴扫描距离（mm）
         public string ZSscanDistance { get; set; }
 
+        [Column("op_z2_scan_speed")]//z2轴扫描速度（mm/s）
+        public string Z2ScanSpeed { get; set; }
+
+        [Column("op_z2_scan_distance")]//z2轴扫描距离（mm）
+        public string Z2SscanDistance { get; set; }
+
         [Column("op_r_scan_speed")]//θ轴扫描速度（°/s）
         public string RScanSpeed { get; set; }
 
@@ -101,16 +107,35 @@ namespace 精密切割系统.database.db.modle
         // 面板寸动距离
         [Column("x_Panel_Jog_Distance")]//X轴屏幕移动速度
         public string xPanelJogDistance { get; set; }
+
         [Column("y_Panel_Jog_Distance")]//Y轴屏幕移动速度
         public string yPanelJogDistance { get; set; }
+
         [Column("z_Panel_Jog_Distance")]//Z轴屏幕移动速度
         public string zPanelJogDistance { get; set; }
 
         [Column("z_axis_comp_num")]// Z轴补偿-前几刀
         public int zAxisCompNum { get; set; } = 0;
+
         [Column("cut_x_axis_back_speed")]// 切割回程速度
         public int cutXAxisBackSpeed { get; set; } = 0;
+
         [Column("z_axis_comp_value")]//Z轴补偿-补偿量
         public string zAxisCompValue { get; set; } = "0";
+
+        [Column("origin_compensation_x")]
+        public string OriginCompensationX { get; set; } = "0";
+
+        [Column("origin_compensation_y")]
+        public string OriginCompensationY { get; set; } = "0";
+
+        [Column("origin_compensation_z1")]
+        public string OriginCompensationZ1 { get; set; } = "0";
+
+        [Column("origin_compensation_z2")]
+        public string OriginCompensationZ2 { get; set; } = "0";
+
+        [Column("origin_compensation_theta")]
+        public string OriginCompensationTheta { get; set; } = "0";
     }
 }

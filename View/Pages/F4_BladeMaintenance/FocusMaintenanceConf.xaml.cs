@@ -73,7 +73,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 
         private void InitData()
         {
-            focusSetPostion.Text = Appsettings.FocusClearZ?.ToString(GlobalParams.DecimalStringFormat);
+            focusSetPostion.Text = Appsettings.FocusWorkpiecesClearZ?.ToString(GlobalParams.DecimalStringFormat);
         }
 
         private void LoadPosition(CancellationToken token)
@@ -114,7 +114,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             else
             {
                 focusSetPostion.Text = currentZ2.Value.ToString(GlobalParams.DecimalStringFormat);
-                Appsettings.FocusClearZ = currentZ2.Value;
+                Appsettings.FocusWorkpiecesClearZ = currentZ2.Value;
                 MaterialSnackUtils.MaterialSnack("对焦点位置确认成功！", MaterialSnackUtils.SnackType.SUCCESS);
             }
         }

@@ -84,6 +84,15 @@ namespace 精密切割系统.Helpers
         }
 
         /// <summary>
+        /// 聚焦工作盘位置Z1
+        /// </summary>
+        public static float? FocusWorkpiecesClearZ
+        {
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
+        }
+
+        /// <summary>
         /// 自更换刀片起刀片切了多长
         /// </summary>
         public static float? AfterReplaceBladeCutLength
@@ -237,6 +246,12 @@ namespace 精密切割系统.Helpers
         }
 
         public static float? NegativeLimitPositionTheta
+        {
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
+        }
+
+        public static float? SafetyMarginZ1
         {
             get => GetValue<float>();
             set => UpdateAppSettings(value);

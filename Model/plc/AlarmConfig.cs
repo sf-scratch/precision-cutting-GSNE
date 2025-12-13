@@ -1,5 +1,6 @@
 ﻿using DryIoc.ImTools;
 using HslCommunication.BasicFramework;
+using NPOI.SS.Formula.Functions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -294,6 +295,14 @@ namespace 精密切割系统.Model.plc
         public bool HasConductivityAlarm()
         {
             return Instance.HasTargetActiveErrorAlarm("MR60408");
+        }
+
+        /// <summary>
+        /// 主轴冷却水异常
+        /// </summary>
+        public bool HasSpindleCoolingWaterAlarm()
+        {
+            return Instance.HasTargetActiveErrorAlarm("MR60400");
         }
 
         /// <summary>

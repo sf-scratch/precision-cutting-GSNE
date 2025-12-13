@@ -393,7 +393,8 @@
                             Grid.Row="4"
                             Grid.Column="1"
                             Margin="0,0,0,10"
-                            VerticalContentAlignment="Center">
+                            VerticalContentAlignment="Center"
+                            FontSize="18">
                             <ComboBoxItem Height="35" Content="否" />
                             <ComboBoxItem Height="35" Content="是" />
                         </ComboBox>

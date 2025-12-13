@@ -239,17 +239,10 @@
                 TextWrapping="Wrap"
                 XMax="4"
                 XMin="1" />-->
-            <Label
-                x:Name="labWorkDiscFocusPosition"
-                Height="35"
-                Margin="0,10,0,0"
-                Content="相机与工作盘聚焦位置"
-                FontWeight="Bold" />
-            <Controls:InputTextBox
-                x:Name="inputWorkDiscFocusPosition"
-                XMax="40"
-                XMin="-10"
-                XPrecision="4" />
+            <Label Content="相机与工作盘聚焦位置" />
+            <Controls:InputTextBox x:Name="inputWorkDiscFocusPosition" XPrecision="4" />
+            <Label Content="相机与工件聚焦位置" />
+            <Controls:InputTextBox x:Name="inputFocusClearZPosition" XPrecision="4" />
             <!--<Label Height="35"  x:Name="labMultipleNum" Content="高速的倍率" Margin="0,10,0,0" FontWeight="Bold" FontSize="16" />
             <Controls:InputTextBox x:Name="inputMultipleNum" Width="300" TextWrapping="Wrap" Height="35" InputType="Decimal" XMin="0" XMax="10"  XPrecision="3" />-->
             <!--<Label

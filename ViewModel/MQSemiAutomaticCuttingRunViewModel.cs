@@ -407,10 +407,24 @@ namespace 精密切割系统.ViewModel
                 // 轴不报警时移动到指定位置
                 if (line != null && !AlarmConfig.Instance.HasAxisErrorAlarms())
                 {
-                    // 执行默认动作
+                    // Z1安全余量
+                    float posZ = 0;
+                    CommonResult<FileTableItemModel> fileTableItemResult = await AutoCutUtils.GetFileTableItemModelAsync();
+                    if (fileTableItemResult.IsSuccess && fileTableItemResult.Data is not null)
+                    {
+                        FileTableItemModel fileTableItem = fileTableItemResult.Data;
+                        float workThickness = fileTableItem.WorkThickness.ToFloat();
+                        float tapeThickness = fileTableItem.TapeThickness.ToFloat();
+                        if (Appsettings.MeasureHeightLast is not null && Appsettings.SafetyMarginZ1 is not null)
+                        {
+                            posZ = Appsettings.MeasureHeightLast.Value - workThickness - tapeThickness - Appsettings.SafetyMarginZ1.Value;
+                        }
+                    }
                     await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, cts.Token);
                     await AutoCutUtils.WorkpieceBlowingAsync(line.StartPoint.Y.ToCameraY(), _eventAggregator, cts.Token);
                     await PlcControl.tagControl.cutting.RunMotionAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), line.StartPoint.Y.ToCameraY(), cts.Token);
+                    // 执行默认动作
+                    //await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(posZ, default, cts.Token);
                 }
                 MaterialSnack(message ?? "暂停中...", SnackType.WARNING, 0, _eventAggregator);
             }

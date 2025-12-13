@@ -604,5 +604,13 @@ namespace 精密切割系统.ViewModel
             get { return _verticalStraighteningStroke; }
             set { SetProperty(ref _verticalStraighteningStroke, value); }
         }
+
+        private string _safetyMarginZ1;
+
+        public string SafetyMarginZ1
+        {
+            get { return _safetyMarginZ1; }
+            set { SetProperty(ref _safetyMarginZ1, value); }
+        }
     }
 }

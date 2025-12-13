@@ -97,6 +97,32 @@ namespace 精密切割系统.ViewModel
             }
         }
 
+        public string Z2ScanSpeed
+        {
+            get { return operationParameter.Z2ScanSpeed; }
+            set
+            {
+                if (operationParameter.Z2ScanSpeed != value)
+                {
+                    operationParameter.Z2ScanSpeed = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        public string Z2SscanDistance
+        {
+            get { return operationParameter.Z2SscanDistance; }
+            set
+            {
+                if (operationParameter.Z2SscanDistance != value)
+                {
+                    operationParameter.Z2SscanDistance = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
         public string RScanSpeed
         {
             get { return operationParameter.RScanSpeed; }
@@ -539,6 +565,56 @@ namespace 精密切割系统.ViewModel
         {
             get { return _negativeLimitPositionTheta; }
             set { SetProperty(ref _negativeLimitPositionTheta, value); }
+        }
+
+        public string OriginCompensationX
+        {
+            get { return operationParameter.OriginCompensationX; }
+            set
+            {
+                operationParameter.OriginCompensationX = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public string OriginCompensationY
+        {
+            get { return operationParameter.OriginCompensationY; }
+            set
+            {
+                operationParameter.OriginCompensationY = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public string OriginCompensationZ1
+        {
+            get { return operationParameter.OriginCompensationZ1; }
+            set
+            {
+                operationParameter.OriginCompensationZ1 = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public string OriginCompensationZ2
+        {
+            get { return operationParameter.OriginCompensationZ2; }
+            set
+            {
+                operationParameter.OriginCompensationZ2 = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public string OriginCompensationTheta
+        {
+            get { return operationParameter.OriginCompensationTheta; }
+            set
+            {
+                operationParameter.OriginCompensationTheta = value;
+                RaisePropertyChanged();
+            }
         }
     }
 }

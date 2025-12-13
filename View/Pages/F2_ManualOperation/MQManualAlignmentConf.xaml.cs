@@ -296,19 +296,19 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         {
             if (code == 2040)
             {
-                _cameraCommon?.SetEdgeWidth(-1, 2);
+                _cameraCommon?.SetEdgeWidth(-CameraOperateUtils.DatumLineChangeStep, 2);
             }
             else if (code == 2041)
             {
-                _cameraCommon?.SetEdgeWidth(1, 2);
+                _cameraCommon?.SetEdgeWidth(CameraOperateUtils.DatumLineChangeStep, 2);
             }
             else if (code == 2407)
             {
-                _cameraCommon?.SetCutMarkWidth(-1, 2);
+                _cameraCommon?.SetCutMarkWidth(-CameraOperateUtils.DatumLineChangeStep, 2);
             }
             else if (code == 2408)
             {
-                _cameraCommon?.SetCutMarkWidth(1, 2);
+                _cameraCommon?.SetCutMarkWidth(CameraOperateUtils.DatumLineChangeStep, 2);
             }
             if (_cameraCommon is not null)
             {

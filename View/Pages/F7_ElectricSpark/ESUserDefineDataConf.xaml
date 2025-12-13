@@ -189,6 +189,13 @@
                 Text="{Binding Path=VerticalStraighteningStroke, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 TextWrapping="Wrap" />
             <Label HorizontalAlignment="Left" Content="mm" />
+            <Label Content="安全余量Z1" />
+            <Controls:InputTextBox
+                x:Name="SafetyMarginZ1"
+                InputType="Decimal"
+                Text="{Binding Path=SafetyMarginZ1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                TextWrapping="Wrap" />
+            <Label HorizontalAlignment="Left" Content="mm" />
         </auto:AutoGrid>
 
         <!--<Label Content="暖机时X轴结束位置" HorizontalAlignment="Left" Grid.Row="7" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="450,0,0,0" />

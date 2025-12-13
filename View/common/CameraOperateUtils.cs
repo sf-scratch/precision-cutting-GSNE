@@ -9,6 +9,7 @@ namespace 精密切割系统.Driver
     // 集成摄像头相关功能的api
     internal class CameraOperateUtils
     {
+        public const float DatumLineChangeStep = 1 / 2.2187f; // 基准线调整步长，单位毫米
         private const double PictureBoxWidth = 765.0;
         private const double PictureBoxHeight = 640.0;
         private const double Scale = 1;

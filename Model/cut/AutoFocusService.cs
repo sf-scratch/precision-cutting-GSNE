@@ -37,7 +37,7 @@ namespace 精密切割系统.Model.cut
                 FileTableItemModel fileTableItem = fileTableItemResult.Data;
                 float workThickness = fileTableItem.WorkThickness.ToFloat();
                 float tapeThickness = fileTableItem.TapeThickness.ToFloat();
-                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(Appsettings.FocusClearZ - workThickness - tapeThickness ?? 0, default, token);
+                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(Appsettings.FocusWorkpiecesClearZ - workThickness - tapeThickness ?? 0, default, token);
                 int direction = 1;
                 // 阶段1：快速粗调（正向扫描）
                 var coarseResult = await FindOptimalFocus(
@@ -67,7 +67,11 @@ namespace 精密切割系统.Model.cut
                     isCoarseScan: false,
                     eventAggregator,
                     token);
-                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(result.Data, default, token);
+                if (result.IsSuccess)
+                {
+                    Appsettings.FocusClearZ = result.Data;
+                    await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(result.Data, default, token);
+                }
                 return result;
             }
             finally
