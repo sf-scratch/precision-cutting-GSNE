@@ -106,33 +106,33 @@
   },
   {
     "Address": "MR60105",
-    "Level": "None",
-    "Message": ""
+    "Level": "Warn",
+    "Message": "工作台真空未打开"
   },
   {
     "Address": "MR60106",
-    "Level": "None",
-    "Message": ""
+    "Level": "Warn",
+    "Message": "X轴绝对定位超限"
   },
   {
     "Address": "MR60107",
-    "Level": "None",
-    "Message": ""
+    "Level": "Warn",
+    "Message": "Y轴绝对定位超限"
   },
   {
     "Address": "MR60108",
-    "Level": "None",
-    "Message": ""
+    "Level": "Warn",
+    "Message": "Z1轴绝对定位超限"
   },
   {
     "Address": "MR60109",
-    "Level": "None",
-    "Message": ""
+    "Level": "Warn",
+    "Message": "Z2轴绝对定位超限"
   },
   {
     "Address": "MR60110",
-    "Level": "None",
-    "Message": ""
+    "Level": "Warn",
+    "Message": "θ轴绝对定位超限"
   },
   {
     "Address": "MR60111",

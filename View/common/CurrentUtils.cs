@@ -68,7 +68,7 @@ namespace 精密切割系统.Utils
             InitInitialPositionModel(initialPositionModel);
             // 初始化测高数据
             InitSetupDate();
-            await AutoCutUtils.SetSoftLimit();
+            await AutoCutUtils.SetFunctionalParameters();
         }
 
         public static void InitSetupDate()

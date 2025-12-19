@@ -86,7 +86,7 @@ namespace 精密切割系统.View.Pages
             mainWindow.NavigateToPage("MainMenu");
         }
 
-        private async void BtnSure_RightClicked(object sender, bool e)
+        private async void BtnSure_RightClicked(object? sender, bool e)
         {
             //执行数据库数据保存。
             var success = this.FormSuccess();
@@ -125,12 +125,7 @@ namespace 精密切割系统.View.Pages
                 Appsettings.NegativeLimitPositionZ2 = f531.NegativeLimitPositionZ2.ToFloat();
                 Appsettings.PositiveLimitPositionTheta = f531.PositiveLimitPositionTheta.ToFloat();
                 Appsettings.NegativeLimitPositionTheta = f531.NegativeLimitPositionTheta.ToFloat();
-                await AutoCutUtils.SetSoftLimit();
-                await PlcControl.tagControl.Xaxis.SetOriginCompensation(operationParameter.OriginCompensationX.ToFloat());
-                await PlcControl.tagControl.Yaxis.SetOriginCompensation(operationParameter.OriginCompensationY.ToFloat());
-                await PlcControl.tagControl.Z1axis.SetOriginCompensation(operationParameter.OriginCompensationZ1.ToFloat());
-                await PlcControl.tagControl.Z2axis.SetOriginCompensation(operationParameter.OriginCompensationZ2.ToFloat());
-                await PlcControl.tagControl.ThetaAxis.SetOriginCompensation(operationParameter.OriginCompensationTheta.ToFloat());
+                await AutoCutUtils.SetFunctionalParameters();
             }
         }
 

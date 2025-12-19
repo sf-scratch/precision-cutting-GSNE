@@ -1902,8 +1902,9 @@ namespace 精密切割系统.Helpers
             return Cv2.ImDecode(jpegBytes, ImreadModes.Color);
         }
 
-        public static async Task SetSoftLimit()
+        public static async Task SetFunctionalParameters()
         {
+            // 极限位置
             await PlcControl.tagControl.Xaxis.SetSoftUpperLimit(Appsettings.PositiveLimitPositionX ?? 0);
             await PlcControl.tagControl.Xaxis.SetSoftLowerLimit(Appsettings.NegativeLimitPositionX ?? 0);
             await PlcControl.tagControl.Yaxis.SetSoftUpperLimit(Appsettings.PositiveLimitPositionY ?? 0);
@@ -1914,6 +1915,22 @@ namespace 精密切割系统.Helpers
             await PlcControl.tagControl.Z2axis.SetSoftLowerLimit(Appsettings.NegativeLimitPositionZ2 ?? 0);
             await PlcControl.tagControl.ThetaAxis.SetSoftUpperLimit(Appsettings.PositiveLimitPositionTheta ?? 0);
             await PlcControl.tagControl.ThetaAxis.SetSoftLowerLimit(Appsettings.NegativeLimitPositionTheta ?? 0);
+            var operationParameter = CurrentUtils.GetOperationParametersModel();
+            if (operationParameter is not null)
+            {
+                // 原点补偿
+                await PlcControl.tagControl.Xaxis.SetOriginCompensation(operationParameter.OriginCompensationX.ToFloat());
+                await PlcControl.tagControl.Yaxis.SetOriginCompensation(operationParameter.OriginCompensationY.ToFloat());
+                await PlcControl.tagControl.Z1axis.SetOriginCompensation(operationParameter.OriginCompensationZ1.ToFloat());
+                await PlcControl.tagControl.Z2axis.SetOriginCompensation(operationParameter.OriginCompensationZ2.ToFloat());
+                await PlcControl.tagControl.ThetaAxis.SetOriginCompensation(operationParameter.OriginCompensationTheta.ToFloat());
+                // 轴速度
+                await PlcControl.tagControl.Xaxis.SetJogRelativeSpeedAsync(operationParameter.XScanSpeed.ToFloat());
+                await PlcControl.tagControl.Yaxis.SetJogRelativeSpeedAsync(operationParameter.YScanSpeed.ToFloat());
+                await PlcControl.tagControl.Z1axis.SetJogRelativeSpeedAsync(operationParameter.ZScanSpeed.ToFloat());
+                await PlcControl.tagControl.Z2axis.SetJogRelativeSpeedAsync(operationParameter.Z2ScanSpeed.ToFloat());
+                await PlcControl.tagControl.ThetaAxis.SetJogRelativeSpeedAsync(operationParameter.RScanSpeed.ToFloat());
+            }
         }
 
         public static async Task<CommonResult<FileTableItemChModel>> GetFirstFileTableItemChModelAsync()

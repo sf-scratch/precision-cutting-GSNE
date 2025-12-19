@@ -64,7 +64,7 @@
                 <Controls:InputTextBox x:Name="inputBladeSetupInitX" />
                 <Label Content="y轴初始位置" />
                 <Controls:InputTextBox x:Name="inputBladeSetupInitY" />
-                <Label Content="z1轴初始位置" />
+                <Label Content="z1轴极限位置" />
                 <Controls:InputTextBox x:Name="inputBladeSetupInitZ1" />
                 <Label Content="x轴速度" />
                 <Controls:InputTextBox x:Name="inputBladeSetupInitSpeedX" />
