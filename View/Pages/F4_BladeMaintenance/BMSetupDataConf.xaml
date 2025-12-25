@@ -76,13 +76,13 @@
             <Label Content="θ轴移动角度" />
             <Controls:InputTextBox x:Name="thetaMovementAngle" XMax="90" />
             <Label Content="deg" />
-            <Label Content="θ轴开始移动位置" />
+            <Label Content="θ轴移动开始位置" />
             <Controls:InputTextBox x:Name="thetaStartingToMovePosition" />
             <Label Content="deg" />
             <Label Content="θ轴移动结束位置" />
             <Controls:InputTextBox x:Name="thetaEndingToMovePosition" />
             <Label Content="deg" />
-            <Label Content="θ轴现在的位置" />
+            <Label Content="θ轴移动当前位置" />
             <Controls:InputTextBox x:Name="thetaCurrentLocation" />
             <Label Content="deg" />
             <Label Content="每次切割前测高" />
@@ -276,38 +276,59 @@
                 </StackPanel>
             </StackPanel>
         </StackPanel>-->
+
+        <StackPanel
+            Grid.Row="1"
+            Grid.Column="1"
+            Orientation="Vertical">
+            <Label
+                Margin="10"
+                Content="测高信息"
+                FontSize="22" />
+            <StackPanel Margin="0,0,0,10" Orientation="Horizontal">
+                <Label
+                    Width="130"
+                    Margin="30,0,0,0"
+                    Content="当前一次" />
+                <Controls:InputTextBox IsEnabled="False" Text="{Binding CurrentMeasureValue}" />
+                <Label Content="mm" FontSize="18" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label
+                    Width="100"
+                    Margin="30,0,0,0"
+                    VerticalAlignment="Top"
+                    Content="历史记录" />
+                <ListBox d:ItemsSource="{d:SampleData}" ItemsSource="{Binding BladeMeasureList}">
+                    <ListBox.ItemContainerStyle>
+                        <Style BasedOn="{StaticResource MaterialDesignListBoxItem}" TargetType="ListBoxItem">
+                            <Setter Property="Margin" Value="0,0,0,1" />
+                            <Setter Property="Padding" Value="0" />
+                            <Setter Property="materialDesign:ListBoxItemAssist.ShowSelection" Value="False" />
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="0,0,0,10" Orientation="Horizontal">
+                                <Label
+                                    Width="30"
+                                    Margin="0,0,0,0"
+                                    Content="{Binding FieldName}"
+                                    FontSize="18"
+                                    FontWeight="Bold" />
+                                <Controls:InputTextBox IsEnabled="False" Text="{Binding FieldValue}" />
+                                <Label Content="mm" FontSize="18" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </StackPanel>
+        </StackPanel>
         <Controls:RealTimeInfoBox
             x:Name="RealTimeInfo"
             Grid.Row="1"
-            Grid.Column="1"
+            Grid.Column="2"
             Width="400"
             Margin="50,0,0,20" />
-        <ListBox
-            Grid.Row="1"
-            Grid.Column="2"
-            Margin="50,0,0,20"
-            d:ItemsSource="{d:SampleData}"
-            ItemsSource="{Binding BladeMeasureList}">
-            <ListBox.ItemContainerStyle>
-                <Style BasedOn="{StaticResource MaterialDesignListBoxItem}" TargetType="ListBoxItem">
-                    <Setter Property="Margin" Value="0,0,0,1" />
-                    <Setter Property="Padding" Value="0" />
-                    <Setter Property="materialDesign:ListBoxItemAssist.ShowSelection" Value="False" />
-                </Style>
-            </ListBox.ItemContainerStyle>
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Margin="5" Orientation="Horizontal">
-                        <Label
-                            Margin="0,0,10,0"
-                            Content="{Binding FieldName}"
-                            FontSize="18"
-                            FontWeight="Bold" />
-                        <Controls:InputTextBox IsEnabled="False" Text="{Binding FieldValue}" />
-                        <Label Content="mm" FontSize="18" />
-                    </StackPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
     </Grid>
 </Page>

@@ -5,9 +5,11 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.plc;
+using 精密切割系统.View.Controls;
 using 精密切割系统.View.Pages.F4_BladeMaintenance;
 using static NPOI.HSSF.Util.HSSFColor;
 using static 精密切割系统.Helpers.MaterialSnackUtils;
@@ -16,12 +18,30 @@ namespace 精密切割系统.ViewModel
 {
     public class EmptyRunViewModel : CustomBindableBase
     {
+        private readonly IRegionManager _regionManager;
+
         private bool _runX;
 
         public bool RunX
         {
             get { return _runX; }
             set { SetProperty(ref _runX, value); }
+        }
+
+        private string _speedX;
+
+        public string SpeedX
+        {
+            get { return _speedX; }
+            set { SetProperty(ref _speedX, value); }
+        }
+
+        private string _repeatCountX;
+
+        public string RepeatCountX
+        {
+            get { return _repeatCountX; }
+            set { SetProperty(ref _repeatCountX, value); }
         }
 
         private bool _runY;
@@ -32,12 +52,44 @@ namespace 精密切割系统.ViewModel
             set { SetProperty(ref _runY, value); }
         }
 
+        private string _speedY;
+
+        public string SpeedY
+        {
+            get { return _speedY; }
+            set { SetProperty(ref _speedY, value); }
+        }
+
+        private string _repeatCountY;
+
+        public string RepeatCountY
+        {
+            get { return _repeatCountY; }
+            set { SetProperty(ref _repeatCountY, value); }
+        }
+
         private bool _runZ1;
 
         public bool RunZ1
         {
             get { return _runZ1; }
             set { SetProperty(ref _runZ1, value); }
+        }
+
+        private string _speedZ1;
+
+        public string SpeedZ1
+        {
+            get { return _speedZ1; }
+            set { SetProperty(ref _speedZ1, value); }
+        }
+
+        private string _repeatCountZ1;
+
+        public string RepeatCountZ1
+        {
+            get { return _repeatCountZ1; }
+            set { SetProperty(ref _repeatCountZ1, value); }
         }
 
         private bool _runZ2;
@@ -48,12 +100,44 @@ namespace 精密切割系统.ViewModel
             set { SetProperty(ref _runZ2, value); }
         }
 
+        private string _speedZ2;
+
+        public string SpeedZ2
+        {
+            get { return _speedZ2; }
+            set { SetProperty(ref _speedZ2, value); }
+        }
+
+        private string _repeatCountZ2;
+
+        public string RepeatCountZ2
+        {
+            get { return _repeatCountZ2; }
+            set { SetProperty(ref _repeatCountZ2, value); }
+        }
+
         private bool _runTheta;
 
         public bool RunTheta
         {
             get { return _runTheta; }
             set { SetProperty(ref _runTheta, value); }
+        }
+
+        private string _speedTheta;
+
+        public string SpeedTheta
+        {
+            get { return _speedTheta; }
+            set { SetProperty(ref _speedTheta, value); }
+        }
+
+        private string _repeatCountTheta;
+
+        public string RepeatCountTheta
+        {
+            get { return _repeatCountTheta; }
+            set { SetProperty(ref _repeatCountTheta, value); }
         }
 
         private bool _isEnabledGrid;
@@ -80,13 +164,31 @@ namespace 精密切割系统.ViewModel
             set { SetProperty(ref _isFlowing, value); }
         }
 
-        private SemaphoreSlim _emptyRunSemaphore;
-        private CancellationTokenSource _emptyRunCts;
+        private bool _hasAnyError;
 
-        public EmptyRunViewModel()
+        public bool HasAnyError
+        {
+            get { return _hasAnyError; }
+            set { SetProperty(ref _hasAnyError, value); }
+        }
+
+        private readonly SemaphoreSlim _emptyRunSemaphore = new(1, 1);
+        private CancellationTokenSource? _emptyRunCts;
+
+        public EmptyRunViewModel(IRegionManager regionManager)
         {
             _isEnabledGrid = true;
-            _emptyRunSemaphore = new SemaphoreSlim(1, 1);
+            _speedX = GlobalParams.XDefaultSpeed.ToString();
+            _speedY = GlobalParams.YDefaultSpeed.ToString();
+            _speedZ1 = GlobalParams.Z1DefaultSpeed.ToString();
+            _speedZ2 = GlobalParams.Z2DefaultSpeed.ToString();
+            _speedTheta = GlobalParams.ThetaDefaultSpeed.ToString();
+            _repeatCountX = "10";
+            _repeatCountY = "10";
+            _repeatCountZ1 = "10";
+            _repeatCountZ2 = "10";
+            _repeatCountTheta = "10";
+            _regionManager = regionManager;
         }
 
         private void InitRightButton()
@@ -104,6 +206,11 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteEmptyRun()
         {
+            if (RegionUtils.FormError(_regionManager))
+            {
+                MaterialSnackUtils.MaterialSnack(RegionUtils.FormErrorMessage, SnackType.WARNING);
+                return;
+            }
             if (AlarmConfig.Instance.HasActiveErrorAlarm())
             {
                 MaterialSnackUtils.MaterialSnack(AlarmConfig.HasErrorAlarmMessage, SnackType.WARNING);
@@ -135,6 +242,18 @@ namespace 精密切割系统.ViewModel
                 {
                     try
                     {
+                        float speedX = _speedX.ToFloat();
+                        float speedY = _speedY.ToFloat();
+                        float speedZ1 = _speedZ1.ToFloat();
+                        float speedZ2 = _speedZ2.ToFloat();
+                        float speedTheta = _speedTheta.ToFloat();
+                        int repeatCountX = _repeatCountX.ToInt();
+                        int repeatCountY = _repeatCountY.ToInt();
+                        int repeatCountZ1 = _repeatCountZ1.ToInt();
+                        int repeatCountZ2 = _repeatCountZ2.ToInt();
+                        int repeatCountTheta = _repeatCountTheta.ToInt();
+                        int currentRepeat = 0;
+                        int maxRepeatCount = new int[] { repeatCountX, repeatCountY, repeatCountZ1, repeatCountZ2, repeatCountTheta }.Max();
                         if (IsOpenWater)
                         {
                             await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
@@ -145,62 +264,62 @@ namespace 精密切割系统.ViewModel
                         }
                         using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(500));
                         List<Task> tasks = [];
-                        while (await timer.WaitForNextTickAsync())
+                        while (await timer.WaitForNextTickAsync() && currentRepeat < maxRepeatCount)
                         {
-                            await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, _emptyRunCts.Token);
-                            await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, default, _emptyRunCts.Token);
-                            if (RunX)
+                            await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, speedZ1, _emptyRunCts.Token);
+                            await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, speedZ2, _emptyRunCts.Token);
+                            if (RunX && currentRepeat < repeatCountX)
                             {
-                                tasks.Add(PlcControl.tagControl.Xaxis.StartAbsoluteAsync(Appsettings.PositiveLimitPositionX ?? 0, default, _emptyRunCts.Token));
+                                tasks.Add(PlcControl.tagControl.Xaxis.StartAbsoluteAsync(Appsettings.PositiveLimitPositionX ?? 0, speedX, _emptyRunCts.Token));
                             }
-                            if (RunY)
+                            if (RunY && currentRepeat < repeatCountY)
                             {
-                                tasks.Add(PlcControl.tagControl.Yaxis.StartAbsoluteAsync(Appsettings.PositiveLimitPositionY ?? 0, default, _emptyRunCts.Token));
+                                tasks.Add(PlcControl.tagControl.Yaxis.StartAbsoluteAsync(Appsettings.PositiveLimitPositionY ?? 0, speedY, _emptyRunCts.Token));
                             }
-                            if (RunTheta)
+                            if (RunTheta && currentRepeat < repeatCountTheta)
                             {
-                                tasks.Add(PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(Appsettings.PositiveLimitPositionTheta ?? 0, default, _emptyRunCts.Token));
-                            }
-                            await Task.WhenAll(tasks);
-                            if (RunX)
-                            {
-                                tasks.Add(PlcControl.tagControl.Xaxis.StartAbsoluteAsync(0, default, _emptyRunCts.Token));
-                            }
-                            if (RunY)
-                            {
-                                tasks.Add(PlcControl.tagControl.Yaxis.StartAbsoluteAsync(0, default, _emptyRunCts.Token));
-                            }
-                            if (RunTheta)
-                            {
-                                tasks.Add(PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0, default, _emptyRunCts.Token));
+                                tasks.Add(PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(Appsettings.PositiveLimitPositionTheta ?? 0, speedTheta, _emptyRunCts.Token));
                             }
                             await Task.WhenAll(tasks);
-                            if (RunZ1)
+                            if (RunX && currentRepeat < repeatCountX)
                             {
-                                //tasks.Add(PlcControl.tagControl.Z1axis.StartAbsoluteAsync(PlcControl.tagControl.Z1axis.softUpperLimit.value.ToFloat(), default, _emptyRunCts.Token));
-                                tasks.Add(PlcControl.tagControl.Z1axis.StartAbsoluteAsync(8, default, _emptyRunCts.Token));
+                                tasks.Add(PlcControl.tagControl.Xaxis.StartAbsoluteAsync(0, speedX, _emptyRunCts.Token));
                             }
-                            if (RunZ2)
+                            if (RunY && currentRepeat < repeatCountY)
                             {
-                                //tasks.Add(PlcControl.tagControl.Z2axis.StartAbsoluteAsync(PlcControl.tagControl.Z2axis.softUpperLimit.value.ToFloat(), default, _emptyRunCts.Token));
-                                tasks.Add(PlcControl.tagControl.Z2axis.StartAbsoluteAsync(8, default, _emptyRunCts.Token));
+                                tasks.Add(PlcControl.tagControl.Yaxis.StartAbsoluteAsync(0, speedY, _emptyRunCts.Token));
+                            }
+                            if (RunTheta && currentRepeat < repeatCountTheta)
+                            {
+                                tasks.Add(PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0, speedTheta, _emptyRunCts.Token));
                             }
                             await Task.WhenAll(tasks);
-                            if (RunZ1)
+                            if (RunZ1 && currentRepeat < repeatCountZ1)
                             {
-                                tasks.Add(PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, _emptyRunCts.Token));
+                                tasks.Add(PlcControl.tagControl.Z1axis.StartAbsoluteAsync(5, speedZ1, _emptyRunCts.Token));
                             }
-                            if (RunZ2)
+                            if (RunZ2 && currentRepeat < repeatCountZ2)
                             {
-                                tasks.Add(PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, default, _emptyRunCts.Token));
+                                tasks.Add(PlcControl.tagControl.Z2axis.StartAbsoluteAsync(5, speedZ2, _emptyRunCts.Token));
+                            }
+                            await Task.WhenAll(tasks);
+                            if (RunZ1 && currentRepeat < repeatCountZ1)
+                            {
+                                tasks.Add(PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, speedZ1, _emptyRunCts.Token));
+                            }
+                            if (RunZ2 && currentRepeat < repeatCountZ2)
+                            {
+                                tasks.Add(PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, speedZ2, _emptyRunCts.Token));
                             }
                             await Task.WhenAll(tasks);
                             tasks.Clear();
+                            currentRepeat++;
                         }
+                        MaterialSnackUtils.MaterialSnack("空运行已完成！", MaterialSnackUtils.SnackType.SUCCESS);
                     }
                     catch (OperationCanceledException)
                     {
-                        MaterialSnackUtils.MaterialSnack("空运行已取消！", MaterialSnackUtils.SnackType.INFO);
+                        MaterialSnackUtils.MaterialSnack("空运行已取消！", MaterialSnackUtils.SnackType.WARNING);
                     }
                     catch (Exception ex)
                     {
@@ -241,9 +360,13 @@ namespace 精密切割系统.ViewModel
                 );
                 InitRightButton();
             }
+            catch (OperationCanceledException)
+            {
+                MaterialSnackUtils.MaterialSnack($"停止空运行超时！", MaterialSnackUtils.SnackType.WARNING);
+            }
             catch (Exception ex)
             {
-                MaterialSnackUtils.MaterialSnack($"停止空运行超时！", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnackUtils.MaterialSnack($"停止空运行发生错误: {ex.Message}", MaterialSnackUtils.SnackType.ERROR);
             }
             finally
             {

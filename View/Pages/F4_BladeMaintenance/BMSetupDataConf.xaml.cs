@@ -140,6 +140,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             {
                 if (ViewModel is not null && Index - 1 < ViewModel.BladeMeasureList.Count && Index - 1 >= 0)
                 {
+                    ViewModel.CurrentMeasureValue = (float)Value;
                     ViewModel.BladeMeasureList[Index - 1].FieldValue = (float)Value;
                 }
             }
@@ -206,11 +207,11 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             if (ViewModel is not null)
             {
                 ViewModel.BladeMeasureList.Clear();
-                for (int i = 0; i < heightMeasureTimes.Text.ToInt(); i++)
+                for (int i = 1; i <= heightMeasureTimes.Text.ToInt(); i++)
                 {
                     ViewModel.BladeMeasureList.Add(new BladeMeasureData()
                     {
-                        FieldName = $"第{i + 1}次测高",
+                        FieldName = i.ToString(),
                         FieldValue = 0
                     });
                 }

@@ -10,6 +10,14 @@ namespace 精密切割系统.ViewModel
     public class BMSetupDataConfViewModel : BindableBase
     {
         public ObservableCollection<BladeMeasureData> BladeMeasureList { get; set; } = new ObservableCollection<BladeMeasureData>();
+
+        private float _currentMeasureValue;
+
+        public float CurrentMeasureValue
+        {
+            get { return _currentMeasureValue; }
+            set { SetProperty(ref _currentMeasureValue, value); }
+        }
     }
 
     public class BladeMeasureData : BindableBase

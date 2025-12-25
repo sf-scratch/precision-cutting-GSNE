@@ -31,14 +31,18 @@ namespace 精密切割系统.View.Pages.Hader
     public partial class HeaderPage : Page
     {
         private DispatcherTimer timer;
-        MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
+        private MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
+
         public HeaderPage()
         {
             InitializeComponent();
         }
-        //  
-        static int showType = 0;
-        RightPage? rightPage;
+
+        //
+        private static int showType = 0;
+
+        private RightPage? rightPage;
+
         private void HeaderPage_Loaded(object sender, RoutedEventArgs e)
         {
             UpdateTime();
@@ -55,12 +59,10 @@ namespace 精密切割系统.View.Pages.Hader
             {
                 sensorBtn.MouseUp += SensorBtn_MouseUp;
             }
-                
         }
 
         private void SensorBtn_MouseUp(object sender, MouseButtonEventArgs e)
         {
-
             DisposeShowType();
         }
 
@@ -68,6 +70,7 @@ namespace 精密切割系统.View.Pages.Hader
         {
             DisposeShowType();
         }
+
         public void DisposeShowType()
         {
             if (showType == 0)
@@ -114,7 +117,6 @@ namespace 精密切割系统.View.Pages.Hader
             mainWindow.mainFrame.Navigate(new Uri($"View/camera/Camera.xaml", UriKind.Relative));
         }
 
-
         private void StackPanel_TouchDown(object sender, TouchEventArgs e)
         {
             ClearAlarmInfo();
@@ -133,7 +135,9 @@ namespace 精密切割系统.View.Pages.Hader
 
         //退出系统；连续10下退出系统或最小化窗口
         private int clickCount = 0;
+
         private long clickTime = 0;//第一次点击时间
+
         private void Image_TouchDown(object sender, TouchEventArgs e)
         {
             dowm();
@@ -180,28 +184,19 @@ namespace 精密切割系统.View.Pages.Hader
         //是否需要密码
         private Boolean havePassWord()
         {
-            UserDefineDataModel userDefineDataModel=null;
-            //查询用不基础配置信息
-            var list =  SqlHelper.Table<UserDefineDataModel>()
-                   .Where(t => t.Id == 1).ToList();
-            //数据不存在，则初始化数据
-            if (list.Count() > 0)
+            UserDefineDataModel userDefineDataModel = CurrentUtils.GetCurrentUserDefineDataModel();
+            if (!string.IsNullOrEmpty(userDefineDataModel.SystemPassword))
             {
-                userDefineDataModel = list[0];
-                if (!string.IsNullOrEmpty(userDefineDataModel.SystemPassword))
+                //查询录入的密码时间戳
+                if (userDefineDataModel.SystemPasswordTime == 0)
                 {
-                    //查询录入的密码时间戳
-                    if (userDefineDataModel.SystemPasswordTime == 0)
-                    {
-                        return true;
-                    }
-                    long currentTimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                    //判断当前录入时间是否间隔2小时
-                    if (currentTimestamp - userDefineDataModel.SystemPasswordTime > 1000 * 60 * 60 * 2)
-                    {
-                        return true;
-                    }
-                    return false;
+                    return true;
+                }
+                long currentTimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                //判断当前录入时间是否间隔2小时
+                if (currentTimestamp - userDefineDataModel.SystemPasswordTime > 1000 * 60 * 60 * 2)
+                {
+                    return true;
                 }
                 return false;
             }

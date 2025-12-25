@@ -137,5 +137,17 @@ namespace 精密切割系统.database.db.modle
 
         [Column("origin_compensation_theta")]
         public string OriginCompensationTheta { get; set; } = "0";
+
+        [Column("is_open_cut_water_after_cutting_completed")]
+        public bool IsAutoShutOffWaterWhenCuttingCompleted { get; set; }
+
+        [Column("is_auto_shut_off_water_when_close_vacuum")]
+        public bool IsAutoShutOffWaterWhenCloseVacuum { get; set; }
+
+        [Column("is_auto_shut_off_water_when_enter_calibration")]
+        public bool IsAutoShutOffWaterWhenEnterCalibration { get; set; }
+
+        [Column("is_manually_turn_off_water")]
+        public bool IsManuallyTurnOffWater { get; set; }
     }
 }

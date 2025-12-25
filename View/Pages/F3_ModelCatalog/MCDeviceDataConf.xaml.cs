@@ -86,16 +86,11 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             operatePage = mainWindow.operateFrame.Content as OperatePage;
 
             // 查询当前用户配置为深度还是高度
-            List<UserDefineDataModel> userDefineList = SqlHelper.Table<UserDefineDataModel>().ToList();
-
-            if (userDefineList != null && userDefineList.Count() > 0)
+            UserDefineDataModel userDefine = CurrentUtils.GetCurrentUserDefineDataModel();
+            cutWay = userDefine.ZAxisCutModel;
+            if (cutWay.Equals("深度"))
             {
-                UserDefineDataModel userDefine = userDefineList[0];
-                cutWay = userDefine.ZAxisCutModel;
-                if (cutWay.Equals("深度"))
-                {
-                    cutHeightLabel.Content = "切割深度";
-                }
+                cutHeightLabel.Content = "切割深度";
             }
 
             initFunctionSelection();

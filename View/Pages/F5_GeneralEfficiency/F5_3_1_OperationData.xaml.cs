@@ -32,7 +32,7 @@ namespace 精密切割系统.View.Pages
         private RightPage? rightPage;
         private OperatePage? operatePage;
 
-        private F5_3_1_OperationDataViewModel f531 = new F5_3_1_OperationDataViewModel();
+        private F5_3_1_OperationDataViewModel ViewModel { get; set; } = new F5_3_1_OperationDataViewModel();
 
         public F5_3_1_FunctionData()
         {
@@ -59,23 +59,23 @@ namespace 精密切割系统.View.Pages
             var operationParameter = CurrentUtils.GetOperationParametersModel();
             if (operationParameter is not null)
             {
-                f531.operationParameter = operationParameter;
+                ViewModel.operationParameter = operationParameter;
             }
             else
             {
-                await SqlHelper.AddAsync(f531.operationParameter);
+                await SqlHelper.AddAsync(ViewModel.operationParameter);
             }
-            f531.PositiveLimitPositionX = (Appsettings.PositiveLimitPositionX ?? 0).ToString();
-            f531.NegativeLimitPositionX = (Appsettings.NegativeLimitPositionX ?? 0).ToString();
-            f531.PositiveLimitPositionY = (Appsettings.PositiveLimitPositionY ?? 0).ToString();
-            f531.NegativeLimitPositionY = (Appsettings.NegativeLimitPositionY ?? 0).ToString();
-            f531.PositiveLimitPositionZ1 = (Appsettings.PositiveLimitPositionZ1 ?? 0).ToString();
-            f531.NegativeLimitPositionZ1 = (Appsettings.NegativeLimitPositionZ1 ?? 0).ToString();
-            f531.PositiveLimitPositionZ2 = (Appsettings.PositiveLimitPositionZ2 ?? 0).ToString();
-            f531.NegativeLimitPositionZ2 = (Appsettings.NegativeLimitPositionZ2 ?? 0).ToString();
-            f531.PositiveLimitPositionTheta = (Appsettings.PositiveLimitPositionTheta ?? 0).ToString();
-            f531.NegativeLimitPositionTheta = (Appsettings.NegativeLimitPositionTheta ?? 0).ToString();
-            DataContext = f531;
+            ViewModel.PositiveLimitPositionX = (Appsettings.PositiveLimitPositionX ?? 0).ToString();
+            ViewModel.NegativeLimitPositionX = (Appsettings.NegativeLimitPositionX ?? 0).ToString();
+            ViewModel.PositiveLimitPositionY = (Appsettings.PositiveLimitPositionY ?? 0).ToString();
+            ViewModel.NegativeLimitPositionY = (Appsettings.NegativeLimitPositionY ?? 0).ToString();
+            ViewModel.PositiveLimitPositionZ1 = (Appsettings.PositiveLimitPositionZ1 ?? 0).ToString();
+            ViewModel.NegativeLimitPositionZ1 = (Appsettings.NegativeLimitPositionZ1 ?? 0).ToString();
+            ViewModel.PositiveLimitPositionZ2 = (Appsettings.PositiveLimitPositionZ2 ?? 0).ToString();
+            ViewModel.NegativeLimitPositionZ2 = (Appsettings.NegativeLimitPositionZ2 ?? 0).ToString();
+            ViewModel.PositiveLimitPositionTheta = (Appsettings.PositiveLimitPositionTheta ?? 0).ToString();
+            ViewModel.NegativeLimitPositionTheta = (Appsettings.NegativeLimitPositionTheta ?? 0).ToString();
+            DataContext = ViewModel;
 
             //如果是空或者小数位数不足-小数初始化为0
             initTbNumber();
@@ -106,25 +106,25 @@ namespace 精密切割系统.View.Pages
 
         public async Task SaveData()
         {
-            OperationParametersModel operationParameter = f531.operationParameter;
+            OperationParametersModel operationParameter = ViewModel.operationParameter;
             if (operationParameter != null)
             {
                 operationParameter.ZStopAfterSeq = cbxZStopAfterSeq.Text;
                 await SqlHelper.UpdateAsync(operationParameter);
                 CurrentUtils.InitAxisSpeedIndex(operationParameter);
                 // 设置Z轴补偿量
-                GlobalParams.zAxisCompNum = f531.zAxisCompNum;
-                GlobalParams.zAxisCompValue = Tools.GetFloatStringValue(f531.zAxisCompValue);
-                Appsettings.PositiveLimitPositionX = f531.PositiveLimitPositionX.ToFloat();
-                Appsettings.NegativeLimitPositionX = f531.NegativeLimitPositionX.ToFloat();
-                Appsettings.PositiveLimitPositionY = f531.PositiveLimitPositionY.ToFloat();
-                Appsettings.NegativeLimitPositionY = f531.NegativeLimitPositionY.ToFloat();
-                Appsettings.PositiveLimitPositionZ1 = f531.PositiveLimitPositionZ1.ToFloat();
-                Appsettings.NegativeLimitPositionZ1 = f531.NegativeLimitPositionZ1.ToFloat();
-                Appsettings.PositiveLimitPositionZ2 = f531.PositiveLimitPositionZ2.ToFloat();
-                Appsettings.NegativeLimitPositionZ2 = f531.NegativeLimitPositionZ2.ToFloat();
-                Appsettings.PositiveLimitPositionTheta = f531.PositiveLimitPositionTheta.ToFloat();
-                Appsettings.NegativeLimitPositionTheta = f531.NegativeLimitPositionTheta.ToFloat();
+                GlobalParams.zAxisCompNum = ViewModel.zAxisCompNum;
+                GlobalParams.zAxisCompValue = Tools.GetFloatStringValue(ViewModel.zAxisCompValue);
+                Appsettings.PositiveLimitPositionX = ViewModel.PositiveLimitPositionX.ToFloat();
+                Appsettings.NegativeLimitPositionX = ViewModel.NegativeLimitPositionX.ToFloat();
+                Appsettings.PositiveLimitPositionY = ViewModel.PositiveLimitPositionY.ToFloat();
+                Appsettings.NegativeLimitPositionY = ViewModel.NegativeLimitPositionY.ToFloat();
+                Appsettings.PositiveLimitPositionZ1 = ViewModel.PositiveLimitPositionZ1.ToFloat();
+                Appsettings.NegativeLimitPositionZ1 = ViewModel.NegativeLimitPositionZ1.ToFloat();
+                Appsettings.PositiveLimitPositionZ2 = ViewModel.PositiveLimitPositionZ2.ToFloat();
+                Appsettings.NegativeLimitPositionZ2 = ViewModel.NegativeLimitPositionZ2.ToFloat();
+                Appsettings.PositiveLimitPositionTheta = ViewModel.PositiveLimitPositionTheta.ToFloat();
+                Appsettings.NegativeLimitPositionTheta = ViewModel.NegativeLimitPositionTheta.ToFloat();
                 await AutoCutUtils.SetFunctionalParameters();
             }
         }

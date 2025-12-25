@@ -136,8 +136,8 @@
   },
   {
     "Address": "MR60111",
-    "Level": "None",
-    "Message": ""
+    "Level": "Error",
+    "Message": "主轴冷却水报警"
   },
   {
     "Address": "MR60112",
@@ -321,8 +321,8 @@
   },
   {
     "Address": "MR60400",
-    "Level": "Error",
-    "Message": "主轴冷却水报警"
+    "Level": "None",
+    "Message": ""
   },
   {
     "Address": "MR60401",

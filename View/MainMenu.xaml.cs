@@ -334,6 +334,7 @@ namespace 精密切割系统.View
                         await PlcControl.tagControl.Xaxis.IsReadyAsync() &&
                         await PlcControl.tagControl.Yaxis.IsReadyAsync() &&
                         await PlcControl.tagControl.Z1axis.IsReadyAsync() &&
+                        await PlcControl.tagControl.Z2axis.IsReadyAsync() &&
                         (await PlcControl.tagControl.ThetaAxis.IsReadyAsync());
                     if (!isReady)
                     {
@@ -341,6 +342,11 @@ namespace 精密切割系统.View
                         break;
                     }
                     MaterialSnackUtils.MaterialSnack("进入校准模式中...", SnackType.WARNING, 0);
+                    var operationParameter = CurrentUtils.GetOperationParametersModel();
+                    if (operationParameter is not null && operationParameter.IsAutoShutOffWaterWhenEnterCalibration)
+                    {
+                        await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
+                    }
                     try
                     {
                         mainWindow.IsEnabled = false;
@@ -355,7 +361,8 @@ namespace 精密切割系统.View
                             moveX = initPos.AlignInitX.ToFloat();
                             moveY = initPos.AlignInitY.ToFloat();
                         }
-                        if (Appsettings.FocusClearZ is null)
+                        float? moveZ2 = Appsettings.FocusClearZ;
+                        if (moveZ2 is null)
                         {
                             await Task.WhenAll(
                                 PlcControl.tagControl.Xaxis.StartAbsoluteAsync(moveX, speedX, timeoutToken.Token),
@@ -367,7 +374,7 @@ namespace 精密切割系统.View
                             await Task.WhenAll(
                                 PlcControl.tagControl.Xaxis.StartAbsoluteAsync(moveX, speedX, timeoutToken.Token),
                                 PlcControl.tagControl.Yaxis.StartAbsoluteAsync(moveY, speedY, timeoutToken.Token),
-                                PlcControl.tagControl.Z2axis.StartAbsoluteAsync(Appsettings.FocusClearZ.Value, default, timeoutToken.Token),
+                                PlcControl.tagControl.Z2axis.StartAbsoluteAsync(moveZ2.Value, default, timeoutToken.Token),
                                 PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(initPos.AlignInitTheta.ToFloat(), speedTheta, timeoutToken.Token));
                         }
                     }

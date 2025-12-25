@@ -60,10 +60,6 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 viewModel.BladeExchangeYPos = list[0].BladeExchangeYPos;
                 viewModel.HairlineAdjustLimit = list[0].HairlineAdjustLimit;
                 viewModel.BlowTime = list[0].BlowTime;
-                viewModel.BaselineWidthCh1 = list[0].BaselineWidthCh1;
-                viewModel.BaselineWidthCh2 = list[0].BaselineWidthCh2;
-                viewModel.BaselineWidthCh3 = list[0].BaselineWidthCh3;
-                viewModel.BaselineWidthCh4 = list[0].BaselineWidthCh4;
                 viewModel.WorkVacuumCheckTime = list[0].WorkVacuumCheckTime;
                 viewModel.WaitTimeUntilEnergySavingMode = list[0].WaitTimeUntilEnergySavingMode;
                 viewModel.Language = list[0].Language;
@@ -189,10 +185,6 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 BladeExchangeYPos = viewModel.BladeExchangeYPos,
                 HairlineAdjustLimit = viewModel.HairlineAdjustLimit,
                 BlowTime = viewModel.BlowTime,
-                BaselineWidthCh1 = viewModel.BaselineWidthCh1,
-                BaselineWidthCh2 = viewModel.BaselineWidthCh2,
-                BaselineWidthCh3 = viewModel.BaselineWidthCh3,
-                BaselineWidthCh4 = viewModel.BaselineWidthCh4,
                 WorkVacuumCheckTime = viewModel.WorkVacuumCheckTime,
                 WaitTimeUntilEnergySavingMode = viewModel.WaitTimeUntilEnergySavingMode,
                 Language = viewModel.Language,

@@ -183,58 +183,6 @@ namespace 精密切割系统.ViewModel
             }
         }
 
-        public string BaselineWidthCh1
-        {
-            get { return _model.BaselineWidthCh1; }
-            set
-            {
-                if (_model.BaselineWidthCh1 != value)
-                {
-                    _model.BaselineWidthCh1 = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        public string BaselineWidthCh2
-        {
-            get { return _model.BaselineWidthCh2; }
-            set
-            {
-                if (_model.BaselineWidthCh2 != value)
-                {
-                    _model.BaselineWidthCh2 = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        public string BaselineWidthCh3
-        {
-            get { return _model.BaselineWidthCh3; }
-            set
-            {
-                if (_model.BaselineWidthCh3 != value)
-                {
-                    _model.BaselineWidthCh3 = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        public string BaselineWidthCh4
-        {
-            get { return _model.BaselineWidthCh4; }
-            set
-            {
-                if (_model.BaselineWidthCh4 != value)
-                {
-                    _model.BaselineWidthCh4 = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
         public string WarmUpTime
         {
             get { return _model.WarmUpTime; }

@@ -452,7 +452,7 @@ namespace 精密切割系统.ViewModel
                 CutParam.AllRunCutLine = process.TotalCutTimes;
                 CutParam.FeedSpeed = process.CutSpeed.ToString("F5");
                 CutParam.BladeHeight = process.CutBladeHeight.ToString("F5");
-                CutParam.ChannelNum = $"CH{process.ChannelNum}";
+                CutParam.ChannelNum = string.Format(GlobalParams.StringFormatCH, process.ChannelNum);
                 if (process.IsCompleted)
                 {
                     Appsettings.AfterReplaceBladeCutTimes++;

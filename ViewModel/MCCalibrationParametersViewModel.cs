@@ -10,7 +10,7 @@ using 精密切割系统.Utils;
 
 namespace 精密切割系统.ViewModel
 {
-    public class MCCalibrationParametersViewModel : INotifyPropertyChanged
+    public class MCCalibrationParametersViewModel : BindableBase
     {
         private UserDefineDataModel _model;
 
@@ -29,11 +29,8 @@ namespace 精密切割系统.ViewModel
             get { return _model.BaselineWidthCh1; }
             set
             {
-                if (_model.BaselineWidthCh1 != value)
-                {
-                    _model.BaselineWidthCh1 = value;
-                    OnPropertyChanged();
-                }
+                _model.BaselineWidthCh1 = value;
+                RaisePropertyChanged();
             }
         }
 
@@ -42,11 +39,8 @@ namespace 精密切割系统.ViewModel
             get { return _model.BaselineWidthCh2; }
             set
             {
-                if (_model.BaselineWidthCh2 != value)
-                {
-                    _model.BaselineWidthCh2 = value;
-                    OnPropertyChanged();
-                }
+                _model.BaselineWidthCh2 = value;
+                RaisePropertyChanged();
             }
         }
 
@@ -55,11 +49,8 @@ namespace 精密切割系统.ViewModel
             get { return _model.BaselineWidthCh3; }
             set
             {
-                if (_model.BaselineWidthCh3 != value)
-                {
-                    _model.BaselineWidthCh3 = value;
-                    OnPropertyChanged();
-                }
+                _model.BaselineWidthCh3 = value;
+                RaisePropertyChanged();
             }
         }
 
@@ -68,11 +59,48 @@ namespace 精密切割系统.ViewModel
             get { return _model.BaselineWidthCh4; }
             set
             {
-                if (_model.BaselineWidthCh4 != value)
-                {
-                    _model.BaselineWidthCh4 = value;
-                    OnPropertyChanged();
-                }
+                _model.BaselineWidthCh4 = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public string EdgeWidthCh1
+        {
+            get { return _model.EdgeWidthCh1; }
+            set
+            {
+                _model.EdgeWidthCh1 = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public string EdgeWidthCh2
+        {
+            get { return _model.EdgeWidthCh2; }
+            set
+            {
+                _model.EdgeWidthCh2 = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public string EdgeWidthCh3
+        {
+            get { return _model.EdgeWidthCh3; }
+            set
+            {
+                _model.EdgeWidthCh3 = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public string EdgeWidthCh4
+        {
+            get { return _model.EdgeWidthCh4; }
+            set
+            {
+                _model.EdgeWidthCh4 = value;
+                RaisePropertyChanged();
             }
         }
 
@@ -81,11 +109,8 @@ namespace 精密切割系统.ViewModel
             get { return _model.LightSourceBrightnessCh1; }
             set
             {
-                if (_model.LightSourceBrightnessCh1 != value)
-                {
-                    _model.LightSourceBrightnessCh1 = value;
-                    OnPropertyChanged();
-                }
+                _model.LightSourceBrightnessCh1 = value;
+                RaisePropertyChanged();
             }
         }
 
@@ -94,11 +119,8 @@ namespace 精密切割系统.ViewModel
             get { return _model.LightSourceBrightnessCh2; }
             set
             {
-                if (_model.LightSourceBrightnessCh2 != value)
-                {
-                    _model.LightSourceBrightnessCh2 = value;
-                    OnPropertyChanged();
-                }
+                _model.LightSourceBrightnessCh2 = value;
+                RaisePropertyChanged();
             }
         }
 
@@ -107,11 +129,8 @@ namespace 精密切割系统.ViewModel
             get { return _model.LightSourceBrightnessCh3; }
             set
             {
-                if (_model.LightSourceBrightnessCh3 != value)
-                {
-                    _model.LightSourceBrightnessCh3 = value;
-                    OnPropertyChanged();
-                }
+                _model.LightSourceBrightnessCh3 = value;
+                RaisePropertyChanged();
             }
         }
 
@@ -120,18 +139,18 @@ namespace 精密切割系统.ViewModel
             get { return _model.LightSourceBrightnessCh4; }
             set
             {
-                if (_model.LightSourceBrightnessCh4 != value)
-                {
-                    _model.LightSourceBrightnessCh4 = value;
-                    OnPropertyChanged();
-                }
+                _model.LightSourceBrightnessCh4 = value;
+                RaisePropertyChanged();
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        public bool HasEdgeLine
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            get { return _model.HasEdgeLine; }
+            set
+            {
+                _model.HasEdgeLine = value; RaisePropertyChanged();
+            }
         }
     }
 }

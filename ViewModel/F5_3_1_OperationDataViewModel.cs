@@ -12,7 +12,7 @@ namespace 精密切割系统.ViewModel
 {
     internal class F5_3_1_OperationDataViewModel : BindableBase
     {
-        public OperationParametersModel operationParameter = null;
+        public OperationParametersModel operationParameter { get; set; }
 
         public F5_3_1_OperationDataViewModel()
         {
@@ -613,6 +613,46 @@ namespace 精密切割系统.ViewModel
             set
             {
                 operationParameter.OriginCompensationTheta = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool IsAutoShutOffWaterWhenCuttingCompleted
+        {
+            get { return operationParameter.IsAutoShutOffWaterWhenCuttingCompleted; }
+            set
+            {
+                operationParameter.IsAutoShutOffWaterWhenCuttingCompleted = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool IsAutoShutOffWaterWhenCloseVacuum
+        {
+            get { return operationParameter.IsAutoShutOffWaterWhenCloseVacuum; }
+            set
+            {
+                operationParameter.IsAutoShutOffWaterWhenCloseVacuum = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool IsAutoShutOffWaterWhenEnterCalibration
+        {
+            get { return operationParameter.IsAutoShutOffWaterWhenEnterCalibration; }
+            set
+            {
+                operationParameter.IsAutoShutOffWaterWhenEnterCalibration = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool IsManuallyTurnOffWater
+        {
+            get { return operationParameter.IsManuallyTurnOffWater; }
+            set
+            {
+                operationParameter.IsManuallyTurnOffWater = value;
                 RaisePropertyChanged();
             }
         }

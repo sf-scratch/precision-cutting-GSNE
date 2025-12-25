@@ -13,8 +13,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
 using 精密切割系统.Helpers;
+using 精密切割系统.Model.cut;
 using 精密切割系统.Utils;
 
 namespace 精密切割系统.View.Pages.common
@@ -53,6 +55,11 @@ namespace 精密切割系统.View.Pages.common
 
         public void InitData()
         {
+            UserDefineDataModel userDefineData = CurrentUtils.GetCurrentUserDefineDataModel();
+            if (int.TryParse(userDefineData.LightSourceBrightnessCh1, out int light))
+            {
+                GlobalParams.intensityRatio = light / 100.0;
+            }
             int intensity = CalculateIntensity(GlobalParams.intensityRatio);
             CameraUtils.SetLightIntensity(intensity, GlobalParams.LightIntensityChannel);
             SetLightRatio(Convert.ToDecimal(GlobalParams.intensityRatio), 0);
@@ -117,8 +124,8 @@ namespace 精密切割系统.View.Pages.common
 
         public static int CalculateIntensity(double intensityRatio)
         {
-            int intensity = (int)Math.Ceiling(intensityRatio * 255);
-            intensity = Math.Clamp(intensity, 1, 255);
+            int intensity = (int)Math.Ceiling(intensityRatio * 100);
+            intensity = Math.Clamp(intensity, 1, 100);
             return intensity;
         }
 
@@ -136,12 +143,12 @@ namespace 精密切割系统.View.Pages.common
 
         private void SubOne_OnClick(object sender, RoutedEventArgs e)
         {
-            AdjustIntensity(-0.0025m, 0);
+            AdjustIntensity(-0.01m, 0);
         }
 
         private void AddOne_OnClick(object sender, RoutedEventArgs e)
         {
-            AdjustIntensity(0.0025m, 0);
+            AdjustIntensity(0.01m, 0);
         }
 
         private void AddFive_OnClick(object sender, RoutedEventArgs e)
@@ -156,23 +163,12 @@ namespace 精密切割系统.View.Pages.common
         /// <param name="type">0 高倍 1 低倍 2 环光</param>
         private void AdjustIntensity(decimal adjustment, int type)
         {
-            decimal t_intensity = Convert.ToDecimal(type == 0 ? GlobalParams.intensityRatio : type == 1
-                ? GlobalParams.lowIntensityRatio : GlobalParams.RingIntensityRatio);
-            t_intensity += adjustment;  //0.8 + 0.05 = 0.85
-            int v_intensity = (int)Math.Ceiling(t_intensity * 255);
-            int reNum = Math.Clamp(v_intensity, 1, 255); //值在这个区间
-            int channel = type == 0 ? GlobalParams.LightIntensityChannel : type == 1
-                ? GlobalParams.LowLightIntensityChannel : GlobalParams.RingLightIntensityChannel;
-            if (reNum == 1)
-            {
-                CameraUtils.TurnOffChannel(channel);
-            }
-            else
-            {
-                CameraUtils.TurnOnChannel(channel);
-            }
-            CameraUtils.SetLightIntensity(reNum, channel);
-            SetLightRatio(t_intensity, type);
+            decimal intensityRatio = Convert.ToDecimal(GlobalParams.intensityRatio);
+            intensityRatio += adjustment;
+            int intensity = CalculateIntensity(Convert.ToDouble(intensityRatio));
+            CameraUtils.SetLightIntensity(intensity, GlobalParams.LightIntensityChannel);
+            SetLightRatio(intensityRatio, type);
+            CurrentUtils.UpdateLightSourceBrightness(SemiAutoCutService.Instance.CurrentChannelNum, intensity);
         }
 
         private void ringSubFive_Click(object sender, RoutedEventArgs e)

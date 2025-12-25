@@ -65,7 +65,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         //根据默认配置控制对应显示和隐藏
         private void UpdateDefineDataModel()
         {
-            UserDefineDataModel userDefineModel = CurrentUtils.getUserDefineDataModel();
+            UserDefineDataModel userDefineModel = CurrentUtils.GetCurrentUserDefineDataModel();
             bool isSpeedChange = "NO".Equals(userDefineModel.SpeedChange);
             bool isHeightChange = "NO".Equals(userDefineModel.HeightChange);
             if (isSpeedChange)//速度变更
@@ -77,6 +77,37 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 HeightChangePanel.Visibility = Visibility.Collapsed;
             }
             mainWindow.UpdateOperatePage(OperateData.GetSemiAutoCuttingOperate(!isSpeedChange, !isHeightChange), OperateClickHandler);
+        }
+
+        private void LoadConfigInfo()
+        {
+            // 查询当前配置信息
+            FileTableItemModel _model = CurrentUtils.GetFileTableItemModel();
+            BladeHeightModel bladeHeightModel = CurrentUtils.GetBladeHeightModel();
+            // 获取当前channel
+            FileTableItemChModel chModel = CurrentUtils.GetFileTableItemChModel();
+            // 设置当前配置信息的切割方法
+            PlcControl.tagControl.cutting.StartCutMethod(CutOperateUtils.GetCutMethod(chModel.CutMode));
+            // 获取刀片高度、进刀速度
+            string bladeHeightStr = chModel.BladeHeight;
+            string feedSpeedStr = chModel.FeedSpeed;
+            string bladeHeight = bladeHeightStr.Split(",")[0];
+            string feedSpeed = feedSpeedStr.Split(",")[0];
+            _viewModel = new MQSemiAutomaticCuttingConfViewModel();
+            _viewModel.DeviceDataNo = _model.DeviceDataNo + "";
+            _viewModel.DeviceDataId = _model.DeviceDataId;
+            _viewModel.ChannelNum = CurrentUtils.GetCurrentConfiguration().ChannelNum;
+            _viewModel.BladeHeight = bladeHeight;
+            _viewModel.FeedSpeed = feedSpeed;
+            _viewModel.CutLine = 0;
+            _viewModel.CutDepthOffset = "0.000";
+            _viewModel.ChangeFeedSpeed = _semiAutoCutService.FeedSpeedCompCompensationValue.ToString();
+            _viewModel.DepthCompensation = _semiAutoCutService.DepthCompensationValue.ToString();
+            _viewModel.CutDirection = "----";
+            _viewModel.SpindleRev = _model.SpindleRev;
+            DataContext = _viewModel;
+            // 设置切割初始参数
+            CutOperateUtils.InitParams(1, mainWindow);
         }
 
         private async void OperateClickHandler(object? sender, int code)
@@ -99,6 +130,84 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
 
                 case 2023:
                     // 手动校准 type
+                    if (mainWindow == null) return;
+                    if (!GlobalParams.OnlineFlag)
+                    {
+                        MaterialSnackUtils.MaterialSnack("进入校准模式中...", SnackType.WARNING, 0);
+                        mainWindow.IsEnabled = false;
+                        await Task.Delay(500);
+                        mainWindow.IsEnabled = true;
+                        mainWindow.NavigateToPage("Pages/F2_ManualOperation/MQManualAlignmentConf", "type=1");
+                        break;
+                    }
+                    InitialPositionModel? initPos = await AutoCutUtils.GetInitialPositionAsync();
+                    if (initPos is null)
+                    {
+                        MaterialSnackUtils.MaterialSnack("获取各模式参数失败，请检查各模式参数配置！", SnackType.WARNING);
+                        break;
+                    }
+                    CommonResult<FileTableItemChModel> fileTableItemResult = await AutoCutUtils.GetFirstFileTableItemChModelAsync();
+                    if (!fileTableItemResult.IsSuccess || fileTableItemResult.Data is null)
+                    {
+                        MaterialSnackUtils.MaterialSnack(fileTableItemResult.Message, SnackType.WARNING);
+                        break;
+                    }
+                    FileTableItemChModel fileTableItemCh = fileTableItemResult.Data;
+                    bool isReady =
+                        await PlcControl.tagControl.Xaxis.IsReadyAsync() &&
+                        await PlcControl.tagControl.Yaxis.IsReadyAsync() &&
+                        await PlcControl.tagControl.Z1axis.IsReadyAsync() &&
+                        await PlcControl.tagControl.Z2axis.IsReadyAsync() &&
+                        (await PlcControl.tagControl.ThetaAxis.IsReadyAsync());
+                    if (!isReady)
+                    {
+                        MaterialSnackUtils.MaterialSnack("轴未准备好，请检查轴状态！", SnackType.WARNING);
+                        break;
+                    }
+                    MaterialSnackUtils.MaterialSnack("进入校准模式中...", SnackType.WARNING, 0);
+                    try
+                    {
+                        mainWindow.IsEnabled = false;
+                        float speedX = initPos.AlignInitSpeedX.ToFloat();
+                        float speedY = initPos.AlignInitSpeedY.ToFloat();
+                        float speedZ1 = initPos.AlignInitSpeedZ1.ToFloat();
+                        float speedTheta = initPos.AlignInitSpeedTheta.ToFloat();
+                        TimeoutToken timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(120));
+                        await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, speedZ1, timeoutToken.Token);
+                        if (!float.TryParse(fileTableItemCh.AlignX, out float moveX) || !float.TryParse(fileTableItemCh.AlignY, out float moveY))
+                        {
+                            moveX = initPos.AlignInitX.ToFloat();
+                            moveY = initPos.AlignInitY.ToFloat();
+                        }
+                        float? moveZ2 = Appsettings.FocusClearZ;
+                        if (moveZ2 is null)
+                        {
+                            await Task.WhenAll(
+                                PlcControl.tagControl.Xaxis.StartAbsoluteAsync(moveX, speedX, timeoutToken.Token),
+                                PlcControl.tagControl.Yaxis.StartAbsoluteAsync(moveY, speedY, timeoutToken.Token),
+                                PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(initPos.AlignInitTheta.ToFloat(), speedTheta, timeoutToken.Token));
+                        }
+                        else
+                        {
+                            await Task.WhenAll(
+                                PlcControl.tagControl.Xaxis.StartAbsoluteAsync(moveX, speedX, timeoutToken.Token),
+                                PlcControl.tagControl.Yaxis.StartAbsoluteAsync(moveY, speedY, timeoutToken.Token),
+                                PlcControl.tagControl.Z2axis.StartAbsoluteAsync(moveZ2.Value, default, timeoutToken.Token),
+                                PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(initPos.AlignInitTheta.ToFloat(), speedTheta, timeoutToken.Token));
+                        }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        MaterialSnackUtils.MaterialSnack("移动到校准位置超时！", SnackType.WARNING);
+                    }
+                    catch (Exception ex)
+                    {
+                        MaterialSnackUtils.MaterialSnack("移动到校准位置失败！" + ex.Message, SnackType.WARNING);
+                    }
+                    finally
+                    {
+                        mainWindow.IsEnabled = true;
+                    }
                     mainWindow.NavigateToPage("Pages/F2_ManualOperation/MQManualAlignmentConf", "type=1");
                     break;
 
@@ -161,7 +270,6 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             }
             _semiAutoCutService.CutLine = _viewModel.CutLine;
             _semiAutoCutService.SpindleRev = _viewModel.SpindleRev;
-            _semiAutoCutService.IsOpenCutWaterAfterCuttingCompleted = _viewModel.IsOpenCutWaterAfterCuttingCompleted;
             ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(MQSemiAutomaticCuttingRun));
         }
 
@@ -185,38 +293,6 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         {
             _viewModel.CutDirection = "向后切";
             _semiAutoCutService.CutDirection = CutDirection.Backward;
-        }
-
-        private void LoadConfigInfo()
-        {
-            // 查询当前配置信息
-            FileTableItemModel _model = CurrentUtils.GetFileTableItemModel();
-            BladeHeightModel bladeHeightModel = CurrentUtils.GetBladeHeightModel();
-            // 获取当前channel
-            FileTableItemChModel chModel = CurrentUtils.GetFileTableItemChModel();
-            // 设置当前配置信息的切割方法
-            PlcControl.tagControl.cutting.StartCutMethod(CutOperateUtils.GetCutMethod(chModel.CutMode));
-            // 获取刀片高度、进刀速度
-            string bladeHeightStr = chModel.BladeHeight;
-            string feedSpeedStr = chModel.FeedSpeed;
-            string bladeHeight = bladeHeightStr.Split(",")[0];
-            string feedSpeed = feedSpeedStr.Split(",")[0];
-            _viewModel = new MQSemiAutomaticCuttingConfViewModel();
-            _viewModel.DeviceDataNo = _model.DeviceDataNo + "";
-            _viewModel.DeviceDataId = _model.DeviceDataId;
-            _viewModel.ChannelNum = CurrentUtils.GetCurrentConfiguration().ChannelNum;
-            _viewModel.BladeHeight = bladeHeight;
-            _viewModel.FeedSpeed = feedSpeed;
-            _viewModel.CutLine = 0;
-            _viewModel.CutDepthOffset = "0.000";
-            _viewModel.ChangeFeedSpeed = _semiAutoCutService.FeedSpeedCompCompensationValue.ToString();
-            _viewModel.DepthCompensation = _semiAutoCutService.DepthCompensationValue.ToString();
-            _viewModel.CutDirection = "----";
-            _viewModel.SpindleRev = _model.SpindleRev;
-            _viewModel.IsOpenCutWaterAfterCuttingCompleted = _semiAutoCutService.IsOpenCutWaterAfterCuttingCompleted;
-            DataContext = _viewModel;
-            // 设置切割初始参数
-            CutOperateUtils.InitParams(1, mainWindow);
         }
 
         /// <summary>

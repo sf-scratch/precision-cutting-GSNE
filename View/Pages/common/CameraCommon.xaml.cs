@@ -1,4 +1,5 @@
 ﻿using OpenCvSharp.WpfExtensions;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -8,6 +9,8 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using 精密切割系统.Driver;
 using 精密切割系统.Helpers;
+using 精密切割系统.Model.cut;
+using 精密切割系统.Utils;
 using 精密切割系统.ViewModel;
 using Color = System.Windows.Media.Color;
 using Point = System.Windows.Point;
@@ -22,16 +25,22 @@ namespace 精密切割系统.View.Pages.common
         public CameraCommon()
         {
             InitializeComponent();
+            var (cutMarkWidth, edgeWidth, lightSourceBrightness) = CurrentUtils.GetWidthAndLight(GlobalParams.CH1);
+            _cutMarkWidth = cutMarkWidth;
+            _edgeChipWidth = edgeWidth;
+            var userDefine = CurrentUtils.GetCurrentUserDefineDataModel();
+            _hasEdgeLine = userDefine.HasEdgeLine;
         }
 
         private Point centerLocation;
         private static List<CustomLine> _lines = new List<CustomLine>();
         private TextBlock cutWidthTextBlock;
         private TextBlock edgeWidthTextBlock;
+        private bool _hasEdgeLine;
 
         public event Action LineChanged;
 
-        private static float _cutMarkWidth = 120;
+        private static float _cutMarkWidth;
 
         /// <summary>
         /// 刀痕宽度
@@ -42,7 +51,7 @@ namespace 精密切割系统.View.Pages.common
             set { _cutMarkWidth = value; }
         }
 
-        private static float _edgeChipWidth = 120;
+        private static float _edgeChipWidth;
 
         /// <summary>
         /// 崩边
@@ -108,6 +117,7 @@ namespace 精密切割系统.View.Pages.common
             _cutMarkWidth = (float)CameraOperateUtils.ConvertPictureBoxToRealSize(tempCutMarkWidth);
             _edgeChipWidth = (float)CameraOperateUtils.ConvertPictureBoxToRealSize(tempEdgeWidth + (width * 2));
             SetEdgeWidthTextBlockY();
+            CurrentUtils.UpdateEdgeWidth(SemiAutoCutService.Instance.CurrentChannelNum, _edgeChipWidth);
         }
 
         public void SetCutMarkWidth(float width, int type)
@@ -119,6 +129,7 @@ namespace 精密切割系统.View.Pages.common
             _cutMarkWidth = (float)CameraOperateUtils.ConvertPictureBoxToRealSize(tempCutMarkWidth + (width * 2));
             _edgeChipWidth = (float)CameraOperateUtils.ConvertPictureBoxToRealSize(tempEdgeWidth);
             SetCutWidthTextBlockY();
+            CurrentUtils.UpdateCutMarkWidth(SemiAutoCutService.Instance.CurrentChannelNum, _cutMarkWidth);
         }
 
         public void UpdateLine(float baselineWidth, float edgeChipWidth)
@@ -191,13 +202,13 @@ namespace 精密切割系统.View.Pages.common
             // 将TextBlock添加到Canvas
             MyCanvas.Children.Add(cutWidthTextBlock);
 
-            if (GlobalParams.HasTheta)
+            if (_hasEdgeLine)
             {
                 edgeWidthTextBlock = new TextBlock
                 {
                     Text = "",
                     FontSize = 18,
-                    Foreground = new SolidColorBrush(Colors.Red),
+                    Foreground = new SolidColorBrush(Colors.Yellow),
                     Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3B444B")),
                     FontWeight = FontWeights.Bold
                 };
@@ -210,7 +221,7 @@ namespace 精密切割系统.View.Pages.common
 
         private void SetEdgeWidthTextBlockY()
         {
-            if (GlobalParams.HasTheta)
+            if (_hasEdgeLine)
             {
                 // 获取上刀痕的位置
                 CustomLine line = _lines[2];
@@ -255,14 +266,14 @@ namespace 精密切割系统.View.Pages.common
                 float startBottomEdgeChipY = imagMideHeight + resultEdgeChip;
                 DoubleCollection dotCollection = new DoubleCollection { 10, 4 }; // 虚线
                 List<CustomLine> lines;
-                if (GlobalParams.HasTheta)
+                if (_hasEdgeLine)
                 {
                     lines = new List<CustomLine>
                     {
                         new CustomLine(new Point(startX, startTopCutMarkY), new Point(enxX, startTopCutMarkY), Color.FromRgb(159, 254, 0), 1, dotCollection),
                         new CustomLine(new Point(startX, startBottomCutMarkY), new Point(enxX, startBottomCutMarkY), Color.FromRgb(159, 254, 0), 1, dotCollection),
-                        new CustomLine(new Point(startX, startToEdgeChipY), new Point(enxX, startToEdgeChipY), Colors.Red, 1, dotCollection),
-                        new CustomLine(new Point(startX, startBottomEdgeChipY), new Point(enxX, startBottomEdgeChipY), Colors.Red, 1, dotCollection),
+                        new CustomLine(new Point(startX, startToEdgeChipY), new Point(enxX, startToEdgeChipY), Colors.Yellow, 1, dotCollection),
+                        new CustomLine(new Point(startX, startBottomEdgeChipY), new Point(enxX, startBottomEdgeChipY), Colors.Yellow, 1, dotCollection),
                         new CustomLine(new Point(0, 320), new Point(765, 320), Color.FromRgb(159, 254, 0), 1, DashStyles.Solid.Dashes),
                         // 短竖
                         new CustomLine(new Point(382.5, 307.5), new Point(382.5, 332.5), Color.FromRgb(159, 254, 0), 1, DashStyles.Solid.Dashes),

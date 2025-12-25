@@ -62,7 +62,7 @@ namespace 精密切割系统.View.Pages.Auto
         //根据默认配置控制对应显示和隐藏
         private void updateDefineDataModel()
         {
-            UserDefineDataModel userDefineModel = CurrentUtils.getUserDefineDataModel();
+            UserDefineDataModel userDefineModel = CurrentUtils.GetCurrentUserDefineDataModel();
             bool isSpeedChange = "NO".Equals(userDefineModel.SpeedChange);
             bool isHeightChange = "NO".Equals(userDefineModel.HeightChange);
             //if (isSpeedChange)//速度变更

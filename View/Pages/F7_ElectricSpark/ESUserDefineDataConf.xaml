@@ -19,9 +19,6 @@
             <Setter Property="FontWeight" Value="Bold" />
         </Style>
     </Page.Resources>
-    <Page.DataContext>
-        <local:UserDefineDataViewModel />
-    </Page.DataContext>
     <Grid x:Name="bigGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="80" />

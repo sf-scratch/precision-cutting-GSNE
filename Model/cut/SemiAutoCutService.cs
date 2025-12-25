@@ -118,17 +118,6 @@ namespace 精密切割系统.Model.cut
             set { _spindleRev = value; }
         }
 
-        private bool _isOpenCutWaterAfterCuttingCompleted;
-
-        /// <summary>
-        /// 切割结束后切割水状态
-        /// </summary>
-        public bool IsOpenCutWaterAfterCuttingCompleted
-        {
-            get { return _isOpenCutWaterAfterCuttingCompleted; }
-            set { _isOpenCutWaterAfterCuttingCompleted = value; }
-        }
-
         private bool _hasNotTakenOutWorkpiecesAfterCuttingCompleted = false;
 
         /// <summary>
@@ -138,6 +127,17 @@ namespace 精密切割系统.Model.cut
         {
             get { return _hasNotTakenOutWorkpiecesAfterCuttingCompleted; }
             set { _hasNotTakenOutWorkpiecesAfterCuttingCompleted = value; }
+        }
+
+        private int _currentChannelNum;
+
+        /// <summary>
+        /// 当前切割通道
+        /// </summary>
+        public int CurrentChannelNum
+        {
+            get { return _currentChannelNum; }
+            set { _currentChannelNum = value; }
         }
 
         /// <summary>
@@ -159,6 +159,7 @@ namespace 精密切割系统.Model.cut
             _depthCompensationValue = 0;
             _feedSpeedCompCompensationValue = 0;
             _isOpenPrecut = false;
+            _currentChannelNum = 1;
         }
 
         public static async Task<CommonResult> CheckCutAsync()
@@ -209,7 +210,7 @@ namespace 精密切割系统.Model.cut
                 await PlcControl.tagControl.cutting.EnterCuttingModeAsync(usingPauseToken);
                 float currentKnifeRemainTime = 60; //初始值
                 LineSegment? preLine = null;
-                int currentChannelNum = 1;
+                _currentChannelNum = 1;
                 int cutTime = 0;
                 while (cutTime < cutSteps.Count)
                 {
@@ -218,7 +219,7 @@ namespace 精密切割系统.Model.cut
                     try
                     {
                         //检查切换通道
-                        if (cutStep.ChannelNum != currentChannelNum)
+                        if (cutStep.ChannelNum != _currentChannelNum)
                         {
                             if (cutStep.IsAbsolute)
                             {
@@ -229,7 +230,7 @@ namespace 精密切割系统.Model.cut
                                 workpiece.Reset(workpiece.CalculateCutY() + cutStep.ChannelStartY);
                             }
                         }
-                        currentChannelNum = cutStep.ChannelNum;
+                        _currentChannelNum = cutStep.ChannelNum;
                         //检测工件是否切完
                         if (!workpiece.CheckCutDistance(_cutDirection, cutStep.NextStepDistance) && !_isContinueBeyondWorkpiece)
                         {
@@ -252,6 +253,7 @@ namespace 精密切割系统.Model.cut
                                 return runResult;
                             }
                         }
+                        _currentChannelNum = cutStep.ChannelNum;
                         line = workpiece.CalculateCuttingLine();
                         float actualCutHeight = cutStep.CutHeight + _depthCompensationValue;
                         float targetEndZ = bladeContactWorkingDiscZ1 - actualCutHeight;
@@ -369,11 +371,8 @@ namespace 精密切割系统.Model.cut
                 _isContinueBeyondWorkpiece = false;
                 //退出全自动切割模式
                 await PlcControl.tagControl.cutting.ExitCuttingModeAsync(default);
-                if (IsOpenCutWaterAfterCuttingCompleted)
-                {
-                    await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
-                }
-                else
+                var operationParameter = CurrentUtils.GetOperationParametersModel();
+                if (operationParameter is not null && operationParameter.IsAutoShutOffWaterWhenCuttingCompleted)
                 {
                     await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
                 }

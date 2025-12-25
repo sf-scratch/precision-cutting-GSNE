@@ -1,19 +1,38 @@
-﻿<Page x:Class="精密切割系统.View.Pages.F3_ModelCatalog.MCCalibrationParameters"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:精密切割系统.View.Pages.F3_ModelCatalog"
-      xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
-      xmlns:Controls="clr-namespace:精密切割系统.View.Controls" 
-      xmlns:auto="clr-namespace:WpfAutoGrid;assembly=WpfAutoGrid.Core"
-      mc:Ignorable="d" 
-      d:DesignHeight="676"
-      d:DesignWidth="1448"
-      d:DataContext="{d:DesignInstance viewModel:MCCalibrationParametersViewModel}"
-      Loaded="Page_Loaded">
+﻿<Page
+    x:Class="精密切割系统.View.Pages.F3_ModelCatalog.MCCalibrationParameters"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
+    xmlns:Converters="clr-namespace:精密切割系统.Converters"
+    xmlns:auto="clr-namespace:WpfAutoGrid;assembly=WpfAutoGrid.Core"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:精密切割系统.View.Pages.F3_ModelCatalog"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
+    d:DataContext="{d:DesignInstance viewModel:MCCalibrationParametersViewModel}"
+    d:DesignHeight="676"
+    d:DesignWidth="1448"
+    Loaded="Page_Loaded"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <Converters:BoolToValueConverter
+            x:Key="BoolToStringConverter"
+            FalseValue="关闭"
+            TrueValue="开启" />
+        <Style TargetType="Label">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+        <Style BasedOn="{StaticResource InputTextStyle}" TargetType="Controls:InputTextBox">
+            <Setter Property="InputType" Value="Decimal" />
+            <Setter Property="XPrecision" Value="3" />
+        </Style>
+    </Page.Resources>
     <Grid Margin="30">
         <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
@@ -27,8 +46,7 @@
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
             Content="校准参数"
-            FontSize="30"
-            FontWeight="Bold" />
+            FontSize="30" />
         <Label
             Grid.Row="1"
             Margin="10,0,0,15"
@@ -36,21 +54,24 @@
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
             Content="基准线宽度"
-            FontSize="20"
-            FontWeight="Bold" />
-        <auto:AutoGrid Grid.Row="2" Margin="10,0,10,10"  Columns="2*,2*,*,2*,2*,*,2*,2*,*,2*,2*,*" RowCount="7">
-            <Label Content="CH1" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right"/>
-            <Controls:InputTextBox Text="{Binding Path=BaselineWidthCh1,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" InputType="Decimal" />
-            <Label Content="um" FontSize="16" FontWeight="Bold"/>
-            <Label Content="CH2" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right"/>
-            <Controls:InputTextBox Text="{Binding Path=BaselineWidthCh2,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" InputType="Decimal" />
-            <Label Content="um" FontSize="16" FontWeight="Bold"/>
-            <Label Content="CH3" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right"/>
-            <Controls:InputTextBox Text="{Binding Path=BaselineWidthCh3,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" InputType="Decimal" />
-            <Label Content="um" FontSize="16" FontWeight="Bold"/>
-            <Label Content="CH4" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right"/>
-            <Controls:InputTextBox Text="{Binding Path=BaselineWidthCh4,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" InputType="Decimal" />
-            <Label Content="um" FontSize="16" FontWeight="Bold"/>
+            FontSize="20" />
+        <auto:AutoGrid
+            Grid.Row="2"
+            Margin="10,0,10,10"
+            Columns="2*,2*,*,2*,2*,*,2*,2*,*,2*,2*,*"
+            RowCount="7">
+            <Label HorizontalAlignment="Right" Content="CH1" />
+            <Controls:InputTextBox Text="{Binding Path=BaselineWidthCh1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <Label Content="um" />
+            <Label HorizontalAlignment="Right" Content="CH2" />
+            <Controls:InputTextBox Text="{Binding Path=BaselineWidthCh2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <Label Content="um" />
+            <Label HorizontalAlignment="Right" Content="CH3" />
+            <Controls:InputTextBox Text="{Binding Path=BaselineWidthCh3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <Label Content="um" />
+            <Label HorizontalAlignment="Right" Content="CH4" />
+            <Controls:InputTextBox Text="{Binding Path=BaselineWidthCh4, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <Label Content="um" />
         </auto:AutoGrid>
         <Label
             Grid.Row="3"
@@ -59,21 +80,64 @@
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
             Content="光源亮度"
-            FontSize="20"
-            FontWeight="Bold" />
-        <auto:AutoGrid Grid.Row="4" Margin="10,0,10,10"  Columns="2*,2*,*,2*,2*,*,2*,2*,*,2*,2*,*" RowCount="7">
-            <Label Content="CH1" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right"/>
-            <Controls:InputTextBox Text="{Binding Path=LightSourceBrightnessCh1,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" InputType="Decimal" />
-            <Label Content="(1-100)" FontSize="16" FontWeight="Bold"/>
-            <Label Content="CH2" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right"/>
-            <Controls:InputTextBox Text="{Binding Path=LightSourceBrightnessCh2,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" InputType="Decimal" />
-            <Label Content="(1-100)" FontSize="16" FontWeight="Bold"/>
-            <Label Content="CH3" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right"/>
-            <Controls:InputTextBox Text="{Binding Path=LightSourceBrightnessCh3,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" InputType="Decimal" />
-            <Label Content="(1-100)" FontSize="16" FontWeight="Bold"/>
-            <Label Content="CH4" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right"/>
-            <Controls:InputTextBox Text="{Binding Path=LightSourceBrightnessCh4,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" InputType="Decimal" />
-            <Label Content="(1-100)" FontSize="16" FontWeight="Bold"/>
+            FontSize="20" />
+        <auto:AutoGrid
+            Grid.Row="4"
+            Margin="10,0,10,10"
+            Columns="2*,2*,*,2*,2*,*,2*,2*,*,2*,2*,*"
+            RowCount="7">
+            <Label HorizontalAlignment="Right" Content="CH1" />
+            <Controls:InputTextBox Text="{Binding Path=LightSourceBrightnessCh1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" XPrecision="0" />
+            <Label Content="(1-100)" />
+            <Label HorizontalAlignment="Right" Content="CH2" />
+            <Controls:InputTextBox Text="{Binding Path=LightSourceBrightnessCh2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" XPrecision="0" />
+            <Label Content="(1-100)" />
+            <Label HorizontalAlignment="Right" Content="CH3" />
+            <Controls:InputTextBox Text="{Binding Path=LightSourceBrightnessCh3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" XPrecision="0" />
+            <Label Content="(1-100)" />
+            <Label HorizontalAlignment="Right" Content="CH4" />
+            <Controls:InputTextBox Text="{Binding Path=LightSourceBrightnessCh4, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" XPrecision="0" />
+            <Label Content="(1-100)" />
         </auto:AutoGrid>
+        <Label
+            Grid.Row="5"
+            Margin="10,0,0,15"
+            Padding="0,0,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            Content="崩边线宽度"
+            FontSize="20" />
+        <auto:AutoGrid
+            Grid.Row="6"
+            Margin="10,0,10,10"
+            Columns="2*,2*,*,2*,2*,*,2*,2*,*,2*,2*,*"
+            RowCount="7">
+            <Label HorizontalAlignment="Right" Content="CH1" />
+            <Controls:InputTextBox Text="{Binding Path=EdgeWidthCh1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <Label Content="um" />
+            <Label HorizontalAlignment="Right" Content="CH2" />
+            <Controls:InputTextBox Text="{Binding Path=EdgeWidthCh2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <Label Content="um" />
+            <Label HorizontalAlignment="Right" Content="CH3" />
+            <Controls:InputTextBox Text="{Binding Path=EdgeWidthCh3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <Label Content="um" />
+            <Label HorizontalAlignment="Right" Content="CH4" />
+            <Controls:InputTextBox Text="{Binding Path=EdgeWidthCh4, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <Label Content="um" />
+        </auto:AutoGrid>
+        <StackPanel Grid.Row="7" Orientation="Horizontal">
+            <Label
+                Margin="35,0,0,0"
+                VerticalAlignment="Center"
+                Content="崩边线是否开启" />
+            <CheckBox
+                x:Name="hasEdgeLine"
+                VerticalAlignment="Center"
+                FontSize="18"
+                IsChecked="{Binding HasEdgeLine}"
+                Style="{StaticResource MaterialDesignFilterChipSecondaryCheckBox}">
+                <TextBlock Text="{Binding ElementName=hasEdgeLine, Path=IsChecked, Converter={StaticResource BoolToStringConverter}}" />
+            </CheckBox>
+        </StackPanel>
     </Grid>
 </Page>

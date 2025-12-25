@@ -28,49 +28,50 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
     /// </summary>
     public partial class MCCalibrationParameters : Page
     {
-        private MainWindow? mainWindow;
-        private RightPage? rightPage;
-        private OperatePage? operatePage;
+        private MainWindow? _mainWindow;
+        private RightPage? _rightPage;
+
         public MCCalibrationParameters()
         {
             InitializeComponent();
-            mainWindow = System.Windows.Application.Current.MainWindow as MainWindow;
+            _mainWindow = System.Windows.Application.Current.MainWindow as MainWindow;
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            rightPage = mainWindow.rightFrame.Content as RightPage;
-            rightPage.PanelAction.Visibility = Visibility.Visible;
-            rightPage.btnBack.Visibility = Visibility.Visible;
-            rightPage.btnBack.BackFlag = false;
-            rightPage.btnBack.SetRightClickedHandler(BackFrom);
-            rightPage.btnSure.SetRightClickedHandler(SureOk);
-            rightPage.btnSure.GlobalRunOperateFlag = true;
-            rightPage.btnBack.GlobalRunOperateFlag = true;
-            operatePage = mainWindow.operateFrame.Content as OperatePage;
-            rightPage.btnSure.Visibility = Visibility.Visible;
-            mainWindow.UpdateOperatePage([], null);
+            if (_mainWindow is null) return;
+            _rightPage = _mainWindow.rightFrame.Content as RightPage;
+            if (_rightPage is null) return;
+            _rightPage.PanelAction.Visibility = Visibility.Visible;
+            _rightPage.btnBack.Visibility = Visibility.Visible;
+            _rightPage.btnBack.BackFlag = false;
+            _rightPage.btnBack.SetRightClickedHandler(BackFrom);
+            _rightPage.btnSure.SetRightClickedHandler(SureOk);
+            _rightPage.btnSure.GlobalRunOperateFlag = true;
+            _rightPage.btnBack.GlobalRunOperateFlag = true;
+            _rightPage.btnSure.Visibility = Visibility.Visible;
+            _mainWindow.UpdateOperatePage([], null);
             this.DataContext = new MCCalibrationParametersViewModel();
         }
 
-        private void BackFrom(object sender, bool v)
+        private void BackFrom(object? sender, bool v)
         {
             int id = int.Parse(QueryUtils.getQuery(this)["id"]);
             bool lookState = bool.Parse(QueryUtils.getQuery(this)["look"]);
-            mainWindow.NavigateToPage("Pages/F3_ModelCatalog/MCDeviceDataConf", $"id={id}&look={lookState}");
+            _mainWindow?.NavigateToPage("Pages/F3_ModelCatalog/MCDeviceDataConf", $"id={id}&look={lookState}");
         }
 
-        private async void SureOk(object sender, bool v)
+        private async void SureOk(object? sender, bool v)
         {
-            if (this.DataContext is MCCalibrationParametersViewModel model)
+            if (this.DataContext is MCCalibrationParametersViewModel viewModel)
             {
                 try
                 {
-                    SqlHelper.Update(model.UserDefineDataModel);
+                    SqlHelper.Update(viewModel.UserDefineDataModel);
                     MaterialSnackUtils.MaterialSnack("保存成功", MaterialSnackUtils.SnackType.SUCCESS);
                     int id = int.Parse(QueryUtils.getQuery(this)["id"]);
                     bool lookState = bool.Parse(QueryUtils.getQuery(this)["look"]);
-                    mainWindow.NavigateToPage("Pages/F3_ModelCatalog/MCDeviceDataConf", $"id={id}&look={lookState}");
+                    _mainWindow?.NavigateToPage("Pages/F3_ModelCatalog/MCDeviceDataConf", $"id={id}&look={lookState}");
                 }
                 catch
                 {

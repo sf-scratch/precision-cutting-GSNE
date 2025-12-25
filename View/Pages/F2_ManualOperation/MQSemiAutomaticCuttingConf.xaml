@@ -194,22 +194,6 @@
                                 TextWrapping="Wrap" />
                             <Label Content="/min" FontSize="16" />
                         </StackPanel>
-                        <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
-                            <Label
-                                Width="200"
-                                VerticalAlignment="Center"
-                                Content="结束后切割水状态"
-                                FontSize="18"
-                                FontWeight="Bold" />
-                            <CheckBox
-                                x:Name="cutWater"
-                                VerticalAlignment="Center"
-                                FontSize="18"
-                                IsChecked="{Binding IsOpenCutWaterAfterCuttingCompleted}"
-                                Style="{StaticResource MaterialDesignFilterChipSecondaryCheckBox}">
-                                <TextBlock Text="{Binding ElementName=cutWater, Path=IsChecked, Converter={StaticResource BoolToStringConverter}}" />
-                            </CheckBox>
-                        </StackPanel>
                         <StackPanel
                             Margin="0,10,0,0"
                             Orientation="Horizontal"

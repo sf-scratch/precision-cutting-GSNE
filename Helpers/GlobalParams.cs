@@ -29,6 +29,9 @@ namespace 精密切割系统.Helpers
         // 小数点格式化字符串
         public static string DecimalStringFormat { get; set; } = "F5";
 
+        // 小数点格式化字符串
+        public static string RoughDecimalStringFormat { get; set; } = "F3";
+
         // 当前页面是否是首页
         public static bool currentPageIsHome = false;
 
@@ -146,6 +149,7 @@ namespace 精密切割系统.Helpers
         public const string CH2 = "Ch 2";
         public const string CH3 = "Ch 3";
         public const string CH4 = "Ch 4";
+        public const string StringFormatCH = "Ch {0}";
 
         // 修刀位置 Y轴前端：129.985  Y轴后端：128.24  Z轴设定位置：39.005    127.98224  129.30324
 

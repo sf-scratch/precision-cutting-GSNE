@@ -1,7 +1,11 @@
-﻿using 精密切割系统.database.db.modle;
+﻿using System;
+using System.Diagnostics;
+using System.Windows;
+using 精密切割系统.database.db.modle;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.bunkering;
 using 精密切割系统.Model.plc;
+using 精密切割系统.View.Pages.common;
 using 精密切割系统.ViewModel;
 using ElectricalDischargeTruingModel = 精密切割系统.database.db.modle.ElectricalDischargeTruingModel;
 
@@ -285,7 +289,135 @@ namespace 精密切割系统.Utils
         /// <returns></returns>
         public static UserDefineDataModel GetCurrentUserDefineDataModel()
         {
-            return SqlHelper.Table<UserDefineDataModel>().Where(t => t.Id == 1).First();
+            return SqlHelper.Table<UserDefineDataModel>().Where(t => t.Id == 1).FirstOrDefault();
+        }
+
+        public static void UpdateCutMarkWidth(int channelNum, float cutMarkWidth)
+        {
+            UserDefineDataModel userDefineData = GetCurrentUserDefineDataModel();
+            switch (string.Format(GlobalParams.StringFormatCH, channelNum))
+            {
+                case GlobalParams.CH1:
+                    userDefineData.BaselineWidthCh1 = cutMarkWidth.ToString(GlobalParams.RoughDecimalStringFormat);
+                    break;
+
+                case GlobalParams.CH2:
+                    userDefineData.BaselineWidthCh2 = cutMarkWidth.ToString(GlobalParams.RoughDecimalStringFormat);
+                    break;
+
+                case GlobalParams.CH3:
+                    userDefineData.BaselineWidthCh3 = cutMarkWidth.ToString(GlobalParams.RoughDecimalStringFormat);
+                    break;
+
+                case GlobalParams.CH4:
+                    userDefineData.BaselineWidthCh4 = cutMarkWidth.ToString(GlobalParams.RoughDecimalStringFormat);
+                    break;
+
+                default:
+                    break;
+            }
+            SqlHelper.Update(userDefineData);
+        }
+
+        public static void UpdateEdgeWidth(int channelNum, float edgeWidth)
+        {
+            UserDefineDataModel userDefineData = GetCurrentUserDefineDataModel();
+            switch (string.Format(GlobalParams.StringFormatCH, channelNum))
+            {
+                case GlobalParams.CH1:
+                    userDefineData.EdgeWidthCh1 = edgeWidth.ToString(GlobalParams.RoughDecimalStringFormat);
+                    break;
+
+                case GlobalParams.CH2:
+                    userDefineData.EdgeWidthCh2 = edgeWidth.ToString(GlobalParams.RoughDecimalStringFormat);
+                    break;
+
+                case GlobalParams.CH3:
+                    userDefineData.EdgeWidthCh3 = edgeWidth.ToString(GlobalParams.RoughDecimalStringFormat);
+                    break;
+
+                case GlobalParams.CH4:
+                    userDefineData.EdgeWidthCh4 = edgeWidth.ToString(GlobalParams.RoughDecimalStringFormat);
+                    break;
+
+                default:
+                    break;
+            }
+            SqlHelper.Update(userDefineData);
+        }
+
+        public static void UpdateLightSourceBrightness(int channelNum, int light)
+        {
+            UserDefineDataModel userDefineData = GetCurrentUserDefineDataModel();
+            switch (string.Format(GlobalParams.StringFormatCH, channelNum))
+            {
+                case GlobalParams.CH1:
+                    userDefineData.LightSourceBrightnessCh1 = light.ToString();
+                    break;
+
+                case GlobalParams.CH2:
+                    userDefineData.LightSourceBrightnessCh2 = light.ToString();
+                    break;
+
+                case GlobalParams.CH3:
+                    userDefineData.LightSourceBrightnessCh3 = light.ToString();
+                    break;
+
+                case GlobalParams.CH4:
+                    userDefineData.LightSourceBrightnessCh4 = light.ToString();
+                    break;
+
+                default:
+                    break;
+            }
+            SqlHelper.Update(userDefineData);
+        }
+
+        public static (float cutMarkWidth, float edgeWidth, int lightSourceBrightness) GetWidthAndLight(string currentChNo)
+        {
+            UserDefineDataModel userDefineData = GetCurrentUserDefineDataModel();
+            switch (currentChNo)
+            {
+                case GlobalParams.CH1:
+                    if (float.TryParse(userDefineData.BaselineWidthCh1, out float baselineWidthCh1) &&
+                        float.TryParse(userDefineData.EdgeWidthCh1, out float edgeWidthCh1) &&
+                        int.TryParse(userDefineData.LightSourceBrightnessCh1, out int lightSourceBrightnessCh1))
+                    {
+                        return (baselineWidthCh1, edgeWidthCh1, lightSourceBrightnessCh1);
+                    }
+                    break;
+
+                case GlobalParams.CH2:
+                    if (float.TryParse(userDefineData.BaselineWidthCh2, out float baselineWidthCh2) &&
+                        float.TryParse(userDefineData.EdgeWidthCh2, out float edgeWidthCh2) &&
+                        int.TryParse(userDefineData.LightSourceBrightnessCh2, out int lightSourceBrightnessCh2))
+                    {
+                        return (baselineWidthCh2, edgeWidthCh2, lightSourceBrightnessCh2);
+                    }
+                    break;
+
+                case GlobalParams.CH3:
+                    if (float.TryParse(userDefineData.BaselineWidthCh3, out float baselineWidthCh3) &&
+                        float.TryParse(userDefineData.EdgeWidthCh3, out float edgeWidthCh3) &&
+                        int.TryParse(userDefineData.LightSourceBrightnessCh3, out int lightSourceBrightnessCh3))
+                    {
+                        return (baselineWidthCh3, edgeWidthCh3, lightSourceBrightnessCh3);
+                    }
+                    break;
+
+                case GlobalParams.CH4:
+                    if (float.TryParse(userDefineData.BaselineWidthCh4, out float baselineWidthCh4) &&
+                        float.TryParse(userDefineData.EdgeWidthCh4, out float edgeWidthCh4) &&
+                        int.TryParse(userDefineData.LightSourceBrightnessCh4, out int lightSourceBrightnessCh4))
+                    {
+                        return (baselineWidthCh4, edgeWidthCh4, lightSourceBrightnessCh4);
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+            return (0, 0, 0);
         }
 
         public static FileTableItemChModel GetFileTableItemChModel()
@@ -391,13 +523,6 @@ namespace 精密切割系统.Utils
         public static List<PositionCompensationModel> GetPositionCompensationModels()
         {
             return SqlHelper.Table<PositionCompensationModel>().ToList();
-        }
-
-        //获取7.0用户默认设置
-        public static UserDefineDataModel getUserDefineDataModel()
-        {
-            var listConf = SqlHelper.Table<UserDefineDataModel>().ToList();
-            return listConf.Count > 0 ? listConf[0] : new UserDefineDataModel();
         }
     }
 }

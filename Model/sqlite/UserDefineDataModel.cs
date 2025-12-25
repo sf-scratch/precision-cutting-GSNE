@@ -49,6 +49,18 @@ namespace 精密切割系统.database.db.modle
         [Column("baseline_width_ch4")]
         public string BaselineWidthCh4 { get; set; } = "0";
 
+        [Column("edge_width_ch1")]
+        public string EdgeWidthCh1 { get; set; } = "0";
+
+        [Column("edge_width_ch2")]
+        public string EdgeWidthCh2 { get; set; } = "0";
+
+        [Column("edge_width_ch3")]
+        public string EdgeWidthCh3 { get; set; } = "0";
+
+        [Column("edge_width_ch4")]
+        public string EdgeWidthCh4 { get; set; } = "0";
+
         [Column("light_source_brightness_ch1")]
         public string LightSourceBrightnessCh1 { get; set; } = "0";
 
@@ -60,6 +72,9 @@ namespace 精密切割系统.database.db.modle
 
         [Column("light_source_brightness_ch4")]
         public string LightSourceBrightnessCh4 { get; set; } = "0";
+
+        [Column("has_edge_line")]
+        public bool HasEdgeLine { get; set; } = false;
 
         [Column("warm_up_time")]//暖机时间
         public string WarmUpTime { get; set; }
@@ -107,7 +122,6 @@ namespace 精密切割系统.database.db.modle
         [Column("processing_after_blade_user_limit_error")]
         public string ProcessingAfterBladeUserLimitError { get; set; } = "WORK";
 
-
         [Column("bbd_timing")]//BBD动作时刻
         public string BBDTiming { get; set; } = "Z-EM";
 
@@ -141,7 +155,5 @@ namespace 精密切割系统.database.db.modle
 
         [Column("atomizing_nozzle_position_y")]
         public string AtomizingNozzlePositionY { get; set; } = "0";
-
-
     }
 }

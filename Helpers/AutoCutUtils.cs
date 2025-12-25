@@ -80,13 +80,7 @@ namespace 精密切割系统.Helpers
         {
             try
             {
-                List<UserDefineDataModel> list = SqlHelper.Table<UserDefineDataModel>().ToList();
-                if (list.Count != 1)
-                {
-                    MaterialSnackUtils.MaterialSnack("功能参数设定，雾化喷嘴位置设定错误！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
-                    return;
-                }
-                UserDefineDataModel userDefineData = list.First();
+                UserDefineDataModel userDefineData = CurrentUtils.GetCurrentUserDefineDataModel();
                 MaterialSnackUtils.MaterialSnack("准备更换刀片,轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
                 InitialPositionModel? initPos = await AutoCutUtils.GetInitialPositionAsync();
                 if (initPos is null)
@@ -894,13 +888,7 @@ namespace 精密切割系统.Helpers
         /// <returns></returns>
         public static async Task WorkpieceBlowingAsync(float? atomizingNozzlePositionY, IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
-            List<UserDefineDataModel> list = SqlHelper.Table<UserDefineDataModel>().ToList();
-            if (list.Count != 1)
-            {
-                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("功能参数设定，雾化喷嘴位置设定错误！"));
-                return;
-            }
-            UserDefineDataModel userDefineData = list.First();
+            UserDefineDataModel userDefineData = CurrentUtils.GetCurrentUserDefineDataModel();
             eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始工件吹气..."));
             try
             {
