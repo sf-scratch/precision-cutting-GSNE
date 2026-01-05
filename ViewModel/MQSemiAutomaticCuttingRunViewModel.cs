@@ -14,6 +14,7 @@ using System.Windows.Interop;
 using 精密切割系统.Data;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
+using 精密切割系统.Entities;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut;
@@ -102,7 +103,7 @@ namespace 精密切割系统.ViewModel
 
         private void InitRightButton()
         {
-            RightButtonCollection.Add(RightButtonParams.YelloRightButton("暂停", "/Assets/icon/right/stop.png", async () => { await PauseAsync(); }));
+            RightButtonCollection.Add(ButtonParams.YelloRightButton("暂停", "/Assets/icon/right/stop.png", async () => { await PauseAsync(); }));
         }
 
         private async Task MonitoringAlarmAsync(CancellationToken token)
@@ -184,12 +185,6 @@ namespace 精密切割系统.ViewModel
 
         private async void RunAutoCut()
         {
-            if (!GlobalParams.OnlineFlag)
-            {
-                SpeedManager.IsHighSpeed = false;
-                MaterialSnack($"切割中...", SnackType.WARNING, 0, _eventAggregator);
-                return;
-            }
             if (!_semiAutoCutService.IsReady)
             {
                 //正在切割中
@@ -219,6 +214,39 @@ namespace 精密切割系统.ViewModel
                 ShowWarnMessageNavigateHome("未设置刀片外径！");
                 return;
             }
+            var bmParameter = await SqlHelper.GetEntityAsync<BMParameterMaintenanceEntity>();
+            if (bmParameter == null)
+            {
+                ShowWarnMessageNavigateHome("获取测高参数失败！");
+                return;
+            }
+            if (Appsettings.MeasureHeightFirst is null || Appsettings.MeasureHeightLast is null)
+            {
+                ShowWarnMessageNavigateHome("未进行测高，请先测高！");
+                return;
+            }
+            float maximumWearAmount = bmParameter.MaximumWearAmount.ToFloat();
+            if (maximumWearAmount < Appsettings.MeasureHeightLast - Appsettings.MeasureHeightFirst)
+            {
+                ShowWarnMessageNavigateHome("超出刀片最大磨损量，请更换刀片！");
+                return;
+            }
+            if (Appsettings.AfterReplaceBladeCutLength is not null && Appsettings.AfterReplaceBladeCutTimes is not null)
+            {
+                float cuttingLifeLength = bmParameter.CuttingLifeLength.ToFloat();
+                int cuttingLifeCutNumber = bmParameter.CuttingLifeCutNumber.ToInt();
+                if (Appsettings.AfterReplaceBladeCutLength >= cuttingLifeLength || Appsettings.AfterReplaceBladeCutTimes >= cuttingLifeCutNumber)
+                {
+                    ShowWarnMessageNavigateHome("已超出刀片使用寿命，请更换刀片！");
+                    return;
+                }
+            }
+            if (!GlobalParams.OnlineFlag)
+            {
+                SpeedManager.IsHighSpeed = false;
+                MaterialSnack($"切割中...", SnackType.WARNING, 0, _eventAggregator);
+                return;
+            }
             if (!GlobalParams.HasFullyAutomatic)
             {
                 await PlcControl.tagControl.wholeDevice.CloseCameraLensCapAsync();
@@ -233,7 +261,7 @@ namespace 精密切割系统.ViewModel
                 CutStep firtStep = cutSteps.First();
                 float cutY = firtStep.IsAbsolute ? firtStep.ChannelStartY : (await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0).ToActualY();
                 float measureHeightZ = 0;
-                if (BmSetupData.Instance.IsAutomHeightMeasureBeforeCutting)
+                if (bmParameter.IsAutomHeightMeasureBeforeCutting)
                 {
                     CommonResult<float> curHeightZ = await AutoCutUtils.ProcessCombineMeasureHeightAsync(_eventAggregator, _pauseCts.Token);
                     if (!curHeightZ.IsSuccess)
@@ -243,14 +271,9 @@ namespace 精密切割系统.ViewModel
                     }
                     measureHeightZ = curHeightZ.Data;
                 }
-                else if (Appsettings.MeasureHeightLast is not null)
-                {
-                    measureHeightZ = Appsettings.MeasureHeightLast.Value;
-                }
                 else
                 {
-                    ShowWarnMessageNavigateHome("未进行测高，请先测高！");
-                    return;
+                    measureHeightZ = Appsettings.MeasureHeightLast.Value;
                 }
                 Stopwatch stopwatch = Stopwatch.StartNew();
                 try
@@ -380,7 +403,7 @@ namespace 精密切割系统.ViewModel
             if (!GlobalParams.OnlineFlag)
             {
                 NavigateUtils.NavigateToPage("Pages/F2_ManualOperation/MQSemiAutomaticCuttingConf");
-                ShowMessage();
+                MaterialSnack($"切割完成！ 总用时：1:10:26", SnackType.SUCCESS, 0);
                 return;
             }
             SemiAutoCutService.Instance.Stop(pauseResult);
@@ -421,7 +444,7 @@ namespace 精密切割系统.ViewModel
                         }
                     }
                     await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, cts.Token);
-                    await AutoCutUtils.WorkpieceBlowingAsync(line.StartPoint.Y.ToCameraY(), _eventAggregator, cts.Token);
+                    await AutoCutUtils.WorkpieceBlowingAsync(line.StartPoint.Y.ToCameraY(), default, _eventAggregator, cts.Token);
                     await PlcControl.tagControl.cutting.RunMotionAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), line.StartPoint.Y.ToCameraY(), cts.Token);
                     // 执行默认动作
                     //await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(posZ, default, cts.Token);

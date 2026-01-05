@@ -12,8 +12,8 @@
     xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
     d:DataContext="{d:DesignInstance viewModel:MQSemiAutomaticCuttingStopViewModel,
                                      IsDesignTimeCreatable=True}"
-    d:DesignHeight="655"
-    d:DesignWidth="1570"
+    d:DesignHeight="645"
+    d:DesignWidth="1560"
     Loaded="Page_Loaded"
     mc:Ignorable="d">
     <behaviors:Interaction.Triggers>

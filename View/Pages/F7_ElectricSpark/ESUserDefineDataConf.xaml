@@ -118,7 +118,8 @@
                 Text="{Binding Path=BlowTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 TextWrapping="Wrap"
                 XMax="300"
-                XMin="0" />
+                XMin="0"
+                XPrecision="0" />
             <Label
                 x:Name="label18"
                 HorizontalAlignment="Left"

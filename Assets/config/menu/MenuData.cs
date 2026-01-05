@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using 精密切割系统.Helpers;
 using 精密切割系统.View.Pages;
+using 精密切割系统.View.Pages.F4_BladeMaintenance;
+using 精密切割系统.ViewModel;
 
 namespace 精密切割系统.Assets.config.menu
 {
@@ -55,6 +57,7 @@ namespace 精密切割系统.Assets.config.menu
             {
                 list.Add(new MenuBean(1, "全自动", "/Assets/icon/menu_0/menu_0_1.png", "/Assets/icon/menu_0/menu_0_1_white.png"));
             }
+            list.Add(new MenuBean(0, "自动切割", "/Assets/icon/menu_0/menu_0_1.png", "/Assets/icon/menu_0/menu_0_1_white.png"));
             list.Add(new MenuBean(2, "手动操作", "/Assets/icon/menu_0/menu_0_2.png", "/Assets/icon/menu_0/menu_0_2_white.png"));
             list.Add(new MenuBean(3, "型号目录", "/Assets/icon/menu_0/menu_0_3.png", "/Assets/icon/menu_0/menu_0_3_white.png", 2, "Pages/F3_ModelCatalog/MCDeviceDataListConf"));
             list.Add(new MenuBean(4, "刀片参数维护", "/Assets/icon/menu_0/menu_0_4.png", "/Assets/icon/menu_0/menu_0_4_white.png"));
@@ -92,6 +95,7 @@ namespace 精密切割系统.Assets.config.menu
                 list.Add(new MenuBean(439, "自动切割参数清单", "ClipboardListOutline", "/Assets/icon/menu_4/menu_4_5_white.png", 3, "Pages/Auto/AutoCutSelectConfig"));
             }
             list.Add(new MenuBean(440, "磨刀参数清单", "ClipboardListOutline", "/Assets/icon/menu_4/menu_4_5_white.png", 3, "Pages/F4_BladeMaintenance/BmSharpenParameter"));
+            list.Add(new MenuBean(0, "测高参数维护", "FormatListNumbered", "/Assets/icon/menu_5/menu_5_1_white.png", 4, nameof(BMParameterMaintenance)));
             list.Add(new MenuBean(501, "预切割参数维护", "FormatListNumbered", "/Assets/icon/menu_5/menu_5_1_white.png", 2, "Pages/F5_GeneralEfficiency/F5_1_PrecutData"));
             list.Add(new MenuBean(512, "刀片状态信息", "/Assets/icon/menu_5/menu_5_1.png", "/Assets/icon/menu_5/menu_5_1_white.png", 2, "Pages/F4_BladeMaintenance/BladeInfo"));
             return list;
@@ -102,15 +106,15 @@ namespace 精密切割系统.Assets.config.menu
         {
             var list = new List<MenuBean>();
             //list.Add(new MenuBean(502, "测量维护", "/Assets/icon/menu_5/menu_5_2.png", "/Assets/icon/menu_5/menu_5_2_white.png"));
-            list.Add(new MenuBean(503, "功能参数维护", "/Assets/icon/menu_5/menu_5_3.png", "/Assets/icon/menu_5/menu_5_3_white.png", 2, "Pages/F5_GeneralEfficiency/F5_3_1_OperationData"));
-            list.Add(new MenuBean(605, "位置校准", "/Assets/icon/menu_6/menu_6_5.png", "/Assets/icon/menu_6/menu_6_5_white.png", 2, "Pages/F6_EngineeringTechnology/ETPositionAlignmentConf"));
-            list.Add(new MenuBean(606, "各模式参数设置", "/Assets/icon/menu_6/menu_6_6.png", "/Assets/icon/menu_6/menu_6_6_white.png", 2, "Pages/F6_EngineeringTechnology/ETInitialPositionConf"));
+            list.Add(new MenuBean(601, "对焦维护", "FocusAuto", "/Assets/icon/menu_6/menu_6_1_white.png", 2, "Pages/F4_BladeMaintenance/FocusMaintenanceConf"));
+            list.Add(new MenuBean(503, "参数设定", "/Assets/icon/menu_5/menu_5_3.png", "/Assets/icon/menu_5/menu_5_3_white.png", 2, "Pages/F5_GeneralEfficiency/F5_3_1_OperationData"));
             list.Add(new MenuBean(520, "轴空运行", "/Assets/icon/menu_5/menu_5_2.png", "/Assets/icon/menu_5/menu_5_2_white.png", 3, ""));
             if (GlobalParams.HasTheta)
             {
                 list.Add(new MenuBean(607, "θ轴旋转中心位校正", "CropRotate", "/Assets/icon/menu_6/menu_6_6_white.png", 3, "Pages/F4_BladeMaintenance/ThetaCenterAlignConf"));
             }
-            list.Add(new MenuBean(601, "对焦维护", "FocusAuto", "/Assets/icon/menu_6/menu_6_1_white.png", 2, "Pages/F4_BladeMaintenance/FocusMaintenanceConf"));
+            list.Add(new MenuBean(606, "各模式参数设置", "/Assets/icon/menu_6/menu_6_6.png", "/Assets/icon/menu_6/menu_6_6_white.png", 2, "Pages/F6_EngineeringTechnology/ETInitialPositionConf"));
+            list.Add(new MenuBean(605, "位置校准", "/Assets/icon/menu_6/menu_6_5.png", "/Assets/icon/menu_6/menu_6_5_white.png", 2, "Pages/F6_EngineeringTechnology/ETPositionAlignmentConf"));
             return list;
         }
 
@@ -132,11 +136,9 @@ namespace 精密切割系统.Assets.config.menu
             var list = new List<MenuBean>();
             list.Add(new MenuBean(709, "法兰修整", "ScissorsCutting", "/Assets/icon/menu_7/menu_7_3_white.png", 3, "Pages/F7_ElectricSpark/FlangeTrimmingConf"));
             list.Add(new MenuBean(701, "轴运动补偿设定", "/Assets/icon/menu_7/menu_7_1.png", "/Assets/icon/menu_7/menu_7_1_white.png", 2, "Pages/F7_ElectricSpark/ESAxisDataConf"));
-            // list.Add(new MenuBean(705, "精度测量", "/Assets/icon/menu_7/menu_7_5.png", "/Assets/icon/menu_7/menu_7_5_white.png", 2, "Pages/F7_ElectricSpark/FrmMain"));
-            //list.Add(new MenuBean(706, "自动精度补偿", "/Assets/icon/menu_7/menu_7_5.png", "/Assets/icon/menu_7/menu_7_5_white.png", 3, "Pages/F7_ElectricSpark/AutoAlignPosition"));
             list.Add(new MenuBean(702, "I/O设备检查", "/Assets/icon/menu_7/menu_7_2.png", "/Assets/icon/menu_7/menu_7_2_white.png", 2, "Pages/F7_ElectricSpark/ESIOCheckConf"));
-            list.Add(new MenuBean(703, "功能参数设定", "/Assets/icon/menu_7/menu_7_3.png", "/Assets/icon/menu_7/menu_7_3_white.png", 2, "Pages/F7_ElectricSpark/ESUserDefineDataConf"));
             list.Add(new MenuBean(704, "轴运动控制", "AxisArrow", "/Assets/icon/menu_7/menu_7_3_white.png", 4, "F7_2_Axis_Operation"));
+            list.Add(new MenuBean(703, "功能参数设定", "/Assets/icon/menu_7/menu_7_3.png", "/Assets/icon/menu_7/menu_7_3_white.png", 2, "Pages/F7_ElectricSpark/ESUserDefineDataConf"));
             list.Add(new MenuBean(708, "运行日志", "/Assets/icon/menu_7/menu_7_4.png", "/Assets/icon/menu_7/menu_7_4_white.png", 2, "Pages/F7_ElectricSpark/RunLogsPage"));
             list.Add(new MenuBean(710, "波形图", "Waveform", "/Assets/icon/menu_7/menu_7_4_white.png", 2, "Pages/F7_ElectricSpark/WaveformDiagram"));
             list.Add(new MenuBean(711, "调试", "BugPlayOutline", "/Assets/icon/menu_7/menu_7_4_white.png", 4, "DebugPage"));

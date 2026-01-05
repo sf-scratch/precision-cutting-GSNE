@@ -67,8 +67,8 @@ namespace 精密切割系统.ViewModel
         private void InitRightButton()
         {
             RightButtonCollection.Clear();
-            RightButtonCollection.Add(RightButtonParams.GreenRightButton("保存", "/Assets/icon/tab_1/01/tab_12.png", Save));
-            RightButtonCollection.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
+            RightButtonCollection.Add(ButtonParams.GreenRightButton("保存", "/Assets/icon/tab_1/01/tab_12.png", Save));
+            RightButtonCollection.Add(ButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }
 
         private async void Save()

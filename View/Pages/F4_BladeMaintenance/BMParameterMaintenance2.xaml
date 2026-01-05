@@ -1,0 +1,123 @@
+﻿<UserControl
+    x:Class="精密切割系统.View.Pages.F4_BladeMaintenance.BMParameterMaintenance2"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
+    xmlns:Converters="clr-namespace:精密切割系统.Converters"
+    xmlns:auto="clr-namespace:WpfAutoGrid;assembly=WpfAutoGrid.Core"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:精密切割系统.View.Pages.F4_BladeMaintenance"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
+    d:DataContext="{d:DesignInstance viewModel:BMParameterMaintenance2ViewModel,
+                                     IsDesignTimeCreatable=True}"
+    d:DesignHeight="645"
+    d:DesignWidth="1560"
+    mc:Ignorable="d">
+
+    <Grid Margin="30,30,0,0">
+        <Grid.Resources>
+            <Style BasedOn="{StaticResource MaterialDesignFilterChipSecondaryCheckBox}" TargetType="CheckBox">
+                <Setter Property="FontSize" Value="18" />
+                <Setter Property="FontWeight" Value="Bold" />
+            </Style>
+            <Style BasedOn="{StaticResource InputTextStyle}" TargetType="Controls:InputTextBox">
+                <Setter Property="Width" Value="150" />
+                <Setter Property="Height" Value="35" />
+                <Setter Property="InputType" Value="Decimal" />
+                <Setter Property="XPrecision" Value="3" />
+            </Style>
+            <Style TargetType="Label">
+                <Setter Property="FontSize" Value="18" />
+                <Setter Property="Height" Value="35" />
+                <Setter Property="FontWeight" Value="Bold" />
+            </Style>
+            <Converters:BoolToValueConverter
+                x:Key="BoolToStringConverter"
+                FalseValue="关闭"
+                TrueValue="开启" />
+        </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Label
+            Grid.ColumnSpan="3"
+            Height="auto"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            Content="测高参数维护(3.5.2)"
+            FontSize="30"
+            FontWeight="Bold" />
+        <StackPanel
+            Grid.Row="1"
+            Grid.Column="0"
+            Orientation="Vertical">
+            <Label
+                Margin="10"
+                Content="测高设置:"
+                FontSize="22" />
+            <auto:AutoGrid
+                Margin="20,0"
+                ChildMargin="5"
+                Columns="auto,auto,auto,auto,auto"
+                RowCount="10">
+                <Label Content="测高位置" />
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="30" Content="X:" />
+                    <Controls:InputTextBox Width="120" Text="{Binding MeasureHeightX}" />
+                </StackPanel>
+                <Label Content="mm" />
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="30" Content="Y:" />
+                    <Controls:InputTextBox Width="120" Text="{Binding MeasureHeightY}" />
+                </StackPanel>
+                <Label Content="mm" />
+                <Label />
+                <Label HorizontalAlignment="Center" Content="机器预设值" />
+                <Label />
+                <Label HorizontalAlignment="Center" Content="当前值" />
+                <Label />
+                <Label Content="测高高速段速度" />
+                <Controls:InputTextBox Text="{Binding Entity.MeasureHeightHighSpeed}" />
+                <Label Content="mm/s" />
+                <Controls:InputTextBox Text="{Binding Entity.MeasureHeightHighSpeed}" />
+                <Label Content="mm/s" />
+                <Label Content="测高低速段速度" />
+                <Controls:InputTextBox Text="{Binding Entity.MeasureHeightSlowSpeed}" />
+                <Label Content="mm/s" />
+                <Controls:InputTextBox Text="{Binding Entity.MeasureHeightSlowSpeed}" />
+                <Label Content="mm/s" />
+                <Label Content="测高低速段范围" />
+                <Controls:InputTextBox Text="{Binding Entity.MeasureHeightSlowSpeedRange}" />
+                <Label Content="mm" />
+                <Controls:InputTextBox Text="{Binding Entity.MeasureHeightSlowSpeedRange}" />
+                <Label Content="mm" />
+            </auto:AutoGrid>
+        </StackPanel>
+        <auto:AutoGrid
+            Grid.Row="1"
+            Grid.Column="1"
+            Margin="20,0"
+            ChildMargin="5"
+            Columns="auto,auto,auto"
+            RowCount="10">
+            <Label Content="刀片吹气时间" />
+            <Controls:InputTextBox Text="{Binding Entity.BladeBlowingTime}" XPrecision="0" />
+            <Label Content="s" />
+            <Label Content="C/T吹气时间" />
+            <Controls:InputTextBox Text="{Binding Entity.CtBlowingTime}" XPrecision="0" />
+            <Label Content="s" />
+            <Label Content="测高允许偏差值(两次差)" />
+            <Controls:InputTextBox Text="{Binding Entity.MeasureHeightAllowableDeviationValue}" />
+            <Label Content="mm" />
+        </auto:AutoGrid>
+    </Grid>
+</UserControl>

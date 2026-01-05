@@ -13,7 +13,7 @@ using 精密切割系统.View.Controls;
 
 namespace 精密切割系统.Model.common
 {
-    public class RightButtonParams : BindableBase
+    public class ButtonParams : BindableBase
     {
         public DelegateCommand RightClickCommand { get; set; }
         public DelegateCommand StartCommand { get; set; }
@@ -99,7 +99,7 @@ namespace 精密切割系统.Model.common
             set { _isOpen = value; RaisePropertyChanged(); }
         }
 
-        public RightButtonParams(Brush backgroundDefColor, Brush backgroundDownColor, string contentText, double fontSize, string imagePath, Action? action, Action? start, Action? stop, Visibility openOrCloseVisibility, Visibility buttonVisibility)
+        public ButtonParams(Brush backgroundDefColor, Brush backgroundDownColor, string contentText, double fontSize, string imagePath, Action? action, Action? start, Action? stop, Visibility openOrCloseVisibility, Visibility buttonVisibility)
         {
             _backgroundDefColor = backgroundDefColor;
             _backgroundDownColor = backgroundDownColor;
@@ -116,7 +116,7 @@ namespace 精密切割系统.Model.common
             StopCommand = new DelegateCommand(() => stop?.Invoke());
         }
 
-        public RightButtonParams(Brush backgroundDefColor, Brush backgroundDownColor, string contentText, double fontSize, string imagePath, Func<Task>? action, Func<Task>? start, Func<Task>? stop, Visibility openOrCloseVisibility, Visibility buttonVisibility)
+        public ButtonParams(Brush backgroundDefColor, Brush backgroundDownColor, string contentText, double fontSize, string imagePath, Func<Task>? action, Func<Task>? start, Func<Task>? stop, Visibility openOrCloseVisibility, Visibility buttonVisibility)
         {
             _backgroundDefColor = backgroundDefColor;
             _backgroundDownColor = backgroundDownColor;
@@ -133,44 +133,44 @@ namespace 精密切割系统.Model.common
             StopCommand = new DelegateCommand(() => stop?.Invoke());
         }
 
-        public static RightButtonParams GreenRightButton(string contentText, string imagePath, Action? action, Action? start = null, Action? stop = null)
+        public static ButtonParams GreenRightButton(string contentText, string imagePath, Action? action, Action? start = null, Action? stop = null)
         {
-            return new RightButtonParams(new SolidColorBrush(Color.FromRgb(0x39, 0xD1, 0x1A)), new SolidColorBrush(Color.FromRgb(0x39, 0xB4, 0x1A)), contentText, 12, imagePath, action, start, stop, Visibility.Collapsed, Visibility.Visible);
+            return new ButtonParams(new SolidColorBrush(Color.FromRgb(0x39, 0xD1, 0x1A)), new SolidColorBrush(Color.FromRgb(0x39, 0xB4, 0x1A)), contentText, 12, imagePath, action, start, stop, Visibility.Collapsed, Visibility.Visible);
         }
 
-        public static RightButtonParams YelloRightButton(string contentText, string imagePath, Action? action, Action? start = null, Action? stop = null)
+        public static ButtonParams YelloRightButton(string contentText, string imagePath, Action? action, Action? start = null, Action? stop = null)
         {
-            return new RightButtonParams(new SolidColorBrush(Color.FromRgb(0xFF, 0xAD, 0x00)), new SolidColorBrush(Color.FromRgb(0xC8, 0xAD, 0x00)), contentText, 12, imagePath, action, start, stop, Visibility.Collapsed, Visibility.Visible);
+            return new ButtonParams(new SolidColorBrush(Color.FromRgb(0xFF, 0xAD, 0x00)), new SolidColorBrush(Color.FromRgb(0xC8, 0xAD, 0x00)), contentText, 12, imagePath, action, start, stop, Visibility.Collapsed, Visibility.Visible);
         }
 
-        public static RightButtonParams BlueButton(string contentText, string imagePath, Action? action, Action? start = null, Action? stop = null, Visibility openOrCloseVisibility = Visibility.Collapsed, Visibility buttonVisibility = Visibility.Visible)
+        public static ButtonParams BlueButton(string contentText, string imagePath, Action? action, Action? start = null, Action? stop = null, Visibility openOrCloseVisibility = Visibility.Collapsed, Visibility buttonVisibility = Visibility.Visible)
         {
-            return new RightButtonParams(new SolidColorBrush(Color.FromRgb(0x50, 0x87, 0xcb)), new SolidColorBrush(Color.FromRgb(0x17, 0x7C, 0xfa)), contentText, 22, imagePath, action, start, stop, openOrCloseVisibility, buttonVisibility);
+            return new ButtonParams(new SolidColorBrush(Color.FromRgb(0x50, 0x87, 0xcb)), new SolidColorBrush(Color.FromRgb(0x17, 0x7C, 0xfa)), contentText, 22, imagePath, action, start, stop, openOrCloseVisibility, buttonVisibility);
         }
 
-        public static RightButtonParams RedRightButton(string contentText, string imagePath, Action? action, Action? start = null, Action? stop = null)
+        public static ButtonParams RedRightButton(string contentText, string imagePath, Action? action, Action? start = null, Action? stop = null)
         {
-            return new RightButtonParams(Brushes.Red, Brushes.DarkRed, contentText, 12, imagePath, action, start, stop, Visibility.Collapsed, Visibility.Visible);
+            return new ButtonParams(Brushes.Red, Brushes.DarkRed, contentText, 12, imagePath, action, start, stop, Visibility.Collapsed, Visibility.Visible);
         }
 
-        public static RightButtonParams GreenRightButton(string contentText, string imagePath, Func<Task>? action, Func<Task>? start = null, Func<Task>? stop = null)
+        public static ButtonParams GreenRightButton(string contentText, string imagePath, Func<Task>? action, Func<Task>? start = null, Func<Task>? stop = null)
         {
-            return new RightButtonParams(new SolidColorBrush(Color.FromRgb(0x39, 0xD1, 0x1A)), new SolidColorBrush(Color.FromRgb(0x39, 0xB4, 0x1A)), contentText, 12, imagePath, action, start, stop, Visibility.Collapsed, Visibility.Visible);
+            return new ButtonParams(new SolidColorBrush(Color.FromRgb(0x39, 0xD1, 0x1A)), new SolidColorBrush(Color.FromRgb(0x39, 0xB4, 0x1A)), contentText, 12, imagePath, action, start, stop, Visibility.Collapsed, Visibility.Visible);
         }
 
-        public static RightButtonParams YelloRightButton(string contentText, string imagePath, Func<Task>? action, Func<Task>? start = null, Func<Task>? stop = null)
+        public static ButtonParams YelloRightButton(string contentText, string imagePath, Func<Task>? action, Func<Task>? start = null, Func<Task>? stop = null)
         {
-            return new RightButtonParams(new SolidColorBrush(Color.FromRgb(0xFF, 0xAD, 0x00)), new SolidColorBrush(Color.FromRgb(0xC8, 0xAD, 0x00)), contentText, 12, imagePath, action, start, stop, Visibility.Collapsed, Visibility.Visible);
+            return new ButtonParams(new SolidColorBrush(Color.FromRgb(0xFF, 0xAD, 0x00)), new SolidColorBrush(Color.FromRgb(0xC8, 0xAD, 0x00)), contentText, 12, imagePath, action, start, stop, Visibility.Collapsed, Visibility.Visible);
         }
 
-        public static RightButtonParams BlueButton(string contentText, string imagePath, Func<Task>? action, Func<Task>? start = null, Func<Task>? stop = null, Visibility openOrCloseVisibility = Visibility.Collapsed, Visibility buttonVisibility = Visibility.Visible)
+        public static ButtonParams BlueButton(string contentText, string imagePath, Func<Task>? action, Func<Task>? start = null, Func<Task>? stop = null, Visibility openOrCloseVisibility = Visibility.Collapsed, Visibility buttonVisibility = Visibility.Visible)
         {
-            return new RightButtonParams(new SolidColorBrush(Color.FromRgb(0x50, 0x87, 0xcb)), new SolidColorBrush(Color.FromRgb(0x17, 0x7C, 0xfa)), contentText, 22, imagePath, action, start, stop, openOrCloseVisibility, buttonVisibility);
+            return new ButtonParams(new SolidColorBrush(Color.FromRgb(0x50, 0x87, 0xcb)), new SolidColorBrush(Color.FromRgb(0x17, 0x7C, 0xfa)), contentText, 22, imagePath, action, start, stop, openOrCloseVisibility, buttonVisibility);
         }
 
-        public static RightButtonParams RedRightButton(string contentText, string imagePath, Func<Task>? action, Func<Task>? start = null, Func<Task>? stop = null)
+        public static ButtonParams RedRightButton(string contentText, string imagePath, Func<Task>? action, Func<Task>? start = null, Func<Task>? stop = null)
         {
-            return new RightButtonParams(Brushes.Red, Brushes.DarkRed, contentText, 12, imagePath, action, start, stop, Visibility.Collapsed, Visibility.Visible);
+            return new ButtonParams(Brushes.Red, Brushes.DarkRed, contentText, 12, imagePath, action, start, stop, Visibility.Collapsed, Visibility.Visible);
         }
     }
 }

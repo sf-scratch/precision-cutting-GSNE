@@ -18,6 +18,7 @@ using System.Windows.Shapes;
 using 精密切割系统.Assets.config.buttom;
 using 精密切割系统.Data;
 using 精密切割系统.database.db.modle;
+using 精密切割系统.Entities;
 using 精密切割系统.Extensions;
 using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
@@ -46,7 +47,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         private CancellationTokenSource _measureHeightCts;
         private CancellationTokenSource _monitorCts;
 
-        private BMSetupDataConfViewModel? ViewModel => DataContext as BMSetupDataConfViewModel;
+        private BMSetupDataConfViewModel ViewModel { get; set; } = new BMSetupDataConfViewModel();
 
         public BMSetupDataConf()
         {
@@ -73,7 +74,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             _rightPage.btnStartSetup.BackFlag = false;
             _rightPage.btnStartSetup.SetRightClickedHandler(BtnStartSetup_RightClicked);
             _rightPage.btnCutStop.SetRightClickedHandler(BtnCutStop_RightClicked);
-            DataContext = new BMSetupDataConfViewModel();
+            DataContext = ViewModel;
             LoadDBData();
             RealTimeInfo.Messages.Add(MessageModel.Create("进入测高界面..."));
         }
@@ -149,18 +150,10 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 
         public async void LoadDBData()
         {
-            spindleRev.Text = BmSetupData.Instance.SpindleRev.ToString();
-            heightMeasureTimes.Text = BmSetupData.Instance.HeightMeasureTimes.ToString();
-            isAutomHeightMeasureBeforeCutting.IsChecked = BmSetupData.Instance.IsAutomHeightMeasureBeforeCutting;
-            thetaMovementAngle.Text = BmSetupData.Instance.ThetaMovementAngle.ToString();
-            thetaStartingToMovePosition.Text = BmSetupData.Instance.ThetaStartingToMovePosition.ToString();
-            thetaEndingToMovePosition.Text = BmSetupData.Instance.ThetaEndingToMovePosition.ToString();
-            thetaCurrentLocation.Text = BmSetupData.Instance.ThetaCurrentLocation.ToString();
-            InitialPositionModel? initPos = await AutoCutUtils.GetInitialPositionAsync();
-            if (initPos is not null)
-            {
-                heightMeasurementMaxZ1Pos.Text = initPos.BladeSetupInitZ1;
-            }
+            ViewModel.BMParameter = await SqlHelper.GetOrCreateEntityAsync(() => new BMParameterMaintenanceEntity());
+            ViewModel.BladeOuterDiameter = Appsettings.BladeOuterDiameter?.ToString("F3") ?? string.Empty;
+            var initialPosition = await SqlHelper.GetOrCreateEntityAsync(() => new InitialPositionModel());
+            ViewModel.BladeSetupInitZ1 = initialPosition.BladeSetupInitZ1;
         }
 
         private async void BtnSure_RightClicked(object? sender, bool e)
@@ -170,20 +163,20 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 MaterialSnack("表单填写有误，请检查!", SnackType.ERROR);
                 return;
             }
-            BmSetupData.Instance.SpindleRev = spindleRev.Text.ToInt();
-            BmSetupData.Instance.HeightMeasureTimes = heightMeasureTimes.Text.ToInt();
-            BmSetupData.Instance.IsAutomHeightMeasureBeforeCutting = isAutomHeightMeasureBeforeCutting.IsChecked ?? false;
-            BmSetupData.Instance.ThetaMovementAngle = thetaMovementAngle.Text.ToFloat();
-            BmSetupData.Instance.ThetaStartingToMovePosition = thetaStartingToMovePosition.Text.ToFloat();
-            BmSetupData.Instance.ThetaEndingToMovePosition = thetaEndingToMovePosition.Text.ToFloat();
-            BmSetupData.Instance.ThetaCurrentLocation = thetaCurrentLocation.Text.ToFloat();
-            InitialPositionModel? initPos = await AutoCutUtils.GetInitialPositionAsync();
-            if (initPos is not null)
+            try
             {
-                initPos.BladeSetupInitZ1 = heightMeasurementMaxZ1Pos.Text;
-                await SqlHelper.UpdateAsync(initPos);
+                await SqlHelper.UpdateAsync(ViewModel.BMParameter);
+                Appsettings.BladeOuterDiameter = ViewModel.BladeOuterDiameter.ToFloat();
+                var initialPosition = await SqlHelper.GetOrCreateEntityAsync(() => new InitialPositionModel());
+                initialPosition.BladeSetupInitZ1 = ViewModel.BladeSetupInitZ1;
+                await SqlHelper.UpdateAsync(initialPosition);
+                MaterialSnack("测高参数已确认!", SnackType.SUCCESS);
             }
-            MaterialSnack("测高参数已确认!", SnackType.SUCCESS);
+            catch (Exception ex)
+            {
+                MaterialSnack("保存测高参数失败:" + ex.Message, SnackType.ERROR);
+                return;
+            }
         }
 
         private void BtnBack_RightClicked(object? sender, bool e)
@@ -207,7 +200,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             if (ViewModel is not null)
             {
                 ViewModel.BladeMeasureList.Clear();
-                for (int i = 1; i <= heightMeasureTimes.Text.ToInt(); i++)
+                for (int i = 1; i <= ViewModel.BMParameter.HeightMeasureTimes.ToInt(); i++)
                 {
                     ViewModel.BladeMeasureList.Add(new BladeMeasureData()
                     {

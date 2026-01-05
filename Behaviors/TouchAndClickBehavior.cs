@@ -75,7 +75,7 @@ namespace 精密切割系统.Behaviors
 
         private void AssociatedObject_PreviewTouchUp(object? sender, TouchEventArgs e)
         {
-            if (sender is not null && sender is RightButton rightButton && rightButton.DataContext is RightButtonParams rightButtonParams)
+            if (sender is not null && sender is RightButton rightButton && rightButton.DataContext is ButtonParams rightButtonParams)
             {
                 rightButton.btnBorder.Background = rightButtonParams.BackgroundDefColor;
             }
@@ -87,7 +87,7 @@ namespace 精密切割系统.Behaviors
 
         private void AssociatedObject_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
-            if (sender is not null && sender is RightButton rightButton && rightButton.DataContext is RightButtonParams rightButtonParams)
+            if (sender is not null && sender is RightButton rightButton && rightButton.DataContext is ButtonParams rightButtonParams)
             {
                 rightButton.btnBorder.Background = rightButtonParams.BackgroundDefColor;
             }
@@ -100,7 +100,7 @@ namespace 精密切割系统.Behaviors
         private void AssociatedObject_TouchUp(object? sender, TouchEventArgs e)
         {
             AssociatedObject.ReleaseTouchCapture(e.TouchDevice);
-            if (sender is not null && sender is RightButton rightButton && rightButton.DataContext is RightButtonParams rightButtonParams)
+            if (sender is not null && sender is RightButton rightButton && rightButton.DataContext is ButtonParams rightButtonParams)
             {
                 rightButton.btnBorder.Background = rightButtonParams.BackgroundDefColor;
             }

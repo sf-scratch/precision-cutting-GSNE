@@ -27,6 +27,7 @@ using 精密切割系统.Data;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
 using 精密切割系统.DTOs;
+using 精密切割系统.Entities;
 using 精密切割系统.Extensions;
 using 精密切割系统.HttpClients;
 using 精密切割系统.Model.common;
@@ -189,7 +190,12 @@ namespace 精密切割系统.Helpers
         public static async Task<CommonResult<float>> ProcessCombineMeasureHeightAsync(IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
             if (!GlobalParams.OnlineFlag) return CommonResult<float>.Success(0);
-            await PlcControl.tagControl.cutting.SetSpindleSpeedAsync(BmSetupData.Instance.SpindleRev);
+            var bmParameter = await SqlHelper.GetEntityAsync<BMParameterMaintenanceEntity>();
+            if (bmParameter == null)
+            {
+                return CommonResult<float>.Failure("获取测高参数失败！");
+            }
+            await PlcControl.tagControl.cutting.SetSpindleSpeedAsync(bmParameter.SpindleRev.ToInt());
             await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
             CommonResult<float> curHeightZ;
             if (Appsettings.MeasureHeightLast == null)
@@ -227,21 +233,33 @@ namespace 精密切割系统.Helpers
         {
             SpeedManager.IsHighSpeed = false;
             InitialPositionModel? initPos = await GetInitialPositionAsync();
-            if (initPos is null) return CommonResult<float>.Failure("获取各模式参数失败，请检查各模式参数配置！");
+            if (initPos is null)
+            {
+                return CommonResult<float>.Failure("获取各模式参数失败，请检查各模式参数配置！");
+            }
+            BMParameterMaintenanceEntity? bmParameter = await SqlHelper.GetEntityAsync<BMParameterMaintenanceEntity>();
+            if (bmParameter == null)
+            {
+                return CommonResult<float>.Failure("获取测高参数失败！");
+            }
             float speedZ1 = initPos.BladeSetupInitSppedZ1.ToFloat();
             await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, speedZ1, token);
             switch (mode)
             {
                 //接触测高
                 case HeightMeasurementMode.Contact:
-                    float nextThetaDeg = BmSetupData.Instance.ThetaCurrentLocation + BmSetupData.Instance.ThetaMovementAngle;
-                    if (BmSetupData.Instance.ThetaMovementAngle > 0 && nextThetaDeg > BmSetupData.Instance.ThetaEndingToMovePosition ||
-                        BmSetupData.Instance.ThetaMovementAngle < 0 && nextThetaDeg < BmSetupData.Instance.ThetaEndingToMovePosition)
+                    float thetaStartingToMovePosition = bmParameter.ThetaStartingToMovePosition.ToFloat();
+                    float thetaCurrentLocation = bmParameter.ThetaCurrentLocation.ToFloat();
+                    float thetaMovementAngle = bmParameter.ThetaMovementAngle.ToFloat();
+                    float thetaEndingToMovePosition = bmParameter.ThetaEndingToMovePosition.ToFloat();
+                    float nextThetaDeg = thetaCurrentLocation + thetaMovementAngle;
+                    if (thetaMovementAngle > 0 && nextThetaDeg > thetaEndingToMovePosition || thetaMovementAngle < 0 && nextThetaDeg < thetaEndingToMovePosition)
                     {
-                        nextThetaDeg = BmSetupData.Instance.ThetaStartingToMovePosition;
+                        nextThetaDeg = thetaStartingToMovePosition;
                     }
-                    BmSetupData.Instance.ThetaCurrentLocation = nextThetaDeg;
-                    await PlcControl.tagControl.bladeMantance.SetBladeSetuInitPositionAsync(initPos.BladeSetupInitX, initPos.BladeSetupInitY, initPos.BladeSetupInitZ1, BmSetupData.Instance.ThetaCurrentLocation);
+                    bmParameter.ThetaCurrentLocation = nextThetaDeg.ToString();
+                    await SqlHelper.UpdateAsync(bmParameter);
+                    await PlcControl.tagControl.bladeMantance.SetBladeSetuInitPositionAsync(initPos.BladeSetupInitX, initPos.BladeSetupInitY, initPos.BladeSetupInitZ1, nextThetaDeg);
                     await PlcControl.tagControl.bladeMantance.StartContactHeightMeasurement();
                     break;
                 //非接触测高
@@ -266,8 +284,9 @@ namespace 精密切割系统.Helpers
                         if (mode is HeightMeasurementMode.Contact)
                         {
                             await PlcControl.tagControl.wholeDevice.StartSpindleAsync();
+                            int blwowTime = bmParameter.BladeBlowingTime.ToInt();
                             // 工作盘吹气
-                            await WorkpieceBlowingAsync(default, eventAggregator, useToken);
+                            await WorkpieceBlowingAsync(default, blwowTime, eventAggregator, useToken);
                         }
                         else if (mode is HeightMeasurementMode.NoContact)
                         {
@@ -305,7 +324,7 @@ namespace 精密切割系统.Helpers
                             return CommonResult<float>.Failure("测高次数获取失败！");
                         }
                         int curMeasureHeightTimes = measureHeightTimes.Value;
-                        int heightMeasureTimes = BmSetupData.Instance.HeightMeasureTimes;
+                        int heightMeasureTimes = bmParameter.HeightMeasureTimes.ToInt();
                         while (curMeasureHeightTimes < heightMeasureTimes)
                         {
                             curMeasureHeightTimes++;
@@ -331,8 +350,9 @@ namespace 精密切割系统.Helpers
                         eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高平均值：{setupValueList.Average()}"));
                         float maxDeviation = setupValueList.Max() - setupValueList.Min();
                         eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高最大偏差：{Math.Round(maxDeviation * 1000, 1)} um"));
+                        float allowableDeviation = bmParameter.MeasureHeightAllowableDeviationValue.ToFloat();
                         // 测高数据异常处理
-                        if (maxDeviation >= 0.01)
+                        if (maxDeviation >= allowableDeviation)
                         {
                             eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高偏差过大，重新测高"));
                             if (times % 3 == 0)
@@ -674,6 +694,22 @@ namespace 精密切割系统.Helpers
             return initialPosition;
         }
 
+        public static async Task<BMParameterMaintenanceEntity> GetBMParameterMaintenanceAsync()
+        {
+            BMParameterMaintenanceEntity initialPosition;
+            var list = await SqlHelper.TableAsync<BMParameterMaintenanceEntity>().Where(t => t.Id == SqlHelper.DefaultId).ToListAsync();
+            if (list.Count == 0)
+            {
+                initialPosition = new BMParameterMaintenanceEntity() { Id = SqlHelper.DefaultId };
+                await SqlHelper.AddAsync(initialPosition);
+            }
+            else
+            {
+                initialPosition = list.First();
+            }
+            return initialPosition;
+        }
+
         /// <summary>
         /// 切割校准
         /// </summary>
@@ -877,7 +913,7 @@ namespace 精密切割系统.Helpers
             Task<float?> yTask = PlcControl.tagControl.Yaxis.GetCurrentLocationAsync();
             await Task.WhenAll(xTask, yTask);
             float curX = xTask.Result ?? 0, curY = yTask.Result ?? 0;
-            await WorkpieceBlowingAsync(default, eventAggregator, token);
+            await WorkpieceBlowingAsync(default, default, eventAggregator, token);
             await PlcControl.tagControl.cutting.RunMotionAsync(curX, curY, token);
         }
 
@@ -886,7 +922,7 @@ namespace 精密切割系统.Helpers
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        public static async Task WorkpieceBlowingAsync(float? atomizingNozzlePositionY, IEventAggregator? eventAggregator = null, CancellationToken token = default)
+        public static async Task WorkpieceBlowingAsync(float? atomizingNozzlePositionY, int? blowTime = null, IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
             UserDefineDataModel userDefineData = CurrentUtils.GetCurrentUserDefineDataModel();
             eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始工件吹气..."));
@@ -894,7 +930,8 @@ namespace 精密切割系统.Helpers
             {
                 await PlcControl.tagControl.wholeDevice.OpenWorkpieceBlowingAsync();
                 await PlcControl.tagControl.cutting.RunMotionAsync(userDefineData.AtomizingNozzlePositionX.ToFloat(), atomizingNozzlePositionY ?? userDefineData.AtomizingNozzlePositionY.ToFloat(), token);
-                await Task.Delay(TimeSpan.FromSeconds(userDefineData.BlowTime.ToFloat()), token);
+                int blowDuration = blowTime ?? userDefineData.BlowTime.ToInt();
+                await Task.Delay(TimeSpan.FromSeconds(blowDuration), token);
             }
             finally
             {

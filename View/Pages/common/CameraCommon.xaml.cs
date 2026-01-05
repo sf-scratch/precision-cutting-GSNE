@@ -29,7 +29,10 @@ namespace 精密切割系统.View.Pages.common
             _cutMarkWidth = cutMarkWidth;
             _edgeChipWidth = edgeWidth;
             var userDefine = CurrentUtils.GetCurrentUserDefineDataModel();
-            _hasEdgeLine = userDefine.HasEdgeLine;
+            if (userDefine is not null)
+            {
+                _hasEdgeLine = userDefine.HasEdgeLine;
+            }
         }
 
         private Point centerLocation;

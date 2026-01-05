@@ -16,13 +16,23 @@ namespace 精密切割系统.Model.cut
 {
     public class AutoFocusService
     {
-        // 对焦参数（可配置）
-        private const float InitialSpeed = 1.0f;    // 初始速度（高速）
+        // 初始速度（高速）
+        private const float InitialSpeed = 1.0f;
 
-        private const float FineTuneSpeed = 0.05f;  // 精细对焦速度
-        private const double BlurThreshold = 0.5;   // 模糊度变化阈值
-        private const float MaxLimitZ = 19.5f;  // Z轴位置限制
-        private const float MinLimitZ = 2f;  // Z轴位置限制
+        // 精细对焦速度
+        private const float FineTuneSpeed = 0.05f;
+
+        // 模糊度变化阈值
+        private const double BlurThreshold = 0.5;
+
+        // Z轴位置限制
+        private const float MaxLimitZ = 19.5f;
+
+        // Z轴位置限制
+        private const float MinLimitZ = 2f;
+
+        // 对焦起始抬起位置
+        private const float FocusStartingLiftPosition = 1f;
 
         public static async Task<CommonResult<float>> GlobalFocusAsync(IEventAggregator? eventAggregator, CancellationToken token)
         {
@@ -37,7 +47,7 @@ namespace 精密切割系统.Model.cut
                 FileTableItemModel fileTableItem = fileTableItemResult.Data;
                 float workThickness = fileTableItem.WorkThickness.ToFloat();
                 float tapeThickness = fileTableItem.TapeThickness.ToFloat();
-                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(Appsettings.FocusWorkpiecesClearZ - workThickness - tapeThickness ?? 0, default, token);
+                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(Appsettings.FocusWorkpiecesClearZ - workThickness - tapeThickness - FocusStartingLiftPosition ?? 0, default, token);
                 int direction = 1;
                 // 阶段1：快速粗调（正向扫描）
                 var coarseResult = await FindOptimalFocus(

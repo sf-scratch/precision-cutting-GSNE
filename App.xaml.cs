@@ -68,6 +68,8 @@ namespace 精密切割系统
             containerRegistry.RegisterForNavigation<MQSemiAutomaticCuttingStop, MQSemiAutomaticCuttingStopViewModel>();
             containerRegistry.RegisterForNavigation<F7_2_Axis_Operation, F7_2_AxisOperationViewModel>();
             containerRegistry.RegisterForNavigation<DebugPage, DebugPageViewModel>();
+            containerRegistry.RegisterForNavigation<BMParameterMaintenance, BMParameterMaintenanceViewModel>();
+            containerRegistry.RegisterForNavigation<BMParameterMaintenance2, BMParameterMaintenance2ViewModel>();
             containerRegistry.RegisterDialog<ConfirmDialog, ConfirmDialogViewModel>();
             containerRegistry.Register<IDialogWindow, ConfirmDialogWindow>(nameof(ConfirmDialogWindow));
         }

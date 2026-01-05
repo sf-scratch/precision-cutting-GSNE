@@ -80,23 +80,6 @@ namespace 精密切割系统.View.Controls
             this.TextChanged += new TextChangedEventHandler(InputTextBox_TextChanged);
         }
 
-        public static bool FormError(DependencyObject parent)
-        {
-            bool result = false;
-            List<InputTextBox> boxes = Tools.GetChildrenOfType<InputTextBox>(parent);
-            for (int i = 0; i < boxes.Count; i++)
-            {
-                InputTextBox inputTextBox = boxes[i];
-                inputTextBox.ValidationCheck();
-                bool isError = inputTextBox.XIsError;
-                if (isError)
-                {
-                    result = true;
-                }
-            }
-            return result;
-        }
-
         private void InputTextBox_Loaded(object sender, RoutedEventArgs e)
         {
             mainWindow = Application.Current.MainWindow as MainWindow;

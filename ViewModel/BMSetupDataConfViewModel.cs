@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using 精密切割系统.Entities;
 
 namespace 精密切割系统.ViewModel
 {
@@ -17,6 +18,30 @@ namespace 精密切割系统.ViewModel
         {
             get { return _currentMeasureValue; }
             set { SetProperty(ref _currentMeasureValue, value); }
+        }
+
+        private BMParameterMaintenanceEntity _bMParameter;
+
+        public BMParameterMaintenanceEntity BMParameter
+        {
+            get { return _bMParameter; }
+            set { SetProperty(ref _bMParameter, value); }
+        }
+
+        private string _bladeOuterDiameter;
+
+        public string BladeOuterDiameter
+        {
+            get { return _bladeOuterDiameter; }
+            set { SetProperty(ref _bladeOuterDiameter, value); }
+        }
+
+        private string _bladeSetupInitZ1;
+
+        public string BladeSetupInitZ1
+        {
+            get { return _bladeSetupInitZ1; }
+            set { SetProperty(ref _bladeSetupInitZ1, value); }
         }
     }
 

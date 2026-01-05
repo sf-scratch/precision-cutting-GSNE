@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using 精密切割系统.Extensions;
 using 精密切割系统.View.Controls;
 
 namespace 精密切割系统.Helpers
@@ -18,7 +19,7 @@ namespace 精密切割系统.Helpers
             var activeView = mainRegion.ActiveViews.FirstOrDefault();
             if (activeView is FrameworkElement view)
             {
-                return InputTextBox.FormError(view);
+                return view.HasFormError();
             }
             return false;
         }

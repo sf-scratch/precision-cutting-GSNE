@@ -12,10 +12,30 @@ namespace 精密切割系统.Helpers
     public class CustomBindableBase : BindableBase, INavigationAware
     {
         // 控制右侧按钮
-        protected ObservableCollection<RightButtonParams> RightButtonCollection { get; } = WindowLayout.RightPageButtons;
+        protected ObservableCollection<ButtonParams> RightButtonCollection { get; } = WindowLayout.RightPageButtons;
 
         // 控制底部侧按钮
-        protected ObservableCollection<RightButtonParams> BottomButtonCollection { get; } = WindowLayout.OperatePageButtons;
+        protected ObservableCollection<ButtonParams> BottomButtonCollection { get; } = WindowLayout.OperatePageButtons;
+
+        protected virtual void InitRightButton()
+        {
+            RightButtonCollection.Clear();
+        }
+
+        protected virtual void InitBottomButton()
+        {
+            BottomButtonCollection.Clear();
+        }
+
+        protected void AddRightButton(ButtonParams button)
+        {
+            RightButtonCollection.Add(button);
+        }
+
+        protected void AddBottomButton(ButtonParams button)
+        {
+            BottomButtonCollection.Add(button);
+        }
 
         public virtual bool IsNavigationTarget(NavigationContext navigationContext)
         {
@@ -32,6 +52,8 @@ namespace 精密切割系统.Helpers
         {
             NavigateUtils.ClearOperatePage();
             NavigateUtils.ClearMainFrame();
+            InitRightButton();
+            InitBottomButton();
         }
     }
 }

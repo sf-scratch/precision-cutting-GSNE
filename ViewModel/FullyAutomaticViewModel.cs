@@ -206,25 +206,25 @@ namespace 精密切割系统.ViewModel
         private void InitRightButtonOnlyBack()
         {
             RightButtonCollection.Clear();
-            RightButtonCollection.Add(RightButtonParams.YelloRightButton("检查轮毂", "FormatListChecks", () => _semaphore.ExecuteAsync(() => CheckLunguAsync(LunguId), "检查轮毂")));
-            RightButtonCollection.Add(RightButtonParams.YelloRightButton("操作记录", "ClipboardTextClockOutline", GoToHistory));
-            RightButtonCollection.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
+            RightButtonCollection.Add(ButtonParams.YelloRightButton("检查轮毂", "FormatListChecks", () => _semaphore.ExecuteAsync(() => CheckLunguAsync(LunguId), "检查轮毂")));
+            RightButtonCollection.Add(ButtonParams.YelloRightButton("操作记录", "ClipboardTextClockOutline", GoToHistory));
+            RightButtonCollection.Add(ButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }
 
         private void InitRightButton()
         {
             RightButtonCollection.Clear();
-            RightButtonCollection.Add(RightButtonParams.GreenRightButton("自动执行", "LocationEnter", () => _semaphore.ExecuteAsync(AutoRunAsync, "自动执行")));
-            RightButtonCollection.Add(RightButtonParams.YelloRightButton("检查轮毂", "FormatListChecks", () => _semaphore.ExecuteAsync(() => CheckLunguAsync(LunguId), "检查轮毂")));
-            RightButtonCollection.Add(RightButtonParams.YelloRightButton("操作记录", "ClipboardTextClockOutline", GoToHistory));
-            RightButtonCollection.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
+            RightButtonCollection.Add(ButtonParams.GreenRightButton("自动执行", "LocationEnter", () => _semaphore.ExecuteAsync(AutoRunAsync, "自动执行")));
+            RightButtonCollection.Add(ButtonParams.YelloRightButton("检查轮毂", "FormatListChecks", () => _semaphore.ExecuteAsync(() => CheckLunguAsync(LunguId), "检查轮毂")));
+            RightButtonCollection.Add(ButtonParams.YelloRightButton("操作记录", "ClipboardTextClockOutline", GoToHistory));
+            RightButtonCollection.Add(ButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }
 
         private void InitBottomButton()
         {
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("换刀片", "SawBlade", () => _semaphore.ExecuteAsync(ReplaceBlade, "换刀片")));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("换磨刀板", "Square", () => _semaphore.ExecuteAsync(ReplaceSharpeningBoard, "换磨刀板")));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("换硅片", "CircleOpacity", () => _semaphore.ExecuteAsync(ReplaceWafer, "换硅片")));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("换刀片", "SawBlade", () => _semaphore.ExecuteAsync(ReplaceBlade, "换刀片")));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("换磨刀板", "Square", () => _semaphore.ExecuteAsync(ReplaceSharpeningBoard, "换磨刀板")));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("换硅片", "CircleOpacity", () => _semaphore.ExecuteAsync(ReplaceWafer, "换硅片")));
         }
 
         private void GoToHistory()

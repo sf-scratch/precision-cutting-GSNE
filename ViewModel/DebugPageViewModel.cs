@@ -34,16 +34,16 @@ namespace 精密切割系统.ViewModel
         private void InitRightButton()
         {
             RightButtonCollection.Clear();
-            RightButtonCollection.Add(RightButtonParams.GreenRightButton("确定", "CogBox", Sure));
-            RightButtonCollection.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
+            RightButtonCollection.Add(ButtonParams.GreenRightButton("确定", "CogBox", Sure));
+            RightButtonCollection.Add(ButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }
 
         private void InitBottomButton()
         {
             BottomButtonCollection.Clear();
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("运行", "PlayOutline", Start));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("新增", "TableColumnPlusAfter", Add));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("删除", "BeakerRemoveOutline", Remove));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("运行", "PlayOutline", Start));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("新增", "TableColumnPlusAfter", Add));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("删除", "BeakerRemoveOutline", Remove));
         }
 
         private void Sure()

@@ -61,8 +61,8 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             _rightPage.btnSure.SetRightClickedHandler(BladeReplaceSure);
             _cts = new CancellationTokenSource();
             NavigateUtils.ClearOperatePage();
-            WindowLayout.OperatePageButtons.Add(RightButtonParams.BlueButton("换刀片", "SawBlade", ReplaceBladeAsync));
-            WindowLayout.OperatePageButtons.Add(RightButtonParams.BlueButton("换工件", "Square", ReplaceWaferAsync));
+            WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("换刀片", "SawBlade", ReplaceBladeAsync));
+            WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("换工件", "Square", ReplaceWaferAsync));
             InitData();
         }
 

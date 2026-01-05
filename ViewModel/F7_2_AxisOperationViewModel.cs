@@ -49,23 +49,23 @@ namespace 精密切割系统.ViewModel
         private void InitRightButton()
         {
             RightButtonCollection.Clear();
-            RightButtonCollection.Add(RightButtonParams.GreenRightButton("确定", "CogBox", Sure));
-            RightButtonCollection.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
+            RightButtonCollection.Add(ButtonParams.GreenRightButton("确定", "CogBox", Sure));
+            RightButtonCollection.Add(ButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }
 
         private void InitBottomButton()
         {
             BottomButtonCollection.Clear();
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("原点", "RotateRight", StartHomingAsync));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("低速尺寸", "Minus", () => SlowRelativeMotionAsync(false)));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("尺寸", "Minus", () => RelativeMotionAsync(false)));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("低速点动", "Minus", null, () => SlowJogAsync(false), StopJogAsync));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("点动", "Minus", null, () => JogAsync(false), StopJogAsync));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("放松", "HandFrontLeft", RelaxAxisAsync));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("低速尺寸", "Plus", () => SlowRelativeMotionAsync(true)));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("尺寸", "Plus", () => RelativeMotionAsync(true)));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("低速点动", "Plus", null, () => SlowJogAsync(true), StopJogAsync));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("点动", "Plus", null, () => JogAsync(true), StopJogAsync));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("原点", "RotateRight", StartHomingAsync));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("低速尺寸", "Minus", () => SlowRelativeMotionAsync(false)));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("尺寸", "Minus", () => RelativeMotionAsync(false)));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("低速点动", "Minus", null, () => SlowJogAsync(false), StopJogAsync));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("点动", "Minus", null, () => JogAsync(false), StopJogAsync));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("放松", "HandFrontLeft", RelaxAxisAsync));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("低速尺寸", "Plus", () => SlowRelativeMotionAsync(true)));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("尺寸", "Plus", () => RelativeMotionAsync(true)));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("低速点动", "Plus", null, () => SlowJogAsync(true), StopJogAsync));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("点动", "Plus", null, () => JogAsync(true), StopJogAsync));
         }
 
         private void Sure()

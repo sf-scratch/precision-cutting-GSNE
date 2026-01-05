@@ -346,7 +346,7 @@ namespace 精密切割系统.View.Pages.operate
                         return;
                     }
                     var operationParameter = CurrentUtils.GetOperationParametersModel();
-                    if (operationParameter is not null && operationParameter.IsAutoShutOffWaterWhenCloseVacuum)
+                    if (operationParameter is not null && !operationParameter.IsAutoShutOffWaterWhenCuttingCompleted && operationParameter.IsAutoShutOffWaterWhenCloseVacuum)
                     {
                         await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
                     }

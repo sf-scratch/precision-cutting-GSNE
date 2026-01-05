@@ -60,17 +60,17 @@
                 ChildMargin="5"
                 Columns="auto,*"
                 RowCount="10">
-                <Label Content="x轴初始位置" />
+                <Label Content="X轴初始位置" />
                 <Controls:InputTextBox x:Name="inputBladeSetupInitX" />
-                <Label Content="y轴初始位置" />
+                <Label Content="Y轴初始位置" />
                 <Controls:InputTextBox x:Name="inputBladeSetupInitY" />
-                <Label Content="z1轴极限位置" />
+                <Label Content="Z1轴极限位置" />
                 <Controls:InputTextBox x:Name="inputBladeSetupInitZ1" />
-                <Label Content="x轴速度" />
+                <Label Content="X轴速度" />
                 <Controls:InputTextBox x:Name="inputBladeSetupInitSpeedX" />
-                <Label Content="y轴速度" />
+                <Label Content="Y轴速度" />
                 <Controls:InputTextBox x:Name="inputBladeSetupInitSpeedY" />
-                <Label Content="z1轴速度" />
+                <Label Content="Z1轴速度" />
                 <Controls:InputTextBox x:Name="inputBladeSetupInitSpeedZ1" />
             </auto:AutoGrid>
 
@@ -185,19 +185,19 @@
                 ChildMargin="5"
                 Columns="auto,*"
                 RowCount="10">
-                <Label Content="x轴初始位置" />
+                <Label Content="X轴初始位置" />
                 <Controls:InputTextBox x:Name="inputAlignInitX" />
-                <Label Content="y轴初始位置" />
+                <Label Content="Y轴初始位置" />
                 <Controls:InputTextBox x:Name="inputAlignInitY" />
                 <!--<Label Content="z1轴初始位置" />
                 <Controls:InputTextBox x:Name="inputAlignInitZ1" />-->
                 <Label Content="θ轴初始位置" />
                 <Controls:InputTextBox x:Name="inputAlignInitTheta" />
-                <Label Content="x轴速度" />
+                <Label Content="X轴速度" />
                 <Controls:InputTextBox x:Name="inputAlignInitSpeedX" />
-                <Label Content="y轴速度" />
+                <Label Content="Y轴速度" />
                 <Controls:InputTextBox x:Name="inputAlignInitSpeedY" />
-                <Label Content="z1轴速度" />
+                <Label Content="Z1轴速度" />
                 <Controls:InputTextBox x:Name="inputAlignInitSpeedZ1" />
                 <Label Content="θ轴速度" />
                 <Controls:InputTextBox x:Name="inputAlignInitSpeedTheta" />
@@ -320,17 +320,17 @@
                 ChildMargin="5"
                 Columns="auto,*"
                 RowCount="10">
-                <Label Content="x轴初始位置" />
+                <Label Content="X轴初始位置" />
                 <Controls:InputTextBox x:Name="inputCutReplaceInitX" />
-                <Label Content="y轴初始位置" />
+                <Label Content="Y轴初始位置" />
                 <Controls:InputTextBox x:Name="inputCutReplaceInitY" />
-                <Label Content="x轴速度" />
+                <Label Content="X轴速度" />
                 <Controls:InputTextBox x:Name="inputCutReplaceInitSpeedX" />
-                <Label Content="y轴速度" />
+                <Label Content="Y轴速度" />
                 <Controls:InputTextBox x:Name="inputCutReplaceInitSpeedY" />
                 <!--<Label Content="z1轴初始位置" />
                 <Controls:InputTextBox x:Name="inputCutReplaceInitZ1" />-->
-                <Label Content="z1轴速度" />
+                <Label Content="Z1轴速度" />
                 <Controls:InputTextBox x:Name="inputCutReplaceInitSpeedZ1" />
             </auto:AutoGrid>
 

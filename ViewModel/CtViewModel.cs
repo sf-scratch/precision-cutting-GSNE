@@ -15,7 +15,7 @@ namespace 精密切割系统.ViewModel
 {
     internal class CtViewModel : INotifyPropertyChanged
     {
-        public ObservableCollection<RightButtonParams> RightButtonParams { get; set; } = WindowLayout.OperatePageButtons;
+        public ObservableCollection<ButtonParams> RightButtonParams { get; set; } = WindowLayout.OperatePageButtons;
 
         private BitmapImage _imageSource01;
         public BitmapImage ImageSource01

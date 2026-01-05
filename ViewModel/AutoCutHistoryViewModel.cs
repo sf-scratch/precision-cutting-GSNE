@@ -87,7 +87,7 @@ namespace 精密切割系统.ViewModel
         private void InitRightButton()
         {
             RightButtonCollection.Clear();
-            RightButtonCollection.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
+            RightButtonCollection.Add(ButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }
 
         private void Back()

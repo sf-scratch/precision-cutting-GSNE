@@ -207,7 +207,7 @@ namespace 精密切割系统.ViewModel
 
         private void InitRightButton()
         {
-            RightButtonCollection.Add(RightButtonParams.YelloRightButton("暂停", "/Assets/icon/right/stop.png", () => Pause()));
+            RightButtonCollection.Add(ButtonParams.YelloRightButton("暂停", "/Assets/icon/right/stop.png", () => Pause()));
         }
 
         private async void RunAutoCut()
@@ -737,7 +737,7 @@ namespace 精密切割系统.ViewModel
                         {
                             // 执行默认动作
                             await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, cts.Token);
-                            await AutoCutUtils.WorkpieceBlowingAsync(default, _eventAggregator, cts.Token);
+                            await AutoCutUtils.WorkpieceBlowingAsync(default, default, _eventAggregator, cts.Token);
                             await PlcControl.tagControl.cutting.RunMotionAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), line.StartPoint.Y.ToCameraY(), cts.Token);
                             await AutoFocusService.GlobalFocusAsync(_eventAggregator, cts.Token);
                             await AutoCutUtils.FineTuneAxisYAsync();

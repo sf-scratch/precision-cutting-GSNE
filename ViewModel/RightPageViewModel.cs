@@ -20,7 +20,7 @@ namespace 精密切割系统.ViewModel
 {
     public class RightPageViewModel : BindableBase
     {
-        public ObservableCollection<RightButtonParams> RightButtonParams { get; set; }
+        public ObservableCollection<ButtonParams> RightButtonParams { get; set; }
         public ObservableCollection<ActiveAlarmModel> ActiveAlarms { get; set; }
 
         public ObservableCollection<string> WaitingFuncNames { get; set; }

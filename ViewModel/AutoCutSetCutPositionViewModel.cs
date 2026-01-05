@@ -59,19 +59,19 @@ namespace 精密切割系统.ViewModel
         private void InitRightButton()
         {
             RightButtonCollection.Clear();
-            RightButtonCollection.Add(RightButtonParams.YelloRightButton("确认位置", "CogBox", Sure));
-            RightButtonCollection.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
+            RightButtonCollection.Add(ButtonParams.YelloRightButton("确认位置", "CogBox", Sure));
+            RightButtonCollection.Add(ButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }
 
         private void InitBottomButton()
         {
             BottomButtonCollection.Clear();
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("磨刀板相机参数", "CameraFlipOutline", CameraUtils.SetCameraDeviceSharpenParams));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("硅片相机参数", "CameraFlipOutline", CameraUtils.SetCameraDeviceWaferParams));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("V槽相机参数", "CameraFlipOutline", CameraUtils.SetCameraDeviceVCaoParams));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("自动曝光参数", "CameraFlipOutline", CameraUtils.SetCameraExposureAutoContinus));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("工件吹气", "WeatherWindy", () => _semaph.ExecuteAsync(WorkpieceBlowing, "工件吹气")));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("对焦", "FocusAuto", () => _semaph.ExecuteAsync(GlobalFocus, "对焦")));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("磨刀板相机参数", "CameraFlipOutline", CameraUtils.SetCameraDeviceSharpenParams));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("硅片相机参数", "CameraFlipOutline", CameraUtils.SetCameraDeviceWaferParams));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("V槽相机参数", "CameraFlipOutline", CameraUtils.SetCameraDeviceVCaoParams));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("自动曝光参数", "CameraFlipOutline", CameraUtils.SetCameraExposureAutoContinus));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("工件吹气", "WeatherWindy", () => _semaph.ExecuteAsync(WorkpieceBlowing, "工件吹气")));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("对焦", "FocusAuto", () => _semaph.ExecuteAsync(GlobalFocus, "对焦")));
         }
 
         private async Task GlobalFocus()

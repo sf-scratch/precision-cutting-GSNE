@@ -171,28 +171,28 @@ namespace 精密切割系统.ViewModel
         private void InitRightButton()
         {
             RightButtonCollection.Clear();
-            RightButtonCollection.Add(RightButtonParams.GreenRightButton("继续", "/Assets/icon/right/enter.png", ContinueCommandExecute));
-            RightButtonCollection.Add(RightButtonParams.RedRightButton("停止", "/Assets/icon/right/stop.png", StopCommandExecute));
+            RightButtonCollection.Add(ButtonParams.GreenRightButton("继续", "/Assets/icon/right/enter.png", ContinueCommandExecute));
+            RightButtonCollection.Add(ButtonParams.RedRightButton("停止", "/Assets/icon/right/stop.png", StopCommandExecute));
         }
 
         private void InitRightButtonOnlyStop()
         {
             RightButtonCollection.Clear();
-            RightButtonCollection.Add(RightButtonParams.RedRightButton("停止", "/Assets/icon/right/stop.png", StopCommandExecute));
+            RightButtonCollection.Add(ButtonParams.RedRightButton("停止", "/Assets/icon/right/stop.png", StopCommandExecute));
         }
 
         private void InitBottomButton()
         {
             BottomButtonCollection.Clear();
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("刀痕识别", "TextRecognition", AutomaticRecognition));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("工件吹气", "WeatherWindy", () => _semaph.ExecuteAsync(WorkpieceBlowing, "工件吹气")));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("对焦", "FocusAuto", () => _semaph.ExecuteAsync(GlobalFocus, "对焦")));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("报废", "DeleteEmpty", () => _semaph.ExecuteAsync(BladeScrap, "报废")));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("基准线校准", "CrosshairsGps", () => _semaph.ExecuteAsync(BaselineCalibration, "基准线校准")));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("基准线调窄", "UnfoldLessHorizontal", BaselineNarrowing));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("基准线调宽", "UnfoldMoreHorizontal", BaselineWidening));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("崩边调窄", "UnfoldLessHorizontal", BrokenEdgeNarrowing));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("崩边调宽", "UnfoldMoreHorizontal", BrokenEdgeWidening));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("刀痕识别", "TextRecognition", AutomaticRecognition));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("工件吹气", "WeatherWindy", () => _semaph.ExecuteAsync(WorkpieceBlowing, "工件吹气")));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("对焦", "FocusAuto", () => _semaph.ExecuteAsync(GlobalFocus, "对焦")));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("报废", "DeleteEmpty", () => _semaph.ExecuteAsync(BladeScrap, "报废")));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("基准线校准", "CrosshairsGps", () => _semaph.ExecuteAsync(BaselineCalibration, "基准线校准")));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("基准线调窄", "UnfoldLessHorizontal", BaselineNarrowing));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("基准线调宽", "UnfoldMoreHorizontal", BaselineWidening));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("崩边调窄", "UnfoldLessHorizontal", BrokenEdgeNarrowing));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("崩边调宽", "UnfoldMoreHorizontal", BrokenEdgeWidening));
         }
 
         private async Task GlobalFocus()

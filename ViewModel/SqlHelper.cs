@@ -17,6 +17,7 @@ namespace 精密切割系统.ViewModel
         private static string connstr = Environment.CurrentDirectory + "\\qg_data.db"; //没有数据库会创建数据库
         public static SQLiteConnection db;
         public static SQLiteAsyncConnection dbAsync;
+        public const long DefaultId = 1;
 
         static SqlHelper()
         {
@@ -61,6 +62,7 @@ namespace 精密切割系统.ViewModel
                 db.CreateTable<SelectedConfigEntity>();
                 db.CreateTable<KnifeWearEntity>();
                 db.CreateTable<ParamsConfigEntity>();
+                db.CreateTable<BMParameterMaintenanceEntity>();
             }
             catch (Exception ex)
             {
@@ -139,6 +141,37 @@ namespace 精密切割系统.ViewModel
         public static AsyncTableQuery<T> TableAsync<T>() where T : new()
         {
             return dbAsync.Table<T>();
+        }
+
+        /// <summary>
+        /// 通用实体获取方法
+        /// </summary>
+        public static async Task<TEntity> GetOrCreateEntityAsync<TEntity>(Func<TEntity> createDefault) where TEntity : class, IEntityWithId, new()
+        {
+            long defaultId = DefaultId;
+            var list = await TableAsync<TEntity>().Where(t => t.Id == defaultId).ToListAsync();
+            if (list.Count == 0)
+            {
+                TEntity entity = createDefault.Invoke();
+                entity.Id = defaultId;
+                await AddAsync(entity);
+                return entity;
+            }
+            return list.First();
+        }
+
+        /// <summary>
+        /// 通用实体获取方法
+        /// </summary>
+        public static async Task<TEntity?> GetEntityAsync<TEntity>() where TEntity : class, IEntityWithId, new()
+        {
+            long defaultId = DefaultId;
+            var list = await TableAsync<TEntity>().Where(t => t.Id == defaultId).ToListAsync();
+            if (list.Count == 0)
+            {
+                return null;
+            }
+            return list.First();
         }
     }
 }

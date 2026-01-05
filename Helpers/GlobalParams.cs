@@ -6,6 +6,7 @@ using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using 精密切割系统.Assets.config.buttom;
 using 精密切割系统.Driver;
 using 精密切割系统.Model.cut;
@@ -15,7 +16,10 @@ namespace 精密切割系统.Helpers
     public static class GlobalParams
     {
         // true 在线版本 false 离线版本
-        public static bool OnlineFlag { get; set; } = true;
+        public static bool OnlineFlag { get; set; } = false;
+
+        // 是否全屏显示
+        public static bool IsFullDcreen { get; set; } = false;
 
         // 是否上传MES
         public static bool OnlineMES { get; set; } = false;
@@ -31,6 +35,8 @@ namespace 精密切割系统.Helpers
 
         // 小数点格式化字符串
         public static string RoughDecimalStringFormat { get; set; } = "F3";
+
+        public static WindowState WindowState { get; set; } = IsFullDcreen ? WindowState.Maximized : WindowState.Normal;
 
         // 当前页面是否是首页
         public static bool currentPageIsHome = false;

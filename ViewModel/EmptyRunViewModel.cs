@@ -194,14 +194,14 @@ namespace 精密切割系统.ViewModel
         private void InitRightButton()
         {
             RightButtonCollection.Clear();
-            RightButtonCollection.Add(RightButtonParams.GreenRightButton("空运行", "LocationEnter", ExecuteEmptyRun));
-            RightButtonCollection.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
+            RightButtonCollection.Add(ButtonParams.GreenRightButton("空运行", "LocationEnter", ExecuteEmptyRun));
+            RightButtonCollection.Add(ButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }
 
         private void InitRuningRightButton()
         {
             RightButtonCollection.Clear();
-            RightButtonCollection.Add(RightButtonParams.RedRightButton("停止", "/Assets/icon/right/stop.png", Stop));
+            RightButtonCollection.Add(ButtonParams.RedRightButton("停止", "/Assets/icon/right/stop.png", Stop));
         }
 
         private async void ExecuteEmptyRun()

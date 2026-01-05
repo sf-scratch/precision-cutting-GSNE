@@ -1,0 +1,141 @@
+﻿<UserControl
+    x:Class="精密切割系统.View.Pages.F4_BladeMaintenance.BMParameterMaintenance"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
+    xmlns:Converters="clr-namespace:精密切割系统.Converters"
+    xmlns:auto="clr-namespace:WpfAutoGrid;assembly=WpfAutoGrid.Core"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:精密切割系统.View.Pages.F4_BladeMaintenance"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
+    d:DataContext="{d:DesignInstance viewModel:BMParameterMaintenanceViewModel,
+                                     IsDesignTimeCreatable=True}"
+    d:DesignHeight="645"
+    d:DesignWidth="1560"
+    mc:Ignorable="d">
+    <Grid Margin="30,30,0,0">
+        <Grid.Resources>
+            <Style BasedOn="{StaticResource MaterialDesignFilterChipSecondaryCheckBox}" TargetType="CheckBox">
+                <Setter Property="FontSize" Value="18" />
+                <Setter Property="FontWeight" Value="Bold" />
+            </Style>
+            <Style BasedOn="{StaticResource InputTextStyle}" TargetType="Controls:InputTextBox">
+                <Setter Property="Width" Value="150" />
+                <Setter Property="Height" Value="35" />
+                <Setter Property="InputType" Value="Decimal" />
+                <Setter Property="XPrecision" Value="3" />
+            </Style>
+            <Style TargetType="Label">
+                <Setter Property="FontSize" Value="18" />
+                <Setter Property="Height" Value="35" />
+                <Setter Property="FontWeight" Value="Bold" />
+            </Style>
+            <Converters:BoolToValueConverter
+                x:Key="BoolToStringConverter"
+                FalseValue="关闭"
+                TrueValue="开启" />
+        </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Label
+            Grid.ColumnSpan="3"
+            Height="auto"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            Content="测高参数维护(3.5)"
+            FontSize="30"
+            FontWeight="Bold" />
+        <auto:AutoGrid
+            Grid.Row="1"
+            Margin="20"
+            ChildMargin="5"
+            Columns="auto,auto,auto"
+            RowCount="10">
+            <Label Content="旋转轴转速" />
+            <Controls:InputTextBox
+                Text="{Binding Entity.SpindleRev}"
+                XMax="30000"
+                XPrecision="0" />
+            <Label Content="/min" />
+            <Label Content="刀片外径" />
+            <Controls:InputTextBox Text="{Binding BladeOuterDiameter}" />
+            <Label Content="mm" />
+            <Label Content="测高次数" />
+            <Controls:InputTextBox
+                Text="{Binding Entity.HeightMeasureTimes}"
+                XMax="3"
+                XPrecision="0" />
+            <Label Content="次" />
+            <Label Content="θ轴移动角度" />
+            <Controls:InputTextBox Text="{Binding Entity.ThetaMovementAngle}" XMax="90" />
+            <Label Content="deg" />
+            <Label Content="θ轴移动开始位置" />
+            <Controls:InputTextBox Text="{Binding Entity.ThetaStartingToMovePosition}" />
+            <Label Content="deg" />
+            <Label Content="θ轴移动结束位置" />
+            <Controls:InputTextBox Text="{Binding Entity.ThetaEndingToMovePosition}" />
+            <Label Content="deg" />
+            <Label Content="θ轴移动当前位置" />
+            <Controls:InputTextBox Text="{Binding Entity.ThetaCurrentLocation}" />
+            <Label Content="deg" />
+            <Label Content="Z1测高极限位置" />
+            <Controls:InputTextBox Text="{Binding BladeSetupInitZ1}" />
+            <Label Content="mm" />
+            <Label Content="每次切割前测高" />
+            <CheckBox
+                x:Name="isAutomHeightMeasureBeforeCutting"
+                Grid.ColumnSpan="2"
+                FontSize="18"
+                IsChecked="{Binding Entity.IsAutomHeightMeasureBeforeCutting}">
+                <TextBlock Text="{Binding ElementName=isAutomHeightMeasureBeforeCutting, Path=IsChecked, Converter={StaticResource BoolToStringConverter}}" />
+            </CheckBox>
+        </auto:AutoGrid>
+        <StackPanel
+            Grid.Row="1"
+            Grid.Column="1"
+            Orientation="Vertical">
+            <Label
+                Margin="10"
+                Content="刀片磨损量检查"
+                FontSize="22" />
+            <auto:AutoGrid
+                Margin="20,0"
+                ChildMargin="5"
+                Columns="auto,auto,auto"
+                RowCount="10">
+                <Label Content="不足磨损量" />
+                <Controls:InputTextBox Text="{Binding Entity.DeficiencyWearAmount}" />
+                <Label Content="mm" />
+                <Label Content="最大磨损量" />
+                <Controls:InputTextBox Text="{Binding Entity.MaximumWearAmount}" />
+                <Label Content="mm" />
+                <Label Content="磨损预留量" />
+                <Controls:InputTextBox Text="{Binding Entity.ReserveWearAmount}" />
+                <Label Content="mm" />
+                <Label Content="切割寿命设定" />
+                <StackPanel Grid.ColumnSpan="2" Orientation="Horizontal">
+                    <Controls:InputTextBox
+                        Width="90"
+                        Text="{Binding Entity.CuttingLifeLength}"
+                        XPrecision="2" />
+                    <Label Content="米" />
+                    <Controls:InputTextBox
+                        Width="70"
+                        Text="{Binding Entity.CuttingLifeCutNumber}"
+                        XPrecision="0" />
+                    <Label Content="刀" />
+                </StackPanel>
+            </auto:AutoGrid>
+        </StackPanel>
+    </Grid>
+</UserControl>

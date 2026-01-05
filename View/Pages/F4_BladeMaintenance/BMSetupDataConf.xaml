@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
+    xmlns:Converters="clr-namespace:精密切割系统.Converters"
     xmlns:auto="clr-namespace:WpfAutoGrid;assembly=WpfAutoGrid.Core"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:精密切割系统.ViewModel"
@@ -22,6 +23,14 @@
     </Page.DataContext>
     <Grid Margin="30,30,0,0">
         <Grid.Resources>
+            <Style BasedOn="{StaticResource MaterialDesignFilterChipSecondaryCheckBox}" TargetType="CheckBox">
+                <Setter Property="FontSize" Value="18" />
+                <Setter Property="FontWeight" Value="Bold" />
+            </Style>
+            <Converters:BoolToValueConverter
+                x:Key="BoolToStringConverter"
+                FalseValue="关闭"
+                TrueValue="开启" />
             <Style BasedOn="{StaticResource InputTextStyle}" TargetType="Controls:InputTextBox">
                 <Setter Property="Width" Value="150" />
                 <Setter Property="Height" Value="35" />
@@ -52,7 +61,7 @@
             Height="auto"
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
-            Content="测高参数(3.3)"
+            Content="测高(3.3)"
             FontSize="30"
             FontWeight="Bold" />
         <auto:AutoGrid
@@ -62,37 +71,44 @@
             Columns="3*,2*,*"
             RowCount="10">
             <Label Content="旋转轴转速" />
-            <Controls:InputTextBox x:Name="spindleRev" XMax="30000" />
+            <Controls:InputTextBox
+                Text="{Binding BMParameter.SpindleRev}"
+                XMax="30000"
+                XPrecision="0" />
             <Label Content="/min" />
+            <Label Content="刀片外径" />
+            <Controls:InputTextBox Text="{Binding BladeOuterDiameter}" />
+            <Label Content="mm" />
             <Label Content="测高次数" />
             <Controls:InputTextBox
-                x:Name="heightMeasureTimes"
+                Text="{Binding BMParameter.HeightMeasureTimes}"
                 TextChanged="heightMeasureTimes_TextChanged"
-                XMax="3" />
+                XMax="3"
+                XPrecision="0" />
             <Label Content="次" />
-            <Label Content="Z1测高极限位置" />
-            <Controls:InputTextBox x:Name="heightMeasurementMaxZ1Pos" />
-            <Label Content="mm" />
             <Label Content="θ轴移动角度" />
-            <Controls:InputTextBox x:Name="thetaMovementAngle" XMax="90" />
+            <Controls:InputTextBox Text="{Binding BMParameter.ThetaMovementAngle}" XMax="90" />
             <Label Content="deg" />
             <Label Content="θ轴移动开始位置" />
-            <Controls:InputTextBox x:Name="thetaStartingToMovePosition" />
+            <Controls:InputTextBox Text="{Binding BMParameter.ThetaStartingToMovePosition}" />
             <Label Content="deg" />
             <Label Content="θ轴移动结束位置" />
-            <Controls:InputTextBox x:Name="thetaEndingToMovePosition" />
+            <Controls:InputTextBox Text="{Binding BMParameter.ThetaEndingToMovePosition}" />
             <Label Content="deg" />
             <Label Content="θ轴移动当前位置" />
-            <Controls:InputTextBox x:Name="thetaCurrentLocation" />
+            <Controls:InputTextBox Text="{Binding BMParameter.ThetaCurrentLocation}" />
             <Label Content="deg" />
+            <Label Content="Z1测高极限位置" />
+            <Controls:InputTextBox Text="{Binding BladeSetupInitZ1}" />
+            <Label Content="mm" />
             <Label Content="每次切割前测高" />
             <CheckBox
                 x:Name="isAutomHeightMeasureBeforeCutting"
                 Grid.ColumnSpan="2"
-                Content="自动测高"
                 FontSize="18"
-                IsChecked="True"
-                Style="{StaticResource MaterialDesignFilterChipCheckBox}" />
+                IsChecked="{Binding BMParameter.IsAutomHeightMeasureBeforeCutting}">
+                <TextBlock Text="{Binding ElementName=isAutomHeightMeasureBeforeCutting, Path=IsChecked, Converter={StaticResource BoolToStringConverter}}" />
+            </CheckBox>
         </auto:AutoGrid>
         <!--<StackPanel
             x:Name="sp1"

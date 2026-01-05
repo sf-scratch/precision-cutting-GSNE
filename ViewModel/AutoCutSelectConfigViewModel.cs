@@ -55,15 +55,15 @@ namespace 精密切割系统.ViewModel
         private void InitRightButton()
         {
             RightButtonCollection.Clear();
-            RightButtonCollection.Add(RightButtonParams.GreenRightButton("进入", "/Assets/icon/right/enter.png", Sure));
-            RightButtonCollection.Add(RightButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
+            RightButtonCollection.Add(ButtonParams.GreenRightButton("进入", "/Assets/icon/right/enter.png", Sure));
+            RightButtonCollection.Add(ButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }
 
         private void InitBottomButton()
         {
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("新增", "FormatListGroupPlus", AddConfig));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("删除", "DeleteOutline", DeleteSelectConfig));
-            BottomButtonCollection.Add(RightButtonParams.BlueButton("拷贝", "ContentCopy", CopyConfig));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("新增", "FormatListGroupPlus", AddConfig));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("删除", "DeleteOutline", DeleteSelectConfig));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("拷贝", "ContentCopy", CopyConfig));
         }
 
         private async void CopyConfig()

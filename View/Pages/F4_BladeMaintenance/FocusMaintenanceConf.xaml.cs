@@ -59,7 +59,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             _rightPage.btnSure.SetRightClickedHandler(BtnSure_RightClicked);
 
             NavigateUtils.ClearOperatePage();
-            WindowLayout.OperatePageButtons.Add(RightButtonParams.BlueButton("实行测量", "FocusAuto", GlobalFocusAsync));
+            WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("实行测量", "FocusAuto", GlobalFocusAsync));
             InitData();
             LoadPosition(_cts.Token);
         }

@@ -354,7 +354,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 await PlcControl.tagControl.cutting.ExitCuttingModeAsync(token);
                 await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
                 // 工作盘吹气
-                await AutoCutUtils.WorkpieceBlowingAsync(default, default, token);
+                await AutoCutUtils.WorkpieceBlowingAsync(default, default, default, token);
                 await PlcControl.tagControl.cutting.RunMotionAsync(((_startX + _endX) / 2).ToCameraX(), startY.ToCameraY(), token);
             }
         }
