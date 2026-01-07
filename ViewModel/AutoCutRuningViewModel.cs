@@ -275,7 +275,7 @@ namespace 精密切割系统.ViewModel
                     return;
                 }
                 // 设置测高参数
-                await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
+                //await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
                 await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(caculateResult.Data - 0.15f);
                 // 开始测高
                 CommonResult<float> firstHeightMeasurementZ = await AutoCutUtils.ProcessMeasureHeightAsync(heightMeasurementMode, _dialogService, _eventAggregator, _pauseCts.Token);

@@ -29,7 +29,7 @@ namespace 精密切割系统.Model.cut
         private const float MaxLimitZ = 19.5f;
 
         // Z轴位置限制
-        private const float MinLimitZ = 2f;
+        private const float MinLimitZ = 0f;
 
         // 对焦起始抬起位置
         private const float FocusStartingLiftPosition = 1f;

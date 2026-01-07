@@ -1,4 +1,5 @@
-﻿using MaterialDesignThemes.Wpf;
+﻿using DryIoc.FastExpressionCompiler.LightExpression;
+using MaterialDesignThemes.Wpf;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NPOI.OpenXml4Net.OPC.Internal.Unmarshallers;
@@ -196,7 +197,7 @@ namespace 精密切割系统.Helpers
                 return CommonResult<float>.Failure("获取测高参数失败！");
             }
             await PlcControl.tagControl.cutting.SetSpindleSpeedAsync(bmParameter.SpindleRev.ToInt());
-            await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
+            await PlcControl.tagControl.bladeMantance.SetHeightMeasureTimes(bmParameter.HeightMeasureTimes.ToInt());
             CommonResult<float> curHeightZ;
             if (Appsettings.MeasureHeightLast == null)
             {
@@ -257,7 +258,7 @@ namespace 精密切割系统.Helpers
                     {
                         nextThetaDeg = thetaStartingToMovePosition;
                     }
-                    bmParameter.ThetaCurrentLocation = nextThetaDeg.ToString();
+                    bmParameter.ThetaCurrentLocation = nextThetaDeg.ToString(GlobalParams.RoughDecimalStringFormat);
                     await SqlHelper.UpdateAsync(bmParameter);
                     await PlcControl.tagControl.bladeMantance.SetBladeSetuInitPositionAsync(initPos.BladeSetupInitX, initPos.BladeSetupInitY, initPos.BladeSetupInitZ1, nextThetaDeg);
                     await PlcControl.tagControl.bladeMantance.StartContactHeightMeasurement();
@@ -348,25 +349,29 @@ namespace 精密切割系统.Helpers
                         //等待完成测高信号
                         await PlcControl.tagControl.bladeMantance.WaitHeightMeasurementCompletedAsync(useToken);
                         eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高平均值：{setupValueList.Average()}"));
-                        float maxDeviation = setupValueList.Max() - setupValueList.Min();
-                        eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高最大偏差：{Math.Round(maxDeviation * 1000, 1)} um"));
-                        float allowableDeviation = bmParameter.MeasureHeightAllowableDeviationValue.ToFloat();
-                        // 测高数据异常处理
-                        if (maxDeviation >= allowableDeviation)
+                        // 偏差处理
+                        if (setupValueList.Count != 1)
                         {
-                            eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高偏差过大，重新测高"));
-                            if (times % 3 == 0)
+                            float maxDeviation = setupValueList.Max() - setupValueList.Min();
+                            eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高最大偏差：{Math.Round(maxDeviation * 1000, 1)} um"));
+                            float allowableDeviation = bmParameter.MeasureHeightAllowableDeviationValue.ToFloat();
+                            // 测高数据异常处理
+                            if (maxDeviation >= allowableDeviation)
                             {
-                                var res = await DialogHost.Show(SelectionDialog.NewInstance("继续测高", "结束切割", title: "测高多次失败，请确认操作"));
-                                if (res is string dialogResult)
+                                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"测高偏差过大，重新测高"));
+                                if (times % 3 == 0)
                                 {
-                                    if (dialogResult == SelectionDialog.NO)
+                                    var res = await DialogHost.Show(SelectionDialog.NewInstance("继续测高", "结束切割", title: "测高多次失败，请确认操作"));
+                                    if (res is string dialogResult)
                                     {
-                                        return CommonResult<float>.Failure("结束切割！");
+                                        if (dialogResult == SelectionDialog.NO)
+                                        {
+                                            return CommonResult<float>.Failure("结束切割！");
+                                        }
                                     }
                                 }
+                                continue;
                             }
-                            continue;
                         }
                         return CommonResult<float>.Success(measureHeightAve);
                     }

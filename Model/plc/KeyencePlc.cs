@@ -1692,37 +1692,9 @@ namespace 精密切割系统.Driver
 
         // ============刀片维护相关 END
 
-        /// <summary>
-        /// 设置测高参数
-        /// </summary>
-        /// <param name="model"></param>
-        public void SetSetupParams(BladeHeightModel model)
+        public async Task SetHeightMeasureTimes(int times)
         {
-            setupZAxisMaxDistance.writeValue = model.SetupZAxisMaxDistance;
-            setupZAxisHighSpeed.writeValue = model.HighSpeedCt;
-            setupZAxisLowSpeed.writeValue = model.LowSpeedCt;
-            setupZAxisLowDistance.writeValue = model.LowSpeedStrokeCt;
-            setupSetNumber.writeValue = model.Retry;
-
-            keyencePlc.writeTag(setupZAxisMaxDistance);
-            keyencePlc.writeTag(setupZAxisHighSpeed);
-            keyencePlc.writeTag(setupZAxisLowSpeed);
-            keyencePlc.writeTag(setupZAxisLowDistance);
-            keyencePlc.writeTag(setupSetNumber);
-            ConfirmParams();
-        }
-
-        public async Task SetSetupParamsAsync(BladeHeightModel model)
-        {
-            setupZAxisMaxDistance.writeValue = model.SetupZAxisMaxDistance;
-            setupZAxisHighSpeed.writeValue = model.HighSpeedCt;
-            setupZAxisLowSpeed.writeValue = model.LowSpeedCt;
-            setupZAxisLowDistance.writeValue = model.LowSpeedStrokeCt;
-            setupSetNumber.writeValue = model.Retry;
-            await keyencePlc.WriteTagAsync(setupZAxisMaxDistance);
-            await keyencePlc.WriteTagAsync(setupZAxisHighSpeed);
-            await keyencePlc.WriteTagAsync(setupZAxisLowSpeed);
-            await keyencePlc.WriteTagAsync(setupZAxisLowDistance);
+            setupSetNumber.writeValue = times.ToString();
             await keyencePlc.WriteTagAsync(setupSetNumber);
         }
 
@@ -2941,8 +2913,6 @@ namespace 精密切割系统.Driver
             fullAutoCutEnd.writeValue = "1";
             await keyencePlc.WriteTagAsync(fullAutoCutEnd);
             await WaitExitCuttingModeAsync(token);
-            //关闭切割水
-            await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
         }
 
         /// <summary>

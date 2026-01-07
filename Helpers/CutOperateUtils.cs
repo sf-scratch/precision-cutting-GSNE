@@ -17,63 +17,92 @@ namespace 精密切割系统.Driver
     {
         // true 运行中 false 空闲
         public static bool _disposed = false;
+
         // 检查状态 false 未检查完成 true 检查完成
         public static bool checkStatus = false;
+
         // 是否停机检查
         public static bool stopCheckFlag = true;
+
         // 如果切割方式是Z_KEEP 则是来回重复切 0 A(从左往右切)  1 Z_KEEP 左右来回切
         public static int cutMethod = 0;
+
         // 是否暂停
         public static bool pauseFlag = false;
+
         // 交换x轴的开始和结束位置
         public static bool exchangeXPosition = false;
+
         // 默认检查刀数
         public static int defaultCheckCutNum = 0;
+
         // 当前刀数
         public static int currentCutLine = 0;
+
         // 当前面刀数
         public static int chCurrentCutLine = 0;
+
         // 当前刀数
         public static string tempCurrentCutLine = "0";
+
         // 切割模式 0 全自动 1 半自动
         public static int cutType = 0;
+
         // 切割方向 0 前切 1 后切
         public static int cutDirection = -1;
+
         // x轴停止位置
         public static float xStopLocation = 0;
+
         // y轴停止位置
         public static float yStopLocation = 0;
+
         // 预切割信息
-        static List<float> preSpeeds = new List<float>();
+        private static List<float> preSpeeds = new List<float>();
+
         // 是否启用预切割
         public static bool precutFlag = false;
+
         // 当前切割深度
         public static float _cutDepth;
+
         // 自定义切割刀数
         public static int _cutLineNum = 0;
+
         // 当前面总切割刀数
         public static int allRunCutLine = 0;
+
         // 刀片高度补偿
         // public static float bladeHeightComp = 0;
         // 进刀速度补偿
         public static float feedSpeedComp = 0;
+
         // 当前进刀速度
         public static float currentFeedSpeed = 0;
+
         // 是否一直重复循环
         public static bool repeatedFlag = false;
+
         // 循环次数
         public static int repeatedCount = 0;
-        static float lastYCurrentPosition = -100;
+
+        private static float lastYCurrentPosition = -100;
+
         // 切割信息文件名
-        static string cutInfoFileName = "logs/cutInfo.txt";
+        private static string cutInfoFileName = "logs/cutInfo.txt";
+
         // 切割光栅尺信息文件名
-        static string cutRulerFileName = "logs/cutRulerInfo.txt";
+        private static string cutRulerFileName = "logs/cutRulerInfo.txt";
+
         // theta轴是否校准
         public static bool thetaAlignFlag = false;
+
         // 是否蜂鸣提示
         public static bool buzzerTipFlag = true;
+
         // z轴开始位置
-        static float zStartLocation = 0;
+        private static float zStartLocation = 0;
+
         // 暂停超时时间
         public static int stopDelayTime = 90;
 
@@ -82,13 +111,15 @@ namespace 精密切割系统.Driver
         public static float globalYCutPosition = 0;
         public static float globalZCutPosition = 0;
 
-        static bool absoluteCutFlag = false;
-        static RightButton _startBtn;
-        static MainWindow _mainWindow;
-        static PositionCompensationModel axisModel = null;
-        static CancellationTokenSource cts = new CancellationTokenSource();
+        private static bool absoluteCutFlag = false;
+        private static RightButton _startBtn;
+        private static MainWindow _mainWindow;
+        private static PositionCompensationModel axisModel = null;
+        private static CancellationTokenSource cts = new CancellationTokenSource();
+
         // 进行过程中是否校验异常 如果有，则不提示切割完成
-        static bool errorFlag = false;
+        private static bool errorFlag = false;
+
         // 重新初始化参数
         public static void InitParams(int _cutType, MainWindow mainWindow)
         {
@@ -108,7 +139,7 @@ namespace 精密切割系统.Driver
             currentCutLine = 0;
             allRunCutLine = 0;
             zStartLocation = 0;
-            cutDirection = errorFlag ? cutDirection : - 1;
+            cutDirection = errorFlag ? cutDirection : -1;
             cutType = _cutType;
             errorFlag = false;
             globalErrorFlag = false;
@@ -120,6 +151,7 @@ namespace 精密切割系统.Driver
             stopDelayTime = 90;
             _mainWindow = mainWindow;
         }
+
         /// <summary>
         /// 执行切割逻辑
         /// </summary>
@@ -193,7 +225,7 @@ namespace 精密切割系统.Driver
             // 初始化相关位置和偏移量
             float thetaCenterLocationX = GlobalParams.thetaCenterLocationX;
             xStopLocation = float.Parse(PlcControl.plc.GetPlcValueString(DeviceKey.curLocationKey));
-            
+
             PlcControl.tagControl.cutting.StopCut(0); // 修改停止信号，防止中途错误触发
             cts = new CancellationTokenSource();
             tempCurrentCutLine = "0";
@@ -220,7 +252,6 @@ namespace 精密切割系统.Driver
                     Thread.Sleep(10);
                     PlcControl.tagControl.cutting.EndFullAutoCut();
                     Thread.Sleep(100);
-                    StopCut();
                     // 记录日志
                     RunLogsCommon.LogEvent(LogType.Cut, new List<RunLogsViewModel>
                     {
@@ -239,7 +270,6 @@ namespace 精密切割系统.Driver
                 MaterialSnackUtils.MaterialSnack($"切割过程中出现错误: {ex.Message}", MaterialSnackUtils.SnackType.ERROR);
                 Tools.LogError($"切割过程中出现错误: {ex.Message}");
                 errorFlag = true;
-                StopCut();
             }
         }
 
@@ -256,7 +286,7 @@ namespace 精密切割系统.Driver
                 if (cts.Token.IsCancellationRequested)
                     return;
                 float yStartCutPosition = 0;
-                // 获取当前子ch信息 
+                // 获取当前子ch信息
                 FileTableItemChModel ch = chModels[tempChIndex];
                 if (string.IsNullOrEmpty(ch.AbsoluteCutPosition))
                 {
@@ -267,25 +297,30 @@ namespace 精密切割系统.Driver
                         case "Ch 1":
                             yStartCutPosition = GlobalParams.ch1CutStartPosition;
                             break;
+
                         case "Ch 2":
                             yStartCutPosition = GlobalParams.ch2CutStartPosition;
                             break;
+
                         case "Ch 3":
                             yStartCutPosition = GlobalParams.ch3CutStartPosition;
                             break;
+
                         case "Ch 4":
                             yStartCutPosition = GlobalParams.ch4CutStartPosition;
                             break;
+
                         default:
                             break;
                     }
-                } else
+                }
+                else
                 {
                     absoluteCutFlag = true;
                     // 设置绝对切割位置
                     yStartCutPosition = Tools.GetFloatStringValue(ch.AbsoluteCutPosition);
                 }
-                
+
                 if (ch.CutLine == null || ch.CutLine.Equals("0"))
                 {
                     MaterialSnackUtils.MaterialSnack($"{ch.ChName} 参数异常！", MaterialSnackUtils.SnackType.WARNING);
@@ -306,6 +341,7 @@ namespace 精密切割系统.Driver
                 }
             }
         }
+
         /// <summary>
         /// 预切割
         /// </summary>
@@ -413,12 +449,12 @@ namespace 精密切割系统.Driver
                 }
                 Debug.WriteLine($"currentCutLine:{currentCutLine} chCurrentCutLine:{chCurrentCutLine}  chCutLines: {chCutLines}");
             } while (chCurrentCutLine < chCutLines);
-            
+
             return true;
         }
 
-        static bool seqFirstFlag = false;
-        static int seqFirstCount = 0;
+        private static bool seqFirstFlag = false;
+        private static int seqFirstCount = 0;
 
         /// <summary>
         /// 根据当前位置和所有切割刀数的步进总和，判断是否超过Y轴限位
@@ -475,8 +511,9 @@ namespace 精密切割系统.Driver
             return true;
         }
 
-        static int timeout = 90;
-        static float yIndex = 0;
+        private static int timeout = 90;
+        private static float yIndex = 0;
+
         /// <summary>
         /// 执行切割步骤
         /// </summary>
@@ -502,7 +539,7 @@ namespace 精密切割系统.Driver
             float nextDepth = 0;
             // 根据重复次数循环切割, 如果循环完了后
             int steps = 0;
-            bool cleanSteps = false; 
+            bool cleanSteps = false;
             for (int k = 0; k < cutLine; k++)
             {
                 if (cts.Token.IsCancellationRequested)
@@ -639,14 +676,15 @@ namespace 精密切割系统.Driver
                         xEndLocation = tempXStartPosition;
                         tempSetFeedSpeed = 5;
                         exchangeXPosition = false;
-                    } else
+                    }
+                    else
                     {
                         exchangeXPosition = true;
                     }
                 }
                 // 设置切割参数并调用API执行切割
                 float setYPosition = SetCutParams(tempSetFeedSpeed, zEndIndex, zStartLocation, xStartLocation, xEndLocation
-                    ,ref yCurrentPosition, "0", tempThetaDeg.ToString(), spindleRev, cutDirection, yIndex);
+                    , ref yCurrentPosition, "0", tempThetaDeg.ToString(), spindleRev, cutDirection, yIndex);
 
                 yStopLocation = setYPosition - GlobalParams.cameraOffsetY;
                 Debug.WriteLine($"setYPosition:{setYPosition} GlobalParams.cameraOffsetY: {GlobalParams.cameraOffsetY}");
@@ -766,7 +804,6 @@ namespace 精密切割系统.Driver
                     PlcControl.tagControl.wholeDevice.SetYellowLightFlash(1);
                     // PlcControl.tagControl.wholeDevice.SetBuzzerStatus(1);
                     // 关水
-                    CloseCutWater();
                     _mainWindow.NavigateToPage("Pages/F2_ManualOperation/MQSemiAutomaticCuttingStop");
                     setStartCutFlag = true;
                 }
@@ -780,6 +817,7 @@ namespace 精密切割系统.Driver
             }
             return true;
         }
+
         /// <summary>
         /// 设置清零后的刀数和长度信息
         /// </summary>
@@ -792,6 +830,7 @@ namespace 精密切割系统.Driver
             CurrentUtils.UpdateCurrentConfiguration(currentConfigurationModel);
             CurrentUtils.UpdateParams();
         }
+
         public static void SetCutRecord(float cutDistance)
         {
             // 增加总共切割刀数
@@ -820,7 +859,7 @@ namespace 精密切割系统.Driver
         /// </summary>
         public static float SetCutParams(float feedSpeed, float zEndIndex, float zStartLocation, float xStartLocation,
                                          float xEndLocation, ref float yCutLocation, string checkFlag, string thetaDeg, string spindleRev
-            ,int cutDirectionValue, float stepIndex, bool compFlag = true)
+            , int cutDirectionValue, float stepIndex, bool compFlag = true)
         {
             string tempYCutLocation = yCutLocation.ToString();
             // 增加Y轴补偿
@@ -832,7 +871,7 @@ namespace 精密切割系统.Driver
             Tools.LogInfo("切割数据：电机位置：" + yCutLocation + "  补偿位置：" + tempYCutLocation);
             // 记录切割数据
             Tools.LogInfo("第" + currentCutLine + "刀切割数据：feedSpeed:" + feedSpeed + " zEndIndex:" + zEndIndex + " tempZEndIndex:" + " zStartLocation:" + zStartLocation
-                + " xStartLocation:" + xStartLocation + " xEndLocation:" + xEndLocation 
+                + " xStartLocation:" + xStartLocation + " xEndLocation:" + xEndLocation
                 + " yCutLocation:" + yCutLocation + " tempYCutLocation:" + tempYCutLocation + " checkFlag:"
                 + checkFlag + " thetaDeg:" + thetaDeg + " spindleRev:" + spindleRev);
             Tools.WriteLineToFile($"绝对定位\t{DateTime.Now}\t第{currentCutLine}刀\t{yCutLocation}\t{tempYCutLocation}", cutInfoFileName);
@@ -845,12 +884,13 @@ namespace 精密切割系统.Driver
             globalZCutPosition = zEndIndex;
             return Tools.GetFloatStringValue(tempYCutLocation);
         }
+
         /// <summary>
         /// 设置切割参数
         /// </summary>
         public static void SetCutParams1(float feedSpeed, float zEndIndex, float zStartLocation, float xStartLocation,
                                          float xEndLocation, ref float yCutLocation, string checkFlag, string thetaDeg, string spindleRev
-            ,int cutDirectionValue, float stepIndex, bool compFlag = true)
+            , int cutDirectionValue, float stepIndex, bool compFlag = true)
         {
             // 增加X轴补偿
             // string tempXStartLocation = PlcControl.GetCompensate(xStartLocation + "", DeviceKey.xName, cutDirection);
@@ -867,7 +907,7 @@ namespace 精密切割系统.Driver
             Tools.LogInfo("切割数据：电机位置：" + yCutLocation + "  补偿位置：" + tempYCutLocation);
             // 记录切割数据
             Tools.LogInfo("第" + currentCutLine + "刀切割数据：feedSpeed:" + feedSpeed + " zEndIndex:" + zEndIndex + " tempZEndIndex:" + " zStartLocation:" + zStartLocation
-                + " xStartLocation:" + xStartLocation + " xEndLocation:" + xEndLocation 
+                + " xStartLocation:" + xStartLocation + " xEndLocation:" + xEndLocation
                 + " yCutLocation:" + yCutLocation + " tempYCutLocation:" + tempYCutLocation + " checkFlag:"
                 + checkFlag + " thetaDeg:" + thetaDeg + " spindleRev:" + spindleRev);
             Tools.WriteLineToFile($"{DateTime.Now}\t第{currentCutLine}刀\t{yCutLocation}\t{tempYCutLocation}", cutInfoFileName);
@@ -875,8 +915,9 @@ namespace 精密切割系统.Driver
             PlcControl.tagControl.cutting.SetCutParams(feedSpeed, zEndIndex.ToString(), zStartLocation, xStartLocation.ToString()
                 , xEndLocation.ToString(), tempYCutLocation, checkFlag, thetaDeg, spindleRev, cutDirectionValue);
         }
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="targetLocation">目标切割位置（电机）</param>
         /// <param name="directionType">方向 0 正向 1 反向</param>
@@ -928,7 +969,7 @@ namespace 精密切割系统.Driver
         }
 
         // 异常标识
-        static bool globalErrorFlag = false;
+        private static bool globalErrorFlag = false;
 
         public static void exitCut()
         {
@@ -937,78 +978,6 @@ namespace 精密切割系统.Driver
             PlcControl.tagControl.cutting.EndFullAutoCut();
             cts.Cancel();
             _disposed = false;
-        }
-
-        public static void StopCut()
-        {
-            InitParams(cutType, _mainWindow);
-            // 如果异常，则直接退出切割
-            if (globalErrorFlag)
-            {
-                PlcControl.tagControl.cutting.EnterFullAutoInit(0);
-                MaterialSnackUtils.MaterialSnack("异常退出", MaterialSnackUtils.SnackType.ERROR, 0);
-                Tools.LogInfo("异常退出...");
-                Debug.WriteLine("异常退出...");
-                GlobalParams.globalRunFlag = false;
-                _mainWindow.NavigateToPage("Pages/F2_ManualOperation/MQSemiAutomaticCuttingConf", "type=1");
-            } else
-            {
-                if (errorFlag)
-                {
-                    // 切割完成
-                    GlobalParams.globalRunFlag = false;
-                    Tools.LogInfo("参数异常退出...");
-                    Debug.WriteLine("参数异常退出...");
-                    _mainWindow.NavigateToPage("Pages/F2_ManualOperation/MQSemiAutomaticCuttingConf", "type=1");
-                    return;
-                }
-                Tools.LogInfo("正常退出...");
-                Debug.WriteLine("正常退出...");
-                Task.Run(() => {
-                    if (MonitorCutStatusFalse())
-                    {
-                        /*if (CommonCheck.GetParamsStatus(DeviceKey.workpieceBlowingStatusKey))
-                        {
-                            // 吹气4秒
-                            Thread.Sleep(4000);
-                            PlcControl.tagControl.wholeDevice.SetWorkpieceBlowing();
-                        }*/
-                        Debug.WriteLine("正常退出成功...");
-                        _mainWindow.NavigateToPage("Pages/F2_ManualOperation/MQSemiAutomaticCuttingConf", "type=1");
-                        MaterialSnackUtils.MaterialSnack("切割完成！", MaterialSnackUtils.SnackType.SUCCESS);
-                        GlobalParams.globalRunFlag = false;
-                        if (buzzerTipFlag)
-                        {
-                            // 蜂鸣+闪黄灯
-                            PlcControl.tagControl.wholeDevice.SetYellowLightFlash(1);
-                            PlcControl.tagControl.wholeDevice.SetBuzzerStatus(1);
-                            Task.Run(() =>
-                            {
-                                Thread.Sleep(3000);
-                                PlcControl.tagControl.wholeDevice.SetBuzzerStatus(0);
-                            });
-                        }
-                    }
-                });
-            }
-            // CloseCutWater();
-            Task.Run(async () => {
-                await Task.Delay(1000);
-                await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
-            });
-        }
-
-        /// <summary>
-        /// 关闭切割水
-        /// </summary>
-        public static async void CloseCutWater()
-        {
-            bool tempSpindleCuttingWater = CommonCheck.GetParamsStatus(DeviceKey.spindleCuttingWaterKey);
-            if (tempSpindleCuttingWater)
-            {
-                // 关水
-                await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
-            }
         }
 
         /// <summary>
@@ -1022,6 +991,7 @@ namespace 精密切割系统.Driver
                 // bladeHeightComp = bladeHeightCompValue;
             }
         }
+
         /// <summary>
         /// 设置进刀速度补偿数据
         /// </summary>
@@ -1105,8 +1075,8 @@ namespace 精密切割系统.Driver
         }
     }
 
-
-    public class PrecutItem{
+    public class PrecutItem
+    {
         private int cutNum;
         private float cutSpeed;
 

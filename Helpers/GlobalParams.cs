@@ -16,10 +16,10 @@ namespace 精密切割系统.Helpers
     public static class GlobalParams
     {
         // true 在线版本 false 离线版本
-        public static bool OnlineFlag { get; set; } = false;
+        public static bool OnlineFlag { get; set; } = true;
 
         // 是否全屏显示
-        public static bool IsFullDcreen { get; set; } = false;
+        public static bool IsFullDcreen { get; set; } = true;
 
         // 是否上传MES
         public static bool OnlineMES { get; set; } = false;
@@ -31,10 +31,10 @@ namespace 精密切割系统.Helpers
         public static bool HasFullyAutomatic { get; set; } = false;
 
         // 小数点格式化字符串
-        public static string DecimalStringFormat { get; set; } = "F5";
+        public const string DecimalStringFormat = "F5";
 
         // 小数点格式化字符串
-        public static string RoughDecimalStringFormat { get; set; } = "F3";
+        public const string RoughDecimalStringFormat = "F3";
 
         public static WindowState WindowState { get; set; } = IsFullDcreen ? WindowState.Maximized : WindowState.Normal;
 

@@ -165,6 +165,11 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                         break;
                     }
                     MaterialSnackUtils.MaterialSnack("进入校准模式中...", SnackType.WARNING, 0);
+                    var operationParameter = CurrentUtils.GetOperationParametersModel();
+                    if (operationParameter is not null && !operationParameter.IsAutoShutOffWaterWhenCuttingCompleted && operationParameter.IsAutoShutOffWaterWhenEnterCalibration)
+                    {
+                        await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
+                    }
                     try
                     {
                         mainWindow.IsEnabled = false;

@@ -70,14 +70,7 @@ namespace 精密切割系统.Utils
             // 设置位置校准
             InitPositionAlignment(positionAlignmentModel);
             InitInitialPositionModel(initialPositionModel);
-            // 初始化测高数据
-            InitSetupDate();
             await AutoCutUtils.SetFunctionalParameters();
-        }
-
-        public static void InitSetupDate()
-        {
-            PlcControl.tagControl.bladeMantance.SetSetupParams(bladeHeightModel);
         }
 
         public static void InitInitialPositionModel(InitialPositionModel _model)
