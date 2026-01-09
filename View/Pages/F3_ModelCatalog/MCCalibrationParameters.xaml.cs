@@ -37,7 +37,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             _mainWindow = System.Windows.Application.Current.MainWindow as MainWindow;
         }
 
-        private void Page_Loaded(object sender, RoutedEventArgs e)
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             if (_mainWindow is null) return;
             _rightPage = _mainWindow.rightFrame.Content as RightPage;
@@ -51,7 +51,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             _rightPage.btnBack.GlobalRunOperateFlag = true;
             _rightPage.btnSure.Visibility = Visibility.Visible;
             _mainWindow.UpdateOperatePage([], null);
-            this.DataContext = new MCCalibrationParametersViewModel();
+            this.DataContext = new MCCalibrationParametersViewModel(await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel()));
         }
 
         private void BackFrom(object? sender, bool v)

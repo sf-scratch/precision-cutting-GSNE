@@ -5,12 +5,13 @@ using System.Linq;
 using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Threading.Tasks;
+using 精密切割系统.Entities;
 
 //用户参数设置(7.4和7.4.2)
 namespace 精密切割系统.database.db.modle
 {
     [Table("table_user_define_data")]
-    public class UserDefineDataModel
+    public class UserDefineDataModel : IEntityWithId
     {
         [PrimaryKey, AutoIncrement]
         [Column("id")]

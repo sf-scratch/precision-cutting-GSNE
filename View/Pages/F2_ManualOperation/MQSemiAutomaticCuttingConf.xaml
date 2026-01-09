@@ -146,8 +146,6 @@
                                 InputType="Decimal"
                                 Text="{Binding Path=ChangeFeedSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 TextWrapping="Wrap"
-                                XMax="100"
-                                XMin="0"
                                 XPrecision="3" />
                             <Label Content="mm/s" FontSize="16" />
                         </StackPanel>

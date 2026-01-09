@@ -39,15 +39,13 @@ namespace 精密切割系统.Model.cut
             try
             {
                 eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始相机对焦..."));
-                CommonResult<FileTableItemModel> fileTableItemResult = await AutoCutUtils.GetFileTableItemModelAsync();
-                if (!fileTableItemResult.IsSuccess || fileTableItemResult.Data is null)
+                CommonResult<float> focusClearPositionResult = await AutoCutUtils.CalculateFocusClearPosition();
+                if (!focusClearPositionResult.IsSuccess)
                 {
-                    return CommonResult<float>.Failure(fileTableItemResult.Message);
+                    return CommonResult<float>.Failure(focusClearPositionResult.Message);
                 }
-                FileTableItemModel fileTableItem = fileTableItemResult.Data;
-                float workThickness = fileTableItem.WorkThickness.ToFloat();
-                float tapeThickness = fileTableItem.TapeThickness.ToFloat();
-                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(Appsettings.FocusWorkpiecesClearZ - workThickness - tapeThickness - FocusStartingLiftPosition ?? 0, default, token);
+                float focusClearPosition = focusClearPositionResult.Data;
+                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(focusClearPosition - FocusStartingLiftPosition, default, token);
                 int direction = 1;
                 // 阶段1：快速粗调（正向扫描）
                 var coarseResult = await FindOptimalFocus(

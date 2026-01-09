@@ -211,6 +211,6 @@
             Grid.Row="1"
             Grid.Column="1"
             Width="600"
-            Height="300" />
+            Height="260" />
     </Grid>
 </UserControl>

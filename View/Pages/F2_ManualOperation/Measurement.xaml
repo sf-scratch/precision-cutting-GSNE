@@ -1,0 +1,100 @@
+﻿<UserControl
+    x:Class="精密切割系统.View.Pages.F2_ManualOperation.Measurement"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
+    xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:common="clr-namespace:精密切割系统.View.Pages.common"
+    xmlns:cvert="clr-namespace:精密切割系统.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:精密切割系统.Helpers"
+    xmlns:local="clr-namespace:精密切割系统.View.Pages.F2_ManualOperation"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
+    d:DataContext="{d:DesignInstance viewModel:MeasurementViewModel,
+                                     IsDesignTimeCreatable=True}"
+    d:DesignHeight="645"
+    d:DesignWidth="1565"
+    mc:Ignorable="d">
+    <behaviors:Interaction.Triggers>
+        <behaviors:EventTrigger EventName="Loaded">
+            <behaviors:InvokeCommandAction Command="{Binding LoadedCommand}" />
+        </behaviors:EventTrigger>
+    </behaviors:Interaction.Triggers>
+    <UserControl.Resources>
+        <!--  布尔到可见性转换器  -->
+        <cvert:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="50*" />
+            <ColumnDefinition Width="50*" />
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+            <common:CameraCommon Width="765" Height="640" />
+        </Grid>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Label
+                Margin="30,30,0,0"
+                Content="测量"
+                FontSize="30"
+                FontWeight="Bold" />
+            <StackPanel Grid.Row="1" Margin="30,30,0,0">
+                <common:CommonDimming x:Name="commonDimming" />
+                <Controls:RealTimeAxisInfo />
+                <StackPanel Margin="0,10,0,10" HorizontalAlignment="Left">
+                    <Label
+                        Width="200"
+                        Margin="0,0,0,10"
+                        HorizontalAlignment="Left"
+                        Content="自计数清零后位置"
+                        FontSize="18"
+                        FontWeight="Bold" />
+                    <StackPanel Orientation="Horizontal">
+                        <Label
+                            VerticalAlignment="Center"
+                            Content="X"
+                            FontSize="16"
+                            FontWeight="Bold" />
+                        <Controls:InputTextBox
+                            Width="160"
+                            Margin="5,0,0,0"
+                            IsEnabled="False"
+                            Text="{Binding XCleanPosition}" />
+                        <Label
+                            VerticalAlignment="Center"
+                            Content="mm"
+                            FontSize="16"
+                            FontWeight="Bold" />
+                        <Label
+                            Margin="15,0,0,0"
+                            VerticalAlignment="Center"
+                            Content="Y"
+                            FontSize="16"
+                            FontWeight="Bold" />
+                        <Controls:InputTextBox
+                            Width="160"
+                            Margin="5,0,0,0"
+                            IsEnabled="False"
+                            Text="{Binding YCleanPosition}" />
+                        <Label
+                            VerticalAlignment="Center"
+                            Content="mm"
+                            FontSize="16"
+                            FontWeight="Bold" />
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+            <common:SimpleDirectOperate
+                Grid.Row="2"
+                Grid.Column="1"
+                Width="600"
+                Height="220" />
+        </Grid>
+    </Grid>
+</UserControl>

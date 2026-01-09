@@ -38,9 +38,8 @@ namespace 精密切割系统.Helpers
         {
             if (_warmUpTcs == null)
             {
-                UserDefineDataModel userDefine = CurrentUtils.GetCurrentUserDefineDataModel();
-                string warmUpTimeStr = userDefine.WarmUpTime;
-                if (int.TryParse(warmUpTimeStr, out int warmUpTimeSeconds))
+                UserDefineDataModel userDefine = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
+                if (int.TryParse(userDefine.WarmUpTime, out int warmUpTimeSeconds))
                 {
                     MaterialSnack("暖机中...", SnackType.WARNING, 0);
                     _remainTime = warmUpTimeSeconds;

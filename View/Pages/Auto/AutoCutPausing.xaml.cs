@@ -60,9 +60,9 @@ namespace 精密切割系统.View.Pages.Auto
         }
 
         //根据默认配置控制对应显示和隐藏
-        private void updateDefineDataModel()
+        private async void updateDefineDataModel()
         {
-            UserDefineDataModel userDefineModel = CurrentUtils.GetCurrentUserDefineDataModel();
+            UserDefineDataModel userDefineModel = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
             bool isSpeedChange = "NO".Equals(userDefineModel.SpeedChange);
             bool isHeightChange = "NO".Equals(userDefineModel.HeightChange);
             //if (isSpeedChange)//速度变更

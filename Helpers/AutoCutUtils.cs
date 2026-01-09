@@ -82,7 +82,6 @@ namespace 精密切割系统.Helpers
         {
             try
             {
-                UserDefineDataModel userDefineData = CurrentUtils.GetCurrentUserDefineDataModel();
                 MaterialSnackUtils.MaterialSnack("准备更换刀片,轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
                 InitialPositionModel? initPos = await AutoCutUtils.GetInitialPositionAsync();
                 if (initPos is null)
@@ -929,7 +928,7 @@ namespace 精密切割系统.Helpers
         /// <returns></returns>
         public static async Task WorkpieceBlowingAsync(float? atomizingNozzlePositionY, int? blowTime = null, IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
-            UserDefineDataModel userDefineData = CurrentUtils.GetCurrentUserDefineDataModel();
+            UserDefineDataModel userDefineData = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
             eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始工件吹气..."));
             try
             {
@@ -2046,7 +2045,7 @@ namespace 精密切割系统.Helpers
                         float offsetY = yIndexs[index];
                         float thetaDeg = float.Parse(ch.ThetaDeg);
                         bool isAbsolute = ch.ComBoxCutMethod.Equals("绝对");
-                        float channelStartY = isAbsolute ? ch.AbsoluteCutPosition.ToFloat() : 0;
+                        float channelStartY = isAbsolute ? ch.AbsoluteCutPosition.ToFloat() : ch.RelativeCutPosition.ToFloat();
                         float offsetX = ch.OffsetX.ToFloat();
                         bool isAlternatingCuttingStroke = ch.CutMode == CutOperateUtils.B_ZKEEP;
                         int channelNum = chSeq;
@@ -2054,6 +2053,12 @@ namespace 精密切割系统.Helpers
                         tempCutSteps.Add(new CutStep(cutHeight, speed, offsetY, thetaDeg, isAbsolute, channelStartY, offsetX, isAlternatingCuttingStroke, channelNum, singleCutDeep));
                     }
                 }
+                if (tempCutSteps.Count == 0)
+                {
+                    continue;
+                }
+                //增加第一刀不跳步进
+                cutSteps.Add(tempCutSteps.First() with { NextStepDistance = 0 });
                 int chCutLines = Tools.GetIntStringValue(ch.CutLine);
                 if (chCutLines == 0)
                 {
@@ -2067,6 +2072,8 @@ namespace 精密切割系统.Helpers
                 {
                     cutSteps.AddRange(tempCutSteps.GetRange(0, chCutLines));
                 }
+                //移除最后多余的一刀
+                cutSteps.RemoveAt(cutSteps.Count - 1);
             }
             if (isOpenPrecut)
             {
@@ -2092,8 +2099,6 @@ namespace 精密切割系统.Helpers
             {
                 return CommonResult<List<CutStep>>.Failure("未生成有效切割步骤！");
             }
-            //第一刀不跳步进
-            cutSteps[0] = cutSteps[0] with { NextStepDistance = 0 };
             return CommonResult<List<CutStep>>.Success(cutSteps);
         }
 
@@ -2111,8 +2116,25 @@ namespace 精密切割系统.Helpers
             {
                 return CommonResult<FileTableItemModel>.Failure("未确认配置信息！");
             }
-            FileTableItemModel fileTableItem = listConf[0];
+            FileTableItemModel fileTableItem = listConf.First();
             return CommonResult<FileTableItemModel>.Success(fileTableItem);
+        }
+
+        public static async Task<CommonResult<float>> CalculateFocusClearPosition()
+        {
+            if (Appsettings.FocusWorkpiecesClearZ is null)
+            {
+                return CommonResult<float>.Failure("未聚焦工作盘！");
+            }
+            CommonResult<FileTableItemModel> fileTableItemResult = await GetFileTableItemModelAsync();
+            if (!fileTableItemResult.IsSuccess || fileTableItemResult.Data is null)
+            {
+                return CommonResult<float>.Failure(fileTableItemResult.Message);
+            }
+            FileTableItemModel fileTableItem = fileTableItemResult.Data;
+            float workThickness = fileTableItem.WorkThickness.ToFloat();
+            float tapeThickness = fileTableItem.TapeThickness.ToFloat();
+            return CommonResult<float>.Success(Appsettings.FocusWorkpiecesClearZ.Value - workThickness - tapeThickness);
         }
 
         public static int AreIndexesContinuous(float[] setBladeHeight, float[] feedSpeeds, float[] yIndexs, float[] repeatTimes)
@@ -2134,6 +2156,93 @@ namespace 精密切割系统.Helpers
 
             // 如果有效索引是连续的，返回最大索引，否则返回0
             return areIndexesContinuous ? validIndexes.Max() : -1;
+        }
+
+        public static async Task<CommonResult> EnterManualAlignmentAsync(MainWindow mainWindow)
+        {
+            if (!GlobalParams.OnlineFlag)
+            {
+                MaterialSnackUtils.MaterialSnack("进入校准模式中...", SnackType.WARNING, 0);
+                mainWindow.IsEnabled = false;
+                await Task.Delay(500);
+                mainWindow.IsEnabled = true;
+                return CommonResult.Success();
+            }
+            InitialPositionModel? initPos = await GetInitialPositionAsync();
+            if (initPos is null)
+            {
+                return CommonResult.Failure("获取各模式参数失败，请检查各模式参数配置！");
+            }
+            CommonResult<FileTableItemChModel> fileTableItemResult = await GetFirstFileTableItemChModelAsync();
+            if (!fileTableItemResult.IsSuccess || fileTableItemResult.Data is null)
+            {
+                return CommonResult.Failure(fileTableItemResult.Message);
+            }
+            FileTableItemChModel fileTableItemCh = fileTableItemResult.Data;
+            bool isReady =
+                await PlcControl.tagControl.Xaxis.IsReadyAsync() &&
+                await PlcControl.tagControl.Yaxis.IsReadyAsync() &&
+                await PlcControl.tagControl.Z1axis.IsReadyAsync() &&
+                await PlcControl.tagControl.Z2axis.IsReadyAsync() &&
+                await PlcControl.tagControl.ThetaAxis.IsReadyAsync();
+            if (!isReady)
+            {
+                return CommonResult.Failure("轴未准备好，请检查轴状态！");
+            }
+            MaterialSnackUtils.MaterialSnack("进入校准模式中...", SnackType.WARNING, 0);
+            var operationParameter = CurrentUtils.GetOperationParametersModel();
+            if (operationParameter is not null && !operationParameter.IsAutoShutOffWaterWhenCuttingCompleted && operationParameter.IsAutoShutOffWaterWhenEnterCalibration)
+            {
+                await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
+            }
+            try
+            {
+                mainWindow.IsEnabled = false;
+                float speedX = initPos.AlignInitSpeedX.ToFloat();
+                float speedY = initPos.AlignInitSpeedY.ToFloat();
+                float speedZ1 = initPos.AlignInitSpeedZ1.ToFloat();
+                float speedTheta = initPos.AlignInitSpeedTheta.ToFloat();
+                TimeoutToken timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(120));
+                await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, speedZ1, timeoutToken.Token);
+                if (!float.TryParse(fileTableItemCh.AlignX, out float moveX) || !float.TryParse(fileTableItemCh.AlignY, out float moveY))
+                {
+                    moveX = initPos.AlignInitX.ToFloat();
+                    moveY = initPos.AlignInitY.ToFloat();
+                }
+                List<Task> moveTasks =
+                [
+                    PlcControl.tagControl.Xaxis.StartAbsoluteAsync(moveX, speedX, timeoutToken.Token),
+                    PlcControl.tagControl.Yaxis.StartAbsoluteAsync(moveY, speedY, timeoutToken.Token),
+                    PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(initPos.AlignInitTheta.ToFloat(), speedTheta, timeoutToken.Token),
+                ];
+                float? moveZ2 = Appsettings.FocusClearZ;
+                if (moveZ2 is null)
+                {
+                    CommonResult<float> focusClearPositionResult = await AutoCutUtils.CalculateFocusClearPosition();
+                    if (focusClearPositionResult.IsSuccess)
+                    {
+                        moveTasks.Add(PlcControl.tagControl.Z2axis.StartAbsoluteAsync(focusClearPositionResult.Data, default, timeoutToken.Token));
+                    }
+                }
+                else
+                {
+                    moveTasks.Add(PlcControl.tagControl.Z2axis.StartAbsoluteAsync(moveZ2.Value, default, timeoutToken.Token));
+                }
+                await Task.WhenAll(moveTasks);
+                return CommonResult.Success();
+            }
+            catch (OperationCanceledException)
+            {
+                return CommonResult.Failure("移动到校准位置超时！");
+            }
+            catch (Exception ex)
+            {
+                return CommonResult.Failure("移动到校准位置失败！" + ex.Message);
+            }
+            finally
+            {
+                mainWindow.IsEnabled = true;
+            }
         }
     }
 

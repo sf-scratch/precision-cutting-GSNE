@@ -7,6 +7,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.cut;
@@ -25,14 +26,6 @@ namespace 精密切割系统.View.Pages.common
         public CameraCommon()
         {
             InitializeComponent();
-            var (cutMarkWidth, edgeWidth, lightSourceBrightness) = CurrentUtils.GetWidthAndLight(GlobalParams.CH1);
-            _cutMarkWidth = cutMarkWidth;
-            _edgeChipWidth = edgeWidth;
-            var userDefine = CurrentUtils.GetCurrentUserDefineDataModel();
-            if (userDefine is not null)
-            {
-                _hasEdgeLine = userDefine.HasEdgeLine;
-            }
         }
 
         private Point centerLocation;
@@ -72,13 +65,25 @@ namespace 精密切割系统.View.Pages.common
         /// </summary>
         public WriteableBitmap? LocalBitmap => _localBitmap;
 
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        private async void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
+            var (cutMarkWidth, edgeWidth, lightSourceBrightness) = await CurrentUtils.GetWidthAndLightAsync(GlobalParams.CH1);
+            _cutMarkWidth = cutMarkWidth;
+            _edgeChipWidth = edgeWidth;
+            var userDefine = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
+            if (userDefine is not null)
+            {
+                _hasEdgeLine = userDefine.HasEdgeLine;
+            }
+
             centerLocation = new Point(cameraImage.Width / 2, cameraImage.Height / 2);
             SetupOverlayPanel();
             CameraUtils.PayloadReceived += CameraUtils_PayloadReceived;
             CompositionTarget.Rendering += OnCompositionTargetRendering;
-            CameraUtils.StartGrabbing();
+            if (GlobalParams.OnlineFlag)
+            {
+                CameraUtils.StartGrabbing();
+            }
         }
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)

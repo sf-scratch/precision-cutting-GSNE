@@ -18,6 +18,7 @@ using 精密切割系统.Driver;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.cut;
 using 精密切割系统.Utils;
+using 精密切割系统.ViewModel;
 
 namespace 精密切割系统.View.Pages.common
 {
@@ -53,9 +54,9 @@ namespace 精密切割系统.View.Pages.common
             _cts?.Dispose();
         }
 
-        public void InitData()
+        public async void InitData()
         {
-            UserDefineDataModel userDefineData = CurrentUtils.GetCurrentUserDefineDataModel();
+            UserDefineDataModel userDefineData = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
             if (int.TryParse(userDefineData.LightSourceBrightnessCh1, out int light))
             {
                 GlobalParams.intensityRatio = light / 100.0;

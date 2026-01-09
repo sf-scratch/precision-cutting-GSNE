@@ -44,7 +44,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             _mainWindow = Application.Current.MainWindow as MainWindow;
         }
 
-        private void Page_Loaded(object sender, RoutedEventArgs e)
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             _cts = new CancellationTokenSource();
             if (_mainWindow == null) return;
@@ -62,6 +62,8 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("实行测量", "FocusAuto", GlobalFocusAsync));
             InitData();
             LoadPosition(_cts.Token);
+            // 打开镜头盖
+            await PlcControl.tagControl.wholeDevice.OpenCameraLensCapAsync();
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -115,6 +117,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             {
                 focusSetPostion.Text = currentZ2.Value.ToString(GlobalParams.DecimalStringFormat);
                 Appsettings.FocusWorkpiecesClearZ = currentZ2.Value;
+                Appsettings.FocusClearZ = null;
                 MaterialSnackUtils.MaterialSnack("对焦点位置确认成功！", MaterialSnackUtils.SnackType.SUCCESS);
             }
         }

@@ -93,7 +93,7 @@ namespace 精密切割系统.Helpers
         }
 
         /// <summary>
-        /// 自更换刀片起刀片切了多长
+        /// 自更换刀片起刀片切了多长（mm）
         /// </summary>
         public static float? AfterReplaceBladeCutLength
         {

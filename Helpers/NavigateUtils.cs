@@ -87,24 +87,17 @@ namespace 精密切割系统.Helpers
             mainWindow.mainFrame.Content = null;
         }
 
-        public static void Clear()
-        {
-            MainWindow? mainWindow = Application.Current.MainWindow as MainWindow;
-            if (mainWindow == null)
-            {
-                return;
-            }
-            mainWindow.mainFrame.Content = null;
-        }
-
         public static void SetWindowIsEnable(bool isEnable)
         {
-            MainWindow? mainWindow = Application.Current.MainWindow as MainWindow;
-            if (mainWindow == null)
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                return;
-            }
-            mainWindow.IsEnabled = isEnable;
+                MainWindow? mainWindow = Application.Current.MainWindow as MainWindow;
+                if (mainWindow == null)
+                {
+                    return;
+                }
+                mainWindow.IsEnabled = isEnable;
+            });
         }
     }
 }

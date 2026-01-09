@@ -148,7 +148,7 @@ namespace 精密切割系统.View.Pages.Hader
             dowm();
         }
 
-        private void dowm()
+        private async void dowm()
         {
             //第一次点击时间
             if (clickCount == 0)
@@ -169,7 +169,7 @@ namespace 精密切割系统.View.Pages.Hader
             if (clickCount >= 10) // 如果点击次数达到10次
             {
                 clickCount = 0; // 重置点击次数
-                if (havePassWord())
+                if (await havePassWordAsync())
                 {
                     mainWindow.NavigateToPage("Pages/system/SystemPage");
                 }
@@ -182,9 +182,9 @@ namespace 精密切割系统.View.Pages.Hader
         }
 
         //是否需要密码
-        private Boolean havePassWord()
+        private async Task<bool> havePassWordAsync()
         {
-            UserDefineDataModel userDefineDataModel = CurrentUtils.GetCurrentUserDefineDataModel();
+            UserDefineDataModel userDefineDataModel = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
             if (!string.IsNullOrEmpty(userDefineDataModel.SystemPassword))
             {
                 //查询录入的密码时间戳

@@ -14,9 +14,9 @@ namespace 精密切割系统.ViewModel
     {
         private UserDefineDataModel _model;
 
-        public MCCalibrationParametersViewModel()
+        public MCCalibrationParametersViewModel(UserDefineDataModel userDefineDataModel)
         {
-            _model = CurrentUtils.GetCurrentUserDefineDataModel();
+            _model = userDefineDataModel;
         }
 
         public UserDefineDataModel UserDefineDataModel

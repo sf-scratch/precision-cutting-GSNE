@@ -47,7 +47,6 @@
                                 x:Name="focusSetPostion"
                                 Width="200"
                                 InputType="Decimal"
-                                IsReadOnly="True"
                                 TextWrapping="Wrap"
                                 XPrecision="5" />
                         </StackPanel>
@@ -61,7 +60,7 @@
                                 x:Name="z2AbsolutePosition"
                                 Width="200"
                                 InputType="Decimal"
-                                IsReadOnly="True"
+                                IsEnabled="False"
                                 TextWrapping="Wrap"
                                 XPrecision="5" />
                         </StackPanel>
@@ -72,7 +71,7 @@
                 </Grid>
             </StackPanel>
             <Grid x:Name="directionGrid" Grid.Row="1">
-                <common:SimpleDirectOperate Width="600" Height="300" />
+                <common:SimpleDirectOperate Width="600" Height="260" />
             </Grid>
         </Grid>
     </Grid>

@@ -46,6 +46,9 @@ namespace 精密切割系统.database.db.modle
         [Column("absolute_cut_position")] //绝对切割位置
         public string AbsoluteCutPosition { get; set; }
 
+        [Column("relative_cut_position")] //相对切割位置
+        public string RelativeCutPosition { get; set; }
+
         [Column("moncut_f")]//切割停止F
         public string MoncutF { get; set; } = "0";
 

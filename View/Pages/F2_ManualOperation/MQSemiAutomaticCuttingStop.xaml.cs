@@ -54,9 +54,9 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         }
 
         //根据默认配置控制对应显示和隐藏
-        private void UpdateDefineDataModel()
+        private async void UpdateDefineDataModel()
         {
-            UserDefineDataModel userDefineModel = CurrentUtils.GetCurrentUserDefineDataModel();
+            UserDefineDataModel userDefineModel = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
             bool isSpeedChange = "NO".Equals(userDefineModel.SpeedChange);
             bool isHeightChange = "NO".Equals(userDefineModel.HeightChange);
             if (isSpeedChange)//速度变更

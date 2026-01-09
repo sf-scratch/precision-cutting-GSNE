@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using 精密切割系统.Driver;
 using 精密切割系统.Extensions;
 using 精密切割系统.Helpers;
@@ -29,8 +30,9 @@ namespace 精密切割系统.ViewModel
         private DataPoint<float>? _originPoint;
         private SemaphoreSlim _semaph = new SemaphoreSlim(1, 1);
         private CancellationTokenSource _operatCts;
-        private float _countingClearX = 0;
-        private float _countingClearY = 0;
+        private float _xOriginPositionValue = 0;
+        private float _yOriginPositionValue = 0;
+        private bool _isReuseView = false;
 
         private DelegateCommand _loadedCommand;
 
@@ -88,22 +90,30 @@ namespace 精密切割系统.ViewModel
             BottomButtonCollection.Clear();
             //BottomButtonCollection.Add(RightButtonParams.BlueButton("刀片状态信息", "UnfoldMoreHorizontal", () => NavigateUtils.NavigateToPage("Pages/F4_BladeMaintenance/BladeInfo", false)));
             //BottomButtonCollection.Add(RightButtonParams.BlueButton("型号参数", "UnfoldMoreHorizontal", () => NavigateUtils.NavigateToPage("Pages/F3_ModelCatalog/MCDeviceDataListConf", false)));
-            BottomButtonCollection.Add(ButtonParams.BlueButton("高度补偿", "FormatLineHeight", SetDepthCompensation));
-            BottomButtonCollection.Add(ButtonParams.BlueButton("速度更改", "SpeedometerMedium", SetFeedSpeed));
-            BottomButtonCollection.Add(ButtonParams.BlueButton("刀痕识别", "TextRecognition", AutomaticRecognition));
-            BottomButtonCollection.Add(ButtonParams.BlueButton("工件吹气", "WeatherWindy", () => _semaph.ExecuteAsync(WorkpieceBlowing, "工件吹气")));
             //BottomButtonCollection.Add(RightButtonParams.BlueButton("精细对焦", "FocusAuto", () => _semaph.ExecuteAsync(FocusAuto, "精细对焦")));
             BottomButtonCollection.Add(ButtonParams.BlueButton("对焦", "FocusAuto", () => _semaph.ExecuteAsync(GlobalFocus, "对焦")));
-            BottomButtonCollection.Add(ButtonParams.BlueButton("位置清零", "Numeric0BoxOutline", CountingClearAsync));
-            BottomButtonCollection.Add(ButtonParams.BlueButton("基准线校准", "CrosshairsGps", () => _semaph.ExecuteAsync(BaselineCalibration, "基准线校准")));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("测量", "/Assets/icon/tab_1/03/tab_03.png", NavigateMeasurement));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("高度补偿", "FormatLineHeight", SetDepthCompensation));
             BottomButtonCollection.Add(ButtonParams.BlueButton("基准线调窄", "UnfoldLessHorizontal", null, BaselineNarrowing, StopUpdateCameraCommonLine));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("基准线校准", "CrosshairsGps", () => _semaph.ExecuteAsync(BaselineCalibration, "基准线校准")));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("刀痕识别", "TextRecognition", AutomaticRecognition));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("位置清零", "Numeric0BoxOutline", CountingClearAsync));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("速度更改", "SpeedometerMedium", SetFeedSpeed));
             BottomButtonCollection.Add(ButtonParams.BlueButton("基准线调宽", "UnfoldMoreHorizontal", null, BaselineWidening, StopUpdateCameraCommonLine));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("工件吹气", "WeatherWindy", () => _semaph.ExecuteAsync(WorkpieceBlowing, "工件吹气")));
+        }
+
+        private void NavigateMeasurement()
+        {
+            _isReuseView = true;
+            NavigationParameters parameters = new NavigationParameters { { "NavigationPageName", nameof(MQSemiAutomaticCuttingStop) } };
+            _regionManager.RequestNavigate(RegionName.MainRegion, nameof(Measurement), parameters);
         }
 
         private async Task CountingClearAsync()
         {
-            _countingClearX = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0;
-            _countingClearY = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0;
+            _xOriginPositionValue = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0;
+            _yOriginPositionValue = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0;
         }
 
         public void StartGetAxisInfo()
@@ -115,17 +125,22 @@ namespace 精密切割系统.ViewModel
                 {
                     try
                     {
-                        var curX = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync();
-                        var curY = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync();
-                        if (curX == null || curY == null) continue;
-                        AfterCountingClearX = (curX.Value - _countingClearX).ToString();
-                        AfterCountingClearY = (curY.Value - _countingClearY).ToString();
+                        var xPostion = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync();
+                        var yPostion = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync();
+                        if (xPostion is not null && yPostion is not null)
+                        {
+                            Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                AfterCountingClearX = (xPostion.Value - _xOriginPositionValue).ToString("F5");
+                                AfterCountingClearY = (yPostion.Value - _yOriginPositionValue).ToString("F5");
+                            });
+                        }
                     }
                     catch (Exception ex)
                     {
                         Tools.LogError($"StartGetAxisInfo()报警监控异常: {ex.Message}");
                     }
-                    await Task.Delay(200);
+                    await Task.Delay(100);
                 }
             });
         }
@@ -135,7 +150,7 @@ namespace 精密切割系统.ViewModel
             // 高度补偿
             _semiAutoCutService.DepthCompensationValue = CutParam.DepthCompensation.ToFloat();
             _semiAutomaticCuttingRunViewModel.CutParam.DepthCompensation = CutParam.DepthCompensation;
-            MaterialSnackUtils.MaterialSnack($"刀片高度补偿设置为{_semiAutoCutService.DepthCompensationValue}！", MaterialSnackUtils.SnackType.SUCCESS);
+            MaterialSnackUtils.MaterialSnack($"刀片高度补偿设置为 {_semiAutoCutService.DepthCompensationValue}！", MaterialSnackUtils.SnackType.SUCCESS);
         }
 
         private void SetFeedSpeed()
@@ -143,7 +158,7 @@ namespace 精密切割系统.ViewModel
             // 速度更改
             _semiAutoCutService.FeedSpeedCompCompensationValue = CutParam.ChangeFeedSpeed.ToFloat();
             _semiAutomaticCuttingRunViewModel.CutParam.ChangeFeedSpeed = CutParam.ChangeFeedSpeed;
-            MaterialSnackUtils.MaterialSnack($"变更进刀速度设置为{_semiAutoCutService.FeedSpeedCompCompensationValue}！", MaterialSnackUtils.SnackType.SUCCESS);
+            MaterialSnackUtils.MaterialSnack($"变更进刀速度设置为 {_semiAutoCutService.FeedSpeedCompCompensationValue}！", MaterialSnackUtils.SnackType.SUCCESS);
         }
 
         private async Task GlobalFocus()
@@ -254,6 +269,12 @@ namespace 精密切割系统.ViewModel
             _operatCts = new CancellationTokenSource();
             InitBottomButton();
             InitRightButton();
+            StartGetAxisInfo();
+            if (_isReuseView)
+            {
+                _isReuseView = false;
+                return;
+            }
             _semiAutomaticCuttingRunViewModel = navigationContext.Parameters.GetValue<MQSemiAutomaticCuttingRunViewModel>(nameof(MQSemiAutomaticCuttingRunViewModel));
             CutParam = _semiAutomaticCuttingRunViewModel.CutParam;
             float? xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync();
@@ -276,7 +297,6 @@ namespace 精密切割系统.ViewModel
             {
                 await PlcControl.tagControl.wholeDevice.OpenCameraLensCapAsync();
             }
-            StartGetAxisInfo();
         }
 
         public override async void OnNavigatedFrom(NavigationContext navigationContext)
@@ -288,6 +308,11 @@ namespace 精密切割系统.ViewModel
             {
                 await PlcControl.tagControl.wholeDevice.CloseCameraLensCapAsync();
             }
+        }
+
+        public override bool IsNavigationTarget(NavigationContext navigationContext)
+        {
+            return _isReuseView;
         }
     }
 }

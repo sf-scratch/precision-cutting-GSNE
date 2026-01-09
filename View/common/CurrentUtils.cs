@@ -276,72 +276,69 @@ namespace 精密切割系统.Utils
             return _model.ChannelNum;
         }
 
-        /// <summary>
-        /// 获取功能参数设定参数
-        /// </summary>
-        /// <returns></returns>
-        public static UserDefineDataModel GetCurrentUserDefineDataModel()
+        public static async void UpdateCutMarkWidth(int channelNum, float cutMarkWidth)
         {
-            return SqlHelper.Table<UserDefineDataModel>().Where(t => t.Id == 1).FirstOrDefault();
-        }
-
-        public static void UpdateCutMarkWidth(int channelNum, float cutMarkWidth)
-        {
-            UserDefineDataModel userDefineData = GetCurrentUserDefineDataModel();
-            switch (string.Format(GlobalParams.StringFormatCH, channelNum))
+            UserDefineDataModel userDefineData = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
+            if (userDefineData != null)
             {
-                case GlobalParams.CH1:
-                    userDefineData.BaselineWidthCh1 = cutMarkWidth.ToString(GlobalParams.RoughDecimalStringFormat);
-                    break;
+                switch (string.Format(GlobalParams.StringFormatCH, channelNum))
+                {
+                    case GlobalParams.CH1:
+                        userDefineData.BaselineWidthCh1 = cutMarkWidth.ToString(GlobalParams.RoughDecimalStringFormat);
+                        break;
 
-                case GlobalParams.CH2:
-                    userDefineData.BaselineWidthCh2 = cutMarkWidth.ToString(GlobalParams.RoughDecimalStringFormat);
-                    break;
+                    case GlobalParams.CH2:
+                        userDefineData.BaselineWidthCh2 = cutMarkWidth.ToString(GlobalParams.RoughDecimalStringFormat);
+                        break;
 
-                case GlobalParams.CH3:
-                    userDefineData.BaselineWidthCh3 = cutMarkWidth.ToString(GlobalParams.RoughDecimalStringFormat);
-                    break;
+                    case GlobalParams.CH3:
+                        userDefineData.BaselineWidthCh3 = cutMarkWidth.ToString(GlobalParams.RoughDecimalStringFormat);
+                        break;
 
-                case GlobalParams.CH4:
-                    userDefineData.BaselineWidthCh4 = cutMarkWidth.ToString(GlobalParams.RoughDecimalStringFormat);
-                    break;
+                    case GlobalParams.CH4:
+                        userDefineData.BaselineWidthCh4 = cutMarkWidth.ToString(GlobalParams.RoughDecimalStringFormat);
+                        break;
 
-                default:
-                    break;
+                    default:
+                        break;
+                }
+                SqlHelper.Update(userDefineData);
             }
-            SqlHelper.Update(userDefineData);
         }
 
-        public static void UpdateEdgeWidth(int channelNum, float edgeWidth)
+        public static async void UpdateEdgeWidth(int channelNum, float edgeWidth)
         {
-            UserDefineDataModel userDefineData = GetCurrentUserDefineDataModel();
-            switch (string.Format(GlobalParams.StringFormatCH, channelNum))
+            UserDefineDataModel userDefineData = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
+            if (userDefineData != null)
             {
-                case GlobalParams.CH1:
-                    userDefineData.EdgeWidthCh1 = edgeWidth.ToString(GlobalParams.RoughDecimalStringFormat);
-                    break;
+                switch (string.Format(GlobalParams.StringFormatCH, channelNum))
+                {
+                    case GlobalParams.CH1:
+                        userDefineData.EdgeWidthCh1 = edgeWidth.ToString(GlobalParams.RoughDecimalStringFormat);
+                        break;
 
-                case GlobalParams.CH2:
-                    userDefineData.EdgeWidthCh2 = edgeWidth.ToString(GlobalParams.RoughDecimalStringFormat);
-                    break;
+                    case GlobalParams.CH2:
+                        userDefineData.EdgeWidthCh2 = edgeWidth.ToString(GlobalParams.RoughDecimalStringFormat);
+                        break;
 
-                case GlobalParams.CH3:
-                    userDefineData.EdgeWidthCh3 = edgeWidth.ToString(GlobalParams.RoughDecimalStringFormat);
-                    break;
+                    case GlobalParams.CH3:
+                        userDefineData.EdgeWidthCh3 = edgeWidth.ToString(GlobalParams.RoughDecimalStringFormat);
+                        break;
 
-                case GlobalParams.CH4:
-                    userDefineData.EdgeWidthCh4 = edgeWidth.ToString(GlobalParams.RoughDecimalStringFormat);
-                    break;
+                    case GlobalParams.CH4:
+                        userDefineData.EdgeWidthCh4 = edgeWidth.ToString(GlobalParams.RoughDecimalStringFormat);
+                        break;
 
-                default:
-                    break;
+                    default:
+                        break;
+                }
+                SqlHelper.Update(userDefineData);
             }
-            SqlHelper.Update(userDefineData);
         }
 
-        public static void UpdateLightSourceBrightness(int channelNum, int light)
+        public static async void UpdateLightSourceBrightness(int channelNum, int light)
         {
-            UserDefineDataModel userDefineData = GetCurrentUserDefineDataModel();
+            UserDefineDataModel userDefineData = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
             switch (string.Format(GlobalParams.StringFormatCH, channelNum))
             {
                 case GlobalParams.CH1:
@@ -366,9 +363,9 @@ namespace 精密切割系统.Utils
             SqlHelper.Update(userDefineData);
         }
 
-        public static (float cutMarkWidth, float edgeWidth, int lightSourceBrightness) GetWidthAndLight(string currentChNo)
+        public static async Task<(float cutMarkWidth, float edgeWidth, int lightSourceBrightness)> GetWidthAndLightAsync(string currentChNo)
         {
-            UserDefineDataModel userDefineData = GetCurrentUserDefineDataModel();
+            UserDefineDataModel userDefineData = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
             switch (currentChNo)
             {
                 case GlobalParams.CH1:

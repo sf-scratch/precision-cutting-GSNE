@@ -380,24 +380,33 @@
                             Visibility="Collapsed" />
                         <!--  列数据  -->
                         <Label
-                            x:Name="CutRelativeFirstOffsetLabel"
+                            x:Name="relativeCutPositionLabel"
                             Grid.Row="4"
                             Grid.Column="0"
-                            Margin="0,0,0,10"
+                            Margin="0,0,0,8"
                             HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center"
-                            Content="第一刀偏移"
-                            FontSize="16" />
-                        <ComboBox
-                            x:Name="CutRelativeFirstOffset"
+                            Content="相对偏移量"
+                            FontSize="16"
+                            Visibility="Collapsed" />
+                        <Controls:InputTextBox
+                            x:Name="relativeCutPosition"
                             Grid.Row="4"
                             Grid.Column="1"
-                            Margin="0,0,0,10"
+                            Margin="0,0,0,8"
+                            InputType="Decimal"
+                            Visibility="Collapsed"
+                            XAllowNull="true" />
+                        <Label
+                            x:Name="relativeCutPositionUnit"
+                            Grid.Row="4"
+                            Grid.Column="3"
+                            Margin="0,0,0,8"
+                            HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center"
-                            FontSize="18">
-                            <ComboBoxItem Height="35" Content="否" />
-                            <ComboBoxItem Height="35" Content="是" />
-                        </ComboBox>
+                            Content="mm"
+                            FontSize="16"
+                            Visibility="Collapsed" />
                         <!--  列数据  -->
                         <Label
                             Grid.Row="6"

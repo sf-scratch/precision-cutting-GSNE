@@ -190,6 +190,12 @@ namespace 精密切割系统.ViewModel
                 //正在切割中
                 return;
             }
+            //if (!GlobalParams.OnlineFlag)
+            //{
+            //    SpeedManager.IsHighSpeed = false;
+            //    MaterialSnack($"切割中...", SnackType.WARNING, 0, _eventAggregator);
+            //    return;
+            //}
             CommonResult checkResult = await SemiAutoCutService.CheckCutAsync();
             if (!checkResult.IsSuccess)
             {
@@ -235,17 +241,12 @@ namespace 精密切割系统.ViewModel
             {
                 float cuttingLifeLength = bmParameter.CuttingLifeLength.ToFloat();
                 int cuttingLifeCutNumber = bmParameter.CuttingLifeCutNumber.ToInt();
-                if (Appsettings.AfterReplaceBladeCutLength >= cuttingLifeLength || Appsettings.AfterReplaceBladeCutTimes >= cuttingLifeCutNumber)
+                float afterReplaceBladeCutLength = Appsettings.AfterReplaceBladeCutLength.Value / 1000;
+                if (afterReplaceBladeCutLength >= cuttingLifeLength || Appsettings.AfterReplaceBladeCutTimes >= cuttingLifeCutNumber)
                 {
                     ShowWarnMessageNavigateHome("已超出刀片使用寿命，请更换刀片！");
                     return;
                 }
-            }
-            if (!GlobalParams.OnlineFlag)
-            {
-                SpeedManager.IsHighSpeed = false;
-                MaterialSnack($"切割中...", SnackType.WARNING, 0, _eventAggregator);
-                return;
             }
             if (!GlobalParams.HasFullyAutomatic)
             {
@@ -259,7 +260,7 @@ namespace 精密切割系统.ViewModel
                 _ = MonitoringAlarmAsync(_monitoringCts.Token);
                 _ = MonitoringCutProgressAsync(_monitoringCts.Token);
                 CutStep firtStep = cutSteps.First();
-                float cutY = firtStep.IsAbsolute ? firtStep.ChannelStartY : (await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0).ToActualY();
+                float cutY = firtStep.IsAbsolute ? firtStep.ChannelStartY : (await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0).ToActualY() + firtStep.ChannelStartY;
                 float measureHeightZ = 0;
                 if (bmParameter.IsAutomHeightMeasureBeforeCutting)
                 {
@@ -425,8 +426,10 @@ namespace 精密切割系统.ViewModel
             float runTime = 60 + currentKnifeRemainTime;
             try
             {
-                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(runTime));// 超时自动取消
+                // 超时自动取消
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(runTime));
                 await PlcControl.tagControl.cutting.ExitCuttingModeAsync(cts.Token);
+                await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
                 // 轴不报警时移动到指定位置
                 if (line != null && !AlarmConfig.Instance.HasAxisErrorAlarms())
                 {
@@ -445,7 +448,9 @@ namespace 精密切割系统.ViewModel
                     }
                     await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, cts.Token);
                     await AutoCutUtils.WorkpieceBlowingAsync(line.StartPoint.Y.ToCameraY(), default, _eventAggregator, cts.Token);
-                    await PlcControl.tagControl.cutting.RunMotionAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), line.StartPoint.Y.ToCameraY(), cts.Token);
+                    await Task.WhenAll(
+                        PlcControl.tagControl.Xaxis.StartAbsoluteAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), 30, cts.Token),
+                        PlcControl.tagControl.Yaxis.StartAbsoluteAsync(line.StartPoint.Y.ToCameraY(), 30, cts.Token));
                     // 执行默认动作
                     //await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(posZ, default, cts.Token);
                 }

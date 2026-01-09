@@ -59,9 +59,9 @@ namespace 精密切割系统.ViewModel
         // 半自动切割时对齐选择选项
         public ObservableCollection<string> AlignSelectionsWhenSemiAutoCutting { get; private set; }
 
-        public UserDefineDataViewModel()
+        public UserDefineDataViewModel(UserDefineDataModel userDefineDataModel)
         {
-            _model = CurrentUtils.GetCurrentUserDefineDataModel();
+            _model = userDefineDataModel;
             //Languages = new ObservableCollection<string> { "Chinese", "English", "Japanese" };
             Languages = new ObservableCollection<string> { "Chinese" };
             DeviceChangeCutSpeeds = new ObservableCollection<string> { "clear", "keep" };

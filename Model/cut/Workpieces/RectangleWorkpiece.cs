@@ -47,7 +47,7 @@ namespace 精密切割系统.Model.cut.Workpieces
             if (cutDirection == CutDirection.Backward)
             {
                 _currentY -= cutSize;
-                if (_rect.Y >= _currentY)
+                if (_rect.Y >= _currentY || _rect.Y + _rect.Height <= _currentY)
                 {
                     return false;
                 }
@@ -55,7 +55,7 @@ namespace 精密切割系统.Model.cut.Workpieces
             if (cutDirection == CutDirection.Forward)
             {
                 _currentY += cutSize;
-                if (_rect.Y + _rect.Height <= _currentY)
+                if (_rect.Y >= _currentY || _rect.Y + _rect.Height <= _currentY)
                 {
                     return false;
                 }

@@ -193,9 +193,12 @@ namespace 精密切割系统.ViewModel
 
         private void InitRightButton()
         {
-            RightButtonCollection.Clear();
-            RightButtonCollection.Add(ButtonParams.GreenRightButton("空运行", "LocationEnter", ExecuteEmptyRun));
-            RightButtonCollection.Add(ButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                RightButtonCollection.Clear();
+                RightButtonCollection.Add(ButtonParams.GreenRightButton("空运行", "LocationEnter", ExecuteEmptyRun));
+                RightButtonCollection.Add(ButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
+            });
         }
 
         private void InitRuningRightButton()
@@ -247,11 +250,11 @@ namespace 精密切割系统.ViewModel
                         float speedZ1 = _speedZ1.ToFloat();
                         float speedZ2 = _speedZ2.ToFloat();
                         float speedTheta = _speedTheta.ToFloat();
-                        int repeatCountX = _repeatCountX.ToInt();
-                        int repeatCountY = _repeatCountY.ToInt();
-                        int repeatCountZ1 = _repeatCountZ1.ToInt();
-                        int repeatCountZ2 = _repeatCountZ2.ToInt();
-                        int repeatCountTheta = _repeatCountTheta.ToInt();
+                        int repeatCountX = RunX ? _repeatCountX.ToInt() : 0;
+                        int repeatCountY = RunY ? _repeatCountY.ToInt() : 0;
+                        int repeatCountZ1 = RunZ1 ? _repeatCountZ1.ToInt() : 0;
+                        int repeatCountZ2 = RunZ2 ? _repeatCountZ2.ToInt() : 0;
+                        int repeatCountTheta = RunTheta ? _repeatCountTheta.ToInt() : 0;
                         int currentRepeat = 0;
                         int maxRepeatCount = new int[] { repeatCountX, repeatCountY, repeatCountZ1, repeatCountZ2, repeatCountTheta }.Max();
                         if (IsOpenWater)
@@ -329,6 +332,7 @@ namespace 精密切割系统.ViewModel
                     {
                         await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
                         await PlcControl.tagControl.wholeDevice.CloseWorkpieceBlowingAsync();
+                        Stop();
                     }
                 }, _emptyRunCts.Token);
             }

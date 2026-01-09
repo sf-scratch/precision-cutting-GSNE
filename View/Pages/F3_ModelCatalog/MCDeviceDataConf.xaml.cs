@@ -86,7 +86,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             operatePage = mainWindow.operateFrame.Content as OperatePage;
 
             // 查询当前用户配置为深度还是高度
-            UserDefineDataModel userDefine = CurrentUtils.GetCurrentUserDefineDataModel();
+            UserDefineDataModel userDefine = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
             cutWay = userDefine.ZAxisCutModel;
             if (cutWay.Equals("深度"))
             {
@@ -654,7 +654,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 ComBoxCutMode.IsEnabled = false;
                 ComBoxCutDir.IsEnabled = false;
                 ComBoxCutMethod.IsEnabled = false;
-                CutRelativeFirstOffset.IsEnabled = false;
+                relativeCutPosition.IsEnabled = false;
                 inputCutLine.IsEnabled = false;
                 absoluteCutPosition.IsEnabled = false;
                 inputBladeAngle.IsEnabled = false;
@@ -679,7 +679,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 ComBoxCutMode.Text = _chModel.CutMode;
                 ComBoxCutDir.Text = _chModel.CutDir;
                 ComBoxCutMethod.Text = _chModel.ComBoxCutMethod;
-                CutRelativeFirstOffset.Text = _chModel.CutRelativeFirstOffset;
+                relativeCutPosition.Text = _chModel.RelativeCutPosition;
                 inputCutLine.Text = _chModel.CutLine;
                 absoluteCutPosition.Text = _chModel.AbsoluteCutPosition;
                 inputBladeAngle.Text = _chModel.BladeAngle;
@@ -1021,7 +1021,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             _chModel.CutMode = ComBoxCutMode.Text;
             _chModel.CutDir = ComBoxCutDir.Text;
             _chModel.ComBoxCutMethod = ComBoxCutMethod.Text;
-            _chModel.CutRelativeFirstOffset = CutRelativeFirstOffset.Text;
+            _chModel.RelativeCutPosition = relativeCutPosition.Text;
             _chModel.CutLine = inputCutLine.Text;
             _chModel.AbsoluteCutPosition = absoluteCutPosition.Text;
             _chModel.BladeAngle = inputBladeAngle.Text;
@@ -1029,14 +1029,6 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             _chModel.OffsetX = inputOffsetX.Text;
             _chModel.AlignX = alignX.Text;
             _chModel.AlignY = alignY.Text;
-            if (ComBoxCutMethod.Text.Equals("相对"))
-            {
-                _chModel.AbsoluteCutPosition = "";
-            }
-            else
-            {
-                _chModel.CutRelativeFirstOffset = "否";
-            }
             //ChItem中表单信息
             for (int i = 0; i < ColList.Count; i++)
             {
@@ -1175,18 +1167,20 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             if (value.Equals("相对"))
             {
                 // 选择了绝对
-                CutRelativeFirstOffsetLabel.Visibility = Visibility.Collapsed;
-                CutRelativeFirstOffset.Visibility = Visibility.Collapsed;
-
                 absoluteCutPosition.Visibility = Visibility.Visible;
                 absoluteCutPositionLabel.Visibility = Visibility.Visible;
                 absoluteCutPositionUnit.Visibility = Visibility.Visible;
+
+                relativeCutPosition.Visibility = Visibility.Collapsed;
+                relativeCutPositionLabel.Visibility = Visibility.Collapsed;
+                relativeCutPositionUnit.Visibility = Visibility.Collapsed;
             }
             else
             {
                 // 选择了相对
-                CutRelativeFirstOffsetLabel.Visibility = Visibility.Visible;
-                CutRelativeFirstOffset.Visibility = Visibility.Visible;
+                relativeCutPosition.Visibility = Visibility.Visible;
+                relativeCutPositionLabel.Visibility = Visibility.Visible;
+                relativeCutPositionUnit.Visibility = Visibility.Visible;
 
                 absoluteCutPosition.Visibility = Visibility.Collapsed;
                 absoluteCutPositionLabel.Visibility = Visibility.Collapsed;

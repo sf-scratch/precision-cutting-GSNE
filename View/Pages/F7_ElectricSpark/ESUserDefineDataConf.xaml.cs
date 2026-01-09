@@ -46,13 +46,13 @@ namespace 精密切割系统.View.F7_ElectricSpark
         {
         }
 
-        private void Page_Loaded(object sender, RoutedEventArgs e)
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             List<UserDefineDataModel> list = SqlHelper.Table<UserDefineDataModel>().ToList();
             Debug.WriteLine(list.Count);
             if (list.Count > 0)
             {
-                UserDefineDataViewModel viewModel = new UserDefineDataViewModel();
+                UserDefineDataViewModel viewModel = new UserDefineDataViewModel(await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel()));
                 viewModel.MachineId = list[0].MachineId;
                 viewModel.SystemPassword = list[0].SystemPassword;
                 viewModel.SystemPasswordTime = list[0].SystemPasswordTime;
@@ -90,7 +90,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
             }
             else
             {
-                DataContext = new UserDefineDataViewModel();
+                DataContext = new UserDefineDataViewModel(await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel()));
             }
             rightPage = mainWindow.rightFrame.Content as RightPage;
             rightPage.PanelAction.Visibility = Visibility.Visible;
