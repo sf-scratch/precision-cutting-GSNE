@@ -10,8 +10,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
     Title="MQSemiAutomaticCuttingConf"
-    d:DesignHeight="655"
-    d:DesignWidth="1570"
+    d:DesignHeight="645"
+    d:DesignWidth="1560"
     Loaded="Page_Loaded"
     mc:Ignorable="d">
     <Page.Resources>

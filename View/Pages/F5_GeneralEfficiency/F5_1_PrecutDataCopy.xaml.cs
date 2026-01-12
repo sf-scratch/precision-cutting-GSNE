@@ -65,14 +65,14 @@ namespace 精密切割系统.View.Pages.F5_GeneralEfficiency
             var success = this.FormSuccess();
             if (!success)
             {
-                MaterialSnackUtils.MaterialSnack("数据异常", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("数据异常", SnackType.ERROR);
                 return;
             }
             if (string.IsNullOrEmpty(tbxDst.Text)) return;
             List<PreCutModel> precutList = SqlHelper.Table<PreCutModel>().Where(t => t.PrecutNo == tbxDst.Text).ToList();
             if (precutList.Count > 0)
             {
-                MaterialSnackUtils.MaterialSnack("预切割编号已存在，请重新输入！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("预切割编号已存在，请重新输入！", SnackType.WARNING);
                 return;
             }
             currentModel.PrecutNo = tbxDst.Text;

@@ -31,6 +31,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
         private RightPage? rightPage;
         private ObservableCollection<FileTableModel> commList { get; set; } = new ObservableCollection<FileTableModel>();
         private FileTableItemModel currentModel;//当前配置
+
         public MCMoveDeviceDirectoryConf()
         {
             InitializeComponent();
@@ -60,7 +61,6 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
 
         private async Task initView()
         {
-
             int id = int.Parse(QueryUtils.getQuery(this)["id"]);
 
             //查询数据
@@ -73,8 +73,6 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 labDeviceDataNo.Text = tableList[0].DeviceDataNo;
                 initFileView(tableList[0].DirectoryId);
             }
-
-
         }
 
         private async Task initFileView(long DirectoryId)
@@ -107,12 +105,12 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             .ToList();
             if (list.Count > 0)
             {
-                MaterialSnackUtils.MaterialSnack("该型号参数号已存在，请修改！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("该型号参数号已存在，请修改！", SnackType.WARNING);
             }
             else
             {
                 currentModel.DirectoryId = fileId;
-                int count =  SqlHelper.Update(currentModel);
+                int count = SqlHelper.Update(currentModel);
                 mainWindow.NavigateToPage("Pages/F3_ModelCatalog/MCDeviceDataListConf");
             }
         }

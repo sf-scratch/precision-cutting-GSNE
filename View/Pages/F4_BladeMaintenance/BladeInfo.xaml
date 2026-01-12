@@ -75,17 +75,17 @@
                 Grid.ColumnSpan="6"
                 FontSize="20"
                 Text="刀片使用寿命" />
-            <Label Content="刀片更换后" />
+            <Label Content="自刀片更换后" />
             <Controls:InputTextBox x:Name="afterReplaceBladeCutTimes" IsEnabled="False" />
             <TextBlock Grid.ColumnSpan="2" Text="刀" />
             <Controls:InputTextBox x:Name="afterReplaceBladeCutLength" IsEnabled="False" />
             <TextBlock Text="m" />
-            <Label Content="测高后" />
+            <Label Content="自测高后" />
             <Controls:InputTextBox x:Name="afterMeasureHeightCutTimes" IsEnabled="False" />
             <TextBlock Grid.ColumnSpan="2" Text="刀" />
             <Controls:InputTextBox x:Name="afterMeasureHeightCutLength" IsEnabled="False" />
             <TextBlock Text="m" />
-            <Label Content="清除数据后" />
+            <Label Content="自计数清零后" />
             <Controls:InputTextBox x:Name="afterClearDataCutTimes" IsEnabled="False" />
             <TextBlock Grid.ColumnSpan="2" Text="刀" />
             <Controls:InputTextBox x:Name="afterClearDataCutLength" IsEnabled="False" />

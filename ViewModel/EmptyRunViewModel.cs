@@ -12,7 +12,6 @@ using 精密切割系统.Model.plc;
 using 精密切割系统.View.Controls;
 using 精密切割系统.View.Pages.F4_BladeMaintenance;
 using static NPOI.HSSF.Util.HSSFColor;
-using static 精密切割系统.Helpers.MaterialSnackUtils;
 
 namespace 精密切割系统.ViewModel
 {
@@ -175,6 +174,10 @@ namespace 精密切割系统.ViewModel
         private readonly SemaphoreSlim _emptyRunSemaphore = new(1, 1);
         private CancellationTokenSource? _emptyRunCts;
 
+        public EmptyRunViewModel()
+        {
+        }
+
         public EmptyRunViewModel(IRegionManager regionManager)
         {
             _isEnabledGrid = true;
@@ -211,29 +214,29 @@ namespace 精密切割系统.ViewModel
         {
             if (RegionUtils.FormError(_regionManager))
             {
-                MaterialSnackUtils.MaterialSnack(RegionUtils.FormErrorMessage, SnackType.WARNING);
+                MaterialSnack(RegionUtils.FormErrorMessage, SnackType.WARNING);
                 return;
             }
             if (AlarmConfig.Instance.HasActiveErrorAlarm())
             {
-                MaterialSnackUtils.MaterialSnack(AlarmConfig.HasErrorAlarmMessage, SnackType.WARNING);
+                MaterialSnack(AlarmConfig.HasErrorAlarmMessage, SnackType.WARNING);
                 return;
             }
             if (!await _emptyRunSemaphore.WaitAsync(TimeSpan.Zero))
             {
-                MaterialSnackUtils.MaterialSnack("准备空运行中！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("准备空运行中！", SnackType.WARNING);
                 return;
             }
             try
             {
                 if (!RunX && !RunY && !RunZ1 && !RunZ2 && !RunTheta && !IsOpenWater && !IsFlowing)
                 {
-                    MaterialSnackUtils.MaterialSnack("请选择至少一个项进行空运行！", MaterialSnackUtils.SnackType.WARNING);
+                    MaterialSnack("请选择至少一个项进行空运行！", SnackType.WARNING);
                     return;
                 }
                 if (_emptyRunCts != null && !_emptyRunCts.IsCancellationRequested)
                 {
-                    MaterialSnackUtils.MaterialSnack("空运行已在进行中！", MaterialSnackUtils.SnackType.WARNING);
+                    MaterialSnack("空运行已在进行中！", SnackType.WARNING);
                     return;
                 }
                 _emptyRunCts?.Dispose();
@@ -318,15 +321,15 @@ namespace 精密切割系统.ViewModel
                             tasks.Clear();
                             currentRepeat++;
                         }
-                        MaterialSnackUtils.MaterialSnack("空运行已完成！", MaterialSnackUtils.SnackType.SUCCESS);
+                        MaterialSnack("空运行已完成！", SnackType.SUCCESS);
                     }
                     catch (OperationCanceledException)
                     {
-                        MaterialSnackUtils.MaterialSnack("空运行已取消！", MaterialSnackUtils.SnackType.WARNING);
+                        MaterialSnack("空运行已取消！", SnackType.WARNING);
                     }
                     catch (Exception ex)
                     {
-                        MaterialSnackUtils.MaterialSnack($"空运行发生错误: {ex.Message}", MaterialSnackUtils.SnackType.ERROR);
+                        MaterialSnack($"空运行发生错误: {ex.Message}", SnackType.ERROR);
                     }
                     finally
                     {
@@ -346,7 +349,7 @@ namespace 精密切割系统.ViewModel
         {
             if (!await _emptyRunSemaphore.WaitAsync(TimeSpan.Zero))
             {
-                MaterialSnackUtils.MaterialSnack("终止空运行中！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("终止空运行中！", SnackType.WARNING);
                 return;
             }
             try
@@ -366,11 +369,11 @@ namespace 精密切割系统.ViewModel
             }
             catch (OperationCanceledException)
             {
-                MaterialSnackUtils.MaterialSnack($"停止空运行超时！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack($"停止空运行超时！", SnackType.WARNING);
             }
             catch (Exception ex)
             {
-                MaterialSnackUtils.MaterialSnack($"停止空运行发生错误: {ex.Message}", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack($"停止空运行发生错误: {ex.Message}", SnackType.ERROR);
             }
             finally
             {

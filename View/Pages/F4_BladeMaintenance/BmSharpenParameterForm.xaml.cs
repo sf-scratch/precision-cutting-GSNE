@@ -107,7 +107,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         {
             if (_model is null)
             {
-                MaterialSnackUtils.MaterialSnack("数据异常", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("数据异常", SnackType.ERROR);
                 return;
             }
             _semiAutoCutService.CutLine = _model.CoCutNum;
@@ -138,7 +138,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             }
             else
             {
-                MaterialSnackUtils.MaterialSnack("数据异常", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("数据异常", SnackType.ERROR);
             }
         }
 
@@ -342,7 +342,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 {
                     var Id = await SqlHelper.AddAsync(_model);
                 }
-                MaterialSnackUtils.MaterialSnack("保存成功！", MaterialSnackUtils.SnackType.SUCCESS);
+                MaterialSnack("保存成功！", SnackType.SUCCESS);
             }
             else
             {

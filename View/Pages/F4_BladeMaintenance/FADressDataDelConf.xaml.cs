@@ -84,7 +84,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             }
             else
             {
-                MaterialSnackUtils.MaterialSnack("数据异常", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("数据异常", SnackType.ERROR);
             }
         }
 
@@ -134,7 +134,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 if (!string.Equals(_model.BladeLotID,"0"))
                 {
                     await SqlHelper.DeleteAsync(_model);
-                    MaterialSnackUtils.MaterialSnack("消除参数号成功！", MaterialSnackUtils.SnackType.SUCCESS);
+                    MaterialSnack("消除参数号成功！", SnackType.SUCCESS);
                     mainWindow.NavigateToPage("Pages/F4_BladeMaintenance/BmSharpenParameter");
                 }                
             }

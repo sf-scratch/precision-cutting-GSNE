@@ -26,6 +26,7 @@ using 精密切割系统.View.Pages.F4_BladeMaintenance;
 using 精密切割系统.View.Pages.operate;
 using 精密切割系统.ViewModel;
 
+
 namespace 精密切割系统.View.Pages.Auto
 {
     /// <summary>
@@ -192,7 +193,7 @@ namespace 精密切割系统.View.Pages.Auto
                     string yCurrentPosition = PlcControl.plc.GetPlcValueString(DeviceKey.yCurLocationKey);
                     float offset = CutOperateUtils.yStopLocation - float.Parse(yCurrentPosition);
                     GlobalParams.cameraOffsetY = cameraCutOffset + offset;
-                    MaterialSnackUtils.MaterialSnack("基准线已确认！", MaterialSnackUtils.SnackType.SUCCESS);
+                    MaterialSnack("基准线已确认！", SnackType.SUCCESS);
                     Tools.LogInfo($"最新基准线：{GlobalParams.cameraOffsetY}");
                     cameraOffsetStatus = true;
                     break;
@@ -202,14 +203,14 @@ namespace 精密切割系统.View.Pages.Auto
                     //// 高度补偿
                     //GlobalParams.depthComp = tempDepthCompensation;
                     // CutOperateUtils.SetBladeHeightComp(tempDepthCompensation);
-                    MaterialSnackUtils.MaterialSnack("刀片高度补偿设置成功！", MaterialSnackUtils.SnackType.SUCCESS);
+                    MaterialSnack("刀片高度补偿设置成功！", SnackType.SUCCESS);
                     break;
 
                 case 2403:
                     //float tempChangeFeedSpeed = Tools.GetFloatStringValue(viewModel.ChangeFeedSpeed);
                     //// 速度更改
                     //CutOperateUtils.SetFeedSpeedComp(tempChangeFeedSpeed);
-                    MaterialSnackUtils.MaterialSnack("变更进刀速度成功！", MaterialSnackUtils.SnackType.SUCCESS);
+                    MaterialSnack("变更进刀速度成功！", SnackType.SUCCESS);
                     break;
 
                 case 2442:
@@ -274,12 +275,12 @@ namespace 精密切割系统.View.Pages.Auto
         {
             if (runFlag)
             {
-                // MaterialSnackUtils.showOperateLimitMsg();
+                // showOperateLimitMsg();
                 return;
             }
             if (!cameraOffsetStatus)
             {
-                MaterialSnackUtils.MaterialSnack("请先进行基准线校准！", MaterialSnackUtils.SnackType.WARNING, 0);
+                MaterialSnack("请先进行基准线校准！", SnackType.WARNING, 0);
                 return;
             }
             cameraOffsetStatus = false;
@@ -296,7 +297,7 @@ namespace 精密切割系统.View.Pages.Auto
 
         private void cutRecognition_Click(object sender, RoutedEventArgs e)
         {
-            MaterialSnackUtils.MaterialSnack("识别中...", MaterialSnackUtils.SnackType.WARNING, 0);
+            MaterialSnack("识别中...", SnackType.WARNING, 0);
             string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss_fff");
             string fileName = $"check_{timestamp}.png";
             Thread.Sleep(1000);
@@ -310,7 +311,7 @@ namespace 精密切割系统.View.Pages.Auto
             cameraCommon.DrawLineForWidth((float)cutWidthValue, (float)edgesWidthValue);
             //viewModel.CutWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((cameraCommon._cutMarkWidth / 1000).ToString(), 4));
             //viewModel.DdgesWidth = Tools.GetDoubleStringValue(Tools.FormatDecimalString((cameraCommon._edgeChipWidth / 1000).ToString(), 4));
-            MaterialSnackUtils.MaterialSnack("识别完成！", MaterialSnackUtils.SnackType.SUCCESS);
+            MaterialSnack("识别完成！", SnackType.SUCCESS);
         }
 
         private void stopCheckCheckbox_Click(object sender, RoutedEventArgs e)

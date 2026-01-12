@@ -31,7 +31,7 @@ using 精密切割系统.View.Controls;
 using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.operate;
 using 精密切割系统.ViewModel;
-using static 精密切割系统.Helpers.MaterialSnackUtils;
+
 
 namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 {
@@ -99,7 +99,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             }
             if (AlarmConfig.Instance.HasActiveErrorAlarm())
             {
-                MaterialSnackUtils.MaterialSnack(AlarmConfig.HasErrorAlarmMessage, SnackType.WARNING);
+                MaterialSnack(AlarmConfig.HasErrorAlarmMessage, SnackType.WARNING);
                 return;
             }
             if (Appsettings.BladeOuterDiameter is null)

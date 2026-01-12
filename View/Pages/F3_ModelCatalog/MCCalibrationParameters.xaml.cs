@@ -68,14 +68,14 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 try
                 {
                     SqlHelper.Update(viewModel.UserDefineDataModel);
-                    MaterialSnackUtils.MaterialSnack("保存成功", MaterialSnackUtils.SnackType.SUCCESS);
+                    MaterialSnack("保存成功", SnackType.SUCCESS);
                     int id = int.Parse(QueryUtils.getQuery(this)["id"]);
                     bool lookState = bool.Parse(QueryUtils.getQuery(this)["look"]);
                     _mainWindow?.NavigateToPage("Pages/F3_ModelCatalog/MCDeviceDataConf", $"id={id}&look={lookState}");
                 }
                 catch
                 {
-                    MaterialSnackUtils.MaterialSnack("保存失败", MaterialSnackUtils.SnackType.ERROR);
+                    MaterialSnack("保存失败", SnackType.ERROR);
                 }
             }
         }

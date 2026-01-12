@@ -231,50 +231,50 @@ namespace 精密切割系统
                 {
                     if (!PlcControl.connectionStatus)
                     {
-                        MaterialSnackUtils.MaterialSnack("PLC连接中...", MaterialSnackUtils.SnackType.INFO);
+                        MaterialSnack("PLC连接中...", SnackType.INFO);
                         bool res = mainPlc.ConnectPlc();
                         if (!res)
                         {
-                            MaterialSnackUtils.MaterialSnack("PLC连接失败，重试中...", MaterialSnackUtils.SnackType.WARNING, 0);
+                            MaterialSnack("PLC连接失败，重试中...", SnackType.WARNING, 0);
                             await Task.Delay(2000);
                         }
                     }
                     if (!CameraUtils.BDeviceOpened)
                     {
-                        MaterialSnackUtils.MaterialSnack("相机连接中...", MaterialSnackUtils.SnackType.INFO, 0);
+                        MaterialSnack("相机连接中...", SnackType.INFO, 0);
                         CameraUtils.ConnectDevice();
                         if (!CameraUtils.BDeviceOpened)
                         {
-                            MaterialSnackUtils.MaterialSnack($"相机连接失败: {CameraUtils.errorMessage}", MaterialSnackUtils.SnackType.WARNING);
+                            MaterialSnack($"相机连接失败: {CameraUtils.errorMessage}", SnackType.WARNING);
                             await Task.Delay(2000);
                         }
                     }
                     if (!CameraUtils.l_lightConnectStatus)
                     {
-                        MaterialSnackUtils.MaterialSnack("光源连接中...", MaterialSnackUtils.SnackType.INFO, 0);
+                        MaterialSnack("光源连接中...", SnackType.INFO, 0);
                         CameraUtils.ConnectLight();
                         if (!CameraUtils.l_lightConnectStatus)
                         {
-                            MaterialSnackUtils.MaterialSnack("光源连接失败，重试中..." + CameraUtils.l_errorMessage, MaterialSnackUtils.SnackType.WARNING);
+                            MaterialSnack("光源连接失败，重试中..." + CameraUtils.l_errorMessage, SnackType.WARNING);
                             await Task.Delay(2000);
                         }
                     }
                     // if (PlcControl.connectionStatus && CameraUtils._bDeviceOpened && CameraUtils.l_lightConnectStatus)
                     if (PlcControl.connectionStatus)
                     {
-                        MaterialSnackUtils.MaterialSnack("设备加载完成！", MaterialSnackUtils.SnackType.SUCCESS, 0);
+                        MaterialSnack("设备加载完成！", SnackType.SUCCESS, 0);
                         break;
                     }
                     else
                     {
-                        MaterialSnackUtils.MaterialSnack("设备加载失败，重试中...", MaterialSnackUtils.SnackType.SUCCESS);
+                        MaterialSnack("设备加载失败，重试中...", SnackType.SUCCESS);
                         await Task.Delay(2000);
                     }
                 }
                 catch (Exception ex)
                 {
                     // 模拟重试逻辑
-                    MaterialSnackUtils.MaterialSnack($"设备连接异常: {ex.Message}", MaterialSnackUtils.SnackType.ERROR);
+                    MaterialSnack($"设备连接异常: {ex.Message}", SnackType.ERROR);
                     Tools.LogError($"设备连接异常: {ex.Message}");
                     await Task.Delay(2000);
                 }

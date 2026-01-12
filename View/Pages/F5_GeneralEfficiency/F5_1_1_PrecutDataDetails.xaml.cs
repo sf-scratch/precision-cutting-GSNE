@@ -185,7 +185,7 @@ namespace 精密切割系统.View.Pages
             var success = this.FormSuccess();
             if (!success)
             {
-                MaterialSnackUtils.MaterialSnack("数据异常", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("数据异常", SnackType.ERROR);
                 return;
             }
 
@@ -200,7 +200,7 @@ namespace 精密切割系统.View.Pages
             // viewModel.PrecutTable = (ObservableCollection<PreCutTableClass>)lvwPrecut.ItemsSource;
             // viewModel.precutParameter.PrecutID = cbbItems.SelectedItem.ToString();
             int result = SqlHelper.Update(model.precutParameter);
-            MaterialSnackUtils.MaterialSnack("保存成功！", MaterialSnackUtils.SnackType.SUCCESS);
+            MaterialSnack("保存成功！", SnackType.SUCCESS);
             // mainWindow.NavigateToPage("Pages/F5_GeneralEfficiency/F5_1_PrecutData");
         }
 

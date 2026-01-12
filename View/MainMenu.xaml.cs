@@ -25,7 +25,7 @@ using System.Reflection;
 using Path = System.IO.Path;
 using 精密切割系统.Assets.config;
 using 精密切割系统.Helpers;
-using static 精密切割系统.Helpers.MaterialSnackUtils;
+
 using 精密切割系统.Utils;
 using 精密切割系统.Driver;
 using 精密切割系统.View.Pages.operate;
@@ -38,6 +38,7 @@ using 精密切割系统.Model.cut;
 using 精密切割系统.View.Pages.Auto;
 using 精密切割系统.View.Pages.F4_BladeMaintenance;
 using Prism.Navigation.Regions;
+using 精密切割系统.View.Pages.F2_ManualOperation;
 
 namespace 精密切割系统.View
 {
@@ -217,11 +218,6 @@ namespace 精密切割系统.View
             }
             switch (bean.Code)
             {
-                case 1:
-                    {
-                        ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(FullyAutomatic));
-                        break;
-                    }
                 case 2:
                     {
                         rightPage.PanelAction.Visibility = Visibility.Visible;
@@ -250,13 +246,6 @@ namespace 精密切割系统.View
                         }
                         break;
                     }
-                //case 6:
-                //    {
-                //        rightPage.PanelAction.Visibility = Visibility.Visible;
-                //        rightPage.btnBack.Visibility = Visibility.Visible;
-                //        UpdateMenu(MenuData.GetF6Menu());
-                //        break;
-                //    }
                 case 7:
                     {
                         if (havePassWord())
@@ -284,7 +273,7 @@ namespace 精密切割系统.View
                         {
                             // 新发送PLC进入模式，当模式进入成功后，跳转页面
                             MenuButton menu = sender as MenuButton;
-                            MaterialSnackUtils.MaterialSnack("进入电火花修刀模式中...", SnackType.WARNING, 0);
+                            MaterialSnack("进入电火花修刀模式中...", SnackType.WARNING, 0);
                             PlcControl.tagControl.sparkRepairKnife.EnterElectrical(1);
                             GlobalParams.globalRunFlag = true;
                             // 监听状态，如果模式准备完成，则跳转页面
@@ -298,7 +287,7 @@ namespace 精密切割系统.View
                                 }
                                 else
                                 {
-                                    MaterialSnackUtils.MaterialSnack("进入电火花修刀模式失败！", SnackType.WARNING, 0);
+                                    MaterialSnack("进入电火花修刀模式失败！", SnackType.WARNING, 0);
                                     // 进入失败，退出模式
                                     PlcControl.tagControl.sparkRepairKnife.EnterElectrical(0);
                                 }
@@ -309,7 +298,7 @@ namespace 精密切割系统.View
                 case 202:
                     if (mainWindow == null)
                     {
-                        MaterialSnackUtils.MaterialSnack($"{nameof(mainWindow)}为空", SnackType.WARNING);
+                        MaterialSnack($"{nameof(mainWindow)}为空", SnackType.WARNING);
                         return;
                     }
                     CommonResult result = await AutoCutUtils.EnterManualAlignmentAsync(mainWindow);
@@ -319,7 +308,7 @@ namespace 精密切割系统.View
                     }
                     else
                     {
-                        MaterialSnackUtils.MaterialSnack(result.Message, SnackType.WARNING);
+                        MaterialSnack(result.Message, SnackType.WARNING);
                     }
                     break;
 
@@ -342,7 +331,7 @@ namespace 精密切割系统.View
                     {
                         // 新发送PLC进入模式，当模式进入成功后，跳转页面
                         // 进入测高模式
-                        MaterialSnackUtils.MaterialSnack("进入测高模式中...", SnackType.WARNING, 0);
+                        MaterialSnack("进入测高模式中...", SnackType.WARNING, 0);
                         MenuButton menu = sender as MenuButton;
                         PlcControl.tagControl.bladeMantance.RunBladeSetup(1);
                         PlcControl.tagControl.wholeDevice.SetPanelButtonsStauts(1);
@@ -360,7 +349,7 @@ namespace 精密切割系统.View
                             {
                                 PlcControl.tagControl.bladeMantance.RunBladeSetup(0);
                                 PlcControl.tagControl.wholeDevice.SetPanelButtonsStauts(0);
-                                MaterialSnackUtils.MaterialSnack("进入刀片测高失败！", SnackType.WARNING, 0);
+                                MaterialSnack("进入刀片测高失败！", SnackType.WARNING, 0);
                             }
                         });
                     }

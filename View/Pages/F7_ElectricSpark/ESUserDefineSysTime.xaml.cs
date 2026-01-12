@@ -73,7 +73,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
             }
             else
             {
-                MaterialSnackUtils.MaterialSnack("数据异常", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("数据异常", SnackType.ERROR);
             }
         }
         public async void saveData()
@@ -106,16 +106,16 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
                 bool isSucess = UpdateTimeHelper.SetDate(dateTime);
                 if (isSucess)
                 {
-                    MaterialSnackUtils.MaterialSnack("设置成功！", MaterialSnackUtils.SnackType.SUCCESS);
+                    MaterialSnack("设置成功！", SnackType.SUCCESS);
                 }
                 else 
                 {
-                    MaterialSnackUtils.MaterialSnack("设置失败！", MaterialSnackUtils.SnackType.SUCCESS);
+                    MaterialSnack("设置失败！", SnackType.SUCCESS);
                 }
             }
             else
             {
-                MaterialSnackUtils.MaterialSnack("无法转换成日期！", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("无法转换成日期！", SnackType.ERROR);
             }
         }
 

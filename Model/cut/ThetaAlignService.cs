@@ -50,7 +50,7 @@ namespace 精密切割系统.Model.cut
         {
             if (!await _thetaAlignSemaphore.WaitAsync(TimeSpan.Zero))
             {
-                MaterialSnackUtils.MaterialSnack("拉直中，请勿重复点击！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("拉直中，请勿重复点击！", SnackType.WARNING);
                 return;
             }
             try
@@ -63,13 +63,13 @@ namespace 精密切割系统.Model.cut
                 switch (_currentThetaAlignStatus)
                 {
                     case ThetaAlignStatus.Horizontal:
-                        MaterialSnackUtils.MaterialSnack("横向拉直中！", MaterialSnackUtils.SnackType.SUCCESS, 0);
+                        MaterialSnack("横向拉直中！", SnackType.SUCCESS, 0);
                         xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationWaitAsync(token);
                         yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationWaitAsync(token);
                         var curTheta = await PlcControl.tagControl.ThetaAxis.GetCurrentLocationWaitAsync(token);
                         if (xLocation == null || yLocation == null || curTheta == null)
                         {
-                            MaterialSnackUtils.MaterialSnack("获取当前位置失败，请重试！", MaterialSnackUtils.SnackType.WARNING);
+                            MaterialSnack("获取当前位置失败，请重试！", SnackType.WARNING);
                             return;
                         }
                         PointF pointB = new PointF(xLocation.Value, yLocation.Value);
@@ -86,12 +86,12 @@ namespace 精密切割系统.Model.cut
                         await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(rotatePointA.X, 80, token);
                         _thetaAlignCompletedDeg = curTheta.Value + angle;
                         _currentThetaAlignStatus = ThetaAlignStatus.Completed;
-                        MaterialSnackUtils.MaterialSnack("横向拉直完成！", MaterialSnackUtils.SnackType.SUCCESS);
+                        MaterialSnack("横向拉直完成！", SnackType.SUCCESS);
                         break;
 
                     case ThetaAlignStatus.Vertical:
                         _currentThetaAlignStatus = ThetaAlignStatus.None;
-                        MaterialSnackUtils.MaterialSnack("已取消竖向拉直!", MaterialSnackUtils.SnackType.WARNING);
+                        MaterialSnack("已取消竖向拉直!", SnackType.WARNING);
                         break;
 
                     default:
@@ -99,19 +99,19 @@ namespace 精密切割系统.Model.cut
                         yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationWaitAsync(token);
                         if (xLocation == null || yLocation == null)
                         {
-                            MaterialSnackUtils.MaterialSnack("获取当前位置失败，请重试！", MaterialSnackUtils.SnackType.WARNING);
+                            MaterialSnack("获取当前位置失败，请重试！", SnackType.WARNING);
                             return;
                         }
                         _pointA = new PointF(xLocation.Value, yLocation.Value);
                         await PlcControl.tagControl.Xaxis.StartRelativeAsync(Appsettings.HorizontalStraighteningStroke ?? AlignDefaultMoveDistance, 80, default);
                         _currentThetaAlignStatus = ThetaAlignStatus.Horizontal;
-                        MaterialSnackUtils.MaterialSnack("请继续横向拉直第二点", MaterialSnackUtils.SnackType.SUCCESS);
+                        MaterialSnack("请继续横向拉直第二点", SnackType.SUCCESS);
                         break;
                 }
             }
             catch (OperationCanceledException)
             {
-                MaterialSnackUtils.MaterialSnack("横向拉直超时！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("横向拉直超时！", SnackType.WARNING);
             }
             finally
             {
@@ -123,7 +123,7 @@ namespace 精密切割系统.Model.cut
         {
             if (!await _thetaAlignSemaphore.WaitAsync(TimeSpan.Zero))
             {
-                MaterialSnackUtils.MaterialSnack("拉直中，请勿重复点击！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("拉直中，请勿重复点击！", SnackType.WARNING);
                 return;
             }
             try
@@ -137,17 +137,17 @@ namespace 精密切割系统.Model.cut
                 {
                     case ThetaAlignStatus.Horizontal:
                         _currentThetaAlignStatus = ThetaAlignStatus.None;
-                        MaterialSnackUtils.MaterialSnack("已取消横向拉直!", MaterialSnackUtils.SnackType.WARNING);
+                        MaterialSnack("已取消横向拉直!", SnackType.WARNING);
                         break;
 
                     case ThetaAlignStatus.Vertical:
-                        MaterialSnackUtils.MaterialSnack("竖向拉直中！", MaterialSnackUtils.SnackType.SUCCESS, 0);
+                        MaterialSnack("竖向拉直中！", SnackType.SUCCESS, 0);
                         xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationWaitAsync(token);
                         yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationWaitAsync(token);
                         var curTheta = await PlcControl.tagControl.ThetaAxis.GetCurrentLocationWaitAsync(token);
                         if (xLocation == null || yLocation == null || curTheta == null)
                         {
-                            MaterialSnackUtils.MaterialSnack("获取当前位置失败，请重试！", MaterialSnackUtils.SnackType.WARNING);
+                            MaterialSnack("获取当前位置失败，请重试！", SnackType.WARNING);
                             return;
                         }
                         PointF pointB = new PointF(xLocation.Value, yLocation.Value);
@@ -164,7 +164,7 @@ namespace 精密切割系统.Model.cut
                         await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(rotatePointA.Y, 60, token);
                         _thetaAlignCompletedDeg = curTheta.Value + angle;
                         _currentThetaAlignStatus = ThetaAlignStatus.Completed;
-                        MaterialSnackUtils.MaterialSnack("竖向拉直完成！", MaterialSnackUtils.SnackType.SUCCESS);
+                        MaterialSnack("竖向拉直完成！", SnackType.SUCCESS);
                         break;
 
                     default:
@@ -172,19 +172,19 @@ namespace 精密切割系统.Model.cut
                         yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationWaitAsync(token);
                         if (xLocation == null || yLocation == null)
                         {
-                            MaterialSnackUtils.MaterialSnack("获取当前位置失败，请重试！", MaterialSnackUtils.SnackType.WARNING);
+                            MaterialSnack("获取当前位置失败，请重试！", SnackType.WARNING);
                             return;
                         }
                         _pointA = new PointF(xLocation.Value, yLocation.Value);
                         await PlcControl.tagControl.Yaxis.StartRelativeAsync(-Appsettings.VerticalStraighteningStroke ?? -AlignDefaultMoveDistance, 60, default);
                         _currentThetaAlignStatus = ThetaAlignStatus.Vertical;
-                        MaterialSnackUtils.MaterialSnack("请继续竖向拉直第二点", MaterialSnackUtils.SnackType.SUCCESS);
+                        MaterialSnack("请继续竖向拉直第二点", SnackType.SUCCESS);
                         break;
                 }
             }
             catch (OperationCanceledException)
             {
-                MaterialSnackUtils.MaterialSnack("竖向拉直超时！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("竖向拉直超时！", SnackType.WARNING);
             }
             finally
             {

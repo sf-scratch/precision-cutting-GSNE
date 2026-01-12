@@ -26,7 +26,7 @@ using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.operate;
 using 精密切割系统.ViewModel;
 using static SQLite.SQLite3;
-using static 精密切割系统.Helpers.MaterialSnackUtils;
+
 
 namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 {
@@ -47,7 +47,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         }
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            MaterialSnackUtils.MaterialSnack("进入测高模式成功！", SnackType.WARNING);
+            MaterialSnack("进入测高模式成功！", SnackType.WARNING);
             rightPage = mainWindow.rightFrame.Content as RightPage;
             mainWindow.UpdateOperatePage(OperateData.GetContactSetupOperate(), OperateClicked);
             rightPage.PanelAction.Visibility = Visibility.Visible;
@@ -75,7 +75,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                         Thread.Sleep(300);
                         // 新发送PLC进入模式，当模式进入成功后，跳转页面
                         // 进入刀片更换模式
-                        MaterialSnackUtils.MaterialSnack("进入刀片更换模式中...", SnackType.WARNING);
+                        MaterialSnack("进入刀片更换模式中...", SnackType.WARNING);
                         // 进入换刀模式
                         PlcControl.tagControl.bladeMantance.RunBladeReplace(1);
                         GlobalParams.globalRunFlag = true;
@@ -90,7 +90,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                             }
                             else
                             {
-                                MaterialSnackUtils.MaterialSnack("进入刀片更换失败！", SnackType.WARNING);
+                                MaterialSnack("进入刀片更换失败！", SnackType.WARNING);
                             }
                         });
                     }
@@ -244,7 +244,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 // 发送测高开始信号到PLC
                 PlcControl.tagControl.bladeMantance.StartSetup();
                 GlobalParams.globalRunFlag = true;
-                MaterialSnackUtils.MaterialSnack("测高中...", MaterialSnackUtils.SnackType.WARNING, 0);
+                MaterialSnack("测高中...", SnackType.WARNING, 0);
                 // 循环获取测高计数信息，如果等于
                 string setupCount = "0";
                 while (!_model.Retry.Equals(setupCount))
@@ -285,7 +285,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                     string avgSetupValue = setupValueList.Average().ToString("F5");
                     Application.Current.Dispatcher.Invoke((Action)(() =>
                     {
-                        MaterialSnackUtils.MaterialSnack("测高完成！", MaterialSnackUtils.SnackType.SUCCESS);
+                        MaterialSnack("测高完成！", SnackType.SUCCESS);
                         inputTextBox6.Text = avgSetupValue;
                         _model.BladeHeight = avgSetupValue;
                         SqlHelper.UpdateAsync(_model);
@@ -294,7 +294,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                     }));
                 } else
                 {
-                    MaterialSnackUtils.MaterialSnack("测高失败！", MaterialSnackUtils.SnackType.SUCCESS);
+                    MaterialSnack("测高失败！", SnackType.SUCCESS);
                 }
                 checkRunFlag = false;
             });

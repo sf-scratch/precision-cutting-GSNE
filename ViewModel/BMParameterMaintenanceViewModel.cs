@@ -15,7 +15,6 @@ using 精密切割系统.Model.common;
 using 精密切割系统.View.Pages.F2_ManualOperation;
 using 精密切割系统.View.Pages.F4_BladeMaintenance;
 using static NPOI.HSSF.Util.HSSFColor;
-using static 精密切割系统.Helpers.MaterialSnackUtils;
 
 namespace 精密切割系统.ViewModel
 {

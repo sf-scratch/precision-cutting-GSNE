@@ -111,14 +111,14 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             float? currentZ2 = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync();
             if (currentZ2 == null)
             {
-                MaterialSnackUtils.MaterialSnack("获取当前位置失败，请检测PLC连接状态！", MaterialSnackUtils.SnackType.SUCCESS);
+                MaterialSnack("获取当前位置失败，请检测PLC连接状态！", SnackType.SUCCESS);
             }
             else
             {
                 focusSetPostion.Text = currentZ2.Value.ToString(GlobalParams.DecimalStringFormat);
                 Appsettings.FocusWorkpiecesClearZ = currentZ2.Value;
                 Appsettings.FocusClearZ = null;
-                MaterialSnackUtils.MaterialSnack("对焦点位置确认成功！", MaterialSnackUtils.SnackType.SUCCESS);
+                MaterialSnack("对焦点位置确认成功！", SnackType.SUCCESS);
             }
         }
     }

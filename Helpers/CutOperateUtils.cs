@@ -11,6 +11,7 @@ using 精密切割系统.Utils;
 using 精密切割系统.View.Controls;
 using 精密切割系统.ViewModel;
 
+
 namespace 精密切割系统.Driver
 {
     internal class CutOperateUtils
@@ -160,7 +161,7 @@ namespace 精密切割系统.Driver
             // 判断是否已准备好切割
             if (!IsReadyToCut())
             {
-                MaterialSnackUtils.MaterialSnack("切割未准备好！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("切割未准备好！", SnackType.WARNING);
                 return;
             }
 
@@ -169,7 +170,7 @@ namespace 精密切割系统.Driver
             // 判断是否已测高
             if (string.IsNullOrEmpty(bladeHeightModel.BladeHeight) || bladeHeightModel.BladeHeight.Equals("0"))
             {
-                MaterialSnackUtils.MaterialSnack("请先测高！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("请先测高！", SnackType.WARNING);
                 return;
             }
 
@@ -179,14 +180,14 @@ namespace 精密切割系统.Driver
             // 判断是否确认配置信息
             if (id == 0)
             {
-                MaterialSnackUtils.MaterialSnack("未确认配置信息！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("未确认配置信息！", SnackType.WARNING);
                 return;
             }
 
             // 判断切割方向
             if (cutDirection == -1)
             {
-                MaterialSnackUtils.MaterialSnack("请设置切割方向！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("请设置切割方向！", SnackType.WARNING);
                 return;
             }
 
@@ -194,7 +195,7 @@ namespace 精密切割系统.Driver
             var listConf = await SqlHelper.TableAsync<FileTableItemModel>().Where(t => t.Id == id).ToListAsync();
             if (listConf.Count == 0)
             {
-                MaterialSnackUtils.MaterialSnack("未确认配置信息！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("未确认配置信息！", SnackType.WARNING);
                 return;
             }
             errorFlag = false;
@@ -213,7 +214,7 @@ namespace 精密切割系统.Driver
             if (_model.SpindleRev == 0 || _model.SpindleRev > 30000)
             {
                 Tools.LogError("切割参数配置错误！");
-                MaterialSnackUtils.MaterialSnack("切割参数配置错误！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("切割参数配置错误！", SnackType.WARNING);
                 errorFlag = true;
                 return;
             }
@@ -267,7 +268,7 @@ namespace 精密切割系统.Driver
             catch (Exception ex)
             {
                 // 捕获异常并提示错误消息
-                MaterialSnackUtils.MaterialSnack($"切割过程中出现错误: {ex.Message}", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack($"切割过程中出现错误: {ex.Message}", SnackType.ERROR);
                 Tools.LogError($"切割过程中出现错误: {ex.Message}");
                 errorFlag = true;
             }
@@ -323,7 +324,7 @@ namespace 精密切割系统.Driver
 
                 if (ch.CutLine == null || ch.CutLine.Equals("0"))
                 {
-                    MaterialSnackUtils.MaterialSnack($"{ch.ChName} 参数异常！", MaterialSnackUtils.SnackType.WARNING);
+                    MaterialSnack($"{ch.ChName} 参数异常！", SnackType.WARNING);
                     Tools.LogError($"{ch.ChName} 参数异常！");
                     errorFlag = true;
                     break;
@@ -395,7 +396,7 @@ namespace 精密切割系统.Driver
             int maxIndex = CutUtils.AreIndexesContinuous(setBladeHeight, feedSpeeds, yIndexs, cutLines);
             if (maxIndex == 0)
             {
-                MaterialSnackUtils.MaterialSnack("切割参数错误！", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("切割参数错误！", SnackType.ERROR);
                 Tools.LogError("切割参数错误！");
                 errorFlag = true;
                 return false;
@@ -413,7 +414,7 @@ namespace 精密切割系统.Driver
             // 如果位置超限，则提示
             if (!positionLimitFlag)
             {
-                MaterialSnackUtils.MaterialSnack("切割参数错误，结束位置超限！", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("切割参数错误，结束位置超限！", SnackType.ERROR);
                 Tools.LogError("切割参数错误，结束位置超限！");
                 errorFlag = true;
                 return false;
@@ -596,7 +597,7 @@ namespace 精密切割系统.Driver
                 }
                 if (zEndIndex >= bladeHeight)
                 {
-                    MaterialSnackUtils.MaterialSnack("Z1轴位置超限！", MaterialSnackUtils.SnackType.ERROR);
+                    MaterialSnack("Z1轴位置超限！", SnackType.ERROR);
                     Tools.LogError("Z1轴位置超限！");
                     errorFlag = true;
                     return false;
@@ -658,7 +659,7 @@ namespace 精密切割系统.Driver
                 setFeedSpeed += feedSpeedComp;
                 if (setFeedSpeed > 150)
                 {
-                    MaterialSnackUtils.MaterialSnack("切割速度超限！", MaterialSnackUtils.SnackType.ERROR);
+                    MaterialSnack("切割速度超限！", SnackType.ERROR);
                     Tools.LogError("切割速度超限！");
                     errorFlag = true;
                     return false;
@@ -711,7 +712,7 @@ namespace 精密切割系统.Driver
                     if (MonitorCutStatus())
                     {
                         _mainWindow.NavigateToPage("Pages/F2_ManualOperation/MQSemiAutomaticCuttingRun");
-                        MaterialSnackUtils.MaterialSnack("切割中....", MaterialSnackUtils.SnackType.SUCCESS, 0);
+                        MaterialSnack("切割中....", SnackType.SUCCESS, 0);
                     }
                 }
 
@@ -792,11 +793,11 @@ namespace 精密切割系统.Driver
                         PlcControl.tagControl.wholeDevice.SetBuzzerStatus(1);
 
                         _mainWindow.NavigateToPage("Pages/F2_ManualOperation/MQSemiAutomaticCuttingStop");*/
-                        MaterialSnackUtils.MaterialSnack("暂停中...", MaterialSnackUtils.SnackType.WARNING, 0);
+                        MaterialSnack("暂停中...", SnackType.WARNING, 0);
                     }
                     else
                     {
-                        MaterialSnackUtils.MaterialSnack("暂停失败！强行退出切割状态！", MaterialSnackUtils.SnackType.WARNING, 0);
+                        MaterialSnack("暂停失败！强行退出切割状态！", SnackType.WARNING, 0);
                         // 如果停止失败，则强行结束切割
                         Tools.LogError("暂停失败！强行退出切割状态！");
                     }
@@ -973,7 +974,7 @@ namespace 精密切割系统.Driver
 
         public static void exitCut()
         {
-            MaterialSnackUtils.MaterialSnack("正在停止切割...", MaterialSnackUtils.SnackType.WARNING, 0);
+            MaterialSnack("正在停止切割...", SnackType.WARNING, 0);
             // 发送结束信号
             PlcControl.tagControl.cutting.EndFullAutoCut();
             cts.Cancel();

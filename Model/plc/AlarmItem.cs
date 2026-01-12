@@ -10,7 +10,7 @@ using 精密切割系统.ViewModel;
 
 namespace 精密切割系统.Model.plc
 {
-    class AlarmItem
+    internal class AlarmItem
     {
         public AlarmItem()
         {
@@ -20,17 +20,24 @@ namespace 精密切割系统.Model.plc
         {
             this.title = t;
         }
+
         public string code = "";
+
         // 报警标题
         public string title = "";
+
         // 报警优先级
         public int alarmPriority = 0;
+
         // 报警描述
         public string desc = "";
+
         // 报警发现时间
         public string startTime = "";
+
         // 是否手动忽略该报警
         public bool ignoreAlarm = false;
+
         // plc类型报警的plc变量
         public Tag? alarmTag = null;
 
@@ -72,6 +79,7 @@ namespace 精密切割系统.Model.plc
             { "26", "请先系统初始化" },
             { "27", "修刀电极状态错误" }
         };
+
         // dm1000  int16
         public Dictionary<string, string> axisAlarm = new Dictionary<string, string>()
         {
@@ -120,11 +128,13 @@ namespace 精密切割系统.Model.plc
                         Tools.WaitForValue(PlcControl.allTags[DeviceKey.curSpeedKey], "0");
                         axisName = DeviceKey.xName;
                         break;
+
                     case "X轴负限位":
                         tempJogDirection = 0;
                         PlcControl.tagControl.Xaxis.StartRelative("20", "5.0", tempJogDirection);
                         axisName = DeviceKey.xName;
                         break;
+
                     case "Y轴正限位":
                         tempJogDirection = 1;
                         PlcControl.tagControl.Yaxis.StartRelative("20", "5.0", tempJogDirection);
@@ -173,10 +183,11 @@ namespace 精密切割系统.Model.plc
                     InitOriginPosition(axisName);
                 }
             }
-            MaterialSnackUtils.HideMessage();
+            HideMessage();
             GlobalParams.globalRunFlag = false;
             return res;
         }
+
         /// <summary>
         /// 回原点
         /// </summary>
@@ -187,20 +198,22 @@ namespace 精密切割系统.Model.plc
             {
                 Tools.WaitForValue(PlcControl.allTags[DeviceKey.curSpeedKey], "0");
                 PlcControl.tagControl.Xaxis.RunInitLocation();
-            } else if (DeviceKey.yName.Equals(axisName))
+            }
+            else if (DeviceKey.yName.Equals(axisName))
             {
                 Tools.WaitForValue(PlcControl.allTags[DeviceKey.yCurSpeedKey], "0");
                 PlcControl.tagControl.Yaxis.RunInitLocation();
-            }else if (DeviceKey.z1Name.Equals(axisName))
+            }
+            else if (DeviceKey.z1Name.Equals(axisName))
             {
                 Tools.WaitForValue(PlcControl.allTags[DeviceKey.z1CurSpeedKey], "0");
                 PlcControl.tagControl.Z1axis.RunInitLocation();
-            }else if (DeviceKey.z2Name.Equals(axisName))
+            }
+            else if (DeviceKey.z2Name.Equals(axisName))
             {
                 Tools.WaitForValue(PlcControl.allTags[DeviceKey.z2CurSpeedKey], "0");
                 PlcControl.tagControl.Z2axis.RunInitLocation();
             }
-
         }
 
         // 重新比较函数，方便判断两个报警是否相同

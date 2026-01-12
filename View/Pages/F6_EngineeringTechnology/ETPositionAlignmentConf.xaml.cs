@@ -76,7 +76,7 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
             if (success)
             {
                 this.saveData();
-                MaterialSnackUtils.MaterialSnack("操作成功", MaterialSnackUtils.SnackType.SUCCESS);
+                MaterialSnack("操作成功", SnackType.SUCCESS);
                 //返回
                 //if (mainWindow.mainFrame.CanGoBack)
                 //{
@@ -85,7 +85,7 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
             }
             else
             {
-                MaterialSnackUtils.MaterialSnack("数据异常", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("数据异常", SnackType.ERROR);
             }
         }
 

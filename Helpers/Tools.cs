@@ -24,6 +24,7 @@ namespace 精密切割系统.Utils
     {
         public static ILog log = LogManager.GetLogger(typeof(Tools));
         public static ILog debugLog = LogManager.GetLogger("SpecialDebug");
+
         //public static string curPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         public static string curPath = AppDomain.CurrentDomain.BaseDirectory;
 
@@ -46,12 +47,14 @@ namespace 精密切割系统.Utils
         {
             debugLog.Debug(msg);
         }
+
         // 把路径转换为BitmapImage
         public static BitmapImage BitmapImageToBitmap(string path)
         {
             BitmapImage bitmapImage = new BitmapImage(new Uri(path, UriKind.RelativeOrAbsolute));
             return bitmapImage;
         }
+
         /// <summary>
         /// 尝试将字符串转换为 decimal。
         /// </summary>
@@ -62,6 +65,7 @@ namespace 精密切割系统.Utils
         {
             return decimal.TryParse(input, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
         }
+
         private static readonly char[] Characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".ToCharArray();
         private static readonly Random Random = new Random();
 
@@ -77,6 +81,7 @@ namespace 精密切割系统.Utils
             }
             return new string(randomString);
         }
+
         public static int[] StringToIntegerArray(string str)
         {
             int[] array = new int[str.Length];
@@ -87,11 +92,13 @@ namespace 精密切割系统.Utils
             }
             return array;
         }
+
         public static string[] StringToStringArray(string str)
         {
             // 将字符串按逗号分割成字符串数组
             return str.Split(',');
         }
+
         public static float[] StringToFloatArray(string str)
         {
             // 将字符串按逗号分割成字符串数组
@@ -106,7 +113,8 @@ namespace 精密切割系统.Utils
                 if (stringArray[i].Trim() != "")
                 {
                     floatArray[i] = float.Parse(stringArray[i]);
-                } else
+                }
+                else
                 {
                     floatArray[i] = 0.0f;
                 }
@@ -147,10 +155,14 @@ namespace 精密切割系统.Utils
 
         // 宽和高的像素
         public static int widthImg = 2448;
+
         public static int heightImg = 2048;
+
         // 宽和高的实际长度，单位微米
         public static int widthAct = 850;
+
         public static int heightAct = 710;
+
         // 根据起止位置计算实际长度
         public static float GetActualLength(int start, int end, bool isHeight = true)
         {
@@ -217,7 +229,6 @@ namespace 精密切割系统.Utils
             return children;
         }
 
-
         public static T GetChildObject<T>(DependencyObject parentObj, string name) where T : FrameworkElement
         {
             DependencyObject child = null;
@@ -249,7 +260,7 @@ namespace 精密切割系统.Utils
         /// <param name="timeout"></param>
         /// <param name="interval"></param>
         /// <returns></returns>
-        public static bool WaitForValue(Tag tag, string eValue, double timeout=10, double interval = 0)
+        public static bool WaitForValue(Tag tag, string eValue, double timeout = 10, double interval = 0)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
             while (stopwatch.Elapsed.TotalSeconds < timeout)
@@ -276,6 +287,7 @@ namespace 精密切割系统.Utils
             stopwatch.Stop();
             return false;
         }
+
         /// <summary>
         /// 等待tag的值达到目标值，timeout和interval单位为秒，超时后会返回false
         /// </summary>
@@ -296,7 +308,7 @@ namespace 精密切割系统.Utils
                 }
                 Task.Delay(100);
                 String runValue = PlcControl.plc.GetPlcValueString(tagName);
-                if (!value1.Equals(runValue) && !value2.Equals(runValue) )
+                if (!value1.Equals(runValue) && !value2.Equals(runValue))
                 {
                     continue;
                 }
@@ -308,6 +320,7 @@ namespace 精密切割系统.Utils
             }
             return false;
         }
+
         /// <summary>
         /// 判断plc的value 是不是true
         /// </summary>
@@ -317,7 +330,6 @@ namespace 精密切割系统.Utils
         {
             return "1".Equals(value) || "True".Equals(value);
         }
-
 
         public static int GetIntStringValue(string value)
         {
@@ -332,6 +344,7 @@ namespace 精密切割系统.Utils
             }
             return 0;
         }
+
         public static double GetDoubleStringValue(string value)
         {
             if (!string.IsNullOrEmpty(value))
@@ -343,6 +356,7 @@ namespace 精密切割系统.Utils
             }
             return 0;
         }
+
         public static float GetFloatStringValue(string value)
         {
             if (!string.IsNullOrEmpty(value))
@@ -354,6 +368,7 @@ namespace 精密切割系统.Utils
             }
             return 0;
         }
+
         public static string FormatDecimalString(string inputString, int decimalPlaces)
         {
             // 如果输入字符串为空或包含非法字符，直接返回原字符串
@@ -383,7 +398,8 @@ namespace 精密切割系统.Utils
                 if (decimalPlaces == 0)
                 {
                     return inputString;
-                } else
+                }
+                else
                 {
                     return inputString + "." + new string('0', decimalPlaces);
                 }
@@ -427,7 +443,6 @@ namespace 精密切割系统.Utils
 
         public static string FormatDecimalString1(string inputString, int decimalPlaces)
         {
-            
             // 如果输入字符串为空或包含非法字符，直接返回原字符串
             if (string.IsNullOrEmpty(inputString) || !IsValidNumber(inputString))
             {
@@ -483,8 +498,9 @@ namespace 精密切割系统.Utils
                 integerPart = "0";
             }
 
-            // 返回最终格式化的数字字符串  
-            if (decimalPlaces == 0) {
+            // 返回最终格式化的数字字符串
+            if (decimalPlaces == 0)
+            {
                 return integerPart;
             }
             // 返回最终格式化的数字字符串
@@ -492,11 +508,12 @@ namespace 精密切割系统.Utils
         }
 
         // 判断字符串是否为有效数字
-        static bool IsValidNumber(string inputString)
+        private static bool IsValidNumber(string inputString)
         {
             // 尝试解析字符串为数字，如果成功返回 true，失败则返回 false
             return decimal.TryParse(inputString, out _);
         }
+
         /// <summary>
         /// 等待状态完成后，执行某些操作，传入一个状态key和方法
         /// </summary>
@@ -523,13 +540,13 @@ namespace 精密切割系统.Utils
                         {
                             onFinish?.Invoke(flag);
                         });
-                    } else
+                    }
+                    else
                     {
-                        MaterialSnackUtils.MaterialSnack("执行超时！", MaterialSnackUtils.SnackType.WARNING, 5000);
+                        MaterialSnack("执行超时！", SnackType.WARNING, 5000);
                         // 如果超时，则不执行回调方法
                         GlobalParams.globalRunFlag = false;
                     }
-
                 });
                 return true;
             }
@@ -541,7 +558,6 @@ namespace 精密切割系统.Utils
             }
             finally
             {
-                
             }
         }
 
@@ -576,6 +592,7 @@ namespace 精密切割系统.Utils
                 Tools.LogInfo($"写入文件时发生错误: {ex.Message}");
             }
         }
+
         /// <summary>
         /// 删除指定路径的文件。
         /// </summary>
@@ -615,6 +632,7 @@ namespace 精密切割系统.Utils
             }
             return 0;
         }
+
         /// <summary>
         /// 根据光栅尺测量值和对应的激光测量值，计算当前位置绝对运动和相对运动需要的目标光栅尺位置，单位均为mm，保留4位小数
         /// </summary>

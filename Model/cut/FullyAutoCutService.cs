@@ -28,14 +28,18 @@ namespace 精密切割系统.Model.cut
     public class FullyAutoCutService
     {
         private static readonly Lazy<FullyAutoCutService> _lazy = new(() => new FullyAutoCutService());
+
         public static FullyAutoCutService Instance
         {
             get { return _lazy.Value; }
         }
 
         public event Action<CutServiceProcess>? CutServiceProcessChanged;
+
         public event Action<LineSegment?, string?>? CutServicePaused;
+
         public event Action? RemindReplaceWafer;
+
         private TaskCompletionSource<ServicePauseResult>? _continueTcs;
         private CancellationToken _usingPauseToken;
 
@@ -249,7 +253,7 @@ namespace 精密切割系统.Model.cut
                                     //退出全自动切割模式
                                     await PlcControl.tagControl.cutting.ExitCuttingModeAsync(_usingPauseToken);
                                     //刀痕检查
-                                    MaterialSnackUtils.MaterialSnack("检查刀痕中...", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+                                    MaterialSnack("检查刀痕中...", SnackType.WARNING, 0, eventAggregator);
                                     ImagesAnalysisResult result = await AutoCutUtils.CheckKnifeMarksStatus(line, eventAggregator, _usingPauseToken);
                                     eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create(
                                         $"最大刀痕宽度：{Math.Round(result.BladeWidthMaxImage.BladeWidth, 3)} " +
@@ -296,6 +300,7 @@ namespace 精密切割系统.Model.cut
                                             _secondToolMarkWidth = bladeWidthMax;
                                         }
                                         break;
+
                                     case 2:
                                         PdaUtils.AddToolMarkWidth(bladeWidthMax);
                                         PdaUtils.AddToolMarkActualWidth(bladeWidthMax);
@@ -303,6 +308,7 @@ namespace 精密切割系统.Model.cut
                                         AutoCutHistoryUtils.SetSecondCutImage(bladeWidthMaxMat);
                                         _secondToolMarkWidth = bladeWidthMax;
                                         break;
+
                                     default:
                                         break;
                                 }
@@ -325,8 +331,8 @@ namespace 精密切割系统.Model.cut
                                 //进入全自动切割模式
                                 await PlcControl.tagControl.cutting.EnterCuttingModeAsync(_usingPauseToken);
                             }
-                            MaterialSnackUtils.MaterialSnack("刀痕合格！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
-                            MaterialSnackUtils.MaterialSnack("切割进行中...", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
+                            MaterialSnack("刀痕合格！", SnackType.WARNING, 0, eventAggregator);
+                            MaterialSnack("切割进行中...", SnackType.SUCCESS, 0, eventAggregator);
                         }
                     }
                     catch (OperationCanceledException)
@@ -457,7 +463,7 @@ namespace 精密切割系统.Model.cut
         //                if (beforeStopCutTimes % _checkMarksCutTimes == 0 || beforeStopCutTimes == needCutTimes)
         //                {
         //                    int chekcTimes = beforeStopCutTimes / _checkMarksCutTimes;
-        //                    MaterialSnackUtils.MaterialSnack("检查刀痕中...", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+        //                    MaterialSnack("检查刀痕中...", SnackType.WARNING, 0, eventAggregator);
         //                    bool isOkKnifeMarksStatus = false;
         //                    try
         //                    {
@@ -468,7 +474,7 @@ namespace 精密切割系统.Model.cut
         //                        //刀痕检查结果为空，表示未检测到刀痕
         //                        if (result == null)
         //                        {
-        //                            MaterialSnackUtils.MaterialSnack("图像识别刀痕异常，请人工检查刀痕状态！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+        //                            MaterialSnack("图像识别刀痕异常，请人工检查刀痕状态！", SnackType.WARNING, 0, eventAggregator);
         //                            CancellationToken? token = await WaitContinueAsync(line);
         //                            if (token == null)
         //                            {
@@ -520,8 +526,8 @@ namespace 精密切割系统.Model.cut
         //                    {
         //                        return RunResult.Fail(RunExceptionType.BladeScrap, "刀痕不合格！");
         //                    }
-        //                    MaterialSnackUtils.MaterialSnack("刀痕合格！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
-        //                    MaterialSnackUtils.MaterialSnack("切割进行中...", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
+        //                    MaterialSnack("刀痕合格！", SnackType.WARNING, 0, eventAggregator);
+        //                    MaterialSnack("切割进行中...", SnackType.SUCCESS, 0, eventAggregator);
         //                }
         //            }
         //            catch (OperationCanceledException)
@@ -571,8 +577,10 @@ namespace 精密切割系统.Model.cut
                     if (camera is not null)
                         await PdaUtils.ScrapAsync(camera.CaptureControl());
                     return RunResult.Fail("刀片已报废！");
+
                 case ServicePauseResultType.Stop:
                     return RunResult.Fail("停止切割");
+
                 default:
                     break;
             }

@@ -27,7 +27,7 @@ using 精密切割系统.Model.position.correction;
 using 精密切割系统.Utils;
 using 精密切割系统.View.page.right;
 using 精密切割系统.ViewModel;
-using static 精密切割系统.Helpers.MaterialSnackUtils;
+
 
 namespace 精密切割系统.View.Pages
 {
@@ -165,7 +165,7 @@ namespace 精密切割系统.View.Pages
             }
             if (string.IsNullOrEmpty(directionInput.Text))
             {
-                MaterialSnackUtils.MaterialSnack("请选择测量方向!", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("请选择测量方向!", SnackType.WARNING);
                 return;
             }
             // 是否双向
@@ -444,7 +444,7 @@ namespace 精密切割系统.View.Pages
         {
             if (string.IsNullOrEmpty(testNumInput.Text))
             {
-                MaterialSnackUtils.MaterialSnack("请输入循环次数！", SnackType.ERROR);
+                MaterialSnack("请输入循环次数！", SnackType.ERROR);
                 return;
             }
             // 开始位置

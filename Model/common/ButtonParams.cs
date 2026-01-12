@@ -19,6 +19,8 @@ namespace 精密切割系统.Model.common
         public DelegateCommand StartCommand { get; set; }
         public DelegateCommand StopCommand { get; set; }
 
+        private CancellationTokenSource _cts;
+
         private bool _backFlag;
 
         public bool BackFlag
@@ -99,8 +101,9 @@ namespace 精密切割系统.Model.common
             set { _isOpen = value; RaisePropertyChanged(); }
         }
 
-        public ButtonParams(Brush backgroundDefColor, Brush backgroundDownColor, string contentText, double fontSize, string imagePath, Action? action, Action? start, Action? stop, Visibility openOrCloseVisibility, Visibility buttonVisibility)
+        public ButtonParams(Brush backgroundDefColor, Brush backgroundDownColor, string contentText, double fontSize, string imagePath, Action? action, Action? start, Action? stop, Func<bool>? isOpenFunc, Visibility openOrCloseVisibility, Visibility buttonVisibility)
         {
+            _cts = new CancellationTokenSource();
             _backgroundDefColor = backgroundDefColor;
             _backgroundDownColor = backgroundDownColor;
             _contentText = contentText;
@@ -110,14 +113,18 @@ namespace 精密切割系统.Model.common
             _contentTextFontSize = fontSize;
             _openOrCloseVisibility = openOrCloseVisibility;
             _buttonVisibility = buttonVisibility;
-            _isOpen = false;
+            if (isOpenFunc != null && openOrCloseVisibility == Visibility.Visible)
+            {
+                Task.Run(() => UpdateIsOpenAsync(isOpenFunc));
+            }
             RightClickCommand = new DelegateCommand(() => action?.Invoke());
             StartCommand = new DelegateCommand(() => start?.Invoke());
             StopCommand = new DelegateCommand(() => stop?.Invoke());
         }
 
-        public ButtonParams(Brush backgroundDefColor, Brush backgroundDownColor, string contentText, double fontSize, string imagePath, Func<Task>? action, Func<Task>? start, Func<Task>? stop, Visibility openOrCloseVisibility, Visibility buttonVisibility)
+        public ButtonParams(Brush backgroundDefColor, Brush backgroundDownColor, string contentText, double fontSize, string imagePath, Func<Task>? action, Func<Task>? startFunc, Func<Task>? stopFunc, Func<Task<bool>>? isOpenFunc, Visibility openOrCloseVisibility, Visibility buttonVisibility)
         {
+            _cts = new CancellationTokenSource();
             _backgroundDefColor = backgroundDefColor;
             _backgroundDownColor = backgroundDownColor;
             _contentText = contentText;
@@ -127,50 +134,73 @@ namespace 精密切割系统.Model.common
             _contentTextFontSize = fontSize;
             _openOrCloseVisibility = openOrCloseVisibility;
             _buttonVisibility = buttonVisibility;
-            _isOpen = false;
+            if (isOpenFunc != null && openOrCloseVisibility == Visibility.Visible)
+            {
+                Task.Run(() => UpdateIsOpenAsync(isOpenFunc));
+            }
             RightClickCommand = new DelegateCommand(() => action?.Invoke());
-            StartCommand = new DelegateCommand(() => start?.Invoke());
-            StopCommand = new DelegateCommand(() => stop?.Invoke());
+            StartCommand = new DelegateCommand(() => startFunc?.Invoke());
+            StopCommand = new DelegateCommand(() => stopFunc?.Invoke());
         }
 
-        public static ButtonParams GreenRightButton(string contentText, string imagePath, Action? action, Action? start = null, Action? stop = null)
+        public async Task UpdateIsOpenAsync(Func<Task<bool>> isOpenFunc)
         {
-            return new ButtonParams(new SolidColorBrush(Color.FromRgb(0x39, 0xD1, 0x1A)), new SolidColorBrush(Color.FromRgb(0x39, 0xB4, 0x1A)), contentText, 12, imagePath, action, start, stop, Visibility.Collapsed, Visibility.Visible);
+            CancellationToken token = _cts.Token;
+            while (!token.IsCancellationRequested)
+            {
+                IsOpen = await isOpenFunc.Invoke();
+                await Task.Delay(100);
+            }
         }
 
-        public static ButtonParams YelloRightButton(string contentText, string imagePath, Action? action, Action? start = null, Action? stop = null)
+        public async Task UpdateIsOpenAsync(Func<bool> isOpenFunc)
         {
-            return new ButtonParams(new SolidColorBrush(Color.FromRgb(0xFF, 0xAD, 0x00)), new SolidColorBrush(Color.FromRgb(0xC8, 0xAD, 0x00)), contentText, 12, imagePath, action, start, stop, Visibility.Collapsed, Visibility.Visible);
+            CancellationToken token = _cts.Token;
+            while (!token.IsCancellationRequested)
+            {
+                IsOpen = isOpenFunc.Invoke();
+                await Task.Delay(100);
+            }
         }
 
-        public static ButtonParams BlueButton(string contentText, string imagePath, Action? action, Action? start = null, Action? stop = null, Visibility openOrCloseVisibility = Visibility.Collapsed, Visibility buttonVisibility = Visibility.Visible)
+        public static ButtonParams GreenRightButton(string contentText, string imagePath, Action? action, Action? start = null, Action? stop = null, Func<bool>? isOpenFunc = null)
         {
-            return new ButtonParams(new SolidColorBrush(Color.FromRgb(0x50, 0x87, 0xcb)), new SolidColorBrush(Color.FromRgb(0x17, 0x7C, 0xfa)), contentText, 22, imagePath, action, start, stop, openOrCloseVisibility, buttonVisibility);
+            return new ButtonParams(new SolidColorBrush(Color.FromRgb(0x39, 0xD1, 0x1A)), new SolidColorBrush(Color.FromRgb(0x39, 0xB4, 0x1A)), contentText, 12, imagePath, action, start, stop, isOpenFunc, Visibility.Collapsed, Visibility.Visible);
         }
 
-        public static ButtonParams RedRightButton(string contentText, string imagePath, Action? action, Action? start = null, Action? stop = null)
+        public static ButtonParams YelloRightButton(string contentText, string imagePath, Action? action, Action? start = null, Action? stop = null, Func<bool>? isOpenFunc = null)
         {
-            return new ButtonParams(Brushes.Red, Brushes.DarkRed, contentText, 12, imagePath, action, start, stop, Visibility.Collapsed, Visibility.Visible);
+            return new ButtonParams(new SolidColorBrush(Color.FromRgb(0xFF, 0xAD, 0x00)), new SolidColorBrush(Color.FromRgb(0xC8, 0xAD, 0x00)), contentText, 12, imagePath, action, start, stop, isOpenFunc, Visibility.Collapsed, Visibility.Visible);
         }
 
-        public static ButtonParams GreenRightButton(string contentText, string imagePath, Func<Task>? action, Func<Task>? start = null, Func<Task>? stop = null)
+        public static ButtonParams BlueButton(string contentText, string imagePath, Action? action, Action? start = null, Action? stop = null, Func<bool>? isOpenFunc = null, Visibility openOrCloseVisibility = Visibility.Collapsed, Visibility buttonVisibility = Visibility.Visible)
         {
-            return new ButtonParams(new SolidColorBrush(Color.FromRgb(0x39, 0xD1, 0x1A)), new SolidColorBrush(Color.FromRgb(0x39, 0xB4, 0x1A)), contentText, 12, imagePath, action, start, stop, Visibility.Collapsed, Visibility.Visible);
+            return new ButtonParams(new SolidColorBrush(Color.FromRgb(0x50, 0x87, 0xcb)), new SolidColorBrush(Color.FromRgb(0x17, 0x7C, 0xfa)), contentText, 22, imagePath, action, start, stop, isOpenFunc, openOrCloseVisibility, buttonVisibility);
         }
 
-        public static ButtonParams YelloRightButton(string contentText, string imagePath, Func<Task>? action, Func<Task>? start = null, Func<Task>? stop = null)
+        public static ButtonParams RedRightButton(string contentText, string imagePath, Action? action, Action? start = null, Action? stop = null, Func<bool>? isOpenFunc = null)
         {
-            return new ButtonParams(new SolidColorBrush(Color.FromRgb(0xFF, 0xAD, 0x00)), new SolidColorBrush(Color.FromRgb(0xC8, 0xAD, 0x00)), contentText, 12, imagePath, action, start, stop, Visibility.Collapsed, Visibility.Visible);
+            return new ButtonParams(Brushes.Red, Brushes.DarkRed, contentText, 12, imagePath, action, start, stop, isOpenFunc, Visibility.Collapsed, Visibility.Visible);
         }
 
-        public static ButtonParams BlueButton(string contentText, string imagePath, Func<Task>? action, Func<Task>? start = null, Func<Task>? stop = null, Visibility openOrCloseVisibility = Visibility.Collapsed, Visibility buttonVisibility = Visibility.Visible)
+        public static ButtonParams GreenRightButton(string contentText, string imagePath, Func<Task>? action, Func<Task>? start = null, Func<Task>? stop = null, Func<Task<bool>>? isOpenFunc = null)
         {
-            return new ButtonParams(new SolidColorBrush(Color.FromRgb(0x50, 0x87, 0xcb)), new SolidColorBrush(Color.FromRgb(0x17, 0x7C, 0xfa)), contentText, 22, imagePath, action, start, stop, openOrCloseVisibility, buttonVisibility);
+            return new ButtonParams(new SolidColorBrush(Color.FromRgb(0x39, 0xD1, 0x1A)), new SolidColorBrush(Color.FromRgb(0x39, 0xB4, 0x1A)), contentText, 12, imagePath, action, start, stop, isOpenFunc, Visibility.Collapsed, Visibility.Visible);
         }
 
-        public static ButtonParams RedRightButton(string contentText, string imagePath, Func<Task>? action, Func<Task>? start = null, Func<Task>? stop = null)
+        public static ButtonParams YelloRightButton(string contentText, string imagePath, Func<Task>? action, Func<Task>? start = null, Func<Task>? stop = null, Func<Task<bool>>? isOpenFunc = null)
         {
-            return new ButtonParams(Brushes.Red, Brushes.DarkRed, contentText, 12, imagePath, action, start, stop, Visibility.Collapsed, Visibility.Visible);
+            return new ButtonParams(new SolidColorBrush(Color.FromRgb(0xFF, 0xAD, 0x00)), new SolidColorBrush(Color.FromRgb(0xC8, 0xAD, 0x00)), contentText, 12, imagePath, action, start, stop, isOpenFunc, Visibility.Collapsed, Visibility.Visible);
+        }
+
+        public static ButtonParams BlueButton(string contentText, string imagePath, Func<Task>? action, Func<Task>? start = null, Func<Task>? stop = null, Func<Task<bool>>? isOpenFunc = null, Visibility openOrCloseVisibility = Visibility.Collapsed, Visibility buttonVisibility = Visibility.Visible)
+        {
+            return new ButtonParams(new SolidColorBrush(Color.FromRgb(0x50, 0x87, 0xcb)), new SolidColorBrush(Color.FromRgb(0x17, 0x7C, 0xfa)), contentText, 22, imagePath, action, start, stop, isOpenFunc, openOrCloseVisibility, buttonVisibility);
+        }
+
+        public static ButtonParams RedRightButton(string contentText, string imagePath, Func<Task>? action, Func<Task>? start = null, Func<Task>? stop = null, Func<Task<bool>>? isOpenFunc = null)
+        {
+            return new ButtonParams(Brushes.Red, Brushes.DarkRed, contentText, 12, imagePath, action, start, stop, isOpenFunc, Visibility.Collapsed, Visibility.Visible);
         }
     }
 }

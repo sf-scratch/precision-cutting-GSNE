@@ -20,7 +20,6 @@ using 精密切割系统.View.Pages.Auto;
 using 精密切割系统.View.Pages.F4_BladeMaintenance;
 using 精密切割系统.View.Pages.operate;
 using 精密切割系统.ViewModel;
-using static 精密切割系统.Helpers.MaterialSnackUtils;
 
 namespace 精密切割系统.View.Pages.F2_ManualOperation
 {
@@ -131,7 +130,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 case 2023:
                     if (mainWindow == null)
                     {
-                        MaterialSnackUtils.MaterialSnack($"{nameof(mainWindow)}为空", SnackType.WARNING);
+                        MaterialSnack($"{nameof(mainWindow)}为空", SnackType.WARNING);
                         return;
                     }
                     CommonResult result = await AutoCutUtils.EnterManualAlignmentAsync(mainWindow);
@@ -141,7 +140,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                     }
                     else
                     {
-                        MaterialSnackUtils.MaterialSnack(result.Message, SnackType.WARNING);
+                        MaterialSnack(result.Message, SnackType.WARNING);
                     }
                     break;
 
@@ -184,7 +183,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         {
             if (AlarmConfig.Instance.HasActiveErrorAlarm())
             {
-                MaterialSnackUtils.MaterialSnack(AlarmConfig.HasErrorAlarmMessage, SnackType.WARNING);
+                MaterialSnack(AlarmConfig.HasErrorAlarmMessage, SnackType.WARNING);
                 return;
             }
             if (WarmUpHelper.IsRuning)

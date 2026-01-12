@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using 精密切割系统.Entities;
 
 namespace 精密切割系统.database.db.modle
 {
     [Table("file_table_item")]
-    public class FileTableItemModel
+    public class FileTableItemModel : IEntityWithId
     {
         [PrimaryKey, AutoIncrement]
         [Column("id")]

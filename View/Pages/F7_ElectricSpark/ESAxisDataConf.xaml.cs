@@ -234,13 +234,13 @@ namespace 精密切割系统.View.F7_ElectricSpark
             string AxisType = cbbAxis.Text;
             if (string.IsNullOrEmpty(AxisType))
             {
-                MaterialSnackUtils.MaterialSnack("请选择运动轴", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("请选择运动轴", SnackType.ERROR);
                 return;
             }
             var success = this.FormSuccess();
             if (!success)
             {
-                MaterialSnackUtils.MaterialSnack("数据异常", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("数据异常", SnackType.ERROR);
                 return;
             }
             if (_model == null)
@@ -274,7 +274,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 await SqlHelper.AddAsync(_model);
             }
             CurrentUtils.UpdateParams();
-            MaterialSnackUtils.MaterialSnack("操作成功", MaterialSnackUtils.SnackType.SUCCESS);
+            MaterialSnack("操作成功", SnackType.SUCCESS);
             //重新加载数据
             //_ = initData();
         }
@@ -308,7 +308,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
             string AxisType = cbbAxis.Text;
             if (string.IsNullOrEmpty(AxisType))
             {
-                MaterialSnackUtils.MaterialSnack("请选择运动轴", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("请选择运动轴", SnackType.ERROR);
                 return;
             }
             try
@@ -318,7 +318,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 this.getViewList();
                 if (list.Count <= 0)
                 {
-                    MaterialSnackUtils.MaterialSnack("没有数据可导出", MaterialSnackUtils.SnackType.ERROR);
+                    MaterialSnack("没有数据可导出", SnackType.ERROR);
                     return;
                 }
                 List<ExportDataVo> reportDatas = new List<ExportDataVo>();
@@ -351,11 +351,11 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 bool relust = ExcelHelper.WriteExcel(filePath, reportDatas, propetryDic, 1);
                 if (relust)
                 {
-                    MaterialSnackUtils.MaterialSnack("导出成功", MaterialSnackUtils.SnackType.SUCCESS);
+                    MaterialSnack("导出成功", SnackType.SUCCESS);
                 }
                 else
                 {
-                    MaterialSnackUtils.MaterialSnack("导出失败", MaterialSnackUtils.SnackType.ERROR);
+                    MaterialSnack("导出失败", SnackType.ERROR);
                 }
             }
             catch (Exception ex)
@@ -379,12 +379,12 @@ namespace 精密切割系统.View.F7_ElectricSpark
         {
             if (!(cbbAxis.SelectedItem != null))
             {
-                MaterialSnackUtils.MaterialSnack("请选择运动轴！", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("请选择运动轴！", SnackType.ERROR);
                 return;
             }
             if (isDoing)
             {
-                MaterialSnackUtils.MaterialSnack("执行导入中请等待上次结果完成！", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("执行导入中请等待上次结果完成！", SnackType.ERROR);
                 return;
             }
             isDoing = true;
@@ -500,11 +500,11 @@ namespace 精密切割系统.View.F7_ElectricSpark
                             pre_listView1.ItemsSource = Col100_199;//将数据绑定到列表
                             pre_listView2.ItemsSource = Col200_299;//将数据绑定到列表
 
-                            MaterialSnackUtils.MaterialSnack("导入成功,共" + ct + "条", MaterialSnackUtils.SnackType.SUCCESS);
+                            MaterialSnack("导入成功,共" + ct + "条", SnackType.SUCCESS);
                         }
                         else
                         {
-                            MaterialSnackUtils.MaterialSnack("导入失败", MaterialSnackUtils.SnackType.ERROR);
+                            MaterialSnack("导入失败", SnackType.ERROR);
                         }
                     }
                 }

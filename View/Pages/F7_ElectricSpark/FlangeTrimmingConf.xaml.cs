@@ -110,7 +110,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
         private async void BtnCutStart_RightClicked(object? sender, bool e)
         {
             _cts = new CancellationTokenSource();
-            MaterialSnackUtils.MaterialSnack("修整中...", MaterialSnackUtils.SnackType.SUCCESS, -1);
+            MaterialSnack("修整中...", SnackType.SUCCESS, -1);
             rightPage.btnCutStart.Visibility = Visibility.Collapsed;
             rightPage.btnCutStop.Visibility = Visibility.Visible;
             currentCount.Text = "0";
@@ -127,12 +127,12 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
             }
             catch (OperationCanceledException)
             {
-                MaterialSnackUtils.MaterialSnack("修整已停止!", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("修整已停止!", SnackType.WARNING);
                 return;
             }
             catch (Exception ex)
             {
-                MaterialSnackUtils.MaterialSnack($"修整异常：{ex.Message}", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack($"修整异常：{ex.Message}", SnackType.ERROR);
                 return;
             }
             finally
@@ -237,7 +237,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
 
         private void BtnCutPause_RightClicked(object? sender, bool e)
         {
-            MaterialSnackUtils.MaterialSnack("修整停止中...", MaterialSnackUtils.SnackType.WARNING, -1);
+            MaterialSnack("修整停止中...", SnackType.WARNING, -1);
             _cts?.Cancel();
         }
 
@@ -245,7 +245,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
         {
             if (this.HasFormError())
             {
-                MaterialSnackUtils.MaterialSnack("表单填写有误，请检查!", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("表单填写有误，请检查!", SnackType.ERROR);
                 return;
             }
             FlangeTrimmingData.Instance.XCenterPosition = xCenterPosition.Text.ToFloat();
@@ -257,7 +257,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
             FlangeTrimmingData.Instance.SpindleRev = spindleRev.Text.ToInt();
             FlangeTrimmingData.Instance.RepeatCount = repectCount.Text.ToInt();
             FlangeTrimmingData.Instance.SparkFreeStep = sparkFreeStep.Text.ToInt();
-            MaterialSnackUtils.MaterialSnack("法兰修整参数确认完成!", MaterialSnackUtils.SnackType.SUCCESS);
+            MaterialSnack("法兰修整参数确认完成!", SnackType.SUCCESS);
         }
 
         private void BtnBack_RightClicked(object? sender, bool e)

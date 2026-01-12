@@ -26,6 +26,7 @@ namespace 精密切割系统.ViewModel
         public ObservableCollection<string> PrecutProcessNoList { get; set; }
 
         private SharpenParamsModel _sharpenParams;
+
         /// <summary>
         /// 磨刀参数
         /// </summary>
@@ -36,6 +37,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private CutParamsModel _cutParams;
+
         /// <summary>
         /// 切割参数
         /// </summary>
@@ -46,6 +48,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private ParamsConfigModel paramsConfig;
+
         public ParamsConfigModel ParamsConfig
         {
             get { return paramsConfig; }
@@ -53,6 +56,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private long _selectedConfigId;
+
         public long SelectedConfigId
         {
             get { return _selectedConfigId; }
@@ -103,12 +107,12 @@ namespace 精密切割系统.ViewModel
                     });
                 }
                 await SelectedConfigEntity.SetCurrentSelectedConfigIdAsync(connection, SelectedConfigId);
-                MaterialSnackUtils.MaterialSnack("自动切割参数保存成功！", MaterialSnackUtils.SnackType.SUCCESS);
+                MaterialSnack("自动切割参数保存成功！", SnackType.SUCCESS);
                 Back();
             }
             catch (SQLiteException)
             {
-                MaterialSnackUtils.MaterialSnack("自动切割参数保存失败！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("自动切割参数保存失败！", SnackType.WARNING);
             }
         }
 

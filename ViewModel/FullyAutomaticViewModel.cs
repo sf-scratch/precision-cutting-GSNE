@@ -199,7 +199,7 @@ namespace 精密切割系统.ViewModel
             }
             else
             {
-                MaterialSnackUtils.MaterialSnack($"切割序列获取失败，请检查切割参数配置！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                MaterialSnack($"切割序列获取失败，请检查切割参数配置！", SnackType.WARNING, 0, _eventAggregator);
             }
         }
 
@@ -237,31 +237,31 @@ namespace 精密切割系统.ViewModel
             if (!GlobalParams.OnlineFlag)
             {
                 InitRightButton();
-                MaterialSnackUtils.MaterialSnack("检查轮毂信息完成，可开始执行自动切割！", MaterialSnackUtils.SnackType.SUCCESS, 0, _eventAggregator);
+                MaterialSnack("检查轮毂信息完成，可开始执行自动切割！", SnackType.SUCCESS, 0, _eventAggregator);
                 return;
             }
             InitRightButtonOnlyBack();
-            MaterialSnackUtils.MaterialSnack("检查轮毂信息中...", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+            MaterialSnack("检查轮毂信息中...", SnackType.WARNING, 0, _eventAggregator);
             HttpUtilsResult<LunguInfoDTO> lunguResult = await HttpUtils.GetLunguInfoAsync(LunguId);
             if (lunguResult.Data is null)
             {
-                MaterialSnackUtils.MaterialSnack(lunguResult.Msg, MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                MaterialSnack(lunguResult.Msg, SnackType.WARNING, 0, _eventAggregator);
                 return;
             }
             if (lunguResult.Data.CurrentGroup != "切割车间")
             {
-                MaterialSnackUtils.MaterialSnack($"当前轮毂在{lunguResult.Data.CurrentGroup}，请检查！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                MaterialSnack($"当前轮毂在{lunguResult.Data.CurrentGroup}，请检查！", SnackType.WARNING, 0, _eventAggregator);
                 return;
             }
             HttpUtilsResult<LunguSksjDTO> lunguSksjResult = await HttpUtils.GetLunguSksjAsync(LunguId);
             if (lunguSksjResult.Data is null)
             {
-                MaterialSnackUtils.MaterialSnack(lunguSksjResult.Msg, MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                MaterialSnack(lunguSksjResult.Msg, SnackType.WARNING, 0, _eventAggregator);
                 return;
             }
             LunguSksj = MapperConfig.Mapper.Map<LunguSksjModel>(lunguSksjResult.Data);
             InitRightButton();
-            MaterialSnackUtils.MaterialSnack("检查轮毂信息完成，可开始执行自动切割！", MaterialSnackUtils.SnackType.SUCCESS, 0, _eventAggregator);
+            MaterialSnack("检查轮毂信息完成，可开始执行自动切割！", SnackType.SUCCESS, 0, _eventAggregator);
         }
 
         private async Task AutoRunAsync()
@@ -280,22 +280,22 @@ namespace 精密切割系统.ViewModel
             }
             if (!await PlcControl.tagControl.wholeDevice.IsCompletedSystemInitAsync())
             {
-                MaterialSnackUtils.MaterialSnack("请完成系统初始化！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                MaterialSnack("请完成系统初始化！", SnackType.WARNING, 0, _eventAggregator);
                 return;
             }
             if (!await PlcControl.tagControl.wholeDevice.IsOpenVacuumSwitchAsync())
             {
-                MaterialSnackUtils.MaterialSnack("请打开工作盘真空！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                MaterialSnack("请打开工作盘真空！", SnackType.WARNING, 0, _eventAggregator);
                 return;
             }
             if (await PlcControl.tagControl.wholeDevice.IsOpenCutSecurityDoorAsync())
             {
-                MaterialSnackUtils.MaterialSnack("请关闭切割安全门！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                MaterialSnack("请关闭切割安全门！", SnackType.WARNING, 0, _eventAggregator);
                 return;
             }
             if (await PlcControl.tagControl.wholeDevice.IsOpenCameraSecurityDoorAsync())
             {
-                MaterialSnackUtils.MaterialSnack("请关闭相机安全门！", MaterialSnackUtils.SnackType.WARNING, 0, _eventAggregator);
+                MaterialSnack("请关闭相机安全门！", SnackType.WARNING, 0, _eventAggregator);
                 return;
             }
             if (Appsettings.SharpenY is not null && Appsettings.SharpenY.Value != SharpenY)

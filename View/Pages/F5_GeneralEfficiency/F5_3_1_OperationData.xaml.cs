@@ -92,15 +92,15 @@ namespace 精密切割系统.View.Pages
             var success = this.FormSuccess();
             if (success)
             {
-                MaterialSnackUtils.MaterialSnack("操作中。。。", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("操作中。。。", SnackType.WARNING);
                 await SaveData();
-                MaterialSnackUtils.MaterialSnack("操作成功", MaterialSnackUtils.SnackType.SUCCESS);
+                MaterialSnack("操作成功", SnackType.SUCCESS);
                 //mainWindow.NavigateToPage("MainMenu");
                 //mainWindow.mainFrame.Source = new Uri("View/Pages/F4_BladeMaintenance/BmSharpenParameter.xaml", UriKind.Relative);
             }
             else
             {
-                MaterialSnackUtils.MaterialSnack("数据异常", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("数据异常", SnackType.ERROR);
             }
         }
 

@@ -103,7 +103,7 @@ namespace 精密切割系统.View.Pages.passowrd
                 }
                 else
                 {
-                    MaterialSnackUtils.MaterialSnack("密码错误", MaterialSnackUtils.SnackType.ERROR);
+                    MaterialSnack("密码错误", SnackType.ERROR);
                 }
             }
         }

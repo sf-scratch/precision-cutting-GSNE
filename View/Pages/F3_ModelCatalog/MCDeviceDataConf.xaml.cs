@@ -42,11 +42,6 @@ using 精密切割系统.View.Controls;
 using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.operate;
 using 精密切割系统.ViewModel;
-using static NPOI.HSSF.Util.HSSFColor;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using static 精密切割系统.View.Controls.InputTextBox;
-using static 精密切割系统.View.Pages.F3_ModelCatalog.MCDeviceDataConf;
 
 namespace 精密切割系统.View.Pages.F3_ModelCatalog
 {
@@ -160,7 +155,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                     }
                     else
                     {
-                        MaterialSnackUtils.MaterialSnack("数据异常", MaterialSnackUtils.SnackType.ERROR);
+                        MaterialSnack("数据异常", SnackType.ERROR);
                     }
                     break;
 
@@ -244,7 +239,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             using (FileStream stream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
             {
                 workbook.Write(stream);
-                MaterialSnackUtils.MaterialSnack($"导出成功：{filePath}", MaterialSnackUtils.SnackType.SUCCESS);
+                MaterialSnack($"导出成功：{filePath}", SnackType.SUCCESS);
             }
         }
 
@@ -405,14 +400,14 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                         addChModel(chModelData, mapDictionary);
                         await SqlHelper.UpdateAsync(chModelData);
                     }
-                    MaterialSnackUtils.MaterialSnack("导入成功！", MaterialSnackUtils.SnackType.SUCCESS);
+                    MaterialSnack("导入成功！", SnackType.SUCCESS);
                     //完成后刷新数据
                     _ = updataChData();
                 }
             }
             catch (Exception)
             {
-                MaterialSnackUtils.MaterialSnack("文件异常或被占用，请重新选择文件！", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("文件异常或被占用，请重新选择文件！", SnackType.ERROR);
             }
         }
 
@@ -569,11 +564,11 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 currentConfigurationModel.ChannelNum = GlobalParams.CH1;
                 CurrentUtils.UpdateCurrentConfiguration(currentConfigurationModel);
                 CurrentUtils.UpdateParams();
-                MaterialSnackUtils.MaterialSnack("保存成功！", MaterialSnackUtils.SnackType.SUCCESS);
+                MaterialSnack("保存成功！", SnackType.SUCCESS);
             }
             else
             {
-                MaterialSnackUtils.MaterialSnack("数据异常", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("数据异常", SnackType.ERROR);
             }
         }
 
@@ -1100,7 +1095,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             CommonResult<List<CutStep>> cutStepResult = await AutoCutUtils.GenerateCutStepListAsync(false);
             if (!cutStepResult.IsSuccess || cutStepResult.Data is null)
             {
-                MaterialSnackUtils.MaterialSnack(cutStepResult.Message, MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack(cutStepResult.Message, SnackType.ERROR);
                 return;
             }
             totalCutNum.Text = cutStepResult.Data.Count.ToString();

@@ -62,7 +62,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 var list = SqlHelper.Table<FileTableModel>().Where(t => t.Name == inputText.Text).ToList();
                 if (list.Count > 0)
                 {
-                    MaterialSnackUtils.MaterialSnack("目录名称已存在，请修改！", MaterialSnackUtils.SnackType.WARNING);
+                    MaterialSnack("目录名称已存在，请修改！", SnackType.WARNING);
                 }
                 else
                 {
@@ -77,7 +77,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             }
             else
             {
-                MaterialSnackUtils.MaterialSnack("目录名称不能为空！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("目录名称不能为空！", SnackType.WARNING);
             }
         }
     }

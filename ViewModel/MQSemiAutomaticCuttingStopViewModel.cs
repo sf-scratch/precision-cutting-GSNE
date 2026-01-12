@@ -17,6 +17,7 @@ using 精密切割系统.View.Pages.Auto;
 using 精密切割系统.View.Pages.common;
 using 精密切割系统.View.Pages.F2_ManualOperation;
 
+
 namespace 精密切割系统.ViewModel
 {
     internal class MQSemiAutomaticCuttingStopViewModel : CustomBindableBase
@@ -150,7 +151,7 @@ namespace 精密切割系统.ViewModel
             // 高度补偿
             _semiAutoCutService.DepthCompensationValue = CutParam.DepthCompensation.ToFloat();
             _semiAutomaticCuttingRunViewModel.CutParam.DepthCompensation = CutParam.DepthCompensation;
-            MaterialSnackUtils.MaterialSnack($"刀片高度补偿设置为 {_semiAutoCutService.DepthCompensationValue}！", MaterialSnackUtils.SnackType.SUCCESS);
+            MaterialSnack($"刀片高度补偿设置为 {_semiAutoCutService.DepthCompensationValue}！", SnackType.SUCCESS);
         }
 
         private void SetFeedSpeed()
@@ -158,7 +159,7 @@ namespace 精密切割系统.ViewModel
             // 速度更改
             _semiAutoCutService.FeedSpeedCompCompensationValue = CutParam.ChangeFeedSpeed.ToFloat();
             _semiAutomaticCuttingRunViewModel.CutParam.ChangeFeedSpeed = CutParam.ChangeFeedSpeed;
-            MaterialSnackUtils.MaterialSnack($"变更进刀速度设置为 {_semiAutoCutService.FeedSpeedCompCompensationValue}！", MaterialSnackUtils.SnackType.SUCCESS);
+            MaterialSnack($"变更进刀速度设置为 {_semiAutoCutService.FeedSpeedCompCompensationValue}！", SnackType.SUCCESS);
         }
 
         private async Task GlobalFocus()
@@ -168,7 +169,7 @@ namespace 精密切割系统.ViewModel
                 CommonResult<float> focusRusult = await AutoFocusService.GlobalFocusAsync(_eventAggregator, _operatCts.Token);
                 if (!focusRusult.IsSuccess)
                 {
-                    MaterialSnackUtils.MaterialSnack(focusRusult.Message, MaterialSnackUtils.SnackType.WARNING);
+                    MaterialSnack(focusRusult.Message, SnackType.WARNING);
                     return;
                 }
                 await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(focusRusult.Data, default, _operatCts.Token);
@@ -209,10 +210,10 @@ namespace 精密切割系统.ViewModel
         {
             if (_originPoint == null)
             {
-                MaterialSnackUtils.MaterialSnack($"基准线校准失败，请重试！", MaterialSnackUtils.SnackType.WARNING, 0);
+                MaterialSnack($"基准线校准失败，请重试！", SnackType.WARNING, 0);
                 return;
             }
-            MaterialSnackUtils.MaterialSnack($"基准线校准中", MaterialSnackUtils.SnackType.INFO, 0);
+            MaterialSnack($"基准线校准中", SnackType.INFO, 0);
             DataPoint<float> relativePostion = Appsettings.CameraRelativeBladePosition;
             DataPoint<float> curPoint = new DataPoint<float>
             {
@@ -223,7 +224,7 @@ namespace 精密切割系统.ViewModel
             float offsetY = _originPoint.Y - curPoint.Y;
             Appsettings.CameraRelativeBladePosition = new DataPoint<float>(relativePostion.X, relativePostion.Y - offsetY);
             _originPoint = curPoint;
-            MaterialSnackUtils.MaterialSnack($"基准线校准完成", MaterialSnackUtils.SnackType.SUCCESS, 0);
+            MaterialSnack($"基准线校准完成", SnackType.SUCCESS, 0);
         }
 
         private async Task WorkpieceBlowing()
@@ -253,7 +254,7 @@ namespace 精密切割系统.ViewModel
         {
             if (AlarmConfig.Instance.HasActiveErrorAlarm())
             {
-                MaterialSnackUtils.MaterialSnack("请先处理错误报警！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("请先处理错误报警！", SnackType.WARNING);
                 return;
             }
             await _operatCts.CancelAsync();

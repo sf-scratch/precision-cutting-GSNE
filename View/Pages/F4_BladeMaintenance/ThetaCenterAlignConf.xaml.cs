@@ -37,7 +37,7 @@ using 精密切割系统.Utils;
 using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.operate;
 using 精密切割系统.ViewModel;
-using static 精密切割系统.Helpers.MaterialSnackUtils;
+
 
 namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 {
@@ -141,7 +141,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         {
             if (AlarmConfig.Instance.HasActiveErrorAlarm())
             {
-                MaterialSnackUtils.MaterialSnack(AlarmConfig.HasErrorAlarmMessage, SnackType.WARNING);
+                MaterialSnack(AlarmConfig.HasErrorAlarmMessage, SnackType.WARNING);
                 return;
             }
             if (Appsettings.BladeOuterDiameter is null)
@@ -156,7 +156,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             }
             if (!await _thetaCenterAlignSemaphore.WaitAsync(TimeSpan.Zero))
             {
-                MaterialSnackUtils.MaterialSnack("theta中心校准运行中，请勿重复点击！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("theta中心校准运行中，请勿重复点击！", SnackType.WARNING);
                 return;
             }
             try
@@ -185,7 +185,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         {
             if (!await _thetaCenterAlignSemaphore.WaitAsync(TimeSpan.Zero))
             {
-                MaterialSnackUtils.MaterialSnack("theta中心校准运行中，请勿重复点击！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("theta中心校准运行中，请勿重复点击！", SnackType.WARNING);
                 return;
             }
             try
@@ -200,7 +200,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 switch (_step)
                 {
                     case ThetaCenterAlignStep.FindFirstIntersection:
-                        MaterialSnackUtils.MaterialSnack("第一次确认交点中...", MaterialSnackUtils.SnackType.WARNING, 0);
+                        MaterialSnack("第一次确认交点中...", SnackType.WARNING, 0);
                         _firstIntersection = new PointF(x, y);
                         Appsettings.CameraRelativeBladePosition = new DataPoint<float>(relativePostion.X, y - _startY);
                         await PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(SecondCutThetaDeg, default, _stopCts.Token);
@@ -210,10 +210,10 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                     case ThetaCenterAlignStep.FindSecondIntersection:
                         if (_firstIntersection is null)
                         {
-                            MaterialSnackUtils.MaterialSnack("未第一次确认交点！", MaterialSnackUtils.SnackType.WARNING, 0);
+                            MaterialSnack("未第一次确认交点！", SnackType.WARNING, 0);
                             return;
                         }
-                        MaterialSnackUtils.MaterialSnack("第二次确认交点中...", MaterialSnackUtils.SnackType.WARNING, 0);
+                        MaterialSnack("第二次确认交点中...", SnackType.WARNING, 0);
                         _secondIntersection = new PointF(x, y);
                         await PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(ThirdCutThetaDeg, default, _stopCts.Token);
                         _step = ThetaCenterAlignStep.FindThirdIntersection;
@@ -222,10 +222,10 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                     case ThetaCenterAlignStep.FindThirdIntersection:
                         if (_secondIntersection is null)
                         {
-                            MaterialSnackUtils.MaterialSnack("未第二次确认交点！", MaterialSnackUtils.SnackType.WARNING, 0);
+                            MaterialSnack("未第二次确认交点！", SnackType.WARNING, 0);
                             return;
                         }
-                        MaterialSnackUtils.MaterialSnack("第三次确认交点中...", MaterialSnackUtils.SnackType.WARNING, 0);
+                        MaterialSnack("第三次确认交点中...", SnackType.WARNING, 0);
                         _thirdIntersection = new PointF(x, y);
                         float distanceY = y - _secondIntersection.Value.Y;
                         await RunCutLineByThetaDegAsync([FirstCutThetaDeg, SecondCutThetaDeg], _startY + (distanceY / 2), _stopCts.Token);
@@ -235,10 +235,10 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                     case ThetaCenterAlignStep.FindCenterIntersection:
                         if (_thirdIntersection is null)
                         {
-                            MaterialSnackUtils.MaterialSnack("未第三次确认交点！", MaterialSnackUtils.SnackType.WARNING, 0);
+                            MaterialSnack("未第三次确认交点！", SnackType.WARNING, 0);
                             return;
                         }
-                        MaterialSnackUtils.MaterialSnack("确认中心交点中...", MaterialSnackUtils.SnackType.WARNING, 0);
+                        MaterialSnack("确认中心交点中...", SnackType.WARNING, 0);
                         Appsettings.CameraThetaCenterPoint = new DataPoint<float>(x, y);
                         thetaCenterX.Text = x.ToString();
                         thetaCenterY.Text = y.ToString();
@@ -263,7 +263,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                     case ThetaCenterAlignStep.FindLeftEndpoint:
                         if (_rightPoint is null)
                         {
-                            MaterialSnackUtils.MaterialSnack("未确认刀痕线段右侧端点！", MaterialSnackUtils.SnackType.WARNING, 0);
+                            MaterialSnack("未确认刀痕线段右侧端点！", SnackType.WARNING, 0);
                             return;
                         }
                         _leftPoint = new PointF(x, y);
@@ -291,7 +291,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             }
             catch (Exception ex)
             {
-                MaterialSnackUtils.MaterialSnack($"确认交点异常：{ex.Message}", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack($"确认交点异常：{ex.Message}", SnackType.ERROR);
             }
             finally
             {
@@ -307,11 +307,11 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             }
             if (_step == ThetaCenterAlignStep.Completed)
             {
-                MaterialSnackUtils.MaterialSnack(_step.GetEnumDescription(), MaterialSnackUtils.SnackType.SUCCESS, 0);
+                MaterialSnack(_step.GetEnumDescription(), SnackType.SUCCESS, 0);
             }
             else
             {
-                MaterialSnackUtils.MaterialSnack(_step.GetEnumDescription(), MaterialSnackUtils.SnackType.WARNING, 0);
+                MaterialSnack(_step.GetEnumDescription(), SnackType.WARNING, 0);
             }
         }
 
@@ -337,7 +337,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                     int? curCutNum = await PlcControl.tagControl.cutting.GetCutNumAsync();
                     if (curCutNum == null)
                     {
-                        MaterialSnackUtils.MaterialSnack("获取当前切割次数失败！", MaterialSnackUtils.SnackType.WARNING, 0);
+                        MaterialSnack("获取当前切割次数失败！", SnackType.WARNING, 0);
                         return;
                     }
                     await PlcControl.tagControl.ThetaAxis.SetAbsoluteSpeedAsync(GlobalParams.ThetaDefaultSpeed);
@@ -361,7 +361,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 
         private void Save()
         {
-            MaterialSnackUtils.MaterialSnack("参数保存中...", MaterialSnackUtils.SnackType.SUCCESS);
+            MaterialSnack("参数保存中...", SnackType.SUCCESS);
             Keyboard.ClearFocus();
             ThetaCenterAlignModel model = MapperConfig.Mapper.Map<ThetaCenterAlignModel>(_viewModel);
             if (model.Id != 1)
@@ -373,7 +373,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 SqlHelper.Update(model);
             }
             Appsettings.CameraThetaCenterPoint = new DataPoint<float>(thetaCenterX.Text.ToFloat(), thetaCenterY.Text.ToFloat());
-            MaterialSnackUtils.MaterialSnack("保存成功！", MaterialSnackUtils.SnackType.SUCCESS);
+            MaterialSnack("保存成功！", SnackType.SUCCESS);
         }
 
         private void BtnBack_RightClicked(object? sender, bool e)
@@ -403,7 +403,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                             CommonResult<float> focusRusult = await AutoFocusService.GlobalFocusAsync(default, timeoutToken.Token);
                             if (!focusRusult.IsSuccess)
                             {
-                                MaterialSnackUtils.MaterialSnack(focusRusult.Message, MaterialSnackUtils.SnackType.WARNING);
+                                MaterialSnack(focusRusult.Message, SnackType.WARNING);
                                 return;
                             }
                             await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(focusRusult.Data, default, timeoutToken.Token);

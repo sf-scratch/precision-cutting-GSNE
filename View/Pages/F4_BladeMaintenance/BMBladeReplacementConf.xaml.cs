@@ -29,7 +29,7 @@ using 精密切割系统.View.Dialogs;
 using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.operate;
 using 精密切割系统.ViewModel;
-using static 精密切割系统.Helpers.MaterialSnackUtils;
+
 
 namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 {
@@ -116,12 +116,12 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             try
             {
                 SaveData();
-                MaterialSnackUtils.MaterialSnack("换刀成功！", MaterialSnackUtils.SnackType.SUCCESS);
+                MaterialSnack("换刀成功！", SnackType.SUCCESS);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                MaterialSnackUtils.MaterialSnack("保存失败", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("保存失败", SnackType.ERROR);
                 return;
             }
         }

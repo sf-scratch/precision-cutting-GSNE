@@ -68,7 +68,7 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
             }
             else
             {
-                MaterialSnackUtils.MaterialSnack("数据异常", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("数据异常", SnackType.ERROR);
             }
         }
 

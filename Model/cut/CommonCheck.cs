@@ -37,6 +37,7 @@ namespace 精密切割系统.Driver
             }
             return true;
         }
+
         /// <summary>
         /// 检查全局运行状态
         /// </summary>
@@ -45,6 +46,7 @@ namespace 精密切割系统.Driver
         {
             return GlobalParams.globalRunFlag;
         }
+
         /// <summary>
         /// 轴运动状态检查 1、全局运行状态 2 轴busy状态 3、报警状态
         /// </summary>
@@ -71,6 +73,7 @@ namespace 精密切割系统.Driver
             }
             return true;
         }
+
         /// <summary>
         /// 电火花修刀状态检查
         /// </summary>
@@ -91,8 +94,6 @@ namespace 精密切割系统.Driver
         /// <returns></returns>
         public static bool FocusStatsCheck()
         {
-
-
             return true;
         }
 
@@ -137,7 +138,8 @@ namespace 精密切割系统.Driver
             if ((fullAutoInit && !cutStatus) || sharpenStatus)
             {
                 return true;
-            } else
+            }
+            else
             {
                 return false;
             }
@@ -151,7 +153,7 @@ namespace 精密切割系统.Driver
         {
             if (Tools.TrueFlag(DeviceKey.alignStatusKey))
             {
-                MaterialSnackUtils.MaterialSnack("校准模式未准备好！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("校准模式未准备好！", SnackType.WARNING);
                 return false;
             }
             return true;
@@ -182,7 +184,7 @@ namespace 精密切割系统.Driver
             }
             return true;
         }
-        
+
         /// <summary>
         /// 检测主轴是否在转
         /// </summary>
@@ -192,7 +194,7 @@ namespace 精密切割系统.Driver
             bool status = Tools.TrueFlag(PlcControl.plc.GetPlcValueString(DeviceKey.spindleManuallyRunStatusKey));
             if (status)
             {
-                MaterialSnackUtils.MaterialSnack("主轴运行中！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("主轴运行中！", SnackType.WARNING);
             }
             return status;
         }
@@ -210,7 +212,7 @@ namespace 精密切割系统.Driver
             // 主轴切割水
             if (!GetParamsStatus(DeviceKey.spindleCoolingWaterKey))
             {
-                MaterialSnackUtils.MaterialSnack("主轴冷却水异常！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("主轴冷却水异常！", SnackType.WARNING);
                 return false;
             }
             return true;
@@ -225,11 +227,12 @@ namespace 精密切割系统.Driver
             // 主轴气源
             if (!GetParamsStatus(DeviceKey.spindleAirKey))
             {
-                MaterialSnackUtils.MaterialSnack("主轴气源未开启或压力不足！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("主轴气源未开启或压力不足！", SnackType.WARNING);
                 return false;
             }
             return true;
         }
+
         /// <summary>
         /// 检查负真空状态
         /// </summary>
@@ -239,12 +242,12 @@ namespace 精密切割系统.Driver
             bool tempVacuumState = CommonCheck.GetParamsStatus(DeviceKey.vacuumSwitchStatusKey);
             if (!tempVacuumState)
             {
-                MaterialSnackUtils.MaterialSnack("请先打开真空！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("请先打开真空！", SnackType.WARNING);
                 return false;
             }
             if (!GetParamsStatus(DeviceKey.vacuumStateKey))
             {
-                MaterialSnackUtils.MaterialSnack("真空不足或工作盘上无工件！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("真空不足或工作盘上无工件！", SnackType.WARNING);
                 return false;
             }
             return true;
@@ -258,27 +261,30 @@ namespace 精密切割系统.Driver
         {
             if (!GetDoorStatus(DeviceKey.securityDoor1StatusKey))
             {
-                MaterialSnackUtils.MaterialSnack("请先关闭安全门！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("请先关闭安全门！", SnackType.WARNING);
                 return false;
             }
             return true;
         }
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <returns></returns>
-        public static bool CheckDoor2() {
-
+        public static bool CheckDoor2()
+        {
             return true;
         }
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <returns></returns>
-        public static bool CheckDoor1() {
+        public static bool CheckDoor1()
+        {
             if (!GetDoorStatus(DeviceKey.securityDoor1StatusKey))
             {
-                MaterialSnackUtils.MaterialSnack("请先关闭安全门！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("请先关闭安全门！", SnackType.WARNING);
                 return false;
             }
             return true;
@@ -293,11 +299,12 @@ namespace 精密切割系统.Driver
             long deviceDataId = CurrentUtils.GetCurrentConfiguration().DeviceDataId;
             if (deviceDataId == 0)
             {
-                MaterialSnackUtils.MaterialSnack("请先选择配置文件！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("请先选择配置文件！", SnackType.WARNING);
                 return false;
             }
             return true;
         }
+
         /// <summary>
         /// 校验是否有测高数据
         /// </summary>
@@ -308,7 +315,7 @@ namespace 精密切割系统.Driver
             bool flag = bladeHeight != null && !"".Equals(bladeHeight) && !"0".Equals(bladeHeight);
             if (!flag)
             {
-                MaterialSnackUtils.MaterialSnack("请先测高！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("请先测高！", SnackType.WARNING);
                 return false;
             }
             return true;
@@ -334,10 +341,7 @@ namespace 精密切割系统.Driver
         // 检查各轴的状态
         public static bool CheckAxisRunStatus()
         {
-
-
             return true;
         }
-
     }
 }

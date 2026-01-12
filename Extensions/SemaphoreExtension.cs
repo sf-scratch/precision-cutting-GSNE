@@ -32,9 +32,9 @@ namespace 精密切割系统.Extensions
             {
                 if (!string.IsNullOrEmpty(currentTaskName))
                 {
-                    MaterialSnackUtils.MaterialSnack(
+                    MaterialSnack(
                         $"{currentTaskName}中，请勿进行其他操作！",
-                        MaterialSnackUtils.SnackType.WARNING,
+                        SnackType.WARNING,
                         0);
                 }
                 return;
@@ -89,9 +89,9 @@ namespace 精密切割系统.Extensions
             {
                 if (!string.IsNullOrEmpty(currentTaskName))
                 {
-                    MaterialSnackUtils.MaterialSnack(
+                    MaterialSnack(
                         $"{currentTaskName}中，请勿进行其他操作！",
-                        MaterialSnackUtils.SnackType.WARNING,
+                        SnackType.WARNING,
                         0);
                 }
                 return;

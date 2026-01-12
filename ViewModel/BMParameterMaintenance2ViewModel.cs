@@ -65,8 +65,8 @@ namespace 精密切割系统.ViewModel
         {
             await SqlHelper.UpdateAsync(Entity);
             InitialPositionModel initialPosition = await SqlHelper.GetOrCreateEntityAsync(() => new InitialPositionModel());
-            initialPosition.BladeSetupInitX  = MeasureHeightX;
-            initialPosition.BladeSetupInitY  = MeasureHeightY;
+            initialPosition.BladeSetupInitX = MeasureHeightX;
+            initialPosition.BladeSetupInitY = MeasureHeightY;
             await SqlHelper.UpdateAsync(initialPosition);
         }
 

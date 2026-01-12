@@ -42,7 +42,7 @@ using 精密切割系统.View.Dialogs;
 using 精密切割系统.View.Pages.common;
 using 精密切割系统.ViewModel;
 using static SQLite.SQLite3;
-using static 精密切割系统.Helpers.MaterialSnackUtils;
+
 using ImageData = 精密切割系统.Model.cut.ImageData;
 using LineSegment = 精密切割系统.Model.cut.LineSegment;
 using Point = OpenCvSharp.Point;
@@ -82,11 +82,11 @@ namespace 精密切割系统.Helpers
         {
             try
             {
-                MaterialSnackUtils.MaterialSnack("准备更换刀片,轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+                MaterialSnack("准备更换刀片,轴运动中！", SnackType.WARNING, 0, eventAggregator);
                 InitialPositionModel? initPos = await AutoCutUtils.GetInitialPositionAsync();
                 if (initPos is null)
                 {
-                    MaterialSnackUtils.MaterialSnack("获取各模式参数失败，请检查各模式参数配置！", SnackType.WARNING);
+                    MaterialSnack("获取各模式参数失败，请检查各模式参数配置！", SnackType.WARNING);
                     return;
                 }
                 float posX = initPos.CutReplaceInitX.ToFloat();
@@ -106,11 +106,11 @@ namespace 精密切割系统.Helpers
                 Appsettings.BladeThickness = null;
                 Appsettings.MeasureHeightFirst = null;
                 Appsettings.MeasureHeightLast = null;
-                MaterialSnackUtils.MaterialSnack("请打开切割安全门，更换刀片！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
+                MaterialSnack("请打开切割安全门，更换刀片！", SnackType.SUCCESS, 0, eventAggregator);
             }
             catch (OperationCanceledException)
             {
-                MaterialSnackUtils.MaterialSnack("更换刀片操作取消！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+                MaterialSnack("更换刀片操作取消！", SnackType.WARNING, 0, eventAggregator);
             }
         }
 
@@ -122,7 +122,7 @@ namespace 精密切割系统.Helpers
         {
             try
             {
-                MaterialSnackUtils.MaterialSnack("请准备更换磨刀板,轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+                MaterialSnack("请准备更换磨刀板,轴运动中！", SnackType.WARNING, 0, eventAggregator);
                 await PlcControl.tagControl.wholeDevice.StopSpindleAsync();
                 Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, token);
                 Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, default, token);
@@ -131,11 +131,11 @@ namespace 精密切割系统.Helpers
                 Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0, default, token);
                 Task speedZero = PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync(token);
                 await Task.WhenAll(taskXY, taskTheta, speedZero);
-                MaterialSnackUtils.MaterialSnack("请打开相机安全门，更换磨刀板！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
+                MaterialSnack("请打开相机安全门，更换磨刀板！", SnackType.SUCCESS, 0, eventAggregator);
             }
             catch (OperationCanceledException)
             {
-                MaterialSnackUtils.MaterialSnack("更换磨刀板操作失败！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+                MaterialSnack("更换磨刀板操作失败！", SnackType.WARNING, 0, eventAggregator);
             }
         }
 
@@ -160,17 +160,17 @@ namespace 精密切割系统.Helpers
         {
             try
             {
-                MaterialSnackUtils.MaterialSnack("请准备更换工件,轴运动中！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+                MaterialSnack("请准备更换工件,轴运动中！", SnackType.WARNING, 0, eventAggregator);
                 await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, token);
                 Task taskXY = PlcControl.tagControl.cutting.RunMotionAsync(0, 0, token);
                 Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0, default, token);
                 await Task.WhenAll(taskXY, taskTheta);
                 SemiAutoCutService.Instance.HasNotTakenOutWorkpiecesAfterCuttingCompleted = false;
-                MaterialSnackUtils.MaterialSnack("请打开安全门，更换工件！", MaterialSnackUtils.SnackType.SUCCESS, 0, eventAggregator);
+                MaterialSnack("请打开安全门，更换工件！", SnackType.SUCCESS, 0, eventAggregator);
             }
             catch (OperationCanceledException)
             {
-                MaterialSnackUtils.MaterialSnack("更换工件操作失败！", MaterialSnackUtils.SnackType.WARNING, 0, eventAggregator);
+                MaterialSnack("更换工件操作失败！", SnackType.WARNING, 0, eventAggregator);
             }
         }
 
@@ -2158,11 +2158,18 @@ namespace 精密切割系统.Helpers
             return areIndexesContinuous ? validIndexes.Max() : -1;
         }
 
-        public static async Task<CommonResult> EnterManualAlignmentAsync(MainWindow mainWindow)
+        public static async Task<CommonResult> EnterManualAlignmentAsync(MainWindow? mainWindow = default)
         {
+            if (mainWindow is null)
+            {
+                mainWindow = Application.Current?.MainWindow as MainWindow;
+                if (mainWindow is not MainWindow validWindow)
+                    return CommonResult.Failure("主窗口对象为空！");
+                mainWindow = validWindow;
+            }
             if (!GlobalParams.OnlineFlag)
             {
-                MaterialSnackUtils.MaterialSnack("进入校准模式中...", SnackType.WARNING, 0);
+                MaterialSnack("进入校准模式中...", SnackType.WARNING, 0);
                 mainWindow.IsEnabled = false;
                 await Task.Delay(500);
                 mainWindow.IsEnabled = true;
@@ -2189,7 +2196,7 @@ namespace 精密切割系统.Helpers
             {
                 return CommonResult.Failure("轴未准备好，请检查轴状态！");
             }
-            MaterialSnackUtils.MaterialSnack("进入校准模式中...", SnackType.WARNING, 0);
+            MaterialSnack("进入校准模式中...", SnackType.WARNING, 0);
             var operationParameter = CurrentUtils.GetOperationParametersModel();
             if (operationParameter is not null && !operationParameter.IsAutoShutOffWaterWhenCuttingCompleted && operationParameter.IsAutoShutOffWaterWhenEnterCalibration)
             {

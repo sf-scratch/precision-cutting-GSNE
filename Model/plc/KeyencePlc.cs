@@ -2325,6 +2325,26 @@ namespace 精密切割系统.Driver
             await keyencePlc.WriteTagAsync(cuttingWater);
         }
 
+        public async Task<bool> IsOpenCuttingWaterAsync()
+        {
+            return await keyencePlc.ReadDataAsync(cuttingWater.addr) == true;
+        }
+
+        /// <summary>
+        /// 切割水
+        /// </summary>
+        public async Task TriggerCuttingWaterAsync()
+        {
+            if (await PlcControl.tagControl.wholeDevice.IsOpenCuttingWaterAsync())
+            {
+                await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
+            }
+            else
+            {
+                await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
+            }
+        }
+
         /// <summary>
         /// 打开或关闭工作盘真空
         /// </summary>
@@ -2358,6 +2378,21 @@ namespace 精密切割系统.Driver
         public async Task<bool> IsOpenWorkVacuumSwitchAsync()
         {
             return await keyencePlc.ReadDataAsync(workVacuumSwitch.addr) == true;
+        }
+
+        /// <summary>
+        /// 操作工件吹气
+        /// </summary>
+        public async Task TriggerWorkVacuumSwitchAsync()
+        {
+            if (await PlcControl.tagControl.wholeDevice.IsOpenWorkVacuumSwitchAsync())
+            {
+                await PlcControl.tagControl.wholeDevice.CloseWorkVacuumSwitchAsync();
+            }
+            else
+            {
+                await PlcControl.tagControl.wholeDevice.OpenWorkVacuumSwitchAsync();
+            }
         }
 
         /// <summary>
@@ -2409,7 +2444,7 @@ namespace 精密切割系统.Driver
         {
             if (await GetSpindleSpeedAsync() != 0)
             {
-                MaterialSnackUtils.MaterialSnack("打开安全门失败，主轴未停止！", MaterialSnackUtils.SnackType.WARNING, 0);
+                MaterialSnack("打开安全门失败，主轴未停止！", SnackType.WARNING, 0);
                 return;
             }
             cutSecurityDoor.writeValue = "0";

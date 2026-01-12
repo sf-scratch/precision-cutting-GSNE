@@ -24,7 +24,6 @@ using 精密切割系统.Utils;
 using 精密切割系统.View.Controls;
 using 精密切割系统.View.page.right;
 using 精密切割系统.ViewModel;
-using static 精密切割系统.Helpers.MaterialSnackUtils;
 
 namespace 精密切割系统.View.F7_ElectricSpark
 {
@@ -129,14 +128,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
             }
             else if (code == 5301)
             {
-                if (await PlcControl.tagControl.wholeDevice.IsOpenWorkVacuumSwitchAsync())
-                {
-                    await PlcControl.tagControl.wholeDevice.CloseWorkVacuumSwitchAsync();
-                }
-                else
-                {
-                    await PlcControl.tagControl.wholeDevice.OpenWorkVacuumSwitchAsync();
-                }
+                await PlcControl.tagControl.wholeDevice.TriggerWorkVacuumSwitchAsync();
             }
             else if (code == 2407)
             {
@@ -171,7 +163,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
             var success = this.FormSuccess();
             if (!success)
             {
-                MaterialSnackUtils.MaterialSnack("数据异常", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("数据异常", SnackType.ERROR);
                 return;
             }
             List<UserDefineDataModel> list = SqlHelper.Table<UserDefineDataModel>().ToList();
@@ -231,11 +223,11 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 {
                     SqlHelper.Update(model);
                     Debug.WriteLine("修改");
-                    MaterialSnackUtils.MaterialSnack("保存成功", MaterialSnackUtils.SnackType.SUCCESS);
+                    MaterialSnack("保存成功", SnackType.SUCCESS);
                 }
                 catch
                 {
-                    MaterialSnackUtils.MaterialSnack("保存失败", MaterialSnackUtils.SnackType.ERROR);
+                    MaterialSnack("保存失败", SnackType.ERROR);
                 }
             }
             else
@@ -245,11 +237,11 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 {
                     int result = SqlHelper.Add(model);
                     Debug.WriteLine("新增");
-                    MaterialSnackUtils.MaterialSnack("保存成功", MaterialSnackUtils.SnackType.SUCCESS);
+                    MaterialSnack("保存成功", SnackType.SUCCESS);
                 }
                 catch
                 {
-                    MaterialSnackUtils.MaterialSnack("保存失败", MaterialSnackUtils.SnackType.ERROR);
+                    MaterialSnack("保存失败", SnackType.ERROR);
                 }
             }
             Debug.WriteLine(viewModel.Language);

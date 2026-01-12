@@ -202,7 +202,7 @@ namespace 精密切割系统.ViewModel
                 CommonResult<float> focusRusult = await AutoFocusService.GlobalFocusAsync(default, _operatCts.Token);
                 if (!focusRusult.IsSuccess)
                 {
-                    MaterialSnackUtils.MaterialSnack(focusRusult.Message, MaterialSnackUtils.SnackType.WARNING);
+                    MaterialSnack(focusRusult.Message, SnackType.WARNING);
                     return;
                 }
                 await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(focusRusult.Data, default, default);
@@ -217,7 +217,7 @@ namespace 精密切割系统.ViewModel
             if (!_isSureBladeScrap)
             {
                 _isSureBladeScrap = true;
-                MaterialSnackUtils.MaterialSnack("再次点击报废，刀片将提交报废并退出自动执行！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("再次点击报废，刀片将提交报废并退出自动执行！", SnackType.WARNING);
                 return;
             }
             InitRightButtonOnlyStop();
@@ -253,10 +253,10 @@ namespace 精密切割系统.ViewModel
         {
             if (_originPoint == null)
             {
-                MaterialSnackUtils.MaterialSnack($"基准线校准失败，请重试！", MaterialSnackUtils.SnackType.WARNING, 0);
+                MaterialSnack($"基准线校准失败，请重试！", SnackType.WARNING, 0);
                 return;
             }
-            MaterialSnackUtils.MaterialSnack($"基准线校准中", MaterialSnackUtils.SnackType.INFO, 0);
+            MaterialSnack($"基准线校准中", SnackType.INFO, 0);
             DataPoint<float> relativePostion = Appsettings.CameraRelativeBladePosition;
             DataPoint<float> curPoint = new DataPoint<float>
             {
@@ -267,7 +267,7 @@ namespace 精密切割系统.ViewModel
             float offsetY = _originPoint.Y - curPoint.Y;
             Appsettings.CameraRelativeBladePosition = new DataPoint<float>(relativePostion.X, relativePostion.Y - offsetY);
             _originPoint = curPoint;
-            MaterialSnackUtils.MaterialSnack($"基准线校准完成", MaterialSnackUtils.SnackType.SUCCESS, 0);
+            MaterialSnack($"基准线校准完成", SnackType.SUCCESS, 0);
         }
 
         private async Task WorkpieceBlowing()
@@ -336,7 +336,7 @@ namespace 精密切割系统.ViewModel
         {
             if (AlarmConfig.Instance.HasActiveErrorAlarm())
             {
-                MaterialSnackUtils.MaterialSnack("请先处理错误报警！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("请先处理错误报警！", SnackType.WARNING);
                 return;
             }
             await _operatCts.CancelAsync();

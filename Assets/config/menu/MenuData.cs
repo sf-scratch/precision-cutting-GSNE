@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using 精密切割系统.Helpers;
 using 精密切割系统.View.Pages;
+using 精密切割系统.View.Pages.F2_ManualOperation;
 using 精密切割系统.View.Pages.F4_BladeMaintenance;
 using 精密切割系统.ViewModel;
 
@@ -55,9 +56,9 @@ namespace 精密切割系统.Assets.config.menu
             var list = new List<MenuBean>();
             if (GlobalParams.HasFullyAutomatic)
             {
-                list.Add(new MenuBean(1, "全自动", "/Assets/icon/menu_0/menu_0_1.png", "/Assets/icon/menu_0/menu_0_1_white.png"));
+                list.Add(new MenuBean(0, "全自动", "/Assets/icon/menu_0/menu_0_1.png", "/Assets/icon/menu_0/menu_0_1_white.png", 4, nameof(FullyAutomatic)));
             }
-            list.Add(new MenuBean(0, "自动切割", "/Assets/icon/menu_0/menu_0_1.png", "/Assets/icon/menu_0/menu_0_1_white.png"));
+            list.Add(new MenuBean(0, "自动切割", "/Assets/icon/menu_0/menu_0_1.png", "/Assets/icon/menu_0/menu_0_1_white.png", 4, nameof(AutomaticCuttingConf)));
             list.Add(new MenuBean(2, "手动操作", "/Assets/icon/menu_0/menu_0_2.png", "/Assets/icon/menu_0/menu_0_2_white.png"));
             list.Add(new MenuBean(3, "型号目录", "/Assets/icon/menu_0/menu_0_3.png", "/Assets/icon/menu_0/menu_0_3_white.png", 2, "Pages/F3_ModelCatalog/MCDeviceDataListConf"));
             list.Add(new MenuBean(4, "刀片参数维护", "/Assets/icon/menu_0/menu_0_4.png", "/Assets/icon/menu_0/menu_0_4_white.png"));

@@ -83,7 +83,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 int count = SqlHelper.Delete(currentModel);
                 mainWindow.NavigateToPage("Pages/F3_ModelCatalog/MCDeviceDataListConf");
             }else {
-                MaterialSnackUtils.MaterialSnack("目录下有配置文件，不允许删除！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("目录下有配置文件，不允许删除！", SnackType.WARNING);
             }
 
         }

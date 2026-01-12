@@ -13,6 +13,7 @@ using 精密切割系统.View.Pages.common;
 using 精密切割系统.View.Pages.operate;
 using 精密切割系统.ViewModel;
 
+
 namespace 精密切割系统.Helpers
 {
     public static class NavigateUtils
@@ -23,7 +24,7 @@ namespace 精密切割系统.Helpers
             MainWindow? mainWindow = Application.Current.MainWindow as MainWindow;
             if (mainWindow == null)
             {
-                MaterialSnackUtils.MaterialSnack("跳转界面失败", MaterialSnackUtils.SnackType.WARNING, 0);
+                MaterialSnack("跳转界面失败", SnackType.WARNING, 0);
                 return;
             }
             mainWindow.NavigateToPage(pageName, isNavigateEmpty: isNavigateEmpty);
@@ -35,7 +36,7 @@ namespace 精密切割系统.Helpers
         //    MainWindow? mainWindow = Application.Current.MainWindow as MainWindow;
         //    if (mainWindow == null)
         //    {
-        //        MaterialSnackUtils.MaterialSnack("跳转界面失败", MaterialSnackUtils.SnackType.WARNING, 0);
+        //        MaterialSnack("跳转界面失败", SnackType.WARNING, 0);
         //        return;
         //    }
         //    if (paramObj != null)

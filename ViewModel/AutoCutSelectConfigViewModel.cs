@@ -27,6 +27,7 @@ namespace 精密切割系统.ViewModel
         public ObservableCollection<ParamsConfigEntity> AutoCutConfigIdList { get; }
 
         private ParamsConfigEntity _selectedConfigId;
+
         public ParamsConfigEntity SelectedParamsConfig
         {
             get { return _selectedConfigId; }
@@ -34,6 +35,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private long _currentSelectedConfigId;
+
         public long CurrentSelectedConfigId
         {
             get { return _currentSelectedConfigId; }
@@ -41,6 +43,7 @@ namespace 精密切割系统.ViewModel
         }
 
         private string _describe;
+
         public string Describe
         {
             get { return _describe; }
@@ -68,11 +71,11 @@ namespace 精密切割系统.ViewModel
 
         private async void CopyConfig()
         {
-            if ((await DialogHost.Show(SelectionDialog.NewInstance("确认拷贝", noBtn:"取消"))) is not string dialogResult || dialogResult != SelectionDialog.YES)
+            if ((await DialogHost.Show(SelectionDialog.NewInstance("确认拷贝", noBtn: "取消"))) is not string dialogResult || dialogResult != SelectionDialog.YES)
             {
                 return;
             }
-            SQLiteAsyncConnection connection = SqlHelper.SQLiteAsync; 
+            SQLiteAsyncConnection connection = SqlHelper.SQLiteAsync;
             try
             {
                 await connection.RunInTransactionAsync(tx =>
@@ -91,11 +94,11 @@ namespace 精密切割系统.ViewModel
                     tx.Insert(MapperConfig.Mapper.Map<CutParamsEntity>(cutParams));
                 });
                 await UpdateAutoCutConfigIdListAsync();
-                MaterialSnackUtils.MaterialSnack("自动切割参数拷贝成功！", MaterialSnackUtils.SnackType.SUCCESS);
+                MaterialSnack("自动切割参数拷贝成功！", SnackType.SUCCESS);
             }
             catch (Exception)
             {
-                MaterialSnackUtils.MaterialSnack("自动切割参数拷贝失败！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("自动切割参数拷贝失败！", SnackType.WARNING);
             }
         }
 
@@ -124,21 +127,21 @@ namespace 精密切割系统.ViewModel
             }
             if (CurrentSelectedConfigId == SelectedParamsConfig.Id)
             {
-                MaterialSnackUtils.MaterialSnack("已选择该自动切割参数，无法删除！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("已选择该自动切割参数，无法删除！", SnackType.WARNING);
                 return;
             }
             SQLiteAsyncConnection connection = SqlHelper.SQLiteAsync;
             ParamsConfigEntity? paramsConfig = await connection.Table<ParamsConfigEntity>().Where(p => p.Id == SelectedParamsConfig.Id).FirstOrDefaultAsync();
             if (paramsConfig == null)
             {
-                MaterialSnackUtils.MaterialSnack($"ParamsConfigEntity ID: {SelectedParamsConfig.Id} 不存在！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack($"ParamsConfigEntity ID: {SelectedParamsConfig.Id} 不存在！", SnackType.WARNING);
                 return;
             }
             SharpenParamsEntity? sharpenParamsEnt = await connection.Table<SharpenParamsEntity>().Where(p => p.Id == paramsConfig.SharpenParamsId).FirstOrDefaultAsync();
             CutParamsEntity? cutParamsEntity = await connection.Table<CutParamsEntity>().Where(p => p.Id == paramsConfig.CutParamsId).FirstOrDefaultAsync();
             if (sharpenParamsEnt == null || cutParamsEntity == null)
             {
-                MaterialSnackUtils.MaterialSnack("该自动切割参数ID不存在！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("该自动切割参数ID不存在！", SnackType.WARNING);
                 return;
             }
             try
@@ -150,11 +153,11 @@ namespace 精密切割系统.ViewModel
                     tx.Delete(cutParamsEntity);
                 });
                 await UpdateAutoCutConfigIdListAsync();
-                MaterialSnackUtils.MaterialSnack("自动切割参数删除成功！", MaterialSnackUtils.SnackType.SUCCESS);
+                MaterialSnack("自动切割参数删除成功！", SnackType.SUCCESS);
             }
             catch (SQLiteException)
             {
-                MaterialSnackUtils.MaterialSnack("自动切割参数删除失败！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("自动切割参数删除失败！", SnackType.WARNING);
             }
         }
 

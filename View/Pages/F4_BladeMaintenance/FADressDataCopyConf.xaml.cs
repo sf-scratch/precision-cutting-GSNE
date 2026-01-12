@@ -85,7 +85,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             }
             else
             {
-                MaterialSnackUtils.MaterialSnack("数据异常", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("数据异常", SnackType.ERROR);
             }
         }
 
@@ -139,7 +139,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 {
                     await SqlHelper.AddAsync(_model);
                 }
-                MaterialSnackUtils.MaterialSnack("保存成功！", MaterialSnackUtils.SnackType.SUCCESS);
+                MaterialSnack("保存成功！", SnackType.SUCCESS);
             }
             else
             {

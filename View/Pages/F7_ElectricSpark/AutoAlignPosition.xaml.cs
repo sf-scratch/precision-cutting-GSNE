@@ -32,7 +32,7 @@ using 精密切割系统.Utils;
 using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.operate;
 using 精密切割系统.ViewModel;
-using static 精密切割系统.Helpers.MaterialSnackUtils;
+
 
 namespace 精密切割系统.View.Pages.F7_ElectricSpark
 {
@@ -123,7 +123,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
         {
             if (sureFlag == 0)
             {
-                MaterialSnackUtils.MaterialSnack("再次点击确认会清除已有数据，并保存当前数据，请确认！", MaterialSnackUtils.SnackType.WARNING, 0);
+                MaterialSnack("再次点击确认会清除已有数据，并保存当前数据，请确认！", SnackType.WARNING, 0);
                 sureFlag = 1;
                 return;
             }
@@ -221,7 +221,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
                     // 如果设置参数错误 则返回
                     if (!flag)
                     {
-                        // MaterialSnackUtils.MaterialSnack("参数设置识别，请检查参数！", MaterialSnackUtils.SnackType.ERROR);
+                        // MaterialSnack("参数设置识别，请检查参数！", SnackType.ERROR);
                         return;
                     }
                     if (setStartCutFlag)
@@ -229,7 +229,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
                         PlcControl.tagControl.cutting.StartCut(0);
                         Thread.Sleep(10);
                         PlcControl.tagControl.cutting.StartCut(1);
-                        MaterialSnackUtils.MaterialSnack("测量中....", MaterialSnackUtils.SnackType.SUCCESS, 0);
+                        MaterialSnack("测量中....", SnackType.SUCCESS, 0);
                         setStartCutFlag = false;
 
                     }
@@ -255,7 +255,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
                         if (runFlag && !stopDisposeFlag) {
                             stopDisposeFlag = true;
                             PlcControl.tagControl.cutting.StopCut(1);
-                            MaterialSnackUtils.MaterialSnack("正在暂停....", MaterialSnackUtils.SnackType.WARNING, 0);
+                            MaterialSnack("正在暂停....", SnackType.WARNING, 0);
                             Application.Current.Dispatcher.Invoke(() =>
                             {
                                 testStatus.Text = "正在暂停...";
@@ -263,7 +263,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
                             Tools.WaitForValue(DeviceKey.cutStatusKey, 1);
                             GlobalParams.globalRunFlag = false;
                             btnPauseFlag = false;
-                            MaterialSnackUtils.MaterialSnack("暂停中....", MaterialSnackUtils.SnackType.WARNING, 0);
+                            MaterialSnack("暂停中....", SnackType.WARNING, 0);
                             Application.Current.Dispatcher.Invoke(() =>
                             {
                                 testStatus.Text = "暂停中...";
@@ -277,7 +277,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
                             PlcControl.tagControl.cutting.StartCut(0);
                             Thread.Sleep(10);
                             PlcControl.tagControl.cutting.StartCut(1);
-                            MaterialSnackUtils.MaterialSnack("测量中....", MaterialSnackUtils.SnackType.SUCCESS, 0);
+                            MaterialSnack("测量中....", SnackType.SUCCESS, 0);
                             Tools.LogInfo("发送测量开始切割信号！");
                             if (CutOperateUtils.MonitorCutStatus())
                             {
@@ -318,7 +318,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     testStatus.Text = "已完成测量！";
-                    MaterialSnackUtils.MaterialSnack("完成测量！", MaterialSnackUtils.SnackType.SUCCESS, 0);
+                    MaterialSnack("完成测量！", SnackType.SUCCESS, 0);
                     exit();
                 });
                 if (CommonCheck.GetParamsStatus(DeviceKey.workpieceBlowingStatusKey))
@@ -344,7 +344,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
                 });
             }
             sureFlag = 0;
-            MaterialSnackUtils.MaterialSnack("保存成功！", MaterialSnackUtils.SnackType.SUCCESS);
+            MaterialSnack("保存成功！", SnackType.SUCCESS);
         }
 
         private void exit()
@@ -389,7 +389,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
                     if (exitStatus == 0)
                     {
                         exitStatus = 1;
-                        MaterialSnackUtils.MaterialSnack("再次点击，停止测量。", MaterialSnackUtils.SnackType.WARNING);
+                        MaterialSnack("再次点击，停止测量。", SnackType.WARNING);
                         return;
                     }
                     exitFlag = true;
@@ -426,19 +426,19 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
 
             if (zEndIndex > GlobalParams.cutZ1MaxLocation)
             {
-                MaterialSnackUtils.MaterialSnack("Z1轴位置超限！", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("Z1轴位置超限！", SnackType.ERROR);
                 Tools.LogError("Z1轴位置超限！");
                 return false;
             }
 
             if (zEndIndex >= bladeHeight)
             {
-                MaterialSnackUtils.MaterialSnack("Z1轴位置超限！", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("Z1轴位置超限！", SnackType.ERROR);
                 return false;
             }
             if (cutDirection == -1)
             {
-                MaterialSnackUtils.MaterialSnack("请设置切割方向！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("请设置切割方向！", SnackType.WARNING);
                 return false;
             }
             FileTableItemModel tableItemModel = CurrentUtils.GetFileTableItemModel();
@@ -454,7 +454,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
             // 设置切割方向 0 前切 1 后切
             if (cutDirection != 0 && cutDirection != 1)
             {
-                MaterialSnackUtils.MaterialSnack("切割方向错误！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("切割方向错误！", SnackType.WARNING);
                 return false;
             }
 
@@ -471,7 +471,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
 
             if (feedSpeed > 150)
             {
-                MaterialSnackUtils.MaterialSnack("切割速度超限！", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("切割速度超限！", SnackType.ERROR);
                 return false;
             }
 
@@ -513,7 +513,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
             int count = _model.Rows.Count;
             if (count<=0)
             {
-                MaterialSnackUtils.MaterialSnack("空数据不能导出", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("空数据不能导出", SnackType.ERROR);
                 return;
             }
             try
@@ -531,7 +531,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
                 }
                 if (reportDatas.Count <= 0)
                 {
-                    MaterialSnackUtils.MaterialSnack("没有数据可导出", MaterialSnackUtils.SnackType.ERROR);
+                    MaterialSnack("没有数据可导出", SnackType.ERROR);
                     return;
                 }                
                 Dictionary<string, string> propetryDic = new Dictionary<string, string>
@@ -549,11 +549,11 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
                 bool relust = ExcelHelper.WriteExcel(filePath, reportDatas, propetryDic, 1);
                 if (relust)
                 {
-                    MaterialSnackUtils.MaterialSnack("导出成功", MaterialSnackUtils.SnackType.SUCCESS);
+                    MaterialSnack("导出成功", SnackType.SUCCESS);
                 }
                 else
                 {
-                    MaterialSnackUtils.MaterialSnack("导出失败", MaterialSnackUtils.SnackType.ERROR);
+                    MaterialSnack("导出失败", SnackType.ERROR);
                 }
             }
             catch (Exception ex)
@@ -579,12 +579,12 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
             int count = _model.Rows.Count;
             if (count <= 0)
             {
-                MaterialSnackUtils.MaterialSnack("页面空数据不能导入", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("页面空数据不能导入", SnackType.ERROR);
                 return;
             }
             if (isDoing)
             {
-                MaterialSnackUtils.MaterialSnack("执行导入中请等待上次结果完成！", MaterialSnackUtils.SnackType.ERROR);
+                MaterialSnack("执行导入中请等待上次结果完成！", SnackType.ERROR);
                 return;
             }
             isDoing = true;
@@ -706,11 +706,11 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
                                 y_model.AxisCompensate = string.Join(",", comp);
                                 await SqlHelper.UpdateAsync(y_model);
                             }
-                            MaterialSnackUtils.MaterialSnack("导入成功,共" + ct + "条", MaterialSnackUtils.SnackType.SUCCESS);
+                            MaterialSnack("导入成功,共" + ct + "条", SnackType.SUCCESS);
                         }
                         else
                         {
-                            MaterialSnackUtils.MaterialSnack("导入失败," + msg, MaterialSnackUtils.SnackType.ERROR);
+                            MaterialSnack("导入失败," + msg, SnackType.ERROR);
                         }
 
                     }

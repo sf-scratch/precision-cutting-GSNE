@@ -29,7 +29,6 @@ using 精密切割系统.View.Pages.common;
 using 精密切割系统.View.Pages.F2_ManualOperation;
 using 精密切割系统.View.Pages.F4_BladeMaintenance;
 using 精密切割系统.ViewModel;
-using static 精密切割系统.Helpers.MaterialSnackUtils;
 
 namespace 精密切割系统.View.Pages.operate
 {
@@ -319,7 +318,7 @@ namespace 精密切割系统.View.Pages.operate
                 }
                 else
                 {
-                    MaterialSnackUtils.MaterialSnack("半自动切割运行/暂停中，无法切换页面！", MaterialSnackUtils.SnackType.WARNING);
+                    MaterialSnack("半自动切割运行/暂停中，无法切换页面！", SnackType.WARNING);
                 }
                 return;
             }
@@ -342,7 +341,7 @@ namespace 精密切割系统.View.Pages.operate
                     }
                     if (SemiAutoCutService.Instance.IsRuning)
                     {
-                        MaterialSnackUtils.MaterialSnack("半自动切割运行中，无法操作CT真空！", MaterialSnackUtils.SnackType.WARNING);
+                        MaterialSnack("半自动切割运行中，无法操作CT真空！", SnackType.WARNING);
                         return;
                     }
                     var operationParameter = CurrentUtils.GetOperationParametersModel();
@@ -369,7 +368,7 @@ namespace 精密切割系统.View.Pages.operate
                     }
                     if (SemiAutoCutService.Instance.IsRuning)
                     {
-                        MaterialSnackUtils.MaterialSnack("半自动切割运行中，无法操作切割水！", MaterialSnackUtils.SnackType.WARNING);
+                        MaterialSnack("半自动切割运行中，无法操作切割水！", SnackType.WARNING);
                         return;
                     }
                     // 切割水
@@ -383,7 +382,7 @@ namespace 精密切割系统.View.Pages.operate
                     }
                     if (SemiAutoCutService.Instance.IsRuning)
                     {
-                        MaterialSnackUtils.MaterialSnack("半自动切割运行中，无法初始化系统！", MaterialSnackUtils.SnackType.WARNING);
+                        MaterialSnack("半自动切割运行中，无法初始化系统！", SnackType.WARNING);
                         return;
                     }
                     // 系统初始化
@@ -397,7 +396,7 @@ namespace 精密切割系统.View.Pages.operate
                     }
                     if (SemiAutoCutService.Instance.IsRuning)
                     {
-                        MaterialSnackUtils.MaterialSnack("半自动切割运行中，无法操作相机镜头盖！", MaterialSnackUtils.SnackType.WARNING);
+                        MaterialSnack("半自动切割运行中，无法操作相机镜头盖！", SnackType.WARNING);
                         return;
                     }
                     // 操作相机镜头盖
@@ -411,12 +410,12 @@ namespace 精密切割系统.View.Pages.operate
                     }
                     if (SemiAutoCutService.Instance.IsRuning)
                     {
-                        MaterialSnackUtils.MaterialSnack("半自动切割运行中，无法操作主轴！", MaterialSnackUtils.SnackType.WARNING);
+                        MaterialSnack("半自动切割运行中，无法操作主轴！", SnackType.WARNING);
                         return;
                     }
                     if (AlarmConfig.Instance.HasSpindleCoolingWaterAlarm())
                     {
-                        MaterialSnackUtils.MaterialSnack("主轴冷却水报警中，无法操作主轴！", MaterialSnackUtils.SnackType.WARNING);
+                        MaterialSnack("主轴冷却水报警中，无法操作主轴！", SnackType.WARNING);
                         return;
                     }
                     await SpindleManuallyRunAsync();
@@ -429,7 +428,7 @@ namespace 精密切割系统.View.Pages.operate
                     }
                     if (SemiAutoCutService.Instance.IsRuning)
                     {
-                        MaterialSnackUtils.MaterialSnack("半自动切割运行中，无法操作相机吹气！", MaterialSnackUtils.SnackType.WARNING);
+                        MaterialSnack("半自动切割运行中，无法操作相机吹气！", SnackType.WARNING);
                         return;
                     }
                     // 相机吹气
@@ -448,12 +447,12 @@ namespace 精密切割系统.View.Pages.operate
                 case 11:
                     if (AlarmConfig.Instance.HasActiveErrorAlarm())
                     {
-                        MaterialSnackUtils.MaterialSnack("存在未处理报警，无法更换工件！", MaterialSnackUtils.SnackType.WARNING);
+                        MaterialSnack("存在未处理报警，无法更换工件！", SnackType.WARNING);
                         return;
                     }
                     if (SemiAutoCutService.Instance.IsRuning)
                     {
-                        MaterialSnackUtils.MaterialSnack("半自动切割运行中，无法更换工件！", MaterialSnackUtils.SnackType.WARNING);
+                        MaterialSnack("半自动切割运行中，无法更换工件！", SnackType.WARNING);
                         return;
                     }
                     TimeoutToken timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(120));
@@ -511,14 +510,7 @@ namespace 精密切割系统.View.Pages.operate
         /// </summary>
         private async Task CutWaterOperateAsync()
         {
-            if (await PlcControl.tagControl.wholeDevice.IsOpenSpindleCuttingWaterAsync())
-            {
-                await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
-            }
-            else
-            {
-                await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
-            }
+            await PlcControl.tagControl.wholeDevice.TriggerCuttingWaterAsync();
         }
 
         /// <summary>
@@ -561,32 +553,32 @@ namespace 精密切割系统.View.Pages.operate
             await PlcControl.tagControl.wholeDevice.AlarmResetAsync();
             if (await PlcControl.tagControl.wholeDevice.IsSystemInitingAsync())
             {
-                MaterialSnackUtils.MaterialSnack("初始化中，请等待初始化完成！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("初始化中，请等待初始化完成！", SnackType.WARNING);
                 return;
             }
             if (!await PlcControl.tagControl.wholeDevice.CanSystemInitAsync())
             {
-                MaterialSnackUtils.MaterialSnack("初始化未准备好！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("初始化未准备好！", SnackType.WARNING);
                 return;
             }
             // 退出所有模式
             PlcControl.plc.exitAllModel();
             await PlcControl.tagControl.wholeDevice.SystemInitAsync();
-            MaterialSnackUtils.MaterialSnack("系统初始化中...", MaterialSnackUtils.SnackType.SUCCESS, 0);
+            MaterialSnack("系统初始化中...", SnackType.SUCCESS, 0);
             try
             {
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(90));
                 await PlcControl.tagControl.wholeDevice.WaitSystemInitCompletedAsync(cts.Token);
                 GlobalParams.systemInitFlag = true;
-                MaterialSnackUtils.MaterialSnack("系统初始化完成！", MaterialSnackUtils.SnackType.SUCCESS);
+                MaterialSnack("系统初始化完成！", SnackType.SUCCESS);
             }
             catch (OperationCanceledException)
             {
-                MaterialSnackUtils.MaterialSnack("系统初始化过程超时，请检查系统状态!", MaterialSnackUtils.SnackType.WARNING, 0);
+                MaterialSnack("系统初始化过程超时，请检查系统状态!", SnackType.WARNING, 0);
             }
             catch (Exception ex)
             {
-                MaterialSnackUtils.MaterialSnack($"系统初始化时遇到其他错误: {ex.Message}", MaterialSnackUtils.SnackType.WARNING, 0);
+                MaterialSnack($"系统初始化时遇到其他错误: {ex.Message}", SnackType.WARNING, 0);
             }
         }
 
@@ -629,14 +621,7 @@ namespace 精密切割系统.View.Pages.operate
         /// </summary>
         private async Task OperateWorkVacuumSwitchAsync()
         {
-            if (await PlcControl.tagControl.wholeDevice.IsOpenWorkVacuumSwitchAsync())
-            {
-                await PlcControl.tagControl.wholeDevice.CloseWorkVacuumSwitchAsync();
-            }
-            else
-            {
-                await PlcControl.tagControl.wholeDevice.OpenWorkVacuumSwitchAsync();
-            }
+            await PlcControl.tagControl.wholeDevice.TriggerWorkVacuumSwitchAsync();
         }
 
         /// <summary>
@@ -660,7 +645,7 @@ namespace 精密切割系统.View.Pages.operate
         {
             if (!await _spindleSemaphore.WaitAsync(TimeSpan.Zero))
             {
-                MaterialSnackUtils.MaterialSnack("主轴加减速中，请勿重复点击！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("主轴加减速中，请勿重复点击！", SnackType.WARNING);
                 return;
             }
             try

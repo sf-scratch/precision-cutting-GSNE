@@ -104,7 +104,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 var list = SqlHelper.Table<FileTableItemModel>().Where(t => t.DeviceDataNo == inputDeviceDataNo.Text).ToList();
                 if (list.Count > 0)
                 {
-                    MaterialSnackUtils.MaterialSnack("型号参数已存在！", MaterialSnackUtils.SnackType.WARNING);
+                    MaterialSnack("型号参数已存在！", SnackType.WARNING);
                 }
                 else
                 {
@@ -132,7 +132,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             }
             else
             {
-                MaterialSnackUtils.MaterialSnack("型号参数不能为空！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("型号参数不能为空！", SnackType.WARNING);
             }
         }
     }

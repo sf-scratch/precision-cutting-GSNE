@@ -57,7 +57,7 @@ namespace 精密切割系统.FrmWindow.common
             List<CameraCommon> cameraCommons = Tools.GetChildrenOfType<CameraCommon>(mainWindow.mainFrame);
             if (cameraCommons.Count == 0)
             {
-                MaterialSnackUtils.MaterialSnack("相机获取失败！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack("相机获取失败！", SnackType.WARNING);
                 return;
             }
             CameraCommon cameraCommon = cameraCommons[0];
@@ -86,7 +86,7 @@ namespace 精密切割系统.FrmWindow.common
             }
             if (!readyFlag)
             {
-                MaterialSnackUtils.MaterialSnack(modeName + "未准备好！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack(modeName + "未准备好！", SnackType.WARNING);
                 // return;
             }
             // 获取当前配置的工作盘和膜的厚度
@@ -103,7 +103,7 @@ namespace 精密切割系统.FrmWindow.common
                 List<BmSharpenParameterModel> list = SqlHelper.Table<BmSharpenParameterModel>().Where(t => t.BladeLotID == BladeLotID).ToList();
                 if (list.Count == 0)
                 {
-                    MaterialSnackUtils.MaterialSnack("磨刀参数错误", MaterialSnackUtils.SnackType.WARNING);
+                    MaterialSnack("磨刀参数错误", SnackType.WARNING);
                     return;
                 }
                 bmSharpenParameterModel = list.FirstOrDefault();
@@ -111,7 +111,7 @@ namespace 精密切割系统.FrmWindow.common
             }
 
             focusRunStatus = true;
-            MaterialSnackUtils.MaterialSnack("自动聚焦中....", MaterialSnackUtils.SnackType.SUCCESS, 0);
+            MaterialSnack("自动聚焦中....", SnackType.SUCCESS, 0);
             GlobalParams.globalRunFlag = true;
             // 往下缓慢移动 35.0
             PlcControl.tagControl.Z2axis.StartAbsolute(GlobalParams.z2DefaultSpeed, startPosition.ToString());
@@ -146,7 +146,7 @@ namespace 精密切割系统.FrmWindow.common
                         if (!res)
                         {
                             Tools.LogInfo("自动对焦失败");
-                            MaterialSnackUtils.MaterialSnack("自动对焦失败!", MaterialSnackUtils.SnackType.ERROR);
+                            MaterialSnack("自动对焦失败!", SnackType.ERROR);
                             focusRunStatus = false;
                             GlobalParams.globalRunFlag = false;
                             return;
@@ -172,7 +172,7 @@ namespace 精密切割系统.FrmWindow.common
                                     PlcControl.tagControl.Z2axis.StartAbsolute(GlobalParams.z2DefaultSpeed, lastPosition.ToString());
                                     GlobalParams.lastFocusZ2Location = (float)lastPosition;
                                     // 可以弹出提示框或日志，告诉用户聚焦已完成
-                                    MaterialSnackUtils.MaterialSnack("自动对焦已完成!", MaterialSnackUtils.SnackType.SUCCESS);
+                                    MaterialSnack("自动对焦已完成!", SnackType.SUCCESS);
                                     GlobalParams.globalRunFlag = false;
                                     // 设置聚焦运行状态为结束
                                     focusRunStatus = false;
@@ -210,7 +210,7 @@ namespace 精密切割系统.FrmWindow.common
                     GlobalParams.globalRunFlag = false;
                     // 设置聚焦运行状态为结束
                     focusRunStatus = false;
-                    MaterialSnackUtils.MaterialSnack("自动对焦结束!", MaterialSnackUtils.SnackType.SUCCESS);
+                    MaterialSnack("自动对焦结束!", SnackType.SUCCESS);
                 });
             }
         }

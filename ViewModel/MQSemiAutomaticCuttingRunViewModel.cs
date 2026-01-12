@@ -26,7 +26,7 @@ using 精密切割系统.Utils;
 using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.Auto;
 using 精密切割系统.View.Pages.F2_ManualOperation;
-using static 精密切割系统.Helpers.MaterialSnackUtils;
+
 
 namespace 精密切割系统.ViewModel
 {

@@ -81,7 +81,7 @@ namespace 精密切割系统.ViewModel
                 CommonResult<float> focusRusult = await AutoFocusService.GlobalFocusAsync(default, _cts?.Token ?? default);
                 if (!focusRusult.IsSuccess)
                 {
-                    MaterialSnackUtils.MaterialSnack(focusRusult.Message, MaterialSnackUtils.SnackType.WARNING);
+                    MaterialSnack(focusRusult.Message, SnackType.WARNING);
                     return;
                 }
                 await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(focusRusult.Data, default, default);
@@ -104,19 +104,19 @@ namespace 精密切割系统.ViewModel
         {
             if (float.IsNaN(CurrentPositionY))
             {
-                MaterialSnackUtils.MaterialSnack($"当前位置获取失败，请重试！", MaterialSnackUtils.SnackType.WARNING);
+                MaterialSnack($"当前位置获取失败，请重试！", SnackType.WARNING);
                 return;
             }
             switch (_setType)
             {
                 case AutoCutSetCutPositionType.SetCut:
                     Appsettings.CutY = CurrentPositionY;
-                    MaterialSnackUtils.MaterialSnack($"切割开始位置设置成功！", MaterialSnackUtils.SnackType.SUCCESS);
+                    MaterialSnack($"切割开始位置设置成功！", SnackType.SUCCESS);
                     break;
 
                 case AutoCutSetCutPositionType.SetSharpen:
                     Appsettings.SharpenY = CurrentPositionY;
-                    MaterialSnackUtils.MaterialSnack($"磨刀开始位置设置成功！", MaterialSnackUtils.SnackType.SUCCESS);
+                    MaterialSnack($"磨刀开始位置设置成功！", SnackType.SUCCESS);
                     break;
 
                 default:

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using 精密切割系统.Helpers;
 using 精密切割系统.ViewModel;
-using static 精密切割系统.Helpers.MaterialSnackUtils;
+
 
 namespace 精密切割系统.Model.common
 {
