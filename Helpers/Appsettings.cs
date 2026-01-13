@@ -257,6 +257,12 @@ namespace 精密切割系统.Helpers
             set => UpdateAppSettings(value);
         }
 
+        public static double? RealHeight
+        {
+            get => GetValue<float>();
+            set => UpdateAppSettings(value);
+        }
+
         /// <summary>
         /// 自更换刀片起刀片切了几道
         /// </summary>

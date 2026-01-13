@@ -95,7 +95,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             _viewModel = new MQSemiAutomaticCuttingConfViewModel();
             _viewModel.DeviceDataNo = _model.DeviceDataNo + "";
             _viewModel.DeviceDataId = _model.DeviceDataId;
-            _viewModel.ChannelNum = CurrentUtils.GetCurrentConfiguration().ChannelNum;
+            _viewModel.ChannelNum = CurrentUtils.GetCurrentCh();
             _viewModel.BladeHeight = bladeHeight;
             _viewModel.FeedSpeed = feedSpeed;
             _viewModel.CutLine = 0;
@@ -179,7 +179,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         }
 
         // 开始切割
-        private void StartCut(object? sender, bool e)
+        private async void StartCut(object? sender, bool e)
         {
             if (AlarmConfig.Instance.HasActiveErrorAlarm())
             {
@@ -201,9 +201,16 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 MaterialSnack("未设置刀片外径！", SnackType.WARNING);
                 return;
             }
+            CommonResult<List<CutStep>> cutStepResult = await AutoCutUtils.GenerateSingleSideCutStepListAsync(_semiAutoCutService.IsOpenPrecut);
+            if (!cutStepResult.IsSuccess || cutStepResult.Data is null)
+            {
+                MaterialSnack(cutStepResult.Message, SnackType.WARNING);
+                return;
+            }
             _semiAutoCutService.CutLine = _viewModel.CutLine;
             _semiAutoCutService.SpindleRev = _viewModel.SpindleRev;
-            ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(MQSemiAutomaticCuttingRun));
+            NavigationParameters parameters = new() { { "cutSteps", cutStepResult.Data } };
+            ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(MQSemiAutomaticCuttingRun), parameters);
         }
 
         private void CutBack(object? sender, bool e)

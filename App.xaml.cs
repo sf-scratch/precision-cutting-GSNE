@@ -72,6 +72,7 @@ namespace 精密切割系统
             containerRegistry.RegisterForNavigation<BMParameterMaintenance2, BMParameterMaintenance2ViewModel>();
             containerRegistry.RegisterForNavigation<Measurement, MeasurementViewModel>();
             containerRegistry.RegisterForNavigation<AutomaticCuttingConf, AutomaticCuttingConfViewModel>();
+            containerRegistry.RegisterForNavigation<ManualAlignment, ManualAlignmentViewModel>();
 
             containerRegistry.RegisterDialog<ConfirmDialog, ConfirmDialogViewModel>();
 

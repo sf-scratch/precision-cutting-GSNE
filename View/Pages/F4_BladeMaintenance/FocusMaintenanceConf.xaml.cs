@@ -97,7 +97,16 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 
         private async Task GlobalFocusAsync()
         {
-            await AutoFocusService.GlobalFocusAsync(default, _cts?.Token ?? default);
+            MaterialSnack("对焦进行中！", SnackType.WARNING);
+            var result = await AutoFocusService.GlobalFocusAsync(default, _cts?.Token ?? default);
+            if (result.IsSuccess)
+            {
+                MaterialSnack("对焦完成！", SnackType.SUCCESS);
+            }
+            else
+            {
+                MaterialSnack(result.Message, SnackType.WARNING);
+            }
         }
 
         private void BtnBack_RightClicked(object? sender, bool e)

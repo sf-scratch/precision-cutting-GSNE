@@ -95,7 +95,7 @@
                         x:Name="inputSpindleRev"
                         Width="120"
                         InputType="Numeral"
-                        XMax="100000"
+                        XMax="30000"
                         XMin="0"
                         XPrecision="0" />
                     <Label
@@ -366,8 +366,7 @@
                             Grid.Column="1"
                             Margin="0,0,0,8"
                             InputType="Decimal"
-                            Visibility="Collapsed"
-                            XAllowNull="true" />
+                            Visibility="Collapsed" />
                         <Label
                             x:Name="absoluteCutPositionUnit"
                             Grid.Row="4"
@@ -395,8 +394,7 @@
                             Grid.Column="1"
                             Margin="0,0,0,8"
                             InputType="Decimal"
-                            Visibility="Collapsed"
-                            XAllowNull="true" />
+                            Visibility="Collapsed" />
                         <Label
                             x:Name="relativeCutPositionUnit"
                             Grid.Row="4"

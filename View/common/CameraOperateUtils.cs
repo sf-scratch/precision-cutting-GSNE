@@ -2,6 +2,7 @@
 using Emgu.CV;
 using MathNet.Numerics;
 using OpenCvSharp.Extensions;
+using 精密切割系统.Helpers;
 using Ocs = OpenCvSharp;
 
 namespace 精密切割系统.Driver
@@ -9,23 +10,20 @@ namespace 精密切割系统.Driver
     // 集成摄像头相关功能的api
     internal class CameraOperateUtils
     {
-        public const float DatumLineChangeStep = 1 / 2.2187f; // 基准线调整步长，单位毫米
-        private const double PictureBoxWidth = 765.0;
-        private const double PictureBoxHeight = 640.0;
-        private const double Scale = 1;
+        /// <summary>
+        /// 基准线调整步长，单位毫米
+        /// </summary>
+        public static float DatumLineChangeStep { get => (float)(PictureBoxHeight / (RealHeight * 2)); }
 
-        //private const double RealWidth = 997.5 / Scale;
-        //private const double RealHeight = 834.5 / Scale;1.216
-        //private const double RealWidth = 820.3125 / Scale;
+        private static double PictureBoxWidth = 765.0;
+        private static double PictureBoxHeight = 640.0;
 
-        //private const double RealHeight = 686.266 / Scale;
-        //private const double RealWidth = 798.574 / Scale;
+        private static double RealWidth { get => (PictureBoxWidth / PictureBoxHeight) * RealHeight; }
+        private static double RealHeight { get => Appsettings.RealHeight ?? PictureBoxHeight; }
+        //private static double RealHeight = 337.2;
 
-        //private const double RealHeight = 668.079 / Scale;
-
-        private const double RealWidth = 848.671875;
-        private const double RealHeight = 710.0;
-        private const double CameraHeight = 2048;
+        //private const double RealHeight = 710;
+        private static double CameraHeight = 2048;
 
         /// <summary>
         /// 根据相机图片的高度换算真实尺寸

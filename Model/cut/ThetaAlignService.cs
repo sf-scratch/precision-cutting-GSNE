@@ -21,8 +21,11 @@ namespace 精密切割系统.Model.cut
             get { return _lazy.Value; }
         }
 
+        public static Dictionary<string, ChData>? ChDictionary { get; set; }
         private const int AlignOutTime = 40;
         private const int AlignDefaultMoveDistance = 40;
+        private PointF _pointA;
+        private SemaphoreSlim _thetaAlignSemaphore;
 
         private ThetaAlignStatus _currentThetaAlignStatus;
 
@@ -37,9 +40,6 @@ namespace 精密切割系统.Model.cut
         {
             get { return _currentThetaAlignStatus == ThetaAlignStatus.Completed ? _thetaAlignCompletedDeg : null; }
         }
-
-        private PointF _pointA;
-        private SemaphoreSlim _thetaAlignSemaphore;
 
         private ThetaAlignService()
         {

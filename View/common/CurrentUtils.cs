@@ -5,11 +5,12 @@ using 精密切割系统.database.db.modle;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.bunkering;
 using 精密切割系统.Model.plc;
+using 精密切割系统.Utils;
 using 精密切割系统.View.Pages.common;
 using 精密切割系统.ViewModel;
 using ElectricalDischargeTruingModel = 精密切割系统.database.db.modle.ElectricalDischargeTruingModel;
 
-namespace 精密切割系统.Utils
+namespace 精密切割系统.Helpers
 {
     internal class CurrentUtils
     {
@@ -229,10 +230,19 @@ namespace 精密切割系统.Utils
         public static async void UpdateCurrentCh(string currentChNo)
         {
             // 设置当前切割面
-            CurrentConfigurationModel currentModel = CurrentUtils.GetCurrentConfiguration();
+            CurrentConfigurationModel currentModel = GetCurrentConfiguration();
             currentModel.ChannelNum = currentChNo;
-            GlobalParams.currentCH = currentChNo;
             await SqlHelper.UpdateAsync(currentModel);
+        }
+
+        /// <summary>
+        /// 获取当前切割面
+        /// </summary>
+        /// <returns></returns>
+        public static string GetCurrentCh()
+        {
+            CurrentConfigurationModel currentModel = GetCurrentConfiguration();
+            return currentModel.ChannelNum;
         }
 
         /// <summary>
@@ -264,16 +274,6 @@ namespace 精密切割系统.Utils
                 _model = listConf[0];
             }
             return _model;
-        }
-
-        /// <summary>
-        /// 获取当前切割面
-        /// </summary>
-        /// <returns></returns>
-        public static string GetCurrentChNo()
-        {
-            CurrentConfigurationModel _model = GetCurrentConfiguration();
-            return _model.ChannelNum;
         }
 
         public static async void UpdateCutMarkWidth(int channelNum, float cutMarkWidth)

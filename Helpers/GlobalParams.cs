@@ -8,10 +8,10 @@ namespace 精密切割系统.Helpers
     public static class GlobalParams
     {
         // true 在线版本 false 离线版本
-        public static bool OnlineFlag { get; set; } = false;
+        public static bool OnlineFlag { get; set; } = true;
 
         // 是否全屏显示
-        public static bool IsFullDcreen { get; set; } = false;
+        public static bool IsFullDcreen { get; set; } = true;
 
         // 是否上传MES
         public static bool OnlineMES { get; set; } = false;
@@ -125,9 +125,6 @@ namespace 精密切割系统.Helpers
         public static int clearDressersNum = 0;
 
         // 切割相关
-        // 当前CH
-        public static string currentCH = CH1;
-
         // CH1 开始切割位置
         public static float ch1CutStartPosition;
 
@@ -148,6 +145,7 @@ namespace 精密切割系统.Helpers
         public const string CH3 = "Ch 3";
         public const string CH4 = "Ch 4";
         public const string StringFormatCH = "Ch {0}";
+        public const string RegexMatchCH = @"Ch\s*(\d+)";
 
         // 修刀位置 Y轴前端：129.985  Y轴后端：128.24  Z轴设定位置：39.005    127.98224  129.30324
 

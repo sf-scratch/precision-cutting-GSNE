@@ -17,7 +17,6 @@ using 精密切割系统.View.Pages.Auto;
 using 精密切割系统.View.Pages.common;
 using 精密切割系统.View.Pages.F2_ManualOperation;
 
-
 namespace 精密切割系统.ViewModel
 {
     internal class MQSemiAutomaticCuttingStopViewModel : CustomBindableBase
@@ -37,8 +36,7 @@ namespace 精密切割系统.ViewModel
 
         private DelegateCommand _loadedCommand;
 
-        public DelegateCommand LoadedCommand =>
-            _loadedCommand ?? (_loadedCommand = new DelegateCommand(ExecuteLoadedCommand));
+        public DelegateCommand LoadedCommand => _loadedCommand ??= new DelegateCommand(ExecuteLoadedCommand);
 
         private void ExecuteLoadedCommand()
         {

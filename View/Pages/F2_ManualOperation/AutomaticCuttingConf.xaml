@@ -115,14 +115,18 @@
                 FontWeight="Bold"
                 Header="型号参数">
                 <StackPanel>
-                    <StackPanel Margin="15" Orientation="Horizontal">
+                    <auto:AutoGrid
+                        Margin="10"
+                        ChildMargin="5"
+                        Columns="auto,auto,auto"
+                        RowCount="3">
                         <Label Width="200" Content="旋转轴转速" />
                         <Controls:InputTextBox
                             Width="120"
                             IsEnabled="False"
                             Text="{Binding Model.SpindleRev}" />
                         <Label Content="/min" />
-                    </StackPanel>
+                    </auto:AutoGrid>
                 </StackPanel>
             </GroupBox>
         </Grid>

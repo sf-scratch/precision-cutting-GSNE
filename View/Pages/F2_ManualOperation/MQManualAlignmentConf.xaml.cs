@@ -20,7 +20,6 @@ using 精密切割系统.View.Pages.common;
 using 精密切割系统.View.Pages.operate;
 using 精密切割系统.ViewModel;
 
-
 namespace 精密切割系统.View.Pages.F2_ManualOperation
 {
     /// <summary>
@@ -40,15 +39,6 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
 
         // 相机操作对象
         private CameraCommon _cameraCommon;
-
-        // 读取轴实时位置标识
-        private bool axisRealTimeFlag = true;
-
-        // 清零后X位置
-        private float _cleanXPosition = 0;
-
-        // 清零后Y位置
-        private float _cleanYPosition = 0;
 
         private CancellationTokenSource _cts;
 
@@ -82,7 +72,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 _operateType = int.Parse(type);
             }
             // 设置相关参数
-            channelNo.Text = CurrentUtils.GetCurrentConfiguration().ChannelNum;
+            channelNo.Text = CurrentUtils.GetCurrentCh();
             CameraCommon? cameraCommon = AutoCutUtils.GetCameraCommon();
             if (cameraCommon is null)
             {
@@ -103,7 +93,6 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
             _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Unsubscribe(ReceivedMessage);
-            axisRealTimeFlag = false;
             _intervalTimer.Dispose();
         }
 
@@ -201,7 +190,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 // 确认Z1对焦位置
                 case 2445:
                     Appsettings.FocusClearZ = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync();
-                    MaterialSnack($"Z2对焦位置已确认：{Appsettings.FocusClearZ}mm！", SnackType.WARNING, default, _eventAggregator);
+                    MaterialSnack($"对焦位置已确认：{Appsettings.FocusClearZ}mm！", SnackType.WARNING, default, _eventAggregator);
                     break;
 
                 // Theta垂直校准
@@ -226,8 +215,6 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
 
                 // 位置清零
                 case 2570:
-                    _cleanXPosition = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0;
-                    _cleanYPosition = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0;
                     break;
 
                 case 2433:

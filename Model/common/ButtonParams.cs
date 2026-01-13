@@ -202,5 +202,25 @@ namespace 精密切割系统.Model.common
         {
             return new ButtonParams(Brushes.Red, Brushes.DarkRed, contentText, 12, imagePath, action, start, stop, isOpenFunc, Visibility.Collapsed, Visibility.Visible);
         }
+
+        public static ButtonParams Sure(Action action)
+        {
+            return GreenRightButton("确认", "/Assets/icon/right/enter.png", action);
+        }
+
+        public static ButtonParams Sure(Func<Task> action)
+        {
+            return GreenRightButton("确认", "/Assets/icon/right/enter.png", action);
+        }
+
+        public static ButtonParams Back(Action action)
+        {
+            return YelloRightButton("返回", "/Assets/icon/right/back.png", action);
+        }
+
+        public static ButtonParams Back(Func<Task> action)
+        {
+            return YelloRightButton("返回", "/Assets/icon/right/back.png", action);
+        }
     }
 }

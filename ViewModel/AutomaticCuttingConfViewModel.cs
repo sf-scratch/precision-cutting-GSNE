@@ -11,7 +11,9 @@ using 精密切割系统.database.db.modle;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut;
+using 精密切割系统.Model.plc;
 using 精密切割系统.Utils;
+using 精密切割系统.View.Pages.F2_ManualOperation;
 using static NPOI.HSSF.Util.HSSFColor;
 
 namespace 精密切割系统.ViewModel
@@ -47,11 +49,37 @@ namespace 精密切割系统.ViewModel
 
         private async Task StartAsync()
         {
+            if (AlarmConfig.Instance.HasActiveErrorAlarm())
+            {
+                MaterialSnack(AlarmConfig.HasErrorAlarmMessage, SnackType.WARNING);
+                return;
+            }
             if (WarmUpHelper.IsRuning)
             {
                 MaterialSnack("请先结束暖机再开始切割！", SnackType.WARNING);
                 return;
             }
+            if (ThetaAlignService.ChDictionary is null || ThetaAlignService.ChDictionary.Count == 0)
+            {
+                MaterialSnack("请先完成自动切割页面中的手动校准！", SnackType.WARNING);
+                return;
+            }
+            if (Appsettings.BladeOuterDiameter is null)
+            {
+                MaterialSnack("未设置刀片外径！", SnackType.WARNING);
+                return;
+            }
+            CommonResult<List<CutStep>> cutStepResult = await AutoCutUtils.GenerateCutStepListAsync(ThetaAlignService.ChDictionary, _semiAutoCutService.IsOpenPrecut);
+            if (!cutStepResult.IsSuccess || cutStepResult.Data is null)
+            {
+                MaterialSnack(cutStepResult.Message, SnackType.WARNING);
+                return;
+            }
+            _semiAutoCutService.CutLine = 0;
+            _semiAutoCutService.SpindleRev = Model.SpindleRev.ToInt();
+            NavigationParameters parameters = new() { { "cutSteps", cutStepResult.Data }, { "backPageName", nameof(AutomaticCuttingConf) } };
+            ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(MQSemiAutomaticCuttingRun), parameters);
+            var chDictionary = ThetaAlignService.ChDictionary;
         }
 
         private void Back()
@@ -104,7 +132,7 @@ namespace 精密切割系统.ViewModel
             CommonResult result = await AutoCutUtils.EnterManualAlignmentAsync();
             if (result.IsSuccess)
             {
-                NavigateUtils.NavigateToPage("Pages/F2_ManualOperation/MQManualAlignmentConf");
+                _regionManager.RequestNavigate(RegionName.MainRegion, nameof(ManualAlignment));
             }
             else
             {

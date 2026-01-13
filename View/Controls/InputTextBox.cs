@@ -45,7 +45,7 @@ namespace 精密切割系统.View.Controls
             //XWmkText 水印文字  比如 请输入内容
             XWmkTextProperty = DependencyProperty.Register("XWmkText", typeof(String), typeof(InputTextBox), new PropertyMetadata(null));
             XIsErrorProperty = DependencyProperty.Register("XIsError", typeof(bool), typeof(InputTextBox), new PropertyMetadata(false));
-            XAllowNullProperty = DependencyProperty.Register("XAllowNull", typeof(bool), typeof(InputTextBox), new PropertyMetadata(true));
+            XAllowNullProperty = DependencyProperty.Register("XAllowNull", typeof(bool), typeof(InputTextBox), new PropertyMetadata(false));
             XWmkForegroundProperty = DependencyProperty.Register("XWmkForeground", typeof(Brush), typeof(InputTextBox), new PropertyMetadata(Brushes.Silver));
             XRegExpProperty = DependencyProperty.Register("XRegExp", typeof(string), typeof(InputTextBox), new PropertyMetadata(""));
             FrameworkElement.DefaultStyleKeyProperty.OverrideMetadata(typeof(InputTextBox), new FrameworkPropertyMetadata(typeof(InputTextBox)));

@@ -207,7 +207,7 @@ namespace 精密切割系统.Model.cut
                             return RunResult.Fail("获取当前切割次数失败！");
                         }
                         //触发切割进度更新事件
-                        CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, needCutTimes + _finishedCutTimes, cutTime + _finishedCutTimes));
+                        CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, line.StartPoint.Y, needCutTimes + _finishedCutTimes, cutTime + _finishedCutTimes));
                         //加上边距
                         var (startX, endX) = CalculateCuttingX(line, _thetaDegQueue.Peek(), cutParams.OffsetX);
                         await PlcControl.tagControl.ThetaAxis.SetAbsoluteSpeedAsync(GlobalParams.ThetaDefaultSpeed);
@@ -219,7 +219,7 @@ namespace 精密切割系统.Model.cut
                         await PlcControl.tagControl.cutting.WaitCutNumUdatedAsync(curCutNum.Value + 1, _usingPauseToken);
                         cutTime++;
                         //触发切割进度更新事件
-                        CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, needCutTimes + _finishedCutTimes, cutTime + _finishedCutTimes, 0, 1, 0, true));
+                        CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, line.StartPoint.Y, needCutTimes + _finishedCutTimes, cutTime + _finishedCutTimes, 0, 1, 0, true));
                         //停止切割前
                         int beforeStopCutTimes = cutTime + _finishedCutTimes;
                         int checkMarksCutTimes = cutParams.CheckMarksCutTimes > 0 ? cutParams.CheckMarksCutTimes : _checkMarksCutTimes;
@@ -722,7 +722,7 @@ namespace 精密切割系统.Model.cut
         }
     }
 
-    public struct CutServiceProcess(float cutBladeHeight, float cutSpeed, int totalCutTimes, int cutTimes, float cutLength = 0f, int channelNum = 1, float remainingTime = 0, bool isCompleted = false)
+    public struct CutServiceProcess(float cutBladeHeight, float cutSpeed, float cutYPosition, int totalCutTimes, int cutTimes, float cutLength = 0f, int channelNum = 1, float remainingTime = 0, bool isCompleted = false)
     {
         /// <summary>
         /// 切割刀片高度
@@ -733,6 +733,11 @@ namespace 精密切割系统.Model.cut
         /// 切割速度
         /// </summary>
         public float CutSpeed { get; set; } = cutSpeed;
+
+        /// <summary>
+        /// 切割速度
+        /// </summary>
+        public float CutYPosition { get; set; } = cutYPosition;
 
         /// <summary>
         /// 切割总次数

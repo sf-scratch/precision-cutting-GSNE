@@ -27,7 +27,6 @@ using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.Auto;
 using 精密切割系统.View.Pages.F2_ManualOperation;
 
-
 namespace 精密切割系统.ViewModel
 {
     public class MQSemiAutomaticCuttingRunViewModel : CustomBindableBase
@@ -40,6 +39,9 @@ namespace 精密切割系统.ViewModel
         private readonly SemiAutoCutService _semiAutoCutService;
         private CancellationTokenSource _pauseCts;
         private CancellationTokenSource _monitoringCts;
+        private List<CutStep>? _cutSteps;
+        private float _currentCutYPosition = 0;
+        private string? _backPageName;
 
         private string _yAxisCutPosition;
 
@@ -165,16 +167,16 @@ namespace 精密切割系统.ViewModel
             {
                 try
                 {
-                    CutParam.ChannelNum = CurrentUtils.GetCurrentConfiguration().ChannelNum;
+                    CutParam.ChannelNum = CurrentUtils.GetCurrentCh();
                     var axisPostion = await AutoCutUtils.GetAxisPositionAsync();
                     Application.Current.Dispatcher.Invoke(() =>
                     {
-                        YAxisCutPosition = CutOperateUtils.globalYCutPosition.ToString();
-                        XAxisCurrentPosition = MathF.Round(axisPostion.X ?? 0, 5).ToString();
-                        YAxisCurrentPosition = MathF.Round(axisPostion.Y ?? 0, 5).ToString();
-                        ZAxisCurrentPosition = MathF.Round(axisPostion.Z1 ?? 0, 5).ToString();
-                        Z2AxisCurrentPosition = MathF.Round(axisPostion.Z2 ?? 0, 5).ToString();
-                        ThetaAxisCurrentPosition = MathF.Round(axisPostion.Theta ?? 0, 5).ToString();
+                        YAxisCutPosition = (axisPostion.Y ?? 0 - _currentCutYPosition).ToString(GlobalParams.DecimalStringFormat);
+                        XAxisCurrentPosition = (axisPostion.X ?? 0).ToString(GlobalParams.DecimalStringFormat);
+                        YAxisCurrentPosition = (axisPostion.Y ?? 0).ToString(GlobalParams.DecimalStringFormat);
+                        ZAxisCurrentPosition = (axisPostion.Z1 ?? 0).ToString(GlobalParams.DecimalStringFormat);
+                        Z2AxisCurrentPosition = (axisPostion.Z2 ?? 0).ToString(GlobalParams.DecimalStringFormat);
+                        ThetaAxisCurrentPosition = (axisPostion.Theta ?? 0).ToString(GlobalParams.DecimalStringFormat);
                     });
                 }
                 catch (Exception)
@@ -202,13 +204,12 @@ namespace 精密切割系统.ViewModel
                 ShowWarnMessageNavigateHome(checkResult.Message);
                 return;
             }
-            CommonResult<List<CutStep>> cutStepResult = await AutoCutUtils.GenerateCutStepListAsync(_semiAutoCutService.IsOpenPrecut);
-            if (!cutStepResult.IsSuccess || cutStepResult.Data is null)
+            if (_cutSteps is null)
             {
-                ShowWarnMessageNavigateHome(cutStepResult.Message);
+                ShowWarnMessageNavigateHome("切割步骤数据异常，请重新设置切割参数！");
                 return;
             }
-            List<CutStep> cutSteps = cutStepResult.Data;
+            List<CutStep> cutSteps = _cutSteps;
             CommonResult<FileTableItemModel> fileTableItemResult = await AutoCutUtils.GetFileTableItemModelAsync();
             if (!fileTableItemResult.IsSuccess || fileTableItemResult.Data is null)
             {
@@ -320,8 +321,20 @@ namespace 精密切割系统.ViewModel
         private void ShowWarnMessageNavigateHome(string message)
         {
             MaterialSnack($"{message}", SnackType.WARNING, 0, _eventAggregator);
-            NavigateUtils.NavigateToPage("Pages/F2_ManualOperation/MQSemiAutomaticCuttingConf");
+            NavigateToHome();
             ShowMessage();
+        }
+
+        public void NavigateToHome()
+        {
+            if (_backPageName is null)
+            {
+                NavigateUtils.NavigateToPage("Pages/F2_ManualOperation/MQSemiAutomaticCuttingConf");
+            }
+            else
+            {
+                _regionManager.RequestNavigate(RegionName.MainRegion, _backPageName);
+            }
         }
 
         private IWorkpieces GenerateWorkpieces(FileTableItemModel fileTableItem, float cutY)
@@ -403,7 +416,7 @@ namespace 精密切割系统.ViewModel
         {
             if (!GlobalParams.OnlineFlag)
             {
-                NavigateUtils.NavigateToPage("Pages/F2_ManualOperation/MQSemiAutomaticCuttingConf");
+                NavigateToHome();
                 MaterialSnack($"切割完成！ 总用时：1:10:26", SnackType.SUCCESS, 0);
                 return;
             }
@@ -411,7 +424,7 @@ namespace 精密切割系统.ViewModel
             await PlcControl.tagControl.wholeDevice.OpenYellowLightAsync();
             //结束切割
             await PlcControl.tagControl.cutting.ExitCuttingModeAsync(default);
-            NavigateUtils.NavigateToPage("Pages/F2_ManualOperation/MQSemiAutomaticCuttingConf");
+            NavigateToHome();
             ShowMessage();
         }
 
@@ -496,6 +509,7 @@ namespace 精密切割系统.ViewModel
                         CutParam.ExpectedProcessingEndTime = DateTime.Now.AddSeconds(process.RemainingTime).ToString("HH:mm:ss");
                     }
                 }
+                _currentCutYPosition = process.CutYPosition;
             });
         }
 
@@ -509,16 +523,24 @@ namespace 精密切割系统.ViewModel
         {
             base.OnNavigatedTo(navigationContext);
             _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Subscribe(ReceivedMessage, ThreadOption.UIThread);
-            if (!navigationContext.Parameters.TryGetValue("isContinue", out bool isContinue))
+            if (!navigationContext.Parameters.TryGetValue("isContinue", out bool _))
             {
                 _pauseCts = new CancellationTokenSource();
                 _monitoringCts = new CancellationTokenSource();
+            }
+            if (navigationContext.Parameters.TryGetValue<List<CutStep>>("cutSteps", out var cutSteps))
+            {
+                _cutSteps = cutSteps;
+            }
+            if (navigationContext.Parameters.TryGetValue<string>("backPageName", out var backPageName))
+            {
+                _backPageName = backPageName;
             }
             // 加载参数
             FileTableItemModel fileTableItem = CurrentUtils.GetFileTableItemModel();
             CutParam.DeviceDataNo = fileTableItem.DeviceDataNo;
             CutParam.DeviceDataId = fileTableItem.DeviceDataId;
-            CutParam.ChannelNum = CurrentUtils.GetCurrentConfiguration().ChannelNum;
+            CutParam.ChannelNum = CurrentUtils.GetCurrentCh();
             CutParam.ChangeFeedSpeed = _semiAutoCutService.FeedSpeedCompCompensationValue.ToString();
             CutParam.DepthCompensation = _semiAutoCutService.DepthCompensationValue.ToString();
             InitRightButton();
