@@ -70,6 +70,11 @@ namespace 精密切割系统.ViewModel
                 MaterialSnack("未获取到CH序列，请检查型号参数配置是否正确！", SnackType.WARNING);
                 return;
             }
+            if (_chQueue.Count == 0)
+            {
+                MaterialSnack("未获取到当前CH，请检查型号参数配置是否正确！", SnackType.WARNING);
+                return;
+            }
             if (_alignService.CurrentThetaAlignStatus == ThetaAlignStatus.Horizontal || _alignService.CurrentThetaAlignStatus == ThetaAlignStatus.Vertical)
             {
                 MaterialSnack("请完成Theta轴校准后，再点击确认！", SnackType.WARNING);
@@ -89,7 +94,7 @@ namespace 精密切割系统.ViewModel
                 chData.AfterCalibrationYPosition = yPosition.Value;
                 if (_chQueue.Count > 0)
                 {
-                    CurrentCh = _chQueue.Dequeue();
+                    await UpdateCurrentChAsync();
                 }
                 else
                 {
@@ -189,6 +194,27 @@ namespace 精密切割系统.ViewModel
             }, "对焦");
         }
 
+        private async Task UpdateCurrentChAsync()
+        {
+            if (_chDictionary is null || _chQueue is null || _chQueue.Count == 0)
+            {
+                return;
+            }
+            CurrentCh = _chQueue.Dequeue();
+            if (_chDictionary.TryGetValue(CurrentCh, out var chData))
+            {
+                try
+                {
+                    await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(120));
+                    await PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(chData.ThetaDeg, 60, timeoutToken.Token);
+                }
+                catch (Exception ex)
+                {
+                    MaterialSnack($"移动到CH：{CurrentCh}的Theta轴位置时发生错误，错误信息：{ex.Message}！", SnackType.ERROR);
+                }
+            }
+        }
+
         public override async void OnNavigatedTo(NavigationContext navigationContext)
         {
             base.OnNavigatedTo(navigationContext);
@@ -204,7 +230,7 @@ namespace 精密切割系统.ViewModel
                     _chDictionary.Add(ch.ChName, ch);
                 }
                 _chQueue = new Queue<string>(chDatas.Select(chData => chData.ChName));
-                CurrentCh = _chQueue.Dequeue();
+                await UpdateCurrentChAsync();
             }
             else
             {

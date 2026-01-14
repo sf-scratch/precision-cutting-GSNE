@@ -1,4 +1,5 @@
-﻿using Emgu.CV;
+﻿using DryIoc;
+using Emgu.CV;
 using MathNet.Numerics;
 using Microsoft.VisualBasic;
 using Microsoft.Win32;
@@ -40,8 +41,8 @@ using 精密切割系统.Model.cut;
 using 精密切割系统.Utils;
 using 精密切割系统.View.Controls;
 using 精密切割系统.View.page.right;
+using 精密切割系统.View.Pages.F2_ManualOperation;
 using 精密切割系统.View.Pages.operate;
-using 精密切割系统.ViewModel;
 
 namespace 精密切割系统.View.Pages.F3_ModelCatalog
 {
@@ -127,6 +128,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
 
         private async void Operate_Click(object sender, int code)
         {
+            NavigationParameters parameters;
             switch (code)
             {
                 case 3001:
@@ -197,6 +199,16 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
 
                 case 5002://校准参数
                     mainWindow.NavigateToPage("Pages/F3_ModelCatalog/MCCalibrationParameters", Uri.UnescapeDataString($"id={id}&look={lookState}"));
+                    break;
+
+                case 5003:
+                    parameters = new() { { "id", id }, { "look", lookState } };
+                    ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(AutomaticCompensationCutHeight), parameters);
+                    break;
+
+                case 5004:
+                    parameters = new() { { "id", id }, { "look", lookState } };
+                    ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(ScratchInspectionParameters), parameters);
                     break;
             }
         }

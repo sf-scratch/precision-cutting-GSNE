@@ -13,12 +13,11 @@ using 精密切割系统.View.Pages.common;
 using 精密切割系统.View.Pages.operate;
 using 精密切割系统.ViewModel;
 
-
 namespace 精密切割系统.Helpers
 {
     public static class NavigateUtils
     {
-        public static void NavigateToPage(string pageName, bool isNavigateEmpty = true)
+        public static void NavigateToPage(string pageName, string? paramsStr = default, bool isNavigateEmpty = true)
         {
             //跳转界面
             MainWindow? mainWindow = Application.Current.MainWindow as MainWindow;
@@ -27,7 +26,7 @@ namespace 精密切割系统.Helpers
                 MaterialSnack("跳转界面失败", SnackType.WARNING, 0);
                 return;
             }
-            mainWindow.NavigateToPage(pageName, isNavigateEmpty: isNavigateEmpty);
+            mainWindow.NavigateToPage(pageName, paramsStr ?? string.Empty, isNavigateEmpty);
         }
 
         //public static void NavigateToPage<T>(string pageName, T paramObj)

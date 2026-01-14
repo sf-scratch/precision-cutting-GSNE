@@ -9,8 +9,9 @@ using 精密切割系统.database.db.modle;
 using 精密切割系统.Entities;
 using 精密切割系统.Model.sqlite;
 using 精密切割系统.View.Pages.F4_BladeMaintenance;
+using 精密切割系统.ViewModel;
 
-namespace 精密切割系统.ViewModel
+namespace 精密切割系统.Helpers
 {
     public static class SqlHelper
     {
@@ -63,6 +64,10 @@ namespace 精密切割系统.ViewModel
                 db.CreateTable<KnifeWearEntity>();
                 db.CreateTable<ParamsConfigEntity>();
                 db.CreateTable<BMParameterMaintenanceEntity>();
+                db.CreateTable<BaselineCalibrationEntity>();
+                db.CreateTable<BaselineCalibrationEntity>();
+                db.CreateTable<AutomaticCompensationCutHeightEntity>();
+                db.CreateTable<ScratchInspectionParametersEntity>();
             }
             catch (Exception ex)
             {

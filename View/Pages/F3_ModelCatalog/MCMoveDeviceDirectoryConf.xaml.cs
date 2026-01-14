@@ -18,7 +18,6 @@ using 精密切割系统.database.db.modle;
 using 精密切割系统.Helpers;
 using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.operate;
-using 精密切割系统.ViewModel;
 
 namespace 精密切割系统.View.Pages.F3_ModelCatalog
 {

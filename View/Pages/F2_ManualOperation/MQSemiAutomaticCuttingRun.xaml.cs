@@ -22,7 +22,6 @@ using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.Auto;
 using 精密切割系统.View.Pages.F4_BladeMaintenance;
 using 精密切割系统.View.Pages.operate;
-using 精密切割系统.ViewModel;
 
 
 namespace 精密切割系统.View.Pages.F2_ManualOperation

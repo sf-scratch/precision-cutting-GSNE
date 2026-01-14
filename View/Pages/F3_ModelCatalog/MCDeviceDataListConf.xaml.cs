@@ -31,7 +31,6 @@ using 精密切割系统.View.common;
 using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.F3_ModelCatalog;
 using 精密切割系统.View.Pages.operate;
-using 精密切割系统.ViewModel;
 using static OpenCvSharp.ML.DTrees;
 
 namespace 精密切割系统.View.F3_ModelCatalog

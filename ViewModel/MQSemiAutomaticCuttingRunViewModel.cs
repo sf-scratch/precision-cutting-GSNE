@@ -510,6 +510,7 @@ namespace 精密切割系统.ViewModel
                     }
                 }
                 _currentCutYPosition = process.CutYPosition;
+                CutParam.DepthCompensation = _semiAutoCutService.DepthCompensationValue.ToString();
             });
         }
 

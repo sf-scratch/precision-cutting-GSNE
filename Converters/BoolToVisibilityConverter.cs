@@ -27,11 +27,7 @@ namespace 精密切割系统.Converters
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            if (value is Visibility visibilityValue)
-            {
-                return visibilityValue == Visibility.Visible;
-            }
-            return false;
+            return Binding.DoNothing;
         }
     }
 }

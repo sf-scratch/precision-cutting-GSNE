@@ -20,7 +20,6 @@ using 精密切割系统.Helpers;
 using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.operate;
 using static System.Net.Mime.MediaTypeNames;
-using 精密切割系统.ViewModel;
 using System.Printing;
 
 namespace 精密切割系统.View.Pages.F3_ModelCatalog

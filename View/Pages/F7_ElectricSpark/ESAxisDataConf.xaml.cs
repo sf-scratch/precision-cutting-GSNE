@@ -28,7 +28,6 @@ using 精密切割系统.Utils;
 using 精密切割系统.View.Controls;
 using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.operate;
-using 精密切割系统.ViewModel;
 using static 精密切割系统.View.Controls.InputTextBox;
 
 namespace 精密切割系统.View.F7_ElectricSpark

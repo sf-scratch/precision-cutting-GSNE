@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using 精密切割系统.Helpers;
 using 精密切割系统.Model.plc;
 using 精密切割系统.Model.sqlite;
 using 精密切割系统.Utils;

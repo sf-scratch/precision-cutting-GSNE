@@ -27,6 +27,9 @@
         <Style TargetType="Label">
             <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
+        <Style BasedOn="{StaticResource InputTextStyle}" TargetType="Controls:InputTextBox">
+            <Setter Property="XAllowNull" Value="True" />
+        </Style>
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>

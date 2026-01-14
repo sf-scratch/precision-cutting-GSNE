@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using 精密切割系统.database.db.modle;
-using 精密切割系统.ViewModel;
+using 精密切割系统.Helpers;
 
 namespace 精密切割系统.View.Pages
 {

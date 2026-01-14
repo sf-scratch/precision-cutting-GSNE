@@ -8,7 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using 精密切割系统.Entities;
-using 精密切割系统.ViewModel;
 
 namespace 精密切割系统.Helpers
 {

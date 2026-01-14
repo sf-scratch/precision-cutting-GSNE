@@ -11,6 +11,7 @@ using 精密切割系统.View.Dialogs;
 using 精密切割系统.View.Pages.Auto;
 using 精密切割系统.View.Pages.common;
 using 精密切割系统.View.Pages.F2_ManualOperation;
+using 精密切割系统.View.Pages.F3_ModelCatalog;
 using 精密切割系统.View.Pages.F4_BladeMaintenance;
 using 精密切割系统.View.Pages.F7_ElectricSpark;
 using 精密切割系统.View.Pages.operate;
@@ -73,6 +74,9 @@ namespace 精密切割系统
             containerRegistry.RegisterForNavigation<Measurement, MeasurementViewModel>();
             containerRegistry.RegisterForNavigation<AutomaticCuttingConf, AutomaticCuttingConfViewModel>();
             containerRegistry.RegisterForNavigation<ManualAlignment, ManualAlignmentViewModel>();
+            containerRegistry.RegisterForNavigation<BaselineCalibration, BaselineCalibrationViewModel>();
+            containerRegistry.RegisterForNavigation<AutomaticCompensationCutHeight, AutomaticCompensationCutHeightViewModel>();
+            containerRegistry.RegisterForNavigation<ScratchInspectionParameters, ScratchInspectionParametersViewModel>();
 
             containerRegistry.RegisterDialog<ConfirmDialog, ConfirmDialogViewModel>();
 

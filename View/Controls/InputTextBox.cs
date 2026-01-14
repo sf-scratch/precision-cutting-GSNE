@@ -88,6 +88,7 @@ namespace 精密切割系统.View.Controls
             {
                 inputTextBox.Background = new SolidColorBrush(Color.FromRgb(240, 242, 245));
             }
+            ValidationCheck();
         }
 
         private void InputTextBox_TextChanged(object sender, TextChangedEventArgs e)

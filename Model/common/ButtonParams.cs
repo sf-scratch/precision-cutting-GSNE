@@ -213,6 +213,26 @@ namespace 精密切割系统.Model.common
             return GreenRightButton("确认", "/Assets/icon/right/enter.png", action);
         }
 
+        public static ButtonParams Start(Action action)
+        {
+            return GreenRightButton("开始", "/Assets/icon/right/enter.png", action);
+        }
+
+        public static ButtonParams Start(Func<Task> action)
+        {
+            return GreenRightButton("开始", "/Assets/icon/right/enter.png", action);
+        }
+
+        public static ButtonParams Stop(Action action)
+        {
+            return RedRightButton("停止", "/Assets/icon/right/stop.png", action);
+        }
+
+        public static ButtonParams Stop(Func<Task> action)
+        {
+            return RedRightButton("停止", "/Assets/icon/right/stop.png", action);
+        }
+
         public static ButtonParams Back(Action action)
         {
             return YelloRightButton("返回", "/Assets/icon/right/back.png", action);

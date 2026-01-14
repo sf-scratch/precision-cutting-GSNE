@@ -13,9 +13,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using 精密切割系统.Helpers;
 using 精密切割系统.Model.sqlite;
 using 精密切割系统.View.page.right;
-using 精密切割系统.ViewModel;
 
 namespace 精密切割系统.View.Pages.F7_ElectricSpark
 {

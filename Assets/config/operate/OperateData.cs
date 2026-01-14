@@ -440,6 +440,8 @@ namespace 精密切割系统.Assets.config.buttom
             list.Add(new OperateBean(3004, "导入数据", "/Assets/icon/tab_3/tab_32.png"));
             list.Add(new OperateBean(3005, "导出数据", "/Assets/icon/tab_3/tab_32.png"));
             list.Add(new OperateBean(5002, "校准参数", "/Assets/icon/tab_3/tab_32.png"));
+            list.Add(new OperateBean(5003, "切割高度自动补偿", "/Assets/icon/tab_3/tab_32.png"));
+            list.Add(new OperateBean(5004, "刀痕查参数", "/Assets/icon/tab_3/tab_32.png"));
             return list;
         }
 

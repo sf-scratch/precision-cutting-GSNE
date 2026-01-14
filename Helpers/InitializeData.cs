@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.database;
 using Emgu.CV.Dnn;
-using 精密切割系统.ViewModel;
 using 精密切割系统.Model.sqlite;
 using 精密切割系统.Helpers;
 

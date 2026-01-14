@@ -1,0 +1,106 @@
+﻿<UserControl
+    x:Class="精密切割系统.View.Pages.F4_BladeMaintenance.BaselineCalibration"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
+    xmlns:auto="clr-namespace:WpfAutoGrid;assembly=WpfAutoGrid.Core"
+    xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:common="clr-namespace:精密切割系统.View.Pages.common"
+    xmlns:cvert="clr-namespace:精密切割系统.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:精密切割系统.Helpers"
+    xmlns:local="clr-namespace:精密切割系统.View.Pages.F4_BladeMaintenance"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
+    d:DataContext="{d:DesignInstance viewModel:BaselineCalibrationViewModel,
+                                     IsDesignTimeCreatable=True}"
+    d:DesignHeight="655"
+    d:DesignWidth="1570"
+    mc:Ignorable="d">
+    <behaviors:Interaction.Triggers>
+        <behaviors:EventTrigger EventName="Loaded">
+            <behaviors:InvokeCommandAction Command="{Binding LoadedCommand}" />
+        </behaviors:EventTrigger>
+    </behaviors:Interaction.Triggers>
+    <UserControl.Resources>
+        <!--  布尔到可见性转换器  -->
+        <cvert:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <cvert:BoolToVisibilityConverter x:Key="BoolToVisibilityInverseConverter" IsInverse="True" />
+        <Style TargetType="Label">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+        <Style BasedOn="{StaticResource InputTextStyle}" TargetType="Controls:InputTextBox">
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="InputType" Value="Decimal" />
+            <Setter Property="XPrecision" Value="3" />
+            <Setter Property="FontWeight" Value="Normal" />
+            <Setter Property="Width" Value="120" />
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="50*" />
+            <ColumnDefinition Width="50*" />
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+            <common:CameraCommon Width="765" Height="640" />
+        </Grid>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+            <Label
+                Margin="30,10,0,0"
+                Content="刀痕基准线校准 (4.5)"
+                FontSize="30"
+                FontWeight="Bold" />
+            <StackPanel Grid.Row="1" Margin="30,0,0,0">
+                <StackPanel>
+                    <Label Content="使用前提：需先完成θ轴旋转中心校正。" FontSize="18" />
+                </StackPanel>
+                <GroupBox FontSize="18" Header="切割片形状和尺寸">
+                    <StackPanel>
+                        <ListBox Margin="0,0,0,10" Style="{StaticResource MaterialDesignChoiceChipSecondaryListBox}">
+                            <ListBoxItem Content="圆形切割尺寸" />
+                            <ListBoxItem Content="长方形切割尺寸" IsSelected="{Binding IsSelectRect}" />
+                        </ListBox>
+                        <StackPanel Orientation="Horizontal" Visibility="{Binding IsSelectRect, Converter={StaticResource BoolToVisibilityInverseConverter}, Mode=OneWay}">
+                            <TextBlock Margin="10,0" Text="切割片尺寸" />
+                            <Controls:InputTextBox Text="{Binding Entity.CircularRadius}" />
+                            <Label Content="mm" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Visibility="{Binding IsSelectRect, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
+                            <TextBlock Margin="10,0" Text="切割片尺寸" />
+                            <TextBlock Margin="5,0" Text="长" />
+                            <Controls:InputTextBox Text="{Binding Entity.RectangularLength}" />
+                            <Label Content="mm" />
+                            <TextBlock Margin="5,0" Text="宽" />
+                            <Controls:InputTextBox Text="{Binding Entity.RectangularWidth}" />
+                            <Label Content="mm" />
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+                <common:CommonDimming Margin="0,5,0,0" />
+                <StackPanel Margin="0,15,0,0" Orientation="Horizontal">
+                    <TextBlock Margin="5,0" Text="刀痕基准线位置" />
+                    <Controls:InputTextBox Text="{Binding CameraRelativeBladePositionY}" />
+                    <Label Content="mm" />
+                </StackPanel>
+            </StackPanel>
+            <common:SimpleDirectOperate
+                Grid.Row="2"
+                Grid.Column="1"
+                Width="600"
+                Height="220" />
+        </Grid>
+    </Grid>
+</UserControl>

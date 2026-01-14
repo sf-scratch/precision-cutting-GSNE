@@ -99,6 +99,7 @@ namespace 精密切割系统.Assets.config.menu
             list.Add(new MenuBean(0, "测高参数维护", "FormatListNumbered", "/Assets/icon/menu_5/menu_5_1_white.png", 4, nameof(BMParameterMaintenance)));
             list.Add(new MenuBean(501, "预切割参数维护", "FormatListNumbered", "/Assets/icon/menu_5/menu_5_1_white.png", 2, "Pages/F5_GeneralEfficiency/F5_1_PrecutData"));
             list.Add(new MenuBean(512, "刀片状态信息", "/Assets/icon/menu_5/menu_5_1.png", "/Assets/icon/menu_5/menu_5_1_white.png", 2, "Pages/F4_BladeMaintenance/BladeInfo"));
+            list.Add(new MenuBean(0, "刀痕基准线校准", "/Assets/icon/menu_5/menu_5_1.png", "/Assets/icon/menu_5/menu_5_1_white.png", 4, nameof(BaselineCalibration)));
             return list;
         }
 
