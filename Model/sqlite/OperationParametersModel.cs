@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SQLite;
+using 精密切割系统.Entities;
 
 namespace 精密切割系统.database.db.modle
 {
     [Table("operation_parameters")]
-    public class OperationParametersModel
+    public class OperationParametersModel : IEntityWithId
     {
         [PrimaryKey, AutoIncrement]
         [Column("id")]
@@ -149,5 +150,11 @@ namespace 精密切割系统.database.db.modle
 
         [Column("is_manually_turn_off_water")]
         public bool IsManuallyTurnOffWater { get; set; }
+
+        [Column("is_exit_cut_clear_manual_compensation")]
+        public bool IsExitCutClearManualCompensation { get; set; }
+
+        [Column("is_update_param_clear_manual_compensation")]
+        public bool IsUpdateParamClearManualCompensation { get; set; }
     }
 }

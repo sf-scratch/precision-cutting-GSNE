@@ -25,9 +25,9 @@ namespace 精密切割系统.View.Controls
         public static readonly DependencyProperty XWmkTextProperty;//水印文字
         public static readonly DependencyProperty XWmkForegroundProperty;//水印着色
         public static readonly DependencyProperty XAllowNullProperty;//是否允许为空
+        public static readonly DependencyProperty XAllowZeroProperty;//是否允许为空
         public static readonly DependencyProperty XIsErrorProperty;//是否字段有误
         public static readonly DependencyProperty XRegExpProperty;//正则表达式
-
         public static readonly DependencyProperty XMinProperty;//最小值 针对数字小数
         public static readonly DependencyProperty XMaxProperty;//最大值 针对数字小数
         public static readonly DependencyProperty XPrecisionProperty;//小数位数 针对数字小数
@@ -45,7 +45,8 @@ namespace 精密切割系统.View.Controls
             //XWmkText 水印文字  比如 请输入内容
             XWmkTextProperty = DependencyProperty.Register("XWmkText", typeof(String), typeof(InputTextBox), new PropertyMetadata(null));
             XIsErrorProperty = DependencyProperty.Register("XIsError", typeof(bool), typeof(InputTextBox), new PropertyMetadata(false));
-            XAllowNullProperty = DependencyProperty.Register("XAllowNull", typeof(bool), typeof(InputTextBox), new PropertyMetadata(false));
+            XAllowNullProperty = DependencyProperty.Register("XAllowNull", typeof(bool), typeof(InputTextBox), new PropertyMetadata(true));
+            XAllowZeroProperty = DependencyProperty.Register("XAllowZero", typeof(bool), typeof(InputTextBox), new PropertyMetadata(true));
             XWmkForegroundProperty = DependencyProperty.Register("XWmkForeground", typeof(Brush), typeof(InputTextBox), new PropertyMetadata(Brushes.Silver));
             XRegExpProperty = DependencyProperty.Register("XRegExp", typeof(string), typeof(InputTextBox), new PropertyMetadata(""));
             FrameworkElement.DefaultStyleKeyProperty.OverrideMetadata(typeof(InputTextBox), new FrameworkPropertyMetadata(typeof(InputTextBox)));
@@ -144,6 +145,11 @@ namespace 精密切割系统.View.Controls
             this.XIsError = false;
             //不允许为空时候
             if (XAllowNull == false && (this.Text == null || this.Text.Trim() == ""))
+            {
+                this.XIsError = true;
+                return;
+            }
+            if (!XAllowZero && this.Text.ToFloat() == 0)
             {
                 this.XIsError = true;
                 return;
@@ -383,6 +389,21 @@ namespace 精密切割系统.View.Controls
             set
             {
                 base.SetValue(XAllowNullProperty, value);
+            }
+        }
+
+        /// <summary>
+        /// 是否数字为数字零
+        /// </summary>
+        public bool XAllowZero
+        {
+            get
+            {
+                return (bool)base.GetValue(XAllowZeroProperty);
+            }
+            set
+            {
+                base.SetValue(XAllowZeroProperty, value);
             }
         }
 

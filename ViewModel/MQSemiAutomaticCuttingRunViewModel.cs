@@ -167,7 +167,6 @@ namespace 精密切割系统.ViewModel
             {
                 try
                 {
-                    CutParam.ChannelNum = CurrentUtils.GetCurrentCh();
                     var axisPostion = await AutoCutUtils.GetAxisPositionAsync();
                     Application.Current.Dispatcher.Invoke(() =>
                     {
@@ -192,12 +191,12 @@ namespace 精密切割系统.ViewModel
                 //正在切割中
                 return;
             }
-            //if (!GlobalParams.OnlineFlag)
-            //{
-            //    SpeedManager.IsHighSpeed = false;
-            //    MaterialSnack($"切割中...", SnackType.WARNING, 0, _eventAggregator);
-            //    return;
-            //}
+            if (!GlobalParams.OnlineFlag)
+            {
+                SpeedManager.IsHighSpeed = false;
+                MaterialSnack($"切割中...", SnackType.WARNING, 0, _eventAggregator);
+                return;
+            }
             CommonResult checkResult = await SemiAutoCutService.CheckCutAsync();
             if (!checkResult.IsSuccess)
             {
@@ -208,6 +207,11 @@ namespace 精密切割系统.ViewModel
             {
                 ShowWarnMessageNavigateHome("切割步骤数据异常，请重新设置切割参数！");
                 return;
+            }
+            CommonResult checkAutomaticCompensationCutHeightResult = await VerifyUtils.CheckAutomaticCompensationCutHeightAsync(_cutSteps);
+            if (!checkAutomaticCompensationCutHeightResult.IsSuccess)
+            {
+                ShowWarnMessageNavigateHome(checkAutomaticCompensationCutHeightResult.Message);
             }
             List<CutStep> cutSteps = _cutSteps;
             CommonResult<FileTableItemModel> fileTableItemResult = await AutoCutUtils.GetFileTableItemModelAsync();
@@ -428,21 +432,22 @@ namespace 精密切割系统.ViewModel
             ShowMessage();
         }
 
-        private async void CutService_CutServicePaused(LineSegment? line, string? message, float currentKnifeRemainTime)
+        private async void CutService_CutServicePaused(CutServicePauseData pauseData)
         {
-            await AfterPauseThenMoveToPosition(line, message, currentKnifeRemainTime);
+            await AfterPauseThenMoveToPosition(pauseData);
         }
 
-        private async Task AfterPauseThenMoveToPosition(LineSegment? line, string? message, float currentKnifeRemainTime)
+        private async Task AfterPauseThenMoveToPosition(CutServicePauseData pauseData)
         {
             MaterialSnack("正在暂停切割...", SnackType.WARNING, 0, _eventAggregator);
-            float runTime = 60 + currentKnifeRemainTime;
+            float runTime = 60 + pauseData.CurrentKnifeRemainTime;
             try
             {
                 // 超时自动取消
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(runTime));
                 await PlcControl.tagControl.cutting.ExitCuttingModeAsync(cts.Token);
                 await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
+                LineSegment? line = pauseData.Line;
                 // 轴不报警时移动到指定位置
                 if (line != null && !AlarmConfig.Instance.HasAxisErrorAlarms())
                 {
@@ -467,7 +472,7 @@ namespace 精密切割系统.ViewModel
                     // 执行默认动作
                     //await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(posZ, default, cts.Token);
                 }
-                MaterialSnack(message ?? "暂停中...", SnackType.WARNING, 0, _eventAggregator);
+                MaterialSnack(pauseData.Message ?? "暂停中...", SnackType.WARNING, 0, _eventAggregator);
             }
             catch (OperationCanceledException)
             {
@@ -479,7 +484,7 @@ namespace 精密切割系统.ViewModel
             }
             finally
             {
-                NavigationParameters parameters = new NavigationParameters { { nameof(MQSemiAutomaticCuttingRunViewModel), this } };
+                NavigationParameters parameters = new NavigationParameters { { nameof(MQSemiAutomaticCuttingRunViewModel), this }, { nameof(CutServicePauseData), pauseData } };
                 _regionManager.RequestNavigate(RegionName.MainRegion, nameof(MQSemiAutomaticCuttingStop), parameters);
             }
         }
@@ -510,7 +515,7 @@ namespace 精密切割系统.ViewModel
                     }
                 }
                 _currentCutYPosition = process.CutYPosition;
-                CutParam.DepthCompensation = _semiAutoCutService.DepthCompensationValue.ToString();
+                CutParam.DepthCompensation = _semiAutoCutService.DepthCompensationValue.ToString(GlobalParams.DecimalStringFormat);
             });
         }
 
@@ -532,6 +537,11 @@ namespace 精密切割系统.ViewModel
             if (navigationContext.Parameters.TryGetValue<List<CutStep>>("cutSteps", out var cutSteps))
             {
                 _cutSteps = cutSteps;
+                if (cutSteps.Count > 0)
+                {
+                    CutStep firstStep = cutSteps.First();
+                    CutParam.ChannelNum = string.Format(GlobalParams.StringFormatCH, firstStep.ChannelNum);
+                }
             }
             if (navigationContext.Parameters.TryGetValue<string>("backPageName", out var backPageName))
             {
@@ -541,9 +551,8 @@ namespace 精密切割系统.ViewModel
             FileTableItemModel fileTableItem = CurrentUtils.GetFileTableItemModel();
             CutParam.DeviceDataNo = fileTableItem.DeviceDataNo;
             CutParam.DeviceDataId = fileTableItem.DeviceDataId;
-            CutParam.ChannelNum = CurrentUtils.GetCurrentCh();
             CutParam.ChangeFeedSpeed = _semiAutoCutService.FeedSpeedCompCompensationValue.ToString();
-            CutParam.DepthCompensation = _semiAutoCutService.DepthCompensationValue.ToString();
+            CutParam.DepthCompensation = _semiAutoCutService.DepthCompensationValue.ToString(GlobalParams.DecimalStringFormat);
             InitRightButton();
         }
 

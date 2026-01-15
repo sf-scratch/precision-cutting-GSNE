@@ -33,7 +33,6 @@ using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.operate;
 using 精密切割系统.ViewModel;
 
-
 namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 {
     /// <summary>
@@ -230,9 +229,9 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             sharpenTitle.Content = "磨刀暂停状态";
         }
 
-        private async void CutService_CutServicePaused(LineSegment? line, string? message, float currentKnifeRemainTime)
+        private async void CutService_CutServicePaused(CutServicePauseData pauseData)
         {
-            await AfterPauseThenMoveToPosition(line, message);
+            await AfterPauseThenMoveToPosition(pauseData.Line, pauseData.Message);
         }
 
         private async Task AfterPauseThenMoveToPosition(LineSegment? line, string? message)

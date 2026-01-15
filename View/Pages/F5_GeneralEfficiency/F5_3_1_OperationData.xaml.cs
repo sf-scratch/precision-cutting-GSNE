@@ -56,15 +56,8 @@ namespace 精密切割系统.View.Pages
             rightPage.btnSure.BackFlag = false;
             rightPage.btnSure.SetRightClickedHandler(BtnSure_RightClicked);
 
-            var operationParameter = CurrentUtils.GetOperationParametersModel();
-            if (operationParameter is not null)
-            {
-                ViewModel.operationParameter = operationParameter;
-            }
-            else
-            {
-                await SqlHelper.AddAsync(ViewModel.operationParameter);
-            }
+            var operationParameter = await CurrentUtils.GetOperationParametersModelAsync();
+            ViewModel.operationParameter = operationParameter;
             ViewModel.PositiveLimitPositionX = (Appsettings.PositiveLimitPositionX ?? 0).ToString();
             ViewModel.NegativeLimitPositionX = (Appsettings.NegativeLimitPositionX ?? 0).ToString();
             ViewModel.PositiveLimitPositionY = (Appsettings.PositiveLimitPositionY ?? 0).ToString();

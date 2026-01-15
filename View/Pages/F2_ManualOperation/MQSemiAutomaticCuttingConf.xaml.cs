@@ -213,12 +213,17 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(MQSemiAutomaticCuttingRun), parameters);
         }
 
-        private void CutBack(object? sender, bool e)
+        private async void CutBack(object? sender, bool e)
         {
             // 回复切割面到Ch 1
             //CurrentUtils.InitCutCh();
             WarmUpHelper.StopWarmUp();
-            SemiAutoCutService.Instance.HasNotTakenOutWorkpiecesAfterCuttingCompleted = false;
+            var operationParams = await CurrentUtils.GetOperationParametersModelAsync();
+            if (operationParams.IsExitCutClearManualCompensation)
+            {
+                _semiAutoCutService.DepthCompensationValue = 0;
+            }
+            _semiAutoCutService.FeedSpeedCompCompensationValue = 0;
             mainWindow.NavigateToPage("MainMenu");
         }
 

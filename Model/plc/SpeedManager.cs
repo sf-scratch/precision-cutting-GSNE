@@ -37,7 +37,7 @@ namespace 精密切割系统.Model.plc
         {
             if (isHighSpeed)
             {
-                var operationParam = CurrentUtils.GetOperationParametersModel();
+                var operationParam = await CurrentUtils.GetOperationParametersModelAsync();
                 if (operationParam is null) return;
                 await Task.Run(async () =>
                 {

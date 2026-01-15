@@ -221,6 +221,10 @@ namespace 精密切割系统.Helpers
             Appsettings.AfterReplaceBladeCutTimes = 0;
             Appsettings.AfterReplaceBladeCutLength = 0;
             Appsettings.MeasureHeightLast = curHeightZ.IsSuccess ? curHeightZ.Data : null;
+            // 自动补偿清零
+            AutomaticCompensationCutHeightEntity automaticCompensationCutHeight = await SqlHelper.GetOrCreateEntityAsync(() => new AutomaticCompensationCutHeightEntity());
+            automaticCompensationCutHeight.CurrentAutomaticCompensationCutHeight = "0";
+            await SqlHelper.UpdateAsync(automaticCompensationCutHeight);
             return curHeightZ;
         }
 
@@ -1944,22 +1948,19 @@ namespace 精密切割系统.Helpers
             await PlcControl.tagControl.Z2axis.SetSoftLowerLimit(Appsettings.NegativeLimitPositionZ2 ?? 0);
             await PlcControl.tagControl.ThetaAxis.SetSoftUpperLimit(Appsettings.PositiveLimitPositionTheta ?? 0);
             await PlcControl.tagControl.ThetaAxis.SetSoftLowerLimit(Appsettings.NegativeLimitPositionTheta ?? 0);
-            var operationParameter = CurrentUtils.GetOperationParametersModel();
-            if (operationParameter is not null)
-            {
-                // 原点补偿
-                await PlcControl.tagControl.Xaxis.SetOriginCompensation(operationParameter.OriginCompensationX.ToFloat());
-                await PlcControl.tagControl.Yaxis.SetOriginCompensation(operationParameter.OriginCompensationY.ToFloat());
-                await PlcControl.tagControl.Z1axis.SetOriginCompensation(operationParameter.OriginCompensationZ1.ToFloat());
-                await PlcControl.tagControl.Z2axis.SetOriginCompensation(operationParameter.OriginCompensationZ2.ToFloat());
-                await PlcControl.tagControl.ThetaAxis.SetOriginCompensation(operationParameter.OriginCompensationTheta.ToFloat());
-                // 轴速度
-                await PlcControl.tagControl.Xaxis.SetJogRelativeSpeedAsync(operationParameter.XScanSpeed.ToFloat());
-                await PlcControl.tagControl.Yaxis.SetJogRelativeSpeedAsync(operationParameter.YScanSpeed.ToFloat());
-                await PlcControl.tagControl.Z1axis.SetJogRelativeSpeedAsync(operationParameter.ZScanSpeed.ToFloat());
-                await PlcControl.tagControl.Z2axis.SetJogRelativeSpeedAsync(operationParameter.Z2ScanSpeed.ToFloat());
-                await PlcControl.tagControl.ThetaAxis.SetJogRelativeSpeedAsync(operationParameter.RScanSpeed.ToFloat());
-            }
+            var operationParameter = await CurrentUtils.GetOperationParametersModelAsync();
+            // 原点补偿
+            await PlcControl.tagControl.Xaxis.SetOriginCompensation(operationParameter.OriginCompensationX.ToFloat());
+            await PlcControl.tagControl.Yaxis.SetOriginCompensation(operationParameter.OriginCompensationY.ToFloat());
+            await PlcControl.tagControl.Z1axis.SetOriginCompensation(operationParameter.OriginCompensationZ1.ToFloat());
+            await PlcControl.tagControl.Z2axis.SetOriginCompensation(operationParameter.OriginCompensationZ2.ToFloat());
+            await PlcControl.tagControl.ThetaAxis.SetOriginCompensation(operationParameter.OriginCompensationTheta.ToFloat());
+            // 轴速度
+            await PlcControl.tagControl.Xaxis.SetJogRelativeSpeedAsync(operationParameter.XScanSpeed.ToFloat());
+            await PlcControl.tagControl.Yaxis.SetJogRelativeSpeedAsync(operationParameter.YScanSpeed.ToFloat());
+            await PlcControl.tagControl.Z1axis.SetJogRelativeSpeedAsync(operationParameter.ZScanSpeed.ToFloat());
+            await PlcControl.tagControl.Z2axis.SetJogRelativeSpeedAsync(operationParameter.Z2ScanSpeed.ToFloat());
+            await PlcControl.tagControl.ThetaAxis.SetJogRelativeSpeedAsync(operationParameter.RScanSpeed.ToFloat());
         }
 
         public static async Task<CommonResult<FileTableItemChModel>> GetFirstFileTableItemChModelAsync()
@@ -2016,6 +2017,7 @@ namespace 精密切割系统.Helpers
             {
                 return CommonResult<List<CutStep>>.Failure("当前通道信息错误！");
             }
+            float thetaAlignDeg = ThetaAlignService.Instance.ThetaAlignCompletedDeg ?? await PlcControl.tagControl.ThetaAxis.GetCurrentLocationAsync() ?? 0;
             int[] chSeqs = Tools.StringToIntegerArray(cuttingChSeq);
             int chSeq = currentCh.Value;
             FileTableItemChModel ch = chModels[chSeq - 1];
@@ -2047,7 +2049,7 @@ namespace 精密切割系统.Helpers
                     float cutHeight = setBladeHeight[index];
                     float speed = feedSpeeds[index];
                     float offsetY = yIndexs[index];
-                    float thetaDeg = float.Parse(ch.ThetaDeg);
+                    float thetaDeg = thetaAlignDeg;
                     bool isAbsolute = ch.ComBoxCutMethod.Equals("绝对");
                     float channelStartY = isAbsolute ? ch.AbsoluteCutPosition.ToFloat() : ch.RelativeCutPosition.ToFloat();
                     float offsetX = ch.OffsetX.ToFloat();
@@ -2474,8 +2476,8 @@ namespace 精密切割系统.Helpers
                 return CommonResult.Failure("轴未准备好，请检查轴状态！");
             }
             MaterialSnack("进入校准模式中...", SnackType.WARNING, 0);
-            var operationParameter = CurrentUtils.GetOperationParametersModel();
-            if (operationParameter is not null && !operationParameter.IsAutoShutOffWaterWhenCuttingCompleted && operationParameter.IsAutoShutOffWaterWhenEnterCalibration)
+            var operationParameter = await CurrentUtils.GetOperationParametersModelAsync();
+            if (!operationParameter.IsAutoShutOffWaterWhenCuttingCompleted && operationParameter.IsAutoShutOffWaterWhenEnterCalibration)
             {
                 await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
             }
@@ -2513,6 +2515,7 @@ namespace 精密切割系统.Helpers
                     moveTasks.Add(PlcControl.tagControl.Z2axis.StartAbsoluteAsync(moveZ2.Value, default, timeoutToken.Token));
                 }
                 await Task.WhenAll(moveTasks);
+                await PlcControl.tagControl.wholeDevice.OpenCameraLensCapAsync();
                 return CommonResult.Success();
             }
             catch (OperationCanceledException)

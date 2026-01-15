@@ -12,8 +12,8 @@
     Title="F5_3_1_FunctionData"
     d:DataContext="{d:DesignInstance local:F5_3_1_OperationDataViewModel,
                                      IsDesignTimeCreatable=True}"
-    d:DesignHeight="676"
-    d:DesignWidth="1448"
+    d:DesignHeight="645"
+    d:DesignWidth="1560"
     Loaded="Page_Loaded"
     mc:Ignorable="d">
     <Page.Resources>
@@ -35,6 +35,10 @@
             x:Key="BoolToStringConverter"
             FalseValue="不关水"
             TrueValue="关水" />
+        <Converters:BoolToValueConverter
+            x:Key="BoolToOpenOrCloseConverter"
+            FalseValue="关闭"
+            TrueValue="开启" />
     </Page.Resources>
     <Page.DataContext>
         <local:F5_3_1_OperationDataViewModel />
@@ -46,9 +50,8 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto" />
             <ColumnDefinition />
-            <ColumnDefinition />
-            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <!--  原5.3.1  -->
         <Label
@@ -439,52 +442,80 @@
                     FontWeight="Bold" />
             </StackPanel>
         </StackPanel>
-        <StackPanel
+        <Grid
             Grid.Row="1"
             Grid.Column="1"
-            Margin="0,5,0,0">
-            <Label
-                Height="35"
-                Content="切割水设置"
-                FontSize="22"
-                FontWeight="Bold" />
-            <auto:AutoGrid
-                Grid.RowSpan="8"
-                Width="680"
-                HorizontalAlignment="Left"
-                ChildMargin="5"
-                Columns="3*,*,3*,*"
-                RowCount="10">
-                <Label Content="切割结束关水/不关水" />
-                <CheckBox
-                    x:Name="cutWaterStatus"
-                    Grid.ColumnSpan="3"
-                    d:IsChecked="False"
-                    IsChecked="{Binding IsAutoShutOffWaterWhenCuttingCompleted}">
-                    <TextBlock Text="{Binding ElementName=cutWaterStatus, Path=IsChecked, Converter={StaticResource BoolToStringConverter}}" />
-                </CheckBox>
+            Margin="30,0,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="335" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+                <Label
+                    Height="35"
+                    Content="切割水设置"
+                    FontSize="22"
+                    FontWeight="Bold" />
                 <auto:AutoGrid
-                    Grid.RowSpan="3"
-                    Grid.ColumnSpan="2"
+                    Grid.RowSpan="8"
+                    ChildMargin="5"
+                    Columns="*,auto"
+                    RowCount="10">
+                    <Label Content="切割结束关水/不关水" />
+                    <CheckBox
+                        x:Name="cutWaterStatus"
+                        d:IsChecked="False"
+                        IsChecked="{Binding IsAutoShutOffWaterWhenCuttingCompleted}">
+                        <TextBlock Text="{Binding ElementName=cutWaterStatus, Path=IsChecked, Converter={StaticResource BoolToStringConverter}}" />
+                    </CheckBox>
+                    <auto:AutoGrid
+                        Grid.ColumnSpan="2"
+                        ChildMargin="0,7"
+                        Columns="3*,*"
+                        RowCount="3"
+                        Visibility="{Binding ElementName=cutWaterStatus, Path=IsChecked, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <Label Content="- 在关闭真空时自动关水" />
+                        <CheckBox x:Name="autoShutOffWaterWhenCloseVacuum" IsChecked="{Binding IsAutoShutOffWaterWhenCloseVacuum}">
+                            <TextBlock Text="{Binding ElementName=autoShutOffWaterWhenCloseVacuum, Path=IsChecked, Converter={StaticResource BoolToStringConverter}}" />
+                        </CheckBox>
+                        <Label Content="- 在进入校准模式时自动关水" />
+                        <CheckBox x:Name="autoShutOffWaterWhenEnterCalibration" IsChecked="{Binding IsAutoShutOffWaterWhenEnterCalibration}">
+                            <TextBlock Text="{Binding ElementName=autoShutOffWaterWhenEnterCalibration, Path=IsChecked, Converter={StaticResource BoolToStringConverter}}" />
+                        </CheckBox>
+                        <Label Content="- 使用者手动关水" />
+                        <CheckBox x:Name="manuallyTurnOffWater" IsChecked="{Binding IsManuallyTurnOffWater}">
+                            <TextBlock Text="{Binding ElementName=manuallyTurnOffWater, Path=IsChecked, Converter={StaticResource BoolToStringConverter}}" />
+                        </CheckBox>
+                    </auto:AutoGrid>
+                </auto:AutoGrid>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Margin="30,0,0,0">
+                <Label
+                    Height="35"
+                    Content="高度补偿设置"
+                    FontSize="22"
+                    FontWeight="Bold" />
+                <auto:AutoGrid
                     ChildMargin="0,7"
-                    Columns="3*,*"
-                    RowCount="3"
-                    Visibility="{Binding ElementName=cutWaterStatus, Path=IsChecked, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <Label Content="- 在关闭真空时自动关水" />
-                    <CheckBox x:Name="autoShutOffWaterWhenCloseVacuum" IsChecked="{Binding IsAutoShutOffWaterWhenCloseVacuum}">
-                        <TextBlock Text="{Binding ElementName=autoShutOffWaterWhenCloseVacuum, Path=IsChecked, Converter={StaticResource BoolToStringConverter}}" />
+                    Columns="auto,*"
+                    RowCount="10">
+                    <Label Content="退出当前切割模式时手动补偿值清零" />
+                    <CheckBox
+                        x:Name="ExitCutClearManualCompensation"
+                        d:IsChecked="False"
+                        IsChecked="{Binding IsExitCutClearManualCompensation}">
+                        <TextBlock Text="{Binding ElementName=ExitCutClearManualCompensation, Path=IsChecked, Converter={StaticResource BoolToOpenOrCloseConverter}}" />
                     </CheckBox>
-                    <Label Content="- 在进入校准模式时自动关水" />
-                    <CheckBox x:Name="autoShutOffWaterWhenEnterCalibration" IsChecked="{Binding IsAutoShutOffWaterWhenEnterCalibration}">
-                        <TextBlock Text="{Binding ElementName=autoShutOffWaterWhenEnterCalibration, Path=IsChecked, Converter={StaticResource BoolToStringConverter}}" />
-                    </CheckBox>
-                    <Label Content="- 使用者手动关水" />
-                    <CheckBox x:Name="manuallyTurnOffWater" IsChecked="{Binding IsManuallyTurnOffWater}">
-                        <TextBlock Text="{Binding ElementName=manuallyTurnOffWater, Path=IsChecked, Converter={StaticResource BoolToStringConverter}}" />
+                    <Label Content="更换型号参数时手动补偿值清零" />
+                    <CheckBox
+                        x:Name="UpdateParamClearManualCompensation"
+                        d:IsChecked="False"
+                        IsChecked="{Binding IsUpdateParamClearManualCompensation}">
+                        <TextBlock Text="{Binding ElementName=UpdateParamClearManualCompensation, Path=IsChecked, Converter={StaticResource BoolToOpenOrCloseConverter}}" />
                     </CheckBox>
                 </auto:AutoGrid>
-            </auto:AutoGrid>
-        </StackPanel>
+            </StackPanel>
+        </Grid>
         <StackPanel
             Grid.Row="1"
             Grid.Column="1"

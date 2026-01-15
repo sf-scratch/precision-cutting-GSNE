@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Model.bunkering;
@@ -41,7 +42,7 @@ namespace 精密切割系统.Helpers
         public static OperationParametersModel operationParametersModel;
         public static PositionAlignmentModel positionAlignmentModel;
 
-        public static void UpdateParams()
+        public static async void UpdateParams()
         {
             // 加载测高参数
             bladeHeightModel = GetBladeHeightModel();
@@ -59,7 +60,7 @@ namespace 精密切割系统.Helpers
             preCutModel = GetPreCutModel();
             initialPositionModel = GetInitialPositionModel();
             speedSettingModel = GetSpeedSettingModel();
-            operationParametersModel = GetOperationParametersModel();
+            operationParametersModel = await GetOperationParametersModelAsync();
             positionAlignmentModel = GetPositionAlignmentModel();
         }
 
@@ -207,8 +208,7 @@ namespace 精密切割系统.Helpers
         //获取当前配置集合
         public static CurrentConfigurationModel GetCurrentConfiguration()
         {
-            var list = SqlHelper.Table<CurrentConfigurationModel>()
-                       .Where(t => t.Id == 1).ToList();
+            var list = SqlHelper.Table<CurrentConfigurationModel>().Where(t => t.Id == 1).ToList();
             CurrentConfigurationModel current = new CurrentConfigurationModel();
             //数据不存在，则初始化数据
             if (list.Count() > 0)
@@ -480,16 +480,9 @@ namespace 精密切割系统.Helpers
             return _model;
         }
 
-        public static OperationParametersModel? GetOperationParametersModel()
+        public static async Task<OperationParametersModel> GetOperationParametersModelAsync()
         {
-            long id = 1;
-            var listConf = SqlHelper.Table<OperationParametersModel>().Where(t => t.Id == id).ToList();
-            OperationParametersModel? _model = null;
-            if (listConf.Count() > 0)
-            {
-                _model = listConf[0];
-            }
-            return _model;
+            return await SqlHelper.GetOrCreateEntityAsync(() => new OperationParametersModel());
         }
 
         public static PositionAlignmentModel GetPositionAlignmentModel()

@@ -44,7 +44,7 @@ namespace 精密切割系统.ViewModel
         {
             base.InitRightButton();
             AddRightButton(ButtonParams.GreenRightButton("开始", "/Assets/icon/right/enter.png", StartAsync));
-            AddRightButton(ButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
+            AddRightButton(ButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", BackAsync));
         }
 
         private async Task StartAsync()
@@ -69,6 +69,9 @@ namespace 精密切割系统.ViewModel
                 MaterialSnack("未设置刀片外径！", SnackType.WARNING);
                 return;
             }
+            //ThetaAlignService.ChDictionary = new Dictionary<string, ChData>();
+            //ThetaAlignService.ChDictionary.Add(GlobalParams.CH2, new ChData(GlobalParams.CH2, 90) { AfterCalibrationThetaDeg = 93.5f, AfterCalibrationYPosition = 100 });
+            //ThetaAlignService.ChDictionary.Add(GlobalParams.CH1, new ChData(GlobalParams.CH1, 0) { AfterCalibrationThetaDeg = 6.3f, AfterCalibrationYPosition = 200 });
             CommonResult<List<CutStep>> cutStepResult = await AutoCutUtils.GenerateCutStepListAsync(ThetaAlignService.ChDictionary, _semiAutoCutService.IsOpenPrecut);
             if (!cutStepResult.IsSuccess || cutStepResult.Data is null)
             {
@@ -82,9 +85,15 @@ namespace 精密切割系统.ViewModel
             var chDictionary = ThetaAlignService.ChDictionary;
         }
 
-        private void Back()
+        private async Task BackAsync()
         {
             WarmUpHelper.StopWarmUp();
+            var operationParams = await CurrentUtils.GetOperationParametersModelAsync();
+            if (operationParams.IsExitCutClearManualCompensation)
+            {
+                _semiAutoCutService.DepthCompensationValue = 0;
+            }
+            _semiAutoCutService.FeedSpeedCompCompensationValue = 0;
             NavigateUtils.NavigateToPage("MainMenu");
         }
 
@@ -100,7 +109,21 @@ namespace 精密切割系统.ViewModel
             AddBottomButton(ButtonParams.BlueButton("速度更改", "/Assets/icon/tab_1/02/tab_25.png", UpdateFeedSpeedCompCompensation));
             AddBottomButton(ButtonParams.BlueButton("刀片状态信息", "/Assets/icon/tab_1/03/tab_03.png", () => NavigateUtils.NavigateToPage("Pages/F4_BladeMaintenance/BladeInfo")));
             AddBottomButton(ButtonParams.BlueButton("预切启动", "/Assets/icon/tab_1/02/tab_27.png", TirggerPrecut));
-            AddBottomButton(ButtonParams.BlueButton("C/T真空", "/Assets/icon/tab_1/02/tab_23.png", PlcControl.tagControl.wholeDevice.TriggerWorkVacuumSwitchAsync, isOpenFunc: PlcControl.tagControl.wholeDevice.IsOpenWorkVacuumSwitchAsync, openOrCloseVisibility: System.Windows.Visibility.Visible));
+            AddBottomButton(ButtonParams.BlueButton("C/T真空", "/Assets/icon/tab_1/02/tab_23.png", TriggerWorkVacuumSwitchAsync, isOpenFunc: PlcControl.tagControl.wholeDevice.IsOpenWorkVacuumSwitchAsync, openOrCloseVisibility: System.Windows.Visibility.Visible));
+        }
+
+        private async Task TriggerWorkVacuumSwitchAsync()
+        {
+            var operationParameter = await CurrentUtils.GetOperationParametersModelAsync();
+            if (!operationParameter.IsAutoShutOffWaterWhenCuttingCompleted && operationParameter.IsAutoShutOffWaterWhenCloseVacuum)
+            {
+                await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
+            }
+            if (SemiAutoCutService.Instance.HasNotTakenOutWorkpiecesAfterCuttingCompleted)
+            {
+                await AutoCutUtils.ReplaceWaferAsync(default, TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(120)).Token);
+            }
+            await PlcControl.tagControl.wholeDevice.TriggerWorkVacuumSwitchAsync();
         }
 
         private void TirggerPrecut()

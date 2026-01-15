@@ -25,7 +25,7 @@ namespace 精密切割系统.Model.cut
 
         public event Action<CutServiceProcess>? CutServiceProcessChanged;
 
-        public event Action<LineSegment?, string?, float>? CutServicePaused;
+        public event Action<CutServicePauseData>? CutServicePaused;
 
         public event Action? RemindReplaceWafer;
 
@@ -146,11 +146,6 @@ namespace 精密切割系统.Model.cut
         /// </summary>
         private bool _isContinueBeyondWorkpiece;
 
-        /// <summary>
-        /// theta轴校准角度
-        /// </summary>
-        private float _cutThetaAlignDeg;
-
         private SemiAutoCutService()
         {
             _isReady = true;
@@ -160,7 +155,6 @@ namespace 精密切割系统.Model.cut
             _depthCompensationValue = 0;
             _feedSpeedCompCompensationValue = 0;
             _isOpenPrecut = false;
-            _currentChannelNum = 1;
         }
 
         public static async Task<CommonResult> CheckCutAsync()
@@ -209,13 +203,16 @@ namespace 精密切割系统.Model.cut
             {
                 cutSteps = cutStepList.ToList();
             }
+            CutStep firstStep = cutSteps.First();
             CancellationToken usingPauseToken = pauseToken;
-            _cutThetaAlignDeg = await GetCutThetaAlignDegAsync();
             ScratchInspectionParametersEntity scratchInspection = await SqlHelper.GetOrCreateEntityAsync(() => new ScratchInspectionParametersEntity());
-            var (firstCheck, nextCheck) = GetScratchInspectionFlagAndInterval(cutStepList.First().ChannelNum, scratchInspection);
+            var (firstCheck, nextCheck) = GetScratchInspectionFlagAndInterval(firstStep.ChannelNum, scratchInspection);
+            int currentChTotalCutTime = cutSteps.Where(p => p.ChannelNum == firstStep.ChannelNum).ToList().Count;
+            int currentChCutTimes = 0;
             AutomaticCompensationCutHeightEntity automaticCompensationCutHeight = await SqlHelper.GetOrCreateEntityAsync(() => new AutomaticCompensationCutHeightEntity());
             int cutHeightCompensationFrequency = automaticCompensationCutHeight.CutHeightCompensationFrequency.ToInt();
             float cutHeightReductionDistance = automaticCompensationCutHeight.CutHeightReductionDistance.ToFloat();
+            float currentAutomaticCompensationCutHeight = automaticCompensationCutHeight.CurrentAutomaticCompensationCutHeight.ToFloat();
             Stopwatch stopwatch = new();
             try
             {
@@ -228,43 +225,45 @@ namespace 精密切割系统.Model.cut
                 await PlcControl.tagControl.cutting.EnterCuttingModeAsync(usingPauseToken);
                 float currentKnifeRemainTime = 60; //初始值
                 LineSegment? preLine = null;
-                _currentChannelNum = 1;
-                int currentCheck = 0;
-                int cutTime = 0;
-                while (cutTime < cutSteps.Count)
+                _currentChannelNum = firstStep.ChannelNum;
+                int cutTimes = 0;
+                while (cutTimes < cutSteps.Count)
                 {
                     LineSegment? line = null;
-                    CutStep cutStep = cutSteps[cutTime];
+                    CutStep cutStep = cutSteps[cutTimes];
                     try
                     {
                         //检查切换通道
                         if (cutStep.ChannelNum != _currentChannelNum)
                         {
                             workpiece.Reset(cutStep.ChannelStartY);
-                            currentCheck = 0;
+                            currentChCutTimes = 0;
                             (firstCheck, nextCheck) = GetScratchInspectionFlagAndInterval(cutStep.ChannelNum, scratchInspection);
+                            currentChTotalCutTime = cutSteps.Where(p => p.ChannelNum == _currentChannelNum).ToList().Count;
                         }
                         _currentChannelNum = cutStep.ChannelNum;
                         //停机检查划痕
-                        if (firstCheck != 0 && nextCheck != 0 && (currentCheck == firstCheck || (currentCheck > firstCheck && (currentCheck - firstCheck) % nextCheck == 0)))
+                        if (firstCheck != 0 && nextCheck != 0 && (currentChCutTimes == firstCheck || (currentChCutTimes > firstCheck && (currentChCutTimes - firstCheck) % nextCheck == 0)))
                         {
                             //触发切割暂停事件
-                            (RunResult runResult, usingPauseToken) = await WaitContinueAsync(preLine ?? line, workpiece, currentKnifeRemainTime, "停机检查，请检查工件情况！");
+                            (RunResult runResult, usingPauseToken) = await WaitContinueAsync(preLine ?? line, workpiece, currentKnifeRemainTime, cutSteps.GetRange(cutTimes, cutSteps.Count - cutTimes), "停机检查，请检查工件情况！");
                             if (!runResult.IsSuccess)
                             {
                                 return runResult;
                             }
                         }
                         //自动补偿刀片高度
-                        if (cutTime % cutHeightCompensationFrequency == 0)
+                        if (cutTimes % cutHeightCompensationFrequency == 0)
                         {
-                            _depthCompensationValue += cutHeightReductionDistance;
+                            currentAutomaticCompensationCutHeight += cutHeightReductionDistance;
+                            automaticCompensationCutHeight.CurrentAutomaticCompensationCutHeight = currentAutomaticCompensationCutHeight.ToString(GlobalParams.DecimalStringFormat);
+                            await SqlHelper.UpdateAsync(automaticCompensationCutHeight);
                         }
                         //检测工件是否切完
                         if (!workpiece.CheckCutDistance(_cutDirection, cutStep.NextStepDistance) && !_isContinueBeyondWorkpiece)
                         {
                             RemindReplaceWafer?.Invoke();
-                            (RunResult runResult, usingPauseToken) = await WaitContinueAsync(preLine ?? line, workpiece, currentKnifeRemainTime, "下一刀将超出工件！");
+                            (RunResult runResult, usingPauseToken) = await WaitContinueAsync(preLine ?? line, workpiece, currentKnifeRemainTime, cutSteps.GetRange(cutTimes, cutSteps.Count - cutTimes), "下一刀将超出工件！");
                             if (!runResult.IsSuccess)
                             {
                                 return runResult;
@@ -272,33 +271,33 @@ namespace 精密切割系统.Model.cut
                             _isContinueBeyondWorkpiece = true;
                         }
                         // 更新切割步骤的NextStepDistance为0，防止累加
-                        cutSteps[cutTime] = cutStep with { NextStepDistance = 0 };
+                        cutSteps[cutTimes] = cutStep with { NextStepDistance = 0 };
                         //检查是否暂停
                         if (usingPauseToken.IsCancellationRequested)
                         {
-                            (RunResult runResult, usingPauseToken) = await WaitContinueAsync(preLine ?? line, workpiece, currentKnifeRemainTime);
+                            (RunResult runResult, usingPauseToken) = await WaitContinueAsync(preLine ?? line, workpiece, currentKnifeRemainTime, cutSteps.GetRange(cutTimes, cutSteps.Count - cutTimes));
                             if (!runResult.IsSuccess)
                             {
                                 return runResult;
                             }
                         }
                         line = workpiece.CalculateCuttingLine();
-                        float actualCutHeight = cutStep.CutHeight + _depthCompensationValue;
+                        float actualCutHeight = cutStep.CutHeight + _depthCompensationValue - currentAutomaticCompensationCutHeight;
                         float targetEndZ = bladeContactWorkingDiscZ1 - actualCutHeight;
                         float startZ = bladeContactWorkingDiscZ1 - workpiece.WorkThickness - workpiece.TapeThickness - bladeLiftingHeight;
                         float cutLength = MathF.Abs(line.EndPoint.X - line.StartPoint.X);
-                        float cutSpeed = cutStep.Speed + _feedSpeedCompCompensationValue;
+                        float cutSpeed = _feedSpeedCompCompensationValue == 0 ? cutStep.Speed : _feedSpeedCompCompensationValue;
                         //加上边距
                         float startX = line.StartPoint.X + cutStep.OffsetX - margin;
                         float endX = line.EndPoint.X + cutStep.OffsetX + margin;
                         //计算当前刀剩余时间
-                        if (cutTime <= 0)
+                        if (cutTimes <= 0)
                         {
                             currentKnifeRemainTime = MathF.Abs(startX - endX) / cutSpeed;
                         }
                         else
                         {
-                            currentKnifeRemainTime = MathF.Abs(startX - endX) / cutSteps[cutTime - 1].Speed;
+                            currentKnifeRemainTime = MathF.Abs(startX - endX) / cutSteps[cutTimes - 1].Speed;
                         }
                         //x方向交替切割
                         if (cutStep.IsAlternatingCuttingStroke)
@@ -324,11 +323,11 @@ namespace 精密切割系统.Model.cut
                             stopwatch.Restart();
                             await PlcControl.tagControl.ThetaAxis.SetAbsoluteSpeedAsync(GlobalParams.ThetaDefaultSpeed);
                             var compensateY = await PlcControl.GetCompensateAsync(PlcControl.tagControl.Yaxis, line.StartPoint.Y);
-                            showCutSpeed = cutTime <= 0 ? cutSpeed : cutSteps[cutTime - 1].Speed + _feedSpeedCompCompensationValue;
+                            showCutSpeed = cutTimes <= 0 ? cutSpeed : cutSteps[cutTimes - 1].Speed;
                             //触发切割进度更新事件
-                            CutServiceProcessChanged?.Invoke(new CutServiceProcess(actualCutHeight, showCutSpeed, compensateY, cutSteps.Count, cutTime));
+                            CutServiceProcessChanged?.Invoke(new CutServiceProcess(actualCutHeight, showCutSpeed, compensateY, currentChTotalCutTime, currentChCutTimes));
                             //设置切割参数
-                            await PlcControl.tagControl.cutting.SetCutParamsAsync(cutSpeed, endZ, startZ, startX, endX, compensateY, "0", _cutThetaAlignDeg + cutStep.ThetaDeg, _spindleRev, true);
+                            await PlcControl.tagControl.cutting.SetCutParamsAsync(cutSpeed, endZ, startZ, startX, endX, compensateY, "0", cutStep.ThetaDeg, _spindleRev, true);
                             //当前切割次数
                             int? curCutNum = await PlcControl.tagControl.cutting.GetCutNumAsync();
                             if (curCutNum == null)
@@ -353,7 +352,7 @@ namespace 精密切割系统.Model.cut
                             RunLogsCommon.LogEvent(
                                 LogType.Cut,
                                 new RunLogsViewModel(LogType.Cut, "切割"),
-                                new RunLogsViewModel("刀数", (cutTime + 1).ToString()),
+                                new RunLogsViewModel("刀数", (cutTimes + 1).ToString()),
                                 new RunLogsViewModel("开始时间", startTime.ToString("yyyy年MM月dd日 HH:mm:ss")),
                                 new RunLogsViewModel("结束时间", DateTime.Now.ToString("yyyy年MM月dd日 HH:mm:ss")),
                                 new RunLogsViewModel("耗时", (DateTime.Now - startTime).TotalSeconds.ToString("F2") + "sec"),
@@ -364,7 +363,7 @@ namespace 精密切割系统.Model.cut
                                 new RunLogsViewModel("X轴结束位置", endX.ToString()),
                                 new RunLogsViewModel("Y轴切割位置", line.StartPoint.Y.ToString()),
                                 new RunLogsViewModel("Y轴实际切割位置", compensateY.ToString()),
-                                new RunLogsViewModel("theta角度", (_cutThetaAlignDeg + cutStep.ThetaDeg).ToString()),
+                                new RunLogsViewModel("theta角度", (cutStep.ThetaDeg).ToString()),
                                 new RunLogsViewModel("主轴转速", _spindleRev.ToString()),
                                 new RunLogsViewModel("震动幅度", string.Join(" ", monitorResult))
                                 );
@@ -372,18 +371,19 @@ namespace 精密切割系统.Model.cut
                             stopwatch.Stop();
                             if (preLine is not null)
                             {
-                                pathCalculator.ReportPass(cutTime, cutLength, (float)stopwatch.Elapsed.TotalSeconds);
+                                pathCalculator.ReportPass(cutTimes, cutLength, (float)stopwatch.Elapsed.TotalSeconds);
                             }
                         }
-                        cutTime++;
-                        showCutSpeed = cutTime <= 0 ? cutSpeed : cutSteps[cutTime - 1].Speed + _feedSpeedCompCompensationValue;
+                        cutTimes++;
+                        currentChCutTimes++;
+                        showCutSpeed = cutTimes <= 0 ? cutSpeed : cutSteps[cutTimes - 1].Speed + _feedSpeedCompCompensationValue;
                         //触发切割进度更新事件
-                        CutServiceProcessChanged?.Invoke(new CutServiceProcess(actualCutHeight, showCutSpeed, default, cutSteps.Count, cutTime, cutLength, cutStep.ChannelNum, pathCalculator.EstimateRemainingTime(), true));
+                        CutServiceProcessChanged?.Invoke(new CutServiceProcess(actualCutHeight, showCutSpeed, default, currentChTotalCutTime, currentChCutTimes, cutLength, cutStep.ChannelNum, pathCalculator.EstimateRemainingTime(), true));
                         preLine = line;
                     }
                     catch (OperationCanceledException)
                     {
-                        (RunResult runResult, usingPauseToken) = await WaitContinueAsync(preLine ?? line, workpiece, currentKnifeRemainTime);
+                        (RunResult runResult, usingPauseToken) = await WaitContinueAsync(preLine ?? line, workpiece, currentKnifeRemainTime, cutSteps.GetRange(cutTimes, cutSteps.Count - cutTimes));
                         if (!runResult.IsSuccess)
                         {
                             return runResult;
@@ -402,8 +402,8 @@ namespace 精密切割系统.Model.cut
                 _isContinueBeyondWorkpiece = false;
                 //退出全自动切割模式
                 await PlcControl.tagControl.cutting.ExitCuttingModeAsync(default);
-                var operationParameter = CurrentUtils.GetOperationParametersModel();
-                if (operationParameter is not null && operationParameter.IsAutoShutOffWaterWhenCuttingCompleted)
+                var operationParameter = await CurrentUtils.GetOperationParametersModelAsync();
+                if (operationParameter.IsAutoShutOffWaterWhenCuttingCompleted)
                 {
                     await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
                 }
@@ -431,10 +431,10 @@ namespace 精密切割系统.Model.cut
             _continueTcs = null;
         }
 
-        private async Task<(RunResult, CancellationToken)> WaitContinueAsync(LineSegment? line, IWorkpieces workpieces, float currentKnifeRemainTime, string? message = null)
+        private async Task<(RunResult, CancellationToken)> WaitContinueAsync(LineSegment? line, IWorkpieces workpieces, float currentKnifeRemainTime, List<CutStep> remainCutSteps, string? message = null)
         {
             _isRuning = false;
-            CutServicePaused?.Invoke(line, message, currentKnifeRemainTime);
+            CutServicePaused?.Invoke(new CutServicePauseData(line, message, currentKnifeRemainTime, remainCutSteps));
             _continueTcs = new TaskCompletionSource<ServicePauseResult>();
             ServicePauseResult result = await _continueTcs.Task;
             switch (result.Type)
@@ -445,7 +445,6 @@ namespace 精密切割系统.Model.cut
                 case ServicePauseResultType.Continue:
                     // 更新使用的暂停令牌
                     CancellationToken usingPauseToken = result.Token ?? default;
-                    _cutThetaAlignDeg = await GetCutThetaAlignDegAsync();
                     await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
                     return (RunResult.Success(), usingPauseToken);
 
@@ -467,4 +466,6 @@ namespace 精密切割系统.Model.cut
     }
 
     public record CutStep(float CutHeight, float Speed, float NextStepDistance, float ThetaDeg, bool IsAbsolute, float ChannelStartY, float OffsetX = 0, bool IsAlternatingCuttingStroke = false, int ChannelNum = 1, float? SingleCutDeep = null);
+
+    public record CutServicePauseData(LineSegment? Line, string? Message, float CurrentKnifeRemainTime, List<CutStep> RemainCutSteps);
 }

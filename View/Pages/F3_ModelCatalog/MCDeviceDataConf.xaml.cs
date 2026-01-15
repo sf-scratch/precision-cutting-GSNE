@@ -572,6 +572,14 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             {
                 await SaveDataAsync();
                 CurrentConfigurationModel currentConfigurationModel = CurrentUtils.GetCurrentConfiguration();
+                if (currentConfigurationModel.DeviceDataId != currentModel.Id)
+                {
+                    var operationParams = await CurrentUtils.GetOperationParametersModelAsync();
+                    if (operationParams.IsUpdateParamClearManualCompensation)
+                    {
+                        SemiAutoCutService.Instance.DepthCompensationValue = 0;
+                    }
+                }
                 currentConfigurationModel.DeviceDataId = currentModel.Id;
                 currentConfigurationModel.ChannelNum = GlobalParams.CH1;
                 CurrentUtils.UpdateCurrentConfiguration(currentConfigurationModel);

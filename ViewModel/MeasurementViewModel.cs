@@ -134,7 +134,7 @@ namespace 精密切割系统.ViewModel
         {
             base.OnNavigatedTo(navigationContext);
             _cts = new CancellationTokenSource();
-            _intervalTimer = new DynamicIntervalTimer(TimeSpan.FromMilliseconds(500), TimeSpan.FromMilliseconds(100));
+            _intervalTimer = new DynamicIntervalTimer(TimeSpan.FromMilliseconds(500), TimeSpan.FromMilliseconds(30));
             _navigationPageName = navigationContext.Parameters.GetValue<string>("NavigationPageName");
             _ = Task.Run(StartLoadPosition);
         }

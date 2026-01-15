@@ -344,8 +344,8 @@ namespace 精密切割系统.View.Pages.operate
                         MaterialSnack("半自动切割运行中，无法操作CT真空！", SnackType.WARNING);
                         return;
                     }
-                    var operationParameter = CurrentUtils.GetOperationParametersModel();
-                    if (operationParameter is not null && !operationParameter.IsAutoShutOffWaterWhenCuttingCompleted && operationParameter.IsAutoShutOffWaterWhenCloseVacuum)
+                    var operationParameter = await CurrentUtils.GetOperationParametersModelAsync();
+                    if (!operationParameter.IsAutoShutOffWaterWhenCuttingCompleted && operationParameter.IsAutoShutOffWaterWhenCloseVacuum)
                     {
                         await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
                     }

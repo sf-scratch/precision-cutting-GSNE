@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using 精密切割系统.Entities;
 
 //当前配置集合模块
 namespace 精密切割系统.database.db.modle
 {
     [Table("current_configuration")]
-    internal class CurrentConfigurationModel
+    internal class CurrentConfigurationModel : IEntityWithId
     {
         [PrimaryKey, AutoIncrement]
         [Column("id")]
@@ -33,6 +33,5 @@ namespace 精密切割系统.database.db.modle
 
         [Column("cleared_cut_all_distance")]// 清零后总距离
         public float ClearedCutAllDistance { get; set; }
-        
     }
 }

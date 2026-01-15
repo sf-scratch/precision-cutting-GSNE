@@ -1053,7 +1053,7 @@ namespace 精密切割系统.ViewModel
                 }
                 try
                 {
-                    await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(90, 60, default);
+                    await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(90, 150, default);
                 }
                 catch (OperationCanceledException) { }
                 finally
@@ -1095,7 +1095,7 @@ namespace 精密切割系统.ViewModel
                 }
                 try
                 {
-                    await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(-90, 60, default);
+                    await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(-90, 150, default);
                 }
                 catch (OperationCanceledException) { }
                 finally

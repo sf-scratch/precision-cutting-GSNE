@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace 精密切割系统.Entities
 {
     [Table("automatic_compensation_cut_height_table")]
-    internal class AutomaticCompensationCutHeightEntity : BindableBase, IEntityWithId
+    internal class AutomaticCompensationCutHeightEntity : IEntityWithId
     {
         [PrimaryKey, AutoIncrement]
         [Column("id")]
@@ -19,5 +19,8 @@ namespace 精密切割系统.Entities
 
         [Column("cut_height_reduction_distance")]
         public string CutHeightReductionDistance { get; set; }
+
+        [Column("current_automatic_compensation_cutheight")]
+        public string CurrentAutomaticCompensationCutHeight { get; set; }
     }
 }

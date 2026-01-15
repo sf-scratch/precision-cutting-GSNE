@@ -33,6 +33,7 @@ namespace 精密切割系统.ViewModel
         private float _xOriginPositionValue = 0;
         private float _yOriginPositionValue = 0;
         private bool _isReuseView = false;
+        private CutServicePauseData _pauseData;
 
         private DelegateCommand _loadedCommand;
 
@@ -92,7 +93,7 @@ namespace 精密切割系统.ViewModel
             //BottomButtonCollection.Add(RightButtonParams.BlueButton("精细对焦", "FocusAuto", () => _semaph.ExecuteAsync(FocusAuto, "精细对焦")));
             BottomButtonCollection.Add(ButtonParams.BlueButton("对焦", "FocusAuto", () => _semaph.ExecuteAsync(GlobalFocus, "对焦")));
             BottomButtonCollection.Add(ButtonParams.BlueButton("测量", "/Assets/icon/tab_1/03/tab_03.png", NavigateMeasurement));
-            BottomButtonCollection.Add(ButtonParams.BlueButton("高度补偿", "FormatLineHeight", SetDepthCompensation));
+            BottomButtonCollection.Add(ButtonParams.BlueButton("高度补偿", "FormatLineHeight", SetDepthCompensationAsync));
             BottomButtonCollection.Add(ButtonParams.BlueButton("基准线调窄", "UnfoldLessHorizontal", null, BaselineNarrowing, StopUpdateCameraCommonLine));
             BottomButtonCollection.Add(ButtonParams.BlueButton("基准线校准", "CrosshairsGps", () => _semaph.ExecuteAsync(BaselineCalibration, "基准线校准")));
             BottomButtonCollection.Add(ButtonParams.BlueButton("刀痕识别", "TextRecognition", AutomaticRecognition));
@@ -144,8 +145,14 @@ namespace 精密切割系统.ViewModel
             });
         }
 
-        private void SetDepthCompensation()
+        private async Task SetDepthCompensationAsync()
         {
+            CommonResult checkAutomaticCompensationCutHeightResult = await VerifyUtils.CheckAutomaticCompensationCutHeightAsync(_pauseData.RemainCutSteps);
+            if (!checkAutomaticCompensationCutHeightResult.IsSuccess)
+            {
+                MaterialSnack(checkAutomaticCompensationCutHeightResult.Message, SnackType.WARNING);
+                return;
+            }
             // 高度补偿
             _semiAutoCutService.DepthCompensationValue = CutParam.DepthCompensation.ToFloat();
             _semiAutomaticCuttingRunViewModel.CutParam.DepthCompensation = CutParam.DepthCompensation;
@@ -264,7 +271,7 @@ namespace 精密切割系统.ViewModel
         public override async void OnNavigatedTo(NavigationContext navigationContext)
         {
             base.OnNavigatedTo(navigationContext);
-            _intervalTimer = new DynamicIntervalTimer(TimeSpan.FromMilliseconds(500), TimeSpan.FromMilliseconds(100));
+            _intervalTimer = new DynamicIntervalTimer(TimeSpan.FromMilliseconds(500), TimeSpan.FromMilliseconds(30));
             _operatCts = new CancellationTokenSource();
             InitBottomButton();
             InitRightButton();
@@ -275,6 +282,10 @@ namespace 精密切割系统.ViewModel
                 return;
             }
             _semiAutomaticCuttingRunViewModel = navigationContext.Parameters.GetValue<MQSemiAutomaticCuttingRunViewModel>(nameof(MQSemiAutomaticCuttingRunViewModel));
+            if (navigationContext.Parameters.TryGetValue<CutServicePauseData>(nameof(CutServicePauseData), out var pauseData))
+            {
+                _pauseData = pauseData;
+            }
             CutParam = _semiAutomaticCuttingRunViewModel.CutParam;
             float? xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync();
             float? yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync();

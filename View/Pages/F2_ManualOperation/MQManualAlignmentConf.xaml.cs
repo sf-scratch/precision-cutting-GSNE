@@ -51,7 +51,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            _intervalTimer = new DynamicIntervalTimer(TimeSpan.FromMilliseconds(500), TimeSpan.FromMilliseconds(100));
+            _intervalTimer = new DynamicIntervalTimer(TimeSpan.FromMilliseconds(500), TimeSpan.FromMilliseconds(30));
             if (_cts.IsCancellationRequested)
             {
                 _cts = new CancellationTokenSource();
@@ -83,10 +83,6 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             if (_operateType == 0)
             {
                 MaterialSnack("进入校准模式成功！", SnackType.WARNING);
-            }
-            if (!GlobalParams.HasFullyAutomatic)
-            {
-                await PlcControl.tagControl.wholeDevice.OpenCameraLensCapAsync();
             }
         }
 

@@ -119,7 +119,7 @@
                         IsEnabled="False"
                         Text="{Binding Path=CutParam.DepthCompensation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         TextWrapping="Wrap"
-                        XPrecision="3" />
+                        XPrecision="5" />
                     <Label
                         x:Name="HeightChange3"
                         Content="mm"

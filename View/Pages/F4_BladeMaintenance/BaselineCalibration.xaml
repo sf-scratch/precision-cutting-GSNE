@@ -42,6 +42,8 @@
             <Setter Property="XPrecision" Value="3" />
             <Setter Property="FontWeight" Value="Normal" />
             <Setter Property="Width" Value="120" />
+            <Setter Property="XAllowNull" Value="False" />
+            <Setter Property="XAllowZero" Value="False" />
         </Style>
     </UserControl.Resources>
     <Grid>
@@ -55,8 +57,8 @@
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto" />
-                <RowDefinition Height="*" />
                 <RowDefinition Height="auto" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Label
                 Margin="30,10,0,0"
@@ -89,12 +91,30 @@
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
-                <common:CommonDimming Margin="0,5,0,0" />
-                <StackPanel Margin="0,15,0,0" Orientation="Horizontal">
-                    <TextBlock Margin="5,0" Text="刀痕基准线位置" />
+                <auto:AutoGrid
+                    Margin="15"
+                    ChildMargin="5"
+                    Columns="2*,2*,*,2*,2*,*"
+                    RowCount="8">
+                    <TextBlock Text="主轴转速" />
+                    <Controls:InputTextBox Text="{Binding Entity.SpindleRev}" XPrecision="0" />
+                    <TextBlock Text="/min" />
+                    <TextBlock Text="工件厚度" />
+                    <Controls:InputTextBox Text="{Binding Entity.WorkThickness}" />
+                    <TextBlock Text="mm" />
+                    <TextBlock Text="膜厚度" />
+                    <Controls:InputTextBox Text="{Binding Entity.TapeThickness}" />
+                    <TextBlock Text="mm" />
+                    <TextBlock Text="刀片高度" />
+                    <Controls:InputTextBox Text="{Binding Entity.BladeHeight}" />
+                    <TextBlock Text="mm" />
+                    <TextBlock Text="进刀速度" />
+                    <Controls:InputTextBox Text="{Binding Entity.CutSpeed}" />
+                    <TextBlock Text="mm/s" />
+                    <TextBlock Text="刀痕基准线位置" />
                     <Controls:InputTextBox Text="{Binding CameraRelativeBladePositionY}" />
                     <Label Content="mm" />
-                </StackPanel>
+                </auto:AutoGrid>
             </StackPanel>
             <common:SimpleDirectOperate
                 Grid.Row="2"

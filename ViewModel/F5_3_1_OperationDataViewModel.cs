@@ -656,5 +656,25 @@ namespace 精密切割系统.ViewModel
                 RaisePropertyChanged();
             }
         }
+
+        public bool IsExitCutClearManualCompensation
+        {
+            get { return operationParameter.IsExitCutClearManualCompensation; }
+            set
+            {
+                operationParameter.IsExitCutClearManualCompensation = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool IsUpdateParamClearManualCompensation
+        {
+            get { return operationParameter.IsUpdateParamClearManualCompensation; }
+            set
+            {
+                operationParameter.IsUpdateParamClearManualCompensation = value;
+                RaisePropertyChanged();
+            }
+        }
     }
 }

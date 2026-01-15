@@ -33,8 +33,6 @@ namespace 精密切割系统.ViewModel
 
         public F7_2_AxisOperationViewModel()
         {
-            var operationParam = CurrentUtils.GetOperationParametersModel();
-            if (operationParam is null) return;
             AxisOperationList.AddRange([
                 new AxisOperationModel(PlcControl.tagControl.Xaxis, async (a,b) => { if(!b) await a.AxisObject.StopJogAsync();}){IsChecked = true, AxisSlowSpeed = "0", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", Unit = "mm", SpeedUnit = "mm/s"},
                 new AxisOperationModel(PlcControl.tagControl.Yaxis, async (a,b) => { if(!b) await a.AxisObject.StopJogAsync();}){AxisSlowSpeed = "0", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", Unit = "mm", SpeedUnit = "mm/s"},
