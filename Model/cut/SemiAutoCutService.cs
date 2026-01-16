@@ -400,6 +400,7 @@ namespace 精密切割系统.Model.cut
                 _isReady = true;
                 _isRuning = false;
                 _isContinueBeyondWorkpiece = false;
+                _currentChannelNum = 0;
                 //退出全自动切割模式
                 await PlcControl.tagControl.cutting.ExitCuttingModeAsync(default);
                 var operationParameter = await CurrentUtils.GetOperationParametersModelAsync();

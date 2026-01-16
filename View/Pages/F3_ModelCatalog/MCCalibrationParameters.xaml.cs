@@ -30,6 +30,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
     {
         private MainWindow? _mainWindow;
         private RightPage? _rightPage;
+        private MCCalibrationParametersViewModel ViewModel { get; set; }
 
         public MCCalibrationParameters()
         {
@@ -51,7 +52,12 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             _rightPage.btnBack.GlobalRunOperateFlag = true;
             _rightPage.btnSure.Visibility = Visibility.Visible;
             _mainWindow.UpdateOperatePage([], null);
-            this.DataContext = new MCCalibrationParametersViewModel(await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel()));
+            ViewModel = new MCCalibrationParametersViewModel(await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel()));
+            this.DataContext = ViewModel;
+            long id = long.Parse(QueryUtils.getQuery(this)["id"]);
+            FileTableItemModel fileTableItem = await SqlHelper.GetOrCreateEntityAsync(() => new FileTableItemModel(), id);
+            ViewModel.HorizontalStraighteningStroke = fileTableItem.HorizontalStraighteningStroke;
+            ViewModel.VerticalStraighteningStroke = fileTableItem.VerticalStraighteningStroke;
         }
 
         private void BackFrom(object? sender, bool v)
@@ -67,10 +73,14 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             {
                 try
                 {
-                    SqlHelper.Update(viewModel.UserDefineDataModel);
-                    MaterialSnack("保存成功", SnackType.SUCCESS);
                     int id = int.Parse(QueryUtils.getQuery(this)["id"]);
                     bool lookState = bool.Parse(QueryUtils.getQuery(this)["look"]);
+                    FileTableItemModel fileTableItem = await SqlHelper.GetOrCreateEntityAsync(() => new FileTableItemModel(), id);
+                    fileTableItem.HorizontalStraighteningStroke = ViewModel.HorizontalStraighteningStroke;
+                    fileTableItem.VerticalStraighteningStroke = ViewModel.VerticalStraighteningStroke;
+                    SqlHelper.Update(fileTableItem);
+                    SqlHelper.Update(viewModel.UserDefineDataModel);
+                    MaterialSnack("保存成功", SnackType.SUCCESS);
                     _mainWindow?.NavigateToPage("Pages/F3_ModelCatalog/MCDeviceDataConf", $"id={id}&look={lookState}");
                 }
                 catch

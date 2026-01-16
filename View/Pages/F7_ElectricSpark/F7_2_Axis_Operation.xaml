@@ -10,6 +10,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:rules="clr-namespace:精密切割系统.Rules"
     xmlns:viewModel="clr-namespace:精密切割系统.ViewModel"
     d:DataContext="{d:DesignInstance viewModel:F7_2_AxisOperationViewModel}"
     d:DesignHeight="676"
@@ -17,6 +18,15 @@
     Background="#FFDFFCFF"
     mc:Ignorable="d">
     <UserControl.Resources>
+        <rules:NotEmptyValidationRule x:Key="NotEmptyRule" ValidatesOnTargetUpdated="True" />
+        <rules:IsDigitalValidationRule
+            x:Key="DigitalRule"
+            DigitalPlaces="4"
+            ValidatesOnTargetUpdated="True" />
+        <behav:ValidationRuleCollection x:Key="TextValidationRules">
+            <StaticResource ResourceKey="NotEmptyRule" />
+            <StaticResource ResourceKey="DigitalRule" />
+        </behav:ValidationRuleCollection>
         <converters:BooleanToColorConverter
             x:Key="BoolToColorConverter"
             FalseColor="OrangeRed"
@@ -49,9 +59,21 @@
             <Setter Property="Width" Value="152" />
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="FontSize" Value="22" />
+            <Setter Property="behav:ValidationBehavior.ValidationRules" Value="{StaticResource TextValidationRules}" />
+        </Style>
+        <Style
+            x:Key="NoRulesTbx"
+            BasedOn="{StaticResource MaterialDesignFloatingHintTextBox}"
+            TargetType="TextBox">
+            <Setter Property="Width" Value="152" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="FontSize" Value="22" />
         </Style>
     </UserControl.Resources>
     <Grid Margin="30">
+        <behaviors:Interaction.Behaviors>
+            <behav:ValidationExceptionBehavior />
+        </behaviors:Interaction.Behaviors>
         <Grid.RowDefinitions>
             <RowDefinition Height="50" />
             <RowDefinition Height="*" />
@@ -114,20 +136,20 @@
                             materialDesign:HintAssist.Hint="当前位置"
                             materialDesign:TextFieldAssist.SuffixText="{Binding Unit}"
                             IsEnabled="False"
+                            Style="{StaticResource NoRulesTbx}"
                             Text="{Binding CurPosition}" />
                         <TextBox
                             materialDesign:HintAssist.Hint="轴慢速度"
                             materialDesign:TextFieldAssist.SuffixText="{Binding SpeedUnit}"
-                            IsEnabled="False"
-                            Text="{Binding AxisSlowSpeed}" />
+                            Text="{Binding AxisSlowSpeed, UpdateSourceTrigger=PropertyChanged}" />
                         <TextBox
                             materialDesign:HintAssist.Hint="轴速度"
                             materialDesign:TextFieldAssist.SuffixText="{Binding SpeedUnit}"
-                            Text="{Binding AxisSpeed}" />
+                            Text="{Binding AxisSpeed, UpdateSourceTrigger=PropertyChanged}" />
                         <TextBox
                             materialDesign:HintAssist.Hint="相对运动长度"
                             materialDesign:TextFieldAssist.SuffixText="{Binding Unit}"
-                            Text="{Binding RelativeDistance}" />
+                            Text="{Binding RelativeDistance, UpdateSourceTrigger=PropertyChanged}" />
                         <materialDesign:PackIcon
                             Width="40"
                             Height="40"

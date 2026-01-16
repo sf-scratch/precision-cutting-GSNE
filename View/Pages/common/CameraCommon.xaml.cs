@@ -137,7 +137,7 @@ namespace 精密切割系统.View.Pages.common
             _cutMarkWidth = (float)CameraOperateUtils.ConvertPictureBoxToRealSize(tempCutMarkWidth + (width * 2));
             _edgeChipWidth = (float)CameraOperateUtils.ConvertPictureBoxToRealSize(tempEdgeWidth);
             SetCutWidthTextBlockY();
-            CurrentUtils.UpdateCutMarkWidth(SemiAutoCutService.Instance.CurrentChannelNum, _cutMarkWidth);
+            _ = CurrentUtils.UpdateCutMarkWidthAsync(SemiAutoCutService.Instance.CurrentChannelNum, _cutMarkWidth);
         }
 
         public void UpdateLine(float baselineWidth, float edgeChipWidth)

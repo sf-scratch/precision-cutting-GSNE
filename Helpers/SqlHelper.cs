@@ -151,9 +151,9 @@ namespace 精密切割系统.Helpers
         /// <summary>
         /// 通用实体获取方法
         /// </summary>
-        public static async Task<TEntity> GetOrCreateEntityAsync<TEntity>(Func<TEntity> createDefault) where TEntity : class, IEntityWithId, new()
+        public static async Task<TEntity> GetOrCreateEntityAsync<TEntity>(Func<TEntity> createDefault, long? id = default) where TEntity : class, IEntityWithId, new()
         {
-            long defaultId = DefaultId;
+            long defaultId = id ?? DefaultId;
             var list = await TableAsync<TEntity>().Where(t => t.Id == defaultId).ToListAsync();
             if (list.Count == 0)
             {

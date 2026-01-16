@@ -20,8 +20,9 @@
             FalseValue="关闭"
             TrueValue="开启" />
         <Style TargetType="Label">
-            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontSize" Value="18" />
             <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
         <Style BasedOn="{StaticResource InputTextStyle}" TargetType="Controls:InputTextBox">
             <Setter Property="InputType" Value="Decimal" />
@@ -58,7 +59,7 @@
         <auto:AutoGrid
             Grid.Row="2"
             Margin="10,0,10,10"
-            Columns="2*,2*,*,2*,2*,*,2*,2*,*,2*,2*,*"
+            Columns="*,2*,*,*,2*,*,*,2*,*,*,2*,*"
             RowCount="7">
             <Label HorizontalAlignment="Right" Content="CH1" />
             <Controls:InputTextBox Text="{Binding Path=BaselineWidthCh1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -84,7 +85,7 @@
         <auto:AutoGrid
             Grid.Row="4"
             Margin="10,0,10,10"
-            Columns="2*,2*,*,2*,2*,*,2*,2*,*,2*,2*,*"
+            Columns="*,2*,*,*,2*,*,*,2*,*,*,2*,*"
             RowCount="7">
             <Label HorizontalAlignment="Right" Content="CH1" />
             <Controls:InputTextBox Text="{Binding Path=LightSourceBrightnessCh1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" XPrecision="0" />
@@ -110,7 +111,7 @@
         <auto:AutoGrid
             Grid.Row="6"
             Margin="10,0,10,10"
-            Columns="2*,2*,*,2*,2*,*,2*,2*,*,2*,2*,*"
+            Columns="*,2*,*,*,2*,*,*,2*,*,*,2*,*"
             RowCount="7">
             <Label HorizontalAlignment="Right" Content="CH1" />
             <Controls:InputTextBox Text="{Binding Path=EdgeWidthCh1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -125,19 +126,29 @@
             <Controls:InputTextBox Text="{Binding Path=EdgeWidthCh4, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <Label Content="um" />
         </auto:AutoGrid>
-        <StackPanel Grid.Row="7" Orientation="Horizontal">
-            <Label
-                Margin="35,0,0,0"
-                VerticalAlignment="Center"
-                Content="崩边线是否开启" />
+
+        <auto:AutoGrid
+            Grid.Row="7"
+            Width="400"
+            HorizontalAlignment="Left"
+            ChildMargin="5"
+            Columns="*,*,auto"
+            RowCount="7">
+            <Label Content="崩边线是否开启" />
             <CheckBox
                 x:Name="hasEdgeLine"
-                VerticalAlignment="Center"
+                Grid.ColumnSpan="2"
                 FontSize="18"
                 IsChecked="{Binding HasEdgeLine}"
                 Style="{StaticResource MaterialDesignFilterChipSecondaryCheckBox}">
                 <TextBlock Text="{Binding ElementName=hasEdgeLine, Path=IsChecked, Converter={StaticResource BoolToStringConverter}}" />
             </CheckBox>
-        </StackPanel>
+            <Label Content="横向拉直距离" />
+            <Controls:InputTextBox Text="{Binding Path=HorizontalStraighteningStroke, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <Label Content="mm" />
+            <Label Content="竖向拉直距离" />
+            <Controls:InputTextBox Text="{Binding Path=VerticalStraighteningStroke, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <Label Content="mm" />
+        </auto:AutoGrid>
     </Grid>
 </Page>

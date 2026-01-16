@@ -102,15 +102,13 @@ namespace 精密切割系统.Helpers
                 await Task.WhenAll(taskX, taskY, speedZero);
                 Appsettings.AfterReplaceBladeCutTimes = 0;
                 Appsettings.AfterReplaceBladeCutLength = 0;
-                Appsettings.BladeOuterDiameter = null;
-                Appsettings.BladeThickness = null;
                 Appsettings.MeasureHeightFirst = null;
                 Appsettings.MeasureHeightLast = null;
-                MaterialSnack("请打开切割安全门，更换刀片！", SnackType.SUCCESS, 0, eventAggregator);
+                MaterialSnack("请打开切割安全门，更换刀片！", SnackType.SUCCESS, default, eventAggregator);
             }
             catch (OperationCanceledException)
             {
-                MaterialSnack("更换刀片操作取消！", SnackType.WARNING, 0, eventAggregator);
+                MaterialSnack("更换刀片操作取消！", SnackType.WARNING, default, eventAggregator);
             }
         }
 
@@ -2184,7 +2182,9 @@ namespace 精密切割系统.Helpers
                     continue;
                 }
                 //增加第一刀不跳步进
-                cutSteps.Add(tempCutSteps.First() with { NextStepDistance = 0 });
+                tempCutSteps.Add(tempCutSteps.First() with { NextStepDistance = 0 });
+                //移除最后多余的一刀
+                tempCutSteps.RemoveAt(tempCutSteps.Count - 1);
                 int chCutLines = Tools.GetIntStringValue(ch.CutLine);
                 if (chCutLines == 0)
                 {
@@ -2198,8 +2198,6 @@ namespace 精密切割系统.Helpers
                 {
                     cutSteps.AddRange(tempCutSteps.GetRange(0, chCutLines));
                 }
-                //移除最后多余的一刀
-                cutSteps.RemoveAt(cutSteps.Count - 1);
             }
             if (isOpenPrecut)
             {

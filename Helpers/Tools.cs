@@ -22,8 +22,8 @@ namespace 精密切割系统.Utils
 {
     internal class Tools
     {
-        public static ILog log = LogManager.GetLogger(typeof(Tools));
-        public static ILog debugLog = LogManager.GetLogger("SpecialDebug");
+        private static ILog log = LogManager.GetLogger(typeof(Tools));
+        private static ILog debugLog = LogManager.GetLogger("SpecialDebug");
 
         //public static string curPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         public static string curPath = AppDomain.CurrentDomain.BaseDirectory;

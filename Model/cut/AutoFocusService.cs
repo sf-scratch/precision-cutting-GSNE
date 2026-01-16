@@ -26,13 +26,13 @@ namespace 精密切割系统.Model.cut
         private const double BlurThreshold = 0.5;
 
         // Z轴位置限制
-        private const float MaxLimitZ = 19.5f;
+        private static float MaxLimitZ = 19.5f;
 
         // Z轴位置限制
-        private const float MinLimitZ = 0f;
+        private static float MinLimitZ = 0f;
 
         // 对焦起始抬起位置
-        private const float FocusStartingLiftPosition = 1f;
+        private const float FocusStartingLiftPosition = 0.5f;
 
         public static async Task<CommonResult<float>> GlobalFocusAsync(IEventAggregator? eventAggregator, CancellationToken token)
         {
@@ -46,6 +46,8 @@ namespace 精密切割系统.Model.cut
                 }
                 float focusClearPosition = focusClearPositionResult.Data;
                 await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(focusClearPosition - FocusStartingLiftPosition, default, token);
+                MinLimitZ = focusClearPosition - FocusStartingLiftPosition;
+                MaxLimitZ = focusClearPosition + FocusStartingLiftPosition;
                 int direction = 1;
                 // 阶段1：快速粗调（正向扫描）
                 var coarseResult = await FindOptimalFocus(
@@ -112,8 +114,6 @@ namespace 精密切割系统.Model.cut
                     }
 
                     float currentPos = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync() ?? 0;
-                    if ((direction == 0 && currentPos > MaxLimitZ) || (direction == 1 && currentPos < MinLimitZ))
-                        return CommonResult<float>.Failure("超过限位！");
 
                     // 2. 计算模糊度
                     double blurScore = VisionAnalyzer.CalculateTenengrad2(bitmap.ToMat());
@@ -124,6 +124,11 @@ namespace 精密切割系统.Model.cut
                     {
                         await PlcControl.tagControl.Z2axis.StopJogAsync();
                         LogMessage(eventAggregator, $"找到最清晰位置: {lastPosition:F4}mm ({(isCoarseScan ? "粗调" : "精调")})");
+                        return CommonResult<float>.Success(lastPosition);
+                    }
+                    else if ((direction == 0 && currentPos > MaxLimitZ) || (direction == 1 && currentPos < MinLimitZ))
+                    {
+                        LogMessage(eventAggregator, $"到达对焦限定位置: {lastPosition:F4}mm ({(isCoarseScan ? "粗调" : "精调")})");
                         return CommonResult<float>.Success(lastPosition);
                     }
 

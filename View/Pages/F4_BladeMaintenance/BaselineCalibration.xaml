@@ -112,7 +112,10 @@
                     <Controls:InputTextBox Text="{Binding Entity.CutSpeed}" />
                     <TextBlock Text="mm/s" />
                     <TextBlock Text="刀痕基准线位置" />
-                    <Controls:InputTextBox Text="{Binding CameraRelativeBladePositionY}" />
+                    <Controls:InputTextBox
+                        IsEnabled="False"
+                        Text="{Binding CameraRelativeBladePositionY}"
+                        XAllowZero="True" />
                     <Label Content="mm" />
                 </auto:AutoGrid>
             </StackPanel>

@@ -30,7 +30,6 @@ using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.operate;
 using 精密切割系统.ViewModel;
 
-
 namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 {
     /// <summary>
@@ -61,7 +60,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             _rightPage.btnSure.SetRightClickedHandler(BladeReplaceSure);
             _cts = new CancellationTokenSource();
             NavigateUtils.ClearOperatePage();
-            WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("换刀片", "SawBlade", ReplaceBladeAsync));
+            //WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("换刀片", "SawBlade", ReplaceBladeAsync));
             WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("换工件", "Square", ReplaceWaferAsync));
             InitData();
         }

@@ -358,15 +358,14 @@
                             HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center"
                             Content="绝对切割位置"
-                            FontSize="16"
-                            Visibility="Collapsed" />
+                            FontSize="16" />
                         <Controls:InputTextBox
                             x:Name="absoluteCutPosition"
                             Grid.Row="4"
                             Grid.Column="1"
                             Margin="0,0,0,8"
                             InputType="Decimal"
-                            Visibility="Collapsed" />
+                            XPrecision="4" />
                         <Label
                             x:Name="absoluteCutPositionUnit"
                             Grid.Row="4"
@@ -375,8 +374,7 @@
                             HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center"
                             Content="mm"
-                            FontSize="16"
-                            Visibility="Collapsed" />
+                            FontSize="16" />
                         <!--  列数据  -->
                         <Label
                             x:Name="relativeCutPositionLabel"
@@ -394,7 +392,8 @@
                             Grid.Column="1"
                             Margin="0,0,0,8"
                             InputType="Decimal"
-                            Visibility="Collapsed" />
+                            Visibility="Collapsed"
+                            XPrecision="4" />
                         <Label
                             x:Name="relativeCutPositionUnit"
                             Grid.Row="4"

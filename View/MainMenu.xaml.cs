@@ -1,8 +1,14 @@
+using Newtonsoft.Json;
+using Prism.Events;
+using Prism.Navigation.Regions;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -14,31 +20,25 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using 精密切割系统.Assets.config.menu;
-using 精密切割系统.View.Controls;
-using static 精密切割系统.Utils.Tools;
-using 精密切割系统.View.page.right;
-using MenuItem = 精密切割系统.Assets.config.menu.MenuItem;
-using Newtonsoft.Json;
-using System.IO;
-using System.Reflection;
-using Path = System.IO.Path;
 using 精密切割系统.Assets.config;
-using 精密切割系统.Helpers;
-
-using 精密切割系统.Utils;
-using 精密切割系统.Driver;
-using 精密切割系统.View.Pages.operate;
 using 精密切割系统.Assets.config.buttom;
-using 精密切割系统.Model.plc;
-using 精密切割系统.ViewModel;
+using 精密切割系统.Assets.config.menu;
 using 精密切割系统.database.db.modle;
-using System.Reflection.PortableExecutable;
+using 精密切割系统.Driver;
+using 精密切割系统.Helpers;
 using 精密切割系统.Model.cut;
+using 精密切割系统.Model.plc;
+using 精密切割系统.Utils;
+using 精密切割系统.View.Controls;
+using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.Auto;
-using 精密切割系统.View.Pages.F4_BladeMaintenance;
-using Prism.Navigation.Regions;
 using 精密切割系统.View.Pages.F2_ManualOperation;
+using 精密切割系统.View.Pages.F4_BladeMaintenance;
+using 精密切割系统.View.Pages.operate;
+using 精密切割系统.ViewModel;
+using static 精密切割系统.Utils.Tools;
+using MenuItem = 精密切割系统.Assets.config.menu.MenuItem;
+using Path = System.IO.Path;
 
 namespace 精密切割系统.View
 {
@@ -313,6 +313,39 @@ namespace 精密切割系统.View
                     break;
 
                 case 409:
+                    if (mainWindow == null)
+                    {
+                        MaterialSnack($"{nameof(mainWindow)}为空", SnackType.WARNING);
+                        return;
+                    }
+                    if (!GlobalParams.OnlineFlag)
+                    {
+                        MaterialSnack("准备更换刀片,轴运动中！", SnackType.WARNING, 0);
+                        mainWindow.IsEnabled = false;
+                        await Task.Delay(500);
+                        mainWindow.IsEnabled = true;
+                        MaterialSnack("请打开切割安全门，更换刀片！", SnackType.SUCCESS, default);
+                        mainWindow.NavigateToPage(bean.PageUrl);
+                        return;
+                    }
+                    try
+                    {
+                        mainWindow.IsEnabled = false;
+                        await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(60));
+                        await AutoCutUtils.ReplaceBladeAsync(default, timeoutToken.Token);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        MaterialSnack("换刀超时！", SnackType.WARNING);
+                    }
+                    catch (Exception e)
+                    {
+                        MaterialSnack($"换刀出现错误：{e.Message}", SnackType.WARNING);
+                    }
+                    finally
+                    {
+                        mainWindow.IsEnabled = true;
+                    }
                     mainWindow.NavigateToPage(bean.PageUrl);
                     break;
 

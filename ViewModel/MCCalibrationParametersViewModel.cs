@@ -152,5 +152,21 @@ namespace 精密切割系统.ViewModel
                 _model.HasEdgeLine = value; RaisePropertyChanged();
             }
         }
+
+        private string _horizontalStraighteningStroke;
+
+        public string HorizontalStraighteningStroke
+        {
+            get { return _horizontalStraighteningStroke; }
+            set { SetProperty(ref _horizontalStraighteningStroke, value); }
+        }
+
+        private string _verticalStraighteningStroke;
+
+        public string VerticalStraighteningStroke
+        {
+            get { return _verticalStraighteningStroke; }
+            set { SetProperty(ref _verticalStraighteningStroke, value); }
+        }
     }
 }

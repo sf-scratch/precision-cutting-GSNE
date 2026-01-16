@@ -275,7 +275,7 @@ namespace 精密切割系统.Helpers
             return _model;
         }
 
-        public static async void UpdateCutMarkWidth(int channelNum, float cutMarkWidth)
+        public static async Task UpdateCutMarkWidthAsync(int channelNum, float cutMarkWidth)
         {
             UserDefineDataModel userDefineData = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
             if (userDefineData != null)
@@ -301,7 +301,7 @@ namespace 精密切割系统.Helpers
                     default:
                         break;
                 }
-                SqlHelper.Update(userDefineData);
+                await SqlHelper.UpdateAsync(userDefineData);
             }
         }
 

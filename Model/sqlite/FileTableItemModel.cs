@@ -62,5 +62,17 @@ namespace 精密切割系统.database.db.modle
 
         [Column("device_type")]//类型;目前有两种类型
         public int DeviceType { get; set; }
+
+        /// <summary>
+        /// 横向拉直距离
+        /// </summary>
+        [Column("horizontal_straighten_distance")]
+        public string HorizontalStraighteningStroke { get; set; }
+
+        /// <summary>
+        /// 竖向拉直距离
+        /// </summary>
+        [Column("vertical_straighten_distance")]
+        public string VerticalStraighteningStroke { get; set; }
     }
 }

@@ -237,8 +237,6 @@ namespace 精密切割系统.ViewModel
             try
             {
                 await AutoCutUtils.WorkpieceBlowingThenBackAsync(_eventAggregator, _operatCts.Token);
-                await AutoCutUtils.FineTuneAxisYAsync();
-                await AutoCutUtils.UpdateCameraCommonLineAsync();
             }
             catch (OperationCanceledException) { }
         }

@@ -1,4 +1,5 @@
 ﻿using HslCommunication.Profinet.OpenProtocol;
+using MathNet.Numerics.LinearAlgebra.Complex.Solvers;
 using Newtonsoft.Json;
 using Prism.Events;
 using System;
@@ -511,7 +512,14 @@ namespace 精密切割系统.ViewModel
                     CutParam.AllCutLineLength = (Appsettings.AfterReplaceBladeCutLength / 1000 ?? 0).ToString("F2");
                     if (process.CutTimes > 1)
                     {
-                        CutParam.ExpectedProcessingEndTime = DateTime.Now.AddSeconds(process.RemainingTime).ToString("HH:mm:ss");
+                        if (process.RemainingTime > 0)
+                        {
+                            CutParam.ExpectedProcessingEndTime = DateTime.Now.AddSeconds(process.RemainingTime).ToString("HH:mm:ss");
+                        }
+                        else
+                        {
+                            Tools.LogDebug($"计算剩余时间异常! RemainingTime:{process.RemainingTime}");
+                        }
                     }
                 }
                 _currentCutYPosition = process.CutYPosition;

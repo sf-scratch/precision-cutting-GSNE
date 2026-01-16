@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
+using 精密切割系统.Behaviors;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
 using 精密切割系统.Helpers;
@@ -25,8 +26,9 @@ using static NPOI.HSSF.Util.HSSFColor;
 
 namespace 精密切割系统.ViewModel
 {
-    public class F7_2_AxisOperationViewModel : CustomBindableBase
+    public class F7_2_AxisOperationViewModel : CustomBindableBase, IValidationExceptionHandler
     {
+        public bool IsAllValid { get; set; } = true;
         public ObservableCollection<AxisOperationModel> AxisOperationList { get; set; } = new ObservableCollection<AxisOperationModel>();
 
         private CancellationTokenSource _cts;
@@ -34,13 +36,13 @@ namespace 精密切割系统.ViewModel
         public F7_2_AxisOperationViewModel()
         {
             AxisOperationList.AddRange([
-                new AxisOperationModel(PlcControl.tagControl.Xaxis, async (a,b) => { if(!b) await a.AxisObject.StopJogAsync();}){IsChecked = true, AxisSlowSpeed = "0", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", Unit = "mm", SpeedUnit = "mm/s"},
-                new AxisOperationModel(PlcControl.tagControl.Yaxis, async (a,b) => { if(!b) await a.AxisObject.StopJogAsync();}){AxisSlowSpeed = "0", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", Unit = "mm", SpeedUnit = "mm/s"},
-                new AxisOperationModel(PlcControl.tagControl.Z1axis, async(a, b) => { if(!b) await a.AxisObject.StopJogAsync();}){AxisSlowSpeed = "0", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", Unit = "mm", SpeedUnit = "mm/s"},
-                new AxisOperationModel(PlcControl.tagControl.Z2axis, async(a, b) => { if(! b) await a.AxisObject.StopJogAsync(); }){AxisSlowSpeed = "0", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", Unit = "mm", SpeedUnit = "mm/s"}]);
+                new AxisOperationModel(PlcControl.tagControl.Xaxis, async (a,b) => { if(!b) await a.AxisObject.StopJogAsync();}){IsChecked = true, AxisSlowSpeed = "0.1", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", Unit = "mm", SpeedUnit = "mm/s"},
+                new AxisOperationModel(PlcControl.tagControl.Yaxis, async (a,b) => { if(!b) await a.AxisObject.StopJogAsync();}){AxisSlowSpeed = "0.1", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", Unit = "mm", SpeedUnit = "mm/s"},
+                new AxisOperationModel(PlcControl.tagControl.Z1axis, async(a, b) => { if(!b) await a.AxisObject.StopJogAsync();}){AxisSlowSpeed = "0.1", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", Unit = "mm", SpeedUnit = "mm/s"},
+                new AxisOperationModel(PlcControl.tagControl.Z2axis, async(a, b) => { if(! b) await a.AxisObject.StopJogAsync(); }){AxisSlowSpeed = "0.1", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", Unit = "mm", SpeedUnit = "mm/s"}]);
             if (GlobalParams.HasTheta)
             {
-                AxisOperationList.Add(new AxisOperationModel(PlcControl.tagControl.ThetaAxis, async (a, b) => { if (!b) await a.AxisObject.StopJogAsync(); }) { AxisSlowSpeed = "0", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", IsReady = true, Unit = "deg", SpeedUnit = "deg/s" });
+                AxisOperationList.Add(new AxisOperationModel(PlcControl.tagControl.ThetaAxis, async (a, b) => { if (!b) await a.AxisObject.StopJogAsync(); }) { AxisSlowSpeed = "0.1", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", IsReady = true, Unit = "deg", SpeedUnit = "deg/s" });
             }
         }
 
@@ -68,6 +70,11 @@ namespace 精密切割系统.ViewModel
 
         private void Sure()
         {
+            if (!IsAllValid)
+            {
+                MaterialSnack("参数异常，请检查参数格式！", SnackType.WARNING, 2);
+                return;
+            }
             MainWindow? mainWindow = Application.Current.MainWindow as MainWindow;
             if (mainWindow == null)
             {
@@ -107,15 +114,25 @@ namespace 精密切割系统.ViewModel
 
         private async Task SlowRelativeMotionAsync(bool isPositive)
         {
+            if (!IsAllValid)
+            {
+                MaterialSnack("参数异常，请检查参数格式！", SnackType.WARNING);
+                return;
+            }
             var selectedAxis = AxisOperationList.FirstOrDefault(a => a.IsChecked);
             if (selectedAxis != null)
             {
-                await selectedAxis.AxisObject.StartRelativeAsync(isPositive ? 5 : -5, selectedAxis.AxisSlowSpeed.ToFloat(), _cts.Token);
+                await selectedAxis.AxisObject.StartRelativeAsync(isPositive ? selectedAxis.RelativeDistance.ToFloat() : -selectedAxis.RelativeDistance.ToFloat(), selectedAxis.AxisSlowSpeed.ToFloat(), _cts.Token);
             }
         }
 
         private async Task RelativeMotionAsync(bool isPositive)
         {
+            if (!IsAllValid)
+            {
+                MaterialSnack("参数异常，请检查参数格式！", SnackType.WARNING);
+                return;
+            }
             var selectedAxis = AxisOperationList.FirstOrDefault(a => a.IsChecked);
             if (selectedAxis != null)
             {
@@ -125,16 +142,27 @@ namespace 精密切割系统.ViewModel
 
         private async Task SlowJogAsync(bool isPositive)
         {
+            if (!IsAllValid)
+            {
+                MaterialSnack("参数异常，请检查参数格式！", SnackType.WARNING);
+                return;
+            }
             var selectedAxis = AxisOperationList.FirstOrDefault(a => a.IsChecked);
             if (selectedAxis != null)
             {
-                SpeedManager.IsHighSpeed = false;
+                SpeedManager.IsHighSpeed = true;
+                await selectedAxis.AxisObject.SetJogRelativeSpeedAsync(selectedAxis.AxisSlowSpeed.ToFloat());
                 await selectedAxis.AxisObject.StartJogAsync(isPositive ? 0 : 1);
             }
         }
 
         private async Task JogAsync(bool isPositive)
         {
+            if (!IsAllValid)
+            {
+                MaterialSnack("参数异常，请检查参数格式！", SnackType.WARNING);
+                return;
+            }
             var selectedAxis = AxisOperationList.FirstOrDefault(a => a.IsChecked);
             if (selectedAxis != null)
             {

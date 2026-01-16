@@ -11,7 +11,6 @@ using 精密切割系统.Utils;
 using 精密切割系统.View.Controls;
 using 精密切割系统.ViewModel;
 
-
 namespace 精密切割系统.Driver
 {
     internal class CutOperateUtils
@@ -802,7 +801,6 @@ namespace 精密切割系统.Driver
                         Tools.LogError("暂停失败！强行退出切割状态！");
                     }
 
-                    PlcControl.tagControl.wholeDevice.SetYellowLightFlash(1);
                     // PlcControl.tagControl.wholeDevice.SetBuzzerStatus(1);
                     // 关水
                     _mainWindow.NavigateToPage("Pages/F2_ManualOperation/MQSemiAutomaticCuttingStop");
