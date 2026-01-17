@@ -156,5 +156,8 @@ namespace 精密切割系统.database.db.modle
 
         [Column("is_update_param_clear_manual_compensation")]
         public bool IsUpdateParamClearManualCompensation { get; set; }
+
+        [Column("is_start_pre_cutting_after_change_blade")]
+        public bool IsStartPreCuttingAfterChangeBlade { get; set; }
     }
 }

@@ -14,6 +14,8 @@ namespace 精密切割系统.Model.cut.Workpieces
 
         bool CheckCutDistance(CutDirection cutDirection, float cutSize);
 
+        void UpdateToNextCutPosition(CutDirection cutDirection, float cutSize);
+
         void Reset(float currentY);
 
         public float WorkThickness { get; set; }

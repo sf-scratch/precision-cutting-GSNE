@@ -251,6 +251,7 @@ namespace 精密切割系统.ViewModel
                 }
                 _chQueue = new Queue<string>(chDatas.Select(chData => chData.ChName));
                 await UpdateCurrentChAsync(true);
+                MaterialSnack("进入校准模式成功！", SnackType.SUCCESS);
             }
             else
             {

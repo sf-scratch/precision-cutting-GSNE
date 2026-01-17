@@ -224,7 +224,7 @@ namespace 精密切割系统.Helpers
         public const float Z2DefaultSpeed = 2f;
 
         // thetaθ轴默认速度
-        public const float ThetaDefaultSpeed = 20;
+        public const float ThetaDefaultSpeed = 90;
 
         // theta轴相机中心点位置 X轴 28.89837  17.8
         public static float thetaCameraLocationX = 17.8f;

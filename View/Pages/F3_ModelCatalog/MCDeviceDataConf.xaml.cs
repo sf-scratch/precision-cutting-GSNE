@@ -1112,7 +1112,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
 
         private async Task UpdateTotalCutNumAsync()
         {
-            CommonResult<List<CutStep>> cutStepResult = await AutoCutUtils.GenerateCutStepListAsync(false);
+            CommonResult<List<CutStep>> cutStepResult = await AutoCutUtils.GenerateCutStepListAsync();
             if (!cutStepResult.IsSuccess || cutStepResult.Data is null)
             {
                 MaterialSnack(cutStepResult.Message, SnackType.ERROR);

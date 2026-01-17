@@ -27,6 +27,7 @@ using 精密切割系统.Utils;
 using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.Auto;
 using 精密切割系统.View.Pages.F2_ManualOperation;
+using 精密切割系统.View.Pages.F4_BladeMaintenance;
 
 namespace 精密切割系统.ViewModel
 {
@@ -40,7 +41,7 @@ namespace 精密切割系统.ViewModel
         private readonly SemiAutoCutService _semiAutoCutService;
         private CancellationTokenSource _pauseCts;
         private CancellationTokenSource _monitoringCts;
-        private List<CutStep>? _cutSteps;
+        private List<ChCutStep>? _cutSteps;
         private float _currentCutYPosition = 0;
         private string? _backPageName;
 
@@ -104,9 +105,34 @@ namespace 精密切割系统.ViewModel
         {
         }
 
-        private void InitRightButton()
+        protected override void InitBottomButton()
         {
-            RightButtonCollection.Add(ButtonParams.YelloRightButton("暂停", "/Assets/icon/right/stop.png", async () => { await PauseAsync(); }));
+            base.InitBottomButton();
+            AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
+            AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
+            AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
+            AddBottomButton(ButtonParams.BlueButton("预切启动", "/Assets/icon/tab_1/02/tab_27.png", OpenPrecut));
+            AddBottomButton(ButtonParams.BlueButton("刀片状态信息", "/Assets/icon/tab_1/02/tab_27.png", NavigateToBladeInfo));
+        }
+
+        private void NavigateToBladeInfo()
+        {
+            BladeInfo.PageName = nameof(MQSemiAutomaticCuttingRun);
+            NavigateUtils.NavigateToPage("Pages/F4_BladeMaintenance/BladeInfo");
+        }
+
+        private void OpenPrecut()
+        {
+            _semiAutoCutService.IsOpenPrecut = true;
+            var preCutSpeedLis = AutoCutUtils.GetPreCutSpeedList(CutParam.FeedSpeed.ToFloat());
+            _semiAutoCutService.UpdatePreCutQueue(preCutSpeedLis);
+            MaterialSnack("开启预切割！", SnackType.SUCCESS);
+        }
+
+        protected override void InitRightButton()
+        {
+            base.InitRightButton();
+            AddRightButton(ButtonParams.YelloRightButton("暂停", "/Assets/icon/right/stop.png", async () => { await PauseAsync(); }));
         }
 
         private async Task MonitoringAlarmAsync(CancellationToken token)
@@ -153,6 +179,11 @@ namespace 精密切割系统.ViewModel
                                     _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"切割报警监控：切割中途闪烁异常 {alarmMessages}"));
                                 }
                             }
+                        }
+
+                        if (AlarmConfig.Instance.HasTargetActiveAlarm("MR60111", "MR60112"))
+                        {
+                            await PauseAsync(PlcControl.tagControl.wholeDevice.OpenRedLightAsync);
                         }
                     }
                     catch (Exception) { }
@@ -214,7 +245,7 @@ namespace 精密切割系统.ViewModel
             {
                 ShowWarnMessageNavigateHome(checkAutomaticCompensationCutHeightResult.Message);
             }
-            List<CutStep> cutSteps = _cutSteps;
+            List<ChCutStep> cutSteps = _cutSteps;
             CommonResult<FileTableItemModel> fileTableItemResult = await AutoCutUtils.GetFileTableItemModelAsync();
             if (!fileTableItemResult.IsSuccess || fileTableItemResult.Data is null)
             {
@@ -265,7 +296,7 @@ namespace 精密切割系统.ViewModel
                 FileTableItemModel fileTableItem = fileTableItemResult.Data;
                 _ = MonitoringAlarmAsync(_monitoringCts.Token);
                 _ = MonitoringCutProgressAsync(_monitoringCts.Token);
-                CutStep firtStep = cutSteps.First();
+                CutStep firtStep = cutSteps.First().CutSteps.First();
                 float cutY = firtStep.IsAbsolute ? firtStep.ChannelStartY : (await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0).ToActualY() + firtStep.ChannelStartY;
                 float measureHeightZ = 0;
                 if (bmParameter.IsAutomHeightMeasureBeforeCutting)
@@ -288,6 +319,9 @@ namespace 精密切割系统.ViewModel
                     IWorkpieces workpiece = GenerateWorkpieces(fileTableItem, cutY);
                     _semiAutoCutService.CutServiceProcessChanged += CutService_CutServiceProcessChanged;
                     _semiAutoCutService.CutServicePaused += CutService_CutServicePaused;
+                    float preCutMaxSpeed = cutSteps.First().CutSteps.First().Speed;
+                    var preCutSpeedLis = AutoCutUtils.GetPreCutSpeedList(preCutMaxSpeed);
+                    _semiAutoCutService.UpdatePreCutQueue(preCutSpeedLis);
                     MaterialSnack($"切割中...", SnackType.WARNING, 0, _eventAggregator);
                     float margin = Appsettings.AdditionalMargin ?? 20;
                     RunResult cutResult = await _semiAutoCutService.RunAsync(cutSteps, workpiece, margin, measureHeightZ, GlobalParams.BladeLiftingHeight, false, _pauseCts.Token);
@@ -447,7 +481,6 @@ namespace 精密切割系统.ViewModel
                 // 超时自动取消
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(runTime));
                 await PlcControl.tagControl.cutting.ExitCuttingModeAsync(cts.Token);
-                await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
                 LineSegment? line = pauseData.Line;
                 // 轴不报警时移动到指定位置
                 if (line != null && !AlarmConfig.Instance.HasAxisErrorAlarms())
@@ -472,6 +505,10 @@ namespace 精密切割系统.ViewModel
                         PlcControl.tagControl.Yaxis.StartAbsoluteAsync(line.StartPoint.Y.ToCameraY(), 30, cts.Token));
                     // 执行默认动作
                     //await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(posZ, default, cts.Token);
+                }
+                if (!AlarmConfig.Instance.HasActiveErrorAlarm())
+                {
+                    await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
                 }
                 MaterialSnack(pauseData.Message ?? "暂停中...", SnackType.WARNING, 0, _eventAggregator);
             }
@@ -499,7 +536,7 @@ namespace 精密切割系统.ViewModel
                 CutParam.AllRunCutLine = process.TotalCutTimes;
                 CutParam.FeedSpeed = process.CutSpeed.ToString("F5");
                 CutParam.BladeHeight = process.CutBladeHeight.ToString("F5");
-                CutParam.ChannelNum = string.Format(GlobalParams.StringFormatCH, process.ChannelNum);
+                CutParam.ChannelNum = process.ChannelNum;
                 if (process.IsCompleted)
                 {
                     Appsettings.AfterReplaceBladeCutTimes++;
@@ -536,19 +573,20 @@ namespace 精密切割系统.ViewModel
         public override void OnNavigatedTo(NavigationContext navigationContext)
         {
             base.OnNavigatedTo(navigationContext);
+            BladeInfo.PageName = null;
             _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Subscribe(ReceivedMessage, ThreadOption.UIThread);
             if (!navigationContext.Parameters.TryGetValue("isContinue", out bool _))
             {
                 _pauseCts = new CancellationTokenSource();
                 _monitoringCts = new CancellationTokenSource();
             }
-            if (navigationContext.Parameters.TryGetValue<List<CutStep>>("cutSteps", out var cutSteps))
+            if (navigationContext.Parameters.TryGetValue<List<ChCutStep>>("cutSteps", out var cutSteps))
             {
                 _cutSteps = cutSteps;
                 if (cutSteps.Count > 0)
                 {
-                    CutStep firstStep = cutSteps.First();
-                    CutParam.ChannelNum = string.Format(GlobalParams.StringFormatCH, firstStep.ChannelNum);
+                    ChCutStep firstStep = cutSteps.First();
+                    CutParam.ChannelNum = firstStep.ChName;
                 }
             }
             if (navigationContext.Parameters.TryGetValue<string>("backPageName", out var backPageName))
@@ -561,7 +599,6 @@ namespace 精密切割系统.ViewModel
             CutParam.DeviceDataId = fileTableItem.DeviceDataId;
             CutParam.ChangeFeedSpeed = _semiAutoCutService.FeedSpeedCompCompensationValue.ToString();
             CutParam.DepthCompensation = _semiAutoCutService.DepthCompensationValue.ToString(GlobalParams.DecimalStringFormat);
-            InitRightButton();
         }
 
         public override void OnNavigatedFrom(NavigationContext navigationContext)

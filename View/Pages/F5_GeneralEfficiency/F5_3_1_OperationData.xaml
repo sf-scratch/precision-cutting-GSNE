@@ -453,7 +453,7 @@
             <StackPanel>
                 <Label
                     Height="35"
-                    Content="切割水设置"
+                    Content="默认操作设置"
                     FontSize="22"
                     FontWeight="Bold" />
                 <auto:AutoGrid
@@ -492,7 +492,7 @@
             <StackPanel Grid.Column="1" Margin="30,0,0,0">
                 <Label
                     Height="35"
-                    Content="高度补偿设置"
+                    Content=""
                     FontSize="22"
                     FontWeight="Bold" />
                 <auto:AutoGrid
@@ -512,6 +512,13 @@
                         d:IsChecked="False"
                         IsChecked="{Binding IsUpdateParamClearManualCompensation}">
                         <TextBlock Text="{Binding ElementName=UpdateParamClearManualCompensation, Path=IsChecked, Converter={StaticResource BoolToOpenOrCloseConverter}}" />
+                    </CheckBox>
+                    <Label Content="执行换刀后需默认启动预切割" />
+                    <CheckBox
+                        x:Name="StartPreCuttingAfterChangeBlade"
+                        d:IsChecked="False"
+                        IsChecked="{Binding IsUpdateParamClearManualCompensation}">
+                        <TextBlock Text="{Binding ElementName=StartPreCuttingAfterChangeBlade, Path=IsChecked, Converter={StaticResource BoolToOpenOrCloseConverter}}" />
                     </CheckBox>
                 </auto:AutoGrid>
             </StackPanel>

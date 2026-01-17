@@ -117,7 +117,7 @@
                         TextWrapping="Wrap"
                         XMax="0.3"
                         XMin="-0.3"
-                        XPrecision="3" />
+                        XPrecision="5" />
                     <Label
                         x:Name="HeightChange3"
                         Content="mm"

@@ -15,7 +15,10 @@ using System.Windows.Shapes;
 using 精密切割系统.Assets.config.buttom;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Helpers;
+using 精密切割系统.Model.common;
+using 精密切割系统.Model.cut;
 using 精密切割系统.Utils;
+using 精密切割系统.View.common;
 using 精密切割系统.View.Controls;
 using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.operate;
@@ -33,7 +36,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         private OperatePage? operatePage;
         private BladeHeightModel _model = null;
         private string urlParams = null;
-        private string pageName = null;
+        public static string? PageName { get; set; } = null;
 
         public BladeInfo()
         {
@@ -54,8 +57,8 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             {
                 urlParams = Uri.UnescapeDataString(urlParamsTemp);
             }
-            pageName = QueryUtils.GetValueFromQueryParams(this, "pageName");
-            mainWindow.UpdateOperatePage(new List<OperateBean>(), null);
+            NavigateUtils.ClearOperatePage();
+            WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("预切关闭", "/Assets/icon/tab_1/02/tab_27.png", ClosePrecut));
             InitData();
         }
 
@@ -73,15 +76,21 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             measureHeightLast.Text = Appsettings.MeasureHeightLast?.ToString("F3");
         }
 
+        private void ClosePrecut()
+        {
+            SemiAutoCutService.Instance.IsOpenPrecut = false;
+            MaterialSnack("关闭预切割！", SnackType.SUCCESS);
+        }
+
         private void BtnBack_RightClicked(object? sender, bool e)
         {
-            if (string.IsNullOrEmpty(pageName))
+            if (string.IsNullOrEmpty(PageName))
             {
                 mainWindow.NavigateToPage("MainMenu");
             }
             else
             {
-                mainWindow.NavigateToPage(pageName, urlParams);
+                ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, PageName);
             }
         }
     }

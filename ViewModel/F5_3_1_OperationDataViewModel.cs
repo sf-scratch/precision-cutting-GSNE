@@ -676,5 +676,15 @@ namespace 精密切割系统.ViewModel
                 RaisePropertyChanged();
             }
         }
+
+        public bool IsStartPreCuttingAfterChangeBlade
+        {
+            get { return operationParameter.IsStartPreCuttingAfterChangeBlade; }
+            set
+            {
+                operationParameter.IsStartPreCuttingAfterChangeBlade = value;
+                RaisePropertyChanged();
+            }
+        }
     }
 }

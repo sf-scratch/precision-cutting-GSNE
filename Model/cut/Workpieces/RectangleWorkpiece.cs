@@ -43,25 +43,38 @@ namespace 精密切割系统.Model.cut.Workpieces
 
         public bool CheckCutDistance(CutDirection cutDirection, float cutSize)
         {
+            float currentY = _currentY;
             //切割距离达到最终位置
             if (cutDirection == CutDirection.Backward)
             {
-                _currentY -= cutSize;
-                if (_rect.Y >= _currentY || _rect.Y + _rect.Height <= _currentY)
+                currentY -= cutSize;
+                if (_rect.Y >= currentY || _rect.Y + _rect.Height <= currentY)
                 {
                     return false;
                 }
             }
             if (cutDirection == CutDirection.Forward)
             {
-                _currentY += cutSize;
-                if (_rect.Y >= _currentY || _rect.Y + _rect.Height <= _currentY)
+                currentY += cutSize;
+                if (_rect.Y >= currentY || _rect.Y + _rect.Height <= currentY)
                 {
                     return false;
                 }
             }
-            Tools.LogDebug($"CheckCutDistance:    {_rect.X}  {_rect.Y}  {_rect.Width}  {_rect.Height}  {_currentY}  {cutDirection}  {cutSize}");
             return true;
+        }
+
+        public void UpdateToNextCutPosition(CutDirection cutDirection, float cutSize)
+        {
+            //切割距离达到最终位置
+            if (cutDirection == CutDirection.Backward)
+            {
+                _currentY -= cutSize;
+            }
+            if (cutDirection == CutDirection.Forward)
+            {
+                _currentY += cutSize;
+            }
         }
 
         public void Reset(float currentY)

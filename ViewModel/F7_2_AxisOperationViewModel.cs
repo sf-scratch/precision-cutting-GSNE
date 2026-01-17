@@ -49,8 +49,8 @@ namespace 精密切割系统.ViewModel
         private void InitRightButton()
         {
             RightButtonCollection.Clear();
-            RightButtonCollection.Add(ButtonParams.GreenRightButton("确定", "CogBox", Sure));
-            RightButtonCollection.Add(ButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
+            RightButtonCollection.Add(ButtonParams.Sure(Sure));
+            RightButtonCollection.Add(ButtonParams.Back(Back));
         }
 
         private void InitBottomButton()

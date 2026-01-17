@@ -2500,7 +2500,7 @@ namespace 精密切割系统.Driver
         }
 
         /// <summary>
-        /// 真空状态
+        /// 工件真空状态
         /// </summary>
         /// <returns></returns>
         public async Task<bool> IsOpenVacuumSwitchAsync()

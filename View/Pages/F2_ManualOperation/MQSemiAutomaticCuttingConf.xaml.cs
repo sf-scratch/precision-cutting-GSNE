@@ -145,16 +145,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                     break;
 
                 case 2404:
-                    if (_semiAutoCutService.IsOpenPrecut)
-                    {
-                        MaterialSnack("关闭预切割！", SnackType.SUCCESS);
-                    }
-                    else
-                    {
-                        MaterialSnack("开启预切割！", SnackType.SUCCESS);
-                    }
-                    // 预切启动
-                    _semiAutoCutService.IsOpenPrecut = !_semiAutoCutService.IsOpenPrecut;
+                    _semiAutoCutService.TriggerPrecut(true);
                     break;
 
                 case 2405:
@@ -201,7 +192,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 MaterialSnack("未设置刀片外径！", SnackType.WARNING);
                 return;
             }
-            CommonResult<List<CutStep>> cutStepResult = await AutoCutUtils.GenerateSingleSideCutStepListAsync(_semiAutoCutService.IsOpenPrecut);
+            CommonResult<List<CutStep>> cutStepResult = await AutoCutUtils.GenerateSingleSideCutStepListAsync();
             if (!cutStepResult.IsSuccess || cutStepResult.Data is null)
             {
                 MaterialSnack(cutStepResult.Message, SnackType.WARNING);

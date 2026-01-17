@@ -159,14 +159,7 @@ namespace 精密切割系统.ViewModel
                 return;
             }
             await SaveEntityAsync();
-            if (_cutY != null)
-            {
-                await BaselineCalibrationAsync(_cutY.Value);
-            }
-            else
-            {
-                MaterialSnack($"基准线校准失败，请开始切割！", SnackType.WARNING, 0);
-            }
+            MaterialSnack("保存成功！", SnackType.SUCCESS);
         }
 
         private void Back()
@@ -187,11 +180,34 @@ namespace 精密切割系统.ViewModel
             AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
             AddBottomButton(ButtonParams.BlueButton("基准线调窄", "/Assets/icon/tab_1/03/tab_02.png", null, BaselineNarrowing, StopUpdateCameraCommonLine));
             AddBottomButton(ButtonParams.BlueButton("θ轴竖向校正", "/Assets/icon/tab_1/03/theta-align-vertical.png", _alignService.ThetaVerticalAlignAsync));
-            AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
+            AddBottomButton(ButtonParams.BlueButton("基准线校准", "CrosshairsGps", BaselineCalibrationAsync));
             AddBottomButton(ButtonParams.BlueButton("测量", "/Assets/icon/tab_1/03/tab_03.png", NavigateMeasurement));
             AddBottomButton(ButtonParams.BlueButton("对焦", "/Assets/icon/tab_1/03/tab_01.png", FocusAutoAsync));
             AddBottomButton(ButtonParams.BlueButton("基准线调宽", "/Assets/icon/tab_1/03/tab_02.png", null, BaselineWidening, StopUpdateCameraCommonLine));
             AddBottomButton(ButtonParams.BlueButton("θ轴横向校正", "/Assets/icon/tab_1/03/tab_04.png", _alignService.ThetaHorizontalAlignAsync));
+        }
+
+        private async Task BaselineCalibrationAsync()
+        {
+            if (_cutY != null)
+            {
+                float cutY = _cutY.Value;
+                MaterialSnack($"基准线校准中", SnackType.INFO, 0);
+                DataPoint<float> relativePostion = Appsettings.CameraRelativeBladePosition;
+                DataPoint<float> curPoint = new DataPoint<float>
+                {
+                    X = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0,
+                    Y = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0
+                };
+                float offsetY = cutY - curPoint.Y;
+                Appsettings.CameraRelativeBladePosition = new DataPoint<float>(relativePostion.X, relativePostion.Y - offsetY);
+                CameraRelativeBladePositionY = Appsettings.CameraRelativeBladePosition.Y;
+                MaterialSnack($"基准线校准完成", SnackType.SUCCESS, 0);
+            }
+            else
+            {
+                MaterialSnack($"基准线校准失败，请开始切割！", SnackType.WARNING, 0);
+            }
         }
 
         private void NavigateMeasurement()
@@ -217,21 +233,6 @@ namespace 精密切割系统.ViewModel
             _cameraCommon?.SetCutMarkWidth(-CameraOperateUtils.DatumLineChangeStep, 2);
             _intervalTimer.RegisterAction(() => _cameraCommon?.SetCutMarkWidth(-CameraOperateUtils.DatumLineChangeStep, 2));
             _intervalTimer.Start();
-        }
-
-        private async Task BaselineCalibrationAsync(float cutY)
-        {
-            MaterialSnack($"基准线校准中", SnackType.INFO, 0);
-            DataPoint<float> relativePostion = Appsettings.CameraRelativeBladePosition;
-            DataPoint<float> curPoint = new DataPoint<float>
-            {
-                X = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0,
-                Y = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0
-            };
-            float offsetY = cutY - curPoint.Y;
-            Appsettings.CameraRelativeBladePosition = new DataPoint<float>(relativePostion.X, relativePostion.Y - offsetY);
-            CameraRelativeBladePositionY = Appsettings.CameraRelativeBladePosition.Y;
-            MaterialSnack($"基准线校准完成", SnackType.SUCCESS, 0);
         }
 
         private async Task FocusAutoAsync()
@@ -271,6 +272,7 @@ namespace 精密切割系统.ViewModel
                 _monitorCts = new CancellationTokenSource();
                 _ = AutoCutUtils.MonitoringAlarmAsync(Stop, AlarmConfig.Instance.HasAutoRunUnexpectedAlarms, default, _monitorCts.Token);
             }
+            await PlcControl.tagControl.wholeDevice.CloseCameraLensCapAsync();
             //打开切割水
             await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
             //进入全自动切割模式
@@ -307,6 +309,7 @@ namespace 精密切割系统.ViewModel
                 // 工作盘吹气
                 await AutoCutUtils.WorkpieceBlowingAsync(default, default, default, token);
                 await PlcControl.tagControl.cutting.RunMotionAsync(((startX + endX) / 2).ToCameraX(), startY.ToCameraY(), token);
+                await PlcControl.tagControl.wholeDevice.OpenCameraLensCapAsync();
             }
         }
 

@@ -219,7 +219,7 @@ namespace 精密切割系统.Model.cut
                         await PlcControl.tagControl.cutting.WaitCutNumUdatedAsync(curCutNum.Value + 1, _usingPauseToken);
                         cutTime++;
                         //触发切割进度更新事件
-                        CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, line.StartPoint.Y, needCutTimes + _finishedCutTimes, cutTime + _finishedCutTimes, 0, 1, 0, true));
+                        CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, line.StartPoint.Y, needCutTimes + _finishedCutTimes, cutTime + _finishedCutTimes, 0, GlobalParams.CH1, 0, true));
                         //停止切割前
                         int beforeStopCutTimes = cutTime + _finishedCutTimes;
                         int checkMarksCutTimes = cutParams.CheckMarksCutTimes > 0 ? cutParams.CheckMarksCutTimes : _checkMarksCutTimes;
@@ -722,7 +722,7 @@ namespace 精密切割系统.Model.cut
         }
     }
 
-    public struct CutServiceProcess(float cutBladeHeight, float cutSpeed, float cutYPosition, int totalCutTimes, int cutTimes, float cutLength = 0f, int channelNum = 1, float remainingTime = 0, bool isCompleted = false)
+    public struct CutServiceProcess(float cutBladeHeight, float cutSpeed, float cutYPosition, int totalCutTimes, int cutTimes, float cutLength = 0f, string channelNum = "", float remainingTime = 0, bool isCompleted = false)
     {
         /// <summary>
         /// 切割刀片高度
@@ -757,7 +757,7 @@ namespace 精密切割系统.Model.cut
         /// <summary>
         /// 切割面
         /// </summary>
-        public int ChannelNum { get; set; } = channelNum;
+        public string ChannelNum { get; set; } = channelNum;
 
         /// <summary>
         /// 剩余时间

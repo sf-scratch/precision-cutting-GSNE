@@ -82,7 +82,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             _cameraCommon = cameraCommon;
             if (_operateType == 0)
             {
-                MaterialSnack("进入校准模式成功！", SnackType.WARNING);
+                MaterialSnack("进入校准模式成功！", SnackType.SUCCESS);
             }
         }
 

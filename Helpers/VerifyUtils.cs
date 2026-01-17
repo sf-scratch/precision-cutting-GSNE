@@ -36,5 +36,35 @@ namespace 精密切割系统.Helpers
             }
             return CommonResult.Success();
         }
+
+        /// <summary>
+        /// 检查自动切割高度补偿
+        /// </summary>
+        /// <param name="cutSteps"></param>
+        /// <returns></returns>
+        public static async Task<CommonResult> CheckAutomaticCompensationCutHeightAsync(List<ChCutStep> cutSteps)
+        {
+            if (cutSteps == null || cutSteps.Count == 0)
+            {
+                return CommonResult.Failure("切割步骤数据异常，请重新设置切割参数！");
+            }
+            float depthCompensationValue = SemiAutoCutService.Instance.DepthCompensationValue;
+            AutomaticCompensationCutHeightEntity automaticCompensationCutHeight = await SqlHelper.GetOrCreateEntityAsync(() => new AutomaticCompensationCutHeightEntity());
+            int cutHeightCompensationFrequency = automaticCompensationCutHeight.CutHeightCompensationFrequency.ToInt();
+            float cutHeightReductionDistance = automaticCompensationCutHeight.CutHeightReductionDistance.ToFloat();
+            float minCutHeight = float.MaxValue;
+            int totalCutSteps = 0;
+            foreach (var step in cutSteps)
+            {
+                minCutHeight = Math.Min(minCutHeight, step.CutSteps.Select(p => p.CutHeight).Min());
+                totalCutSteps += step.CutSteps.Count;
+            }
+            int unsafeCutTimes = (int)(minCutHeight / cutHeightReductionDistance * cutHeightCompensationFrequency);
+            if (unsafeCutTimes < totalCutSteps)
+            {
+                return CommonResult.Failure($"将在第 {unsafeCutTimes} 刀时切到工作盘，请检查型号参数设置！");
+            }
+            return CommonResult.Success();
+        }
     }
 }

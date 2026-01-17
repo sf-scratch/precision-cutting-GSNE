@@ -151,14 +151,6 @@
                     Margin="10,0,0,0"
                     Command="{Binding UpdateExposureTimeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                     CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
-                    Content="-1000"
-                    FontSize="18"
-                    FontWeight="Bold" />
-                <Button
-                    Width="100"
-                    Margin="10,0,0,0"
-                    Command="{Binding UpdateExposureTimeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                    CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
                     Content="-100"
                     FontSize="18"
                     FontWeight="Bold" />
@@ -167,7 +159,7 @@
                     Margin="10,0,0,0"
                     Command="{Binding UpdateExposureTimeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                     CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
-                    Content="+100"
+                    Content="-50"
                     FontSize="18"
                     FontWeight="Bold" />
                 <Button
@@ -175,7 +167,15 @@
                     Margin="10,0,0,0"
                     Command="{Binding UpdateExposureTimeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                     CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
-                    Content="+1000"
+                    Content="+50"
+                    FontSize="18"
+                    FontWeight="Bold" />
+                <Button
+                    Width="100"
+                    Margin="10,0,0,0"
+                    Command="{Binding UpdateExposureTimeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                    CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
+                    Content="+100"
                     FontSize="18"
                     FontWeight="Bold" />
             </StackPanel>

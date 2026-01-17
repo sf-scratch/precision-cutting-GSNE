@@ -89,6 +89,11 @@ namespace 精密切割系统.Helpers
                     MaterialSnack("获取各模式参数失败，请检查各模式参数配置！", SnackType.WARNING);
                     return;
                 }
+                var operateParams = await CurrentUtils.GetOperationParametersModelAsync();
+                if (operateParams.IsStartPreCuttingAfterChangeBlade)
+                {
+                    SemiAutoCutService.Instance.IsOpenPrecut = true;
+                }
                 float posX = initPos.CutReplaceInitX.ToFloat();
                 float posY = initPos.CutReplaceInitY.ToFloat();
                 float speedX = initPos.CutReplaceInitSpeedX.ToFloat();
@@ -576,13 +581,13 @@ namespace 精密切割系统.Helpers
             return cutSpeedList;
         }
 
-        public static CommonResult<List<float>> GetPreCutSpeedList()
+        public static List<float> GetPreCutSpeedList(float maxSpeed)
         {
             PreCutModel preCutModel = CurrentUtils.GetPreCutModel();
             //起始为0，直接返回空集合
             if (preCutModel.NewBladeNo == 0)
             {
-                return CommonResult<List<float>>.Success([]);
+                return [];
             }
             // 获取
             float[] feedSpds = Tools.StringToFloatArray(preCutModel.FeedSpd); // 获取进刀速度
@@ -594,6 +599,10 @@ namespace 精密切割系统.Helpers
                 // 获取进刀速度
                 float feedspeed = feedSpds[i - 1];
                 float cutLine = ofLinesList[i - 1];
+                if (feedspeed > maxSpeed)
+                {
+                    break;
+                }
                 if (feedspeed != 0 && cutLine != 0)
                 {
                     for (int j = 0; j < cutLine; j++)
@@ -602,7 +611,7 @@ namespace 精密切割系统.Helpers
                     }
                 }
             }
-            return CommonResult<List<float>>.Success(cutSpeed);
+            return cutSpeed;
         }
 
         /// <summary>
@@ -930,12 +939,20 @@ namespace 精密切割系统.Helpers
         /// <returns></returns>
         public static async Task WorkpieceBlowingAsync(float? atomizingNozzlePositionY, int? blowTime = null, IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
+            float xSpeed = 30, ySpeed = 20;
+            InitialPositionModel? initPos = await GetInitialPositionAsync();
+            if (initPos is not null)
+            {
+                xSpeed = initPos.AlignInitSpeedX.ToFloat(xSpeed);
+                ySpeed = initPos.AlignInitSpeedY.ToFloat(ySpeed);
+            }
             UserDefineDataModel userDefineData = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
             eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始工件吹气..."));
             try
             {
                 await PlcControl.tagControl.wholeDevice.OpenWorkpieceBlowingAsync();
-                await PlcControl.tagControl.cutting.RunMotionAsync(userDefineData.AtomizingNozzlePositionX.ToFloat(), atomizingNozzlePositionY ?? userDefineData.AtomizingNozzlePositionY.ToFloat(), token);
+                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(userDefineData.AtomizingNozzlePositionX.ToFloat(), xSpeed, token);
+                await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(atomizingNozzlePositionY ?? userDefineData.AtomizingNozzlePositionY.ToFloat(), ySpeed, token);
                 int blowDuration = blowTime ?? userDefineData.BlowTime.ToInt();
                 await Task.Delay(TimeSpan.FromSeconds(blowDuration), token);
             }
@@ -1984,7 +2001,7 @@ namespace 精密切割系统.Helpers
             return CommonResult<FileTableItemChModel>.Success(chModels[chSeq - 1]);
         }
 
-        public static async Task<CommonResult<List<CutStep>>> GenerateSingleSideCutStepListAsync(bool isOpenPrecut)
+        public static async Task<CommonResult<List<CutStep>>> GenerateSingleSideCutStepListAsync()
         {
             //获取功能选择数据
             var selectionModels = await SqlHelper.TableAsync<FunctionSelectionModel>().Where(t => t.Id == 1).ToListAsync();
@@ -2078,26 +2095,6 @@ namespace 精密切割系统.Helpers
             }
             //移除最后多余的一刀
             cutSteps.RemoveAt(cutSteps.Count - 1);
-            if (isOpenPrecut)
-            {
-                CommonResult<List<float>> preCutSpeedResult = AutoCutUtils.GetPreCutSpeedList();
-                if (!preCutSpeedResult.IsSuccess || preCutSpeedResult.Data is null)
-                {
-                    return CommonResult<List<CutStep>>.Failure(preCutSpeedResult.Message);
-                }
-                List<float> speeds = preCutSpeedResult.Data;
-                if (speeds.Count > cutSteps.Count)
-                {
-                    speeds = speeds.GetRange(0, cutSteps.Count);
-                }
-                for (int i = 0; i < speeds.Count; i++)
-                {
-                    if (speeds[i] < cutSteps[i].Speed)
-                    {
-                        cutSteps[i] = cutSteps[i] with { Speed = speeds[i] };
-                    }
-                }
-            }
             if (cutSteps.Count == 0)
             {
                 return CommonResult<List<CutStep>>.Failure("未生成有效切割步骤！");
@@ -2105,13 +2102,13 @@ namespace 精密切割系统.Helpers
             return CommonResult<List<CutStep>>.Success(cutSteps);
         }
 
-        public static async Task<CommonResult<List<CutStep>>> GenerateCutStepListAsync(Dictionary<string, ChData> chDictionary, bool isOpenPrecut)
+        public static async Task<CommonResult<List<ChCutStep>>> GenerateCutStepListAsync(Dictionary<string, ChData> chDictionary)
         {
             //获取功能选择数据
             var selectionModels = await SqlHelper.TableAsync<FunctionSelectionModel>().Where(t => t.Id == 1).ToListAsync();
             if (selectionModels.Count <= 0)
             {
-                return CommonResult<List<CutStep>>.Failure("功能选择配置异常！");
+                return CommonResult<List<ChCutStep>>.Failure("功能选择配置异常！");
             }
             FunctionSelectionModel functionModel = selectionModels[0];
             bool isDeep = functionModel.DepthStepsFunction;
@@ -2119,16 +2116,16 @@ namespace 精密切割系统.Helpers
             CommonResult<FileTableItemModel> fileTableItemResult = await GetFileTableItemModelAsync();
             if (!fileTableItemResult.IsSuccess || fileTableItemResult.Data is null)
             {
-                return CommonResult<List<CutStep>>.Failure(fileTableItemResult.Message);
+                return CommonResult<List<ChCutStep>>.Failure(fileTableItemResult.Message);
             }
             FileTableItemModel fileTableItem = fileTableItemResult.Data;
             string cuttingChSeq = fileTableItem.CuttingChSeq;
             // 参数校验
             if (fileTableItem.SpindleRev == 0 || fileTableItem.SpindleRev > 30000)
             {
-                return CommonResult<List<CutStep>>.Failure("切割转速配置错误！");
+                return CommonResult<List<ChCutStep>>.Failure("切割转速配置错误！");
             }
-            List<CutStep> cutSteps = [];
+            List<ChCutStep> cutSteps = [];
             // 查询通道信息
             List<FileTableItemChModel> chModels = await SqlHelper.TableAsync<FileTableItemChModel>().Where(t => t.ItemId == fileTableItem.Id).ToListAsync();
             int[] chSeqs = Tools.StringToIntegerArray(cuttingChSeq);
@@ -2136,7 +2133,7 @@ namespace 精密切割系统.Helpers
             {
                 if (!chDictionary.TryGetValue(string.Format(GlobalParams.StringFormatCH, chSeq), out var chData))
                 {
-                    return CommonResult<List<CutStep>>.Failure($"通道{chSeq}数据异常！");
+                    return CommonResult<List<ChCutStep>>.Failure($"通道{chSeq}数据异常！");
                 }
                 FileTableItemChModel ch = chModels[chSeq - 1];
                 float[] setBladeHeight = Tools.StringToFloatArray(ch.BladeHeight);// 设置的刀片高度
@@ -2149,11 +2146,11 @@ namespace 精密切割系统.Helpers
                 int maxIndex = AreIndexesContinuous(setBladeHeight, feedSpeeds, yIndexs, repeatTimes);
                 if (maxIndex == -1)
                 {
-                    return CommonResult<List<CutStep>>.Failure("切割参数错误！");
+                    return CommonResult<List<ChCutStep>>.Failure("切割参数错误！");
                 }
                 if (cutDepths.Length <= maxIndex)
                 {
-                    return CommonResult<List<CutStep>>.Failure("切割深度参数错误！");
+                    return CommonResult<List<ChCutStep>>.Failure("切割深度参数错误！");
                 }
                 // 生成子序列
                 List<string> repetitions = [.. loops];
@@ -2188,45 +2185,25 @@ namespace 精密切割系统.Helpers
                 int chCutLines = Tools.GetIntStringValue(ch.CutLine);
                 if (chCutLines == 0)
                 {
-                    cutSteps.AddRange(tempCutSteps);
+                    cutSteps.Add(new ChCutStep(chData.ChName, tempCutSteps));
                 }
                 else if (chCutLines > tempCutSteps.Count)
                 {
-                    cutSteps.AddRange(Enumerable.Range(0, chCutLines).Select(i => tempCutSteps[i % tempCutSteps.Count]));
+                    cutSteps.Add(new ChCutStep(chData.ChName, Enumerable.Range(0, chCutLines).Select(i => tempCutSteps[i % tempCutSteps.Count]).ToList()));
                 }
                 else
                 {
-                    cutSteps.AddRange(tempCutSteps.GetRange(0, chCutLines));
-                }
-            }
-            if (isOpenPrecut)
-            {
-                CommonResult<List<float>> preCutSpeedResult = GetPreCutSpeedList();
-                if (!preCutSpeedResult.IsSuccess || preCutSpeedResult.Data is null)
-                {
-                    return CommonResult<List<CutStep>>.Failure(preCutSpeedResult.Message);
-                }
-                List<float> speeds = preCutSpeedResult.Data;
-                if (speeds.Count > cutSteps.Count)
-                {
-                    speeds = speeds.GetRange(0, cutSteps.Count);
-                }
-                for (int i = 0; i < speeds.Count; i++)
-                {
-                    if (speeds[i] < cutSteps[i].Speed)
-                    {
-                        cutSteps[i] = cutSteps[i] with { Speed = speeds[i] };
-                    }
+                    cutSteps.Add(new ChCutStep(chData.ChName, tempCutSteps.GetRange(0, chCutLines)));
                 }
             }
             if (cutSteps.Count == 0)
             {
-                return CommonResult<List<CutStep>>.Failure("未生成有效切割步骤！");
+                return CommonResult<List<ChCutStep>>.Failure("未生成有效切割步骤！");
             }
-            return CommonResult<List<CutStep>>.Success(cutSteps);
+            return CommonResult<List<ChCutStep>>.Success(cutSteps);
         }
 
-        public static async Task<CommonResult<List<CutStep>>> GenerateCutStepListAsync(bool isOpenPrecut)
+        public static async Task<CommonResult<List<CutStep>>> GenerateCutStepListAsync()
         {
             //获取功能选择数据
             var selectionModels = await SqlHelper.TableAsync<FunctionSelectionModel>().Where(t => t.Id == 1).ToListAsync();
@@ -2316,26 +2293,26 @@ namespace 精密切割系统.Helpers
                 //移除最后多余的一刀
                 cutSteps.RemoveAt(cutSteps.Count - 1);
             }
-            if (isOpenPrecut)
-            {
-                CommonResult<List<float>> preCutSpeedResult = GetPreCutSpeedList();
-                if (!preCutSpeedResult.IsSuccess || preCutSpeedResult.Data is null)
-                {
-                    return CommonResult<List<CutStep>>.Failure(preCutSpeedResult.Message);
-                }
-                List<float> speeds = preCutSpeedResult.Data;
-                if (speeds.Count > cutSteps.Count)
-                {
-                    speeds = speeds.GetRange(0, cutSteps.Count);
-                }
-                for (int i = 0; i < speeds.Count; i++)
-                {
-                    if (speeds[i] < cutSteps[i].Speed)
-                    {
-                        cutSteps[i] = cutSteps[i] with { Speed = speeds[i] };
-                    }
-                }
-            }
+            //if (isOpenPrecut)
+            //{
+            //    CommonResult<List<float>> preCutSpeedResult = GetPreCutSpeedList();
+            //    if (!preCutSpeedResult.IsSuccess || preCutSpeedResult.Data is null)
+            //    {
+            //        return CommonResult<List<CutStep>>.Failure(preCutSpeedResult.Message);
+            //    }
+            //    List<float> speeds = preCutSpeedResult.Data;
+            //    if (speeds.Count > cutSteps.Count)
+            //    {
+            //        speeds = speeds.GetRange(0, cutSteps.Count);
+            //    }
+            //    for (int i = 0; i < speeds.Count; i++)
+            //    {
+            //        if (speeds[i] < cutSteps[i].Speed)
+            //        {
+            //            cutSteps[i] = cutSteps[i] with { Speed = speeds[i] };
+            //        }
+            //    }
+            //}
             if (cutSteps.Count == 0)
             {
                 return CommonResult<List<CutStep>>.Failure("未生成有效切割步骤！");
@@ -2451,6 +2428,10 @@ namespace 精密切割系统.Helpers
                 await Task.Delay(500);
                 mainWindow.IsEnabled = true;
                 return CommonResult.Success();
+            }
+            if (!await PlcControl.tagControl.wholeDevice.IsOpenVacuumSwitchAsync())
+            {
+                return CommonResult.Failure("工件真空未打开！");
             }
             InitialPositionModel? initPos = await GetInitialPositionAsync();
             if (initPos is null)

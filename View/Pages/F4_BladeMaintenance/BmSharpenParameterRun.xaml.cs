@@ -93,7 +93,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 MaterialSnack(sharpenParamResult.Message, SnackType.WARNING);
                 return;
             }
-            CommonResult<List<CutStep>> cutStepResult = await GenerateCutStepListAsync();
+            CommonResult<List<ChCutStep>> cutStepResult = await GenerateCutStepListAsync();
             if (!cutStepResult.IsSuccess || cutStepResult.Data is null)
             {
                 MaterialSnack(cutStepResult.Message, SnackType.WARNING);
@@ -109,7 +109,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             bladeHeight.Text = bmSharpenParameter.CutHeight.ToString();
             FeedSpeed.Text = bmSharpenParameter.MoCutOneSpeed;
             currentCutNum.Text = "0";
-            totalCutNum.Text = cutStepResult.Data.Count.ToString();
+            totalCutNum.Text = cutStepResult.Data.First().CutSteps.Count.ToString();
             dirLightRatio.Text = Math.Round(GlobalParams.intensityRatio * 100, 2).ToString();
             _ = MonitoringAlarmAsync(_monitoringAlarmCts.Token);
             Stopwatch stopwatch = Stopwatch.StartNew();
@@ -303,12 +303,12 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             catch (OperationCanceledException) { }
         }
 
-        private async Task<CommonResult<List<CutStep>>> GenerateCutStepListAsync()
+        private async Task<CommonResult<List<ChCutStep>>> GenerateCutStepListAsync()
         {
             CommonResult<BmSharpenParameterModel> result = await GetBmSharpenParameterModelAsync();
             if (!result.IsSuccess || result.Data is null)
             {
-                return CommonResult<List<CutStep>>.Failure(result.Message);
+                return CommonResult<List<ChCutStep>>.Failure(result.Message);
             }
             BmSharpenParameterModel bmSharpenParameter = result.Data;
             var cutDataList = new List<(int, float)>()
@@ -337,18 +337,19 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 }
             }
             int chCutLines = bmSharpenParameter.CoCutNum;
-            if (chCutLines == 0)
+            if (chCutLines != 0)
             {
-                return CommonResult<List<CutStep>>.Success(cutSteps);
+                if (chCutLines > cutSteps.Count)
+                {
+                    cutSteps = Enumerable.Range(0, chCutLines).Select(i => cutSteps[i % cutSteps.Count]).ToList();
+                }
+                else
+                {
+                    cutSteps = cutSteps.GetRange(0, chCutLines);
+                }
             }
-            else if (chCutLines > cutSteps.Count)
-            {
-                return CommonResult<List<CutStep>>.Success(Enumerable.Range(0, chCutLines).Select(i => cutSteps[i % cutSteps.Count]).ToList());
-            }
-            else
-            {
-                return CommonResult<List<CutStep>>.Success(cutSteps.GetRange(0, chCutLines));
-            }
+
+            return CommonResult<List<ChCutStep>>.Success(new List<ChCutStep>() { new ChCutStep(GlobalParams.CH1, cutSteps) });
         }
 
         private async Task<CommonResult<BmSharpenParameterModel>> GetBmSharpenParameterModelAsync()

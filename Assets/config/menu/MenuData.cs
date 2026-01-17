@@ -9,6 +9,7 @@ using 精密切割系统.Helpers;
 using 精密切割系统.View.Pages;
 using 精密切割系统.View.Pages.F2_ManualOperation;
 using 精密切割系统.View.Pages.F4_BladeMaintenance;
+using 精密切割系统.View.Pages.F5_GeneralEfficiency;
 using 精密切割系统.ViewModel;
 
 namespace 精密切割系统.Assets.config.menu
@@ -107,6 +108,7 @@ namespace 精密切割系统.Assets.config.menu
         {
             var list = new List<MenuBean>();
             //list.Add(new MenuBean(502, "测量维护", "/Assets/icon/menu_5/menu_5_2.png", "/Assets/icon/menu_5/menu_5_2_white.png"));
+            list.Add(new MenuBean(0, "吸盘更换", "VacuumOutline", "SawBlade", 4, nameof(SuctionCupReplacement)));
             list.Add(new MenuBean(601, "对焦维护", "FocusAuto", "/Assets/icon/menu_6/menu_6_1_white.png", 2, "Pages/F4_BladeMaintenance/FocusMaintenanceConf"));
             list.Add(new MenuBean(503, "参数设定", "/Assets/icon/menu_5/menu_5_3.png", "/Assets/icon/menu_5/menu_5_3_white.png", 2, "Pages/F5_GeneralEfficiency/F5_3_1_OperationData"));
             list.Add(new MenuBean(520, "轴空运行", "/Assets/icon/menu_5/menu_5_2.png", "/Assets/icon/menu_5/menu_5_2_white.png", 3, ""));

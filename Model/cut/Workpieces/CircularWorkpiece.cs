@@ -56,24 +56,38 @@ namespace 精密切割系统.Model.cut.Workpieces
 
         public bool CheckCutDistance(CutDirection cutDirection, float cutSize)
         {
+            float currentY = _currentY;
             //切割距离达到最终位置
             if (cutDirection == CutDirection.Backward)
             {
-                if (_center.Y - WorkpieceRadius - _currentY + cutSize >= - 5)
+                currentY -= cutSize;
+                if (_center.Y - WorkpieceRadius - currentY + cutSize >= -5)
                 {
                     return false;
                 }
+            }
+            if (cutDirection == CutDirection.Forward)
+            {
+                currentY += cutSize;
+                if (_center.Y + WorkpieceRadius - currentY - cutSize <= 5)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public void UpdateToNextCutPosition(CutDirection cutDirection, float cutSize)
+        {
+            //切割距离达到最终位置
+            if (cutDirection == CutDirection.Backward)
+            {
                 _currentY -= cutSize;
             }
             if (cutDirection == CutDirection.Forward)
             {
-                if (_center.Y + WorkpieceRadius - _currentY - cutSize <= 5)
-                {
-                    return false;
-                }
                 _currentY += cutSize;
             }
-            return true;
         }
 
         public void Reset(float currentY)
