@@ -108,11 +108,16 @@ namespace 精密切割系统.ViewModel
         protected override void InitBottomButton()
         {
             base.InitBottomButton();
-            AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
-            AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
-            AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
-            AddBottomButton(ButtonParams.BlueButton("预切启动", "/Assets/icon/tab_1/02/tab_27.png", OpenPrecut));
-            AddBottomButton(ButtonParams.BlueButton("刀片状态信息", "/Assets/icon/tab_1/02/tab_27.png", NavigateToBladeInfo));
+            switch (GlobalParams.DeviceModel)
+            {
+                case GlobalParams.Device_321:
+                    AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
+                    AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
+                    AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
+                    AddBottomButton(ButtonParams.BlueButton("预切启动", "/Assets/icon/tab_1/02/tab_27.png", OpenPrecut));
+                    AddBottomButton(ButtonParams.BlueButton("刀片状态信息", "/Assets/icon/tab_1/02/tab_27.png", NavigateToBladeInfo));
+                    break;
+            }
         }
 
         private void NavigateToBladeInfo()
@@ -285,6 +290,12 @@ namespace 精密切割系统.ViewModel
                     return;
                 }
             }
+            var currentY = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync();
+            if (currentY is null)
+            {
+                ShowWarnMessageNavigateHome("获取Y轴当前位置失败！");
+                return;
+            }
             if (!GlobalParams.HasFullyAutomatic)
             {
                 await PlcControl.tagControl.wholeDevice.CloseCameraLensCapAsync();
@@ -297,7 +308,7 @@ namespace 精密切割系统.ViewModel
                 _ = MonitoringAlarmAsync(_monitoringCts.Token);
                 _ = MonitoringCutProgressAsync(_monitoringCts.Token);
                 CutStep firtStep = cutSteps.First().CutSteps.First();
-                float cutY = firtStep.IsAbsolute ? firtStep.ChannelStartY : (await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0).ToActualY() + firtStep.ChannelStartY;
+                float cutY = firtStep.IsAbsolute ? firtStep.ChannelStartY : currentY.Value.ToActualY() - firtStep.ChannelStartY;
                 float measureHeightZ = 0;
                 if (bmParameter.IsAutomHeightMeasureBeforeCutting)
                 {

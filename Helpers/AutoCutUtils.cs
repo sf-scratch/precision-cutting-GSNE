@@ -2001,13 +2001,13 @@ namespace 精密切割系统.Helpers
             return CommonResult<FileTableItemChModel>.Success(chModels[chSeq - 1]);
         }
 
-        public static async Task<CommonResult<List<CutStep>>> GenerateSingleSideCutStepListAsync()
+        public static async Task<CommonResult<List<ChCutStep>>> GenerateSingleSideCutStepListAsync()
         {
             //获取功能选择数据
             var selectionModels = await SqlHelper.TableAsync<FunctionSelectionModel>().Where(t => t.Id == 1).ToListAsync();
             if (selectionModels.Count <= 0)
             {
-                return CommonResult<List<CutStep>>.Failure("功能选择配置异常！");
+                return CommonResult<List<ChCutStep>>.Failure("功能选择配置异常！");
             }
             FunctionSelectionModel functionModel = selectionModels[0];
             bool isDeep = functionModel.DepthStepsFunction;
@@ -2015,22 +2015,23 @@ namespace 精密切割系统.Helpers
             CommonResult<FileTableItemModel> fileTableItemResult = await GetFileTableItemModelAsync();
             if (!fileTableItemResult.IsSuccess || fileTableItemResult.Data is null)
             {
-                return CommonResult<List<CutStep>>.Failure(fileTableItemResult.Message);
+                return CommonResult<List<ChCutStep>>.Failure(fileTableItemResult.Message);
             }
             FileTableItemModel fileTableItem = fileTableItemResult.Data;
             string cuttingChSeq = fileTableItem.CuttingChSeq;
             // 参数校验
             if (fileTableItem.SpindleRev == 0 || fileTableItem.SpindleRev > 30000)
             {
-                return CommonResult<List<CutStep>>.Failure("切割转速配置错误！");
+                return CommonResult<List<ChCutStep>>.Failure("切割转速配置错误！");
             }
             List<CutStep> cutSteps = [];
             // 查询通道信息
             List<FileTableItemChModel> chModels = await SqlHelper.TableAsync<FileTableItemChModel>().Where(t => t.ItemId == fileTableItem.Id).ToListAsync();
-            int? currentCh = RegexMatchUtils.ExtractChNumber(CurrentUtils.GetCurrentCh());
+            string chStr = CurrentUtils.GetCurrentCh();
+            int? currentCh = RegexMatchUtils.ExtractChNumber(chStr);
             if (currentCh is null)
             {
-                return CommonResult<List<CutStep>>.Failure("当前通道信息错误！");
+                return CommonResult<List<ChCutStep>>.Failure("当前通道信息错误！");
             }
             float thetaAlignDeg = ThetaAlignService.Instance.ThetaAlignCompletedDeg ?? await PlcControl.tagControl.ThetaAxis.GetCurrentLocationAsync() ?? 0;
             int[] chSeqs = Tools.StringToIntegerArray(cuttingChSeq);
@@ -2046,11 +2047,11 @@ namespace 精密切割系统.Helpers
             int maxIndex = AreIndexesContinuous(setBladeHeight, feedSpeeds, yIndexs, repeatTimes);
             if (maxIndex == -1)
             {
-                return CommonResult<List<CutStep>>.Failure("切割参数错误！");
+                return CommonResult<List<ChCutStep>>.Failure("切割参数错误！");
             }
             if (cutDepths.Length <= maxIndex)
             {
-                return CommonResult<List<CutStep>>.Failure("切割深度参数错误！");
+                return CommonResult<List<ChCutStep>>.Failure("切割深度参数错误！");
             }
             // 生成子序列
             List<string> repetitions = [.. loops];
@@ -2076,10 +2077,8 @@ namespace 精密切割系统.Helpers
             }
             if (tempCutSteps.Count == 0)
             {
-                return CommonResult<List<CutStep>>.Failure("未生成有效切割步骤！");
+                return CommonResult<List<ChCutStep>>.Failure("未生成有效切割步骤！");
             }
-            //增加第一刀不跳步进
-            cutSteps.Add(tempCutSteps.First() with { NextStepDistance = 0 });
             int chCutLines = Tools.GetIntStringValue(ch.CutLine);
             if (chCutLines == 0)
             {
@@ -2093,13 +2092,11 @@ namespace 精密切割系统.Helpers
             {
                 cutSteps.AddRange(tempCutSteps.GetRange(0, chCutLines));
             }
-            //移除最后多余的一刀
-            cutSteps.RemoveAt(cutSteps.Count - 1);
             if (cutSteps.Count == 0)
             {
-                return CommonResult<List<CutStep>>.Failure("未生成有效切割步骤！");
+                return CommonResult<List<ChCutStep>>.Failure("未生成有效切割步骤！");
             }
-            return CommonResult<List<CutStep>>.Success(cutSteps);
+            return CommonResult<List<ChCutStep>>.Success(new List<ChCutStep>() { new ChCutStep(chStr, cutSteps) });
         }
 
         public static async Task<CommonResult<List<ChCutStep>>> GenerateCutStepListAsync(Dictionary<string, ChData> chDictionary)
@@ -2166,7 +2163,7 @@ namespace 精密切割系统.Helpers
                         float offsetY = yIndexs[index];
                         float thetaDeg = chData.AfterCalibrationThetaDeg;
                         bool isAbsolute = ch.ComBoxCutMethod.Equals("绝对");
-                        float channelStartY = isAbsolute ? ch.AbsoluteCutPosition.ToFloat() : chData.AfterCalibrationYPosition + ch.RelativeCutPosition.ToFloat();
+                        float channelStartY = isAbsolute ? ch.AbsoluteCutPosition.ToFloat() : chData.AfterCalibrationYPosition - ch.RelativeCutPosition.ToFloat();
                         float offsetX = ch.OffsetX.ToFloat();
                         bool isAlternatingCuttingStroke = ch.CutMode == CutOperateUtils.B_ZKEEP;
                         int channelNum = chSeq;
@@ -2178,10 +2175,6 @@ namespace 精密切割系统.Helpers
                 {
                     continue;
                 }
-                //增加第一刀不跳步进
-                tempCutSteps.Add(tempCutSteps.First() with { NextStepDistance = 0 });
-                //移除最后多余的一刀
-                tempCutSteps.RemoveAt(tempCutSteps.Count - 1);
                 int chCutLines = Tools.GetIntStringValue(ch.CutLine);
                 if (chCutLines == 0)
                 {
@@ -2275,8 +2268,6 @@ namespace 精密切割系统.Helpers
                 {
                     continue;
                 }
-                //增加第一刀不跳步进
-                cutSteps.Add(tempCutSteps.First() with { NextStepDistance = 0 });
                 int chCutLines = Tools.GetIntStringValue(ch.CutLine);
                 if (chCutLines == 0)
                 {
@@ -2290,8 +2281,6 @@ namespace 精密切割系统.Helpers
                 {
                     cutSteps.AddRange(tempCutSteps.GetRange(0, chCutLines));
                 }
-                //移除最后多余的一刀
-                cutSteps.RemoveAt(cutSteps.Count - 1);
             }
             //if (isOpenPrecut)
             //{

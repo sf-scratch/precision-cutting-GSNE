@@ -222,6 +222,8 @@ namespace 精密切割系统.Model.cut
                 float currentKnifeRemainTime = 60; //初始值
                 LineSegment? preLine = null;
                 float? preCutSpeed = null;
+                CutServiceProcess? preFirstCutServiceProcess = null;
+                CutServiceProcess? preNextCutServiceProcess = null;
                 int cutTimes = 0;
                 foreach (ChCutStep chCutStep in cutStepList)
                 {
@@ -231,7 +233,10 @@ namespace 精密切割系统.Model.cut
                     }
                     List<CutStep> cutSteps = chCutStep.CutSteps;
                     _currentChannelNum = cutSteps.First().ChannelNum;
-                    workpiece.Reset(cutSteps.First().ChannelStartY);
+                    if (cutSteps.First().IsAbsolute)
+                    {
+                        workpiece.Reset(cutSteps.First().ChannelStartY);
+                    }
                     (firstCheck, nextCheck) = GetScratchInspectionFlagAndInterval(chCutStep.ChName, scratchInspection);
                     for (int currentChCutTimes = 0; currentChCutTimes < cutSteps.Count && cutTimes < cutLine; currentChCutTimes++, cutTimes++)
                     {
@@ -267,8 +272,6 @@ namespace 精密切割系统.Model.cut
                             //    }
                             //    _isContinueBeyondWorkpiece = true;
                             //}
-                            //更新工件到下一切割位置
-                            workpiece.UpdateToNextCutPosition(_cutDirection, cutStep.NextStepDistance);
                             // 更新切割步骤的NextStepDistance为0，防止累加
                             cutSteps[currentChCutTimes] = cutStep with { NextStepDistance = 0 };
                             //检查是否暂停
@@ -284,6 +287,7 @@ namespace 精密切割系统.Model.cut
                             float actualCutHeight = cutStep.CutHeight + _depthCompensationValue - currentAutomaticCompensationCutHeight;
                             float targetEndZ = bladeContactWorkingDiscZ1 - actualCutHeight;
                             float startZ = bladeContactWorkingDiscZ1 - workpiece.WorkThickness - workpiece.TapeThickness - bladeLiftingHeight;
+                            float depthEntry = bladeContactWorkingDiscZ1 - workpiece.WorkThickness - workpiece.TapeThickness - 0.5f;
                             float cutLength = MathF.Abs(line.EndPoint.X - line.StartPoint.X);
                             float cutSpeed;
                             if (_feedSpeedCompCompensationValue != 0)
@@ -323,17 +327,21 @@ namespace 精密切割系统.Model.cut
                                 }
                             }
                             endZList.Add(targetEndZ);
-                            float showCutSpeed;
+                            float compensateY = 0;
                             foreach (float endZ in endZList)
                             {
                                 stopwatch.Restart();
                                 await PlcControl.tagControl.ThetaAxis.SetAbsoluteSpeedAsync(GlobalParams.ThetaDefaultSpeed);
-                                var compensateY = await PlcControl.GetCompensateAsync(PlcControl.tagControl.Yaxis, line.StartPoint.Y);
-                                showCutSpeed = preCutSpeed is null ? cutSpeed : preCutSpeed.Value;
+                                compensateY = await PlcControl.GetCompensateAsync(PlcControl.tagControl.Yaxis, line.StartPoint.Y);
+                                if (preFirstCutServiceProcess == null)
+                                {
+                                    preFirstCutServiceProcess = new CutServiceProcess(actualCutHeight, cutSpeed, compensateY, cutSteps.Count, currentChCutTimes + 1, chCutStep.ChName);
+                                }
                                 //触发切割进度更新事件
-                                CutServiceProcessChanged?.Invoke(new CutServiceProcess(actualCutHeight, showCutSpeed, compensateY, cutSteps.Count, currentChCutTimes));
+                                CutServiceProcessChanged?.Invoke(preFirstCutServiceProcess.Value);
+                                preFirstCutServiceProcess = new CutServiceProcess(actualCutHeight, cutSpeed, compensateY, cutSteps.Count, currentChCutTimes + 1, chCutStep.ChName);
                                 //设置切割参数
-                                await PlcControl.tagControl.cutting.SetCutParamsAsync(cutSpeed, endZ, startZ, startX, endX, compensateY, "0", cutStep.ThetaDeg, _spindleRev, true);
+                                await PlcControl.tagControl.cutting.SetCutParamsAsync(cutSpeed, endZ, startZ, startX, endX, compensateY, "0", cutStep.ThetaDeg, _spindleRev, depthEntry);
                                 //当前切割次数
                                 int? curCutNum = await PlcControl.tagControl.cutting.GetCutNumAsync();
                                 if (curCutNum == null)
@@ -374,16 +382,19 @@ namespace 精密切割系统.Model.cut
                                     new RunLogsViewModel("主轴转速", _spindleRev.ToString()),
                                     new RunLogsViewModel("震动幅度", string.Join(" ", monitorResult))
                                     );
-
                                 stopwatch.Stop();
                                 if (preLine is not null)
                                 {
                                     pathCalculator.ReportPass(cutLength, (float)stopwatch.Elapsed.TotalSeconds);
                                 }
                             }
-                            showCutSpeed = preCutSpeed is null ? cutSpeed : preCutSpeed.Value;
+                            if (preNextCutServiceProcess == null)
+                            {
+                                preNextCutServiceProcess = new CutServiceProcess(actualCutHeight, cutSpeed, compensateY, cutSteps.Count, currentChCutTimes + 1, chCutStep.ChName, cutLength, pathCalculator.EstimateRemainingTime(), true);
+                            }
                             //触发切割进度更新事件
-                            CutServiceProcessChanged?.Invoke(new CutServiceProcess(actualCutHeight, cutSpeed, default, cutSteps.Count, currentChCutTimes, cutLength, chCutStep.ChName, pathCalculator.EstimateRemainingTime(), true));
+                            CutServiceProcessChanged?.Invoke(preNextCutServiceProcess.Value);
+                            preNextCutServiceProcess = new CutServiceProcess(actualCutHeight, cutSpeed, compensateY, cutSteps.Count, currentChCutTimes + 1, chCutStep.ChName, cutLength, pathCalculator.EstimateRemainingTime(), true);
                             preLine = line;
                             preCutSpeed = cutSpeed;
                         }
@@ -397,8 +408,11 @@ namespace 精密切割系统.Model.cut
                         }
                         catch (Exception ex)
                         {
+                            Tools.LogDebug(ex.ToString());
                             return RunResult.Fail($"执行切割步骤失败！{ex.Message}");
                         }
+                        //更新工件到下一切割位置
+                        workpiece.UpdateToNextCutPosition(_cutDirection, cutStep.NextStepDistance);
                     }
                 }
             }

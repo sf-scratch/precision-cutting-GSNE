@@ -16,22 +16,26 @@ using 精密切割系统.ViewModel;
 namespace 精密切割系统.Model.cut
 {
     public class FullyAutoSharpenService
-	{
+    {
         private static readonly Lazy<FullyAutoSharpenService> _lazy = new(() => new FullyAutoSharpenService());
+
         public static FullyAutoSharpenService Instance
         {
             get { return _lazy.Value; }
         }
 
         public event Action<SharpenServiceProcess>? SharpenServiceProcessChanged;
+
         public event Action<LineSegment?>? SharpenServicePaused;
-        public event Action? RemindReplaceSharpenBoard; 
+
+        public event Action? RemindReplaceSharpenBoard;
+
         private TaskCompletionSource<CancellationToken?>? _continueTcs;
 
         /// <summary>
         /// 磨刀板尺寸
         /// </summary>
-        public readonly static DataRectangleF _sharpenRect = GlobalParams.SharpenRect;
+        public static readonly DataRectangleF _sharpenRect = GlobalParams.SharpenRect;
 
         /// <summary>
         /// 在磨刀几次后检测
@@ -159,6 +163,7 @@ namespace 精密切割系统.Model.cut
                         }
                         float bladeWaer = singleBladeWear * curSharpenTimes <= 0.1f ? singleBladeWear * curSharpenTimes : 0.1f;
                         float endZ = bladeContactWorkingDiscZ1 - sharpenParams.CutHeight + bladeWaer;
+                        float depthEntry = bladeContactWorkingDiscZ1 - sharpenParams.CutHeight - 0.5f;
                         float startZ = endZ - bladeLiftingHeight;
                         float sharpenSpeed = GetCutSpeed(sharpenParams.HightestCutSpeed);
                         //检查是否暂停
@@ -182,7 +187,7 @@ namespace 精密切割系统.Model.cut
                         SharpenServiceProcessChanged?.Invoke(new SharpenServiceProcess(endZ, sharpenSpeed, sharpenTimes + _finishedSharpenTimes, currentSharpenTimes + _finishedSharpenTimes));
                         await PlcControl.tagControl.ThetaAxis.SetAbsoluteSpeedAsync(GlobalParams.ThetaDefaultSpeed);
                         //设置磨刀参数
-                        await PlcControl.tagControl.cutting.SetCutParamsAsync(sharpenSpeed, endZ, startZ, line.StartPoint.X, line.EndPoint.X, line.StartPoint.Y, "0", _thetaDegQueue.Peek(), sharpenParams.SpindleRev);
+                        await PlcControl.tagControl.cutting.SetCutParamsAsync(sharpenSpeed, endZ, startZ, line.StartPoint.X, line.EndPoint.X, line.StartPoint.Y, "0", _thetaDegQueue.Peek(), sharpenParams.SpindleRev, depthEntry);
                         //开始磨刀
                         await PlcControl.tagControl.cutting.StartCutAsync();
                         try

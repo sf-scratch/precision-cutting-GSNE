@@ -2844,6 +2844,9 @@ namespace 精密切割系统.Driver
         // 差步Y轴运动位置
         public Tag yInterpolationMotion { get; set; }
 
+        // 当前切入深度
+        public Tag currentDepthEntry { get; set; }
+
         public Tag flangeRepairBegins { get; set; }
         public Tag detectedSparks { get; set; }
         public Tag spindleRevReach { get; set; }
@@ -3269,7 +3272,7 @@ namespace 精密切割系统.Driver
         /// <param name="yCutLocation">Y轴切割位置</param>
         /// <param name="spindleRev">主轴转速</param>
         public async Task SetCutParamsAsync(float feedSpeedValue, float zEndLocation, float zStartLocation, float xStartLoaction, float xEndLocation,
-            float yCutLocation, string checkStatus, float thetaDeg, int spindleRevValue, bool isCompensate = false)
+            float yCutLocation, string checkStatus, float thetaDeg, int spindleRevValue, float depthEntry)
         {
             float xSoftUpperLimit = Appsettings.PositiveLimitPositionX ?? 0;
             if (xEndLocation > xSoftUpperLimit)
@@ -3322,6 +3325,9 @@ namespace 精密切割系统.Driver
             //确认切割参数
             confirmParams.writeValue = "1";
             await keyencePlc.WriteTagAsync(confirmParams);
+            // 当前切入深度
+            currentDepthEntry.writeValue = depthEntry.ToString();
+            await keyencePlc.WriteTagAsync(currentDepthEntry);
         }
 
         /// <summary>

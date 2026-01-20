@@ -87,7 +87,7 @@ namespace 精密切割系统.ViewModel
                     return;
                 }
                 chData.AfterCalibrationThetaDeg = thetaDeg.Value;
-                chData.AfterCalibrationYPosition = yPosition.Value;
+                chData.AfterCalibrationYPosition = yPosition.Value.ToActualY();
                 if (_chQueue.Count > 0)
                 {
                     await UpdateCurrentChAsync(false);
@@ -114,7 +114,8 @@ namespace 精密切割系统.ViewModel
 
         protected override void InitBottomButton()
         {
-            base.InitBottomButton(); switch (GlobalParams.DeviceModel)
+            base.InitBottomButton();
+            switch (GlobalParams.DeviceModel)
             {
                 case GlobalParams.Device_321:
                     AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));

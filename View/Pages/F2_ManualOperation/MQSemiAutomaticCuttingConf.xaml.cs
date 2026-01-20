@@ -192,7 +192,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 MaterialSnack("未设置刀片外径！", SnackType.WARNING);
                 return;
             }
-            CommonResult<List<CutStep>> cutStepResult = await AutoCutUtils.GenerateSingleSideCutStepListAsync();
+            CommonResult<List<ChCutStep>> cutStepResult = await AutoCutUtils.GenerateSingleSideCutStepListAsync();
             if (!cutStepResult.IsSuccess || cutStepResult.Data is null)
             {
                 MaterialSnack(cutStepResult.Message, SnackType.WARNING);

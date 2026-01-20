@@ -38,7 +38,6 @@ using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.operate;
 using 精密切割系统.ViewModel;
 
-
 namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 {
     /// <summary>
@@ -329,6 +328,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             await PlcControl.tagControl.cutting.EnterCuttingModeAsync(token);
             float endZ = _measureHeigthY - _viewModel.BladeHeight.ToFloat();
             float startZ = _measureHeigthY - _viewModel.WorkThickness.ToFloat() - _viewModel.TapeThickness.ToFloat() - GlobalParams.BladeLiftingHeight;
+            float depthEntry = _measureHeigthY - _viewModel.WorkThickness.ToFloat() - _viewModel.TapeThickness.ToFloat() - 0.5f;
             try
             {
                 foreach (float thetaDeg in thetaDegs)
@@ -342,7 +342,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                     }
                     await PlcControl.tagControl.ThetaAxis.SetAbsoluteSpeedAsync(GlobalParams.ThetaDefaultSpeed);
                     //设置切割参数
-                    await PlcControl.tagControl.cutting.SetCutParamsAsync(_viewModel.CutSpeed.ToFloat(), endZ, startZ, _startX, _startX + _viewModel.WorkSize.ToFloat(), startY, "0", thetaDeg, _viewModel.SpindleSpeed.ToInt());
+                    await PlcControl.tagControl.cutting.SetCutParamsAsync(_viewModel.CutSpeed.ToFloat(), endZ, startZ, _startX, _startX + _viewModel.WorkSize.ToFloat(), startY, "0", thetaDeg, _viewModel.SpindleSpeed.ToInt(), depthEntry);
                     //开始切割信号
                     await PlcControl.tagControl.cutting.StartCutAsync();
                     //等待切割次数变化

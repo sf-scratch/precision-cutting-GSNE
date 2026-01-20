@@ -712,9 +712,14 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
 
         private void updateOperateLabel()
         {
-            _ = Dispatcher.BeginInvoke(new Action(() =>
+            _ = Dispatcher.BeginInvoke(new Action(async () =>
             {
                 TextBlock operateText = Tools.GetChildObject<TextBlock>(operatePage, "operateTxt3001");
+                for (int i = 0; i < 30 && operateText == null; i++)
+                {
+                    operateText = Tools.GetChildObject<TextBlock>(operatePage, "operateTxt3001");
+                    await Task.Delay(100);
+                }
                 if (operateText == null) return;
                 string defnName = chName;
                 if (chName.Equals(GlobalParams.CH1))

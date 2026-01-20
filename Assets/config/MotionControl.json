@@ -1404,6 +1404,13 @@
       "addr": "DM564",
       "name": "Y轴插补位置",
       "describe": "Y轴插补位置"
+    },
+    "currentDepthEntry": {
+      "defaultValue": "0",
+      "valueType": "float",
+      "addr": "DM1400",
+      "name": "当前切入深度",
+      "describe": "当前切入深度"
     }
   },
   "sparkRepairKnife": {
