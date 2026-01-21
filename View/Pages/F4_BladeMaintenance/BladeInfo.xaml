@@ -65,6 +65,9 @@
             <Label Content="刀片厚度" />
             <Controls:InputTextBox x:Name="bladeThickness" />
             <TextBlock Text="mm" />
+            <Label Content="刀架外径" />
+            <Controls:InputTextBox x:Name="toolHolderOuterDiameter" />
+            <TextBlock Grid.ColumnSpan="4" Text="mm" />
             <Label Content="第一次测高" />
             <Controls:InputTextBox x:Name="measureHeightFirst" IsEnabled="False" />
             <TextBlock Text="mm" />

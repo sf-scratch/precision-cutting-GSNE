@@ -68,6 +68,7 @@ namespace 精密切割系统.Helpers
                 db.CreateTable<BaselineCalibrationEntity>();
                 db.CreateTable<AutomaticCompensationCutHeightEntity>();
                 db.CreateTable<ScratchInspectionParametersEntity>();
+                db.CreateTable<BladeInfoEntity>();
             }
             catch (Exception ex)
             {

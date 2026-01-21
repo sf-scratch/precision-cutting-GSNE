@@ -86,17 +86,17 @@
                 <Label HorizontalAlignment="Center" Content="当前值" />
                 <Label />
                 <Label Content="测高高速段速度" />
-                <Controls:InputTextBox Text="{Binding Entity.MeasureHeightHighSpeed}" />
+                <Controls:InputTextBox Text="{Binding Entity.MeasureHeightHighSpeedPreset}" />
                 <Label Content="mm/s" />
                 <Controls:InputTextBox Text="{Binding Entity.MeasureHeightHighSpeed}" />
                 <Label Content="mm/s" />
                 <Label Content="测高低速段速度" />
-                <Controls:InputTextBox Text="{Binding Entity.MeasureHeightSlowSpeed}" />
+                <Controls:InputTextBox Text="{Binding Entity.MeasureHeightSlowSpeedPreset}" />
                 <Label Content="mm/s" />
-                <Controls:InputTextBox Text="{Binding Entity.MeasureHeightSlowSpeed}" />
+                <Controls:InputTextBox Text="{Binding Entity.MeasureHeightSlowSpeed}" XMax="0.08" />
                 <Label Content="mm/s" />
                 <Label Content="测高低速段范围" />
-                <Controls:InputTextBox Text="{Binding Entity.MeasureHeightSlowSpeedRange}" />
+                <Controls:InputTextBox Text="{Binding Entity.MeasureHeightSlowSpeedRangePreset}" />
                 <Label Content="mm" />
                 <Controls:InputTextBox Text="{Binding Entity.MeasureHeightSlowSpeedRange}" />
                 <Label Content="mm" />

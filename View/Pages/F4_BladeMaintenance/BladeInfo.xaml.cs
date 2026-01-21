@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using 精密切割系统.Assets.config.buttom;
 using 精密切割系统.database.db.modle;
+using 精密切割系统.Entities;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut;
@@ -44,7 +45,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             InitializeComponent();
         }
 
-        private void Page_Loaded(object sender, RoutedEventArgs e)
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             rightPage = mainWindow.rightFrame.Content as RightPage;
             rightPage.PanelAction.Visibility = Visibility.Visible;
@@ -59,10 +60,10 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             }
             NavigateUtils.ClearOperatePage();
             WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("预切关闭", "/Assets/icon/tab_1/02/tab_27.png", ClosePrecut));
-            InitData();
+            await InitDataAsync();
         }
 
-        private void InitData()
+        private async Task InitDataAsync()
         {
             bladeOuterDiameter.Text = Appsettings.BladeOuterDiameter?.ToString("F3");
             bladeThickness.Text = Appsettings.BladeThickness?.ToString("F3");
@@ -74,6 +75,8 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             afterClearDataCutLength.Text = (Appsettings.AfterClearDataCutLength / 1000 ?? 0).ToString("F2");
             measureHeightFirst.Text = Appsettings.MeasureHeightFirst?.ToString("F3");
             measureHeightLast.Text = Appsettings.MeasureHeightLast?.ToString("F3");
+            var bladeInfo = await SqlHelper.GetOrCreateEntityAsync(() => new BladeInfoEntity());
+            toolHolderOuterDiameter.Text = bladeInfo.ToolHolderOuterDiameter;
         }
 
         private void ClosePrecut()

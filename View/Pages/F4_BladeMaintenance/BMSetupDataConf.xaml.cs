@@ -32,7 +32,6 @@ using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.operate;
 using 精密切割系统.ViewModel;
 
-
 namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 {
     /// <summary>
@@ -154,6 +153,19 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             ViewModel.BladeOuterDiameter = Appsettings.BladeOuterDiameter?.ToString("F3") ?? string.Empty;
             var initialPosition = await SqlHelper.GetOrCreateEntityAsync(() => new InitialPositionModel());
             ViewModel.BladeSetupInitZ1 = initialPosition.BladeSetupInitZ1;
+            var caculateResult = await AutoCutUtils.CaculateActulMeasureHeightSlowSpeedRangedAsync(ViewModel.BMParameter.MeasureHeightSlowSpeedRange.ToFloat());
+            if (caculateResult.IsSuccess)
+            {
+                float measureHeightHighSpeed = ViewModel.BMParameter.MeasureHeightHighSpeed.ToFloat();
+                float measureHeightSlowSpeed = ViewModel.BMParameter.MeasureHeightSlowSpeed.ToFloat();
+                float measureHeightSlowSpeedRange = caculateResult.Data;
+                await PlcControl.tagControl.bladeMantance.SetMeasureHeightParams(measureHeightHighSpeed, measureHeightSlowSpeed, measureHeightSlowSpeedRange);
+            }
+            else
+            {
+                MaterialSnack(caculateResult.Message, SnackType.ERROR);
+                return;
+            }
         }
 
         private async void BtnSure_RightClicked(object? sender, bool e)

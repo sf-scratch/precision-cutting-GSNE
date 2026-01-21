@@ -39,7 +39,6 @@ using 精密切割系统.View.Pages.common;
 using 精密切割系统.View.Pages.F4_BladeMaintenance;
 using static NPOI.HSSF.Util.HSSFColor;
 
-
 namespace 精密切割系统.ViewModel
 {
     public class AutoCutRuningViewModel : CustomBindableBase
@@ -269,15 +268,8 @@ namespace 精密切割系统.ViewModel
                 // 测高的同时移动相机位置
                 RunStatus = AutoRunStatus.HeightMeasurementInProgress;
                 HeightMeasurementMode heightMeasurementMode = HeightMeasurementMode.Contact;
-                var caculateResult = AutoCutUtils.CaculateZAxisMaxDistance(LunguSksj.BladeOuterDiameter);
-                if (!caculateResult.IsSuccess)
-                {
-                    MaterialSnack(caculateResult.Message, SnackType.WARNING, 0, _eventAggregator);
-                    return;
-                }
                 // 设置测高参数
                 //await PlcControl.tagControl.bladeMantance.SetSetupParamsAsync(CurrentUtils.GetBladeHeightModel());
-                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(caculateResult.Data - 0.15f);
                 // 开始测高
                 CommonResult<float> firstHeightMeasurementZ = await AutoCutUtils.ProcessMeasureHeightAsync(heightMeasurementMode, _dialogService, _eventAggregator, _pauseCts.Token);
                 if (!firstHeightMeasurementZ.IsSuccess)

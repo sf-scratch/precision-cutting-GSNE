@@ -853,12 +853,6 @@
       "name": "测高开始",
       "describe": "测高开始"
     },
-    "setupZAxisMaxDistance": {
-      "valueType": "float",
-      "addr": "DM500",
-      "name": "刀片测高最大距离",
-      "describe": "刀片测高最大距离"
-    },
     "setupZAxisHighSpeed": {
       "valueType": "float",
       "addr": "DM502",
@@ -894,6 +888,24 @@
       "addr": "DM512",
       "name": "刀片测高计数",
       "describe": "刀片测高计数"
+    },
+    "measureHeightHighSpeed": {
+      "valueType": "float",
+      "addr": "DM1022",
+      "name": "测高高速段速度",
+      "describe": "测高高速段速度"
+    },
+    "measureHeightSlowSpeed": {
+      "valueType": "float",
+      "addr": "DM1026",
+      "name": "测高低速段速度",
+      "describe": "测高低速段速度"
+    },
+    "measureHeightSlowSpeedRanged": {
+      "valueType": "float",
+      "addr": "DM500",
+      "name": "测高低速段范围",
+      "describe": "测高低速段范围"
     }
   },
   "wholeDevice": {

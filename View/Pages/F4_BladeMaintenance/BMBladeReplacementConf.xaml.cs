@@ -18,6 +18,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using 精密切割系统.database.db.modle;
+using 精密切割系统.Entities;
 using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.common;
@@ -47,7 +48,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             _mainWindow = Application.Current.MainWindow as MainWindow;
         }
 
-        private void Page_Loaded(object sender, RoutedEventArgs e)
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             if (_mainWindow is null) return;
             _rightPage = _mainWindow.rightFrame.Content as RightPage;
@@ -62,7 +63,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             NavigateUtils.ClearOperatePage();
             //WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("换刀片", "SawBlade", ReplaceBladeAsync));
             WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("换工件", "Square", ReplaceWaferAsync));
-            InitData();
+            await InitDataAsync();
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -76,7 +77,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         {
             await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(60), _cts.Token);
             await AutoCutUtils.ReplaceBladeAsync(default, timeoutToken.Token);
-            InitData();
+            await InitDataAsync();
         }
 
         private async Task ReplaceWaferAsync()
@@ -85,7 +86,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             await AutoCutUtils.ReplaceWaferAsync(default, timeoutToken.Token);
         }
 
-        private void InitData()
+        private async Task InitDataAsync()
         {
             bladeOuterDiameter.Text = Appsettings.BladeOuterDiameter?.ToString("F3");
             bladeThickness.Text = Appsettings.BladeThickness?.ToString("F3");
@@ -97,12 +98,17 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             afterClearDataCutLength.Text = (Appsettings.AfterClearDataCutLength / 1000 ?? 0).ToString("F2");
             measureHeightFirst.Text = Appsettings.MeasureHeightFirst?.ToString("F3");
             measureHeightLast.Text = Appsettings.MeasureHeightLast?.ToString("F3");
+            var bladeInfo = await SqlHelper.GetOrCreateEntityAsync(() => new BladeInfoEntity());
+            toolHolderOuterDiameter.Text = bladeInfo.ToolHolderOuterDiameter;
         }
 
-        private void SaveData()
+        private async Task SaveDataAsync()
         {
             Appsettings.BladeOuterDiameter = bladeOuterDiameter.Text.ToFloat();
             Appsettings.BladeThickness = bladeThickness.Text.ToFloat();
+            var bladeInfo = await SqlHelper.GetOrCreateEntityAsync(() => new BladeInfoEntity());
+            bladeInfo.ToolHolderOuterDiameter = toolHolderOuterDiameter.Text;
+            await SqlHelper.UpdateAsync(bladeInfo);
         }
 
         private void BtnBack_RightClicked(object? sender, bool e)
@@ -110,11 +116,11 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             _mainWindow?.NavigateToPage("MainMenu");
         }
 
-        private void BladeReplaceSure(object? sender, bool e)
+        private async void BladeReplaceSure(object? sender, bool e)
         {
             try
             {
-                SaveData();
+                await SaveDataAsync();
                 MaterialSnack("换刀成功！", SnackType.SUCCESS);
             }
             catch (Exception ex)

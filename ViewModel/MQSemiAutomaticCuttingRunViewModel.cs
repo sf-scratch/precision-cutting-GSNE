@@ -44,6 +44,7 @@ namespace 精密切割系统.ViewModel
         private List<ChCutStep>? _cutSteps;
         private float _currentCutYPosition = 0;
         private string? _backPageName;
+        private CutServiceCompleteData? _completeData;
 
         private string _yAxisCutPosition;
 
@@ -162,17 +163,17 @@ namespace 精密切割系统.ViewModel
                                         if (AlarmConfig.Instance.TryGetActiveAlarms(alarms, out List<AlarmInfo> alarmInfos))
                                         {
                                             string alarmMessages = string.Join(",", alarmInfos.Select(a => a.Message));
-                                            _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"切割报警监控：{alarmMessages}"));
+                                            _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Error报警监控：{alarmMessages}"));
                                             await PauseAsync(PlcControl.tagControl.wholeDevice.OpenRedLightAsync);
                                         }
                                         else
                                         {
-                                            _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"切割报警监控：未获取到有效报警信息！{alarms}"));
+                                            _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Error报警监控：未获取到有效报警信息！{alarms}"));
                                         }
                                     }
                                     else
                                     {
-                                        _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"切割报警监控：读到空数据！"));
+                                        _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Error报警监控：读到空数据！"));
                                     }
                                 }
                             }
@@ -181,14 +182,46 @@ namespace 精密切割系统.ViewModel
                                 if (alarms != null && AlarmConfig.Instance.TryGetActiveAlarms(alarms, out List<AlarmInfo> alarmInfos))
                                 {
                                     string alarmMessages = string.Join(",", alarmInfos.Select(a => a.Message));
-                                    _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"切割报警监控：切割中途闪烁异常 {alarmMessages}"));
+                                    _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Error报警监控：切割中途闪烁异常 {alarmMessages}"));
                                 }
                             }
                         }
 
-                        if (AlarmConfig.Instance.HasTargetActiveAlarm("MR60111", "MR60112"))
+                        if (AlarmConfig.Instance.HasTargetActiveAlarm(out bool[]? targetAlarms, "MR60111", "MR60112"))
                         {
-                            await PauseAsync(PlcControl.tagControl.wholeDevice.OpenRedLightAsync);
+                            // 等待1秒钟再判断报警是否还存在
+                            await Task.Delay(1000, default);
+                            if (AlarmConfig.Instance.HasTargetActiveAlarm("MR60111", "MR60112"))
+                            {
+                                if (!_pauseCts.IsCancellationRequested)
+                                {
+                                    if (targetAlarms != null)
+                                    {
+                                        if (AlarmConfig.Instance.TryGetActiveAlarms(targetAlarms, out List<AlarmInfo> alarmInfos))
+                                        {
+                                            string alarmMessages = string.Join(",", alarmInfos.Select(a => a.Message));
+                                            _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Warn报警监控：{alarmMessages}"));
+                                            await PauseAsync(PlcControl.tagControl.wholeDevice.OpenRedLightAsync);
+                                        }
+                                        else
+                                        {
+                                            _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Warn报警监控：未获取到有效报警信息！{targetAlarms}"));
+                                        }
+                                    }
+                                    else
+                                    {
+                                        _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Warn报警监控：读到空数据！"));
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (targetAlarms != null && AlarmConfig.Instance.TryGetActiveAlarms(targetAlarms, out List<AlarmInfo> alarmInfos))
+                                {
+                                    string alarmMessages = string.Join(",", alarmInfos.Select(a => a.Message));
+                                    _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Warn报警监控：切割中途闪烁异常 {alarmMessages}"));
+                                }
+                            }
                         }
                     }
                     catch (Exception) { }
@@ -228,12 +261,12 @@ namespace 精密切割系统.ViewModel
                 //正在切割中
                 return;
             }
-            if (!GlobalParams.OnlineFlag)
-            {
-                SpeedManager.IsHighSpeed = false;
-                MaterialSnack($"切割中...", SnackType.WARNING, 0, _eventAggregator);
-                return;
-            }
+            //if (!GlobalParams.OnlineFlag)
+            //{
+            //    SpeedManager.IsHighSpeed = false;
+            //    MaterialSnack($"切割中...", SnackType.WARNING, 0, _eventAggregator);
+            //    return;
+            //}
             CommonResult checkResult = await SemiAutoCutService.CheckCutAsync();
             if (!checkResult.IsSuccess)
             {
@@ -330,6 +363,7 @@ namespace 精密切割系统.ViewModel
                     IWorkpieces workpiece = GenerateWorkpieces(fileTableItem, cutY);
                     _semiAutoCutService.CutServiceProcessChanged += CutService_CutServiceProcessChanged;
                     _semiAutoCutService.CutServicePaused += CutService_CutServicePaused;
+                    _semiAutoCutService.CutServiceCompleted += CutService_CutServiceCompleted;
                     float preCutMaxSpeed = cutSteps.First().CutSteps.First().Speed;
                     var preCutSpeedLis = AutoCutUtils.GetPreCutSpeedList(preCutMaxSpeed);
                     _semiAutoCutService.UpdatePreCutQueue(preCutSpeedLis);
@@ -341,21 +375,27 @@ namespace 精密切割系统.ViewModel
                         MaterialSnack($"{cutResult.Message}", SnackType.WARNING, 0, _eventAggregator);
                         return;
                     }
+                    //// 移动到最后一刀位置
+                    //if (_completeData != null)
+                    //{
+                    //    await AfterCompletedThenMoveToPositionAsync(_completeData);
+                    //}
                     stopwatch.Stop();
                     TimeSpan timeSpan = TimeSpan.FromSeconds(stopwatch.Elapsed.TotalSeconds);
                     string formattedTime = $"{timeSpan.Hours:D2}:{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}";
-                    await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(Appsettings.ThetaCenterPoint.X, default, _pauseCts.Token);
                     _ = PlcControl.tagControl.wholeDevice.OpenBuzzerAsync(5);
                     MaterialSnack($"切割完成！ 总用时：{formattedTime}", SnackType.SUCCESS, 0);
                 }
                 catch (Exception ex)
                 {
+                    Tools.LogDebug(ex.ToString());
                     MaterialSnack($"切割异常：{ex.Message}", SnackType.WARNING, 0, _eventAggregator);
                 }
                 finally
                 {
                     _semiAutoCutService.CutServiceProcessChanged -= CutService_CutServiceProcessChanged;
                     _semiAutoCutService.CutServicePaused -= CutService_CutServicePaused;
+                    _semiAutoCutService.CutServiceCompleted -= CutService_CutServiceCompleted; ;
                     stopwatch.Stop();
                     _monitoringCts.Cancel();
                     _pauseCts.Cancel();
@@ -478,12 +518,59 @@ namespace 精密切割系统.ViewModel
             ShowMessage();
         }
 
-        private async void CutService_CutServicePaused(CutServicePauseData pauseData)
+        private async void CutService_CutServiceCompleted(CutServiceCompleteData completeData)
         {
-            await AfterPauseThenMoveToPosition(pauseData);
+            _completeData = completeData;
         }
 
-        private async Task AfterPauseThenMoveToPosition(CutServicePauseData pauseData)
+        private async void CutService_CutServicePaused(CutServicePauseData pauseData)
+        {
+            await AfterPauseThenMoveToPositionAsync(pauseData);
+        }
+
+        private async Task AfterCompletedThenMoveToPositionAsync(CutServiceCompleteData completeData)
+        {
+            float runTime = 60;
+            try
+            {
+                // 超时自动取消
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(runTime));
+                await PlcControl.tagControl.cutting.ExitCuttingModeAsync(cts.Token);
+                LineSegment? line = completeData.Line;
+                // 轴不报警时移动到指定位置
+                if (line != null && !AlarmConfig.Instance.HasAxisErrorAlarms())
+                {
+                    // Z1安全余量
+                    float posZ = 0;
+                    CommonResult<FileTableItemModel> fileTableItemResult = await AutoCutUtils.GetFileTableItemModelAsync();
+                    if (fileTableItemResult.IsSuccess && fileTableItemResult.Data is not null)
+                    {
+                        FileTableItemModel fileTableItem = fileTableItemResult.Data;
+                        float workThickness = fileTableItem.WorkThickness.ToFloat();
+                        float tapeThickness = fileTableItem.TapeThickness.ToFloat();
+                        if (Appsettings.MeasureHeightLast is not null && Appsettings.SafetyMarginZ1 is not null)
+                        {
+                            posZ = Appsettings.MeasureHeightLast.Value - workThickness - tapeThickness - Appsettings.SafetyMarginZ1.Value;
+                        }
+                    }
+                    await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, cts.Token);
+                    await AutoCutUtils.WorkpieceBlowingAsync(line.StartPoint.Y.ToCameraY(), default, _eventAggregator, cts.Token);
+                    await Task.WhenAll(
+                        PlcControl.tagControl.Xaxis.StartAbsoluteAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), 30, cts.Token),
+                        PlcControl.tagControl.Yaxis.StartAbsoluteAsync(line.StartPoint.Y.ToCameraY(), 30, cts.Token));
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                Tools.LogDebug("结束切割超时");
+            }
+            catch (Exception ex)
+            {
+                Tools.LogDebug(ex.ToString());
+            }
+        }
+
+        private async Task AfterPauseThenMoveToPositionAsync(CutServicePauseData pauseData)
         {
             MaterialSnack("正在暂停切割...", SnackType.WARNING, 0, _eventAggregator);
             float runTime = 60 + pauseData.CurrentKnifeRemainTime;
@@ -510,6 +597,7 @@ namespace 精密切割系统.ViewModel
                         }
                     }
                     await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, cts.Token);
+                    await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
                     await AutoCutUtils.WorkpieceBlowingAsync(line.StartPoint.Y.ToCameraY(), default, _eventAggregator, cts.Token);
                     await Task.WhenAll(
                         PlcControl.tagControl.Xaxis.StartAbsoluteAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), 30, cts.Token),

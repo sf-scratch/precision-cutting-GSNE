@@ -28,8 +28,13 @@ namespace 精密切割系统.Helpers
             AutomaticCompensationCutHeightEntity automaticCompensationCutHeight = await SqlHelper.GetOrCreateEntityAsync(() => new AutomaticCompensationCutHeightEntity());
             int cutHeightCompensationFrequency = automaticCompensationCutHeight.CutHeightCompensationFrequency.ToInt();
             float cutHeightReductionDistance = automaticCompensationCutHeight.CutHeightReductionDistance.ToFloat();
+            if (cutHeightCompensationFrequency <= 0 || cutHeightReductionDistance <= 0)
+            {
+                return CommonResult.Success();
+            }
             float minCutHeight = cutSteps.Select(p => p.CutHeight).Min();
-            int unsafeCutTimes = (int)(minCutHeight / cutHeightReductionDistance * cutHeightCompensationFrequency);
+            int frequencyTimes = (int)(minCutHeight / cutHeightReductionDistance);
+            long unsafeCutTimes = frequencyTimes * cutHeightCompensationFrequency;
             if (unsafeCutTimes < cutSteps.Count)
             {
                 return CommonResult.Failure($"将在第 {unsafeCutTimes} 刀时切到工作盘，请检查型号参数设置！");
@@ -52,6 +57,10 @@ namespace 精密切割系统.Helpers
             AutomaticCompensationCutHeightEntity automaticCompensationCutHeight = await SqlHelper.GetOrCreateEntityAsync(() => new AutomaticCompensationCutHeightEntity());
             int cutHeightCompensationFrequency = automaticCompensationCutHeight.CutHeightCompensationFrequency.ToInt();
             float cutHeightReductionDistance = automaticCompensationCutHeight.CutHeightReductionDistance.ToFloat();
+            if (cutHeightCompensationFrequency <= 0 || cutHeightReductionDistance <= 0)
+            {
+                return CommonResult.Success();
+            }
             float minCutHeight = float.MaxValue;
             int totalCutSteps = 0;
             foreach (var step in cutSteps)
@@ -59,7 +68,8 @@ namespace 精密切割系统.Helpers
                 minCutHeight = Math.Min(minCutHeight, step.CutSteps.Select(p => p.CutHeight).Min());
                 totalCutSteps += step.CutSteps.Count;
             }
-            int unsafeCutTimes = (int)(minCutHeight / cutHeightReductionDistance * cutHeightCompensationFrequency);
+            int frequencyTimes = (int)(minCutHeight / cutHeightReductionDistance);
+            long unsafeCutTimes = frequencyTimes * cutHeightCompensationFrequency;
             if (unsafeCutTimes < totalCutSteps)
             {
                 return CommonResult.Failure($"将在第 {unsafeCutTimes} 刀时切到工作盘，请检查型号参数设置！");

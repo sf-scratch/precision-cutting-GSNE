@@ -837,6 +837,7 @@ namespace 精密切割系统.Driver
             // 检查上下限值
             writeValue = GetValidatedWriteValue(tag);
 
+            Tools.LogDebug($"地址：{tag.addr}  写入：{writeValue}");
             // 尝试写入数据，最多重试3次
             const int retryCount = 3;
             for (int attempt = 1; attempt <= retryCount; attempt++)
@@ -846,7 +847,7 @@ namespace 精密切割系统.Driver
                     OperateResult? res = await WriteDataAsync(tag.addr, writeValue, typeMap[tag.valueType]);
                     if (res != null && res.IsSuccess)
                     {
-                        // Tools.LogInfo($"写入PLC成功：地址 {tag.addr}，值 {writeValue}");
+                        Tools.LogDebug($"地址：{tag.addr}  写入：{writeValue}  状态：成功");
                         return true;
                     }
                     Tools.LogWarning($"写入PLC失败：地址 {tag.addr}，值 {writeValue}，尝试次数 {attempt}");
@@ -856,8 +857,8 @@ namespace 精密切割系统.Driver
                     Tools.LogError($"写入PLC异常：地址 {tag.addr}，值 {writeValue}，尝试次数 {attempt}，异常信息：{ex.Message}");
                 }
             }
-
             Tools.LogError($"写入PLC失败：地址 {tag.addr}，值 {writeValue}，所有尝试均失败");
+            Tools.LogDebug($"地址：{tag.addr}  写入：{writeValue}  状态：失败");
             return false;
         }
 
@@ -1682,26 +1683,35 @@ namespace 精密切割系统.Driver
         public Tag z1BaseMeasurePos { get; set; }
         public Tag z2BaseMeasurePos { get; set; }
         public Tag setupStart { get; set; }
-        public Tag setupZAxisMaxDistance { get; set; }
         public Tag setupZAxisHighSpeed { get; set; }
         public Tag setupZAxisLowSpeed { get; set; }
         public Tag setupZAxisLowDistance { get; set; }
         public Tag setupSetNumber { get; set; }
         public Tag setupValue { get; set; }
         public Tag setupNumber { get; set; }
+        public Tag measureHeightHighSpeed { get; set; }
+        public Tag measureHeightSlowSpeed { get; set; }
+        public Tag measureHeightSlowSpeedRanged { get; set; }
 
         // ============刀片维护相关 END
+
+        public async Task SetMeasureHeightParams(float hightspeed, float slowspeed, float slowspeedranged)
+        {
+            // 设置测高高速
+            measureHeightHighSpeed.writeValue = hightspeed.ToString();
+            await keyencePlc.WriteTagAsync(measureHeightHighSpeed);
+            // 设置测高低速
+            measureHeightSlowSpeed.writeValue = slowspeed.ToString();
+            await keyencePlc.WriteTagAsync(measureHeightSlowSpeed);
+            // 设置测高低速距离
+            measureHeightSlowSpeedRanged.writeValue = slowspeedranged.ToString();
+            await keyencePlc.WriteTagAsync(measureHeightSlowSpeedRanged);
+        }
 
         public async Task SetHeightMeasureTimes(int times)
         {
             setupSetNumber.writeValue = times.ToString();
             await keyencePlc.WriteTagAsync(setupSetNumber);
-        }
-
-        public async Task SetZAxisMaxDistanceAsync(float maxDistance)
-        {
-            setupZAxisMaxDistance.writeValue = MathF.Round(maxDistance, 3).ToString();
-            await keyencePlc.WriteTagAsync(setupZAxisMaxDistance);
         }
 
         /// <summary>

@@ -207,18 +207,23 @@ namespace 精密切割系统.Helpers
                 {
                     return CommonResult<float>.Failure("未设置刀片外径，无法测高！");
                 }
-                var caculateResult = CaculateZAxisMaxDistance(Appsettings.BladeOuterDiameter.Value);
-                if (!caculateResult.IsSuccess)
+                var caculateResult = await CaculateActulMeasureHeightSlowSpeedRangedAsync(bmParameter.MeasureHeightSlowSpeedRange.ToFloat());
+                if (caculateResult.IsSuccess)
                 {
-                    return caculateResult;
+                    float measureHeightHighSpeed = bmParameter.MeasureHeightHighSpeed.ToFloat();
+                    float measureHeightSlowSpeed = bmParameter.MeasureHeightSlowSpeed.ToFloat();
+                    float measureHeightSlowSpeedRange = caculateResult.Data;
+                    await PlcControl.tagControl.bladeMantance.SetMeasureHeightParams(measureHeightHighSpeed, measureHeightSlowSpeed, measureHeightSlowSpeedRange);
                 }
-                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(caculateResult.Data - 0.15f);
+                else
+                {
+                    return CommonResult<float>.Failure(caculateResult.Message);
+                }
                 curHeightZ = await ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, eventAggregator, token);
                 Appsettings.MeasureHeightFirst = curHeightZ.IsSuccess ? curHeightZ.Data : null;
             }
             else
             {
-                await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(Appsettings.MeasureHeightLast.Value - 0.15f);
                 curHeightZ = await ProcessMeasureHeightAsync(HeightMeasurementMode.Contact, default, eventAggregator, token);
             }
             Appsettings.AfterReplaceBladeCutTimes = 0;
@@ -343,8 +348,6 @@ namespace 精密切割系统.Helpers
                             }
                             eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"第{curMeasureHeightTimes}次测高：{setupValue.Value}"));
                             setupValueList.Add(setupValue.Value);
-                            // 设置下次测高最大距离，优化流程时间
-                            await PlcControl.tagControl.bladeMantance.SetZAxisMaxDistanceAsync(setupValue.Value - 0.15f);
                         }
                         if (setupValueList.Count == 0)
                         {
@@ -426,13 +429,19 @@ namespace 精密切割系统.Helpers
             return (indexMatch.Success && valueMatch.Success, index, value);
         }
 
-        public static CommonResult<float> CaculateZAxisMaxDistance(float bladeOuterDiameter)
+        public static async Task<CommonResult<float>> CaculateActulMeasureHeightSlowSpeedRangedAsync(float measureHeightSlowSpeedRange)
         {
+            var bladeInfo = await SqlHelper.GetOrCreateEntityAsync(() => new BladeInfoEntity());
+            float toolHolderOuterDiameter = bladeInfo.ToolHolderOuterDiameter.ToFloat();
+            if (string.IsNullOrEmpty(bladeInfo.ToolHolderOuterDiameter) || toolHolderOuterDiameter == 0)
+            {
+                return CommonResult<float>.Failure("刀架外径设定异常！");
+            }
             if (Appsettings.AxisToWorkingDiscDistance is null)
             {
                 return CommonResult<float>.Failure("功能参数设定异常，未配置轴心零点到工作盘距离！");
             }
-            return CommonResult<float>.Success(Appsettings.AxisToWorkingDiscDistance.Value - bladeOuterDiameter / 2);
+            return CommonResult<float>.Success(Appsettings.AxisToWorkingDiscDistance.Value - toolHolderOuterDiameter / 2 - measureHeightSlowSpeedRange);
         }
 
         //public static async Task<CommonResult<float>> ProcessMeasureWearAmountAsync(HeightMeasurementMode mode, bool isFirst, IDialogService dialogService, IEventAggregator? eventAggregator = null, CancellationToken token = default)
@@ -939,7 +948,7 @@ namespace 精密切割系统.Helpers
         /// <returns></returns>
         public static async Task WorkpieceBlowingAsync(float? atomizingNozzlePositionY, int? blowTime = null, IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
-            float xSpeed = 30, ySpeed = 20;
+            float xSpeed = 50, ySpeed = 50;
             InitialPositionModel? initPos = await GetInitialPositionAsync();
             if (initPos is not null)
             {

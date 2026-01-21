@@ -133,6 +133,33 @@ namespace 精密切割系统.Entities
             set { SetProperty(ref _cuttingLifeCutNumber, value); }
         }
 
+        private string _measureHeightHighSpeedPreset;
+
+        [Column("measure_height_high_speed_preset")]
+        public string MeasureHeightHighSpeedPreset
+        {
+            get { return _measureHeightHighSpeedPreset; }
+            set { SetProperty(ref _measureHeightHighSpeedPreset, value); }
+        }
+
+        private string _measureHeightSlowSpeedPreset;
+
+        [Column("measure_height_slow_speed_preset")]
+        public string MeasureHeightSlowSpeedPreset
+        {
+            get { return _measureHeightSlowSpeedPreset; }
+            set { SetProperty(ref _measureHeightSlowSpeedPreset, value); }
+        }
+
+        private string _measureHeightSlowSpeedRangePreset;
+
+        [Column("measure_height_slow_speed_range_preset")]
+        public string MeasureHeightSlowSpeedRangePreset
+        {
+            get { return _measureHeightSlowSpeedRangePreset; }
+            set { SetProperty(ref _measureHeightSlowSpeedRangePreset, value); }
+        }
+
         private string _measureHeightHighSpeed;
 
         [Column("measure_height_high_speed")]

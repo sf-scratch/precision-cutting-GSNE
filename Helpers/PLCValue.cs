@@ -22,7 +22,7 @@ namespace 精密切割系统.Helpers
         static PLCValue()
         {
             _values.TryAdd("DM2000", 0);
-            Task.Factory.StartNew(UpdateNewestPLCValueAsync, TaskCreationOptions.LongRunning);
+            //Task.Factory.StartNew(UpdateNewestPLCValueAsync, TaskCreationOptions.LongRunning);
         }
 
         private static async Task UpdateNewestPLCValueAsync()
