@@ -72,8 +72,7 @@ namespace 精密切割系统.Model.plc
 
         private async Task StartAlarmMonitoring(CancellationToken token)
         {
-            using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(100));
-            while (await timer.WaitForNextTickAsync(token))
+            while (!token.IsCancellationRequested)
             {
                 try
                 {
@@ -83,6 +82,7 @@ namespace 精密切割系统.Model.plc
                 {
                     Tools.LogError($"报警监控异常: {ex.Message}");
                 }
+                await Task.Delay(100);
             }
         }
 

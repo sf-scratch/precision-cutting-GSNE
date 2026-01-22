@@ -178,7 +178,7 @@ namespace 精密切割系统.Driver
                 // 打开相机
                 OpenDevice();
             }
-            SetCameraDeviceWaferParams();
+            //SetCameraDeviceWaferParams();
         }
 
         /// <summary>
@@ -277,6 +277,7 @@ namespace 精密切割系统.Driver
                 SCI_DEVICE_INFO item = _stDevList.pDevInfo[i];
                 SCI_DEVICE_GIGE_INFO gigeDevInfo = (SCI_DEVICE_GIGE_INFO)ByteToStruct(item.info.gigeInfo, typeof(SCI_DEVICE_GIGE_INFO));
                 string devIP = new IPAddress(gigeDevInfo.ip).ToString();
+                //if (devIP.StartsWith("192.168.20"))
                 if (devIP.StartsWith("192.168.10"))
                 {
                     SciCam tempSciCam = new SciCam();

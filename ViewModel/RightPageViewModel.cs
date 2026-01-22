@@ -49,8 +49,7 @@ namespace 精密切割系统.ViewModel
             _alarmVisibility = Visibility.Visible;
             Task.Run(async () =>
             {
-                using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(300));
-                while (await timer.WaitForNextTickAsync())
+                while (true)
                 {
                     try
                     {
@@ -109,6 +108,7 @@ namespace 精密切割系统.ViewModel
                     {
                         Tools.LogError($"报警监控异常: {ex.Message}");
                     }
+                    await Task.Delay(300);
                 }
             });
         }

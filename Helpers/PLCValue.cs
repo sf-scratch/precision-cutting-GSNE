@@ -19,10 +19,12 @@ namespace 精密切割系统.Helpers
     {
         private static readonly ConcurrentDictionary<string, short> _values = new ConcurrentDictionary<string, short>();
 
+        public const int UpdateFrequency = 100;
+
         static PLCValue()
         {
             _values.TryAdd("DM2000", 0);
-            //Task.Factory.StartNew(UpdateNewestPLCValueAsync, TaskCreationOptions.LongRunning);
+            Task.Factory.StartNew(UpdateNewestPLCValueAsync, TaskCreationOptions.LongRunning);
         }
 
         private static async Task UpdateNewestPLCValueAsync()
@@ -44,7 +46,7 @@ namespace 精密切割系统.Helpers
                     //TimeSpan timeSpan = TimeSpan.FromSeconds(stopwatch.Elapsed.TotalMilliseconds);
                     //_values[key] = (short)stopwatch.ElapsedMilliseconds;
                 }
-                await Task.Delay(50); // 每秒更新一次
+                await Task.Delay(UpdateFrequency); // 每秒更新一次
             }
         }
 

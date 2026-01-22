@@ -24,6 +24,7 @@ namespace 精密切割系统.Utils
     {
         private static ILog log = LogManager.GetLogger(typeof(Tools));
         private static ILog debugLog = LogManager.GetLogger("SpecialDebug");
+        private static ILog _monitor = LogManager.GetLogger("Monitor");
 
         //public static string curPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         public static string curPath = AppDomain.CurrentDomain.BaseDirectory;
@@ -46,6 +47,11 @@ namespace 精密切割系统.Utils
         public static void LogDebug(string msg)
         {
             debugLog.Debug(msg);
+        }
+
+        public static void Monitor(string msg)
+        {
+            _monitor.Info(msg);
         }
 
         // 把路径转换为BitmapImage

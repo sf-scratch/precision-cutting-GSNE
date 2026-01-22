@@ -195,8 +195,8 @@
                     <Controls:InputTextBox
                         IsEnabled="False"
                         Text="{Binding XAxisCurrentPosition}"
-                        TextWrapping="Wrap"
-                        XPrecision="3" />
+                        TextAlignment="Right"
+                        TextWrapping="Wrap" />
                     <Label Content="mm" FontSize="16" />
                     <Label
                         Content="Y轴"
@@ -205,8 +205,8 @@
                     <Controls:InputTextBox
                         IsEnabled="False"
                         Text="{Binding YAxisCurrentPosition}"
-                        TextWrapping="Wrap"
-                        XPrecision="3" />
+                        TextAlignment="Right"
+                        TextWrapping="Wrap" />
                     <Label Content="mm" FontSize="16" />
                     <Label
                         Content="Z1轴"
@@ -215,8 +215,8 @@
                     <Controls:InputTextBox
                         IsEnabled="False"
                         Text="{Binding ZAxisCurrentPosition}"
-                        TextWrapping="Wrap"
-                        XPrecision="3" />
+                        TextAlignment="Right"
+                        TextWrapping="Wrap" />
                     <Label Content="mm" FontSize="16" />
                     <Label
                         Content="Z2轴"
@@ -225,8 +225,8 @@
                     <Controls:InputTextBox
                         IsEnabled="False"
                         Text="{Binding Z2AxisCurrentPosition}"
-                        TextWrapping="Wrap"
-                        XPrecision="3" />
+                        TextAlignment="Right"
+                        TextWrapping="Wrap" />
                     <Label Content="mm" FontSize="16" />
                     <Label
                         Content="θ轴"
@@ -236,9 +236,9 @@
                     <Controls:InputTextBox
                         IsEnabled="False"
                         Text="{Binding ThetaAxisCurrentPosition}"
+                        TextAlignment="Right"
                         TextWrapping="Wrap"
-                        Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}"
-                        XPrecision="3" />
+                        Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
                     <Label
                         Content="°"
                         FontSize="16"
@@ -251,6 +251,7 @@
                         HorizontalContentAlignment="Left"
                         IsEnabled="False"
                         Text="{Binding YAxisCutPosition}"
+                        TextAlignment="Right"
                         TextWrapping="Wrap" />
                     <Label Content="mm" FontSize="16" />
                 </auto:AutoGrid>

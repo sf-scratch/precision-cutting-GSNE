@@ -28,7 +28,7 @@ namespace 精密切割系统.Helpers
         /// 开始监控属性
         /// </summary>
         /// <param name="valueGetter">获取属性值的方法</param>
-        public void StartMonitoring(Func<T> valueGetter)
+        public void StartMonitoring(Func<T> valueGetter, int period)
         {
             if (_isMonitoring)
             {
@@ -40,7 +40,7 @@ namespace 精密切割系统.Helpers
             _isMonitoring = true;
 
             // 创建定时器，每50ms执行一次，立即开始
-            _timer = new Timer(CollectValue, null, 0, 50);
+            _timer = new Timer(CollectValue, null, 0, period);
 
             Console.WriteLine("属性监控已启动，每50ms采集一次数据...");
         }

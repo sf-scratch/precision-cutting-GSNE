@@ -85,6 +85,12 @@ namespace 精密切割系统.ViewModel
             RightButtonCollection.Add(ButtonParams.RedRightButton("停止", "/Assets/icon/right/stop.png", StopAsync));
         }
 
+        private void InitRightOnlyStopButton()
+        {
+            RightButtonCollection.Clear();
+            RightButtonCollection.Add(ButtonParams.RedRightButton("停止", "/Assets/icon/right/stop.png", StopAsync));
+        }
+
         private void InitBottomButton()
         {
             BottomButtonCollection.Clear();
@@ -140,7 +146,7 @@ namespace 精密切割系统.ViewModel
                     {
                         Tools.LogError($"StartGetAxisInfo()报警监控异常: {ex.Message}");
                     }
-                    await Task.Delay(100);
+                    await Task.Delay(200);
                 }
             });
         }
@@ -272,7 +278,6 @@ namespace 精密切割系统.ViewModel
             _intervalTimer = new DynamicIntervalTimer(TimeSpan.FromMilliseconds(500), TimeSpan.FromMilliseconds(30));
             _operatCts = new CancellationTokenSource();
             InitBottomButton();
-            InitRightButton();
             StartGetAxisInfo();
             if (_isReuseView)
             {
@@ -283,6 +288,18 @@ namespace 精密切割系统.ViewModel
             if (navigationContext.Parameters.TryGetValue<CutServicePauseData>(nameof(CutServicePauseData), out var pauseData))
             {
                 _pauseData = pauseData;
+                if (pauseData != null && pauseData.IsCompleted)
+                {
+                    InitRightOnlyStopButton();
+                }
+                else
+                {
+                    InitRightButton();
+                }
+            }
+            else
+            {
+                InitRightButton();
             }
             CutParam = _semiAutomaticCuttingRunViewModel.CutParam;
             float? xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync();

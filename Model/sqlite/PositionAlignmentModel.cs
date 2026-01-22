@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using 精密切割系统.Entities;
 
 namespace 精密切割系统.database.db.modle
 {
     [Table("position_alignment")]
-    internal class PositionAlignmentModel
+    internal class PositionAlignmentModel : IEntityWithId
     {
         [PrimaryKey, AutoIncrement]
         [Column("id")]
@@ -34,6 +35,9 @@ namespace 精密切割系统.database.db.modle
 
         [Column("cutZ1MaxLocation")]//切割Z1轴最大安全距离
         public string CutZ1MaxLocation { get; set; } = "40";
+
+        [Column("measurement_height_compensation")]
+        public string MeasurementHeightCompensation { get; set; } = "0";
 
         [Column("cameraOffsetX")]//相机和切割点的X轴的偏移量
         public string CameraOffsetX { get; set; } = "10";
@@ -67,6 +71,5 @@ namespace 精密切割系统.database.db.modle
 
         [Column("high_mag_to_low_mag_camera_y_offset")]//高倍和低倍相机的Y轴偏移量
         public string HighMagToLowMagCameraYOffset { get; set; } = "0";
-
     }
 }

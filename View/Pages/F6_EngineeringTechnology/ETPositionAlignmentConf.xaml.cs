@@ -116,6 +116,7 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
             inputCameraToCutXOffset.Text = Appsettings.CameraRelativeBladePosition.X.ToString();
             inputCameraToCutYOffset.Text = Appsettings.CameraRelativeBladePosition.Y.ToString();
             inputCutZ1MaxLocation.Text = _model.CutZ1MaxLocation;
+            MeasurementHeightCompensation.Text = _model.MeasurementHeightCompensation;
             //inputCameraOffsetX.Text = _model.CameraOffsetX;
             //inputCameraOffsetY.Text = _model.CameraOffsetY;
             //inputHighMagToLowMagCameraXOffset.Text = _model.HighMagToLowMagCameraXOffset;
@@ -152,6 +153,7 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
                 _model.CameraToCutXOffset = inputCameraToCutXOffset.Text;
                 _model.CameraToCutYOffset = inputCameraToCutYOffset.Text;
                 _model.CutZ1MaxLocation = inputCutZ1MaxLocation.Text;
+                _model.MeasurementHeightCompensation = MeasurementHeightCompensation.Text;
                 //_model.CameraOffsetX = inputCameraOffsetX.Text;
                 //_model.CameraOffsetY = inputCameraOffsetY.Text;
                 //_model.HighMagToLowMagCameraXOffset = inputHighMagToLowMagCameraXOffset.Text;

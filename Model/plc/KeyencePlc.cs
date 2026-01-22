@@ -232,7 +232,7 @@ namespace 精密切割系统.Driver
                 {
                     if (!EnsurePlcConnected())
                     {
-                        Tools.LogError($"读取PLC失败：PLC未连接（尝试 {attempt}/{maxRetries}）");
+                        Tools.Monitor($"同步 读取PLC失败：PLC未连接（尝试 {attempt}/{maxRetries}）");
                         continue;
                     }
 
@@ -361,13 +361,13 @@ namespace 精密切割系统.Driver
 
                     if (attempt < maxRetries)
                     {
-                        Tools.LogWarning($"读取PLC数据失败，地址：{plcAddr}，类型：{dataType}，尝试第{attempt}次重试");
+                        //Tools.LogWarning($"读取PLC数据失败，地址：{plcAddr}，类型：{dataType}，尝试第{attempt}次重试");
                         System.Threading.Thread.Sleep(MinDelayMs);
                     }
                 }
                 catch (Exception ex)
                 {
-                    Tools.LogError($"读取PLC异常：地址 {plcAddr}，类型 {dataType}，尝试 {attempt}/{maxRetries}，异常：{ex.Message}");
+                    //Tools.LogError($"读取PLC异常：地址 {plcAddr}，类型 {dataType}，尝试 {attempt}/{maxRetries}，异常：{ex.Message}");
                     if (attempt < maxRetries)
                     {
                         System.Threading.Thread.Sleep(MinDelayMs);
@@ -375,7 +375,7 @@ namespace 精密切割系统.Driver
                 }
             }
 
-            Tools.LogError($"读取PLC失败：地址 {plcAddr}，类型 {dataType}，所有尝试均失败");
+            Tools.Monitor($"同步 读取PLC失败：地址 {plcAddr}，类型 {dataType}，所有尝试均失败");
             return null;
         }
 
@@ -409,20 +409,20 @@ namespace 精密切割系统.Driver
                     }
                     if (attempt < maxRetries)
                     {
-                        Tools.LogWarning($"读取PLC数据失败，地址：{plcAddr}，类型：{typeof(bool)}，尝试第{attempt}次重试");
+                        //Tools.LogWarning($"读取PLC数据失败，地址：{plcAddr}，类型：{typeof(bool)}，尝试第{attempt}次重试");
                         await Task.Delay(MinDelayMs);
                     }
                 }
                 catch (Exception ex)
                 {
-                    Tools.LogError($"读取PLC异常：地址 {plcAddr}，类型 {typeof(bool)}，尝试 {attempt}/{maxRetries}，异常：{ex.Message}");
+                    //Tools.LogError($"读取PLC异常：地址 {plcAddr}，类型 {typeof(bool)}，尝试 {attempt}/{maxRetries}，异常：{ex.Message}");
                     if (attempt < maxRetries)
                     {
                         await Task.Delay(MinDelayMs);
                     }
                 }
             }
-            Tools.LogError($"读取PLC失败：地址 {plcAddr}，类型 {typeof(bool)}，所有尝试均失败");
+            Tools.Monitor($"读取PLC失败：地址 {plcAddr}，类型 {typeof(bool)}，所有尝试均失败");
             return null;
         }
 
@@ -518,22 +518,16 @@ namespace 精密切割系统.Driver
                     {
                         throw new ArgumentException($"不支持的数据类型：{type.Name}");
                     }
-                    if (attempt < maxRetries)
-                    {
-                        Tools.LogWarning($"读取PLC数据失败，地址：{plcAddr}，类型：{type.Name}，尝试第{attempt}次重试");
-                        await Task.Delay(MinDelayMs);
-                    }
                 }
                 catch (Exception ex)
                 {
-                    Tools.LogError($"读取PLC异常：地址 {plcAddr}，类型 {type.Name}，尝试 {attempt}/{maxRetries}，异常：{ex.Message}");
-                    if (attempt < maxRetries)
-                    {
-                        await Task.Delay(MinDelayMs);
-                    }
+                }
+                if (attempt < maxRetries)
+                {
+                    await Task.Delay(MinDelayMs);
                 }
             }
-            Tools.LogError($"读取PLC失败：地址 {plcAddr}，类型 {type.Name}，所有尝试均失败");
+            Tools.Monitor($"读取PLC失败：地址 {plcAddr}，类型 {type.Name}，所有尝试均失败");
             return null;
         }
 
@@ -772,14 +766,14 @@ namespace 精密切割系统.Driver
             // 检查PLC连接状态
             if (!EnsurePlcConnected())
             {
-                Tools.LogError("写入PLC失败：PLC未连接");
+                //Tools.LogError("写入PLC失败：PLC未连接");
                 return false;
             }
 
             // 检查输入参数有效性
             if (tag == null || string.IsNullOrEmpty(tag.writeValue))
             {
-                Tools.LogError("写入PLC失败：tag或tag.writeValue为空");
+                Tools.Monitor("同步 写入PLC失败：tag或tag.writeValue为空");
                 return false;
             }
 
@@ -800,15 +794,15 @@ namespace 精密切割系统.Driver
                         // Tools.LogInfo($"写入PLC成功：地址 {tag.addr}，值 {writeValue}");
                         return true;
                     }
-                    Tools.LogWarning($"写入PLC失败：地址 {tag.addr}，值 {writeValue}，尝试次数 {attempt}");
+                    //Tools.LogWarning($"写入PLC失败：地址 {tag.addr}，值 {writeValue}，尝试次数 {attempt}");
                 }
                 catch (Exception ex)
                 {
-                    Tools.LogError($"写入PLC异常：地址 {tag.addr}，值 {writeValue}，尝试次数 {attempt}，异常信息：{ex.Message}");
+                    //Tools.LogError($"写入PLC异常：地址 {tag.addr}，值 {writeValue}，尝试次数 {attempt}，异常信息：{ex.Message}");
                 }
             }
 
-            Tools.LogError($"写入PLC失败：地址 {tag.addr}，值 {writeValue}，所有尝试均失败");
+            Tools.Monitor($"同步 写入PLC失败：地址 {tag.addr}，值 {writeValue}，所有尝试均失败");
             return false;
         }
 
@@ -818,26 +812,18 @@ namespace 精密切割系统.Driver
             {
                 return true;
             }
-            // 检查PLC连接状态
-            //if (!await EnsurePlcConnectedAsync())
-            //{
-            //    Tools.LogError("写入PLC失败：PLC未连接");
-            //    return false;
-            //}
-
             string writeValue = tag.writeValue;
 
             // 检查输入参数有效性
             if (tag == null || string.IsNullOrEmpty(writeValue))
             {
-                Tools.LogError("写入PLC失败：tag或tag.writeValue为空");
+                Tools.Monitor("写入PLC失败：tag或tag.writeValue为空");
                 return false;
             }
 
             // 检查上下限值
             writeValue = GetValidatedWriteValue(tag);
 
-            Tools.LogDebug($"地址：{tag.addr}  写入：{writeValue}");
             // 尝试写入数据，最多重试3次
             const int retryCount = 3;
             for (int attempt = 1; attempt <= retryCount; attempt++)
@@ -847,18 +833,19 @@ namespace 精密切割系统.Driver
                     OperateResult? res = await WriteDataAsync(tag.addr, writeValue, typeMap[tag.valueType]);
                     if (res != null && res.IsSuccess)
                     {
-                        Tools.LogDebug($"地址：{tag.addr}  写入：{writeValue}  状态：成功");
                         return true;
                     }
-                    Tools.LogWarning($"写入PLC失败：地址 {tag.addr}，值 {writeValue}，尝试次数 {attempt}");
                 }
                 catch (Exception ex)
                 {
-                    Tools.LogError($"写入PLC异常：地址 {tag.addr}，值 {writeValue}，尝试次数 {attempt}，异常信息：{ex.Message}");
+                }
+                if (attempt < retryCount)
+                {
+                    await Task.Delay(MinDelayMs);
                 }
             }
-            Tools.LogError($"写入PLC失败：地址 {tag.addr}，值 {writeValue}，所有尝试均失败");
-            Tools.LogDebug($"地址：{tag.addr}  写入：{writeValue}  状态：失败");
+            Tools.Monitor($"写入PLC失败：地址 {tag.addr}，值 {writeValue}，所有尝试均失败");
+            //Tools.LogDebug($"地址：{tag.addr}  写入：{writeValue}  状态：失败");
             return false;
         }
 
@@ -3281,7 +3268,7 @@ namespace 精密切割系统.Driver
         /// <param name="xEndLocation">X轴结束位置</param>
         /// <param name="yCutLocation">Y轴切割位置</param>
         /// <param name="spindleRev">主轴转速</param>
-        public async Task SetCutParamsAsync(float feedSpeedValue, float zEndLocation, float zStartLocation, float xStartLoaction, float xEndLocation,
+        public async Task<bool> SetCutParamsAsync(float feedSpeedValue, float zEndLocation, float zStartLocation, float xStartLoaction, float xEndLocation,
             float yCutLocation, string checkStatus, float thetaDeg, int spindleRevValue, float depthEntry)
         {
             float xSoftUpperLimit = Appsettings.PositiveLimitPositionX ?? 0;
@@ -3306,38 +3293,40 @@ namespace 精密切割系统.Driver
                 $"主轴转速: {spindleRevValue}\r\n" +
                 $""
                 );
+            bool success = true;
             // 切割速度
             await PlcControl.tagControl.Xaxis.SetAbsoluteSpeedAsync(feedSpeedValue);
             // x轴开始位置
             xStartPosition.writeValue = xStartLoaction.ToString();
-            await keyencePlc.WriteTagAsync(xStartPosition);
+            success &= await keyencePlc.WriteTagAsync(xStartPosition);
             // x结束位置
             xLength.writeValue = xEndLocation.ToString();
-            await keyencePlc.WriteTagAsync(xLength);
+            success &= await keyencePlc.WriteTagAsync(xLength);
             // Y轴切割开始位置
             yStartPosition.writeValue = yCutLocation.ToString();
-            await keyencePlc.WriteTagAsync(yStartPosition);
+            success &= await keyencePlc.WriteTagAsync(yStartPosition);
             // z轴开始位置
             z1StartPosition.writeValue = zStartLocation.ToString();
-            await keyencePlc.WriteTagAsync(z1StartPosition);
+            success &= await keyencePlc.WriteTagAsync(z1StartPosition);
             // z轴结束位置
             z1EndPosition.writeValue = zEndLocation.ToString();
-            await keyencePlc.WriteTagAsync(z1EndPosition);
+            success &= await keyencePlc.WriteTagAsync(z1EndPosition);
             // 停机检查
             shutdownCheck.writeValue = checkStatus;
-            await keyencePlc.WriteTagAsync(shutdownCheck);
+            success &= await keyencePlc.WriteTagAsync(shutdownCheck);
             // 切割角度
             cutFaceAngle.writeValue = thetaDeg.ToString();
-            await keyencePlc.WriteTagAsync(cutFaceAngle);
+            success &= await keyencePlc.WriteTagAsync(cutFaceAngle);
             // 主轴转速
             spindleRev.writeValue = spindleRevValue.ToString();
-            await keyencePlc.WriteTagAsync(spindleRev);
+            success &= await keyencePlc.WriteTagAsync(spindleRev);
             //确认切割参数
             confirmParams.writeValue = "1";
-            await keyencePlc.WriteTagAsync(confirmParams);
+            success &= await keyencePlc.WriteTagAsync(confirmParams);
             // 当前切入深度
             currentDepthEntry.writeValue = depthEntry.ToString();
-            await keyencePlc.WriteTagAsync(currentDepthEntry);
+            success &= await keyencePlc.WriteTagAsync(currentDepthEntry);
+            return success;
         }
 
         /// <summary>

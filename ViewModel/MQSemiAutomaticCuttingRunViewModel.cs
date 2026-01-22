@@ -42,7 +42,7 @@ namespace 精密切割系统.ViewModel
         private CancellationTokenSource _pauseCts;
         private CancellationTokenSource _monitoringCts;
         private List<ChCutStep>? _cutSteps;
-        private float _currentCutYPosition = 0;
+        private volatile float _currentCutYPosition = 0;
         private string? _backPageName;
         private CutServiceCompleteData? _completeData;
 
@@ -143,104 +143,99 @@ namespace 精密切割系统.ViewModel
 
         private async Task MonitoringAlarmAsync(CancellationToken token)
         {
-            try
+            while (!token.IsCancellationRequested)
             {
-                using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
-                while (await timer.WaitForNextTickAsync(token))
+                try
                 {
-                    try
+                    if (AlarmConfig.Instance.HasAutoRunUnexpectedAlarms(out bool[]? alarms))
                     {
-                        if (AlarmConfig.Instance.HasAutoRunUnexpectedAlarms(out bool[]? alarms))
+                        // 等待1秒钟再判断报警是否还存在
+                        await Task.Delay(1000, default);
+                        if (AlarmConfig.Instance.HasAutoRunUnexpectedAlarms())
                         {
-                            // 等待1秒钟再判断报警是否还存在
-                            await Task.Delay(1000, default);
-                            if (AlarmConfig.Instance.HasAutoRunUnexpectedAlarms())
+                            if (!_pauseCts.IsCancellationRequested)
                             {
-                                if (!_pauseCts.IsCancellationRequested)
+                                if (alarms != null)
                                 {
-                                    if (alarms != null)
+                                    if (AlarmConfig.Instance.TryGetActiveAlarms(alarms, out List<AlarmInfo> alarmInfos))
                                     {
-                                        if (AlarmConfig.Instance.TryGetActiveAlarms(alarms, out List<AlarmInfo> alarmInfos))
-                                        {
-                                            string alarmMessages = string.Join(",", alarmInfos.Select(a => a.Message));
-                                            _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Error报警监控：{alarmMessages}"));
-                                            await PauseAsync(PlcControl.tagControl.wholeDevice.OpenRedLightAsync);
-                                        }
-                                        else
-                                        {
-                                            _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Error报警监控：未获取到有效报警信息！{alarms}"));
-                                        }
+                                        string alarmMessages = string.Join(",", alarmInfos.Select(a => a.Message));
+                                        _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Error报警监控：{alarmMessages}"));
+                                        await PauseAsync(PlcControl.tagControl.wholeDevice.OpenRedLightAsync);
                                     }
                                     else
                                     {
-                                        _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Error报警监控：读到空数据！"));
+                                        _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Error报警监控：未获取到有效报警信息！{alarms}"));
                                     }
                                 }
-                            }
-                            else
-                            {
-                                if (alarms != null && AlarmConfig.Instance.TryGetActiveAlarms(alarms, out List<AlarmInfo> alarmInfos))
+                                else
                                 {
-                                    string alarmMessages = string.Join(",", alarmInfos.Select(a => a.Message));
-                                    _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Error报警监控：切割中途闪烁异常 {alarmMessages}"));
+                                    _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Error报警监控：读到空数据！"));
                                 }
                             }
                         }
-
-                        if (AlarmConfig.Instance.HasTargetActiveAlarm(out bool[]? targetAlarms, "MR60111", "MR60112"))
+                        else
                         {
-                            // 等待1秒钟再判断报警是否还存在
-                            await Task.Delay(1000, default);
-                            if (AlarmConfig.Instance.HasTargetActiveAlarm("MR60111", "MR60112"))
+                            if (alarms != null && AlarmConfig.Instance.TryGetActiveAlarms(alarms, out List<AlarmInfo> alarmInfos))
                             {
-                                if (!_pauseCts.IsCancellationRequested)
-                                {
-                                    if (targetAlarms != null)
-                                    {
-                                        if (AlarmConfig.Instance.TryGetActiveAlarms(targetAlarms, out List<AlarmInfo> alarmInfos))
-                                        {
-                                            string alarmMessages = string.Join(",", alarmInfos.Select(a => a.Message));
-                                            _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Warn报警监控：{alarmMessages}"));
-                                            await PauseAsync(PlcControl.tagControl.wholeDevice.OpenRedLightAsync);
-                                        }
-                                        else
-                                        {
-                                            _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Warn报警监控：未获取到有效报警信息！{targetAlarms}"));
-                                        }
-                                    }
-                                    else
-                                    {
-                                        _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Warn报警监控：读到空数据！"));
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                if (targetAlarms != null && AlarmConfig.Instance.TryGetActiveAlarms(targetAlarms, out List<AlarmInfo> alarmInfos))
-                                {
-                                    string alarmMessages = string.Join(",", alarmInfos.Select(a => a.Message));
-                                    _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Warn报警监控：切割中途闪烁异常 {alarmMessages}"));
-                                }
+                                string alarmMessages = string.Join(",", alarmInfos.Select(a => a.Message));
+                                _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Error报警监控：切割中途闪烁异常 {alarmMessages}"));
                             }
                         }
                     }
-                    catch (Exception) { }
+
+                    if (AlarmConfig.Instance.HasTargetActiveAlarm(out bool[]? targetAlarms, "MR60111", "MR60112"))
+                    {
+                        // 等待1秒钟再判断报警是否还存在
+                        await Task.Delay(1000, default);
+                        if (AlarmConfig.Instance.HasTargetActiveAlarm("MR60111", "MR60112"))
+                        {
+                            if (!_pauseCts.IsCancellationRequested)
+                            {
+                                if (targetAlarms != null)
+                                {
+                                    if (AlarmConfig.Instance.TryGetActiveAlarms(targetAlarms, out List<AlarmInfo> alarmInfos))
+                                    {
+                                        string alarmMessages = string.Join(",", alarmInfos.Select(a => a.Message));
+                                        _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Warn报警监控：{alarmMessages}"));
+                                        await PauseAsync(PlcControl.tagControl.wholeDevice.OpenRedLightAsync);
+                                    }
+                                    else
+                                    {
+                                        _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Warn报警监控：未获取到有效报警信息！{targetAlarms}"));
+                                    }
+                                }
+                                else
+                                {
+                                    _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Warn报警监控：读到空数据！"));
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (targetAlarms != null && AlarmConfig.Instance.TryGetActiveAlarms(targetAlarms, out List<AlarmInfo> alarmInfos))
+                            {
+                                string alarmMessages = string.Join(",", alarmInfos.Select(a => a.Message));
+                                _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Warn报警监控：切割中途闪烁异常 {alarmMessages}"));
+                            }
+                        }
+                    }
                 }
+                catch (Exception) { }
+                await Task.Delay(200);
             }
-            catch (OperationCanceledException) { }
         }
 
         private async Task MonitoringCutProgressAsync(CancellationToken token)
         {
-            using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
-            while (await timer.WaitForNextTickAsync(token))
+            while (!token.IsCancellationRequested)
             {
                 try
                 {
                     var axisPostion = await AutoCutUtils.GetAxisPositionAsync();
                     Application.Current.Dispatcher.Invoke(() =>
                     {
-                        YAxisCutPosition = (axisPostion.Y ?? 0 - _currentCutYPosition).ToString(GlobalParams.DecimalStringFormat);
+                        YAxisCutPosition = (axisPostion.Y is null ? 0 : axisPostion.Y.Value - _currentCutYPosition).ToString(GlobalParams.DecimalStringFormat);
                         XAxisCurrentPosition = (axisPostion.X ?? 0).ToString(GlobalParams.DecimalStringFormat);
                         YAxisCurrentPosition = (axisPostion.Y ?? 0).ToString(GlobalParams.DecimalStringFormat);
                         ZAxisCurrentPosition = (axisPostion.Z1 ?? 0).ToString(GlobalParams.DecimalStringFormat);
@@ -251,6 +246,7 @@ namespace 精密切割系统.ViewModel
                 catch (Exception)
                 {
                 }
+                await Task.Delay(200);
             }
         }
 
@@ -357,7 +353,8 @@ namespace 精密切割系统.ViewModel
                 {
                     measureHeightZ = Appsettings.MeasureHeightLast.Value;
                 }
-                Stopwatch stopwatch = Stopwatch.StartNew();
+                PositionAlignmentModel positionAlignment = await SqlHelper.GetOrCreateEntityAsync(() => new PositionAlignmentModel());
+                measureHeightZ -= positionAlignment.MeasurementHeightCompensation.ToFloat();
                 try
                 {
                     IWorkpieces workpiece = GenerateWorkpieces(fileTableItem, cutY);
@@ -369,22 +366,12 @@ namespace 精密切割系统.ViewModel
                     _semiAutoCutService.UpdatePreCutQueue(preCutSpeedLis);
                     MaterialSnack($"切割中...", SnackType.WARNING, 0, _eventAggregator);
                     float margin = Appsettings.AdditionalMargin ?? 20;
-                    RunResult cutResult = await _semiAutoCutService.RunAsync(cutSteps, workpiece, margin, measureHeightZ, GlobalParams.BladeLiftingHeight, false, _pauseCts.Token);
+                    RunResult cutResult = await _semiAutoCutService.RunAsync(cutSteps, workpiece, margin, measureHeightZ, GlobalParams.BladeLiftingHeight, false, _eventAggregator, _pauseCts.Token);
                     if (!cutResult.IsSuccess)
                     {
                         MaterialSnack($"{cutResult.Message}", SnackType.WARNING, 0, _eventAggregator);
                         return;
                     }
-                    //// 移动到最后一刀位置
-                    //if (_completeData != null)
-                    //{
-                    //    await AfterCompletedThenMoveToPositionAsync(_completeData);
-                    //}
-                    stopwatch.Stop();
-                    TimeSpan timeSpan = TimeSpan.FromSeconds(stopwatch.Elapsed.TotalSeconds);
-                    string formattedTime = $"{timeSpan.Hours:D2}:{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}";
-                    _ = PlcControl.tagControl.wholeDevice.OpenBuzzerAsync(5);
-                    MaterialSnack($"切割完成！ 总用时：{formattedTime}", SnackType.SUCCESS, 0);
                 }
                 catch (Exception ex)
                 {
@@ -396,7 +383,6 @@ namespace 精密切割系统.ViewModel
                     _semiAutoCutService.CutServiceProcessChanged -= CutService_CutServiceProcessChanged;
                     _semiAutoCutService.CutServicePaused -= CutService_CutServicePaused;
                     _semiAutoCutService.CutServiceCompleted -= CutService_CutServiceCompleted; ;
-                    stopwatch.Stop();
                     _monitoringCts.Cancel();
                     _pauseCts.Cancel();
                     await StopAsync(ServicePauseResult.Stop);
@@ -609,7 +595,15 @@ namespace 精密切割系统.ViewModel
                 {
                     await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
                 }
-                MaterialSnack(pauseData.Message ?? "暂停中...", SnackType.WARNING, 0, _eventAggregator);
+                if (pauseData.IsCompleted)
+                {
+                    _ = PlcControl.tagControl.wholeDevice.OpenBuzzerAsync(5);
+                    MaterialSnack(pauseData.Message ?? "切割完成...", SnackType.SUCCESS, 0, _eventAggregator);
+                }
+                else
+                {
+                    MaterialSnack(pauseData.Message ?? "暂停中...", SnackType.WARNING, 0, _eventAggregator);
+                }
             }
             catch (OperationCanceledException)
             {
