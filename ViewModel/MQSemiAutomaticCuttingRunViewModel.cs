@@ -1,4 +1,5 @@
-﻿using HslCommunication.Profinet.OpenProtocol;
+﻿using Emgu.CV.Dai;
+using HslCommunication.Profinet.OpenProtocol;
 using MathNet.Numerics.LinearAlgebra.Complex.Solvers;
 using Newtonsoft.Json;
 using Prism.Events;
@@ -11,7 +12,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Interop;
+using 精密切割系统.Assets.config.buttom;
 using 精密切割系统.Data;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
@@ -355,6 +358,7 @@ namespace 精密切割系统.ViewModel
                 }
                 PositionAlignmentModel positionAlignment = await SqlHelper.GetOrCreateEntityAsync(() => new PositionAlignmentModel());
                 measureHeightZ -= positionAlignment.MeasurementHeightCompensation.ToFloat();
+                Stopwatch completeStopwatch = Stopwatch.StartNew();
                 try
                 {
                     IWorkpieces workpiece = GenerateWorkpieces(fileTableItem, cutY);
@@ -372,6 +376,15 @@ namespace 精密切割系统.ViewModel
                         MaterialSnack($"{cutResult.Message}", SnackType.WARNING, 0, _eventAggregator);
                         return;
                     }
+                    completeStopwatch.Stop();
+                    if (GlobalParams.DeviceModel == GlobalParams.Device_562)
+                    {
+                        TimeSpan timeSpan = TimeSpan.FromSeconds(completeStopwatch.Elapsed.TotalSeconds);
+                        string formattedTime = $"{timeSpan.Hours:D2}:{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}";
+                        await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(Appsettings.ThetaCenterPoint.X, 50, _pauseCts.Token);
+                        _ = PlcControl.tagControl.wholeDevice.OpenBuzzerAsync(5);
+                        MaterialSnack($"切割完成！ 总用时：{formattedTime}", SnackType.SUCCESS, 0);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -385,6 +398,7 @@ namespace 精密切割系统.ViewModel
                     _semiAutoCutService.CutServiceCompleted -= CutService_CutServiceCompleted; ;
                     _monitoringCts.Cancel();
                     _pauseCts.Cancel();
+                    completeStopwatch.Stop();
                     await StopAsync(ServicePauseResult.Stop);
                 }
             }
@@ -586,7 +600,7 @@ namespace 精密切割系统.ViewModel
                     await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
                     await AutoCutUtils.WorkpieceBlowingAsync(line.StartPoint.Y.ToCameraY(), default, _eventAggregator, cts.Token);
                     await Task.WhenAll(
-                        PlcControl.tagControl.Xaxis.StartAbsoluteAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), 30, cts.Token),
+                        PlcControl.tagControl.Xaxis.StartAbsoluteAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), 50, cts.Token),
                         PlcControl.tagControl.Yaxis.StartAbsoluteAsync(line.StartPoint.Y.ToCameraY(), 30, cts.Token));
                     // 执行默认动作
                     //await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(posZ, default, cts.Token);

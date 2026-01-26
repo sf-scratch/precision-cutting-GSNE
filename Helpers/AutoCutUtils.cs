@@ -2053,7 +2053,7 @@ namespace 精密切割系统.Helpers
             float[] cutDepths = Tools.StringToFloatArray(ch.DepthSteps); // 获取切割深度
             string[] loops = Tools.StringToStringArray(ch.Loop);         // 获取循环控制信息
                                                                          // 检查索引是否连续
-            int maxIndex = AreIndexesContinuous(setBladeHeight, feedSpeeds, yIndexs, repeatTimes);
+            int maxIndex = AreIndexesContinuous(setBladeHeight, feedSpeeds, repeatTimes);
             if (maxIndex == -1)
             {
                 return CommonResult<List<ChCutStep>>.Failure("切割参数错误！");
@@ -2149,7 +2149,7 @@ namespace 精密切割系统.Helpers
                 float[] cutDepths = Tools.StringToFloatArray(ch.DepthSteps); // 获取切割深度
                 string[] loops = Tools.StringToStringArray(ch.Loop);         // 获取循环控制信息
                 // 检查索引是否连续
-                int maxIndex = AreIndexesContinuous(setBladeHeight, feedSpeeds, yIndexs, repeatTimes);
+                int maxIndex = AreIndexesContinuous(setBladeHeight, feedSpeeds, repeatTimes);
                 if (maxIndex == -1)
                 {
                     return CommonResult<List<ChCutStep>>.Failure("切割参数错误！");
@@ -2242,7 +2242,7 @@ namespace 精密切割系统.Helpers
                 float[] cutDepths = Tools.StringToFloatArray(ch.DepthSteps); // 获取切割深度
                 string[] loops = Tools.StringToStringArray(ch.Loop);         // 获取循环控制信息
                 // 检查索引是否连续
-                int maxIndex = AreIndexesContinuous(setBladeHeight, feedSpeeds, yIndexs, repeatTimes);
+                int maxIndex = AreIndexesContinuous(setBladeHeight, feedSpeeds, repeatTimes);
                 if (maxIndex == -1)
                 {
                     return CommonResult<List<CutStep>>.Failure("切割参数错误！");
@@ -2389,12 +2389,12 @@ namespace 精密切割系统.Helpers
             return CommonResult<float>.Success(Appsettings.FocusWorkpiecesClearZ.Value - workThickness - tapeThickness);
         }
 
-        public static int AreIndexesContinuous(float[] setBladeHeight, float[] feedSpeeds, float[] yIndexs, float[] repeatTimes)
+        public static int AreIndexesContinuous(float[] setBladeHeight, float[] feedSpeeds, float[] repeatTimes)
         {
             // 获取满足条件的索引
             var validIndexes = setBladeHeight
                 .Select((value, index) => new { Value = value, Index = index })
-                .Where(x => x.Value > 0 && feedSpeeds[x.Index] > 0 && yIndexs[x.Index] != 0 && repeatTimes[x.Index] > 0)
+                .Where(x => x.Value > 0 && feedSpeeds[x.Index] > 0 && repeatTimes[x.Index] > 0)
                 .Select(x => x.Index)
                 .OrderBy(x => x)
                 .ToList();
@@ -2442,6 +2442,11 @@ namespace 精密切割系统.Helpers
                 return CommonResult.Failure(fileTableItemResult.Message);
             }
             FileTableItemChModel fileTableItemCh = fileTableItemResult.Data;
+            if (!await PlcControl.tagControl.Z1axis.IsReadyAsync())
+            {
+                return CommonResult.Failure("轴未准备好，请检查轴状态！");
+            }
+            await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, 30, default);
             bool isReady =
                 await PlcControl.tagControl.Xaxis.IsReadyAsync() &&
                 await PlcControl.tagControl.Yaxis.IsReadyAsync() &&

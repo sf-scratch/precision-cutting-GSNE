@@ -442,10 +442,12 @@ namespace 精密切割系统.Model.cut
                     CutServiceProcessChanged?.Invoke(preNextCutServiceProcess.Value);
                 }
                 completeStopwatch.Stop();
-                TimeSpan timeSpan = TimeSpan.FromSeconds(completeStopwatch.Elapsed.TotalSeconds);
-                string formattedTime = $"{timeSpan.Hours:D2}:{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}";
-                // 切割完成，等待继续或停止
-                await WaitContinueAsync(preLine, workpiece, currentKnifeRemainTime, [], true, $"切割完成！ 总用时：{formattedTime}");
+                if (GlobalParams.DeviceModel == GlobalParams.Device_321)
+                {
+                    TimeSpan timeSpan = TimeSpan.FromSeconds(completeStopwatch.Elapsed.TotalSeconds);
+                    string formattedTime = $"{timeSpan.Hours:D2}:{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}";
+                    await WaitContinueAsync(preLine, workpiece, currentKnifeRemainTime, [], true, $"切割完成！ 总用时：{formattedTime}");
+                }
                 //触发切割完成事件
                 //CutServiceCompleted?.Invoke(new CutServiceCompleteData(preLine));
             }
@@ -455,6 +457,7 @@ namespace 精密切割系统.Model.cut
                 _isRuning = false;
                 _isContinueBeyondWorkpiece = false;
                 _currentChannelNum = 0;
+                completeStopwatch.Stop();
                 //退出全自动切割模式
                 await PlcControl.tagControl.cutting.ExitCuttingModeAsync(default);
                 var operationParameter = await CurrentUtils.GetOperationParametersModelAsync();

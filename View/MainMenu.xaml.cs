@@ -313,40 +313,7 @@ namespace 精密切割系统.View
                     break;
 
                 case 409:
-                    if (mainWindow == null)
-                    {
-                        MaterialSnack($"{nameof(mainWindow)}为空", SnackType.WARNING);
-                        return;
-                    }
-                    if (!GlobalParams.OnlineFlag)
-                    {
-                        MaterialSnack("准备更换刀片,轴运动中！", SnackType.WARNING, 0);
-                        mainWindow.IsEnabled = false;
-                        await Task.Delay(500);
-                        mainWindow.IsEnabled = true;
-                        MaterialSnack("请打开切割安全门，更换刀片！", SnackType.SUCCESS, default);
-                        mainWindow.NavigateToPage(bean.PageUrl);
-                        return;
-                    }
-                    try
-                    {
-                        mainWindow.IsEnabled = false;
-                        await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(60));
-                        await AutoCutUtils.ReplaceBladeAsync(default, timeoutToken.Token);
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        MaterialSnack("换刀超时！", SnackType.WARNING);
-                    }
-                    catch (Exception e)
-                    {
-                        MaterialSnack($"换刀出现错误：{e.Message}", SnackType.WARNING);
-                    }
-                    finally
-                    {
-                        mainWindow.IsEnabled = true;
-                    }
-                    mainWindow.NavigateToPage(bean.PageUrl);
+                    mainWindow?.NavigateToPage(bean.PageUrl);
                     break;
 
                 case 439:

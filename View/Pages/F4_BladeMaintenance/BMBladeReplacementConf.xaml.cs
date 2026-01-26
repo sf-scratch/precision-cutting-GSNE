@@ -118,16 +118,39 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 
         private async void BladeReplaceSure(object? sender, bool e)
         {
+            if (_mainWindow == null)
+            {
+                MaterialSnack($"{nameof(_mainWindow)}为空", SnackType.WARNING);
+                return;
+            }
+            if (!GlobalParams.OnlineFlag)
+            {
+                MaterialSnack("准备更换刀片,轴运动中！", SnackType.WARNING, 0);
+                _mainWindow.IsEnabled = false;
+                await Task.Delay(500);
+                _mainWindow.IsEnabled = true;
+                MaterialSnack("请打开切割安全门，更换刀片！", SnackType.SUCCESS, default);
+                return;
+            }
             try
             {
+                _mainWindow.IsEnabled = false;
                 await SaveDataAsync();
+                await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(60));
+                await AutoCutUtils.ReplaceBladeAsync(default, timeoutToken.Token);
                 MaterialSnack("换刀成功！", SnackType.SUCCESS);
+            }
+            catch (OperationCanceledException)
+            {
+                MaterialSnack("换刀超时！", SnackType.WARNING);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                MaterialSnack("保存失败", SnackType.ERROR);
-                return;
+                MaterialSnack($"换刀出现错误：{ex.Message}", SnackType.WARNING);
+            }
+            finally
+            {
+                _mainWindow.IsEnabled = true;
             }
         }
     }
