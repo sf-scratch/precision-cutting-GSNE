@@ -298,18 +298,6 @@ namespace 精密切割系统.Model.cut
 
             return new PointF(newX + center.X, newY + center.Y);
         }
-
-        private void SetCalibrationAngle()
-        {
-            // 获取当前面的切割角度，然后用当前角度减去切割角度 等于拉直误差角度
-            FileTableItemChModel chModel = CurrentUtils.GetFileTableItemChModel();
-            float tempCh = Tools.GetFloatStringValue(chModel.ThetaDeg);
-            float thetaCurrentDeg = Tools.GetFloatStringValue(PlcControl.plc.GetPlcValueString(DeviceKey.thetaCurLocationKey));
-            GlobalParams.calibrationAngle = thetaCurrentDeg - tempCh;
-            Tools.LogInfo($"GlobalParams.calibrationAngle:{GlobalParams.calibrationAngle}");
-            Tools.LogInfo($"thetaCurrentDeg:{thetaCurrentDeg}");
-            Tools.LogInfo($"tempCh:{tempCh}");
-        }
     }
 
     public enum ThetaAlignStatus

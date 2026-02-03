@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using 精密切割系统.Driver;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut;
@@ -25,7 +26,7 @@ namespace 精密切割系统.ViewModel
 
         public ObservableCollection<string> WaitingFuncNames { get; set; }
 
-        private Visibility _alarmVisibility;
+        private Visibility _alarmVisibility = Visibility.Visible;
 
         public Visibility AlarmVisibility
         {
@@ -46,8 +47,7 @@ namespace 精密切割系统.ViewModel
             RightButtonParams = WindowLayout.RightPageButtons;
             ActiveAlarms = new ObservableCollection<ActiveAlarmModel>();
             WaitingFuncNames = new ObservableCollection<string>();
-            _alarmVisibility = Visibility.Visible;
-            Task.Run(async () =>
+            Task.Factory.StartNew(async () =>
             {
                 while (true)
                 {
@@ -93,6 +93,7 @@ namespace 精密切割系统.ViewModel
                         Application.Current.Dispatcher.Invoke(() =>
                         {
                             WaitingFuncNames.Clear();
+                            WaitingFuncNames.Add(KeyencePlc.PlcSemaphore.CurrentCount.ToString());
                             WaitingFuncNames.AddRange(TaskUtils.CurrentWaitingFuncDict.Values);
                             if (WaitingFuncNames.Count == 0)
                             {
@@ -110,7 +111,7 @@ namespace 精密切割系统.ViewModel
                     }
                     await Task.Delay(300);
                 }
-            });
+            }, TaskCreationOptions.LongRunning);
         }
 
         private bool IsSamely(List<AlarmInfo> alarmInfos, ObservableCollection<ActiveAlarmModel> activeAlarms)

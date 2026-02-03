@@ -82,7 +82,7 @@ namespace 精密切割系统.Model.plc
                 {
                     Tools.LogError($"报警监控异常: {ex.Message}");
                 }
-                await Task.Delay(100);
+                await Task.Delay(200);
             }
         }
 

@@ -56,7 +56,7 @@ namespace 精密切割系统.View.Controls
                     });
                 }
                 catch (Exception) { }
-                await Task.Delay(100);
+                await Task.Delay(200);
             }
         }
     }

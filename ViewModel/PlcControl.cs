@@ -47,9 +47,7 @@ namespace 精密切割系统.ViewModel
             return plcControl;
         }
 
-        private float epsilon = 0.00001f; // 一个小的容差值
-        public static string DefaultPlcIP = "192.168.10.10";
-        public static KeyencePlc plc = KeyencePlc.GetInstance(DefaultPlcIP);
+        public static KeyencePlc plc = KeyencePlc.Instance;
 
         // plc变量默认值是否初始化完成（tag中的default value属性会在连上plc的时候写入plc一次）
         public bool plcInit = false;
@@ -64,7 +62,7 @@ namespace 精密切割系统.ViewModel
         public static Dictionary<string, Tag> allTags = new Dictionary<string, Tag>();
 
         // plc连接状态
-        public static bool connectionStatus = false;
+        public static bool ConnectionStatus { get; set; } = false;
 
         // plc系统报警信息
         public static ObservableCollection<AlarmItem> allAlarm = new ObservableCollection<AlarmItem>();
@@ -142,254 +140,6 @@ namespace 精密切割系统.ViewModel
             }
         }
 
-        private static AlarmItem currentAxisAlarmItem = null;
-        private static AlarmItem currentDeviceAlarmItem = null;
-
-        /// <summary>
-        /// 记录报警日志
-        /// </summary>
-        public static void AddAlarmLog()
-        {
-            string formatStr = "yyyy年MM月dd日 HH:mm:ss";
-            // 监听DM1000和DM1010的值，
-            Thread thread = new Thread(() =>
-            {
-                // 轴报警错误
-                string dm1000 = PlcControl.plc.GetPlcValueStringByAddr("DM1000", PlcDataType.Int16);
-                if (!"0".Equals(dm1000) && (currentAxisAlarmItem == null || !dm1000.Equals(currentAxisAlarmItem.code)))
-                {
-                    currentAxisAlarmItem = new AlarmItem();
-                    currentAxisAlarmItem.code = dm1000;
-                    currentAxisAlarmItem.title = currentAxisAlarmItem.axisAlarm[dm1000];
-                    currentAxisAlarmItem.startTime = DateTime.Now.ToString(formatStr);
-                    Debug.WriteLine($"dm1010:{dm1000}");
-                    // 记录日志
-                    Tools.LogError($"异常报警，代码：{dm1000}，描述：{currentAxisAlarmItem.title}");
-                    // 记录日志
-                    RunLogsCommon.LogEvent(LogType.Error, new List<RunLogsViewModel>
-                    {
-                        new RunLogsViewModel(LogType.Error, "异常"),
-                        new RunLogsViewModel("时间", currentAxisAlarmItem.startTime),
-                        new RunLogsViewModel("异常编码", "A-" + currentAxisAlarmItem.code),
-                        new RunLogsViewModel("异常描述", currentAxisAlarmItem.title),
-                    });
-                }
-                else if ("0".Equals(dm1000))
-                {
-                    currentAxisAlarmItem = null;
-                }
-                // 设备信息
-                string dm1010 = PlcControl.plc.GetPlcValueStringByAddr("DM1010", PlcDataType.Int16);
-                if (!"0".Equals(dm1010) && (currentDeviceAlarmItem == null || !dm1000.Equals(currentDeviceAlarmItem.code)))
-                {
-                    currentDeviceAlarmItem = new AlarmItem();
-                    currentDeviceAlarmItem.code = dm1010;
-                    currentDeviceAlarmItem.title = currentDeviceAlarmItem.axisAlarm[dm1010];
-                    currentDeviceAlarmItem.startTime = DateTime.Now.ToString(formatStr);
-                    Debug.WriteLine($"dm1010:{dm1010}");
-                    // 记录日志
-                    Tools.LogError($"异常报警，代码：{dm1010}，描述：{currentDeviceAlarmItem.title}");
-                    // 记录日志
-                    RunLogsCommon.LogEvent(LogType.Error, new List<RunLogsViewModel>
-                    {
-                        new RunLogsViewModel(LogType.Error, "异常"),
-                        new RunLogsViewModel("时间", currentDeviceAlarmItem.startTime),
-                        new RunLogsViewModel("异常编码", "D-" + currentDeviceAlarmItem.code),
-                        new RunLogsViewModel("异常描述", currentDeviceAlarmItem.title),
-                    });
-                }
-                else if ("0".Equals(dm1010))
-                {
-                    currentDeviceAlarmItem = null;
-                }
-                Thread.Sleep(200);
-            });
-            thread.IsBackground = true;
-            thread.Start();
-        }
-
-        /// <summary>
-        /// 步进补偿
-        /// </summary>
-        /// <param name="location"></param>
-        /// <param name="axisParams"></param>
-        /// <param name="directionType"></param>
-        /// <returns></returns>
-        public static string GetCompensateStep2(float stepIndex, string axisParams, int directionType = -1, float targetPosition = -100)
-        {
-            // 获取当前位置 光栅尺位置
-            string currentLocationStr = GetCurrentLocation(axisParams, 0);
-            // 获取补偿数据模型
-            List<PositionCompensationModel> models = CurrentUtils.GetPositionCompensationModels();
-            if (models == null || models.Count == 0) return null;
-
-            if (!float.TryParse(currentLocationStr, out float currLocation))
-            {
-                return null; // 数据无效，直接返回原目标位置
-            }
-            float targetLocation = targetPosition == -100 ? currLocation + stepIndex : targetPosition;
-            // 确定补偿方向
-            PositionCompensationModel axisModel = null;
-            if (directionType == -1) // 自动判断方向
-            {
-                directionType = targetLocation > currLocation ? 0 : 1;
-            }
-            axisModel = models.Find(item => item.AxisType.Equals(axisParams + (directionType == 1 ? "-反向" : "")));
-            // 无法找到对应轴的补偿信息
-            if (axisModel == null) return targetLocation.ToString();
-            targetLocation = (float)Math.Round(targetLocation, GlobalParams.decimalPlaces);
-            // 获取目标点位的补偿数据
-            float targetLocationComp = CalculateCompensation(axisModel, targetLocation, directionType);
-            float compStr = 0;
-            // 获取当前点位(上一点位)的补偿数据
-            float currentLocationComp = CalculateCompensation(axisModel, currLocation, directionType);
-            // 判断2个位置之间的
-            // 用目标点位的补偿值 - 上一目标值的补偿值 = 2个点之间的差值
-            float comp = (float)Math.Round(targetLocationComp - currentLocationComp, GlobalParams.decimalPlaces);
-            if (directionType == 0)
-            {
-                stepIndex += comp;
-                compStr = comp;
-            }
-            else if (directionType == 1)
-            {
-                stepIndex -= comp;
-                compStr = comp;
-            }
-            // 电机位置
-            float yCurrentPosition = Tools.GetFloatStringValue(GetCurrentLocation(axisParams, 0));
-            // 最终位置等于 电机位置 + 步进 + comp
-            yCurrentPosition = yCurrentPosition + stepIndex;
-            Debug.WriteLine($"targetLocation:{targetLocation} /t realPosition:{yCurrentPosition}");
-            Tools.WriteLineToFile(
-                   $"{DateTime.Now}\t{stepIndex}\t{targetLocation}\t{yCurrentPosition}\t{currLocation}\t{compStr.ToString("F6")}"
-                   , "logs/compInfo.txt");
-            return yCurrentPosition.ToString("F6"); // 返回调整后的目标位置，保留6位小数
-        }
-
-        /// <summary>
-        /// 步进补偿
-        /// </summary>
-        /// <param name="location"></param>
-        /// <param name="axisParams"></param>
-        /// <param name="directionType"></param>
-        /// <returns></returns>
-        public static string GetCompensateStep(string stepValue, string axisParams, float targetLocationValue, int directionType = -1)
-        {
-            // 获取当前位置 Tools.GetFloatStringValue(GetCurrentLocation(axisParams))
-            string currentLocationStr = GetCurrentLocation(axisParams);
-            float targetLocation = (float)((GlobalParams.upPosition == -100 ? targetLocationValue
-                : GlobalParams.upPosition) + Tools.GetFloatStringValue(stepValue));
-            // 获取补偿数据模型
-            List<PositionCompensationModel> models = CurrentUtils.GetPositionCompensationModels();
-            if (models == null || models.Count == 0) return targetLocation.ToString();
-
-            if (!float.TryParse(currentLocationStr, out float currLocation))
-            {
-                return targetLocation.ToString(); // 数据无效，直接返回原目标位置
-            }
-
-            // 确定补偿方向
-            PositionCompensationModel axisModel = null;
-            if (directionType == -1) // 自动判断方向
-            {
-                directionType = targetLocation > currLocation ? 0 : 1;
-            }
-            axisModel = models.Find(item => item.AxisType.Equals(axisParams + (directionType == 1 ? "-反向" : "")));
-            // 无法找到对应轴的补偿信息
-            if (axisModel == null) return targetLocation.ToString();
-            targetLocation = (float)Math.Round(targetLocation, GlobalParams.decimalPlaces);
-            // 获取目标点位的补偿数据
-            float targetLocationComp = CalculateCompensation(axisModel, targetLocation, directionType);
-            float realPosition = targetLocation; // 本次要走的位置
-            string compStr = "";
-            // 如果步进等于0 则取一个点的补偿就返回
-            if (stepValue.Equals("0"))
-            {
-                if (directionType == 0)
-                {
-                    realPosition -= targetLocationComp;
-                    compStr = $"正方向补偿-={targetLocationComp}";
-                }
-                else if (directionType == 1)
-                {
-                    realPosition += targetLocationComp;
-                    compStr = $"反方向补偿-={targetLocationComp}";
-                }
-            }
-            else
-            {
-                // 获取当前点位(上一点位)的补偿数据
-                float currentLocationComp = CalculateCompensation(axisModel, GlobalParams.upPosition, directionType);
-                // 判断2个位置之间的
-                // 用目标点位的补偿值 - 上一目标值的补偿值 = 2个点之间的差值
-                float comp = (float)Math.Round(targetLocationComp - currentLocationComp, GlobalParams.decimalPlaces);
-                // 如果两次的差值小于0.0002 则不补偿，加入总补偿差值
-                GlobalParams.allDeepValue += comp;
-                // 如果累积的差值大于0.0002 则本次运动需要加上补偿值 0.0002
-                Tools.LogInfo($"comp:{comp}\tGlobalParams.allDeepValue:{GlobalParams.allDeepValue}");
-                if (MathF.Round(GlobalParams.allDeepValue, 4) >= 0.0002f || MathF.Round(GlobalParams.allDeepValue, 4) <= -0.0002f)
-                {
-                    if (directionType == 0)
-                    {
-                        realPosition -= GlobalParams.allDeepValue;
-                        compStr = $"正方向补偿-={GlobalParams.allDeepValue}";
-                        Tools.LogInfo(compStr);
-                    }
-                    else if (directionType == 1)
-                    {
-                        realPosition += GlobalParams.allDeepValue;
-                        compStr = $"反方向补偿-={GlobalParams.allDeepValue}";
-                        Tools.LogInfo(compStr);
-                    }
-                    GlobalParams.allDeepValue = 0;
-                }
-            }
-            GlobalParams.upPosition = realPosition;
-            Debug.WriteLine($"targetLocation:{targetLocation} /t realPosition:{realPosition}");
-            Tools.WriteLineToFile(
-                   $"{DateTime.Now}\t{targetLocationValue}\t{stepValue}\t{targetLocation}\t{realPosition}\t{compStr}"
-                   , "logs/compInfo.txt");
-            return realPosition.ToString("F4"); // 返回调整后的目标位置，保留6位小数
-        }
-
-        public static string GetCompensate(string location, string axisParams, int directionType = -1)
-        {
-            // 获取补偿数据模型
-            List<PositionCompensationModel> models = CurrentUtils.GetPositionCompensationModels();
-            if (models == null || models.Count == 0) return location;
-
-            // 获取当前位置
-            string currentLocationStr = GetCurrentLocation(axisParams);
-            if (!float.TryParse(currentLocationStr, out float currLocation) || !float.TryParse(location, out float targetLocation))
-            {
-                return location; // 数据无效，直接返回原目标位置
-            }
-
-            // 确定补偿方向
-            PositionCompensationModel axisModel = null;
-            if (directionType == -1) // 自动判断方向
-            {
-                directionType = targetLocation > currLocation ? 0 : 1;
-            }
-            axisModel = models.Find(item => item.AxisType.Equals(axisParams + (directionType == 1 ? "-反向" : "")));
-
-            // 无法找到对应轴的补偿信息
-            if (axisModel == null) return location;
-            targetLocation = (float)Math.Round(targetLocation, GlobalParams.decimalPlaces);
-            // 调用补偿计算函数
-            float adjustedLocation = CalculateCompensation(axisModel, targetLocation, directionType);
-            if (directionType == 0)
-            {
-                targetLocation -= adjustedLocation;
-            }
-            else if (directionType == 1)
-            {
-                targetLocation += adjustedLocation;
-            }
-            return targetLocation.ToString("F6"); // 返回调整后的目标位置，保留6位小数
-        }
-
         public static async Task<float> GetCompensateAsync(Axis axis, float location)
         {
             // 获取补偿数据模型
@@ -420,42 +170,6 @@ namespace 精密切割系统.ViewModel
                 targetLocation += adjustedLocation;
             }
             return targetLocation; // 返回调整后的目标位置，保留6位小数
-        }
-
-        /// <summary>
-        /// 根据轴参数获取当前位置
-        /// </summary>
-        public static string GetCurrentLocation(string axisParams, int type = 1)
-        {
-            try
-            {
-                if (type == 0)
-                {
-                    return axisParams switch
-                    {
-                        "X轴" => PlcControl.plc.GetPlcValueString(DeviceKey.curLocationKey),
-                        "Y轴" => PlcControl.plc.GetPlcValueString(DeviceKey.yCurLocationKey),
-                        "Z1轴" => PlcControl.plc.GetPlcValueString(DeviceKey.z1CurLocationKey),
-                        _ => null // 未知轴类型
-                    };
-                }
-                else if (type == 1)
-                {
-                    return axisParams switch
-                    {
-                        "X轴" => PlcControl.plc.GetPlcValueString(DeviceKey.curLocationKey),
-                        "Y轴" => PlcControl.plc.GetPlcValueString(DeviceKey.yGratingRulerCurLocationKey),
-                        "Z1轴" => PlcControl.plc.GetPlcValueString(DeviceKey.z1GratingRulerCurLocationKey),
-                        _ => null // 未知轴类型
-                    };
-                }
-                return null;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error retrieving current location for {axisParams}: {ex.Message}");
-                return null;
-            }
         }
 
         /// <summary>
@@ -711,22 +425,6 @@ namespace 精密切割系统.ViewModel
             float b = (sumY - a * sumX) / n;
 
             return (a, b);
-        }
-
-        public bool ConnectPlc()
-        {
-            connectionStatus = plc.ConnectPlc();
-            return connectionStatus;
-        }
-
-        public bool DisconnectPlc()
-        {
-            bool res = plc.CloseConnect();
-            if (res)
-            {
-                connectionStatus = false;
-            }
-            return res;
         }
     }
 }

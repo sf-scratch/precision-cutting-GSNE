@@ -183,45 +183,42 @@ namespace 精密切割系统.ViewModel
 
         private async Task MonitiorAxisState(CancellationToken token)
         {
-            await Task.Run(async () =>
+            using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
+            while (await timer.WaitForNextTickAsync(token))
             {
-                using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
-                while (await timer.WaitForNextTickAsync(token))
+                var axisPostion = await AutoCutUtils.GetAxisPositionAsync();
+                var axisState = await AutoCutUtils.GetAxisStateAsync();
+                var xAxis = AxisOperationList.Where(p => p.AxisName == AxisNameType.X).FirstOrDefault();
+                if (xAxis is not null)
                 {
-                    var axisPostion = await AutoCutUtils.GetAxisPositionAsync();
-                    var axisState = await AutoCutUtils.GetAxisStateAsync();
-                    var xAxis = AxisOperationList.Where(p => p.AxisName == AxisNameType.X).FirstOrDefault();
-                    if (xAxis is not null)
-                    {
-                        xAxis.CurPosition = axisPostion.X?.ToString("F3") ?? "N";
-                        xAxis.IsReady = axisState.X == true;
-                    }
-                    var yAxis = AxisOperationList.Where(p => p.AxisName == AxisNameType.Y).FirstOrDefault();
-                    if (yAxis is not null)
-                    {
-                        yAxis.CurPosition = axisPostion.Y?.ToString("F3") ?? "N";
-                        yAxis.IsReady = axisState.Y == true;
-                    }
-                    var zAxis = AxisOperationList.Where(p => p.AxisName == AxisNameType.Z1).FirstOrDefault();
-                    if (zAxis is not null)
-                    {
-                        zAxis.CurPosition = axisPostion.Z1?.ToString("F3") ?? "N";
-                        zAxis.IsReady = axisState.Z1 == true;
-                    }
-                    var z2Axis = AxisOperationList.Where(p => p.AxisName == AxisNameType.Z2).FirstOrDefault();
-                    if (z2Axis is not null)
-                    {
-                        z2Axis.CurPosition = axisPostion.Z2?.ToString("F3") ?? "N";
-                        z2Axis.IsReady = axisState.Z2 == true;
-                    }
-                    var thetaAxis = AxisOperationList.Where(p => p.AxisName == AxisNameType.Theta).FirstOrDefault();
-                    if (thetaAxis is not null)
-                    {
-                        thetaAxis.CurPosition = axisPostion.Theta?.ToString("F3") ?? "N";
-                        thetaAxis.IsReady = axisState.Theta == true;
-                    }
+                    xAxis.CurPosition = axisPostion.X?.ToString("F3") ?? "N";
+                    xAxis.IsReady = axisState.X == true;
                 }
-            });
+                var yAxis = AxisOperationList.Where(p => p.AxisName == AxisNameType.Y).FirstOrDefault();
+                if (yAxis is not null)
+                {
+                    yAxis.CurPosition = axisPostion.Y?.ToString("F3") ?? "N";
+                    yAxis.IsReady = axisState.Y == true;
+                }
+                var zAxis = AxisOperationList.Where(p => p.AxisName == AxisNameType.Z1).FirstOrDefault();
+                if (zAxis is not null)
+                {
+                    zAxis.CurPosition = axisPostion.Z1?.ToString("F3") ?? "N";
+                    zAxis.IsReady = axisState.Z1 == true;
+                }
+                var z2Axis = AxisOperationList.Where(p => p.AxisName == AxisNameType.Z2).FirstOrDefault();
+                if (z2Axis is not null)
+                {
+                    z2Axis.CurPosition = axisPostion.Z2?.ToString("F3") ?? "N";
+                    z2Axis.IsReady = axisState.Z2 == true;
+                }
+                var thetaAxis = AxisOperationList.Where(p => p.AxisName == AxisNameType.Theta).FirstOrDefault();
+                if (thetaAxis is not null)
+                {
+                    thetaAxis.CurPosition = axisPostion.Theta?.ToString("F3") ?? "N";
+                    thetaAxis.IsReady = axisState.Theta == true;
+                }
+            }
         }
 
         private async Task SetLowSpeedAsync()
@@ -233,7 +230,7 @@ namespace 精密切割系统.ViewModel
         {
             base.OnNavigatedTo(navigationContext);
             _cts = new CancellationTokenSource();
-            _ = MonitiorAxisState(_cts.Token);
+            _ = Task.Run(() => MonitiorAxisState(_cts.Token));
             InitRightButton();
             InitBottomButton();
         }

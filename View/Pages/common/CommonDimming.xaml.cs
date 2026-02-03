@@ -28,12 +28,12 @@ namespace 精密切割系统.View.Pages.common
     {
         private CancellationTokenSource _cts = new();
 
-        private DelegateCommand<string> _updateExposureTime;
-        public DelegateCommand<string> UpdateExposureTimeCommand => _updateExposureTime ??= new DelegateCommand<string>(ExecuteUpdateExposureTimeCommand);
+        private AsyncDelegateCommand<string> _updateExposureTime;
+        public AsyncDelegateCommand<string> UpdateExposureTimeCommand => _updateExposureTime ??= new AsyncDelegateCommand<string>(ExecuteUpdateExposureTimeCommand);
 
-        private void ExecuteUpdateExposureTimeCommand(string exposureTime)
+        private async Task ExecuteUpdateExposureTimeCommand(string exposureTime)
         {
-            CameraUtils.SetCameraExposureTime(CameraUtils.GetCameraExposureTime() + exposureTime.ToFloat());
+            await CameraUtils.SetCameraExposureTimeAsync(CameraUtils.GetCameraExposureTime() + exposureTime.ToFloat());
         }
 
         public CommonDimming()
@@ -73,7 +73,7 @@ namespace 精密切割系统.View.Pages.common
                 _cts = new CancellationTokenSource();
             }
             CancellationToken token = _cts.Token;
-            Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
                 using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
                 while (await timer.WaitForNextTickAsync(token))

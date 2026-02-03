@@ -278,13 +278,6 @@ namespace 精密切割系统.ViewModel
             _intervalTimer = new DynamicIntervalTimer(TimeSpan.FromMilliseconds(500), TimeSpan.FromMilliseconds(30));
             _operatCts = new CancellationTokenSource();
             InitBottomButton();
-            StartGetAxisInfo();
-            if (_isReuseView)
-            {
-                _isReuseView = false;
-                return;
-            }
-            _semiAutomaticCuttingRunViewModel = navigationContext.Parameters.GetValue<MQSemiAutomaticCuttingRunViewModel>(nameof(MQSemiAutomaticCuttingRunViewModel));
             if (navigationContext.Parameters.TryGetValue<CutServicePauseData>(nameof(CutServicePauseData), out var pauseData))
             {
                 _pauseData = pauseData;
@@ -301,6 +294,13 @@ namespace 精密切割系统.ViewModel
             {
                 InitRightButton();
             }
+            StartGetAxisInfo();
+            if (_isReuseView)
+            {
+                _isReuseView = false;
+                return;
+            }
+            _semiAutomaticCuttingRunViewModel = navigationContext.Parameters.GetValue<MQSemiAutomaticCuttingRunViewModel>(nameof(MQSemiAutomaticCuttingRunViewModel));
             CutParam = _semiAutomaticCuttingRunViewModel.CutParam;
             float? xLocation = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync();
             float? yLocation = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync();

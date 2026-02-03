@@ -25,24 +25,32 @@ namespace 精密切割系统.Driver
     //基恩士PLC各个点位和变量的读取及写入
     public class KeyencePlc
     {
-        private const int MinDelayMs = 50; // 基础延迟
+        private static readonly Lazy<KeyencePlc> _lazy = new(() => new KeyencePlc());
+
+        public static KeyencePlc Instance
+        {
+            get { return _lazy.Value; }
+        }
+
+        private const int MinDelayMs = 100; // 基础延迟
         public static string plcIP = "192.168.10.10";
-        private static KeyencePlc? plc = null;
-        private static readonly object _Object = new object();
-        private static volatile KeyenceMcNet keyence_net = new KeyenceMcNet(plcIP, 5000);
+        private static KeyenceMcNet keyence_net = new KeyenceMcNet(plcIP, 5000);
         private static KeyenceMcNet _keyence_async_net = new KeyenceMcNet(plcIP, 5000);
         public static OperateResult connect;
         public Dictionary<string, PlcDataType> typeMap = new Dictionary<string, PlcDataType>();
+        public static readonly SemaphoreSlim PlcSemaphore = new(10, 10);
+        private readonly TimeSpan TimeOutSpan = TimeSpan.FromSeconds(3);
 
         static KeyencePlc()
         {
+            keyence_net.ConnectTimeOut = 1000;
+            keyence_net.ReceiveTimeOut = MinDelayMs;
             _keyence_async_net.ConnectTimeOut = 1000;
             _keyence_async_net.ReceiveTimeOut = MinDelayMs;
         }
 
-        private KeyencePlc(string ip)
+        private KeyencePlc()
         {
-            plcIP = ip;
             typeMap.Add("bool", PlcDataType.Bool);
             typeMap.Add("int16", PlcDataType.Int16);
             typeMap.Add("uint16", PlcDataType.UInt16);
@@ -54,328 +62,177 @@ namespace 精密切割系统.Driver
             typeMap.Add("double", PlcDataType.Double);
         }
 
-        /// <summary>
-        /// 全局访问点, 获取唯一系统操作类实例
-        /// 设置为静态方法则可在外边无需创建该类的实例就可调用该方法
-        /// 回原点 MR304 Z2  MR204 Z1  MR104 Y轴  MR004 X轴  标定 MR500 复位 MR501 停止 MR502
-        /// </summary>
-        /// <returns></returns>
-        public static KeyencePlc GetInstance(string? plcIP = null)
+        public async Task<CommonResult> ConnectServerAsync()
         {
-            lock (_Object)
-            {
-                if (plc == null && plcIP != null)
-                {
-                    plc = new KeyencePlc(plcIP);
-                }
-                if (plc != null && (connect == null || !connect.IsSuccess))
-                {
-                    if (GlobalParams.OnlineFlag)
-                    {
-                        plc.EnsurePlcConnected();  // 确保PLC连接;
-                    }
-                    else
-                    {
-                        plc = new KeyencePlc(plcIP);
-                    }
-                }
-            }
-            return plc;
-        }
-
-        public bool ConnectPlc(string? IP = null)
-        {
-            if (IP != null)
-            {
-                keyence_net = new KeyenceMcNet(IP, 5000);
-                plcIP = IP;
-            }
-            else
-            {
-                keyence_net = new KeyenceMcNet(plcIP, 5000);
-            }
-
-            connect = keyence_net.ConnectServer();
+            var connect = await keyence_net.ConnectServerAsync();
             if (!connect.IsSuccess)
             {
-                Tools.LogError("PLC连接失败！");
-                return false;
+                return CommonResult.Failure($"PLC连接失败: {connect.Message}");
             }
-
-            // 进行一次PLC读写测试，确保通信正常
-            if (!TestPlcCommunication())
-            {
-                Tools.LogError("PLC连接成功，但无法通信！");
-                return false;
-            }
-
-            return true;
-        }
-
-        public async Task<bool> ConnectPlcAsync(string? IP = null)
-        {
-            if (IP != null)
-            {
-                _keyence_async_net = new KeyenceMcNet(IP, 5000);
-                plcIP = IP;
-            }
-            else
-            {
-                _keyence_async_net = new KeyenceMcNet(plcIP, 5000);
-            }
-
             connect = await _keyence_async_net.ConnectServerAsync();
             if (!connect.IsSuccess)
             {
-                Tools.LogError("PLC连接失败！");
-                return false;
+                return CommonResult.Failure($"PLC连接失败: {connect.Message}");
             }
-
-            // 进行一次PLC读写测试，确保通信正常
-            if (!await TestPlcCommunicationAsync())
-            {
-                Tools.LogError("PLC连接成功，但无法通信！");
-                return false;
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// 测试PLC是否真的可以通信
-        /// </summary>
-        /// <returns>是否通信成功</returns>
-        private bool TestPlcCommunication()
-        {
-            if (keyence_net == null)
-            {
-                return false;
-            }
-            // 进行读写测试组合验证 257110103562
-            var testRead = keyence_net.ReadBool("MR1010", 1);
-            if (!testRead.IsSuccess) return false;
-
-            // 写入测试
-            //var testWrite = keyence_net.Write("MR1010", testRead.Content[0]);
-            //if (!testWrite.IsSuccess) return false;
-
-            // 再次读取验证
-            var verifyRead = keyence_net.ReadBool("MR1010", 1);
-            return verifyRead.IsSuccess && verifyRead.Content[0] == testRead.Content[0];
-        }
-
-        /// <summary>
-        /// 测试PLC是否真的可以通信
-        /// </summary>
-        /// <returns>是否通信成功</returns>
-        private async Task<bool> TestPlcCommunicationAsync()
-        {
-            if (keyence_net == null)
-            {
-                return false;
-            }
-            // 进行读写测试组合验证 257110103562
-            var testRead = await _keyence_async_net.ReadBoolAsync("MR1010", 1);
-            if (!testRead.IsSuccess)
-            {
-                return false;
-            }
-
-            // 写入测试
-            //var testWrite = await keyence_net.WriteAsync("MR1010", testRead.Content[0]);
-            //if (!testWrite.IsSuccess) return false;
-
-            // 再次读取验证
-            var verifyRead = await _keyence_async_net.ReadBoolAsync("MR1010", 1);
-            bool result = verifyRead.IsSuccess && verifyRead.Content[0] == testRead.Content[0];
-            if (!result)
-            {
-            }
-            return result;
-        }
-
-        public bool CloseConnect()
-        {
-            if (keyence_net != null)
-            {
-                OperateResult result = keyence_net.ConnectClose();
-                keyence_net = null; // 释放对象，防止旧连接影响新连接
-                plc = plc = new KeyencePlc(plcIP);
-                connect = null;
-                return result.IsSuccess;
-            }
-            return false;
-        }
-
-        public async Task<bool> CloseConnectAsync()
-        {
-            if (_keyence_async_net != null)
-            {
-                OperateResult result = await _keyence_async_net.ConnectCloseAsync();
-                _keyence_async_net = null; // 释放对象，防止旧连接影响新连接
-                plc = plc = new KeyencePlc(plcIP);
-                connect = null;
-                return result.IsSuccess;
-            }
-            return false;
+            return CommonResult.Success();
         }
 
         public string readData(string plcAddr, PlcDataType dataType = PlcDataType.Int32, ushort dataNumber = 1)
         {
             if (!GlobalParams.OnlineFlag) return "";
-
-            const int maxRetries = 3;
-
-            for (int attempt = 1; attempt <= maxRetries; attempt++)
+            if (!PlcSemaphore.Wait(TimeOutSpan))
             {
-                try
-                {
-                    if (!EnsurePlcConnected())
-                    {
-                        Tools.Monitor($"同步 读取PLC失败：PLC未连接（尝试 {attempt}/{maxRetries}）");
-                        continue;
-                    }
-
-                    OperateResult<object[]> read = null;
-                    switch (dataType)
-                    {
-                        case PlcDataType.Bool:
-                            var boolResult = keyence_net.ReadBool(plcAddr, dataNumber);
-                            read = boolResult.IsSuccess ?
-                                OperateResult.CreateSuccessResult(boolResult.Content.Cast<object>().ToArray()) :
-                                OperateResult.CreateFailedResult<object[]>(boolResult);
-                            break;
-
-                        case PlcDataType.Int16:
-                            var int16Result = keyence_net.ReadInt16(plcAddr, dataNumber);
-                            if (int16Result.IsSuccess)
-                            {
-                                var convertedContent = int16Result.Content.Select(x => (object)((int)x)).ToArray();
-                                read = OperateResult.CreateSuccessResult(convertedContent);
-                            }
-                            else
-                            {
-                                read = OperateResult.CreateFailedResult<object[]>(int16Result);
-                            }
-                            break;
-
-                        case PlcDataType.UInt16:
-                            var uint16Result = keyence_net.ReadUInt16(plcAddr, dataNumber);
-                            if (uint16Result.IsSuccess)
-                            {
-                                var convertedContent = uint16Result.Content.Select(x => (object)((uint)x)).ToArray();
-                                read = OperateResult.CreateSuccessResult(convertedContent);
-                            }
-                            else
-                            {
-                                read = OperateResult.CreateFailedResult<object[]>(uint16Result);
-                            }
-                            break;
-
-                        case PlcDataType.Int32:
-                            var int32Result = keyence_net.ReadInt32(plcAddr, dataNumber);
-                            if (int32Result.IsSuccess)
-                            {
-                                var convertedContent = int32Result.Content.Select(x => (object)((int)x)).ToArray();
-                                read = OperateResult.CreateSuccessResult(convertedContent);
-                            }
-                            else
-                            {
-                                read = OperateResult.CreateFailedResult<object[]>(int32Result);
-                            }
-                            break;
-
-                        case PlcDataType.UInt32:
-                            var uint32Result = keyence_net.ReadUInt32(plcAddr, dataNumber);
-                            if (uint32Result.IsSuccess)
-                            {
-                                var convertedContent = uint32Result.Content.Select(x => (object)((uint)x)).ToArray();
-                                read = OperateResult.CreateSuccessResult(convertedContent);
-                            }
-                            else
-                            {
-                                read = OperateResult.CreateFailedResult<object[]>(uint32Result);
-                            }
-                            break;
-
-                        case PlcDataType.Int64:
-                            var int64Result = keyence_net.ReadInt64(plcAddr, dataNumber);
-                            if (int64Result.IsSuccess)
-                            {
-                                var convertedContent = int64Result.Content.Select(x => (object)((long)x)).ToArray();
-                                read = OperateResult.CreateSuccessResult(convertedContent);
-                            }
-                            else
-                            {
-                                read = OperateResult.CreateFailedResult<object[]>(int64Result);
-                            }
-                            break;
-
-                        case PlcDataType.UInt64:
-                            var uint64Result = keyence_net.ReadUInt64(plcAddr, dataNumber);
-                            if (uint64Result.IsSuccess)
-                            {
-                                var convertedContent = uint64Result.Content.Select(x => (object)((ulong)x)).ToArray();
-                                read = OperateResult.CreateSuccessResult(convertedContent);
-                            }
-                            else
-                            {
-                                read = OperateResult.CreateFailedResult<object[]>(uint64Result);
-                            }
-                            break;
-
-                        case PlcDataType.Float:
-                            var floatResult = keyence_net.ReadFloat(plcAddr, dataNumber);
-                            if (floatResult.IsSuccess)
-                            {
-                                var convertedContent = floatResult.Content.Select(x => (object)((float)x)).ToArray();
-                                read = OperateResult.CreateSuccessResult(convertedContent);
-                            }
-                            else
-                            {
-                                read = OperateResult.CreateFailedResult<object[]>(floatResult);
-                            }
-                            break;
-
-                        case PlcDataType.Double:
-                            var doubleResult = keyence_net.ReadDouble(plcAddr, dataNumber);
-                            if (doubleResult.IsSuccess)
-                            {
-                                var convertedContent = doubleResult.Content.Select(x => (object)((double)x)).ToArray();
-                                read = OperateResult.CreateSuccessResult(convertedContent);
-                            }
-                            else
-                            {
-                                read = OperateResult.CreateFailedResult<object[]>(doubleResult);
-                            }
-                            break;
-
-                        default:
-                            throw new ArgumentException($"不支持的数据类型：{dataType}");
-                    }
-
-                    if (read != null && read.IsSuccess && read.Content != null && read.Content.Length > 0)
-                    {
-                        return read.Content[0].ToString();
-                    }
-
-                    if (attempt < maxRetries)
-                    {
-                        //Tools.LogWarning($"读取PLC数据失败，地址：{plcAddr}，类型：{dataType}，尝试第{attempt}次重试");
-                        System.Threading.Thread.Sleep(MinDelayMs);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    //Tools.LogError($"读取PLC异常：地址 {plcAddr}，类型 {dataType}，尝试 {attempt}/{maxRetries}，异常：{ex.Message}");
-                    if (attempt < maxRetries)
-                    {
-                        System.Threading.Thread.Sleep(MinDelayMs);
-                    }
-                }
+                return null;
             }
+            try
+            {
+                const int maxRetries = 3;
+                for (int attempt = 1; attempt <= maxRetries; attempt++)
+                {
+                    try
+                    {
+                        OperateResult<object[]> read = null;
+                        switch (dataType)
+                        {
+                            case PlcDataType.Bool:
+                                var boolResult = keyence_net.ReadBool(plcAddr, dataNumber);
+                                read = boolResult.IsSuccess ?
+                                    OperateResult.CreateSuccessResult(boolResult.Content.Cast<object>().ToArray()) :
+                                    OperateResult.CreateFailedResult<object[]>(boolResult);
+                                break;
 
-            Tools.Monitor($"同步 读取PLC失败：地址 {plcAddr}，类型 {dataType}，所有尝试均失败");
+                            case PlcDataType.Int16:
+                                var int16Result = keyence_net.ReadInt16(plcAddr, dataNumber);
+                                if (int16Result.IsSuccess)
+                                {
+                                    var convertedContent = int16Result.Content.Select(x => (object)((int)x)).ToArray();
+                                    read = OperateResult.CreateSuccessResult(convertedContent);
+                                }
+                                else
+                                {
+                                    read = OperateResult.CreateFailedResult<object[]>(int16Result);
+                                }
+                                break;
+
+                            case PlcDataType.UInt16:
+                                var uint16Result = keyence_net.ReadUInt16(plcAddr, dataNumber);
+                                if (uint16Result.IsSuccess)
+                                {
+                                    var convertedContent = uint16Result.Content.Select(x => (object)((uint)x)).ToArray();
+                                    read = OperateResult.CreateSuccessResult(convertedContent);
+                                }
+                                else
+                                {
+                                    read = OperateResult.CreateFailedResult<object[]>(uint16Result);
+                                }
+                                break;
+
+                            case PlcDataType.Int32:
+                                var int32Result = keyence_net.ReadInt32(plcAddr, dataNumber);
+                                if (int32Result.IsSuccess)
+                                {
+                                    var convertedContent = int32Result.Content.Select(x => (object)((int)x)).ToArray();
+                                    read = OperateResult.CreateSuccessResult(convertedContent);
+                                }
+                                else
+                                {
+                                    read = OperateResult.CreateFailedResult<object[]>(int32Result);
+                                }
+                                break;
+
+                            case PlcDataType.UInt32:
+                                var uint32Result = keyence_net.ReadUInt32(plcAddr, dataNumber);
+                                if (uint32Result.IsSuccess)
+                                {
+                                    var convertedContent = uint32Result.Content.Select(x => (object)((uint)x)).ToArray();
+                                    read = OperateResult.CreateSuccessResult(convertedContent);
+                                }
+                                else
+                                {
+                                    read = OperateResult.CreateFailedResult<object[]>(uint32Result);
+                                }
+                                break;
+
+                            case PlcDataType.Int64:
+                                var int64Result = keyence_net.ReadInt64(plcAddr, dataNumber);
+                                if (int64Result.IsSuccess)
+                                {
+                                    var convertedContent = int64Result.Content.Select(x => (object)((long)x)).ToArray();
+                                    read = OperateResult.CreateSuccessResult(convertedContent);
+                                }
+                                else
+                                {
+                                    read = OperateResult.CreateFailedResult<object[]>(int64Result);
+                                }
+                                break;
+
+                            case PlcDataType.UInt64:
+                                var uint64Result = keyence_net.ReadUInt64(plcAddr, dataNumber);
+                                if (uint64Result.IsSuccess)
+                                {
+                                    var convertedContent = uint64Result.Content.Select(x => (object)((ulong)x)).ToArray();
+                                    read = OperateResult.CreateSuccessResult(convertedContent);
+                                }
+                                else
+                                {
+                                    read = OperateResult.CreateFailedResult<object[]>(uint64Result);
+                                }
+                                break;
+
+                            case PlcDataType.Float:
+                                var floatResult = keyence_net.ReadFloat(plcAddr, dataNumber);
+                                if (floatResult.IsSuccess)
+                                {
+                                    var convertedContent = floatResult.Content.Select(x => (object)((float)x)).ToArray();
+                                    read = OperateResult.CreateSuccessResult(convertedContent);
+                                }
+                                else
+                                {
+                                    read = OperateResult.CreateFailedResult<object[]>(floatResult);
+                                }
+                                break;
+
+                            case PlcDataType.Double:
+                                var doubleResult = keyence_net.ReadDouble(plcAddr, dataNumber);
+                                if (doubleResult.IsSuccess)
+                                {
+                                    var convertedContent = doubleResult.Content.Select(x => (object)((double)x)).ToArray();
+                                    read = OperateResult.CreateSuccessResult(convertedContent);
+                                }
+                                else
+                                {
+                                    read = OperateResult.CreateFailedResult<object[]>(doubleResult);
+                                }
+                                break;
+
+                            default:
+                                throw new ArgumentException($"不支持的数据类型：{dataType}");
+                        }
+
+                        if (read != null && read.IsSuccess && read.Content != null && read.Content.Length > 0)
+                        {
+                            return read.Content[0].ToString();
+                        }
+
+                        if (attempt < maxRetries)
+                        {
+                            System.Threading.Thread.Sleep(MinDelayMs);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        if (attempt < maxRetries)
+                        {
+                            System.Threading.Thread.Sleep(MinDelayMs);
+                        }
+                    }
+                }
+                Tools.Monitor($"同步 读取PLC失败：地址 {plcAddr}，类型 {dataType}，所有尝试均失败");
+            }
+            finally
+            {
+                PlcSemaphore.Release();
+            }
             return null;
         }
 
@@ -392,37 +249,43 @@ namespace 精密切割系统.Driver
         public async Task<bool[]?> ReadDataAsync(string plcAddr, ushort dataNumber)
         {
             if (!GlobalParams.OnlineFlag) return null;
-            const int maxRetries = 3;
-            for (int attempt = 1; attempt <= maxRetries; attempt++)
+            if (!await PlcSemaphore.WaitAsync(TimeOutSpan))
             {
-                try
-                {
-                    //if (!await EnsurePlcConnectedAsync())
-                    //{
-                    //    Tools.LogError($"读取PLC失败：PLC未连接（尝试 {attempt}/{maxRetries}）");
-                    //    continue;
-                    //}
-                    var int16Result = await _keyence_async_net.ReadBoolAsync(plcAddr, dataNumber);
-                    if (int16Result.IsSuccess)
-                    {
-                        return int16Result.Content;
-                    }
-                    if (attempt < maxRetries)
-                    {
-                        //Tools.LogWarning($"读取PLC数据失败，地址：{plcAddr}，类型：{typeof(bool)}，尝试第{attempt}次重试");
-                        await Task.Delay(MinDelayMs);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    //Tools.LogError($"读取PLC异常：地址 {plcAddr}，类型 {typeof(bool)}，尝试 {attempt}/{maxRetries}，异常：{ex.Message}");
-                    if (attempt < maxRetries)
-                    {
-                        await Task.Delay(MinDelayMs);
-                    }
-                }
+                return null;
             }
-            Tools.Monitor($"读取PLC失败：地址 {plcAddr}，类型 {typeof(bool)}，所有尝试均失败");
+            try
+            {
+                const int maxRetries = 3;
+                for (int attempt = 1; attempt <= maxRetries; attempt++)
+                {
+                    try
+                    {
+                        var int16Result = await _keyence_async_net.ReadBoolAsync(plcAddr, dataNumber);
+                        if (int16Result.IsSuccess)
+                        {
+                            return int16Result.Content;
+                        }
+                        if (attempt < maxRetries)
+                        {
+                            //Tools.LogWarning($"读取PLC数据失败，地址：{plcAddr}，类型：{typeof(bool)}，尝试第{attempt}次重试");
+                            await Task.Delay(MinDelayMs);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        //Tools.LogError($"读取PLC异常：地址 {plcAddr}，类型 {typeof(bool)}，尝试 {attempt}/{maxRetries}，异常：{ex.Message}");
+                        if (attempt < maxRetries)
+                        {
+                            await Task.Delay(MinDelayMs);
+                        }
+                    }
+                }
+                Tools.Monitor($"异步 读取PLC失败：地址 {plcAddr}，类型 {typeof(bool)}，所有尝试均失败");
+            }
+            finally
+            {
+                PlcSemaphore.Release();
+            }
             return null;
         }
 
@@ -440,99 +303,109 @@ namespace 精密切割系统.Driver
         {
             Type type = typeof(T);
             if (!type.IsPrimitive) return null;
-            const int maxRetries = 3;
-            for (int attempt = 1; attempt <= maxRetries; attempt++)
+            if (!await PlcSemaphore.WaitAsync(TimeOutSpan))
             {
-                try
-                {
-                    //if (!await EnsurePlcConnectedAsync())
-                    //{
-                    //    Tools.LogError($"读取PLC失败：PLC未连接（尝试 {attempt}/{maxRetries}）");
-                    //    continue;
-                    //}
-                    if (type == typeof(short))
-                    {
-                        var int16Result = await _keyence_async_net.ReadInt16Async(plcAddr, dataNumber);
-                        if (int16Result.IsSuccess)
-                        {
-                            return int16Result.Content.Select(p => T.CreateChecked(p)).ToArray();
-                        }
-                    }
-                    else if (type == typeof(ushort))
-                    {
-                        var uint16Result = await _keyence_async_net.ReadUInt16Async(plcAddr, dataNumber);
-                        if (uint16Result.IsSuccess)
-                        {
-                            return uint16Result.Content.Select(p => T.CreateChecked(p)).ToArray();
-                        }
-                    }
-                    else if (type == typeof(int))
-                    {
-                        var int32Result = await _keyence_async_net.ReadInt32Async(plcAddr, dataNumber);
-                        if (int32Result.IsSuccess)
-                        {
-                            return int32Result.Content.Select(p => T.CreateChecked(p)).ToArray();
-                        }
-                    }
-                    else if (type == typeof(uint))
-                    {
-                        var uint32Result = await _keyence_async_net.ReadUInt32Async(plcAddr, dataNumber);
-                        if (uint32Result.IsSuccess)
-                        {
-                            return uint32Result.Content.Select(p => T.CreateChecked(p)).ToArray();
-                        }
-                    }
-                    else if (type == typeof(long))
-                    {
-                        var int64Result = await _keyence_async_net.ReadInt64Async(plcAddr, dataNumber);
-                        if (int64Result.IsSuccess)
-                        {
-                            return int64Result.Content.Select(p => T.CreateChecked(p)).ToArray();
-                        }
-                    }
-                    else if (type == typeof(ulong))
-                    {
-                        var uint64Result = await _keyence_async_net.ReadUInt64Async(plcAddr, dataNumber);
-                        if (uint64Result.IsSuccess)
-                        {
-                            return uint64Result.Content.Select(p => T.CreateChecked(p)).ToArray();
-                        }
-                    }
-                    else if (type == typeof(float))
-                    {
-                        var floatResult = await _keyence_async_net.ReadFloatAsync(plcAddr, dataNumber);
-                        if (floatResult.IsSuccess)
-                        {
-                            return floatResult.Content.Select(p => T.CreateChecked(p)).ToArray();
-                        }
-                    }
-                    else if (type == typeof(double))
-                    {
-                        var doubleResult = await _keyence_async_net.ReadDoubleAsync(plcAddr, dataNumber);
-                        if (doubleResult.IsSuccess)
-                        {
-                            return doubleResult.Content.Select(p => T.CreateChecked(p)).ToArray();
-                        }
-                    }
-                    else
-                    {
-                        throw new ArgumentException($"不支持的数据类型：{type.Name}");
-                    }
-                }
-                catch (Exception ex)
-                {
-                }
-                if (attempt < maxRetries)
-                {
-                    await Task.Delay(MinDelayMs);
-                }
+                return null;
             }
-            Tools.Monitor($"读取PLC失败：地址 {plcAddr}，类型 {type.Name}，所有尝试均失败");
+            try
+            {
+                const int maxRetries = 3;
+                for (int attempt = 1; attempt <= maxRetries; attempt++)
+                {
+                    try
+                    {
+                        if (type == typeof(short))
+                        {
+                            var int16Result = await _keyence_async_net.ReadInt16Async(plcAddr, dataNumber);
+                            if (int16Result.IsSuccess)
+                            {
+                                return int16Result.Content.Select(p => T.CreateChecked(p)).ToArray();
+                            }
+                        }
+                        else if (type == typeof(ushort))
+                        {
+                            var uint16Result = await _keyence_async_net.ReadUInt16Async(plcAddr, dataNumber);
+                            if (uint16Result.IsSuccess)
+                            {
+                                return uint16Result.Content.Select(p => T.CreateChecked(p)).ToArray();
+                            }
+                        }
+                        else if (type == typeof(int))
+                        {
+                            var int32Result = await _keyence_async_net.ReadInt32Async(plcAddr, dataNumber);
+                            if (int32Result.IsSuccess)
+                            {
+                                return int32Result.Content.Select(p => T.CreateChecked(p)).ToArray();
+                            }
+                        }
+                        else if (type == typeof(uint))
+                        {
+                            var uint32Result = await _keyence_async_net.ReadUInt32Async(plcAddr, dataNumber);
+                            if (uint32Result.IsSuccess)
+                            {
+                                return uint32Result.Content.Select(p => T.CreateChecked(p)).ToArray();
+                            }
+                        }
+                        else if (type == typeof(long))
+                        {
+                            var int64Result = await _keyence_async_net.ReadInt64Async(plcAddr, dataNumber);
+                            if (int64Result.IsSuccess)
+                            {
+                                return int64Result.Content.Select(p => T.CreateChecked(p)).ToArray();
+                            }
+                        }
+                        else if (type == typeof(ulong))
+                        {
+                            var uint64Result = await _keyence_async_net.ReadUInt64Async(plcAddr, dataNumber);
+                            if (uint64Result.IsSuccess)
+                            {
+                                return uint64Result.Content.Select(p => T.CreateChecked(p)).ToArray();
+                            }
+                        }
+                        else if (type == typeof(float))
+                        {
+                            var floatResult = await _keyence_async_net.ReadFloatAsync(plcAddr, dataNumber);
+                            if (floatResult.IsSuccess)
+                            {
+                                return floatResult.Content.Select(p => T.CreateChecked(p)).ToArray();
+                            }
+                        }
+                        else if (type == typeof(double))
+                        {
+                            var doubleResult = await _keyence_async_net.ReadDoubleAsync(plcAddr, dataNumber);
+                            if (doubleResult.IsSuccess)
+                            {
+                                return doubleResult.Content.Select(p => T.CreateChecked(p)).ToArray();
+                            }
+                        }
+                        else
+                        {
+                            throw new ArgumentException($"不支持的数据类型：{type.Name}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                    }
+                    if (attempt < maxRetries)
+                    {
+                        await Task.Delay(MinDelayMs);
+                    }
+                }
+                Tools.Monitor($"异步 读取PLC失败：地址 {plcAddr}，类型 {type.Name}，所有尝试均失败");
+            }
+            finally
+            {
+                PlcSemaphore.Release();
+            }
             return null;
         }
 
         public OperateResult? WriteData(string plcAddr, object pData, PlcDataType dataType = PlcDataType.Int32)
         {
+            if (!PlcSemaphore.Wait(TimeOutSpan))
+            {
+                return null;
+            }
             OperateResult write = new OperateResult();
 
             try
@@ -608,12 +481,20 @@ namespace 精密切割系统.Driver
             {
                 write = new OperateResult { IsSuccess = false, Message = ex.Message };
             }
+            finally
+            {
+                PlcSemaphore.Release();
+            }
 
             return write;
         }
 
         public async Task<OperateResult?> WriteDataAsync(string plcAddr, object pData, PlcDataType dataType = PlcDataType.Int32)
         {
+            if (!await PlcSemaphore.WaitAsync(TimeOutSpan))
+            {
+                return null;
+            }
             OperateResult write;
             try
             {
@@ -692,6 +573,10 @@ namespace 精密切割系统.Driver
             {
                 write = new OperateResult { IsSuccess = false, Message = ex.Message };
             }
+            finally
+            {
+                PlcSemaphore.Release();
+            }
 
             return write;
         }
@@ -705,14 +590,13 @@ namespace 精密切割系统.Driver
             PlcControl.tagControl.bladeMantance.RunBladeReplace(0);
             PlcControl.tagControl.cutting.EnterFullAutoInit(0);
             PlcControl.tagControl.sparkRepairKnife.EnterElectrical(0);
-            PlcControl.tagControl.calibration.AlignInit(0);
             PlcControl.tagControl.wholeDevice.IoModelSet(0);
             PlcControl.tagControl.flange.JoinTrimming(0);
         }
 
         public string GetPlcValueString(string tKey)
         {
-            if (!GlobalParams.OnlineFlag || !PlcControl.connectionStatus)
+            if (!GlobalParams.OnlineFlag)
             {
                 return "0";
             }
@@ -730,46 +614,12 @@ namespace 精密切割系统.Driver
             return value;
         }
 
-        public string GetPlcValueStringByAddr(string addr, PlcDataType dataType)
-        {
-            return readData(addr, dataType);
-        }
-
-        public string GetPlcDefaultValueString(string tKey)
-        {
-            if (PlcControl.allTags == null || PlcControl.allTags.Count == 0) return "";
-            Tag tmpTag = PlcControl.allTags.ContainsKey(tKey) ? PlcControl.allTags[tKey] : null;
-            if (tmpTag == null)
-            {
-                return null;
-            }
-            string value = readData(tmpTag.addr, typeMap[tmpTag.valueType]);
-            return value;
-        }
-
-        public bool readTag(Tag t)
-        {
-            t.Value = readData(t.addr, typeMap[t.valueType]);
-            if (t.Value == null)
-            {
-                return false;
-            }
-            return true;
-        }
-
         public bool writeTag(Tag tag)
         {
             if (!GlobalParams.OnlineFlag)
             {
                 return true;
             }
-            // 检查PLC连接状态
-            if (!EnsurePlcConnected())
-            {
-                //Tools.LogError("写入PLC失败：PLC未连接");
-                return false;
-            }
-
             // 检查输入参数有效性
             if (tag == null || string.IsNullOrEmpty(tag.writeValue))
             {
@@ -847,100 +697,6 @@ namespace 精密切割系统.Driver
             Tools.Monitor($"写入PLC失败：地址 {tag.addr}，值 {writeValue}，所有尝试均失败");
             //Tools.LogDebug($"地址：{tag.addr}  写入：{writeValue}  状态：失败");
             return false;
-        }
-
-        /// <summary>
-        /// 检查PLC连接状态，如果未连接则尝试重连3次。
-        /// </summary>
-        /// <returns>是否连接成功</returns>
-        private bool EnsurePlcConnected()
-        {
-            // 检查当前连接状态
-            if (!IsConnectionHealthy())
-            {
-                const int maxReconnectAttempts = 3;
-                const int reconnectDelayMs = 1000; // 重连间隔1秒
-
-                for (int attempt = 1; attempt <= maxReconnectAttempts; attempt++)
-                {
-                    Tools.LogInfo($"开始第{attempt}次PLC重连尝试");
-                    CloseConnect();
-                    System.Threading.Thread.Sleep(reconnectDelayMs);
-
-                    if (ConnectPlc())
-                    {
-                        // 进行通信测试
-                        if (TestPlcCommunication())
-                        {
-                            Tools.LogInfo($"PLC重连成功（第{attempt}次尝试）");
-                            return true;
-                        }
-                    }
-                    Tools.LogWarning($"PLC重连失败（第{attempt}次尝试）");
-                }
-                return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// 检查PLC连接状态，如果未连接则尝试重连3次。
-        /// </summary>
-        /// <returns>是否连接成功</returns>
-        private async Task<bool> EnsurePlcConnectedAsync()
-        {
-            // 检查当前连接状态
-            if (!await IsConnectionHealthyAsync())
-            {
-                const int maxReconnectAttempts = 3;
-                const int reconnectDelayMs = 1000; // 重连间隔1秒
-                for (int attempt = 1; attempt <= maxReconnectAttempts; attempt++)
-                {
-                    Tools.LogInfo($"开始第{attempt}次PLC重连尝试");
-                    //await CloseConnectAsync();
-                    await Task.Delay(reconnectDelayMs);
-
-                    //if (await ConnectPlcAsync())
-                    {
-                        // 进行通信测试
-                        if (await TestPlcCommunicationAsync())
-                        {
-                            Tools.LogInfo($"PLC重连成功（第{attempt}次尝试）");
-                            return true;
-                        }
-                    }
-                    Tools.LogWarning($"PLC重连失败（第{attempt}次尝试）");
-                }
-                return false;
-            }
-            return true;
-        }
-
-        private bool IsConnectionHealthy()
-        {
-            if (connect == null) return false;
-
-            // 进行基本连接检查
-            OperateResult<bool[]> read = keyence_net.ReadBool("MR510", 1);
-            if (!read.IsSuccess) return false;
-
-            // 检查通信质量
-            return TestPlcCommunication();
-        }
-
-        private async Task<bool> IsConnectionHealthyAsync()
-        {
-            if (connect == null) return false;
-
-            // 进行基本连接检查
-            OperateResult<bool[]> read = await _keyence_async_net.ReadBoolAsync("MR510", 1);
-            if (!read.IsSuccess)
-            {
-                return false;
-            }
-
-            // 检查通信质量
-            return await TestPlcCommunicationAsync();
         }
 
         /// <summary>
@@ -1025,7 +781,7 @@ namespace 精密切割系统.Driver
             this.axisName = name;
         }
 
-        private KeyencePlc keyencePlc = KeyencePlc.GetInstance();
+        private KeyencePlc keyencePlc = KeyencePlc.Instance;
 
         // 运动轴名称
         public string axisName;
@@ -1212,18 +968,6 @@ namespace 精密切割系统.Driver
         /// <summary>
         /// 回零点
         /// </summary>
-        public void RunInitLocation()
-        {
-            if (!IsReady()) return;
-            startHoming.writeValue = "0";
-            keyencePlc.writeTag(startHoming);
-            startHoming.writeValue = "1";
-            keyencePlc.writeTag(startHoming);
-        }
-
-        /// <summary>
-        /// 回零点
-        /// </summary>
         public async Task StartHomingAsync()
         {
             startHoming.writeValue = "0";
@@ -1249,28 +993,6 @@ namespace 精密切割系统.Driver
         /// </summary>
         /// <param name="speed">速度</param>
         /// <param name="jogDirection">方向 0 正 1 负</param>
-        public void StartJog(int jogDirection)
-        {
-            if (!IsReady()) return;
-            // 设置移动距离为0.001
-            relativeDistance.writeValue = "0.001";
-            keyencePlc.writeTag(relativeDistance);
-            Thread.Sleep(5);
-            // 设置运动类型为点动
-            runType.writeValue = "0";
-            keyencePlc.writeTag(runType);
-            Thread.Sleep(5);
-            // SetRelativeSpeed("10");
-            Thread.Sleep(5);
-            // 执行电动或者相对运动
-            RunJog(jogDirection);
-        }
-
-        /// <summary>
-        /// 点动开始
-        /// </summary>
-        /// <param name="speed">速度</param>
-        /// <param name="jogDirection">方向 0 正 1 负</param>
         public async Task StartJogAsync(int jogDirection)
         {
             if (jogDirection == 0)
@@ -1285,18 +1007,6 @@ namespace 精密切割系统.Driver
                 jogAntiStart.writeValue = "1";
                 await keyencePlc.WriteTagAsync(jogAntiStart);
             }
-        }
-
-        /// <summary>
-        /// 点动结束
-        /// </summary>
-        /// <param name="jogDirection">方向 0 正 1 负</param>
-        public void StopMove()
-        {
-            jogStart.writeValue = "0";
-            keyencePlc.writeTag(jogStart);
-            jogAntiStart.writeValue = "0";
-            keyencePlc.writeTag(jogAntiStart);
         }
 
         /// <summary>
@@ -1331,31 +1041,6 @@ namespace 精密切割系统.Driver
             await keyencePlc.WriteTagAsync(jogAntiStart);
         }
 
-        public void StartRelative(string speed, string distance, int jogDirection)
-        {
-            if (!IsReady()) return;
-            // 设置相对运动
-            runType.writeValue = "1";
-            keyencePlc.writeTag(runType);
-            Thread.Sleep(10);
-            // 设置相对运动距离
-            relativeDistance.writeValue = distance;
-            keyencePlc.writeTag(relativeDistance);
-            Thread.Sleep(5);
-            // 执行电动或者相对运动
-            RunJog(jogDirection);
-        }
-
-        /// <summary>
-        /// 设置点动和寸动的移动速度
-        /// </summary>
-        /// <param name="speed"></param>
-        public void SetRelativeSpeed(string speed)
-        {
-            jogRelativeSpeed.writeValue = speed;
-            keyencePlc.writeTag(jogRelativeSpeed);
-        }
-
         /// <summary>
         /// 设置点动和寸动的移动速度
         /// </summary>
@@ -1366,54 +1051,10 @@ namespace 精密切割系统.Driver
             await keyencePlc.WriteTagAsync(jogRelativeSpeed);
         }
 
-        /// <summary>
-        /// 获取当前点动和寸动的移动速度
-        /// </summary>
-        /// <param name="speed"></param>
-        public async Task<float?> GetJogRelativeSpeedAsync()
-        {
-            return await PlcControl.plc.ReadDataAsync<float>(jogRelativeSpeed.addr);
-        }
-
-        public void SetAbsoluteSpeed(string speed)
-        {
-            absoluteSpeed.writeValue = speed;
-            keyencePlc.writeTag(absoluteSpeed);
-        }
-
         public async Task SetAbsoluteSpeedAsync(float speed)
         {
             absoluteSpeed.writeValue = speed.ToString();
             await keyencePlc.WriteTagAsync(absoluteSpeed);
-        }
-
-        public async Task<float?> GetAbsoluteSpeedAsync()
-        {
-            return await keyencePlc.ReadDataAsync<float>(absoluteSpeed.addr);
-        }
-
-        public string StartAbsolute(string speed, string location, bool compFlag = false)
-        {
-            if (!IsReady()) return null;
-            // 位置补偿
-            if (GlobalParams.runCompFlag && compFlag)
-            {
-                location = PlcControl.GetCompensate(location, axisName);
-            }
-            // 设置绝对运动位置
-            absoluteLocation.writeValue = location;
-            keyencePlc.writeTag(absoluteLocation);
-            // 设置绝对运动速度
-            SetAbsoluteSpeed(speed);
-            Thread.Sleep(5);
-            // 设置绝对运功开始
-            /*absoluteStart.writeValue= "0";
-            keyencePlc.writeTag(absoluteStart);
-            Thread.Sleep(5);*/
-            // 设置绝对运功开始
-            absoluteStart.writeValue = "1";
-            keyencePlc.writeTag(absoluteStart);
-            return location;
         }
 
         /// <summary>
@@ -1529,41 +1170,6 @@ namespace 精密切割系统.Driver
             }
         }
 
-        public void RunJog(int jogDirection)
-        {
-            if (!IsReady()) return;
-            Thread.Sleep(10);
-            // 关闭正转
-            jogStart.writeValue = "0";
-            keyencePlc.writeTag(jogStart);
-            // 关闭反转
-            jogAntiStart.writeValue = "0";
-            keyencePlc.writeTag(jogAntiStart);
-            Thread.Sleep(10);
-            if (jogDirection == 0)
-            {
-                // 开启正转
-                jogStart.writeValue = "1";
-                keyencePlc.writeTag(jogStart);
-            }
-            else
-            {
-                // 开启反转
-                jogAntiStart.writeValue = "1";
-                keyencePlc.writeTag(jogAntiStart);
-            }
-        }
-
-        /// <summary>
-        /// 设置是否高速 0 低速 1 高速
-        /// </summary>
-        /// <param name="highFlag"></param>
-        public void SetHighSpeed(string highFlag)
-        {
-            highSpeed.writeValue = highFlag;
-            keyencePlc.writeTag(highSpeed);
-        }
-
         /// <summary>
         /// 设置是否高速 0 低速 1 高速
         /// </summary>
@@ -1572,40 +1178,6 @@ namespace 精密切割系统.Driver
         {
             highSpeed.writeValue = highFlag.ToString();
             await keyencePlc.WriteTagAsync(highSpeed);
-        }
-
-        /// <summary>
-        /// 设置各轴运动速度和距离
-        /// </summary>
-        /// <param name="jogRelativeSpeedValue">点动速度-高速</param>
-        /// <param name="jogRelativeHighSpeedValue">点动速度-高速</param>
-        /// <param name="relativeDistanceValue">点动距离</param>
-        /// <param name="absoluteSpeedValue">绝对运动速度</param>
-        /// <param name="panelRelativeDistanceValue">按钮寸动距离</param>
-        public void SetAxisSpeed(string jogRelativeSpeedValue
-            , string jogRelativeHighSpeedValue, string relativeDistanceValue
-            , string absoluteSpeedValue, string panelRelativeDistanceValue)
-        {
-            // 点动速度-低速
-            jogRelativeSpeed.writeValue = jogRelativeSpeedValue;
-            keyencePlc.writeTag(jogRelativeSpeed);
-            Thread.Sleep(5);
-            // 点动速度-高速
-            jogRelativeHighSpeed.writeValue = jogRelativeHighSpeedValue;
-            keyencePlc.writeTag(jogRelativeHighSpeed);
-            Thread.Sleep(5);
-            // 点动距离
-            relativeDistance.writeValue = relativeDistanceValue;
-            keyencePlc.writeTag(relativeDistance);
-            Thread.Sleep(5);
-            // 绝对运动速度
-            absoluteSpeed.writeValue = absoluteSpeedValue;
-            keyencePlc.writeTag(absoluteSpeed);
-            Thread.Sleep(5);
-            // 按钮寸动距离
-            panelRelativeDistance.writeValue = panelRelativeDistanceValue;
-            keyencePlc.writeTag(panelRelativeDistance);
-            Thread.Sleep(5);
         }
     }
 
@@ -1624,7 +1196,7 @@ namespace 精密切割系统.Driver
         {
         }
 
-        private KeyencePlc keyencePlc = KeyencePlc.GetInstance();
+        private KeyencePlc keyencePlc = KeyencePlc.Instance;
 
         // ============刀片维护相关
         public Tag initReplaceLocation { get; set; }
@@ -2033,7 +1605,7 @@ namespace 精密切割系统.Driver
         {
         }
 
-        private KeyencePlc keyencePlc = KeyencePlc.GetInstance();
+        private KeyencePlc keyencePlc = KeyencePlc.Instance;
 
         public Tag canSystemInit { get; set; }
         public Tag debugMode { get; set; }
@@ -2659,7 +2231,7 @@ namespace 精密切割系统.Driver
         {
         }
 
-        private KeyencePlc keyencePlc = KeyencePlc.GetInstance();
+        private KeyencePlc keyencePlc = KeyencePlc.Instance;
 
         // ============校准 ===============
         // 进入校准画面
@@ -2683,15 +2255,6 @@ namespace 精密切割系统.Driver
         public Tag confirmParams { get; set; }
 
         // ============校准结束===========
-
-        /// <summary>
-        /// 进入校准位置
-        /// </summary>
-        public void AlignInit(int status)
-        {
-            alignInit.writeValue = "" + status;
-            keyencePlc.writeTag(alignInit);
-        }
 
         /// <summary>
         /// 设置校准初始位置
@@ -2733,7 +2296,7 @@ namespace 精密切割系统.Driver
         public Cutting()
         { }
 
-        private KeyencePlc keyencePlc = KeyencePlc.GetInstance();
+        private KeyencePlc keyencePlc = KeyencePlc.Instance;
 
         // ================切割相关
         // 自动切割画面进入
@@ -3151,65 +2714,6 @@ namespace 精密切割系统.Driver
         }
 
         /// <summary>
-        /// 设置切割需要的参数
-        /// </summary>
-        /// <param name="feedSpeedValue">切割速度</param>
-        /// <param name="zEndIndex">Z轴切割位置</param>
-        /// <param name="xStartLoaction">X轴开始位置</param>
-        /// <param name="xEndLocation">X轴结束位置</param>
-        /// <param name="yCutLocation">Y轴切割位置</param>
-        /// <param name="spindleRev">主轴转速</param>
-        public void SetCutParams(float feedSpeedValue, string zEndLocation, float zStartLocation, string xStartLoaction
-            , string xEndLocation, string yCutLocation, string checkStatus, string thetaDeg, string spindleRevValue, int cutDirection)
-        {
-            // 切割速度
-            PlcControl.tagControl.Xaxis.SetAbsoluteSpeed(feedSpeedValue.ToString());
-            // x轴开始位置
-            xStartPosition.writeValue = xStartLoaction.ToString();
-            keyencePlc.writeTag(xStartPosition);
-            // x结束位置
-            xLength.writeValue = xEndLocation.ToString();
-            keyencePlc.writeTag(xLength);
-            // Y轴切割开始位置
-            yStartPosition.writeValue = yCutLocation.ToString();
-            keyencePlc.writeTag(yStartPosition);
-            // z轴开始位置
-            z1StartPosition.writeValue = zStartLocation.ToString();
-            keyencePlc.writeTag(z1StartPosition);
-            // z轴结束位置
-            z1EndPosition.writeValue = zEndLocation.ToString();
-            keyencePlc.writeTag(z1EndPosition);
-            // 停机检查
-            shutdownCheck.writeValue = checkStatus;
-            keyencePlc.writeTag(shutdownCheck);
-            // 切割角度
-            cutFaceAngle.writeValue = thetaDeg;
-            keyencePlc.writeTag(cutFaceAngle);
-            // 主轴转速
-            spindleRev.writeValue = spindleRevValue;
-            keyencePlc.writeTag(spindleRev);
-            // 切割方向
-            if (cutDirection == 0)
-            {
-                cutDirectionAfter.writeValue = "0";
-                keyencePlc.writeTag(cutDirectionAfter);
-                Thread.Sleep(10);
-                cutDirectionAgo.writeValue = "1";
-                keyencePlc.writeTag(cutDirectionAgo);
-            }
-            else if (cutDirection == 1)
-            {
-                cutDirectionAgo.writeValue = "0";
-                keyencePlc.writeTag(cutDirectionAgo);
-                Thread.Sleep(10);
-                cutDirectionAfter.writeValue = "1";
-                keyencePlc.writeTag(cutDirectionAfter);
-            }
-            Thread.Sleep(50);
-            ConfirmParams();
-        }
-
-        /// <summary>
         /// 主轴转速设置
         /// </summary>
         /// <param name="spindleRevValue"></param>
@@ -3420,7 +2924,7 @@ namespace 精密切割系统.Driver
 
     public class SparkRepairKnife
     {
-        private KeyencePlc keyencePlc = KeyencePlc.GetInstance();
+        private KeyencePlc keyencePlc = KeyencePlc.Instance;
 
         public SparkRepairKnife()
         { }
@@ -3597,7 +3101,7 @@ namespace 精密切割系统.Driver
 
     public class Flange
     {
-        private KeyencePlc keyencePlc = KeyencePlc.GetInstance();
+        private KeyencePlc keyencePlc = KeyencePlc.Instance;
 
         public Flange()
         { }
@@ -3796,8 +3300,6 @@ namespace 精密切割系统.Driver
         public Tag()
         {
         }
-
-        private KeyencePlc keyencePlc = KeyencePlc.GetInstance();
 
         public Tag(string addr)
         {

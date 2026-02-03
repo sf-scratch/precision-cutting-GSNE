@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace 精密切割系统.ViewModel
+namespace 精密切割系统.Helpers
 {
-    static class LogType
+    internal static class LogType
     {
         public static string Cut = "CUT";
         public static string Wring = "WRING";

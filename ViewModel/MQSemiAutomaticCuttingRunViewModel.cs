@@ -260,12 +260,12 @@ namespace 精密切割系统.ViewModel
                 //正在切割中
                 return;
             }
-            //if (!GlobalParams.OnlineFlag)
-            //{
-            //    SpeedManager.IsHighSpeed = false;
-            //    MaterialSnack($"切割中...", SnackType.WARNING, 0, _eventAggregator);
-            //    return;
-            //}
+            if (!GlobalParams.OnlineFlag)
+            {
+                SpeedManager.IsHighSpeed = false;
+                MaterialSnack($"切割中...", SnackType.WARNING, 0, _eventAggregator);
+                return;
+            }
             CommonResult checkResult = await SemiAutoCutService.CheckCutAsync();
             if (!checkResult.IsSuccess)
             {

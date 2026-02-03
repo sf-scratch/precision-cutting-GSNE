@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -47,7 +48,7 @@ namespace 精密切割系统.Driver
         { get { return _bDeviceOpened; } }
 
         private static string lightIp = "192.168.10.150"; // 光源IP
-        public static bool l_lightConnectStatus = false; // 光源连接状态
+        public static bool LightConnectStatus { get; set; } = false; // 光源连接状态
         public static string l_errorMessage = ""; // 光源异常信息
         private static LightControllerAPI LightController = new LightControllerAPI();
 
@@ -178,7 +179,7 @@ namespace 精密切割系统.Driver
                 // 打开相机
                 OpenDevice();
             }
-            //SetCameraDeviceWaferParams();
+            SetCameraDeviceWaferParams();
         }
 
         /// <summary>
@@ -191,12 +192,12 @@ namespace 精密切割系统.Driver
             {
                 // "Failed to create Ethernet connection by IP"
                 l_errorMessage = "Failed to create Ethernet connection by IP";
-                l_lightConnectStatus = false;
+                LightConnectStatus = false;
                 return;
             }
             else
             {
-                l_lightConnectStatus = true;
+                LightConnectStatus = true;
                 // textBox_Status.Text = "Succeed";
             }
         }
@@ -311,10 +312,13 @@ namespace 精密切割系统.Driver
             _bDeviceOpened = true;
         }
 
-        public static void SetCameraExposureTime(double exposureTime)
+        public static async Task SetCameraExposureTimeAsync(double exposureTime)
         {
-            _currentDev.SetEnumValueByStringEx(SciCam.SciCamDeviceXmlType.SciCam_DeviceXml_Camera, "ExposureAuto", "Off");
-            _currentDev.SetFloatValueEx(SciCam.SciCamDeviceXmlType.SciCam_DeviceXml_Camera, "ExposureTime", exposureTime);
+            await Task.Run(() =>
+            {
+                _currentDev.SetEnumValueByStringEx(SciCam.SciCamDeviceXmlType.SciCam_DeviceXml_Camera, "ExposureAuto", "Off");
+                _currentDev.SetFloatValueEx(SciCam.SciCamDeviceXmlType.SciCam_DeviceXml_Camera, "ExposureTime", exposureTime);
+            });
         }
 
         public static double GetCameraExposureTime()
@@ -331,7 +335,7 @@ namespace 精密切割系统.Driver
 
         public static void SetCameraDeviceWaferParams()
         {
-            string configPath = Path.Combine(AppContext.BaseDirectory, "Assets\\config\\OPT-CC1-M050-GG3-14(D24B110358).camcfg");
+            string configPath = Path.Combine(AppContext.BaseDirectory, "Assets\\config\\OPT-CC1-M050-GG3-14(D259120427).camcfg");
             _currentDev.FeatureLoad(configPath);
         }
 
@@ -344,12 +348,6 @@ namespace 精密切割系统.Driver
         public static void SetCameraDeviceVCaoParams()
         {
             string configPath = Path.Combine(AppContext.BaseDirectory, "Assets\\config\\OPT-CC1-M050-GG3-14(D24B110358)VCao.camcfg");
-            _currentDev.FeatureLoad(configPath);
-        }
-
-        public static void SetCameraDeviceAutoParams()
-        {
-            string configPath = Path.Combine(AppContext.BaseDirectory, "Assets\\config\\OPT-CC1-M050-GG3-14(D24B110358)Auto.camcfg");
             _currentDev.FeatureLoad(configPath);
         }
 
@@ -383,10 +381,7 @@ namespace 精密切割系统.Driver
             {
                 return;
             }
-            {
-                StopGrabbing();
-            }
-
+            StopGrabbing();
             uint nReVal = _currentDev.CloseDevice();
             if (nReVal != SciCam.SCI_CAMERA_OK)
             {

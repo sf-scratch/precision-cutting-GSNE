@@ -342,31 +342,7 @@ namespace 精密切割系统.View.F3_ModelCatalog
 
         private void BackFrom(object sender, bool e)
         {
-            if (CommonCheck.CutModeCheck())
-            {
-                switch (GlobalParams.cutStatusInfo)
-                {
-                    case 0:
-                        mainWindow.NavigateToPage("Pages/F2_ManualOperation/MQSemiAutomaticCuttingConf");
-                        break;
-
-                    case 1:
-                        mainWindow.NavigateToPage("Pages/F2_ManualOperation/MQSemiAutomaticCuttingRun");
-                        break;
-
-                    case 2:
-                        mainWindow.NavigateToPage("Pages/F2_ManualOperation/MQSemiAutomaticCuttingStop");
-                        break;
-
-                    default:
-                        mainWindow.NavigateToPage("MainMenu");
-                        break;
-                }
-            }
-            else
-            {
-                mainWindow.NavigateToPage("MainMenu");
-            }
+            mainWindow.NavigateToPage("MainMenu");
         }
 
         //跳转详情页面

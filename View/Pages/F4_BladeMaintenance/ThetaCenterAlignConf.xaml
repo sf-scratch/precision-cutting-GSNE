@@ -181,7 +181,7 @@
                     x:Name="directionGrid"
                     Margin="0,60,0,0"
                     Visibility="Collapsed">
-                    <common:CommonDirection />
+                    <common:SimpleDirectOperate />
                 </Grid>
             </StackPanel>
         </Grid>

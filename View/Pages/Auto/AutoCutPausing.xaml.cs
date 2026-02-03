@@ -26,7 +26,6 @@ using 精密切割系统.View.Pages.F4_BladeMaintenance;
 using 精密切割系统.View.Pages.operate;
 using 精密切割系统.ViewModel;
 
-
 namespace 精密切割系统.View.Pages.Auto
 {
     /// <summary>
@@ -190,12 +189,6 @@ namespace 精密切割系统.View.Pages.Auto
             {
                 case 2409:
                     // 确认基准线
-                    string yCurrentPosition = PlcControl.plc.GetPlcValueString(DeviceKey.yCurLocationKey);
-                    float offset = CutOperateUtils.yStopLocation - float.Parse(yCurrentPosition);
-                    GlobalParams.cameraOffsetY = cameraCutOffset + offset;
-                    MaterialSnack("基准线已确认！", SnackType.SUCCESS);
-                    Tools.LogInfo($"最新基准线：{GlobalParams.cameraOffsetY}");
-                    cameraOffsetStatus = true;
                     break;
 
                 case 2401:
@@ -219,7 +212,6 @@ namespace 精密切割系统.View.Pages.Auto
                     {
                         break;
                     }
-                    CommonOperate.GetInstance().AutoFocus(2, mainWindow, null);
                     break;
 
                 case 2412:

@@ -96,7 +96,6 @@ namespace 精密切割系统.View.Pages.operate
                 bool tempSystemInitFlagStatus = await PlcControl.tagControl.wholeDevice.IsCompletedSystemInitAsync();
                 bool tempIsOpenWorkVacuumSwitchStatus = await PlcControl.tagControl.wholeDevice.IsOpenWorkVacuumSwitchAsync();
                 bool tempIsRuningSpindle = await PlcControl.tagControl.wholeDevice.GetSpindleSpeedAsync() != 0;
-                bool tempPanelStatus = CommonCheck.GetParamsStatus(DeviceKey.panelStatusKey);
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     if (tempIsOpenOpticalFiberSensorBlowing != isOpenOpticalFiberSensorBlowing || firstJoin)
@@ -149,11 +148,6 @@ namespace 精密切割系统.View.Pages.operate
                     {
                         isOpenWorkVacuumSwitchStatus = tempIsOpenWorkVacuumSwitchStatus;
                         isSwitchOpen(isOpenWorkVacuumSwitchStatus, 10);
-                    }
-                    if (tempPanelStatus != panelStatus || firstJoin)
-                    {
-                        panelStatus = tempPanelStatus;
-                        isSwitchOpen(tempPanelStatus, 8004);
                     }
                     if (firstJoin)
                     {

@@ -67,7 +67,7 @@ namespace 精密切割系统.Helpers
         public static async Task InitPlcDataAsync()
         {
             // 各轴运动速度 点动高速/低速速度  绝对运动速度
-            InitAxisSpeedIndex(operationParametersModel);
+            await InitAxisSpeedIndexAsync(operationParametersModel);
             // 设置位置校准
             InitPositionAlignment(positionAlignmentModel);
             InitInitialPositionModel(initialPositionModel);
@@ -166,43 +166,13 @@ namespace 精密切割系统.Helpers
         /// <summary>
         /// 设置各轴的速度和距离数据
         /// </summary>
-        public static void InitAxisSpeedIndex(OperationParametersModel operationParametersModel)
+        public static async Task InitAxisSpeedIndexAsync(OperationParametersModel operationParametersModel)
         {
-            // 设置X轴相关速度、位置设置
-            PlcControl.tagControl.Xaxis.SetAxisSpeed(operationParametersModel.MoveLowTime
-                , operationParametersModel.XScanSpeed, operationParametersModel.XSscanDistance
-                , operationParametersModel.XScanSpeed, operationParametersModel.xPanelJogDistance);
-            // 设置Y轴相关速度、位置设置
-            PlcControl.tagControl.Yaxis.SetAxisSpeed(operationParametersModel.MoveLowTime, operationParametersModel.YScanSpeed
-                , operationParametersModel.YSscanDistance
-                , operationParametersModel.YScanSpeed, operationParametersModel.yPanelJogDistance);
-            // 设置Z1轴相关速度、位置设置
-            PlcControl.tagControl.Z1axis.SetAxisSpeed(operationParametersModel.MoveLowTime, operationParametersModel.ZScanSpeed
-                , operationParametersModel.ZSscanDistance
-                , operationParametersModel.ZScanSpeed, operationParametersModel.zPanelJogDistance);
-
-            // 设置屏幕移动量 θ轴的屏幕移动量根据选择的型号参数来动
-            GlobalParams.xScreenIndex = operationParametersModel.XScreenIndex;
-            GlobalParams.yScreenIndex = operationParametersModel.YScreenIndex;
-            // 设置扫描移动距离
-            GlobalParams.xScanDistance = operationParametersModel.XSscanDistance;
-            GlobalParams.yScanDistance = operationParametersModel.YSscanDistance;
-            GlobalParams.z1ScanDistance = operationParametersModel.ZSscanDistance;
-            // 设置屏幕移动速度
-            GlobalParams.xScreenSpeed = operationParametersModel.XScanSpeed;
-            GlobalParams.yScreenSpeed = operationParametersModel.YScanSpeed;
-
-            // 设置扫描速度
-            GlobalParams.xScanSpeed = operationParametersModel.XScanSpeed;
-            GlobalParams.yScanSpeed = operationParametersModel.YScanSpeed;
-
-            // Z轴补偿
-            // 设置Z轴补偿量
-            GlobalParams.zAxisCompNum = operationParametersModel.zAxisCompNum;
-            GlobalParams.zAxisCompValue = Tools.GetFloatStringValue(operationParametersModel.zAxisCompValue);
-
-            // 设置切割回程速度
-            PlcControl.tagControl.cutting.SetReturnSpeed(operationParametersModel.cutXAxisBackSpeed);
+            await PlcControl.tagControl.Xaxis.SetJogRelativeSpeedAsync(operationParametersModel.XScanSpeed.ToFloat());
+            await PlcControl.tagControl.Yaxis.SetJogRelativeSpeedAsync(operationParametersModel.YScanSpeed.ToFloat());
+            await PlcControl.tagControl.Z1axis.SetJogRelativeSpeedAsync(operationParametersModel.ZScanSpeed.ToFloat());
+            //await PlcControl.tagControl.Z2axis.SetJogRelativeSpeedAsync(operationParametersModel.Z2ScanSpeed.ToFloat());
+            await PlcControl.tagControl.ThetaAxis.SetJogRelativeSpeedAsync(operationParametersModel.RScanSpeed.ToFloat());
         }
 
         //获取当前配置集合
@@ -242,19 +212,6 @@ namespace 精密切割系统.Helpers
         {
             CurrentConfigurationModel currentModel = GetCurrentConfiguration();
             return currentModel.ChannelNum;
-        }
-
-        /// <summary>
-        /// 初始化切割面，切换到Ch 1
-        /// </summary>
-        public static void InitCutCh()
-        {
-            Tools.LogInfo($"InitCutCh() 初始化GlobalParams.calibrationAngle");
-            // 修改切割面
-            UpdateCurrentCh(GlobalParams.CH1);
-            GlobalParams.calibrationAngle = 0;
-            // 旋转切割面
-            PlcControl.tagControl.ThetaAxis.StartAbsolute("90", "0");
         }
 
         //刷新当前配置集合

@@ -126,7 +126,7 @@ namespace 精密切割系统.ViewModel
                 {
                     Tools.LogError($"StartLoadPosition()报警监控异常: {ex.Message}");
                 }
-                await Task.Delay(100);
+                await Task.Delay(200);
             }
         }
 

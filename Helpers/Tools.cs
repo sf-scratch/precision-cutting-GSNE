@@ -259,75 +259,6 @@ namespace 精密切割系统.Utils
         }
 
         /// <summary>
-        /// 等待tag的值达到目标值，timeout和interval单位为秒，超时后会返回false
-        /// </summary>
-        /// <param name="tag"></param>
-        /// <param name="eValue"></param>
-        /// <param name="timeout"></param>
-        /// <param name="interval"></param>
-        /// <returns></returns>
-        public static bool WaitForValue(Tag tag, string eValue, double timeout = 10, double interval = 0)
-        {
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            while (stopwatch.Elapsed.TotalSeconds < timeout)
-            {
-                Task.Delay(100);
-                String runValue = PlcControl.plc.GetPlcValueString(tag.name);
-                if (runValue != eValue && Math.Abs(float.Parse(eValue) - float.Parse(runValue)) > 0.001)
-                {
-                    if (interval == 0)
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        Thread.Sleep(Convert.ToInt32(interval));
-                    }
-                }
-                else
-                {
-                    stopwatch.Stop();
-                    return true;
-                }
-            }
-            stopwatch.Stop();
-            return false;
-        }
-
-        /// <summary>
-        /// 等待tag的值达到目标值，timeout和interval单位为秒，超时后会返回false
-        /// </summary>
-        /// <param name="tagName"></param>
-        /// <param name="type">1 true 0 false</param>
-        /// <returns></returns>
-        public static bool WaitForValue(string tagName, int type, double timeout = 60)
-        {
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            string value1 = type == 0 ? "0" : "1";
-            string value2 = type == 0 ? "False" : "True";
-            while (stopwatch.IsRunning)
-            {
-                if (timeout > 0 && stopwatch.Elapsed.TotalSeconds > timeout)
-                {
-                    stopwatch.Stop();
-                    return false;
-                }
-                Task.Delay(100);
-                String runValue = PlcControl.plc.GetPlcValueString(tagName);
-                if (!value1.Equals(runValue) && !value2.Equals(runValue))
-                {
-                    continue;
-                }
-                else
-                {
-                    stopwatch.Stop();
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        /// <summary>
         /// 判断plc的value 是不是true
         /// </summary>
         /// <param name="value"></param>
@@ -518,53 +449,6 @@ namespace 精密切割系统.Utils
         {
             // 尝试解析字符串为数字，如果成功返回 true，失败则返回 false
             return decimal.TryParse(inputString, out _);
-        }
-
-        /// <summary>
-        /// 等待状态完成后，执行某些操作，传入一个状态key和方法
-        /// </summary>
-        /// <param name="statusKey">状态的唯一标识</param>
-        /// <param name="onFinish">状态完成后执行的方法</param>
-        /// <param name="timeoutSeconds">最大等待时间，单位毫秒</param>
-        /// <returns>是否成功完成任务</returns>
-        public static bool AwaitForStatusFinishAsync(
-            string statusKey,
-            Action<bool> onFinish,
-            int timeoutSeconds = 10) // 默认超时30秒
-        {
-            try
-            {
-                Task.Run(() =>
-                {
-                    // 监测状态完成的任务 这是一个同步任务
-                    bool flag = Tools.WaitForValue(statusKey, 1, timeoutSeconds);
-                    Thread.Sleep(500);
-                    if (flag)
-                    {
-                        // 使用 Dispatcher 确保回调在主线程执行
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            onFinish?.Invoke(flag);
-                        });
-                    }
-                    else
-                    {
-                        MaterialSnack("执行超时！", SnackType.WARNING, 5000);
-                        // 如果超时，则不执行回调方法
-                        GlobalParams.globalRunFlag = false;
-                    }
-                });
-                return true;
-            }
-            catch (Exception ex)
-            {
-                // 捕获异常并记录
-                Console.WriteLine($"发生错误: {ex.Message}");
-                return false;
-            }
-            finally
-            {
-            }
         }
 
         /// <summary>

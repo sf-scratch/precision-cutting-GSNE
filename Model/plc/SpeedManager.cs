@@ -39,32 +39,26 @@ namespace 精密切割系统.Model.plc
             {
                 var operationParam = await CurrentUtils.GetOperationParametersModelAsync();
                 if (operationParam is null) return;
-                await Task.Run(async () =>
-                {
-                    // 设置为高速
-                    await PlcControl.tagControl.Xaxis.SetHighSpeedAsync(1);
-                    await PlcControl.tagControl.Xaxis.SetJogRelativeSpeedAsync(operationParam.XScanSpeed.ToFloat());
-                    await PlcControl.tagControl.Yaxis.SetHighSpeedAsync(1);
-                    await PlcControl.tagControl.Yaxis.SetJogRelativeSpeedAsync(operationParam.YScanSpeed.ToFloat());
-                    await PlcControl.tagControl.Z1axis.SetHighSpeedAsync(1);
-                    await PlcControl.tagControl.Z1axis.SetJogRelativeSpeedAsync(operationParam.ZScanSpeed.ToFloat());
-                    await PlcControl.tagControl.Z2axis.SetHighSpeedAsync(1);
-                    await PlcControl.tagControl.Z2axis.SetJogRelativeSpeedAsync(operationParam.Z2ScanSpeed.ToFloat());
-                    await PlcControl.tagControl.ThetaAxis.SetHighSpeedAsync(1);
-                    await PlcControl.tagControl.ThetaAxis.SetJogRelativeSpeedAsync(operationParam.RScanSpeed.ToFloat());
-                });
+                // 设置为高速
+                await PlcControl.tagControl.Xaxis.SetHighSpeedAsync(1);
+                await PlcControl.tagControl.Xaxis.SetJogRelativeSpeedAsync(operationParam.XScanSpeed.ToFloat());
+                await PlcControl.tagControl.Yaxis.SetHighSpeedAsync(1);
+                await PlcControl.tagControl.Yaxis.SetJogRelativeSpeedAsync(operationParam.YScanSpeed.ToFloat());
+                await PlcControl.tagControl.Z1axis.SetHighSpeedAsync(1);
+                await PlcControl.tagControl.Z1axis.SetJogRelativeSpeedAsync(operationParam.ZScanSpeed.ToFloat());
+                await PlcControl.tagControl.Z2axis.SetHighSpeedAsync(1);
+                await PlcControl.tagControl.Z2axis.SetJogRelativeSpeedAsync(operationParam.Z2ScanSpeed.ToFloat());
+                await PlcControl.tagControl.ThetaAxis.SetHighSpeedAsync(1);
+                await PlcControl.tagControl.ThetaAxis.SetJogRelativeSpeedAsync(operationParam.RScanSpeed.ToFloat());
             }
             else
             {
-                await Task.Run(async () =>
-                {
-                    // 设置为低速
-                    await PlcControl.tagControl.Xaxis.SetHighSpeedAsync(0);
-                    await PlcControl.tagControl.Yaxis.SetHighSpeedAsync(0);
-                    await PlcControl.tagControl.Z1axis.SetHighSpeedAsync(0);
-                    await PlcControl.tagControl.Z2axis.SetHighSpeedAsync(0);
-                    await PlcControl.tagControl.ThetaAxis.SetHighSpeedAsync(0);
-                });
+                // 设置为低速
+                await PlcControl.tagControl.Xaxis.SetHighSpeedAsync(0);
+                await PlcControl.tagControl.Yaxis.SetHighSpeedAsync(0);
+                await PlcControl.tagControl.Z1axis.SetHighSpeedAsync(0);
+                await PlcControl.tagControl.Z2axis.SetHighSpeedAsync(0);
+                await PlcControl.tagControl.ThetaAxis.SetHighSpeedAsync(0);
             }
         }
 

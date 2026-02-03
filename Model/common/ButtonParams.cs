@@ -115,7 +115,7 @@ namespace 精密切割系统.Model.common
             _buttonVisibility = buttonVisibility;
             if (isOpenFunc != null && openOrCloseVisibility == Visibility.Visible)
             {
-                Task.Run(() => UpdateIsOpenAsync(isOpenFunc));
+                _ = Task.Run(() => UpdateIsOpenAsync(isOpenFunc));
             }
             RightClickCommand = new DelegateCommand(() => action?.Invoke());
             StartCommand = new DelegateCommand(() => start?.Invoke());
@@ -136,7 +136,7 @@ namespace 精密切割系统.Model.common
             _buttonVisibility = buttonVisibility;
             if (isOpenFunc != null && openOrCloseVisibility == Visibility.Visible)
             {
-                Task.Run(() => UpdateIsOpenAsync(isOpenFunc));
+                _ = Task.Run(() => UpdateIsOpenAsync(isOpenFunc));
             }
             RightClickCommand = new DelegateCommand(() => action?.Invoke());
             StartCommand = new DelegateCommand(() => startFunc?.Invoke());
@@ -149,7 +149,7 @@ namespace 精密切割系统.Model.common
             while (!token.IsCancellationRequested)
             {
                 IsOpen = await isOpenFunc.Invoke();
-                await Task.Delay(100);
+                await Task.Delay(200);
             }
         }
 
@@ -159,7 +159,7 @@ namespace 精密切割系统.Model.common
             while (!token.IsCancellationRequested)
             {
                 IsOpen = isOpenFunc.Invoke();
-                await Task.Delay(100);
+                await Task.Delay(200);
             }
         }
 

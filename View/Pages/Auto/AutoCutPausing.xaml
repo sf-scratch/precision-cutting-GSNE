@@ -210,6 +210,5 @@
             <Controls:InputTextBox IsEnabled="False" Text="{Binding BrokenEdgeWidth}" />
             <TextBlock HorizontalAlignment="Left" Text="mm" />
         </auto:AutoGrid>
-        <!--<common:CommonDirection Grid.Row="2"/>-->
     </Grid>
 </UserControl>

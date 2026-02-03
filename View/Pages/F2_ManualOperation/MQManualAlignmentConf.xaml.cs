@@ -258,15 +258,10 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 case 2041:
                     _intervalTimer.Stop();
                     break;
-
-                case 2466:
-                case 2477:
-                    PlcControl.tagControl.Z2axis.StopMove();
-                    break;
             }
         }
 
-        private void TouchDownHandler(object? sender, int code)
+        private async void TouchDownHandler(object? sender, int code)
         {
             switch (code)
             {
@@ -287,9 +282,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                     // Z2轴上升
                     // Z2轴上升
                     // 设置Z轴为低速
-                    PlcControl.tagControl.Z2axis.SetHighSpeed("0");
-                    PlcControl.tagControl.Z2axis.SetRelativeSpeed("0.2");
-                    PlcControl.tagControl.Z2axis.StartJog(code == 2466 ? 1 : 0);
+                    await PlcControl.tagControl.Z2axis.SetHighSpeedAsync(0);
                     break;
 
                 default:

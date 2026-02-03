@@ -165,11 +165,6 @@ namespace 精密切割系统
                 }
                 GlobalParams.ValueChanged += (sender, args) =>
                 {
-                    List<CommonDirection> commonDirectionList = Tools.GetChildrenOfType<CommonDirection>(mainFrame);
-                    if (commonDirectionList != null && commonDirectionList.Count > 0)
-                    {
-                        commonDirectionList[0].SetHighBtnStatus(GlobalParams.heightSpeedStatus);
-                    }
                     List<DirectOperate> directOperateList = Tools.GetChildrenOfType<DirectOperate>(operateFrame);
                     if (directOperateList != null && directOperateList.Count > 0)
                     {
@@ -229,11 +224,12 @@ namespace 精密切割系统
             {
                 try
                 {
-                    if (!PlcControl.connectionStatus)
+                    if (!PlcControl.ConnectionStatus)
                     {
                         MaterialSnack("PLC连接中...", SnackType.INFO);
-                        bool res = mainPlc.ConnectPlc();
-                        if (!res)
+                        var res = await KeyencePlc.Instance.ConnectServerAsync();
+                        PlcControl.ConnectionStatus = res.IsSuccess;
+                        if (!PlcControl.ConnectionStatus)
                         {
                             MaterialSnack("PLC连接失败，重试中...", SnackType.WARNING, 0);
                             await Task.Delay(2000);
@@ -249,18 +245,17 @@ namespace 精密切割系统
                             await Task.Delay(2000);
                         }
                     }
-                    if (!CameraUtils.l_lightConnectStatus)
+                    if (!CameraUtils.LightConnectStatus)
                     {
                         MaterialSnack("光源连接中...", SnackType.INFO, 0);
                         CameraUtils.ConnectLight();
-                        if (!CameraUtils.l_lightConnectStatus)
+                        if (!CameraUtils.LightConnectStatus)
                         {
                             MaterialSnack("光源连接失败，重试中..." + CameraUtils.l_errorMessage, SnackType.WARNING);
                             await Task.Delay(2000);
                         }
                     }
-                    // if (PlcControl.connectionStatus && CameraUtils._bDeviceOpened && CameraUtils.l_lightConnectStatus)
-                    if (PlcControl.connectionStatus)
+                    if (PlcControl.ConnectionStatus && CameraUtils.BDeviceOpened && CameraUtils.LightConnectStatus)
                     {
                         MaterialSnack("设备加载完成！", SnackType.SUCCESS, 0);
                         break;
@@ -283,7 +278,6 @@ namespace 精密切割系统
             PlcControl.plc.exitAllModel();
             await Task.Delay(1000);
             await CurrentUtils.InitPlcDataAsync();
-            BunkeringHandler.AddBunkeringRecord();
             // 设置面板禁用
             PlcControl.tagControl.wholeDevice.SetPanelButtonsStauts(0);
             // 关闭Y轴光栅尺校准

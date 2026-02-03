@@ -268,31 +268,6 @@ namespace 精密切割系统.View
                             mainWindow.NavigateToPage(bean.PageUrl);
                             break;
                         }
-                        // 电火花修刀
-                        if (CommonCheck.TruingStatusCheck())
-                        {
-                            // 新发送PLC进入模式，当模式进入成功后，跳转页面
-                            MenuButton menu = sender as MenuButton;
-                            MaterialSnack("进入电火花修刀模式中...", SnackType.WARNING, 0);
-                            PlcControl.tagControl.sparkRepairKnife.EnterElectrical(1);
-                            GlobalParams.globalRunFlag = true;
-                            // 监听状态，如果模式准备完成，则跳转页面
-                            _ = Task.Run(() =>
-                            {
-                                bool flag = Tools.WaitForValue(DeviceKey.sharpenStatusKey, 1);
-                                GlobalParams.globalRunFlag = false;
-                                if (flag)
-                                {
-                                    mainWindow.NavigateToPage(bean.PageUrl);
-                                }
-                                else
-                                {
-                                    MaterialSnack("进入电火花修刀模式失败！", SnackType.WARNING, 0);
-                                    // 进入失败，退出模式
-                                    PlcControl.tagControl.sparkRepairKnife.EnterElectrical(0);
-                                }
-                            });
-                        }
                         break;
                     }
                 case 202:
@@ -321,38 +296,6 @@ namespace 精密切割系统.View
                     break;
 
                 case 402:
-                    if (!GlobalParams.OnlineFlag)
-                    {
-                        mainWindow.NavigateToPage(bean.PageUrl);
-                        break;
-                    }
-                    // 测高
-                    if (CommonCheck.MlignStatusCheck())
-                    {
-                        // 新发送PLC进入模式，当模式进入成功后，跳转页面
-                        // 进入测高模式
-                        MaterialSnack("进入测高模式中...", SnackType.WARNING, 0);
-                        MenuButton menu = sender as MenuButton;
-                        PlcControl.tagControl.bladeMantance.RunBladeSetup(1);
-                        PlcControl.tagControl.wholeDevice.SetPanelButtonsStauts(1);
-                        GlobalParams.globalRunFlag = true;
-                        // 监听状态，如果模式准备完成，则跳转页面
-                        Task.Run(() =>
-                        {
-                            bool flag = Tools.WaitForValue(DeviceKey.bladeMantanceStatusKey, 1);
-                            GlobalParams.globalRunFlag = false;
-                            if (flag)
-                            {
-                                mainWindow.NavigateToPage(bean.PageUrl);
-                            }
-                            else
-                            {
-                                PlcControl.tagControl.bladeMantance.RunBladeSetup(0);
-                                PlcControl.tagControl.wholeDevice.SetPanelButtonsStauts(0);
-                                MaterialSnack("进入刀片测高失败！", SnackType.WARNING, 0);
-                            }
-                        });
-                    }
                     break;
 
                 case 203:

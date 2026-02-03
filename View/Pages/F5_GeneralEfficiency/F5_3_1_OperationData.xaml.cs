@@ -86,7 +86,7 @@ namespace 精密切割系统.View.Pages
             if (success)
             {
                 MaterialSnack("操作中。。。", SnackType.WARNING);
-                await SaveData();
+                await SaveDataAsync();
                 MaterialSnack("操作成功", SnackType.SUCCESS);
                 //mainWindow.NavigateToPage("MainMenu");
                 //mainWindow.mainFrame.Source = new Uri("View/Pages/F4_BladeMaintenance/BmSharpenParameter.xaml", UriKind.Relative);
@@ -97,14 +97,14 @@ namespace 精密切割系统.View.Pages
             }
         }
 
-        public async Task SaveData()
+        public async Task SaveDataAsync()
         {
             OperationParametersModel operationParameter = ViewModel.operationParameter;
             if (operationParameter != null)
             {
                 operationParameter.ZStopAfterSeq = cbxZStopAfterSeq.Text;
                 await SqlHelper.UpdateAsync(operationParameter);
-                CurrentUtils.InitAxisSpeedIndex(operationParameter);
+                await CurrentUtils.InitAxisSpeedIndexAsync(operationParameter);
                 // 设置Z轴补偿量
                 GlobalParams.zAxisCompNum = ViewModel.zAxisCompNum;
                 GlobalParams.zAxisCompValue = Tools.GetFloatStringValue(ViewModel.zAxisCompValue);

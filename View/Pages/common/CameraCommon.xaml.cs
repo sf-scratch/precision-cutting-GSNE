@@ -28,13 +28,14 @@ namespace 精密切割系统.View.Pages.common
             InitializeComponent();
         }
 
+        public event Action LineChanged;
+
         private Point centerLocation;
         private static List<CustomLine> _lines = new List<CustomLine>();
         private TextBlock cutWidthTextBlock;
         private TextBlock edgeWidthTextBlock;
         private bool _hasEdgeLine;
-
-        public event Action LineChanged;
+        private readonly SemaphoreSlim _semaphore = new(1, 1);
 
         private static float _cutMarkWidth;
 
@@ -358,73 +359,54 @@ namespace 精密切割系统.View.Pages.common
 
         private async Task CameraPictureRunAsync(double x, double y)
         {
-            var positon = await Task.WhenAll(PlcControl.tagControl.Xaxis.GetCurrentLocationAsync(), PlcControl.tagControl.Yaxis.GetCurrentLocationAsync());
-            double? xPosition = positon[0];
-            double? yPosition = positon[1];
-            if (xPosition is null || yPosition is null)
+            if (Appsettings.PositiveLimitPositionX is null || Appsettings.NegativeLimitPositionX is null || Appsettings.PositiveLimitPositionY is null || Appsettings.NegativeLimitPositionY is null)
+            {
+                MaterialSnack("未设置轴极限位置！", SnackType.WARNING, 2);
+                return;
+            }
+            if (!await _semaphore.WaitAsync(0))
             {
                 return;
             }
-            if (x != 0)
+            try
             {
-                // 根据图片像素和真实比例，计算要走的位置
-                double distance = CameraOperateUtils.ConvertPictureBoxToRealSizeWidth(Math.Abs(x));
-                distance = distance / 1000;
-                // 如果大于0 正转 小于0 反转
-                if (x > 0)
-                {
-                    xPosition += distance;
-                }
-                else
-                {
-                    xPosition -= distance;
-                }
-            }
-            if (y != 0)
-            {
-                double distance = CameraOperateUtils.ConvertPictureBoxToRealSize(Math.Abs(y));
-                distance = distance / 1000;
-                // 如果大于0 正转 小于0 反转
-                if (y > 0)
-                {
-                    yPosition += distance;
-                }
-                else
-                {
-                    yPosition -= distance;
-                }
-            }
-            //// 判断X 和Y是否超限，超限则保留最大或者最小值
-            //Tag xLimitUpperTag = PlcControl.allTags[DeviceKey.softUpperLimitKey];
-            //Tag xLimitLowerTag = PlcControl.allTags[DeviceKey.softLowerLimitKey];
+                // 使用元组解构，避免数组索引
+                var xPos = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync();
+                var yPos = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync();
+                if (xPos is null || yPos is null) return;
 
-            //Tag yLimitUpperTag = PlcControl.allTags[DeviceKey.ySoftUpperLimitKey];
-            //Tag yLimitLowerTag = PlcControl.allTags[DeviceKey.ySoftLowerLimitKey];
+                // 使用本地函数处理坐标计算
+                float? newX = CalculateNewPosition(xPos.Value, x, CameraOperateUtils.ConvertPictureBoxToRealSizeWidth);
+                float? newY = CalculateNewPosition(yPos.Value, y, CameraOperateUtils.ConvertPictureBoxToRealSize);
 
-            //float xUpperValue = float.Parse(xLimitUpperTag.defaultValue);
-            //float xLowerValue = float.Parse(xLimitLowerTag.defaultValue);
-            //float yUpperValue = float.Parse(yLimitUpperTag.defaultValue);
-            //float yLowerValue = float.Parse(yLimitLowerTag.defaultValue);
-            //if (xPosition >= xUpperValue)
-            //{
-            //    xPosition = xUpperValue;
-            //}
-            //if (xPosition <= xLowerValue)
-            //{
-            //    xPosition = xLowerValue;
-            //}
-            //if (yPosition >= yUpperValue)
-            //{
-            //    yPosition = yUpperValue;
-            //}
-            //if (yPosition <= yLowerValue)
-            //{
-            //    yPosition = yLowerValue;
-            //}
-            if (await PlcControl.tagControl.Xaxis.IsReadyAsync() && await PlcControl.tagControl.Yaxis.IsReadyAsync())
-            {
-                await PlcControl.tagControl.cutting.RunMotionNoWaitAsync((float)xPosition, (float)yPosition);
+                // 或者直接修改原变量
+                if (newX.HasValue) xPos = newX;
+                if (newY.HasValue) yPos = newY;
+
+                //// 判断X 和Y是否超限，超限则保留最大或者最小值
+                float xUpperValue = Appsettings.PositiveLimitPositionX.Value;
+                float xLowerValue = Appsettings.NegativeLimitPositionX.Value;
+                float yUpperValue = Appsettings.PositiveLimitPositionY.Value;
+                float yLowerValue = Appsettings.NegativeLimitPositionY.Value;
+                // 使用 Math.Clamp 限制范围
+                xPos = Math.Clamp(xPos.Value, xLowerValue, xUpperValue);
+                yPos = Math.Clamp(yPos.Value, yLowerValue, yUpperValue);
+                if (await PlcControl.tagControl.Xaxis.IsReadyAsync() && await PlcControl.tagControl.Yaxis.IsReadyAsync())
+                {
+                    await PlcControl.tagControl.cutting.RunMotionNoWaitAsync(xPos.Value, yPos.Value);
+                }
             }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
+
+        private static float? CalculateNewPosition(float currentPosition, double offset, Func<double, double> convertFunc)
+        {
+            if (offset == 0) return null;
+            float distance = (float)convertFunc(Math.Abs(offset)) / 1000f;
+            return currentPosition + (Math.Sign(offset) * distance);
         }
 
         public OpenCvSharp.Mat CaptureControl()

@@ -80,7 +80,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 
         private void LoadPosition(CancellationToken token)
         {
-            Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
                 using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(300));
                 while (await timer.WaitForNextTickAsync(token))
