@@ -15,7 +15,7 @@ namespace 精密切割系统.Helpers
         public static bool OnlineFlag { get; set; } = true;
 
         // 是否全屏显示
-        public static bool IsFullDcreen { get; set; } = false;
+        public static bool IsFullDcreen { get; set; } = true;
 
         // 机器型号
         public static string DeviceModel { get; set; } = Device_321;

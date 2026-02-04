@@ -117,11 +117,30 @@ namespace 精密切割系统.ViewModel
                 case GlobalParams.Device_321:
                     AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
                     AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
-                    AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
+                    AddBottomButton(ButtonParams.BlueButton("高度补偿", "FormatLineHeight", SetDepthCompensationAsync));
                     AddBottomButton(ButtonParams.BlueButton("预切启动", "/Assets/icon/tab_1/02/tab_27.png", OpenPrecut));
                     AddBottomButton(ButtonParams.BlueButton("刀片状态信息", "/Assets/icon/tab_1/02/tab_27.png", NavigateToBladeInfo));
+                    AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
+                    AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
+                    AddBottomButton(ButtonParams.BlueButton("速度更改", "SpeedometerMedium", SetFeedSpeed));
                     break;
             }
+        }
+
+        private async Task SetDepthCompensationAsync()
+        {
+            // 高度补偿
+            _semiAutoCutService.DepthCompensationValue = CutParam.DepthCompensation.ToFloat();
+            CutParam.DepthCompensation = CutParam.DepthCompensation;
+            MaterialSnack($"刀片高度补偿设置为 {_semiAutoCutService.DepthCompensationValue}！", SnackType.SUCCESS);
+        }
+
+        private void SetFeedSpeed()
+        {
+            // 速度更改
+            _semiAutoCutService.FeedSpeedCompCompensationValue = CutParam.ChangeFeedSpeed.ToFloat();
+            CutParam.ChangeFeedSpeed = CutParam.ChangeFeedSpeed;
+            MaterialSnack($"变更进刀速度设置为 {_semiAutoCutService.FeedSpeedCompCompensationValue}！", SnackType.SUCCESS);
         }
 
         private void NavigateToBladeInfo()
@@ -164,6 +183,7 @@ namespace 精密切割系统.ViewModel
                                     {
                                         string alarmMessages = string.Join(",", alarmInfos.Select(a => a.Message));
                                         _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Error报警监控：{alarmMessages}"));
+                                        await PlcControl.tagControl.wholeDevice.OpenBuzzerAsync();
                                         await PauseAsync(PlcControl.tagControl.wholeDevice.OpenRedLightAsync);
                                     }
                                     else
@@ -201,6 +221,7 @@ namespace 精密切割系统.ViewModel
                                     {
                                         string alarmMessages = string.Join(",", alarmInfos.Select(a => a.Message));
                                         _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Warn报警监控：{alarmMessages}"));
+                                        await PlcControl.tagControl.wholeDevice.OpenBuzzerAsync();
                                         await PauseAsync(PlcControl.tagControl.wholeDevice.OpenRedLightAsync);
                                     }
                                     else
@@ -554,7 +575,7 @@ namespace 精密切割系统.ViewModel
                         }
                     }
                     await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, cts.Token);
-                    await AutoCutUtils.WorkpieceBlowingAsync(line.StartPoint.Y.ToCameraY(), default, _eventAggregator, cts.Token);
+                    await AutoCutUtils.WorkpieceBlowingAsync(line.StartPoint.Y.ToCameraY(), default, default, _eventAggregator, cts.Token);
                     await Task.WhenAll(
                         PlcControl.tagControl.Xaxis.StartAbsoluteAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), 30, cts.Token),
                         PlcControl.tagControl.Yaxis.StartAbsoluteAsync(line.StartPoint.Y.ToCameraY(), 30, cts.Token));
@@ -598,7 +619,10 @@ namespace 精密切割系统.ViewModel
                     }
                     await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, cts.Token);
                     await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
-                    await AutoCutUtils.WorkpieceBlowingAsync(line.StartPoint.Y.ToCameraY(), default, _eventAggregator, cts.Token);
+                    if (!pauseData.IsCompleted)
+                    {
+                        await AutoCutUtils.WorkpieceBlowingAsync(line.StartPoint.Y.ToCameraY(), default, false, _eventAggregator, cts.Token);
+                    }
                     await Task.WhenAll(
                         PlcControl.tagControl.Xaxis.StartAbsoluteAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), 50, cts.Token),
                         PlcControl.tagControl.Yaxis.StartAbsoluteAsync(line.StartPoint.Y.ToCameraY(), 30, cts.Token));
@@ -616,7 +640,15 @@ namespace 精密切割系统.ViewModel
                 }
                 else
                 {
-                    MaterialSnack(pauseData.Message ?? "暂停中...", SnackType.WARNING, 0, _eventAggregator);
+                    if (AlarmConfig.Instance.HasAutoRunUnexpectedAlarms(out bool[]? alarms) && alarms is not null && AlarmConfig.Instance.TryGetActiveAlarms(alarms, out List<AlarmInfo> alarmInfos))
+                    {
+                        string alarmMessages = string.Join(",", alarmInfos.Select(a => a.Message));
+                        MaterialSnack(pauseData.Message ?? alarmMessages, SnackType.WARNING, 0, _eventAggregator);
+                    }
+                    else
+                    {
+                        MaterialSnack(pauseData.Message ?? "暂停中...", SnackType.WARNING, 0, _eventAggregator);
+                    }
                 }
             }
             catch (OperationCanceledException)
@@ -667,7 +699,6 @@ namespace 精密切割系统.ViewModel
                     }
                 }
                 _currentCutYPosition = process.CutYPosition;
-                CutParam.DepthCompensation = _semiAutoCutService.DepthCompensationValue.ToString(GlobalParams.DecimalStringFormat);
             });
         }
 

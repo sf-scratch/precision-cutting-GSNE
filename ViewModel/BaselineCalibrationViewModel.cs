@@ -183,12 +183,12 @@ namespace 精密切割系统.ViewModel
                 case GlobalParams.Device_321:
                     AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
                     AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
-                    AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
+                    AddBottomButton(ButtonParams.BlueButton("对焦", "/Assets/icon/tab_1/03/tab_01.png", FocusAutoAsync));
                     AddBottomButton(ButtonParams.BlueButton("基准线调窄", "/Assets/icon/tab_1/03/tab_02.png", null, BaselineNarrowing, StopUpdateCameraCommonLine));
                     AddBottomButton(ButtonParams.BlueButton("θ轴横向校正", "/Assets/icon/tab_1/03/tab_04.png", _alignService.ThetaHorizontalAlignAsync));
                     AddBottomButton(ButtonParams.BlueButton("基准线校准", "CrosshairsGps", BaselineCalibrationAsync));
                     AddBottomButton(ButtonParams.BlueButton("测量", "/Assets/icon/tab_1/03/tab_03.png", NavigateMeasurement));
-                    AddBottomButton(ButtonParams.BlueButton("对焦", "/Assets/icon/tab_1/03/tab_01.png", FocusAutoAsync));
+                    AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
                     AddBottomButton(ButtonParams.BlueButton("基准线调宽", "/Assets/icon/tab_1/03/tab_02.png", null, BaselineWidening, StopUpdateCameraCommonLine));
                     AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
                     break;
@@ -196,12 +196,12 @@ namespace 精密切割系统.ViewModel
                 case GlobalParams.Device_562:
                     AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
                     AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
-                    AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
+                    AddBottomButton(ButtonParams.BlueButton("对焦", "/Assets/icon/tab_1/03/tab_01.png", FocusAutoAsync));
                     AddBottomButton(ButtonParams.BlueButton("基准线调窄", "/Assets/icon/tab_1/03/tab_02.png", null, BaselineNarrowing, StopUpdateCameraCommonLine));
                     AddBottomButton(ButtonParams.BlueButton("θ轴竖向校正", "/Assets/icon/tab_1/03/theta-align-vertical.png", _alignService.ThetaVerticalAlignAsync));
                     AddBottomButton(ButtonParams.BlueButton("基准线校准", "CrosshairsGps", BaselineCalibrationAsync));
                     AddBottomButton(ButtonParams.BlueButton("测量", "/Assets/icon/tab_1/03/tab_03.png", NavigateMeasurement));
-                    AddBottomButton(ButtonParams.BlueButton("对焦", "/Assets/icon/tab_1/03/tab_01.png", FocusAutoAsync));
+                    AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
                     AddBottomButton(ButtonParams.BlueButton("基准线调宽", "/Assets/icon/tab_1/03/tab_02.png", null, BaselineWidening, StopUpdateCameraCommonLine));
                     AddBottomButton(ButtonParams.BlueButton("θ轴横向校正", "/Assets/icon/tab_1/03/tab_04.png", _alignService.ThetaHorizontalAlignAsync));
                     break;
@@ -209,12 +209,12 @@ namespace 精密切割系统.ViewModel
                 case GlobalParams.Device_551:
                     AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
                     AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
-                    AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
+                    AddBottomButton(ButtonParams.BlueButton("对焦", "/Assets/icon/tab_1/03/tab_01.png", FocusAutoAsync));
                     AddBottomButton(ButtonParams.BlueButton("基准线调窄", "/Assets/icon/tab_1/03/tab_02.png", null, BaselineNarrowing, StopUpdateCameraCommonLine));
                     AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
                     AddBottomButton(ButtonParams.BlueButton("基准线校准", "CrosshairsGps", BaselineCalibrationAsync));
                     AddBottomButton(ButtonParams.BlueButton("测量", "/Assets/icon/tab_1/03/tab_03.png", NavigateMeasurement));
-                    AddBottomButton(ButtonParams.BlueButton("对焦", "/Assets/icon/tab_1/03/tab_01.png", FocusAutoAsync));
+                    AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
                     AddBottomButton(ButtonParams.BlueButton("基准线调宽", "/Assets/icon/tab_1/03/tab_02.png", null, BaselineWidening, StopUpdateCameraCommonLine));
                     AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
                     break;
@@ -234,6 +234,13 @@ namespace 精密切割系统.ViewModel
                     Y = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0
                 };
                 float offsetY = cutY - curPoint.Y;
+                var userdefineDdata = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
+                float hairlineAdjustLimit = userdefineDdata.HairlineAdjustLimit.ToFloat();
+                if (MathF.Abs(offsetY) > hairlineAdjustLimit)
+                {
+                    MaterialSnack($"超出基准线校准调整极限！", SnackType.WARNING);
+                    return;
+                }
                 Appsettings.CameraRelativeBladePosition = new DataPoint<float>(relativePostion.X, relativePostion.Y - offsetY);
                 CameraRelativeBladePositionY = Appsettings.CameraRelativeBladePosition.Y;
                 _cutY = curPoint.Y;
@@ -284,6 +291,7 @@ namespace 精密切割系统.ViewModel
                         MaterialSnack(result.Message, SnackType.WARNING, default, _eventAggregator);
                         return;
                     }
+                    MaterialSnack(result.Message, SnackType.WARNING, default, _eventAggregator);
                 }
                 catch (OperationCanceledException)
                 {
@@ -343,7 +351,7 @@ namespace 精密切割系统.ViewModel
                 await PlcControl.tagControl.cutting.ExitCuttingModeAsync(token);
                 await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
                 // 工作盘吹气
-                await AutoCutUtils.WorkpieceBlowingAsync(default, default, default, token);
+                await AutoCutUtils.WorkpieceBlowingAsync(default, default, default, default, token);
                 await PlcControl.tagControl.cutting.RunMotionAsync(((startX + endX) / 2).ToCameraX(), startY.ToCameraY(), token);
                 await PlcControl.tagControl.wholeDevice.OpenCameraLensCapAsync();
                 _cutY = startY.ToCameraY();

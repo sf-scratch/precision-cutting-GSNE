@@ -69,6 +69,7 @@ namespace 精密切割系统.Helpers
                 db.CreateTable<AutomaticCompensationCutHeightEntity>();
                 db.CreateTable<ScratchInspectionParametersEntity>();
                 db.CreateTable<BladeInfoEntity>();
+                db.CreateTable<CameraEntity>();
             }
             catch (Exception ex)
             {
@@ -161,6 +162,23 @@ namespace 精密切割系统.Helpers
                 TEntity entity = createDefault.Invoke();
                 entity.Id = defaultId;
                 await AddAsync(entity);
+                return entity;
+            }
+            return list.First();
+        }
+
+        /// <summary>
+        /// 通用实体获取方法
+        /// </summary>
+        public static TEntity GetOrCreateEntity<TEntity>(Func<TEntity> createDefault, long? id = default) where TEntity : class, IEntityWithId, new()
+        {
+            long defaultId = id ?? DefaultId;
+            var list = Table<TEntity>().Where(t => t.Id == defaultId).ToList();
+            if (list.Count == 0)
+            {
+                TEntity entity = createDefault.Invoke();
+                entity.Id = defaultId;
+                Add(entity);
                 return entity;
             }
             return list.First();

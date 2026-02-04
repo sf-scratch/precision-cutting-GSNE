@@ -333,7 +333,12 @@ namespace 精密切割系统.View.Pages.operate
                     {
                         return;
                     }
-                    if (SemiAutoCutService.Instance.IsRuning)
+                    var dataContext = RegionUtils.GetActiveViewDataContext();
+                    if (dataContext is MQSemiAutomaticCuttingStopViewModel viewModel && viewModel.PauseData.IsCompleted)
+                    {
+                        await viewModel.StopAsync();
+                    }
+                    else if (SemiAutoCutService.Instance.IsRuning)
                     {
                         MaterialSnack("半自动切割运行中，无法操作CT真空！", SnackType.WARNING);
                         return;

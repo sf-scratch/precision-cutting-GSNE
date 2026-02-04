@@ -206,9 +206,6 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
 
         private async void CutBack(object? sender, bool e)
         {
-            // 回复切割面到Ch 1
-            //CurrentUtils.InitCutCh();
-            WarmUpHelper.StopWarmUp();
             var operationParams = await CurrentUtils.GetOperationParametersModelAsync();
             if (operationParams.IsExitCutClearManualCompensation)
             {

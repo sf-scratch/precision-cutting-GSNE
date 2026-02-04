@@ -517,8 +517,15 @@
                     <CheckBox
                         x:Name="StartPreCuttingAfterChangeBlade"
                         d:IsChecked="False"
-                        IsChecked="{Binding IsUpdateParamClearManualCompensation}">
+                        IsChecked="{Binding IsStartPreCuttingAfterChangeBlade}">
                         <TextBlock Text="{Binding ElementName=StartPreCuttingAfterChangeBlade, Path=IsChecked, Converter={StaticResource BoolToOpenOrCloseConverter}}" />
+                    </CheckBox>
+                    <Label Content="手动校准每个面必须校准" />
+                    <CheckBox
+                        x:Name="MustCalibrated"
+                        d:IsChecked="False"
+                        IsChecked="{Binding IsMustCalibrated}">
+                        <TextBlock Text="{Binding ElementName=MustCalibrated, Path=IsChecked, Converter={StaticResource BoolToOpenOrCloseConverter}}" />
                     </CheckBox>
                 </auto:AutoGrid>
             </StackPanel>

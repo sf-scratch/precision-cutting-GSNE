@@ -159,5 +159,8 @@ namespace 精密切割系统.database.db.modle
 
         [Column("is_start_pre_cutting_after_change_blade")]
         public bool IsStartPreCuttingAfterChangeBlade { get; set; }
+
+        [Column("is_must_calibrated")]
+        public bool IsMustCalibrated { get; set; }
     }
 }

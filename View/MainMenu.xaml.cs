@@ -128,7 +128,7 @@ namespace 精密切割系统.View
 
         private void BtnBack_RightClicked(object? sender, bool e)
         {
-            // rightPage.PanelAction.Visibility = Visibility.Collapsed;
+            WarmUpHelper.StopWarmUp();
             UpdateMenu(MenuData.GetF1Menu());
         }
 
@@ -288,6 +288,29 @@ namespace 精密切割系统.View
                     break;
 
                 case 409:
+                    if (mainWindow == null)
+                    {
+                        MaterialSnack($"{nameof(mainWindow)}为空", SnackType.WARNING);
+                        return;
+                    }
+                    try
+                    {
+                        mainWindow.IsEnabled = false;
+                        await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(60));
+                        await AutoCutUtils.ReplaceBladeAsync(default, timeoutToken.Token);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        MaterialSnack("换刀超时！", SnackType.WARNING);
+                    }
+                    catch (Exception ex)
+                    {
+                        MaterialSnack($"换刀出现错误：{ex.Message}", SnackType.WARNING);
+                    }
+                    finally
+                    {
+                        mainWindow.IsEnabled = true;
+                    }
                     mainWindow?.NavigateToPage(bean.PageUrl);
                     break;
 
@@ -296,6 +319,10 @@ namespace 精密切割系统.View
                     break;
 
                 case 402:
+                    break;
+
+                case 5001:
+                    await WarmUpHelper.TriggerWarmUpAsync();
                     break;
 
                 case 203:

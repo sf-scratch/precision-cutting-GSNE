@@ -230,7 +230,7 @@ namespace 精密切割系统.Assets.config.buttom
             return list;
         }
 
-        // 半自动切割切割中操作按钮
+        // 单一面校准
         public static List<OperateBean> GetManualAlignmentOperate()
         {
             var list = new List<OperateBean>();
@@ -240,12 +240,12 @@ namespace 精密切割系统.Assets.config.buttom
             {
                 case GlobalParams.Device_321:
 
-                    list.Add(new OperateBean(-1, "", ""));
+                    list.Add(new OperateBean(2052, "切割道中心", "FormatVerticalAlignCenter"));
                     list.Add(new OperateBean(2441, "对焦", "FocusAuto"));
                     list.Add(new OperateBean(2445, "对焦确认", "/Assets/icon/tab_1/03/tab_01.png"));
                     list.Add(new OperateBean(2407, "基准线调窄", "UnfoldLessHorizontal"));
                     list.Add(new OperateBean(2453, "θ轴横向校正", "/Assets/icon/tab_1/03/tab_04.png"));
-                    list.Add(new OperateBean(-1, "", ""));
+                    list.Add(new OperateBean(2051, "辅助线", "VectorLine"));
                     list.Add(new OperateBean(2433, "刀痕识别", "TextRecognition"));
                     list.Add(new OperateBean(2050, "测量", "/Assets/icon/tab_1/03/tab_03.png"));
                     list.Add(new OperateBean(2408, "基准线调宽", "UnfoldMoreHorizontal"));
@@ -254,12 +254,12 @@ namespace 精密切割系统.Assets.config.buttom
 
                 case GlobalParams.Device_562:
 
-                    list.Add(new OperateBean(-1, "", ""));
+                    list.Add(new OperateBean(2052, "切割道中心", "FormatVerticalAlignCenter"));
                     list.Add(new OperateBean(2441, "对焦", "FocusAuto"));
                     list.Add(new OperateBean(2445, "对焦确认", "/Assets/icon/tab_1/03/tab_01.png"));
                     list.Add(new OperateBean(2407, "基准线调窄", "UnfoldLessHorizontal"));
                     list.Add(new OperateBean(2443, "θ轴竖向校正", "/Assets/icon/tab_1/03/theta-align-vertical.png"));
-                    list.Add(new OperateBean(-1, "", ""));
+                    list.Add(new OperateBean(2051, "辅助线", "VectorLine"));
                     list.Add(new OperateBean(2433, "刀痕识别", "TextRecognition"));
                     list.Add(new OperateBean(2050, "测量", "/Assets/icon/tab_1/03/tab_03.png"));
                     list.Add(new OperateBean(2408, "基准线调宽", "UnfoldMoreHorizontal"));

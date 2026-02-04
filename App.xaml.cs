@@ -79,6 +79,8 @@ namespace 精密切割系统
             containerRegistry.RegisterForNavigation<AutomaticCompensationCutHeight, AutomaticCompensationCutHeightViewModel>();
             containerRegistry.RegisterForNavigation<ScratchInspectionParameters, ScratchInspectionParametersViewModel>();
             containerRegistry.RegisterForNavigation<SuctionCupReplacement, SuctionCupReplacementViewModel>();
+            containerRegistry.RegisterForNavigation<AuxiliaryLine, AuxiliaryLineViewModel>();
+            containerRegistry.RegisterForNavigation<FindCenterLine, FindCenterLineViewModel>();
 
             containerRegistry.RegisterDialog<ConfirmDialog, ConfirmDialogViewModel>();
 

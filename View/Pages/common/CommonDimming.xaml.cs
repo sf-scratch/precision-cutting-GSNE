@@ -33,7 +33,21 @@ namespace 精密切割系统.View.Pages.common
 
         private async Task ExecuteUpdateExposureTimeCommand(string exposureTime)
         {
-            await CameraUtils.SetCameraExposureTimeAsync(CameraUtils.GetCameraExposureTime() + exposureTime.ToFloat());
+            if (!double.TryParse(exposureTime, out double updateExposureTime))
+            {
+                return;
+            }
+            double currentExposureTime = CameraUtils.GetCameraExposureTime();
+            if ((currentExposureTime == 1000 && updateExposureTime > 0) || (currentExposureTime == 1 && updateExposureTime < 0))
+            {
+                return;
+            }
+            double newExposureTime = currentExposureTime + updateExposureTime;
+            if (newExposureTime > 1000)
+            {
+                newExposureTime = 1000;
+            }
+            await CameraUtils.SetCameraExposureTimeAsync(newExposureTime);
         }
 
         public CommonDimming()

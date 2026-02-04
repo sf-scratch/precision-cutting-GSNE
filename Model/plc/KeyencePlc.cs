@@ -19,6 +19,7 @@ using 精密切割系统.Model.sqlite;
 using 精密切割系统.PubSubEvent;
 using 精密切割系统.Utils;
 using 精密切割系统.ViewModel;
+using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace 精密切割系统.Driver
 {
@@ -1874,6 +1875,16 @@ namespace 精密切割系统.Driver
         public async Task<bool> IsOpenSpindleCuttingWaterAsync()
         {
             return await keyencePlc.ReadDataAsync(spindleCuttingWater.addr) == true;
+        }
+
+        public async Task OpenCuttingWaterAndConfirmStatusAsync(CancellationToken token)
+        {
+            await TaskUtils.WaitExpectedResultAsync(async () =>
+            {
+                await OpenCuttingWaterAsync();
+                await Task.Delay(1000);
+                return await IsOpenSpindleCuttingWaterAsync();
+            }, default, token);
         }
 
         /// <summary>

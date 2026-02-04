@@ -69,24 +69,20 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
 
         private async void SureOk(object? sender, bool v)
         {
-            if (this.DataContext is MCCalibrationParametersViewModel viewModel)
+            try
             {
-                try
-                {
-                    int id = int.Parse(QueryUtils.getQuery(this)["id"]);
-                    bool lookState = bool.Parse(QueryUtils.getQuery(this)["look"]);
-                    FileTableItemModel fileTableItem = await SqlHelper.GetOrCreateEntityAsync(() => new FileTableItemModel(), id);
-                    fileTableItem.HorizontalStraighteningStroke = ViewModel.HorizontalStraighteningStroke;
-                    fileTableItem.VerticalStraighteningStroke = ViewModel.VerticalStraighteningStroke;
-                    SqlHelper.Update(fileTableItem);
-                    SqlHelper.Update(viewModel.UserDefineDataModel);
-                    MaterialSnack("保存成功", SnackType.SUCCESS);
-                    _mainWindow?.NavigateToPage("Pages/F3_ModelCatalog/MCDeviceDataConf", $"id={id}&look={lookState}");
-                }
-                catch
-                {
-                    MaterialSnack("保存失败", SnackType.ERROR);
-                }
+                int id = int.Parse(QueryUtils.getQuery(this)["id"]);
+                bool lookState = bool.Parse(QueryUtils.getQuery(this)["look"]);
+                FileTableItemModel fileTableItem = await SqlHelper.GetOrCreateEntityAsync(() => new FileTableItemModel(), id);
+                fileTableItem.HorizontalStraighteningStroke = ViewModel.HorizontalStraighteningStroke;
+                fileTableItem.VerticalStraighteningStroke = ViewModel.VerticalStraighteningStroke;
+                SqlHelper.Update(fileTableItem);
+                SqlHelper.Update(ViewModel.UserDefineDataModel);
+                MaterialSnack("保存成功", SnackType.SUCCESS);
+            }
+            catch
+            {
+                MaterialSnack("保存失败", SnackType.ERROR);
             }
         }
     }

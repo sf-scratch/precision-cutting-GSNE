@@ -131,6 +131,7 @@
                 InputType="Decimal"
                 Text="{Binding Path=WarmUpTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 TextWrapping="Wrap"
+                XPrecision="0"
                 XMax="3600"
                 XMin="0" />
             <Label

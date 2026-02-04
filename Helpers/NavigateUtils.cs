@@ -19,6 +19,7 @@ namespace 精密切割系统.Helpers
     {
         public static void NavigateToPage(string pageName, string? paramsStr = default, bool isNavigateEmpty = true)
         {
+            WarmUpHelper.StopWarmUp();
             //跳转界面
             MainWindow? mainWindow = Application.Current.MainWindow as MainWindow;
             if (mainWindow == null)

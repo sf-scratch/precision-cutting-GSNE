@@ -686,5 +686,15 @@ namespace 精密切割系统.ViewModel
                 RaisePropertyChanged();
             }
         }
+
+        public bool IsMustCalibrated
+        {
+            get { return operationParameter.IsMustCalibrated; }
+            set
+            {
+                operationParameter.IsMustCalibrated = value;
+                RaisePropertyChanged();
+            }
+        }
     }
 }

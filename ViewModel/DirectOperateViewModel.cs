@@ -868,6 +868,7 @@ namespace 精密切割系统.ViewModel
             {
                 _cancelScrOrIdxCts = new CancellationTokenSource();
                 CancellationToken token = _cancelScrOrIdxCts.Token;
+                await PlcControl.tagControl.Xaxis.StartRelativeAsync(1, default, default);
                 while (!token.IsCancellationRequested)
                 {
                     try
@@ -910,6 +911,7 @@ namespace 精密切割系统.ViewModel
             {
                 _cancelScrOrIdxCts = new CancellationTokenSource();
                 CancellationToken token = _cancelScrOrIdxCts.Token;
+                await PlcControl.tagControl.Xaxis.StartRelativeAsync(-1, default, default);
                 while (!token.IsCancellationRequested)
                 {
                     try
@@ -952,6 +954,7 @@ namespace 精密切割系统.ViewModel
             {
                 _cancelScrOrIdxCts = new CancellationTokenSource();
                 CancellationToken token = _cancelScrOrIdxCts.Token;
+                await PlcControl.tagControl.Yaxis.StartRelativeAsync(1, default, default);
                 while (!token.IsCancellationRequested)
                 {
                     try
@@ -994,6 +997,7 @@ namespace 精密切割系统.ViewModel
             {
                 _cancelScrOrIdxCts = new CancellationTokenSource();
                 CancellationToken token = _cancelScrOrIdxCts.Token;
+                await PlcControl.tagControl.Yaxis.StartRelativeAsync(-1, default, default);
                 while (!token.IsCancellationRequested)
                 {
                     try
@@ -1036,6 +1040,7 @@ namespace 精密切割系统.ViewModel
             {
                 _cancelScrOrIdxCts = new CancellationTokenSource();
                 CancellationToken token = _cancelScrOrIdxCts.Token;
+                await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(1, default, default);
                 while (!token.IsCancellationRequested)
                 {
                     try
@@ -1078,6 +1083,7 @@ namespace 精密切割系统.ViewModel
             {
                 _cancelScrOrIdxCts = new CancellationTokenSource();
                 CancellationToken token = _cancelScrOrIdxCts.Token;
+                await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(-1, default, default);
                 while (!token.IsCancellationRequested)
                 {
                     try
@@ -1112,6 +1118,14 @@ namespace 精密切割系统.ViewModel
         private async void ExecuteStopScrOrIdxCommand()
         {
             _cancelScrOrIdxCts?.Cancel();
+        }
+
+        private DelegateCommand _updateHighSpeedCommand;
+        public DelegateCommand UpdateHighSpeedCommand => _updateHighSpeedCommand ??= new DelegateCommand(ExecuteUpdateHighSpeedCommand);
+
+        private void ExecuteUpdateHighSpeedCommand()
+        {
+            IsHighSpeed = !IsHighSpeed;
         }
 
         private bool _isHighSpeed = SpeedManager.IsHighSpeed;

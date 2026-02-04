@@ -12,6 +12,7 @@ using 精密切割系统.Model.common;
 using 精密切割系统.Utils;
 using 精密切割系统.View.Pages.Auto;
 using 精密切割系统.View.Pages.common;
+using 精密切割系统.View.Pages.F2_ManualOperation;
 using static NPOI.HSSF.Util.HSSFColor;
 
 namespace 精密切割系统.ViewModel
@@ -53,7 +54,6 @@ namespace 精密切割系统.ViewModel
         protected override void InitRightButton()
         {
             base.InitRightButton();
-            AddRightButton(ButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
         }
 
         protected override void InitBottomButton()
@@ -66,13 +66,15 @@ namespace 精密切割系统.ViewModel
             AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
             AddBottomButton(ButtonParams.BlueButton("基准线调宽", "UnfoldMoreHorizontal", null, BaselineWidening, StopUpdateCameraCommonLine));
             AddBottomButton(ButtonParams.BlueButton("位置清零", "/Assets/icon/tab_1/03/z_axis_down.png", PositionResetAsync));
+            AddBottomButton(ButtonParams.BlueButton("返回", "/Assets/icon/right/back.png", Back));
         }
 
         private void Back()
         {
             if (_navigationPageName is not null)
             {
-                ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, _navigationPageName);
+                NavigationParameters parameters = new NavigationParameters { { "TemporaryNavigate", true } };
+                ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, _navigationPageName, parameters);
             }
             else
             {

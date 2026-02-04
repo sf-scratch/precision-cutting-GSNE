@@ -1,6 +1,7 @@
 ﻿using Emgu.CV.Dnn;
 using MaterialDesignThemes.Wpf;
 using NPOI.SS.Formula.Functions;
+using Prism.Events;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,6 +23,7 @@ using 精密切割系统.Entities;
 using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.common;
+using 精密切割系统.Model.cut;
 using 精密切割系统.Model.plc;
 using 精密切割系统.Utils;
 using 精密切割系统.View.common;
@@ -132,25 +134,15 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 MaterialSnack("请打开切割安全门，更换刀片！", SnackType.SUCCESS, default);
                 return;
             }
-            try
+            var operateParams = await CurrentUtils.GetOperationParametersModelAsync();
+            if (GlobalParams.DeviceModel == GlobalParams.Device_321 && operateParams.IsStartPreCuttingAfterChangeBlade)
             {
-                _mainWindow.IsEnabled = false;
-                await SaveDataAsync();
-                await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(60));
-                await AutoCutUtils.ReplaceBladeAsync(default, timeoutToken.Token);
+                SemiAutoCutService.Instance.IsOpenPrecut = true;
+                MaterialSnack("换刀成功，预切割已开启！", SnackType.SUCCESS, 3);
+            }
+            else
+            {
                 MaterialSnack("换刀成功！", SnackType.SUCCESS);
-            }
-            catch (OperationCanceledException)
-            {
-                MaterialSnack("换刀超时！", SnackType.WARNING);
-            }
-            catch (Exception ex)
-            {
-                MaterialSnack($"换刀出现错误：{ex.Message}", SnackType.WARNING);
-            }
-            finally
-            {
-                _mainWindow.IsEnabled = true;
             }
         }
     }

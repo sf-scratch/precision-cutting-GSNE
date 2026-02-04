@@ -19,6 +19,8 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using 精密切割系统.Entities;
+using 精密切割系统.Helpers;
 using 精密切割系统.Model.camera;
 using 精密切割系统.Utils;
 using static OpenCvSharp.ML.DTrees;
@@ -314,6 +316,9 @@ namespace 精密切割系统.Driver
 
         public static async Task SetCameraExposureTimeAsync(double exposureTime)
         {
+            var cameraEntity = await SqlHelper.GetOrCreateEntityAsync(() => new CameraEntity());
+            cameraEntity.ExposureTime = exposureTime.ToString();
+            await SqlHelper.UpdateAsync(cameraEntity);
             await Task.Run(() =>
             {
                 _currentDev.SetEnumValueByStringEx(SciCam.SciCamDeviceXmlType.SciCam_DeviceXml_Camera, "ExposureAuto", "Off");
@@ -333,10 +338,12 @@ namespace 精密切割系统.Driver
             _currentDev.SetEnumValueByStringEx(SciCam.SciCamDeviceXmlType.SciCam_DeviceXml_Camera, "ExposureAuto", "Continuous");
         }
 
-        public static void SetCameraDeviceWaferParams()
+        public static async void SetCameraDeviceWaferParams()
         {
-            string configPath = Path.Combine(AppContext.BaseDirectory, "Assets\\config\\OPT-CC1-M050-GG3-14(D259120427).camcfg");
-            _currentDev.FeatureLoad(configPath);
+            var cameraEntity = await SqlHelper.GetOrCreateEntityAsync(() => new CameraEntity());
+            await SetCameraExposureTimeAsync(cameraEntity.ExposureTime.ToFloat());
+            //string configPath = Path.Combine(AppContext.BaseDirectory, "Assets\\config\\OPT-CC1-M050-GG3-14(D259120427).camcfg");
+            //_currentDev.FeatureLoad(configPath);
         }
 
         public static void SetCameraDeviceSharpenParams()

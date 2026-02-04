@@ -1,4 +1,6 @@
-﻿using NPOI.SS.Formula.Functions;
+﻿using Newtonsoft.Json.Linq;
+using NPOI.SS.Formula.Functions;
+using Prism.Events;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -6,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using 精密切割系统.Assets.config.buttom;
+using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
 using 精密切割系统.Extensions;
 using 精密切割系统.Helpers;
@@ -16,6 +20,7 @@ using 精密切割系统.Utils;
 using 精密切割系统.View.Pages.Auto;
 using 精密切割系统.View.Pages.common;
 using 精密切割系统.View.Pages.F2_ManualOperation;
+using 精密切割系统.View.Pages.operate;
 
 namespace 精密切割系统.ViewModel
 {
@@ -33,7 +38,7 @@ namespace 精密切割系统.ViewModel
         private float _xOriginPositionValue = 0;
         private float _yOriginPositionValue = 0;
         private bool _isReuseView = false;
-        private CutServicePauseData _pauseData;
+        public CutServicePauseData PauseData { get; set; }
 
         private DelegateCommand _loadedCommand;
 
@@ -153,7 +158,7 @@ namespace 精密切割系统.ViewModel
 
         private async Task SetDepthCompensationAsync()
         {
-            CommonResult checkAutomaticCompensationCutHeightResult = await VerifyUtils.CheckAutomaticCompensationCutHeightAsync(_pauseData.RemainCutSteps);
+            CommonResult checkAutomaticCompensationCutHeightResult = await VerifyUtils.CheckAutomaticCompensationCutHeightAsync(PauseData.RemainCutSteps);
             if (!checkAutomaticCompensationCutHeightResult.IsSuccess)
             {
                 MaterialSnack(checkAutomaticCompensationCutHeightResult.Message, SnackType.WARNING);
@@ -231,8 +236,14 @@ namespace 精密切割系统.ViewModel
                 X = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync() ?? 0,
                 Y = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync() ?? 0
             };
-            float offsetX = _originPoint.X - curPoint.X;
             float offsetY = _originPoint.Y - curPoint.Y;
+            var userdefineDdata = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
+            float hairlineAdjustLimit = userdefineDdata.HairlineAdjustLimit.ToFloat();
+            if (MathF.Abs(offsetY) > hairlineAdjustLimit)
+            {
+                MaterialSnack($"超出基准线校准调整极限！", SnackType.WARNING);
+                return;
+            }
             Appsettings.CameraRelativeBladePosition = new DataPoint<float>(relativePostion.X, relativePostion.Y - offsetY);
             _originPoint = curPoint;
             MaterialSnack($"基准线校准完成", SnackType.SUCCESS, 0);
@@ -242,7 +253,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await AutoCutUtils.WorkpieceBlowingThenBackAsync(_eventAggregator, _operatCts.Token);
+                await AutoCutUtils.WorkpieceBlowingNoMoveAsync(default, default, _eventAggregator, _operatCts.Token);
             }
             catch (OperationCanceledException) { }
         }
@@ -253,7 +264,7 @@ namespace 精密切割系统.ViewModel
             await AutoCutUtils.UpdateCameraCommonLineAsync();
         }
 
-        private async Task StopAsync()
+        public async Task StopAsync()
         {
             await _operatCts.CancelAsync();
             await _semiAutomaticCuttingRunViewModel.StopAsync(ServicePauseResult.Stop);
@@ -266,6 +277,7 @@ namespace 精密切割系统.ViewModel
                 MaterialSnack("请先处理错误报警！", SnackType.WARNING);
                 return;
             }
+            await PlcControl.tagControl.wholeDevice.CloseWorkpieceBlowingAsync();
             await _operatCts.CancelAsync();
             await _semiAutomaticCuttingRunViewModel.ContinueAsync();
             NavigationParameters parameters = new NavigationParameters { { "isContinue", true } };
@@ -280,10 +292,16 @@ namespace 精密切割系统.ViewModel
             InitBottomButton();
             if (navigationContext.Parameters.TryGetValue<CutServicePauseData>(nameof(CutServicePauseData), out var pauseData))
             {
-                _pauseData = pauseData;
+                PauseData = pauseData;
                 if (pauseData != null && pauseData.IsCompleted)
                 {
                     InitRightOnlyStopButton();
+                    if (Application.Current.MainWindow is MainWindow mainWindow && mainWindow.operateFrame.Content is OperatePage operatePage)
+                    {
+                        operatePage.SetOperateShowType(0);
+                        mainWindow.ShortcutBtnClick();
+                        operatePage.UpdateOperate(OperateData.GetTab01Operate());
+                    }
                 }
                 else
                 {

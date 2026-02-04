@@ -71,11 +71,18 @@ namespace 精密切割系统.ViewModel
                 MaterialSnack("未获取到CH序列，请检查型号参数配置是否正确！", SnackType.WARNING);
                 return;
             }
+            var operateParams = await CurrentUtils.GetOperationParametersModelAsync();
+            if (operateParams.IsMustCalibrated && _alignService.CurrentThetaAlignStatus == ThetaAlignStatus.None)
+            {
+                MaterialSnack("请先进行Theta轴校准，再点击确认！", SnackType.WARNING);
+                return;
+            }
             if (_alignService.CurrentThetaAlignStatus == ThetaAlignStatus.Horizontal || _alignService.CurrentThetaAlignStatus == ThetaAlignStatus.Vertical)
             {
                 MaterialSnack("请完成Theta轴校准后，再点击确认！", SnackType.WARNING);
                 return;
             }
+            _alignService.Reset();
             ThetaAlignService.ChDictionary = null;
             if (_chDictionary.TryGetValue(CurrentCh, out var chData))
             {
@@ -118,31 +125,49 @@ namespace 精密切割系统.ViewModel
             switch (GlobalParams.DeviceModel)
             {
                 case GlobalParams.Device_321:
-                    AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
+                    AddBottomButton(ButtonParams.BlueButton("切割道中心", "FormatVerticalAlignCenter", NavigateToFindCenterLine));
                     AddBottomButton(ButtonParams.BlueButton("对焦", "/Assets/icon/tab_1/03/tab_01.png", FocusAutoAsync));
                     AddBottomButton(ButtonParams.BlueButton("对焦确认", "/Assets/icon/tab_1/03/tab_01.png", FocusAutoSureAsync));
                     AddBottomButton(ButtonParams.BlueButton("基准线调窄", "UnfoldLessHorizontal", null, BaselineNarrowing, StopUpdateCameraCommonLine));
                     AddBottomButton(ButtonParams.BlueButton("θ轴横向校正", "/Assets/icon/tab_1/03/tab_04.png", _alignService.ThetaHorizontalAlignAsync));
-                    AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
+                    AddBottomButton(ButtonParams.BlueButton("辅助线", "VectorLine", NavigateToAuxiliaryLine));
                     AddBottomButton(ButtonParams.BlueButton("刀痕识别", "/Assets/icon/tab_1/03/tab_03.png", TextRecognitionAsync));
-                    AddBottomButton(ButtonParams.BlueButton("测量", "/Assets/icon/tab_1/03/tab_03.png", MeasureAsync));
+                    AddBottomButton(ButtonParams.BlueButton("测量", "/Assets/icon/tab_1/03/tab_03.png", NavigateToMeasurement));
                     AddBottomButton(ButtonParams.BlueButton("基准线调宽", "UnfoldMoreHorizontal", null, BaselineWidening, StopUpdateCameraCommonLine));
                     break;
 
                 case GlobalParams.Device_551:
                 case GlobalParams.Device_562:
-                    AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
+                    AddBottomButton(ButtonParams.BlueButton("切割道中心", "FormatVerticalAlignCenter", NavigateToFindCenterLine));
                     AddBottomButton(ButtonParams.BlueButton("对焦", "/Assets/icon/tab_1/03/tab_01.png", FocusAutoAsync));
                     AddBottomButton(ButtonParams.BlueButton("对焦确认", "/Assets/icon/tab_1/03/tab_01.png", FocusAutoSureAsync));
                     AddBottomButton(ButtonParams.BlueButton("基准线调窄", "UnfoldLessHorizontal", null, BaselineNarrowing, StopUpdateCameraCommonLine));
                     AddBottomButton(ButtonParams.BlueButton("θ轴竖向校正", "/Assets/icon/tab_1/03/theta-align-vertical.png", _alignService.ThetaVerticalAlignAsync));
-                    AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
+                    AddBottomButton(ButtonParams.BlueButton("辅助线", "VectorLine", NavigateToAuxiliaryLine));
                     AddBottomButton(ButtonParams.BlueButton("刀痕识别", "/Assets/icon/tab_1/03/tab_03.png", TextRecognitionAsync));
-                    AddBottomButton(ButtonParams.BlueButton("测量", "/Assets/icon/tab_1/03/tab_03.png", MeasureAsync));
+                    AddBottomButton(ButtonParams.BlueButton("测量", "/Assets/icon/tab_1/03/tab_03.png", NavigateToMeasurement));
                     AddBottomButton(ButtonParams.BlueButton("基准线调宽", "UnfoldMoreHorizontal", null, BaselineWidening, StopUpdateCameraCommonLine));
                     AddBottomButton(ButtonParams.BlueButton("θ轴横向校正", "/Assets/icon/tab_1/03/tab_04.png", _alignService.ThetaHorizontalAlignAsync));
                     break;
             }
+        }
+
+        private void NavigateToFindCenterLine()
+        {
+            NavigationParameters parameters = new NavigationParameters { { "NavigationPageName", nameof(ManualAlignment) } };
+            _regionManager.RequestNavigate(RegionName.MainRegion, nameof(FindCenterLine), parameters);
+        }
+
+        private void NavigateToMeasurement()
+        {
+            NavigationParameters parameters = new NavigationParameters { { "NavigationPageName", nameof(ManualAlignment) } };
+            _regionManager.RequestNavigate(RegionName.MainRegion, nameof(Measurement), parameters);
+        }
+
+        private void NavigateToAuxiliaryLine()
+        {
+            NavigationParameters parameters = new NavigationParameters { { "NavigationPageName", nameof(ManualAlignment) } };
+            _regionManager.RequestNavigate(RegionName.MainRegion, nameof(AuxiliaryLine), parameters);
         }
 
         private void BaselineWidening()
@@ -150,11 +175,6 @@ namespace 精密切割系统.ViewModel
             _cameraCommon?.SetCutMarkWidth(CameraOperateUtils.DatumLineChangeStep, 2);
             _intervalTimer.RegisterAction(() => _cameraCommon?.SetCutMarkWidth(CameraOperateUtils.DatumLineChangeStep, 2));
             _intervalTimer.Start();
-        }
-
-        private void MeasureAsync()
-        {
-            _regionManager.RequestNavigate(RegionName.MainRegion, nameof(Measurement));
         }
 
         private void TextRecognitionAsync()
@@ -193,6 +213,7 @@ namespace 精密切割系统.ViewModel
                         MaterialSnack(result.Message, SnackType.WARNING, default, _eventAggregator);
                         return;
                     }
+                    MaterialSnack("对焦完成", SnackType.SUCCESS, 2);
                 }
                 catch (OperationCanceledException)
                 {
@@ -241,6 +262,11 @@ namespace 精密切割系统.ViewModel
             base.OnNavigatedTo(navigationContext);
             _cts = new CancellationTokenSource();
             _intervalTimer = new DynamicIntervalTimer(TimeSpan.FromMilliseconds(500), TimeSpan.FromMilliseconds(30));
+            _alignService.Reset();
+            if (navigationContext.Parameters.TryGetValue("TemporaryNavigate", out bool temporarynavigate) && temporarynavigate)
+            {
+                return;
+            }
             CommonResult<ChData[]> chDataResult = await AutoCutUtils.GetChSequenseAsync();
             if (chDataResult.IsSuccess && chDataResult.Data != null)
             {

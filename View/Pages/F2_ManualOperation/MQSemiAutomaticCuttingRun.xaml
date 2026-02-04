@@ -116,7 +116,6 @@
                     <Controls:InputTextBox
                         x:Name="HeightChange2"
                         InputType="Decimal"
-                        IsEnabled="False"
                         Text="{Binding Path=CutParam.DepthCompensation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         TextWrapping="Wrap"
                         XPrecision="5" />
@@ -141,7 +140,6 @@
                     <Controls:InputTextBox
                         x:Name="ChangeFeedSpeed2"
                         InputType="Decimal"
-                        IsEnabled="False"
                         Text="{Binding Path=CutParam.ChangeFeedSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         TextWrapping="Wrap"
                         XPrecision="3" />

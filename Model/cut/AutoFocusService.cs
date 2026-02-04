@@ -9,6 +9,7 @@ using 精密切割系统.Helpers;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.plc;
 using 精密切割系统.PubSubEvent;
+using 精密切割系统.Utils;
 using 精密切割系统.View.Pages.common;
 using 精密切割系统.ViewModel;
 
@@ -17,7 +18,7 @@ namespace 精密切割系统.Model.cut
     public class AutoFocusService
     {
         // 初始速度（高速）
-        private const float InitialSpeed = 1.0f;
+        private const float InitialSpeed = 0.3f;
 
         // 精细对焦速度
         private const float FineTuneSpeed = 0.05f;
@@ -79,7 +80,71 @@ namespace 精密切割系统.Model.cut
                     token);
                 if (result.IsSuccess)
                 {
-                    Appsettings.FocusClearZ = result.Data;
+                    var currentZ2 = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync();
+                    if (currentZ2 is not null)
+                    {
+                        Appsettings.FocusClearZ = currentZ2.Value;
+                    }
+                    await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(result.Data, default, token);
+                }
+                return result;
+            }
+            finally
+            {
+                await SafeStopAxis();
+            }
+        }
+
+        public static async Task<CommonResult<float>> GlobalZeroPointFocusAsync(IEventAggregator? eventAggregator, CancellationToken token)
+        {
+            try
+            {
+                eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始相机对焦..."));
+                CommonResult<float> focusClearPositionResult = await AutoCutUtils.CalculateFocusClearPosition();
+                if (!focusClearPositionResult.IsSuccess)
+                {
+                    return CommonResult<float>.Failure(focusClearPositionResult.Message);
+                }
+                float focusClearPosition = focusClearPositionResult.Data;
+                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, default, token);
+                MinLimitZ = 0;
+                MaxLimitZ = Appsettings.PositiveLimitPositionY ?? 3;
+                int direction = 1;
+                // 阶段1：快速粗调（正向扫描）
+                var coarseResult = await FindOptimalFocus(
+                    direction: 0,
+                    speed: 0.5f,
+                    isCoarseScan: true,
+                    eventAggregator,
+                    token);
+
+                if (!coarseResult.IsSuccess)
+                {
+                    direction = 0;
+                    coarseResult = await FindOptimalFocus(
+                    direction: 1,
+                    speed: 0.5f,
+                    isCoarseScan: true,
+                    eventAggregator,
+                    token);
+                    if (!coarseResult.IsSuccess)
+                        return coarseResult;
+                }
+
+                // 阶段2：反向精调
+                CommonResult<float> result = await FindOptimalFocus(
+                    direction: direction,
+                    speed: FineTuneSpeed,
+                    isCoarseScan: false,
+                    eventAggregator,
+                    token);
+                if (result.IsSuccess)
+                {
+                    var currentZ2 = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync();
+                    if (currentZ2 is not null)
+                    {
+                        Appsettings.FocusClearZ = currentZ2.Value;
+                    }
                     await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(result.Data, default, token);
                 }
                 return result;
@@ -99,11 +164,10 @@ namespace 精密切割系统.Model.cut
             }
             try
             {
-                await ConfigureAxis(speed, direction);
+                await ConfigureAxis(speed, direction, token);
                 double lastBlurScore = 0;
                 float lastPosition = 0;
-                using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
-                while (await timer.WaitForNextTickAsync(token))
+                while (!token.IsCancellationRequested)
                 {
                     var bitmap = camera.LocalBitmap;
                     // 1. 获取当前帧和位置
@@ -113,7 +177,8 @@ namespace 精密切割系统.Model.cut
                         continue;
                     }
 
-                    float currentPos = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync() ?? 0;
+                    float? currentPos = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync();
+                    if (currentPos is null) continue;
 
                     // 2. 计算模糊度
                     double blurScore = VisionAnalyzer.CalculateTenengrad2(bitmap.ToMat());
@@ -126,14 +191,20 @@ namespace 精密切割系统.Model.cut
                         LogMessage(eventAggregator, $"找到最清晰位置: {lastPosition:F4}mm ({(isCoarseScan ? "粗调" : "精调")})");
                         return CommonResult<float>.Success(lastPosition);
                     }
-                    else if ((direction == 0 && currentPos > MaxLimitZ) || (direction == 1 && currentPos < MinLimitZ))
+                    else if (direction == 0 && currentPos > MaxLimitZ)
                     {
                         LogMessage(eventAggregator, $"到达对焦限定位置: {lastPosition:F4}mm ({(isCoarseScan ? "粗调" : "精调")})");
-                        return CommonResult<float>.Success(lastPosition);
+                        return CommonResult<float>.Success(MaxLimitZ);
+                    }
+                    else if (direction == 1 && currentPos < MinLimitZ)
+                    {
+                        LogMessage(eventAggregator, $"到达对焦限定位置: {lastPosition:F4}mm ({(isCoarseScan ? "粗调" : "精调")})");
+                        return CommonResult<float>.Success(MinLimitZ);
                     }
 
                     lastBlurScore = blurScore;
-                    lastPosition = currentPos;
+                    lastPosition = currentPos.Value;
+                    await Task.Delay(100);
                 }
             }
             finally
@@ -144,8 +215,9 @@ namespace 精密切割系统.Model.cut
             return CommonResult<float>.Failure("对焦未完成");
         }
 
-        private static async Task ConfigureAxis(float speed, int direction)
+        private static async Task ConfigureAxis(float speed, int direction, CancellationToken token)
         {
+            await PlcControl.tagControl.Z2axis.WaitAxisReadyAsync(token);
             await PlcControl.tagControl.Z2axis.SetJogRelativeSpeedAsync(speed);
             await PlcControl.tagControl.Z2axis.StartJogAsync(direction);
         }

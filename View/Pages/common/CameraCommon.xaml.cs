@@ -34,7 +34,6 @@ namespace 精密切割系统.View.Pages.common
         private static List<CustomLine> _lines = new List<CustomLine>();
         private TextBlock cutWidthTextBlock;
         private TextBlock edgeWidthTextBlock;
-        private bool _hasEdgeLine;
         private readonly SemaphoreSlim _semaphore = new(1, 1);
 
         private static float _cutMarkWidth;
@@ -71,12 +70,6 @@ namespace 精密切割系统.View.Pages.common
             var (cutMarkWidth, edgeWidth, lightSourceBrightness) = await CurrentUtils.GetWidthAndLightAsync(GlobalParams.CH1);
             _cutMarkWidth = cutMarkWidth;
             _edgeChipWidth = edgeWidth;
-            var userDefine = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
-            if (userDefine is not null)
-            {
-                _hasEdgeLine = userDefine.HasEdgeLine;
-            }
-
             centerLocation = new Point(cameraImage.Width / 2, cameraImage.Height / 2);
             SetupOverlayPanel();
             CameraUtils.PayloadReceived += CameraUtils_PayloadReceived;
@@ -155,6 +148,16 @@ namespace 精密切割系统.View.Pages.common
             LineChanged?.Invoke();
         }
 
+        public void Flash()
+        {
+            double cutWidth = CameraOperateUtils.ConvertToPictureBoxSize(_cutMarkWidth);
+            double edgesWidth = CameraOperateUtils.ConvertToPictureBoxSize(_edgeChipWidth);
+            DrawLineForWidth((float)cutWidth, (float)edgesWidth);
+            AddTextToCanvas();
+            SetCutWidthTextBlockY();
+            SetEdgeWidthTextBlockY();
+        }
+
         private void SetupOverlayPanel()
         {
             // 根据宽度设置线条
@@ -211,7 +214,8 @@ namespace 精密切割系统.View.Pages.common
             // 将TextBlock添加到Canvas
             MyCanvas.Children.Add(cutWidthTextBlock);
 
-            if (_hasEdgeLine)
+            var userDefine = SqlHelper.GetOrCreateEntity(() => new UserDefineDataModel());
+            if (userDefine.HasEdgeLine)
             {
                 edgeWidthTextBlock = new TextBlock
                 {
@@ -230,7 +234,8 @@ namespace 精密切割系统.View.Pages.common
 
         private void SetEdgeWidthTextBlockY()
         {
-            if (_hasEdgeLine)
+            var userDefine = SqlHelper.GetOrCreateEntity(() => new UserDefineDataModel());
+            if (userDefine.HasEdgeLine)
             {
                 // 获取上刀痕的位置
                 CustomLine line = _lines[2];
@@ -275,7 +280,8 @@ namespace 精密切割系统.View.Pages.common
                 float startBottomEdgeChipY = imagMideHeight + resultEdgeChip;
                 DoubleCollection dotCollection = new DoubleCollection { 10, 4 }; // 虚线
                 List<CustomLine> lines;
-                if (_hasEdgeLine)
+                var userDefine = SqlHelper.GetOrCreateEntity(() => new UserDefineDataModel());
+                if (userDefine.HasEdgeLine)
                 {
                     lines = new List<CustomLine>
                     {

@@ -156,5 +156,11 @@ namespace 精密切割系统.database.db.modle
 
         [Column("atomizing_nozzle_position_y")]
         public string AtomizingNozzlePositionY { get; set; } = "0";
+
+        [Column("cut_y_positivt_limit")]
+        public string CutYPositiveLimit { get; set; } = "200";
+
+        [Column("cut_y_negative_limit")]
+        public string CutYNegativeLimit { get; set; } = "0";
     }
 }

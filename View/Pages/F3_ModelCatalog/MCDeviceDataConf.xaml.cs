@@ -22,6 +22,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Policy;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -104,8 +105,6 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 CutUtils.UpdateGlobalRunFlag(OperateData.GetMCDeviceDataOperate());
             }
             initGridView();
-            //更新界面数据
-            await UpdateTotalCutNumAsync();
         }
 
         private async void initFunctionSelection()
@@ -710,6 +709,15 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             }
         }
 
+        // 预定义映射字典
+        private static readonly Dictionary<string, string> ChannelMapping = new()
+        {
+            { GlobalParams.CH1, GlobalParams.CH2 },
+            { GlobalParams.CH2, GlobalParams.CH3 },
+            { GlobalParams.CH3, GlobalParams.CH4 },
+            { GlobalParams.CH4, GlobalParams.CH1 }
+        };
+
         private void updateOperateLabel()
         {
             _ = Dispatcher.BeginInvoke(new Action(async () =>
@@ -721,23 +729,8 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                     await Task.Delay(100);
                 }
                 if (operateText == null) return;
-                string defnName = chName;
-                if (chName.Equals(GlobalParams.CH1))
-                {
-                    defnName = GlobalParams.CH2;
-                }
-                else if (chName.Equals(GlobalParams.CH2))
-                {
-                    defnName = GlobalParams.CH3;
-                }
-                else if (chName.Equals(GlobalParams.CH3))
-                {
-                    defnName = GlobalParams.CH4;
-                }
-                else
-                {
-                    defnName = GlobalParams.CH1;
-                }
+                string defnName = ChannelMapping.TryGetValue(chName, out var mappedName) ? mappedName : GlobalParams.CH1;
+                await UpdateTotalCutNumAsync();
                 operateText.Text = defnName;
                 GlobalParams.currentOperateBeanList[0].Title = defnName;
             }));
@@ -1021,7 +1014,6 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
         //保存数据
         private async Task SaveDataAsync()
         {
-            updateOperateLabel();
             await UpdateFocusClearZAsync();
             //tableItem信息
             currentModel.DeviceDataId = inputDeviceDataId.Text;
@@ -1110,20 +1102,26 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 }
                 await SqlHelper.UpdateAsync(currentModel);
                 await SqlHelper.UpdateAsync(_chModel);
-                //更新界面数据
-                await UpdateTotalCutNumAsync();
+                updateOperateLabel();
             }
         }
 
         private async Task UpdateTotalCutNumAsync()
         {
-            CommonResult<List<CutStep>> cutStepResult = await AutoCutUtils.GenerateCutStepListAsync();
-            if (!cutStepResult.IsSuccess || cutStepResult.Data is null)
+            System.Text.RegularExpressions.Match match = Regex.Match(chName, GlobalParams.RegexMatchCH);
+            if (match.Success)
             {
-                MaterialSnack(cutStepResult.Message, SnackType.ERROR);
-                return;
+                int number = int.Parse(match.Groups[1].Value);
+                CommonResult<int> cutNumResult = await AutoCutUtils.GetCutStepListByChNumAsync(number);
+                if (!cutNumResult.IsSuccess)
+                {
+                    totalCutNum.Text = "0";
+                }
+                else
+                {
+                    totalCutNum.Text = cutNumResult.Data.ToString();
+                }
             }
-            totalCutNum.Text = cutStepResult.Data.Count.ToString();
         }
 
         private void lvDataView_Loaded(object sender, RoutedEventArgs e)

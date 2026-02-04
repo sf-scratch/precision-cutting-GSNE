@@ -23,5 +23,20 @@ namespace 精密切割系统.Helpers
             }
             return false;
         }
+
+        public static object? GetActiveViewDataContext(IRegionManager? regionManager = default)
+        {
+            if (regionManager == null)
+            {
+                regionManager = ContainerLocator.Container.Resolve<IRegionManager>();
+            }
+            var mainRegion = regionManager.Regions[RegionName.MainRegion];
+            var activeView = mainRegion.ActiveViews.FirstOrDefault();
+            if (activeView is FrameworkElement view)
+            {
+                return view.DataContext;
+            }
+            return null;
+        }
     }
 }

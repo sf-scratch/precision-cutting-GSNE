@@ -143,6 +143,12 @@
                 Style="{StaticResource MaterialDesignFilterChipSecondaryCheckBox}">
                 <TextBlock Text="{Binding ElementName=hasEdgeLine, Path=IsChecked, Converter={StaticResource BoolToStringConverter}}" />
             </CheckBox>
+            <Label Content="切割Y正限位" />
+            <Controls:InputTextBox Text="{Binding Path=CutYPositiveLimit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <Label Content="mm" />
+            <Label Content="切割Y负限位" />
+            <Controls:InputTextBox Text="{Binding Path=CutYNegativeLimit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <Label Content="mm" />
             <Label Content="横向拉直距离" />
             <Controls:InputTextBox Text="{Binding Path=HorizontalStraighteningStroke, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <Label Content="mm" />

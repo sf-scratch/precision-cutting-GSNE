@@ -167,6 +167,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                                     MaterialSnack(result.Message, SnackType.WARNING, default, _eventAggregator);
                                     return;
                                 }
+                                MaterialSnack("对焦完成", SnackType.SUCCESS, 2, _eventAggregator);
                             }
                             catch (OperationCanceledException)
                             {
@@ -207,6 +208,16 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 // 测量
                 case 2050:
                     ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(Measurement));
+                    break;
+
+                // 辅助线
+                case 2051:
+                    ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(AuxiliaryLine));
+                    break;
+
+                // 切割道中心线
+                case 2052:
+                    ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(FindCenterLine));
                     break;
 
                 // 位置清零

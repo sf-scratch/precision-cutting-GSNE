@@ -79,6 +79,7 @@ namespace 精密切割系统.Assets.config.menu
             // list.Add(new MenuBean(203, "自动切割", "/Assets/icon/menu_2/menu_2_3.png", "/Assets/icon/menu_2/menu_2_3_white.png", 3, "Pages/F2_ManualOperation/MQAutoCutoConf"));
             // list.Add(new MenuBean(204, "自动切割", "/Assets/icon/menu_2/menu_2_4.png", "/Assets/icon/menu_2/menu_2_4_white.png", 3, "Pages/F2_ManualOperation/MQAutoCutoConf"));
             list.Add(new MenuBean(204, "半自动切割", "/Assets/icon/menu_2/menu_2_4.png", "/Assets/icon/menu_2/menu_2_4_white.png", 3, "Pages/F2_ManualOperation/MQSemiAutomaticCuttingConf"));
+            list.Add(new MenuBean(5001, "暖机", "/Assets/icon/menu_2/menu_2_3.png", "/Assets/icon/menu_2/menu_2_4_white.png", 3, "Pages/F2_ManualOperation/MQSemiAutomaticCuttingConf"));
             return list;
         }
 

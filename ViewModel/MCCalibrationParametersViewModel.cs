@@ -149,7 +149,28 @@ namespace 精密切割系统.ViewModel
             get { return _model.HasEdgeLine; }
             set
             {
-                _model.HasEdgeLine = value; RaisePropertyChanged();
+                _model.HasEdgeLine = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public string CutYPositiveLimit
+        {
+            get { return _model.CutYPositiveLimit; }
+            set
+            {
+                _model.CutYPositiveLimit = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public string CutYNegativeLimit
+        {
+            get { return _model.CutYNegativeLimit; }
+            set
+            {
+                _model.CutYNegativeLimit = value;
+                RaisePropertyChanged();
             }
         }
 

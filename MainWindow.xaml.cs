@@ -77,6 +77,7 @@ namespace 精密切割系统
 
         public void NavigateToPage(string pageName, string paramsStr = "", bool isNavigateEmpty = true)
         {
+            WarmUpHelper.StopWarmUp();
             Application.Current.Dispatcher.Invoke(() =>
             {
                 if (isNavigateEmpty)
@@ -490,7 +491,7 @@ namespace 精密切割系统
             }
         }
 
-        private void DirectBtnDown()
+        public void DirectBtnDown()
         {
             operatePage.SetOperateShowType(0);
             shortcutBottomBtnSel = !shortcutBottomBtnSel;

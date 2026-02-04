@@ -140,7 +140,7 @@ namespace 精密切割系统.Model.cut
             set { _hasNotTakenOutWorkpiecesAfterCuttingCompleted = value; }
         }
 
-        private int _currentChannelNum;
+        private int _currentChannelNum = 1;
 
         /// <summary>
         /// 当前切割通道
@@ -216,6 +216,8 @@ namespace 精密切割系统.Model.cut
             {
                 _isReady = false;
                 _isRuning = true;
+                var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromMinutes(10), usingPauseToken);
+                await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAndConfirmStatusAsync(timeoutToken.Token);
                 //打开切割水
                 await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
                 //进入全自动切割模式
@@ -442,6 +444,8 @@ namespace 精密切割系统.Model.cut
                     CutServiceProcessChanged?.Invoke(preNextCutServiceProcess.Value);
                 }
                 completeStopwatch.Stop();
+                // 切割完成
+                HasNotTakenOutWorkpiecesAfterCuttingCompleted = true;
                 if (GlobalParams.DeviceModel == GlobalParams.Device_321)
                 {
                     TimeSpan timeSpan = TimeSpan.FromSeconds(completeStopwatch.Elapsed.TotalSeconds);
@@ -456,8 +460,9 @@ namespace 精密切割系统.Model.cut
                 _isReady = true;
                 _isRuning = false;
                 _isContinueBeyondWorkpiece = false;
-                _currentChannelNum = 0;
+                _currentChannelNum = 1;
                 completeStopwatch.Stop();
+                await PlcControl.tagControl.wholeDevice.CloseWorkpieceBlowingAsync();
                 //退出全自动切割模式
                 await PlcControl.tagControl.cutting.ExitCuttingModeAsync(default);
                 var operationParameter = await CurrentUtils.GetOperationParametersModelAsync();
@@ -495,6 +500,7 @@ namespace 精密切割系统.Model.cut
             CutServicePaused?.Invoke(new CutServicePauseData(line, message, currentKnifeRemainTime, remainCutSteps, isCompleted));
             _continueTcs = new TaskCompletionSource<ServicePauseResult>();
             ServicePauseResult result = await _continueTcs.Task;
+            await PlcControl.tagControl.wholeDevice.CloseWorkpieceBlowingAsync();
             switch (result.Type)
             {
                 case ServicePauseResultType.ContinueAndResetCutY:
@@ -503,9 +509,17 @@ namespace 精密切割系统.Model.cut
                 case ServicePauseResultType.Continue:
                     // 更新使用的暂停令牌
                     CancellationToken usingPauseToken = result.Token ?? default;
-                    await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
-                    return (RunResult.Success(), usingPauseToken);
-
+                    try
+                    {
+                        await PlcControl.tagControl.wholeDevice.CloseWorkpieceBlowingAsync();
+                        var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromMinutes(10), usingPauseToken);
+                        await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAndConfirmStatusAsync(timeoutToken.Token);
+                        return (RunResult.Success(), usingPauseToken);
+                    }
+                    catch (Exception)
+                    {
+                        return (RunResult.Fail("打开切割水出现异常！"), default);
+                    }
                 case ServicePauseResultType.BladeScrap:
                     return (RunResult.Fail("刀片已报废！"), default);
 

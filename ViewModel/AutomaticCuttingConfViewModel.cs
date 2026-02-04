@@ -78,16 +78,37 @@ namespace 精密切割系统.ViewModel
                 MaterialSnack(cutStepResult.Message, SnackType.WARNING);
                 return;
             }
+            var chCutSteps = cutStepResult.Data;
+            var userDefineData = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
+            float cutYPositiveLimit = userDefineData.CutYPositiveLimit.ToFloat();
+            float cutYNegativeLimit = userDefineData.CutYNegativeLimit.ToFloat();
+            foreach (var chCutStep in chCutSteps)
+            {
+                float yPositon = chCutStep.CutSteps.First().ChannelStartY;
+                foreach (var cutStep in chCutStep.CutSteps)
+                {
+                    yPositon -= cutStep.NextStepDistance;
+                }
+                if (yPositon > cutYPositiveLimit)
+                {
+                    MaterialSnack($"切割 {chCutStep.ChName} 时，将超出正限位！", SnackType.WARNING);
+                    return;
+                }
+                if (yPositon < cutYNegativeLimit)
+                {
+                    MaterialSnack($"切割 {chCutStep.ChName} 时，将超出负限位！", SnackType.WARNING);
+                    return;
+                }
+            }
             _semiAutoCutService.CutLine = 0;
             _semiAutoCutService.SpindleRev = Model.SpindleRev.ToInt();
-            NavigationParameters parameters = new() { { "cutSteps", cutStepResult.Data }, { "backPageName", nameof(AutomaticCuttingConf) } };
+            NavigationParameters parameters = new() { { "cutSteps", chCutSteps }, { "backPageName", nameof(AutomaticCuttingConf) } };
             ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(MQSemiAutomaticCuttingRun), parameters);
             var chDictionary = ThetaAlignService.ChDictionary;
         }
 
         private async Task BackAsync()
         {
-            WarmUpHelper.StopWarmUp();
             var operationParams = await CurrentUtils.GetOperationParametersModelAsync();
             if (operationParams.IsExitCutClearManualCompensation)
             {
