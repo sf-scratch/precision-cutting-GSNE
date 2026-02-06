@@ -11,6 +11,7 @@
     d:DesignHeight="676"
     d:DesignWidth="1448"
     Loaded="Page_Loaded"
+    Unloaded="Page_Unloaded"
     mc:Ignorable="d">
     <Page.Resources>
         <Style TargetType="Label">

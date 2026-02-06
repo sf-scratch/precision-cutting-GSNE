@@ -112,19 +112,14 @@ namespace 精密切割系统.ViewModel
         protected override void InitBottomButton()
         {
             base.InitBottomButton();
-            switch (GlobalParams.DeviceModel)
-            {
-                case GlobalParams.Device_321:
-                    AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
-                    AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
-                    AddBottomButton(ButtonParams.BlueButton("高度补偿", "FormatLineHeight", SetDepthCompensationAsync));
-                    AddBottomButton(ButtonParams.BlueButton("预切启动", "/Assets/icon/tab_1/02/tab_27.png", OpenPrecut));
-                    AddBottomButton(ButtonParams.BlueButton("刀片状态信息", "/Assets/icon/tab_1/02/tab_27.png", NavigateToBladeInfo));
-                    AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
-                    AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
-                    AddBottomButton(ButtonParams.BlueButton("速度更改", "SpeedometerMedium", SetFeedSpeed));
-                    break;
-            }
+            AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
+            AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
+            AddBottomButton(ButtonParams.BlueButton("高度补偿", "FormatLineHeight", SetDepthCompensationAsync));
+            AddBottomButton(ButtonParams.BlueButton("预切启动", "/Assets/icon/tab_1/02/tab_27.png", OpenPrecut));
+            AddBottomButton(ButtonParams.BlueButton("刀片状态信息", "/Assets/icon/tab_1/02/tab_27.png", NavigateToBladeInfo));
+            AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
+            AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
+            AddBottomButton(ButtonParams.BlueButton("速度更改", "SpeedometerMedium", SetFeedSpeed));
         }
 
         private async Task SetDepthCompensationAsync()
@@ -185,6 +180,7 @@ namespace 精密切割系统.ViewModel
                                         _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Error报警监控：{alarmMessages}"));
                                         await PlcControl.tagControl.wholeDevice.OpenBuzzerAsync();
                                         await PauseAsync(PlcControl.tagControl.wholeDevice.OpenRedLightAsync);
+                                        Tools.CuttingRecord(alarmMessages);
                                     }
                                     else
                                     {
@@ -223,6 +219,7 @@ namespace 精密切割系统.ViewModel
                                         _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Warn报警监控：{alarmMessages}"));
                                         await PlcControl.tagControl.wholeDevice.OpenBuzzerAsync();
                                         await PauseAsync(PlcControl.tagControl.wholeDevice.OpenRedLightAsync);
+                                        Tools.CuttingRecord(alarmMessages);
                                     }
                                     else
                                     {
@@ -270,7 +267,7 @@ namespace 精密切割系统.ViewModel
                 catch (Exception)
                 {
                 }
-                await Task.Delay(200);
+                await Task.Delay(100);
             }
         }
 
@@ -278,13 +275,13 @@ namespace 精密切割系统.ViewModel
         {
             if (!_semiAutoCutService.IsReady)
             {
-                //正在切割中
+                _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("切割中..."));
                 return;
             }
             if (!GlobalParams.OnlineFlag)
             {
                 SpeedManager.IsHighSpeed = false;
-                MaterialSnack($"切割中...", SnackType.WARNING, 0, _eventAggregator);
+                MaterialSnack("切割中...", SnackType.WARNING, 0, _eventAggregator);
                 return;
             }
             CommonResult checkResult = await SemiAutoCutService.CheckCutAsync();
@@ -391,7 +388,7 @@ namespace 精密切割系统.ViewModel
                     _semiAutoCutService.UpdatePreCutQueue(preCutSpeedLis);
                     MaterialSnack($"切割中...", SnackType.WARNING, 0, _eventAggregator);
                     float margin = Appsettings.AdditionalMargin ?? 20;
-                    RunResult cutResult = await _semiAutoCutService.RunAsync(cutSteps, workpiece, margin, measureHeightZ, GlobalParams.BladeLiftingHeight, false, _eventAggregator, _pauseCts.Token);
+                    RunResult cutResult = await _semiAutoCutService.RunAsync(cutSteps, workpiece, margin, measureHeightZ, GlobalParams.BladeLiftingHeight, _eventAggregator, _pauseCts.Token);
                     if (!cutResult.IsSuccess)
                     {
                         MaterialSnack($"{cutResult.Message}", SnackType.WARNING, 0, _eventAggregator);
@@ -402,7 +399,7 @@ namespace 精密切割系统.ViewModel
                     {
                         TimeSpan timeSpan = TimeSpan.FromSeconds(completeStopwatch.Elapsed.TotalSeconds);
                         string formattedTime = $"{timeSpan.Hours:D2}:{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}";
-                        await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(Appsettings.ThetaCenterPoint.X, 50, _pauseCts.Token);
+                        await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(Appsettings.ThetaCenterPoint.X, 80, _pauseCts.Token);
                         _ = PlcControl.tagControl.wholeDevice.OpenBuzzerAsync(5);
                         MaterialSnack($"切割完成！ 总用时：{formattedTime}", SnackType.SUCCESS, 0);
                     }

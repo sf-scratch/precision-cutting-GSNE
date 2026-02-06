@@ -3,6 +3,7 @@ using MaterialDesignThemes.Wpf;
 using ScottPlot.TickGenerators.TimeUnits;
 using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
 using 精密切割系统.Driver;
 using 精密切割系统.Entities;
 using 精密切割系统.Helpers;
@@ -201,7 +202,36 @@ namespace 精密切割系统.Model.cut
             };
         }
 
-        public async Task<RunResult> RunAsync(List<ChCutStep> cutStepList, IWorkpieces workpiece, float margin, float bladeContactWorkingDiscZ1, float bladeLiftingHeight, bool isExchangeX, IEventAggregator? eventAggregator, CancellationToken pauseToken)
+        private async Task StartCuttingRecord(CancellationToken token)
+        {
+            int cutTimes = 1;
+            while (!token.IsCancellationRequested)
+            {
+                try
+                {
+                    await PlcControl.tagControl.cutting.WaitReadyCuttingDataAsyncAsync(token);
+                    var (instructionPositionY, averagePositionY, instructionPositionZ1, averagePositionZ1) = await PlcControl.tagControl.cutting.GetCuttingDataAsync();
+                    await PlcControl.tagControl.cutting.SetIsReadyCuttingDataAsync(false);
+                    Tools.CuttingRecord(
+                        $"第{cutTimes}\t\t" +
+                        $"{instructionPositionY.ToString("F6")}\t\t" +
+                        $"{averagePositionY.ToString("F6")}\t\t" +
+                        $"{instructionPositionZ1.ToString("F6")}\t\t" +
+                        $"{averagePositionZ1.ToString("F6")}");
+                    cutTimes++;
+                    await Task.Delay(200);
+                }
+                catch (OperationCanceledException)
+                {
+                }
+                catch (Exception ex)
+                {
+                    Tools.CuttingRecord(ex.ToString());
+                }
+            }
+        }
+
+        public async Task<RunResult> RunAsync(List<ChCutStep> cutStepList, IWorkpieces workpiece, float margin, float bladeContactWorkingDiscZ1, float bladeLiftingHeight, IEventAggregator? eventAggregator, CancellationToken pauseToken)
         {
             CancellationToken usingPauseToken = pauseToken;
             ScratchInspectionParametersEntity scratchInspection = await SqlHelper.GetOrCreateEntityAsync(() => new ScratchInspectionParametersEntity());
@@ -212,6 +242,8 @@ namespace 精密切割系统.Model.cut
             float currentAutomaticCompensationCutHeight = automaticCompensationCutHeight.CurrentAutomaticCompensationCutHeight.ToFloat();
             Stopwatch stopwatch = new();
             Stopwatch completeStopwatch = Stopwatch.StartNew();
+            CancellationTokenSource cuttingRecordCts = new CancellationTokenSource();
+            _ = StartCuttingRecord(cuttingRecordCts.Token);
             try
             {
                 _isReady = false;
@@ -320,11 +352,7 @@ namespace 精密切割系统.Model.cut
                             //x方向交替切割
                             if (cutStep.IsAlternatingCuttingStroke)
                             {
-                                if (isExchangeX)
-                                {
-                                    (startX, endX) = (endX, startX);
-                                }
-                                isExchangeX = !isExchangeX;
+                                (startX, endX) = (endX, startX);
                             }
                             List<float> endZList = [];
                             if (cutStep.SingleCutDeep is not null && cutStep.SingleCutDeep > 0)
@@ -472,6 +500,7 @@ namespace 精密切割系统.Model.cut
                 }
                 HasNotTakenOutWorkpiecesAfterCuttingCompleted = true;
                 stopwatch.Stop();
+                await cuttingRecordCts.CancelAsync();
             }
             return RunResult.Success();
         }

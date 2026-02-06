@@ -1423,6 +1423,40 @@
       "addr": "DM1400",
       "name": "当前切入深度",
       "describe": "当前切入深度"
+    },
+    "instructionPositionY": {
+      "defaultValue": "0",
+      "valueType": "float",
+      "addr": "DM1308",
+      "name": "切割时Y的指令位置",
+      "describe": "切割时Y的指令位置"
+    },
+    "averagePositionY": {
+      "defaultValue": "0",
+      "valueType": "float",
+      "addr": "DM1300",
+      "name": "切割时Y的平均位置",
+      "describe": "切割时Y的平均位置"
+    },
+    "instructionPositionZ1": {
+      "defaultValue": "0",
+      "valueType": "float",
+      "addr": "DM1312",
+      "name": "切割时Z1的指令位置",
+      "describe": "切割时Z1的指令位置"
+    },
+    "averagePositionZ1": {
+      "defaultValue": "0",
+      "valueType": "float",
+      "addr": "DM1304",
+      "name": "切割时Z1的平均位置",
+      "describe": "切割时Z1的平均位置"
+    },
+    "isReadyCuttingData": {
+      "valueType": "bool",
+      "addr": "MR1100",
+      "name": "切割数据准备就绪",
+      "describe": "切割数据准备就绪"
     }
   },
   "sparkRepairKnife": {

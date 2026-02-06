@@ -163,8 +163,8 @@
                                 </Button.Style>
                                 <Button.Content>
                                     <materialDesign:PackIcon
-                                        Width="60"
-                                        Height="60"
+                                        Width="50"
+                                        Height="50"
                                         Foreground="Gray"
                                         Kind="Speedometer" />
                                 </Button.Content>

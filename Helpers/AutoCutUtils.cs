@@ -2089,6 +2089,7 @@ namespace 精密切割系统.Helpers
             List<int> sequences = [.. Enumerable.Range(0, maxIndex + 1)];
             List<int> newSeq = isLoop ? CutUtils.CombineSequences(sequences, repetitions) : sequences;
             List<CutStep> tempCutSteps = [];
+            bool isAlternatingCuttingStroke = false;
             foreach (int index in newSeq)
             {
                 for (int i = 0; i < repeatTimes[index]; i++)
@@ -2100,10 +2101,13 @@ namespace 精密切割系统.Helpers
                     bool isAbsolute = ch.ComBoxCutMethod.Equals("绝对");
                     float channelStartY = isAbsolute ? ch.AbsoluteCutPosition.ToFloat() : ch.RelativeCutPosition.ToFloat();
                     float offsetX = ch.OffsetX.ToFloat();
-                    bool isAlternatingCuttingStroke = ch.CutMode == CutOperateUtils.B_ZKEEP;
                     int channelNum = chSeq;
                     float? singleCutDeep = isDeep ? cutDepths[index] : null;
                     tempCutSteps.Add(new CutStep(cutHeight, speed, offsetY, thetaDeg, isAbsolute, channelStartY, offsetX, isAlternatingCuttingStroke, channelNum, singleCutDeep));
+                    if (ch.CutMode == CutOperateUtils.B_ZKEEP)
+                    {
+                        isAlternatingCuttingStroke = !isAlternatingCuttingStroke;
+                    }
                 }
             }
             if (tempCutSteps.Count == 0)
@@ -2186,6 +2190,7 @@ namespace 精密切割系统.Helpers
                 List<int> sequences = [.. Enumerable.Range(0, maxIndex + 1)];
                 List<int> newSeq = isLoop ? CutUtils.CombineSequences(sequences, repetitions) : sequences;
                 List<CutStep> tempCutSteps = [];
+                bool isAlternatingCuttingStroke = false;
                 foreach (int index in newSeq)
                 {
                     for (int i = 0; i < repeatTimes[index]; i++)
@@ -2197,10 +2202,13 @@ namespace 精密切割系统.Helpers
                         bool isAbsolute = ch.ComBoxCutMethod.Equals("绝对");
                         float channelStartY = isAbsolute ? ch.AbsoluteCutPosition.ToFloat() : chData.AfterCalibrationYPosition - ch.RelativeCutPosition.ToFloat();
                         float offsetX = ch.OffsetX.ToFloat();
-                        bool isAlternatingCuttingStroke = ch.CutMode == CutOperateUtils.B_ZKEEP;
                         int channelNum = chSeq;
                         float? singleCutDeep = isDeep ? cutDepths[index] : null;
                         tempCutSteps.Add(new CutStep(cutHeight, speed, offsetY, thetaDeg, true, channelStartY, offsetX, isAlternatingCuttingStroke, channelNum, singleCutDeep));
+                        if (ch.CutMode == CutOperateUtils.B_ZKEEP)
+                        {
+                            isAlternatingCuttingStroke = !isAlternatingCuttingStroke;
+                        }
                     }
                 }
                 if (tempCutSteps.Count == 0)
@@ -2280,6 +2288,7 @@ namespace 精密切割系统.Helpers
             List<int> sequences = [.. Enumerable.Range(0, maxIndex + 1)];
             List<int> newSeq = isLoop ? CutUtils.CombineSequences(sequences, repetitions) : sequences;
             List<CutStep> tempCutSteps = [];
+            bool isAlternatingCuttingStroke = false;
             foreach (int index in newSeq)
             {
                 for (int i = 0; i < repeatTimes[index]; i++)
@@ -2291,10 +2300,13 @@ namespace 精密切割系统.Helpers
                     bool isAbsolute = ch.ComBoxCutMethod.Equals("绝对");
                     float channelStartY = isAbsolute ? ch.AbsoluteCutPosition.ToFloat() : ch.RelativeCutPosition.ToFloat();
                     float offsetX = ch.OffsetX.ToFloat();
-                    bool isAlternatingCuttingStroke = ch.CutMode == CutOperateUtils.B_ZKEEP;
                     int channelNum = chNum;
                     float? singleCutDeep = isDeep ? cutDepths[index] : null;
                     tempCutSteps.Add(new CutStep(cutHeight, speed, offsetY, thetaDeg, isAbsolute, channelStartY, offsetX, isAlternatingCuttingStroke, channelNum, singleCutDeep));
+                    if (ch.CutMode == CutOperateUtils.B_ZKEEP)
+                    {
+                        isAlternatingCuttingStroke = !isAlternatingCuttingStroke;
+                    }
                 }
             }
             if (tempCutSteps.Count == 0)

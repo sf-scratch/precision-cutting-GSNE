@@ -123,7 +123,7 @@ namespace 精密切割系统.ViewModel
             base.InitBottomButton();
             AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
             AddBottomButton(ButtonParams.BlueButton("高度补偿", "/Assets/icon/tab_1/02/tab_20.png", UpdateDepthCompensation));
-            AddBottomButton(ButtonParams.BlueButton("型号参数", "/Assets/icon/tab_0/tab_02.png", () => NavigateUtils.NavigateToPage("Pages/F3_ModelCatalog/MCDeviceDataConf")));
+            AddBottomButton(ButtonParams.BlueButton("型号参数", "/Assets/icon/tab_0/tab_02.png", () => NavigateUtils.NavigateToPage("Pages/F3_ModelCatalog/MCDeviceDataConf", $"id={CurrentUtils.GetCurrentConfiguration().DeviceDataId}&look={false}")));
             AddBottomButton(ButtonParams.BlueButton("手动校准", "/Assets/icon/tab_1/02/tab_21.png", NavigateToManualAlignmentAsync));
             AddBottomButton(ButtonParams.BlueButton("切割水", "/Assets/icon/tab_0/tab_05.png", PlcControl.tagControl.wholeDevice.TriggerCuttingWaterAsync, isOpenFunc: PlcControl.tagControl.wholeDevice.IsOpenSpindleCuttingWaterAsync, openOrCloseVisibility: System.Windows.Visibility.Visible));
             AddBottomButton(ButtonParams.BlueButton("暖机", "/Assets/icon/menu_2/menu_2_3_white.png", WarmUpHelper.TriggerWarmUpAsync));

@@ -1,9 +1,9 @@
 {
-  "HeightMeasureTimes": "2",
+  "HeightMeasureTimes": "1",
   "IsAutomHeightMeasureBeforeCutting": "False",
-  "SpindleRev": "24000",
-  "ThetaCurrentLocation": "4.000",
-  "ThetaEndingToMovePosition": "100.000",
+  "SpindleRev": "20000",
+  "ThetaCurrentLocation": "246.600",
+  "ThetaEndingToMovePosition": "288.000",
   "ThetaMovementAngle": "0.400",
-  "ThetaStartingToMovePosition": "0.000"
+  "ThetaStartingToMovePosition": "245.000"
 }

@@ -63,6 +63,11 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             await InitDataAsync();
         }
 
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            WindowLayout.OperatePageButtons.Clear();
+        }
+
         private async Task InitDataAsync()
         {
             bladeOuterDiameter.Text = Appsettings.BladeOuterDiameter?.ToString("F3");

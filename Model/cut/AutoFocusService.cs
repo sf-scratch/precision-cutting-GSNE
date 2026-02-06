@@ -18,7 +18,7 @@ namespace 精密切割系统.Model.cut
     public class AutoFocusService
     {
         // 初始速度（高速）
-        private const float InitialSpeed = 0.3f;
+        private const float InitialSpeed = 0.15f;
 
         // 精细对焦速度
         private const float FineTuneSpeed = 0.05f;
@@ -219,6 +219,7 @@ namespace 精密切割系统.Model.cut
         {
             await PlcControl.tagControl.Z2axis.WaitAxisReadyAsync(token);
             await PlcControl.tagControl.Z2axis.SetJogRelativeSpeedAsync(speed);
+            await PlcControl.tagControl.Z2axis.SetHighSpeedAsync(1);
             await PlcControl.tagControl.Z2axis.StartJogAsync(direction);
         }
 

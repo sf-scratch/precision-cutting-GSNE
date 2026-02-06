@@ -2421,6 +2421,36 @@ namespace 精密切割系统.Driver
         public Tag flangeRepairBegins { get; set; }
         public Tag detectedSparks { get; set; }
         public Tag spindleRevReach { get; set; }
+        public Tag instructionPositionY { get; set; }
+        public Tag averagePositionY { get; set; }
+        public Tag instructionPositionZ1 { get; set; }
+        public Tag averagePositionZ1 { get; set; }
+        public Tag isReadyCuttingData { get; set; }
+
+        private async Task<bool> IsReadyCuttingDataAsync()
+        {
+            return await keyencePlc.ReadDataAsync(isReadyCuttingData.addr) == true;
+        }
+
+        public async Task SetIsReadyCuttingDataAsync(bool isReady)
+        {
+            isReadyCuttingData.writeValue = (isReady ? 1 : 0).ToString();
+            await keyencePlc.WriteTagAsync(isReadyCuttingData);
+        }
+
+        public async Task WaitReadyCuttingDataAsyncAsync(CancellationToken token)
+        {
+            await TaskUtils.WaitExpectedResultAsync(IsReadyCuttingDataAsync, default, token);
+        }
+
+        public async Task<(double instructionPositionY, double averagePositionY, double instructionPositionZ1, double averagePositionZ1)> GetCuttingDataAsync()
+        {
+            var insY = await keyencePlc.ReadDataAsync<double>(instructionPositionY.addr) ?? 0;
+            var aveY = await keyencePlc.ReadDataAsync<double>(averagePositionY.addr) ?? 0;
+            var insZ1 = await keyencePlc.ReadDataAsync<double>(instructionPositionZ1.addr) ?? 0;
+            var aveZ1 = await keyencePlc.ReadDataAsync<double>(averagePositionZ1.addr) ?? 0;
+            return (insY, aveY, insZ1, aveZ1);
+        }
 
         /// <summary>
         /// 执行插补运动

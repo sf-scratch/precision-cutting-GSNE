@@ -18,7 +18,7 @@ namespace 精密切割系统.Helpers
         public static bool IsFullDcreen { get; set; } = true;
 
         // 机器型号
-        public static string DeviceModel { get; set; } = Device_321;
+        public static string DeviceModel { get; set; } = Device_562;
 
         // 是否上传MES
         public static bool OnlineMES { get; set; } = false;

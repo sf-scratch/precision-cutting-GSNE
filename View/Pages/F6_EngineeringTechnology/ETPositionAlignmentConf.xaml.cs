@@ -147,11 +147,9 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
             if (_model != null)
             {
                 _model.ThetaCenterLocationX = inputThetaCenterLocationX.Text;
-                _model.ThetaCenterLocationY = inputThetaCenterLocationY.Text;
                 _model.ThetaCameraLocationX = inputThetaCameraLocationX.Text;
                 _model.ThetaCameraLocationY = inputThetaCameraLocationY.Text;
                 _model.CameraToCutXOffset = inputCameraToCutXOffset.Text;
-                _model.CameraToCutYOffset = inputCameraToCutYOffset.Text;
                 _model.CutZ1MaxLocation = inputCutZ1MaxLocation.Text;
                 _model.MeasurementHeightCompensation = MeasurementHeightCompensation.Text;
                 //_model.CameraOffsetX = inputCameraOffsetX.Text;
@@ -164,14 +162,18 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
                 _model.WorkDiscFocusPosition = Tools.GetFloatStringValue(inputWorkDiscFocusPosition.Text);
                 Appsettings.FocusWorkpiecesClearZ = inputWorkDiscFocusPosition.Text.ToFloat();
                 Appsettings.FocusClearZ = inputFocusClearZPosition.Text.ToFloat();
-                float thetaCameraX = inputThetaCameraLocationX.Text.ToFloat();
+                float cameraToCutYOffset = inputCameraToCutYOffset.Text.ToFloat();
                 float thetaCameraY = inputThetaCameraLocationY.Text.ToFloat();
+                float thetaCenterY = thetaCameraY - cameraToCutYOffset;
+                float thetaCameraX = inputThetaCameraLocationX.Text.ToFloat();
                 float thetaCenterX = inputThetaCenterLocationX.Text.ToFloat();
-                float thetaCenterY = inputThetaCenterLocationY.Text.ToFloat();
+                float cameraToCutXOffset = thetaCameraX - thetaCenterX;
                 Appsettings.CameraThetaCenterPoint = new DataPoint<float>(thetaCameraX, thetaCameraY);
-                Appsettings.CameraRelativeBladePosition = new DataPoint<float>(thetaCameraX - thetaCenterX, thetaCameraY - thetaCenterY);
-                inputCameraToCutXOffset.Text = Appsettings.CameraRelativeBladePosition.X.ToString();
-                inputCameraToCutYOffset.Text = Appsettings.CameraRelativeBladePosition.Y.ToString();
+                Appsettings.CameraRelativeBladePosition = new DataPoint<float>(cameraToCutXOffset, cameraToCutYOffset);
+                inputThetaCenterLocationY.Text = thetaCenterY.ToString(GlobalParams.RoughDecimalStringFormat);
+                _model.ThetaCenterLocationY = thetaCenterY.ToString(GlobalParams.RoughDecimalStringFormat);
+                inputCameraToCutXOffset.Text = cameraToCutXOffset.ToString(GlobalParams.RoughDecimalStringFormat);
+                _model.CameraToCutXOffset = cameraToCutXOffset.ToString(GlobalParams.RoughDecimalStringFormat);
                 await SqlHelper.UpdateAsync(_model);
                 CurrentUtils.InitPositionAlignment(_model);
             }
