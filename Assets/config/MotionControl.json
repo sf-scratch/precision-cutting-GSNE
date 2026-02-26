@@ -1077,6 +1077,12 @@
       "name": "主轴转速显示",
       "describe": "主轴转速显示"
     },
+    "spindleDirectionSwitch": {
+      "valueType": "bool",
+      "addr": "MR512",
+      "name": "主轴方向切换",
+      "describe": "主轴方向切换"
+    },
     "interpositionStatus": {
       "valueType": "int16",
       "addr": "DM009",
@@ -1142,6 +1148,48 @@
       "addr": "MR1400",
       "name": "输出调试模式",
       "describe": "输出调试模式"
+    },
+    "temperatureSensor1": {
+      "valueType": "int16",
+      "addr": "DM1220",
+      "name": "温度传感器1",
+      "describe": "温度传感器1"
+    },
+    "temperatureSensor2": {
+      "valueType": "int16",
+      "addr": "DM1221",
+      "name": "温度传感器2",
+      "describe": "温度传感器2"
+    },
+    "temperatureSensor3": {
+      "valueType": "int16",
+      "addr": "DM1222",
+      "name": "温度传感器3",
+      "describe": "温度传感器3"
+    },
+    "temperatureSensor4": {
+      "valueType": "int16",
+      "addr": "DM1223",
+      "name": "温度传感器4",
+      "describe": "温度传感器4"
+    },
+    "temperatureSensor5": {
+      "valueType": "int16",
+      "addr": "DM1224",
+      "name": "温度传感器5",
+      "describe": "温度传感器5"
+    },
+    "temperatureSensor6": {
+      "valueType": "int16",
+      "addr": "DM1225",
+      "name": "温度传感器6",
+      "describe": "温度传感器6"
+    },
+    "temperatureSensor7": {
+      "valueType": "int16",
+      "addr": "DM1226",
+      "name": "温度传感器7",
+      "describe": "温度传感器7"
     }
   },
   "calibration": {

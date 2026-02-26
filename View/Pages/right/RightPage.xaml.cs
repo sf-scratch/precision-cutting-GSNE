@@ -45,68 +45,70 @@ namespace 精密切割系统.View.page.right
             }
         }
 
-        private void RefreshDeviceStatus()
+        private async Task RefreshDeviceStatusAsync()
         {
-            Thread _thread = new Thread(() =>
+            await Task.Delay(5000);
+            bool vacuumStateStatus = false;
+            bool spindleAirStatus = false;
+            bool spindleCoolingWaterStatus = false;
+            bool spindleCuttingWaterStatus = false;
+            string spindleSpeedPlcValue = "0";
+            bool firstFlag = true;
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                Thread.Sleep(5000);
-                bool vacuumStateStatus = false;
-                bool spindleAirStatus = false;
-                bool spindleCoolingWaterStatus = false;
-                bool spindleCuttingWaterStatus = false;
-                string spindleSpeedPlcValue = "0";
-                bool firstFlag = true;
+                spindleSpeedValue.Content = spindleSpeedPlcValue;
+            });
+            while (true)
+            {
+                bool tempVacuumStateStatus = await PlcControl.tagControl.wholeDevice.IsOpenVacuumSwitchAsync();
+                bool tempSpindleAirStatus = await PlcControl.tagControl.wholeDevice.IsOpenSpindleAirAsync();
+                bool tempSpindleCoolingWaterStatus = await PlcControl.tagControl.wholeDevice.IsOpenSpindleCoolingWaterAsync();
+                bool tempSpindleCuttingWaterStatus = await PlcControl.tagControl.wholeDevice.IsOpenSpindleCuttingWaterAsync();
+                int? tempSpindleSpeedPlcValue = await PlcControl.tagControl.wholeDevice.GetSpindleSpeedAsync();
+                var temperatures = await PlcControl.tagControl.wholeDevice.GetTemperatureSensorsAsync();
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    spindleSpeedValue.Content = spindleSpeedPlcValue;
-                });
-                while (true)
-                {
-                    // 需要修改为线程内可以操作的方式
-                    bool tempVacuumStateStatus = Tools.TrueFlag(PlcControl.plc.GetPlcValueString(DeviceKey.vacuumStateKey));
-                    bool tempSpindleAirStatus = Tools.TrueFlag(PlcControl.plc.GetPlcValueString(DeviceKey.spindleAirKey));
-                    bool tempSpindleCoolingWaterStatus = Tools.TrueFlag(PlcControl.plc.GetPlcValueString(DeviceKey.spindleCoolingWaterKey));
-                    bool tempSpindleCuttingWaterStatus = Tools.TrueFlag(PlcControl.plc.GetPlcValueString(DeviceKey.spindleCuttingWaterKey));
-                    string tempSpindleSpeedPlcValue = PlcControl.plc.GetPlcValueString(DeviceKey.spindleSpeedStatusKey);
-                    Application.Current.Dispatcher.Invoke(() =>
+                    if (vacuumStateStatus != tempVacuumStateStatus || firstFlag)
                     {
-                        if (vacuumStateStatus != tempVacuumStateStatus || firstFlag)
-                        {
-                            vacuumStateStatus = tempVacuumStateStatus;
-                            vacuumStateStatusIcon.Source = Tools.BitmapImageToBitmap(vacuumStateStatus ? "/Assets/picture/lamp_normal.png"
-                                : "/Assets/picture/lamp_error.png");
-                        }
-                        if (spindleAirStatus != tempSpindleAirStatus || firstFlag)
-                        {
-                            spindleAirStatus = tempSpindleAirStatus;
-                            spindleAirStatusIcon.Source = Tools.BitmapImageToBitmap(spindleAirStatus ? "/Assets/picture/lamp_normal.png"
-                                : "/Assets/picture/lamp_error.png");
-                        }
-                        if (spindleCoolingWaterStatus != tempSpindleCoolingWaterStatus || firstFlag)
-                        {
-                            spindleCoolingWaterStatus = tempSpindleCoolingWaterStatus;
-                            spindleCoolingWaterStatusIcon.Source = Tools.BitmapImageToBitmap(spindleCoolingWaterStatus ? "/Assets/picture/lamp_normal.png"
-                                : "/Assets/picture/lamp_error.png");
-                        }
-                        if (spindleCuttingWaterStatus != tempSpindleCuttingWaterStatus || firstFlag)
-                        {
-                            spindleCuttingWaterStatus = tempSpindleCuttingWaterStatus;
-                            spindleCuttingWaterStatusIcon.Source = Tools.BitmapImageToBitmap(spindleCuttingWaterStatus ? "/Assets/picture/lamp_normal.png"
-                                : "/Assets/picture/lamp_error.png");
-                        }
-                        if ((spindleSpeedValue != null && !String.IsNullOrEmpty(spindleSpeedPlcValue)
-                        && !String.IsNullOrEmpty(tempSpindleSpeedPlcValue) && spindleSpeedPlcValue != tempSpindleSpeedPlcValue) || firstFlag)
-                        {
-                            spindleSpeedPlcValue = tempSpindleSpeedPlcValue;
-                            spindleSpeedValue.Content = spindleSpeedPlcValue;
-                        }
-                    });
-                    firstFlag = false;
-                    Thread.Sleep(500);
-                }
-            });
-            _thread.IsBackground = true;
-            _thread.Start();
+                        vacuumStateStatus = tempVacuumStateStatus;
+                        vacuumStateStatusIcon.Source = Tools.BitmapImageToBitmap(vacuumStateStatus ? "/Assets/picture/lamp_normal.png"
+                            : "/Assets/picture/lamp_error.png");
+                    }
+                    if (spindleAirStatus != tempSpindleAirStatus || firstFlag)
+                    {
+                        spindleAirStatus = tempSpindleAirStatus;
+                        spindleAirStatusIcon.Source = Tools.BitmapImageToBitmap(spindleAirStatus ? "/Assets/picture/lamp_normal.png"
+                            : "/Assets/picture/lamp_error.png");
+                    }
+                    if (spindleCoolingWaterStatus != tempSpindleCoolingWaterStatus || firstFlag)
+                    {
+                        spindleCoolingWaterStatus = tempSpindleCoolingWaterStatus;
+                        spindleCoolingWaterStatusIcon.Source = Tools.BitmapImageToBitmap(spindleCoolingWaterStatus ? "/Assets/picture/lamp_normal.png"
+                            : "/Assets/picture/lamp_error.png");
+                    }
+                    if (spindleCuttingWaterStatus != tempSpindleCuttingWaterStatus || firstFlag)
+                    {
+                        spindleCuttingWaterStatus = tempSpindleCuttingWaterStatus;
+                        spindleCuttingWaterStatusIcon.Source = Tools.BitmapImageToBitmap(spindleCuttingWaterStatus ? "/Assets/picture/lamp_normal.png"
+                            : "/Assets/picture/lamp_error.png");
+                    }
+                    if ((spindleSpeedValue != null && !String.IsNullOrEmpty(spindleSpeedPlcValue) && tempSpindleSpeedPlcValue is not null))
+                    {
+                        spindleSpeedPlcValue = tempSpindleSpeedPlcValue.Value.ToString();
+                        spindleSpeedValue.Content = spindleSpeedPlcValue;
+                    }
+                    if (temperatures is not null && temperatures.Length >= 5)
+                    {
+                        temperatureSensor1.Content = temperatures[0].ToString("F1");
+                        temperatureSensor2.Content = temperatures[1].ToString("F1");
+                        temperatureSensor3.Content = temperatures[2].ToString("F1");
+                        temperatureSensor4.Content = temperatures[3].ToString("F1");
+                        temperatureSensor5.Content = temperatures[4].ToString("F1");
+                    }
+                });
+                firstFlag = false;
+                await Task.Delay(500);
+            }
         }
 
         // 当Frame的Source属性变化时调用
@@ -146,7 +148,7 @@ namespace 精密切割系统.View.page.right
             if (GlobalParams.OnlineFlag)
             {
                 // 刷新主轴转速等状态信息
-                RefreshDeviceStatus();
+                Task.Factory.StartNew(RefreshDeviceStatusAsync, TaskCreationOptions.LongRunning);
             }
         }
 

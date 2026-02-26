@@ -279,6 +279,7 @@ namespace 精密切割系统
             PlcControl.plc.exitAllModel();
             await Task.Delay(1000);
             await CurrentUtils.InitPlcDataAsync();
+            await SqlHelper.InitDatabaseAsync();
             // 设置面板禁用
             PlcControl.tagControl.wholeDevice.SetPanelButtonsStauts(0);
             // 关闭Y轴光栅尺校准

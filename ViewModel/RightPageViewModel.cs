@@ -47,71 +47,74 @@ namespace 精密切割系统.ViewModel
             RightButtonParams = WindowLayout.RightPageButtons;
             ActiveAlarms = new ObservableCollection<ActiveAlarmModel>();
             WaitingFuncNames = new ObservableCollection<string>();
-            Task.Factory.StartNew(async () =>
+            Task.Factory.StartNew(StartMonitorAlarmsAsync, TaskCreationOptions.LongRunning);
+            Task.Factory.StartNew(TemperatureSensorUtils.StartRecordingAsync, TaskCreationOptions.LongRunning);
+        }
+
+        private async Task StartMonitorAlarmsAsync()
+        {
+            while (true)
             {
-                while (true)
+                try
                 {
-                    try
+                    if (!AtomicConfig.IsCutProcessing)
                     {
-                        if (!AtomicConfig.IsCutProcessing)
+                        if (AlarmConfig.Instance.HasActiveErrorAlarm(false))
                         {
-                            if (AlarmConfig.Instance.HasActiveErrorAlarm(false))
-                            {
-                                // 不在切割状态下，且有报警时，三色灯报警红色
-                                await PlcControl.tagControl.wholeDevice.OpenRedLightAsync();
-                            }
-                            else
-                            {
-                                // 不在切割状态下，且有没报警时，三色灯报警黄色
-                                await PlcControl.tagControl.wholeDevice.OpenYellowLightAsync();
-                            }
-                        }
-                        bool[]? alarms = AlarmConfig.Instance.GetNewestAlarms();
-                        if (alarms != null && AlarmConfig.Instance.TryGetActiveAlarms(alarms, out List<AlarmInfo> alarmInfos))
-                        {
-                            if (!IsSamely(alarmInfos, ActiveAlarms))
-                            {
-                                Application.Current.Dispatcher.Invoke(() =>
-                                {
-                                    ActiveAlarms.Clear();
-                                    foreach (AlarmInfo alarmInfo in alarmInfos)
-                                    {
-                                        ActiveAlarms.Add(new ActiveAlarmModel() { Address = alarmInfo.Address, Level = alarmInfo.Level, Message = alarmInfo.Message });
-                                    }
-                                    AlarmVisibility = Visibility.Visible;
-                                });
-                            }
+                            // 不在切割状态下，且有报警时，三色灯报警红色
+                            await PlcControl.tagControl.wholeDevice.OpenRedLightAsync();
                         }
                         else
+                        {
+                            // 不在切割状态下，且有没报警时，三色灯报警黄色
+                            await PlcControl.tagControl.wholeDevice.OpenYellowLightAsync();
+                        }
+                    }
+                    bool[]? alarms = AlarmConfig.Instance.GetNewestAlarms();
+                    if (alarms != null && AlarmConfig.Instance.TryGetActiveAlarms(alarms, out List<AlarmInfo> alarmInfos))
+                    {
+                        if (!IsSamely(alarmInfos, ActiveAlarms))
                         {
                             Application.Current.Dispatcher.Invoke(() =>
                             {
                                 ActiveAlarms.Clear();
-                                AlarmVisibility = Visibility.Hidden;
+                                foreach (AlarmInfo alarmInfo in alarmInfos)
+                                {
+                                    ActiveAlarms.Add(new ActiveAlarmModel() { Address = alarmInfo.Address, Level = alarmInfo.Level, Message = alarmInfo.Message });
+                                }
+                                AlarmVisibility = Visibility.Visible;
                             });
                         }
+                    }
+                    else
+                    {
                         Application.Current.Dispatcher.Invoke(() =>
                         {
-                            WaitingFuncNames.Clear();
-                            WaitingFuncNames.Add(KeyencePlc.PlcSemaphore.CurrentCount.ToString());
-                            WaitingFuncNames.AddRange(TaskUtils.CurrentWaitingFuncDict.Values);
-                            if (WaitingFuncNames.Count == 0)
-                            {
-                                WaitingFuncNamesVisibility = Visibility.Hidden;
-                            }
-                            else
-                            {
-                                WaitingFuncNamesVisibility = Visibility.Visible;
-                            }
+                            ActiveAlarms.Clear();
+                            AlarmVisibility = Visibility.Hidden;
                         });
                     }
-                    catch (Exception ex)
+                    Application.Current.Dispatcher.Invoke(() =>
                     {
-                        Tools.LogError($"报警监控异常: {ex.Message}");
-                    }
-                    await Task.Delay(300);
+                        WaitingFuncNames.Clear();
+                        WaitingFuncNames.Add(KeyencePlc.PlcSemaphore.CurrentCount.ToString());
+                        WaitingFuncNames.AddRange(TaskUtils.CurrentWaitingFuncDict.Values);
+                        if (WaitingFuncNames.Count == 0)
+                        {
+                            WaitingFuncNamesVisibility = Visibility.Hidden;
+                        }
+                        else
+                        {
+                            WaitingFuncNamesVisibility = Visibility.Visible;
+                        }
+                    });
                 }
-            }, TaskCreationOptions.LongRunning);
+                catch (Exception ex)
+                {
+                    Tools.LogError($"报警监控异常: {ex.Message}");
+                }
+                await Task.Delay(300);
+            }
         }
 
         private bool IsSamely(List<AlarmInfo> alarmInfos, ObservableCollection<ActiveAlarmModel> activeAlarms)

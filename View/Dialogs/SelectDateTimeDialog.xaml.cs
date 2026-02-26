@@ -34,5 +34,13 @@ namespace 精密切割系统.View.Dialogs
         {
             InitializeComponent();
         }
+
+        private void CombinedClock_TimeChanged(object sender, MaterialDesignThemes.Wpf.TimeChangedEventArgs e)
+        {
+            if (SelectedDate != null)
+            {
+                SelectedDate = SelectedDate.Value.Date + e.NewTime.TimeOfDay;
+            }
+        }
     }
 }

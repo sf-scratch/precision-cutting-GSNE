@@ -17,7 +17,8 @@
     Loaded="Page_Loaded"
     mc:Ignorable="d">
     <Page.Resources>
-        <Converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" IsInverse="True" />
+        <Converters:BoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" IsInverse="True" />
+        <Converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <Style TargetType="Label">
             <Setter Property="FontSize" Value="18" />
             <Setter Property="FontWeight" Value="Bold" />
@@ -46,7 +47,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="80" />
-            <RowDefinition Height="220" />
+            <RowDefinition Height="250" />
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -473,7 +474,7 @@
                         ChildMargin="0,7"
                         Columns="3*,*"
                         RowCount="3"
-                        Visibility="{Binding ElementName=cutWaterStatus, Path=IsChecked, Converter={StaticResource BoolToVisibilityConverter}}">
+                        Visibility="{Binding ElementName=cutWaterStatus, Path=IsChecked, Converter={StaticResource InverseBoolToVisibilityConverter}}">
                         <Label Content="- 在关闭真空时自动关水" />
                         <CheckBox x:Name="autoShutOffWaterWhenCloseVacuum" IsChecked="{Binding IsAutoShutOffWaterWhenCloseVacuum}">
                             <TextBlock Text="{Binding ElementName=autoShutOffWaterWhenCloseVacuum, Path=IsChecked, Converter={StaticResource BoolToStringConverter}}" />

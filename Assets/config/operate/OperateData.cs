@@ -442,6 +442,7 @@ namespace 精密切割系统.Assets.config.buttom
             list.Add(new OperateBean(5300, "设置时日", "/Assets/icon/tab_5/tab_04.png"));
             list.Add(new OperateBean(5301, "工作盘真空", "VacuumOutline"));
             list.Add(new OperateBean(2407, "暖机", "/Assets/icon/menu_2/menu_2_3_white.png"));
+            list.Add(new OperateBean(2408, "主轴方向切换", "Update"));
             return list;
         }
     }

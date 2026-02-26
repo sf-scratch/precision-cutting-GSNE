@@ -1,4 +1,5 @@
 ﻿using ScottPlot;
+using ScottPlot.WPF;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -80,6 +81,7 @@ namespace 精密切割系统.View.Controls
             double xInitialMax = XInitialMaxValue;
             double xMax = XMaxValue;
             bool showLine = ShowLine;
+            formsPlot1.Plot.Title("(Vibration Variation Diagram)");
             Thread thread = new Thread(new ThreadStart(() => RefreshChart(xInitialMax, xMax, showLine)));
             thread.Start();
         }

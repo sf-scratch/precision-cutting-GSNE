@@ -150,6 +150,16 @@ namespace 精密切割系统.View.F7_ElectricSpark
                     Process.Start(psi);
                 }
             }
+            else if (code == 2408)
+            {
+                if (await PlcControl.tagControl.wholeDevice.GetSpindleSpeedAsync() != 0)
+                {
+                    MaterialSnack("主轴完全停止后，再进行主轴方向切换", SnackType.WARNING);
+                    return;
+                }
+                await PlcControl.tagControl.wholeDevice.TriggerSpindleDirection();
+                MaterialSnack("主轴方向切换成功！", SnackType.SUCCESS);
+            }
         }
 
         private void BtnBack_RightClicked(object? sender, bool e)

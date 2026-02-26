@@ -212,12 +212,17 @@ namespace 精密切割系统.Model.cut
                     await PlcControl.tagControl.cutting.WaitReadyCuttingDataAsyncAsync(token);
                     var (instructionPositionY, averagePositionY, instructionPositionZ1, averagePositionZ1) = await PlcControl.tagControl.cutting.GetCuttingDataAsync();
                     await PlcControl.tagControl.cutting.SetIsReadyCuttingDataAsync(false);
-                    Tools.CuttingRecord(
-                        $"第{cutTimes}\t\t" +
-                        $"{instructionPositionY.ToString("F6")}\t\t" +
-                        $"{averagePositionY.ToString("F6")}\t\t" +
-                        $"{instructionPositionZ1.ToString("F6")}\t\t" +
-                        $"{averagePositionZ1.ToString("F6")}");
+                    var temperatures = await PlcControl.tagControl.wholeDevice.GetTemperatureSensorsAsync();
+                    string temperatureInfo = temperatures != null ? string.Join("  ", temperatures.Select(t => $"{t:F1}°C")) : "N/A";
+                    int colWidth = 20; // 可以根据需要调整
+                    string cuttingRecord = string.Format("{0}{1}{2}{3}{4}{5}{6}",
+                        cutTimes.ToString().PadRight(colWidth),
+                        instructionPositionY.ToString("F6").PadRight(colWidth),
+                        averagePositionY.ToString("F6").PadRight(colWidth),
+                        instructionPositionZ1.ToString("F6").PadRight(colWidth),
+                        averagePositionZ1.ToString("F6").PadRight(colWidth),
+                        temperatureInfo);
+                    Tools.CuttingRecord(cuttingRecord);
                     cutTimes++;
                     await Task.Delay(200);
                 }

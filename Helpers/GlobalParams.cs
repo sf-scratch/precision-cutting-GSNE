@@ -18,13 +18,13 @@ namespace 精密切割系统.Helpers
         public static bool IsFullDcreen { get; set; } = true;
 
         // 机器型号
-        public static string DeviceModel { get; set; } = Device_562;
+        public static string DeviceModel { get; set; } = Device_551;
 
         // 是否上传MES
         public static bool OnlineMES { get; set; } = false;
 
         // 是否带Theta轴
-        public static bool HasTheta { get; set; } = true;
+        public static bool HasTheta { get; set; } = false;
 
         // 是否开放全自动功能
         public static bool HasFullyAutomatic { get; set; } = false;

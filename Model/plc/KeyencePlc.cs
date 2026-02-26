@@ -595,26 +595,6 @@ namespace 精密切割系统.Driver
             PlcControl.tagControl.flange.JoinTrimming(0);
         }
 
-        public string GetPlcValueString(string tKey)
-        {
-            if (!GlobalParams.OnlineFlag)
-            {
-                return "0";
-            }
-            if (PlcControl.allTags == null || PlcControl.allTags.Count == 0) return "";
-            Tag tmpTag = PlcControl.allTags.ContainsKey(tKey) ? PlcControl.allTags[tKey] : null;
-            if (tmpTag == null)
-            {
-                return null;
-            }
-            string value = readData(tmpTag.addr, typeMap[tmpTag.valueType]);
-            if ("read data error".Equals(value))
-            {
-                value = readData(tmpTag.addr, typeMap[tmpTag.valueType]);
-            }
-            return value;
-        }
-
         public bool writeTag(Tag tag)
         {
             if (!GlobalParams.OnlineFlag)
@@ -1077,12 +1057,12 @@ namespace 精密切割系统.Driver
             await keyencePlc.WriteTagAsync(absoluteLocation);
             // 最大移动距离
             int maxDistance = 400;
-            int waitTime;
+            int waitTime = 1;
             if (speed != null)
             {
                 // 设置绝对运动速度
                 await SetAbsoluteSpeedAsync(speed.Value);
-                waitTime = (int)MathF.Ceiling(maxDistance / speed.Value);
+                waitTime += (int)MathF.Ceiling(maxDistance / speed.Value);
             }
             else
             {
@@ -1096,7 +1076,7 @@ namespace 精密切割系统.Driver
                     _ => 1f // 默认值
                 };
                 await SetAbsoluteSpeedAsync(defaultSpeed);
-                waitTime = (int)MathF.Ceiling(maxDistance / defaultSpeed);
+                waitTime += (int)MathF.Ceiling(maxDistance / defaultSpeed);
             }
             absoluteStart.writeValue = "0";
             await keyencePlc.WriteTagAsync(absoluteStart);
@@ -1683,7 +1663,47 @@ namespace 精密切割系统.Driver
         // IO检测模式
         public Tag ioModel { get; set; }
 
+        public Tag temperatureSensor1 { get; set; }
+
+        public Tag temperatureSensor2 { get; set; }
+
+        public Tag temperatureSensor3 { get; set; }
+
+        public Tag temperatureSensor4 { get; set; }
+
+        public Tag temperatureSensor5 { get; set; }
+
+        public Tag temperatureSensor6 { get; set; }
+
+        public Tag temperatureSensor7 { get; set; }
+
+        public Tag spindleDirectionSwitch { get; set; }
+
         // ============整机相关 END==========
+
+        public async Task TriggerSpindleDirection()
+        {
+            if (await PlcControl.tagControl.wholeDevice.GetSpindleSpeedAsync() == 0)
+            {
+                bool result = await PlcControl.plc.ReadDataAsync(spindleDirectionSwitch.addr) == true;
+                spindleDirectionSwitch.writeValue = result ? "0" : "1";
+                await keyencePlc.WriteTagAsync(spindleDirectionSwitch);
+            }
+        }
+
+        /// <summary>
+        /// 读取多个温度传感器
+        /// </summary>
+        /// <returns></returns>
+        public async Task<float[]?> GetTemperatureSensorsAsync()
+        {
+            var result = await PlcControl.plc.ReadDataAsync<short>(temperatureSensor1.addr, 5);
+            if (result != null && result.Length == 5)
+            {
+                return result.Select(p => p / 10.0f).ToArray();
+            }
+            return null;
+        }
 
         /// <summary>
         /// 能否执行系统初始化
@@ -2086,6 +2106,24 @@ namespace 精密切割系统.Driver
         public async Task<bool> IsOpenVacuumSwitchAsync()
         {
             return await keyencePlc.ReadDataAsync(vacuumState.addr) == true;
+        }
+
+        /// <summary>
+        /// 主轴气源
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> IsOpenSpindleAirAsync()
+        {
+            return await keyencePlc.ReadDataAsync(spindleAir.addr) == true;
+        }
+
+        /// <summary>
+        /// 主轴冷却水
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> IsOpenSpindleCoolingWaterAsync()
+        {
+            return await keyencePlc.ReadDataAsync(spindleCoolingWater.addr) == true;
         }
 
         //public async Task OpenVacuumSwitchAsync()

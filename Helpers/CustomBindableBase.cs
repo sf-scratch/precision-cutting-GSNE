@@ -42,16 +42,16 @@ namespace 精密切割系统.Helpers
             return true;
         }
 
-        public virtual void OnNavigatedFrom(NavigationContext navigationContext)
-        {
-            RightButtonCollection.Clear();
-            BottomButtonCollection.Clear();
-        }
-
         public virtual void OnNavigatedTo(NavigationContext navigationContext)
         {
             NavigateUtils.ClearOperatePage();
             NavigateUtils.ClearMainFrame();
+            InitRightButton();
+            InitBottomButton();
+        }
+
+        public virtual void OnNavigatedFrom(NavigationContext navigationContext)
+        {
             InitRightButton();
             InitBottomButton();
         }

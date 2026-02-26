@@ -15,7 +15,6 @@ using 精密切割系统.View.Pages.operate;
 using static MaterialDesignThemes.Wpf.Theme.ToolBar;
 using static NPOI.HSSF.Util.HSSFColor;
 
-
 namespace 精密切割系统.ViewModel
 {
     internal class DebugPageViewModel : CustomBindableBase
@@ -181,6 +180,7 @@ namespace 精密切割系统.ViewModel
                         moveTasks.Add(PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(item.ThetaPosition.ToFloat(), default, _cts.Token));
                     }
                     await Task.WhenAll(moveTasks);
+                    await Task.Delay(500);
                 }
                 MaterialSnack("运行完成！", SnackType.SUCCESS);
             }

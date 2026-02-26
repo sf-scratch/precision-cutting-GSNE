@@ -5,6 +5,7 @@
     xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:精密切割系统.View.Pages.F7_ElectricSpark"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:scottplot="clr-namespace:ScottPlot.WPF;assembly=ScottPlot.WPF"
     Title="WaveformDiagram"
@@ -19,7 +20,7 @@
             <RowDefinition Height="50" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Grid>
+        <StackPanel Orientation="Horizontal">
             <Label
                 Padding="0,0,0,0"
                 HorizontalAlignment="Left"
@@ -27,10 +28,37 @@
                 Content="波形图(5.7)"
                 FontSize="30"
                 FontWeight="Bold" />
-        </Grid>
+            <StackPanel Margin="10,0,0,0" Orientation="Horizontal">
+                <TextBlock
+                    x:Name="StartDateTextBlock"
+                    VerticalAlignment="Center"
+                    FontSize="20" />
+                <Button
+                    Margin="8,0,0,0"
+                    Click="StartTimeButton_Click"
+                    Content="{materialDesign:PackIcon CalendarRange}" />
+            </StackPanel>
+            <StackPanel Margin="50,0,0,0" Orientation="Horizontal">
+                <TextBlock
+                    x:Name="EndDateTextBlock"
+                    VerticalAlignment="Center"
+                    FontSize="20" />
+                <Button
+                    Margin="8,0,0,0"
+                    Click="EndTimeButton_Click"
+                    Content="{materialDesign:PackIcon CalendarRange}" />
+            </StackPanel>
+        </StackPanel>
+        <scottplot:WpfPlot
+            x:Name="wpfPlot"
+            Grid.Row="1"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Visibility="Collapsed" />
         <Controls:CustomPlot
             x:Name="customPlot"
             Grid.Row="1"
+            Visibility="Visible"
             XInitialMaxValue="150"
             XMaxValue="2000" />
     </Grid>

@@ -14,11 +14,19 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Viewbox Width="300" Stretch="Uniform">
-            <Calendar
-                x:Name="Calendar"
-                Margin="-1,-4,-1,0"
-                SelectedDate="{Binding SelectedDate, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+        <Viewbox Width="800" Stretch="Uniform">
+            <StackPanel Orientation="Horizontal">
+                <Calendar
+                    x:Name="Calendar"
+                    Margin="-1,-2,-1,-2"
+                    SelectedDate="{Binding SelectedDate, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                <materialDesign:Clock
+                    x:Name="CombinedClock"
+                    DisplayAutomation="CycleWithSeconds"
+                    Is24Hours="True"
+                    Time="{Binding SelectedDate, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}"
+                    TimeChanged="CombinedClock_TimeChanged" />
+            </StackPanel>
         </Viewbox>
         <StackPanel
             Grid.Row="1"

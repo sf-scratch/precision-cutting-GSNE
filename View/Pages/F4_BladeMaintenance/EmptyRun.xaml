@@ -141,14 +141,16 @@
                 Content="θ轴"
                 IsChecked="{Binding RunTheta}"
                 Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
-            <StackPanel Orientation="Horizontal">
+            <StackPanel Orientation="Horizontal"
+                Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}">
                 <Controls:InputTextBox
                     InputType="Decimal"
                     Text="{Binding SpeedTheta}"
                     XPrecision="3" />
                 <Label Content="mm/s " FontSize="18" />
             </StackPanel>
-            <StackPanel Orientation="Horizontal">
+            <StackPanel Orientation="Horizontal"
+                Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}">
                 <Controls:InputTextBox
                     InputType="Decimal"
                     Text="{Binding RepeatCountTheta}"

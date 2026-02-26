@@ -7,7 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Entities;
+using 精密切割系统.Model.common;
 using 精密切割系统.Model.sqlite;
+using 精密切割系统.View.common;
 using 精密切割系统.View.Pages.F4_BladeMaintenance;
 using 精密切割系统.ViewModel;
 
@@ -49,7 +51,6 @@ namespace 精密切割系统.Helpers
                 db.CreateTable<SpeedSettingModel>();//速度设置(6.4)
                 db.CreateTable<PositionAlignmentModel>();//校准参数(6.5)
                 db.CreateTable<InitialPositionModel>();//各模式初始位置 (6.6)
-
                 db.CreateTable<BladeSharpenModel>();//刀片修正/磨刀（4.4/4.4.0） 未用
                 db.CreateTable<BmSharpenParameterModel>();//刀片修正/磨刀 (4.4.0) 新
                 db.CreateTable<AutoAlignPositionParamsModel>(); // 自动切割校准
@@ -70,6 +71,8 @@ namespace 精密切割系统.Helpers
                 db.CreateTable<ScratchInspectionParametersEntity>();
                 db.CreateTable<BladeInfoEntity>();
                 db.CreateTable<CameraEntity>();
+                db.CreateTable<TemperatureSensorEntity>();
+                db.CreateTable<TemperatureLogEntity>();
             }
             catch (Exception ex)
             {
@@ -187,15 +190,39 @@ namespace 精密切割系统.Helpers
         /// <summary>
         /// 通用实体获取方法
         /// </summary>
-        public static async Task<TEntity?> GetEntityAsync<TEntity>() where TEntity : class, IEntityWithId, new()
+        public static async Task<TEntity?> GetEntityAsync<TEntity>(long? id = default) where TEntity : class, IEntityWithId, new()
         {
-            long defaultId = DefaultId;
+            long defaultId = id ?? DefaultId;
             var list = await TableAsync<TEntity>().Where(t => t.Id == defaultId).ToListAsync();
             if (list.Count == 0)
             {
                 return null;
             }
             return list.First();
+        }
+
+        public static async Task InitDatabaseAsync()
+        {
+            List<TemperatureSensorEntity> temperatureSensors =
+            [
+                new TemperatureSensorEntity() { Id = 1, SensorName = "温度1" },
+                new TemperatureSensorEntity() { Id = 2, SensorName = "温度2" },
+                new TemperatureSensorEntity() { Id = 3, SensorName = "温度3" },
+                new TemperatureSensorEntity() { Id = 4, SensorName = "温度4" },
+                new TemperatureSensorEntity() { Id = 5, SensorName = "温度5" },
+            ];
+            foreach (var sensor in temperatureSensors)
+            {
+                var sensorEntity = await GetEntityAsync<TemperatureSensorEntity>(sensor.Id);
+                if (sensorEntity != null)
+                {
+                    await UpdateAsync(sensor);
+                }
+                else
+                {
+                    await AddAsync(sensor);
+                }
+            }
         }
     }
 }
