@@ -50,6 +50,7 @@ namespace 精密切割系统.View.Controls
             get { return (bool)GetValue(BackFlagProperty); }
             set { SetValue(BackFlagProperty, value); }
         }
+
         // 全局有操作时，是否可以点击
         public static readonly DependencyProperty GlobalRunOperateFlagProperty =
         DependencyProperty.Register("GlobalRunOperateFlag", typeof(bool), typeof(BottomButton), new PropertyMetadata(null));
@@ -59,6 +60,7 @@ namespace 精密切割系统.View.Controls
             get { return (bool)GetValue(GlobalRunOperateFlagProperty); }
             set { SetValue(GlobalRunOperateFlagProperty, value); }
         }
+
         //图片ICON
         public static readonly DependencyProperty ImagePathProperty =
        DependencyProperty.Register("ImagePath", typeof(string), typeof(BottomButton), new PropertyMetadata(null));
@@ -72,7 +74,6 @@ namespace 精密切割系统.View.Controls
         //按钮背景色
         public static readonly DependencyProperty BackgroundDefColorProperty =
         DependencyProperty.Register("BackgroundDefColor", typeof(Brush), typeof(BottomButton), new PropertyMetadata(Brushes.Silver));
-
 
         public Brush BackgroundDefColor
         {
@@ -89,6 +90,16 @@ namespace 精密切割系统.View.Controls
             get { return (Brush)GetValue(BackgroundDownColorProperty); }
             set { SetValue(BackgroundDownColorProperty, value); }
         }
+
+        public Brush FrontColor
+        {
+            get { return (Brush)GetValue(FrontColorProperty); }
+            set { SetValue(FrontColorProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for FrontColor.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty FrontColorProperty =
+            DependencyProperty.Register(nameof(FrontColor), typeof(Brush), typeof(BottomButton), new PropertyMetadata(Brushes.Silver));
 
         public double ButtonWidth
         {
@@ -129,8 +140,6 @@ namespace 精密切割系统.View.Controls
         // Using a DependencyProperty as the backing store for IsOpen.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty IsOpenProperty =
             DependencyProperty.Register("IsOpen", typeof(bool), typeof(BottomButton), new PropertyMetadata(false));
-
-
 
         public BottomButton()
         {

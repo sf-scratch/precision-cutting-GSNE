@@ -205,11 +205,11 @@ namespace 精密切割系统.Helpers
         {
             List<TemperatureSensorEntity> temperatureSensors =
             [
-                new TemperatureSensorEntity() { Id = 1, SensorName = "温度1" },
-                new TemperatureSensorEntity() { Id = 2, SensorName = "温度2" },
-                new TemperatureSensorEntity() { Id = 3, SensorName = "温度3" },
-                new TemperatureSensorEntity() { Id = 4, SensorName = "温度4" },
-                new TemperatureSensorEntity() { Id = 5, SensorName = "温度5" },
+                new TemperatureSensorEntity() { Id = 1, SensorName = "温度1", FrontColor = "F44336" },
+                new TemperatureSensorEntity() { Id = 2, SensorName = "温度2", FrontColor = "D500F9" },
+                new TemperatureSensorEntity() { Id = 3, SensorName = "温度3", FrontColor = "212121" },
+                new TemperatureSensorEntity() { Id = 4, SensorName = "温度4", FrontColor = "00E676" },
+                new TemperatureSensorEntity() { Id = 5, SensorName = "温度5", FrontColor = "FDD835" },
             ];
             foreach (var sensor in temperatureSensors)
             {

@@ -158,6 +158,11 @@ namespace 精密切割系统.ViewModel
 
         private async Task SetDepthCompensationAsync()
         {
+            if (RegionUtils.FormError(_regionManager))
+            {
+                MaterialSnack(RegionUtils.FormErrorMessage, SnackType.WARNING);
+                return;
+            }
             CommonResult checkAutomaticCompensationCutHeightResult = await VerifyUtils.CheckAutomaticCompensationCutHeightAsync(PauseData.RemainCutSteps);
             if (!checkAutomaticCompensationCutHeightResult.IsSuccess)
             {
@@ -172,6 +177,11 @@ namespace 精密切割系统.ViewModel
 
         private void SetFeedSpeed()
         {
+            if (RegionUtils.FormError(_regionManager))
+            {
+                MaterialSnack(RegionUtils.FormErrorMessage, SnackType.WARNING);
+                return;
+            }
             // 速度更改
             _semiAutoCutService.FeedSpeedCompCompensationValue = CutParam.ChangeFeedSpeed.ToFloat();
             _semiAutomaticCuttingRunViewModel.CutParam.ChangeFeedSpeed = CutParam.ChangeFeedSpeed;

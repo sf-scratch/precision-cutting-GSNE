@@ -5,7 +5,9 @@
     xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
     xmlns:Converters="clr-namespace:精密切割系统.Converters"
     xmlns:auto="clr-namespace:WpfAutoGrid;assembly=WpfAutoGrid.Core"
+    xmlns:convert="clr-namespace:精密切割系统.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:精密切割系统.Helpers"
     xmlns:local="clr-namespace:精密切割系统.ViewModel"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -21,6 +23,30 @@
     <Page.DataContext>
         <local:BladeHeightViewModel />
     </Page.DataContext>
+    <Page.Resources>
+        <convert:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <convert:BoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" IsInverse="True" />
+        <convert:BoolToValueConverter
+            x:Key="MovingDistanceConverter"
+            FalseValue="X轴移动距离"
+            TrueValue="θ轴移动角度" />
+        <convert:BoolToValueConverter
+            x:Key="StartPositionConverter"
+            FalseValue="X轴移动开始位置"
+            TrueValue="θ轴移动开始位置" />
+        <convert:BoolToValueConverter
+            x:Key="EndPositionConverter"
+            FalseValue="X轴移动结束位置"
+            TrueValue="θ轴移动结束位置" />
+        <convert:BoolToValueConverter
+            x:Key="CurPositionConverter"
+            FalseValue="X轴移动当前位置"
+            TrueValue="θ轴移动当前位置" />
+        <convert:BoolToValueConverter
+            x:Key="UnitConverter"
+            FalseValue="mm"
+            TrueValue="deg" />
+    </Page.Resources>
     <Grid Margin="30,30,0,0">
         <Grid.Resources>
             <Style BasedOn="{StaticResource MaterialDesignFilterChipSecondaryCheckBox}" TargetType="CheckBox">
@@ -86,18 +112,18 @@
                 XMax="3"
                 XPrecision="0" />
             <Label Content="次" />
-            <Label Content="θ轴移动角度" />
+            <Label Content="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource MovingDistanceConverter}}" />
             <Controls:InputTextBox Text="{Binding BMParameter.ThetaMovementAngle}" XMax="90" />
-            <Label Content="deg" />
-            <Label Content="θ轴移动开始位置" />
-            <Controls:InputTextBox Text="{Binding BMParameter.ThetaStartingToMovePosition}" />
-            <Label Content="deg" />
-            <Label Content="θ轴移动结束位置" />
+            <Label Content="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource UnitConverter}}" />
+            <Label Content="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource StartPositionConverter}}" />
+            <Controls:InputTextBox Text="{Binding BMParameter.ThetaStartingToMovePosition}" IsEnabled="{Binding Source={x:Static helpers:GlobalParams.HasTheta}}" />
+            <Label Content="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource UnitConverter}}" />
+            <Label Content="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource EndPositionConverter}}" />
             <Controls:InputTextBox Text="{Binding BMParameter.ThetaEndingToMovePosition}" />
-            <Label Content="deg" />
-            <Label Content="θ轴移动当前位置" />
+            <Label Content="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource UnitConverter}}" />
+            <Label Content="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource CurPositionConverter}}" />
             <Controls:InputTextBox Text="{Binding BMParameter.ThetaCurrentLocation}" />
-            <Label Content="deg" />
+            <Label Content="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource UnitConverter}}" />
             <Label Content="Z1测高极限位置" />
             <Controls:InputTextBox Text="{Binding BladeSetupInitZ1}" />
             <Label Content="mm" />

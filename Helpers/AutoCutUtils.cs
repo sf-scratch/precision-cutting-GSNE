@@ -266,7 +266,14 @@ namespace 精密切割系统.Helpers
                     }
                     bmParameter.ThetaCurrentLocation = nextThetaDeg.ToString(GlobalParams.RoughDecimalStringFormat);
                     await SqlHelper.UpdateAsync(bmParameter);
-                    await PlcControl.tagControl.bladeMantance.SetBladeSetuInitPositionAsync(initPos.BladeSetupInitX, initPos.BladeSetupInitY, initPos.BladeSetupInitZ1, nextThetaDeg);
+                    if (GlobalParams.HasTheta)
+                    {
+                        await PlcControl.tagControl.bladeMantance.SetBladeSetuInitPositionAsync(initPos.BladeSetupInitX, initPos.BladeSetupInitY, initPos.BladeSetupInitZ1, nextThetaDeg);
+                    }
+                    else
+                    {
+                        await PlcControl.tagControl.bladeMantance.SetBladeSetuInitPositionAsync(nextThetaDeg.ToString(), initPos.BladeSetupInitY, initPos.BladeSetupInitZ1);
+                    }
                     await PlcControl.tagControl.bladeMantance.StartContactHeightMeasurement();
                     break;
                 //非接触测高
@@ -293,7 +300,7 @@ namespace 精密切割系统.Helpers
                             await PlcControl.tagControl.wholeDevice.StartSpindleAsync();
                             int blwowTime = bmParameter.BladeBlowingTime.ToInt();
                             // 工作盘吹气
-                            await WorkpieceBlowingAsync(default, blwowTime, default, eventAggregator, useToken);
+                            await WorkpieceBlowingAsync(default, blwowTime, true, eventAggregator, useToken);
                         }
                         else if (mode is HeightMeasurementMode.NoContact)
                         {
@@ -932,7 +939,7 @@ namespace 精密切割系统.Helpers
             Task<float?> yTask = PlcControl.tagControl.Yaxis.GetCurrentLocationAsync();
             await Task.WhenAll(xTask, yTask);
             float curX = xTask.Result ?? 0, curY = yTask.Result ?? 0;
-            await WorkpieceBlowingAsync(default, default, default, eventAggregator, token);
+            await WorkpieceBlowingAsync(default, default, true, eventAggregator, token);
             await PlcControl.tagControl.cutting.RunMotionAsync(curX, curY, token);
         }
 
@@ -941,7 +948,7 @@ namespace 精密切割系统.Helpers
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        public static async Task WorkpieceBlowingAsync(float? atomizingNozzlePositionY, int? blowTime = null, bool isCloseWhenEnd = true, IEventAggregator? eventAggregator = null, CancellationToken token = default)
+        public static async Task WorkpieceBlowingAsync(float? atomizingNozzlePositionY, int? blowTime, bool isCloseWhenEnd, IEventAggregator? eventAggregator = null, CancellationToken token = default)
         {
             float xSpeed = 50, ySpeed = 50;
             InitialPositionModel? initPos = await GetInitialPositionAsync();
@@ -2450,7 +2457,7 @@ namespace 精密切割系统.Helpers
                 await PlcControl.tagControl.Yaxis.IsReadyAsync() &&
                 await PlcControl.tagControl.Z1axis.IsReadyAsync() &&
                 await PlcControl.tagControl.Z2axis.IsReadyAsync() &&
-                await PlcControl.tagControl.ThetaAxis.IsReadyAsync();
+                (!GlobalParams.HasTheta || await PlcControl.tagControl.ThetaAxis.IsReadyAsync());
             if (!isReady)
             {
                 return CommonResult.Failure("轴未准备好，请检查轴状态！");

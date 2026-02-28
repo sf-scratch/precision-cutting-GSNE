@@ -115,8 +115,6 @@
                         InputType="Decimal"
                         Text="{Binding Path=CutParam.DepthCompensation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         TextWrapping="Wrap"
-                        XMax="0.3"
-                        XMin="-0.3"
                         XPrecision="5" />
                     <Label
                         x:Name="HeightChange3"
@@ -141,8 +139,6 @@
                         InputType="Decimal"
                         Text="{Binding Path=CutParam.ChangeFeedSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         TextWrapping="Wrap"
-                        XMax="100"
-                        XMin="0"
                         XPrecision="3" />
                     <Label
                         x:Name="ChangeFeedSpeed3"

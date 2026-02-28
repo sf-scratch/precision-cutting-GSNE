@@ -395,7 +395,7 @@ namespace 精密切割系统.ViewModel
                         return;
                     }
                     completeStopwatch.Stop();
-                    if (GlobalParams.DeviceModel == GlobalParams.Device_562)
+                    if (GlobalParams.DeviceModel != GlobalParams.Device_321)
                     {
                         TimeSpan timeSpan = TimeSpan.FromSeconds(completeStopwatch.Elapsed.TotalSeconds);
                         string formattedTime = $"{timeSpan.Hours:D2}:{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}";
@@ -572,7 +572,7 @@ namespace 精密切割系统.ViewModel
                         }
                     }
                     await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, cts.Token);
-                    await AutoCutUtils.WorkpieceBlowingAsync(line.StartPoint.Y.ToCameraY(), default, default, _eventAggregator, cts.Token);
+                    await AutoCutUtils.WorkpieceBlowingAsync(line.StartPoint.Y.ToCameraY(), default, true, _eventAggregator, cts.Token);
                     await Task.WhenAll(
                         PlcControl.tagControl.Xaxis.StartAbsoluteAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), 30, cts.Token),
                         PlcControl.tagControl.Yaxis.StartAbsoluteAsync(line.StartPoint.Y.ToCameraY(), 30, cts.Token));

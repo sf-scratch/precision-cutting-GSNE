@@ -22,5 +22,8 @@ namespace 精密切割系统.Entities
 
         [Column("description")]
         public string Description { get; set; }
+
+        [Column("front_color")]
+        public string FrontColor { get; set; }
     }
 }

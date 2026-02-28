@@ -36,6 +36,8 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
     public partial class WaveformDiagram : Page
     {
         private string _dateFormat = "yyyy-MM-dd HH:mm:ss";
+        private HashSet<long> _plottedSensorIds = [];
+        private Dictionary<long, ScottPlot.Color> _colorDictionary = [];
 
         public WaveformDiagram()
         {
@@ -52,10 +54,16 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
             WindowLayout.RightPageButtons.Add(ButtonParams.Back(Back));
             WindowLayout.OperatePageButtons.Clear();
             WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("实时震动", "Vibrate", RealTimeVibration));
+            WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
+            WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
+            WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
+            WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
             List<TemperatureSensorEntity> temperatureSensors = await SqlHelper.TableAsync<TemperatureSensorEntity>().ToListAsync();
             foreach (var sensor in temperatureSensors)
             {
-                WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton(sensor.SensorName, "TemperatureCelsius", () => Temperature(sensor.Id)));
+                var (r, g, b) = ColorUtils.ParseHexColor(sensor.FrontColor);
+                _colorDictionary.Add(sensor.Id, new ScottPlot.Color(r, g, b));
+                WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton(sensor.SensorName, "TemperatureCelsius", () => Temperature(sensor.Id), frontColor: new SolidColorBrush(System.Windows.Media.Color.FromRgb(r, g, b))));
             }
         }
 
@@ -69,18 +77,36 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
         {
             customPlot.Visibility = Visibility.Collapsed;
             wpfPlot.Visibility = Visibility.Visible;
-            DateTime startTime = DateTime.ParseExact(StartDateTextBlock.Text, _dateFormat, CultureInfo.InvariantCulture);
-            DateTime endTime = DateTime.ParseExact(EndDateTextBlock.Text, _dateFormat, CultureInfo.InvariantCulture);
-            var temperatureLogs = await SqlHelper.TableAsync<TemperatureLogEntity>()
-                .Where(log => log.SensorId == sensorId && log.CreatedAt >= startTime && log.CreatedAt < endTime)
-                .OrderBy(log => log.CreatedAt)
-                .ToListAsync();
-
-            List<DateTime> times = temperatureLogs.Select(log => log.CreatedAt).ToList();
-            List<double> temperatures = temperatureLogs.Select(log => (double)log.Temperature).ToList();
-            wpfPlot.Plot.Title("(Temperature Variation Chart)");
-            wpfPlot.Plot.Add.Scatter(times.ToArray(), temperatures.ToArray());
-            wpfPlot.Plot.Axes.DateTimeTicksBottom();
+            if (_plottedSensorIds.Contains(sensorId))
+            {
+                _plottedSensorIds.Remove(sensorId);
+            }
+            else
+            {
+                _plottedSensorIds.Add(sensorId);
+            }
+            wpfPlot.Plot.Clear();
+            foreach (var id in _plottedSensorIds)
+            {
+                DateTime startTime = DateTime.ParseExact(StartDateTextBlock.Text, _dateFormat, CultureInfo.InvariantCulture);
+                DateTime endTime = DateTime.ParseExact(EndDateTextBlock.Text, _dateFormat, CultureInfo.InvariantCulture);
+                var temperatureLogs = await SqlHelper.TableAsync<TemperatureLogEntity>()
+                    .Where(log => log.SensorId == id && log.CreatedAt >= startTime && log.CreatedAt < endTime)
+                    .OrderBy(log => log.CreatedAt)
+                    .ToListAsync();
+                List<DateTime> times = temperatureLogs.Select(log => log.CreatedAt).ToList();
+                List<double> temperatures = temperatureLogs.Select(log => (double)log.Temperature).ToList();
+                wpfPlot.Plot.Title("(Temperature Variation Chart)");
+                if (_colorDictionary.TryGetValue(id, out var color))
+                {
+                    wpfPlot.Plot.Add.Scatter(times.ToArray(), temperatures.ToArray(), color);
+                }
+                else
+                {
+                    wpfPlot.Plot.Add.Scatter(times.ToArray(), temperatures.ToArray(), ScottPlot.Color.RandomHue());
+                }
+                wpfPlot.Plot.Axes.DateTimeTicksBottom();
+            }
             wpfPlot.Refresh();
         }
 
@@ -93,6 +119,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
 
         private void Clear()
         {
+            _plottedSensorIds.Clear();
             customPlot.Clear();
             wpfPlot.Plot.Clear();
             wpfPlot.Refresh();

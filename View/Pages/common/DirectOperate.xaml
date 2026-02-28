@@ -285,7 +285,7 @@
                     <TextBlock Text="θ" Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
                     <!--<TextBox materialDesign:HintAssist.Hint="当前Jog速度deg/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentJogSpeedTheta}" />
                     <TextBox materialDesign:HintAssist.Hint="当前速度deg/s" IsEnabled="False" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding CurrentSpeedTheta}" />-->
-                    <TextBlock Text="位置 " />
+                    <TextBlock Text="位置 " Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
                     <TextBox
                         FontSize="18"
                         IsEnabled="False"

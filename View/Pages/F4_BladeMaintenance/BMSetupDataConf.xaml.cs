@@ -149,6 +149,16 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 
         public async void LoadDBData()
         {
+            if (!GlobalParams.HasTheta)
+            {
+                InitialPositionModel? initPos = await AutoCutUtils.GetInitialPositionAsync();
+                if (initPos is not null)
+                {
+                    var bmParams = await SqlHelper.GetOrCreateEntityAsync(() => new BMParameterMaintenanceEntity());
+                    bmParams.ThetaStartingToMovePosition = initPos.BladeSetupInitX;
+                    await SqlHelper.UpdateAsync(bmParams);
+                }
+            }
             ViewModel.BMParameter = await SqlHelper.GetOrCreateEntityAsync(() => new BMParameterMaintenanceEntity());
             ViewModel.BladeOuterDiameter = Appsettings.BladeOuterDiameter?.ToString("F3") ?? string.Empty;
             var initialPosition = await SqlHelper.GetOrCreateEntityAsync(() => new InitialPositionModel());

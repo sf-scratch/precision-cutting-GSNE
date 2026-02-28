@@ -88,6 +88,7 @@
                         ButtonWidth="268"
                         ContentText="{Binding ContentText}"
                         ContentTextFontSize="{Binding ContentTextFontSize}"
+                        FrontColor="{Binding FrontColor}"
                         ImagePath="{Binding ImagePath}"
                         IsOpen="{Binding IsOpen}"
                         OpenOrCloseVisibility="{Binding OpenOrCloseVisibility}"
