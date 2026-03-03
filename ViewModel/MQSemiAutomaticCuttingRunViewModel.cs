@@ -124,17 +124,23 @@ namespace 精密切割系统.ViewModel
 
         private async Task SetDepthCompensationAsync()
         {
-            // 高度补偿
+            if (RegionUtils.FormError(_regionManager))
+            {
+                MaterialSnack(RegionUtils.FormErrorMessage, SnackType.WARNING);
+                return;
+            }
             _semiAutoCutService.DepthCompensationValue = CutParam.DepthCompensation.ToFloat();
-            CutParam.DepthCompensation = CutParam.DepthCompensation;
             MaterialSnack($"刀片高度补偿设置为 {_semiAutoCutService.DepthCompensationValue}！", SnackType.SUCCESS);
         }
 
         private void SetFeedSpeed()
         {
-            // 速度更改
+            if (RegionUtils.FormError(_regionManager))
+            {
+                MaterialSnack(RegionUtils.FormErrorMessage, SnackType.WARNING);
+                return;
+            }
             _semiAutoCutService.FeedSpeedCompCompensationValue = CutParam.ChangeFeedSpeed.ToFloat();
-            CutParam.ChangeFeedSpeed = CutParam.ChangeFeedSpeed;
             MaterialSnack($"变更进刀速度设置为 {_semiAutoCutService.FeedSpeedCompCompensationValue}！", SnackType.SUCCESS);
         }
 

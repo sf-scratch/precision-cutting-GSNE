@@ -2039,13 +2039,13 @@ namespace 精密切割系统.Helpers
             return CommonResult<FileTableItemChModel>.Success(chModels[chSeq - 1]);
         }
 
-        public static async Task<CommonResult<List<ChCutStep>>> GenerateSingleSideCutStepListAsync()
+        public static async Task<CommonResult<ChCutStep>> GenerateSingleSideCutStepListAsync()
         {
             //获取功能选择数据
             var selectionModels = await SqlHelper.TableAsync<FunctionSelectionModel>().Where(t => t.Id == 1).ToListAsync();
             if (selectionModels.Count <= 0)
             {
-                return CommonResult<List<ChCutStep>>.Failure("功能选择配置异常！");
+                return CommonResult<ChCutStep>.Failure("功能选择配置异常！");
             }
             FunctionSelectionModel functionModel = selectionModels[0];
             bool isDeep = functionModel.DepthStepsFunction;
@@ -2053,14 +2053,14 @@ namespace 精密切割系统.Helpers
             CommonResult<FileTableItemModel> fileTableItemResult = await GetFileTableItemModelAsync();
             if (!fileTableItemResult.IsSuccess || fileTableItemResult.Data is null)
             {
-                return CommonResult<List<ChCutStep>>.Failure(fileTableItemResult.Message);
+                return CommonResult<ChCutStep>.Failure(fileTableItemResult.Message);
             }
             FileTableItemModel fileTableItem = fileTableItemResult.Data;
             string cuttingChSeq = fileTableItem.CuttingChSeq;
             // 参数校验
             if (fileTableItem.SpindleRev == 0 || fileTableItem.SpindleRev > 30000)
             {
-                return CommonResult<List<ChCutStep>>.Failure("切割转速配置错误！");
+                return CommonResult<ChCutStep>.Failure("切割转速配置错误！");
             }
             List<CutStep> cutSteps = [];
             // 查询通道信息
@@ -2069,7 +2069,7 @@ namespace 精密切割系统.Helpers
             int? currentCh = RegexMatchUtils.ExtractChNumber(chStr);
             if (currentCh is null)
             {
-                return CommonResult<List<ChCutStep>>.Failure("当前通道信息错误！");
+                return CommonResult<ChCutStep>.Failure("当前通道信息错误！");
             }
             float thetaAlignDeg = ThetaAlignService.Instance.ThetaAlignCompletedDeg ?? await PlcControl.tagControl.ThetaAxis.GetCurrentLocationAsync() ?? 0;
             int[] chSeqs = Tools.StringToIntegerArray(cuttingChSeq);
@@ -2085,11 +2085,11 @@ namespace 精密切割系统.Helpers
             int maxIndex = AreIndexesContinuous(setBladeHeight, feedSpeeds, repeatTimes);
             if (maxIndex == -1)
             {
-                return CommonResult<List<ChCutStep>>.Failure("切割参数错误！");
+                return CommonResult<ChCutStep>.Failure("切割参数错误！");
             }
             if (cutDepths.Length <= maxIndex)
             {
-                return CommonResult<List<ChCutStep>>.Failure("切割深度参数错误！");
+                return CommonResult<ChCutStep>.Failure("切割深度参数错误！");
             }
             // 生成子序列
             List<string> repetitions = [.. loops];
@@ -2119,7 +2119,7 @@ namespace 精密切割系统.Helpers
             }
             if (tempCutSteps.Count == 0)
             {
-                return CommonResult<List<ChCutStep>>.Failure("未生成有效切割步骤！");
+                return CommonResult<ChCutStep>.Failure("未生成有效切割步骤！");
             }
             int chCutLines = Tools.GetIntStringValue(ch.CutLine);
             if (chCutLines == 0)
@@ -2136,10 +2136,10 @@ namespace 精密切割系统.Helpers
             }
             if (cutSteps.Count == 0)
             {
-                return CommonResult<List<ChCutStep>>.Failure("未生成有效切割步骤！");
+                return CommonResult<ChCutStep>.Failure("未生成有效切割步骤！");
             }
 
-            return CommonResult<List<ChCutStep>>.Success(new List<ChCutStep>() { new ChCutStep(chStr, cutSteps) });
+            return CommonResult<ChCutStep>.Success(new ChCutStep(chStr, cutSteps));
         }
 
         public static async Task<CommonResult<List<ChCutStep>>> GenerateCutStepListAsync(Dictionary<string, ChData> chDictionary)

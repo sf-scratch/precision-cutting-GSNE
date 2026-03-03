@@ -8,6 +8,7 @@ using System.Windows.Documents;
 using 精密切割系统.Assets.config.buttom;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
+using 精密切割系统.Extensions;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut;
@@ -114,17 +115,23 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             switch (code)
             {
                 case 2401:
-                    float tempDepthCompensation = Tools.GetFloatStringValue(_viewModel.DepthCompensation);
-                    // 高度补偿
-                    _semiAutoCutService.DepthCompensationValue = tempDepthCompensation;
-                    MaterialSnack("刀片高度补偿设置成功！", SnackType.SUCCESS);
+                    if (this.HasFormError())
+                    {
+                        MaterialSnack(RegionUtils.FormErrorMessage, SnackType.WARNING);
+                        return;
+                    }
+                    _semiAutoCutService.DepthCompensationValue = _viewModel.DepthCompensation.ToFloat();
+                    MaterialSnack($"刀片高度补偿设置为 {_semiAutoCutService.DepthCompensationValue}！", SnackType.SUCCESS);
                     break;
 
                 case 2403:
-                    float tempChangeFeedSpeed = Tools.GetFloatStringValue(_viewModel.ChangeFeedSpeed);
-                    // 速度更改
-                    _semiAutoCutService.FeedSpeedCompCompensationValue = tempChangeFeedSpeed;
-                    MaterialSnack("变更进刀速度成功！", SnackType.SUCCESS);
+                    if (this.HasFormError())
+                    {
+                        MaterialSnack(RegionUtils.FormErrorMessage, SnackType.WARNING);
+                        return;
+                    }
+                    _semiAutoCutService.FeedSpeedCompCompensationValue = _viewModel.ChangeFeedSpeed.ToFloat();
+                    MaterialSnack($"变更进刀速度设置为 {_semiAutoCutService.FeedSpeedCompCompensationValue}！", SnackType.SUCCESS);
                     break;
 
                 case 2023:
@@ -192,15 +199,53 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 MaterialSnack("未设置刀片外径！", SnackType.WARNING);
                 return;
             }
-            CommonResult<List<ChCutStep>> cutStepResult = await AutoCutUtils.GenerateSingleSideCutStepListAsync();
+            CommonResult<ChCutStep> cutStepResult = await AutoCutUtils.GenerateSingleSideCutStepListAsync();
             if (!cutStepResult.IsSuccess || cutStepResult.Data is null)
             {
                 MaterialSnack(cutStepResult.Message, SnackType.WARNING);
                 return;
             }
+            var currentY = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync();
+            if (currentY is null)
+            {
+                MaterialSnack("获取Y轴当前位置失败！", SnackType.WARNING);
+                return;
+            }
+            var userDefineData = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
+            float cutYPositiveLimit = userDefineData.CutYPositiveLimit.ToFloat();
+            float cutYNegativeLimit = userDefineData.CutYNegativeLimit.ToFloat();
+            var chCutStep = cutStepResult.Data;
+            CutStep firtStep = chCutStep.CutSteps.First();
+            float yPositon = firtStep.IsAbsolute ? firtStep.ChannelStartY : currentY.Value.ToActualY() - firtStep.ChannelStartY;
+            for (int i = 0; i < chCutStep.CutSteps.Count; i++)
+            {
+                if (yPositon > cutYPositiveLimit)
+                {
+                    MaterialSnack($"{chCutStep.ChName}面 第{i + 1}刀，将超出切割正限位！", SnackType.WARNING);
+                    return;
+                }
+                else if (yPositon < cutYNegativeLimit)
+                {
+                    MaterialSnack($"{chCutStep.ChName}面 第{i + 1}刀，将超出切割负限位！", SnackType.WARNING);
+                    return;
+                }
+                CutStep cutStep = chCutStep.CutSteps[i];
+                switch (_semiAutoCutService.CutDirection)
+                {
+                    case CutDirection.Backward:
+                        yPositon -= cutStep.NextStepDistance;
+                        break;
+
+                    case CutDirection.Forward:
+                        yPositon += cutStep.NextStepDistance;
+                        break;
+
+                    default: break;
+                }
+            }
             _semiAutoCutService.CutLine = _viewModel.CutLine;
             _semiAutoCutService.SpindleRev = _viewModel.SpindleRev;
-            NavigationParameters parameters = new() { { "cutSteps", cutStepResult.Data } };
+            NavigationParameters parameters = new() { { "cutSteps", new List<ChCutStep>() { cutStepResult.Data } } };
             ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(MQSemiAutomaticCuttingRun), parameters);
         }
 

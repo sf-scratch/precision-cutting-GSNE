@@ -1,11 +1,15 @@
 ﻿using HslCommunication.Profinet.OpenProtocol;
 using MaterialDesignThemes.Wpf;
+using NPOI.SS.UserModel;
 using ScottPlot.TickGenerators.TimeUnits;
 using System.Diagnostics;
+using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using 精密切割系统.Driver;
 using 精密切割系统.Entities;
+using 精密切割系统.Extensions;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut.Workpieces;
@@ -204,36 +208,79 @@ namespace 精密切割系统.Model.cut
 
         private async Task StartCuttingRecord(CancellationToken token)
         {
-            int cutTimes = 1;
-            while (!token.IsCancellationRequested)
+            string parentPath = System.Environment.CurrentDirectory + "\\Records\\";
+            if (!Directory.Exists(parentPath))
             {
-                try
-                {
-                    await PlcControl.tagControl.cutting.WaitReadyCuttingDataAsyncAsync(token);
-                    var (instructionPositionY, averagePositionY, instructionPositionZ1, averagePositionZ1) = await PlcControl.tagControl.cutting.GetCuttingDataAsync();
-                    await PlcControl.tagControl.cutting.SetIsReadyCuttingDataAsync(false);
-                    var temperatures = await PlcControl.tagControl.wholeDevice.GetTemperatureSensorsAsync();
-                    string temperatureInfo = temperatures != null ? string.Join("  ", temperatures.Select(t => $"{t:F1}°C")) : "N/A";
-                    int colWidth = 20; // 可以根据需要调整
-                    string cuttingRecord = string.Format("{0}{1}{2}{3}{4}{5}{6}",
-                        cutTimes.ToString().PadRight(colWidth),
-                        instructionPositionY.ToString("F6").PadRight(colWidth),
-                        averagePositionY.ToString("F6").PadRight(colWidth),
-                        instructionPositionZ1.ToString("F6").PadRight(colWidth),
-                        averagePositionZ1.ToString("F6").PadRight(colWidth),
-                        temperatureInfo);
-                    Tools.CuttingRecord(cuttingRecord);
-                    cutTimes++;
-                    await Task.Delay(200);
-                }
-                catch (OperationCanceledException)
-                {
-                }
-                catch (Exception ex)
-                {
-                    Tools.CuttingRecord(ex.ToString());
-                }
+                Directory.CreateDirectory(parentPath);
             }
+
+            DateTime now = DateTime.Now;
+            string format1 = now.ToString("yyyy_MM_dd_HHmmss");
+            string fileName = "cuttingRecord" + format1 + ".txt";
+            string filePath = Path.Combine(parentPath, fileName); // 使用Path.Combine更安全
+
+            int colWidth = 30;
+
+            // 使用using语句确保资源释放
+            using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read))
+            using (StreamWriter streamWriter = new StreamWriter(fs, Encoding.UTF8))
+            {
+                // 写入标题
+                string cuttingRecord = string.Format("{0}{1}{2}{3}{4}{5}",
+                    "切割次数".PadRightDisplay(colWidth),
+                    "指令位置Y".PadRightDisplay(colWidth),
+                    "平均位置Y".PadRightDisplay(colWidth),
+                    "指令位置Z".PadRightDisplay(colWidth),
+                    "平均位置Z".PadRightDisplay(colWidth),
+                    "传感器温度");
+
+                await streamWriter.WriteLineAsync(cuttingRecord);
+                await streamWriter.FlushAsync(); // 确保标题写入
+
+                int cutTimes = 1;
+
+                while (!token.IsCancellationRequested)
+                {
+                    try
+                    {
+                        await PlcControl.tagControl.cutting.WaitReadyCuttingDataAsyncAsync(token);
+                        var (instructionPositionY, averagePositionY, instructionPositionZ1, averagePositionZ1) =
+                            await PlcControl.tagControl.cutting.GetCuttingDataAsync();
+
+                        await PlcControl.tagControl.cutting.SetIsReadyCuttingDataAsync(false);
+
+                        var temperatures = await PlcControl.tagControl.wholeDevice.GetTemperatureSensorsAsync();
+                        string temperatureInfo = temperatures != null
+                            ? string.Join("  ", temperatures.Select(t => $"{t:F1}°C"))
+                            : "N/A";
+
+                        cuttingRecord = string.Format("{0}{1}{2}{3}{4}{5}",
+                            cutTimes.ToString().PadRightDisplay(colWidth),
+                            instructionPositionY.ToString("F6").PadRightDisplay(colWidth),
+                            averagePositionY.ToString("F6").PadRightDisplay(colWidth),
+                            instructionPositionZ1.ToString("F6").PadRightDisplay(colWidth),
+                            averagePositionZ1.ToString("F6").PadRightDisplay(colWidth),
+                            temperatureInfo);
+
+                        await streamWriter.WriteLineAsync(cuttingRecord);
+                        await streamWriter.FlushAsync(); // 每条记录后立即写入磁盘，防止数据丢失
+
+                        cutTimes++;
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        // 正常取消，退出循环
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        Tools.CuttingRecord($"写入异常: {ex.ToString()}");
+                        // 可以继续尝试，或者根据情况决定是否退出
+                    }
+
+                    await Task.Delay(200, token); // 传入token，支持取消
+                }
+            } // 离开using作用域时自动调用Dispose，确保数据写入
         }
 
         public async Task<RunResult> RunAsync(List<ChCutStep> cutStepList, IWorkpieces workpiece, float margin, float bladeContactWorkingDiscZ1, float bladeLiftingHeight, IEventAggregator? eventAggregator, CancellationToken pauseToken)

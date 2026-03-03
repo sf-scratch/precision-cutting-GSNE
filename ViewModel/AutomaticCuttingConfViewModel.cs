@@ -69,35 +69,45 @@ namespace 精密切割系统.ViewModel
                 MaterialSnack("未设置刀片外径！", SnackType.WARNING);
                 return;
             }
-            //ThetaAlignService.ChDictionary = new Dictionary<string, ChData>();
-            //ThetaAlignService.ChDictionary.Add(GlobalParams.CH2, new ChData(GlobalParams.CH2, 90) { AfterCalibrationThetaDeg = 93.5f, AfterCalibrationYPosition = 100 });
-            //ThetaAlignService.ChDictionary.Add(GlobalParams.CH1, new ChData(GlobalParams.CH1, 0) { AfterCalibrationThetaDeg = 6.3f, AfterCalibrationYPosition = 200 });
             CommonResult<List<ChCutStep>> cutStepResult = await AutoCutUtils.GenerateCutStepListAsync(ThetaAlignService.ChDictionary);
             if (!cutStepResult.IsSuccess || cutStepResult.Data is null)
             {
                 MaterialSnack(cutStepResult.Message, SnackType.WARNING);
                 return;
             }
-            var chCutSteps = cutStepResult.Data;
+            _semiAutoCutService.CutDirection = CutDirection.Backward;
             var userDefineData = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
             float cutYPositiveLimit = userDefineData.CutYPositiveLimit.ToFloat();
             float cutYNegativeLimit = userDefineData.CutYNegativeLimit.ToFloat();
+            var chCutSteps = cutStepResult.Data;
             foreach (var chCutStep in chCutSteps)
             {
                 float yPositon = chCutStep.CutSteps.First().ChannelStartY;
-                foreach (var cutStep in chCutStep.CutSteps)
+                for (int i = 0; i < chCutStep.CutSteps.Count; i++)
                 {
-                    yPositon -= cutStep.NextStepDistance;
-                }
-                if (yPositon > cutYPositiveLimit)
-                {
-                    MaterialSnack($"切割 {chCutStep.ChName} 时，将超出正限位！", SnackType.WARNING);
-                    return;
-                }
-                if (yPositon < cutYNegativeLimit)
-                {
-                    MaterialSnack($"切割 {chCutStep.ChName} 时，将超出负限位！", SnackType.WARNING);
-                    return;
+                    if (yPositon > cutYPositiveLimit)
+                    {
+                        MaterialSnack($"{chCutStep.ChName}面 第{i + 1}刀，将超出切割正限位！", SnackType.WARNING);
+                        return;
+                    }
+                    else if (yPositon < cutYNegativeLimit)
+                    {
+                        MaterialSnack($"{chCutStep.ChName}面 第{i + 1}刀，将超出切割负限位！", SnackType.WARNING);
+                        return;
+                    }
+                    CutStep cutStep = chCutStep.CutSteps[i];
+                    switch (_semiAutoCutService.CutDirection)
+                    {
+                        case CutDirection.Backward:
+                            yPositon -= cutStep.NextStepDistance;
+                            break;
+
+                        case CutDirection.Forward:
+                            yPositon += cutStep.NextStepDistance;
+                            break;
+
+                        default: break;
+                    }
                 }
             }
             _semiAutoCutService.CutLine = 0;
@@ -160,7 +170,7 @@ namespace 精密切割系统.ViewModel
                 return;
             }
             _semiAutoCutService.FeedSpeedCompCompensationValue = Model.ChangeFeedSpeed.ToFloat();
-            MaterialSnack("变更进刀速度成功！", SnackType.SUCCESS);
+            MaterialSnack($"变更进刀速度设置为 {_semiAutoCutService.FeedSpeedCompCompensationValue}！", SnackType.SUCCESS);
         }
 
         private async Task NavigateToManualAlignmentAsync()
@@ -184,7 +194,7 @@ namespace 精密切割系统.ViewModel
                 return;
             }
             _semiAutoCutService.DepthCompensationValue = Model.DepthCompensation.ToFloat();
-            MaterialSnack("刀片高度补偿设置成功！", SnackType.SUCCESS);
+            MaterialSnack($"刀片高度补偿设置为 {_semiAutoCutService.DepthCompensationValue}！", SnackType.SUCCESS);
         }
 
         public override async void OnNavigatedTo(NavigationContext navigationContext)

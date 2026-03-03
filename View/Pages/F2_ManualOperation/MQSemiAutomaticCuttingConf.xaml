@@ -129,7 +129,7 @@
                                 TextWrapping="Wrap"
                                 XMax="0.3"
                                 XMin="-0.3"
-                                XPrecision="3" />
+                                XPrecision="5" />
                             <Label Content="mm" FontSize="16" />
                         </StackPanel>
                         <StackPanel
