@@ -24,6 +24,7 @@ using 精密切割系统.View.Controls;
 using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.operate;
 using 精密切割系统.ViewModel;
+using static NPOI.HSSF.Util.HSSFColor;
 
 namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 {
@@ -34,9 +35,6 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
     {
         private MainWindow? mainWindow;
         private RightPage? rightPage;
-        private OperatePage? operatePage;
-        private BladeHeightModel _model = null;
-        private string urlParams = null;
         public static string? PageName { get; set; } = null;
 
         public BladeInfo()
@@ -47,18 +45,10 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            rightPage = mainWindow.rightFrame.Content as RightPage;
-            rightPage.PanelAction.Visibility = Visibility.Visible;
-            rightPage.btnBack.Visibility = Visibility.Visible;
-            rightPage.btnBack.BackFlag = false;
-            rightPage.btnBack.SetRightClickedHandler(BtnBack_RightClicked);
-            rightPage.btnBack.GlobalRunOperateFlag = true;
-            string urlParamsTemp = QueryUtils.GetValueFromQueryParams(this, "urlParams");
-            if (!string.IsNullOrEmpty(urlParamsTemp))
-            {
-                urlParams = Uri.UnescapeDataString(urlParamsTemp);
-            }
             NavigateUtils.ClearOperatePage();
+            WindowLayout.RightPageButtons.Clear();
+            WindowLayout.RightPageButtons.Add(ButtonParams.Back(Back));
+            WindowLayout.OperatePageButtons.Clear();
             WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("预切关闭", "/Assets/icon/tab_1/02/tab_27.png", ClosePrecut));
             await InitDataAsync();
         }
@@ -90,7 +80,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             MaterialSnack("关闭预切割！", SnackType.SUCCESS);
         }
 
-        private void BtnBack_RightClicked(object? sender, bool e)
+        private void Back()
         {
             if (string.IsNullOrEmpty(PageName))
             {

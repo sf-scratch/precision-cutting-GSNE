@@ -2243,7 +2243,7 @@ namespace 精密切割系统.Helpers
             return CommonResult<List<ChCutStep>>.Success(cutSteps);
         }
 
-        public static async Task<CommonResult<int>> GetCutStepListByChNumAsync(int chNum)
+        public static async Task<CommonResult<int>> GetCutStepListByChNumAsync(long deviceDataId, int chNum)
         {
             //获取功能选择数据
             var selectionModels = await SqlHelper.TableAsync<FunctionSelectionModel>().Where(t => t.Id == 1).ToListAsync();
@@ -2254,7 +2254,7 @@ namespace 精密切割系统.Helpers
             FunctionSelectionModel functionModel = selectionModels[0];
             bool isDeep = functionModel.DepthStepsFunction;
             bool isLoop = functionModel.LoopFunction;
-            CommonResult<FileTableItemModel> fileTableItemResult = await GetFileTableItemModelAsync();
+            CommonResult<FileTableItemModel> fileTableItemResult = await GetFileTableItemModelAsync(deviceDataId);
             if (!fileTableItemResult.IsSuccess || fileTableItemResult.Data is null)
             {
                 return CommonResult<int>.Failure(fileTableItemResult.Message);
@@ -2359,13 +2359,21 @@ namespace 精密切割系统.Helpers
             return CommonResult<ChData[]>.Success(chDatas);
         }
 
-        public static async Task<CommonResult<FileTableItemModel>> GetFileTableItemModelAsync()
+        public static async Task<CommonResult<FileTableItemModel>> GetFileTableItemModelAsync(long? deviceDataId = null)
         {
-            long id = CurrentUtils.GetCurrentConfiguration().DeviceDataId;
-            // 判断是否确认配置信息
-            if (id == 0)
+            long id;
+            if (deviceDataId is null)
             {
-                return CommonResult<FileTableItemModel>.Failure("未确认配置信息！");
+                id = CurrentUtils.GetCurrentConfiguration().DeviceDataId;
+                // 判断是否确认配置信息
+                if (id == 0)
+                {
+                    return CommonResult<FileTableItemModel>.Failure("未确认配置信息！");
+                }
+            }
+            else
+            {
+                id = deviceDataId.Value;
             }
             // 查询配置信息
             List<FileTableItemModel> listConf = await SqlHelper.TableAsync<FileTableItemModel>().Where(t => t.Id == id).ToListAsync();

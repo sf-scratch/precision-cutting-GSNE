@@ -1111,8 +1111,10 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             System.Text.RegularExpressions.Match match = Regex.Match(chName, GlobalParams.RegexMatchCH);
             if (match.Success)
             {
+                Dictionary<string, string> dic = QueryUtils.getQuery(this);
+                int id = Tools.GetIntStringValue(dic["id"]);
                 int number = int.Parse(match.Groups[1].Value);
-                CommonResult<int> cutNumResult = await AutoCutUtils.GetCutStepListByChNumAsync(number);
+                CommonResult<int> cutNumResult = await AutoCutUtils.GetCutStepListByChNumAsync(id, number);
                 if (!cutNumResult.IsSuccess)
                 {
                     totalCutNum.Text = "0";

@@ -43,7 +43,10 @@
                 Margin="30,5,30,20"
                 HorizontalAlignment="Left"
                 IsSynchronizedWithCurrentItem="False"
-                SelectionChanged="pre_listView_SelectionChanged">
+                ScrollViewer.CanContentScroll="True"
+                SelectionChanged="pre_listView_SelectionChanged"
+                VirtualizingPanel.IsVirtualizing="True"
+                VirtualizingPanel.ScrollUnit="Item">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="{x:Type ListViewItem}">
                         <Setter Property="Height" Value="50" />

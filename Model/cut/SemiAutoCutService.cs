@@ -263,7 +263,7 @@ namespace 精密切割系统.Model.cut
                             temperatureInfo);
 
                         await streamWriter.WriteLineAsync(cuttingRecord);
-                        await streamWriter.FlushAsync(); // 每条记录后立即写入磁盘，防止数据丢失
+                        await streamWriter.FlushAsync();
 
                         cutTimes++;
                     }
@@ -274,8 +274,8 @@ namespace 精密切割系统.Model.cut
                     }
                     catch (Exception ex)
                     {
-                        Tools.CuttingRecord($"写入异常: {ex.ToString()}");
-                        // 可以继续尝试，或者根据情况决定是否退出
+                        await streamWriter.WriteLineAsync($"写入异常: {ex.ToString()}");
+                        await streamWriter.FlushAsync();
                     }
 
                     await Task.Delay(200, token); // 传入token，支持取消
@@ -463,25 +463,28 @@ namespace 精密切割系统.Model.cut
                                 {
                                     monitorResult = monitorResult.GetRange(0, actualMonitorCount);
                                 }
+                                var temperatures = await PlcControl.tagControl.wholeDevice.GetTemperatureSensorsAsync();
+                                string temperatureInfo = temperatures != null ? string.Join("  ", temperatures.Select(t => $"{t:F1}°C")) : "N/A";
                                 // 记录日志
                                 RunLogsCommon.LogEvent(
                                     LogType.Cut,
                                     new RunLogsViewModel(LogType.Cut, "切割"),
-                                    new RunLogsViewModel("切割面", chCutStep.ChName),
-                                    new RunLogsViewModel("刀数", (currentChCutTimes + 1).ToString()),
                                     new RunLogsViewModel("开始时间", startTime.ToString("yyyy年MM月dd日 HH:mm:ss")),
                                     new RunLogsViewModel("结束时间", DateTime.Now.ToString("yyyy年MM月dd日 HH:mm:ss")),
                                     new RunLogsViewModel("耗时", (DateTime.Now - startTime).TotalSeconds.ToString("F2") + "sec"),
+                                    new RunLogsViewModel("切割面", chCutStep.ChName),
+                                    new RunLogsViewModel("刀数", (currentChCutTimes + 1).ToString()),
                                     new RunLogsViewModel("切割速度", cutSpeed.ToString()),
-                                    new RunLogsViewModel("Z轴开始位置", endZ.ToString()),
-                                    new RunLogsViewModel("Z轴结束位置", startZ.ToString()),
                                     new RunLogsViewModel("X轴开始位置", startX.ToString()),
                                     new RunLogsViewModel("X轴结束位置", endX.ToString()),
+                                    new RunLogsViewModel("Z轴开始位置", endZ.ToString()),
+                                    new RunLogsViewModel("Z轴结束位置", startZ.ToString()),
                                     new RunLogsViewModel("Y轴切割位置", line.StartPoint.Y.ToString()),
                                     new RunLogsViewModel("Y轴实际切割位置", compensateY.ToString()),
                                     new RunLogsViewModel("步进距离", cutStep.NextStepDistance.ToString()),
                                     new RunLogsViewModel("theta角度", cutStep.ThetaDeg.ToString()),
                                     new RunLogsViewModel("主轴转速", _spindleRev.ToString()),
+                                    new RunLogsViewModel("传感器温度", temperatureInfo),
                                     new RunLogsViewModel("震动幅度", string.Join(" ", monitorResult))
                                     );
                                 stopwatch.Stop();

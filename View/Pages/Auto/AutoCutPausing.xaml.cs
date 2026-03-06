@@ -55,7 +55,6 @@ namespace 精密切割系统.View.Pages.Auto
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             mainWindow = Application.Current.MainWindow as MainWindow;
-            NavigateUtils.ClearOperatePage();
             //updateDefineDataModel();
         }
 
