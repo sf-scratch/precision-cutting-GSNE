@@ -254,6 +254,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 }
             }
             Debug.WriteLine(viewModel.Language);
+            NavigateUtils.ToOperateButton();
         }
 
         /// <summary>

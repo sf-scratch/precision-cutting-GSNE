@@ -2303,7 +2303,7 @@ namespace 精密切割系统.Helpers
                     float cutHeight = setBladeHeight[index];
                     float speed = feedSpeeds[index];
                     float offsetY = yIndexs[index];
-                    float thetaDeg = float.Parse(ch.ThetaDeg);
+                    float thetaDeg = ch.ThetaDeg.ToFloat();
                     bool isAbsolute = ch.ComBoxCutMethod.Equals("绝对");
                     float channelStartY = isAbsolute ? ch.AbsoluteCutPosition.ToFloat() : ch.RelativeCutPosition.ToFloat();
                     float offsetX = ch.OffsetX.ToFloat();

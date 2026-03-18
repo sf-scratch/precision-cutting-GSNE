@@ -583,6 +583,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 currentConfigurationModel.ChannelNum = GlobalParams.CH1;
                 CurrentUtils.UpdateCurrentConfiguration(currentConfigurationModel);
                 CurrentUtils.UpdateParams();
+                NavigateUtils.ToOperateButton(OperatePage.OperateType.OperationMenu);
                 MaterialSnack("保存成功！", SnackType.SUCCESS);
             }
             else
@@ -671,7 +672,6 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 relativeCutPosition.IsEnabled = false;
                 inputCutLine.IsEnabled = false;
                 absoluteCutPosition.IsEnabled = false;
-                inputBladeAngle.IsEnabled = false;
                 inputOffsetX.IsEnabled = false;
                 alignX.IsEnabled = false;
                 alignY.IsEnabled = false;
@@ -696,7 +696,6 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 relativeCutPosition.Text = _chModel.RelativeCutPosition;
                 inputCutLine.Text = _chModel.CutLine;
                 absoluteCutPosition.Text = _chModel.AbsoluteCutPosition;
-                inputBladeAngle.Text = _chModel.BladeAngle;
                 //inputMoncutF.Text = _chModel.MoncutF;
                 //inputMoncutR.Text = _chModel.MoncutR;
                 inputOffsetX.Text = _chModel.OffsetX;
@@ -741,11 +740,13 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
         {
             ColList.Clear();
             //绑定数据
-            List<ChBean> list = new List<ChBean>();
-            list.Add(new ChBean() { type = 1, data = _chModel.BladeHeight });
-            list.Add(new ChBean() { type = 2, data = _chModel.FeedSpeed });
-            list.Add(new ChBean() { type = 3, data = _chModel.YIndex });
-            list.Add(new ChBean() { type = 4, data = _chModel.RepeatTimes });
+            List<ChBean> list =
+            [
+                new ChBean() { type = 1, data = _chModel.BladeHeight },
+                new ChBean() { type = 2, data = _chModel.FeedSpeed },
+                new ChBean() { type = 3, data = _chModel.YIndex },
+                new ChBean() { type = 4, data = _chModel.RepeatTimes },
+            ];
             if (_functionModel != null && _functionModel.DepthStepsFunction)
             {
                 list.Add(new ChBean() { type = 5, data = _chModel.DepthSteps });
@@ -754,11 +755,6 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             {
                 list.Add(new ChBean() { type = 6, data = _chModel.Loop });
             }
-            /*string[] list = { _chModel.BladeHeight, _chModel.FeedSpeed,
-                _chModel.YIndex, _chModel.RepeatTimes,
-                _chModel.DepthSteps, _chModel.Loop,
-                _chModel.ZDownSpeed };*/
-            //string[] list = { _chModel.BladeHeight };
             for (int i = 0; i < list.Count; i++)
             {
                 string[] strs = list[i].data.Split(",");
@@ -790,13 +786,11 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                     // 格式化文本
                     string formattedValue = strs[n];
                     // 如果cutWay为深度模式，且是刀片高度，则要换算值
-                    if (cutWay.Equals("深度") && bean.type == 1 && Tools.GetDoubleStringValue(formattedValue) != 0)
+                    if (cutWay.Equals("深度") && bean.type == 1 && formattedValue.ToFloat() != 0)
                     {
                         // 把高度换算为深度 = 工件1.5 + 膜0.7 - 刀片高度1.415 = 0.155
-                        double tempValue = Tools.GetDoubleStringValue(currentModel.WorkThickness)
-                            + Tools.GetDoubleStringValue(currentModel.TapeThickness) - Tools.GetDoubleStringValue(formattedValue);
-                        formattedValue = tempValue.ToString("F3");
-                        // Debug.WriteLine(tempValue.ToString("F3"));
+                        float tempValue = currentModel.WorkThickness.ToFloat() + currentModel.TapeThickness.ToFloat() - formattedValue.ToFloat();
+                        formattedValue = tempValue.ToString(GlobalParams.DecimalStringFormat);
                     }
                     if (bean.intputType.Equals("Numeral") || bean.intputType.Equals("Decimal"))
                     {
@@ -1036,7 +1030,6 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
             _chModel.RelativeCutPosition = relativeCutPosition.Text;
             _chModel.CutLine = inputCutLine.Text;
             _chModel.AbsoluteCutPosition = absoluteCutPosition.Text;
-            _chModel.BladeAngle = inputBladeAngle.Text;
             //_chModel.MoncutR = inputMoncutR.Text;
             _chModel.OffsetX = inputOffsetX.Text;
             _chModel.AlignX = alignX.Text;
@@ -1060,8 +1053,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                                 // 把深度换算为高度 = 工件1.5 + 膜0.7 - 切割深度0.155 = 1.415
                                 double tempValue = Tools.GetDoubleStringValue(currentModel.WorkThickness)
                                     + Tools.GetDoubleStringValue(currentModel.TapeThickness) - Tools.GetDoubleStringValue(value);
-                                value = tempValue.ToString("F3");
-                                Debug.WriteLine(tempValue.ToString("F3"));
+                                value = tempValue.ToString(GlobalParams.DecimalStringFormat);
                             }
                         }
                         strs.Add(value);

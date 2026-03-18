@@ -7,24 +7,24 @@ namespace 精密切割系统.Helpers
 {
     public static class GlobalParams
     {
-        public const string Device_321 = nameof(Device_321);
-        public const string Device_551 = nameof(Device_551);
-        public const string Device_562 = nameof(Device_562);
+        public const string Device_321 = "321";
+        public const string Device_551 = "551";
+        public const string Device_562 = "562";
 
         // true 在线版本 false 离线版本
-        public static bool OnlineFlag { get; set; } = true;
+        public static bool OnlineFlag { get; set; } = false;
 
         // 是否全屏显示
         public static bool IsFullDcreen { get; set; } = true;
 
         // 机器型号
-        public static string DeviceModel { get; set; } = Device_551;
+        public static string DeviceModel { get; set; } = Device_562;
 
         // 是否上传MES
         public static bool OnlineMES { get; set; } = false;
 
         // 是否带Theta轴
-        public static bool HasTheta { get; set; } = false;
+        public static bool HasTheta { get; set; } = true;
 
         // 是否开放全自动功能
         public static bool HasFullyAutomatic { get; set; } = false;

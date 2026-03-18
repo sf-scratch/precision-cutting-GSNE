@@ -37,6 +37,7 @@ using 精密切割系统.View.Pages.F4_BladeMaintenance;
 using 精密切割系统.View.Pages.operate;
 using 精密切割系统.ViewModel;
 using static 精密切割系统.Utils.Tools;
+using static 精密切割系统.View.Pages.operate.OperatePage;
 using MenuItem = 精密切割系统.Assets.config.menu.MenuItem;
 using Path = System.IO.Path;
 
@@ -116,7 +117,7 @@ namespace 精密切割系统.View
             {
                 // mainWindow.isNavigating = true;
                 // mainWindow.operateFrame.Navigate(new Uri("View/Pages/operate/OperatePage.xaml", UriKind.Relative));
-                operatePage.SetOperateShowType(0);
+                operatePage.SetOperateShowType(OperateType.OperationMenu);
             }
             else
             {

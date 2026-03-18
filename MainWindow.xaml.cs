@@ -1,49 +1,50 @@
 using HslCommunication.Profinet.OpenProtocol;
 using Newtonsoft.Json;
+using NPOI.OpenXmlFormats.Dml.Diagram;
+using OpenCvSharp;
 using System.ComponentModel;
+using System.Data;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
+using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using 精密切割系统.Assets.config.buttom;
 using 精密切割系统.Assets.config.menu;
+using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
 using 精密切割系统.Helpers;
+using 精密切割系统.Model.bunkering;
+using 精密切割系统.Model.cut;
+using 精密切割系统.Model.logs;
+using 精密切割系统.Model.plc;
+using 精密切割系统.Model.sqlite;
 using 精密切割系统.Utils;
 using 精密切割系统.View;
+using 精密切割系统.View.common;
+using 精密切割系统.View.Controls;
 using 精密切割系统.View.page.right;
+using 精密切割系统.View.Pages.Auto;
+using 精密切割系统.View.Pages.common;
 using 精密切割系统.View.Pages.Hader;
 using 精密切割系统.View.Pages.operate;
 using 精密切割系统.ViewModel;
-using System.Data;
-using System.Windows.Media.Effects;
-using System.Windows.Media.Animation;
-using System.Globalization;
-using System.Diagnostics;
-using 精密切割系统.View.Pages.common;
-using 精密切割系统.View.Controls;
-using 精密切割系统.database.db.modle;
-using 精密切割系统.Model.bunkering;
-using 精密切割系统.Model.sqlite;
-using System.Text.Json.Nodes;
-using System.Text.Json;
-using 精密切割系统.Model.logs;
 using static SQLite.SQLite3;
-using NPOI.OpenXmlFormats.Dml.Diagram;
-using 精密切割系统.Model.plc;
-using 精密切割系统.View.Pages.Auto;
-using 精密切割系统.Model.cut;
-using System.Windows.Threading;
-using 精密切割系统.View.common;
-using OpenCvSharp;
-using System.IO;
-using System.Threading.Tasks;
+using static 精密切割系统.View.Pages.operate.OperatePage;
 
 namespace 精密切割系统
 {
@@ -142,7 +143,7 @@ namespace 精密切割系统
                 LogCleaner.StartLogCleanup(logDirectory, daysThreshold, interval);
 
                 operatePage = operateFrame.Content as OperatePage;
-                operatePage.SetOperateShowType(0);
+                operatePage.SetOperateShowType(OperateType.OperationMenu);
                 operatePage.UpdateOperate(OperateData.GetTab01Operate());
                 InitializeData.initSystemData();
                 if (!GlobalParams.OnlineFlag)
@@ -362,7 +363,7 @@ namespace 精密切割系统
 
         public void UpdateOperatePage(List<OperateBean> operateBeans, EventHandler<int> _onClicked, EventHandler<int> _touchLeave = null, EventHandler<int> _touchDown = null)
         {
-            operatePage.SetOperateShowType(0);
+            operatePage.SetOperateShowType(OperateType.OperationMenu);
             shortcutTopBtnSel = false;
             operatePage.UpdateOperate(operateBeans);
             operatePage.SetOnClickedHandler(_onClicked, _touchLeave, _touchDown);
@@ -370,7 +371,7 @@ namespace 精密切割系统
 
         public void SetOperateBtn(OperatePage operatePage)
         {
-            operatePage.SetOperateShowType(0);
+            operatePage.SetOperateShowType(OperateType.OperationMenu);
             if (shortcutBottomBtnSel)
             {
                 operatePage.UpdateOperate(OperateData.GetTab01Operate());
@@ -394,14 +395,14 @@ namespace 精密切割系统
                 shortcutTopBtnSel = false;
                 shortcutBottomBtnSel = false;
                 // operateFrame.Source = new Uri("View/Pages/common/CustomKeyboard.xaml", UriKind.Relative);
-                operatePage.SetOperateShowType(2);
+                operatePage.SetOperateShowType(OperateType.KeyboardMenu);
                 CommonEvent.BtnScaleDown(shortcutDirectBtn, 0);
                 CommonEvent.BtnScaleDown(shortcutTopBtn, 0);
             }
             else if (status == 0)
             {
                 // operateFrame.Navigate(new Uri("View/Pages/operate/OperatePage.xaml", UriKind.Relative));
-                operatePage.SetOperateShowType(0);
+                operatePage.SetOperateShowType(OperateType.OperationMenu);
                 // 判断是否有上一个页面
                 isNavigating = true;
             }
@@ -466,7 +467,7 @@ namespace 精密切割系统
 
         private void TopBtnDown()
         {
-            operatePage.SetOperateShowType(0);
+            operatePage.SetOperateShowType(OperateType.OperationMenu);
             shortcutTopBtnSel = !shortcutTopBtnSel;
             shortcutBottomBtnSel = false;
             ShortcutBtnClick();
@@ -474,7 +475,7 @@ namespace 精密切割系统
             {
                 SpeedManager.IsHighSpeed = true;
                 // 显示方向界面
-                operatePage.SetOperateShowType(1);
+                operatePage.SetOperateShowType(OperateType.DirectionMenu);
             }
             else
             {
@@ -485,7 +486,7 @@ namespace 精密切割系统
                 }
                 if (WindowLayout.OperatePageButtons.Count != 0)
                 {
-                    operatePage.SetOperateShowType(3);
+                    operatePage.SetOperateShowType(OperateType.PrismOperationMenu);
                     return;
                 }
                 operatePage.UpdateOperate(GlobalParams.currentOperateBeanList);
@@ -494,7 +495,7 @@ namespace 精密切割系统
 
         public void DirectBtnDown()
         {
-            operatePage.SetOperateShowType(0);
+            operatePage.SetOperateShowType(OperateType.OperationMenu);
             shortcutBottomBtnSel = !shortcutBottomBtnSel;
             shortcutTopBtnSel = false;
             ShortcutBtnClick();
@@ -511,7 +512,7 @@ namespace 精密切割系统
                 }
                 if (WindowLayout.OperatePageButtons.Count != 0)
                 {
-                    operatePage.SetOperateShowType(3);
+                    operatePage.SetOperateShowType(OperateType.PrismOperationMenu);
                     return;
                 }
                 operatePage.UpdateOperate(GlobalParams.currentOperateBeanList);

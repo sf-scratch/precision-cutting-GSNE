@@ -162,6 +162,7 @@ namespace 精密切割系统.ViewModel
                 return;
             }
             await SaveEntityAsync();
+            NavigateUtils.ToOperateButton();
             MaterialSnack("保存成功！", SnackType.SUCCESS, 3);
         }
 
@@ -183,39 +184,39 @@ namespace 精密切割系统.ViewModel
                 case GlobalParams.Device_321:
                     AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
                     AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
-                    AddBottomButton(ButtonParams.BlueButton("对焦", "/Assets/icon/tab_1/03/tab_01.png", FocusAutoAsync));
-                    AddBottomButton(ButtonParams.BlueButton("基准线调窄", "/Assets/icon/tab_1/03/tab_02.png", null, BaselineNarrowing, StopUpdateCameraCommonLine));
+                    AddBottomButton(ButtonParams.BlueButton("对焦", "FocusAuto", FocusAutoAsync));
+                    AddBottomButton(ButtonParams.BlueButton("基准线调窄", "UnfoldLessHorizontal", null, BaselineNarrowing, StopUpdateCameraCommonLine));
                     AddBottomButton(ButtonParams.BlueButton("θ轴横向校正", "/Assets/icon/tab_1/03/tab_04.png", _alignService.ThetaHorizontalAlignAsync));
                     AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
                     AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
                     AddBottomButton(ButtonParams.BlueButton("测量", "/Assets/icon/tab_1/03/tab_03.png", NavigateMeasurement));
-                    AddBottomButton(ButtonParams.BlueButton("基准线调宽", "/Assets/icon/tab_1/03/tab_02.png", null, BaselineWidening, StopUpdateCameraCommonLine));
+                    AddBottomButton(ButtonParams.BlueButton("基准线调宽", "UnfoldMoreHorizontal", null, BaselineWidening, StopUpdateCameraCommonLine));
                     AddBottomButton(ButtonParams.BlueButton("基准线校准", "CrosshairsGps", BaselineCalibrationAsync));
                     break;
 
                 case GlobalParams.Device_562:
                     AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
                     AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
-                    AddBottomButton(ButtonParams.BlueButton("对焦", "/Assets/icon/tab_1/03/tab_01.png", FocusAutoAsync));
-                    AddBottomButton(ButtonParams.BlueButton("基准线调窄", "/Assets/icon/tab_1/03/tab_02.png", null, BaselineNarrowing, StopUpdateCameraCommonLine));
+                    AddBottomButton(ButtonParams.BlueButton("对焦", "FocusAuto", FocusAutoAsync));
+                    AddBottomButton(ButtonParams.BlueButton("基准线调窄", "UnfoldLessHorizontal", null, BaselineNarrowing, StopUpdateCameraCommonLine));
                     AddBottomButton(ButtonParams.BlueButton("θ轴竖向校正", "/Assets/icon/tab_1/03/theta-align-vertical.png", _alignService.ThetaVerticalAlignAsync));
                     AddBottomButton(ButtonParams.BlueButton("基准线校准", "CrosshairsGps", BaselineCalibrationAsync));
                     AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
                     AddBottomButton(ButtonParams.BlueButton("测量", "/Assets/icon/tab_1/03/tab_03.png", NavigateMeasurement));
-                    AddBottomButton(ButtonParams.BlueButton("基准线调宽", "/Assets/icon/tab_1/03/tab_02.png", null, BaselineWidening, StopUpdateCameraCommonLine));
+                    AddBottomButton(ButtonParams.BlueButton("基准线调宽", "UnfoldMoreHorizontal", null, BaselineWidening, StopUpdateCameraCommonLine));
                     AddBottomButton(ButtonParams.BlueButton("θ轴横向校正", "/Assets/icon/tab_1/03/tab_04.png", _alignService.ThetaHorizontalAlignAsync));
                     break;
 
                 case GlobalParams.Device_551:
                     AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
                     AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
-                    AddBottomButton(ButtonParams.BlueButton("对焦", "/Assets/icon/tab_1/03/tab_01.png", FocusAutoAsync));
-                    AddBottomButton(ButtonParams.BlueButton("基准线调窄", "/Assets/icon/tab_1/03/tab_02.png", null, BaselineNarrowing, StopUpdateCameraCommonLine));
+                    AddBottomButton(ButtonParams.BlueButton("对焦", "FocusAuto", FocusAutoAsync));
+                    AddBottomButton(ButtonParams.BlueButton("基准线调窄", "UnfoldLessHorizontal", null, BaselineNarrowing, StopUpdateCameraCommonLine));
                     AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
                     AddBottomButton(ButtonParams.BlueButton("基准线校准", "CrosshairsGps", BaselineCalibrationAsync));
                     AddBottomButton(ButtonParams.BlueButton("测量", "/Assets/icon/tab_1/03/tab_03.png", NavigateMeasurement));
                     AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
-                    AddBottomButton(ButtonParams.BlueButton("基准线调宽", "/Assets/icon/tab_1/03/tab_02.png", null, BaselineWidening, StopUpdateCameraCommonLine));
+                    AddBottomButton(ButtonParams.BlueButton("基准线调宽", "UnfoldMoreHorizontal", null, BaselineWidening, StopUpdateCameraCommonLine));
                     AddBottomButton(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
                     break;
             }

@@ -142,7 +142,7 @@
                         Orientation="Horizontal">
                         <Controls:KeyboardBtn
                             BtnType="2"
-                            BtnValue="Caps"
+                            BtnValue="Tab"
                             FontSize="20" />
                         <Controls:KeyboardBtn
                             BtnType="3"
@@ -177,7 +177,7 @@
                         Orientation="Horizontal">
                         <Controls:KeyboardBtn
                             BtnType="2"
-                            BtnValue="Shift"
+                            BtnValue="Caps"
                             FontSize="20" />
                         <Controls:KeyboardBtn
                             BtnType="3"
@@ -185,7 +185,7 @@
                             FontSize="40" />
                         <Controls:KeyboardBtn
                             BtnType="2"
-                            BtnValue="Tab"
+                            BtnValue="Back"
                             FontSize="20" />
                     </StackPanel>
                 </Grid>

@@ -52,8 +52,8 @@ namespace 精密切割系统.Helpers
 
         public virtual void OnNavigatedFrom(NavigationContext navigationContext)
         {
-            InitRightButton();
-            InitBottomButton();
+            RightButtonCollection.Clear();
+            BottomButtonCollection.Clear();
         }
     }
 }

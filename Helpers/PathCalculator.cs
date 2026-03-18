@@ -23,12 +23,10 @@ namespace 精密切割系统.Helpers
     public class PathCalculator
     {
         private List<PathRecord> _records;
-        private int _index;
 
         public PathCalculator(List<PathRecord> pathRecords)
         {
             _records = pathRecords;
-            _index = 0;
         }
 
         public PathCalculator(List<float> speeds)
@@ -54,16 +52,15 @@ namespace 精密切割系统.Helpers
         //}
 
         // 记录通过信息
-        public void ReportPass(float pathLength, float actualTime)
+        public void ReportPass(int index, float pathLength, float actualTime)
         {
-            if (_index >= _records.Count)
+            if (index >= _records.Count)
             {
                 return;
             }
-            var record = _records[_index];
+            var record = _records[index];
             record.PathLength = pathLength;
             record.ActualTime = actualTime;
-            _index++;
         }
 
         // 估算剩余时间

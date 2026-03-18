@@ -47,11 +47,11 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
         public BMBladeReplacementConf()
         {
             InitializeComponent();
-            _mainWindow = Application.Current.MainWindow as MainWindow;
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            _mainWindow = Application.Current.MainWindow as MainWindow;
             if (_mainWindow is null) return;
             _rightPage = _mainWindow.rightFrame.Content as RightPage;
             if (_rightPage is null) return;

@@ -37,5 +37,8 @@ namespace 精密切割系统.Entities
 
         [Column("next_check_ch4")]
         public string NextCheckCh4 { get; set; }
+
+        [Column("blade_angle")]
+        public string BladeAngle { get; set; } = "0";
     }
 }

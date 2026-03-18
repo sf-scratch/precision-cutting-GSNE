@@ -34,7 +34,6 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
     public partial class BladeInfo : Page
     {
         private MainWindow? mainWindow;
-        private RightPage? rightPage;
         public static string? PageName { get; set; } = null;
 
         public BladeInfo()

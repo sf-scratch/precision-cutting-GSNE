@@ -63,11 +63,26 @@ namespace 精密切割系统.ViewModel
 
         private async Task SaveAsync()
         {
-            await SqlHelper.UpdateAsync(Entity);
-            InitialPositionModel initialPosition = await SqlHelper.GetOrCreateEntityAsync(() => new InitialPositionModel());
-            initialPosition.BladeSetupInitX = MeasureHeightX;
-            initialPosition.BladeSetupInitY = MeasureHeightY;
-            await SqlHelper.UpdateAsync(initialPosition);
+            if (RegionUtils.FormError(_regionManager))
+            {
+                MaterialSnack(RegionUtils.FormErrorMessage, SnackType.WARNING);
+                return;
+            }
+            try
+            {
+                await SqlHelper.UpdateAsync(Entity);
+                InitialPositionModel initialPosition = await SqlHelper.GetOrCreateEntityAsync(() => new InitialPositionModel());
+                initialPosition.BladeSetupInitX = MeasureHeightX;
+                initialPosition.BladeSetupInitY = MeasureHeightY;
+                await SqlHelper.UpdateAsync(initialPosition);
+                NavigateUtils.ToOperateButton();
+                MaterialSnack("测高参数已确认!", SnackType.SUCCESS);
+            }
+            catch (Exception ex)
+            {
+                MaterialSnack("保存测高参数失败:" + ex.Message, SnackType.ERROR);
+                return;
+            }
         }
 
         protected override void InitBottomButton()

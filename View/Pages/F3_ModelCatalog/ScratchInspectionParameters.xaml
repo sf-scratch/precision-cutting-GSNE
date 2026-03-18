@@ -81,6 +81,15 @@
                     <Controls:InputTextBox Text="{Binding Entity.NextCheckCh3}" />
                     <Controls:InputTextBox Text="{Binding Entity.NextCheckCh4}" />
                 </auto:AutoGrid>
+                <TextBlock Margin="0,20,0,0" Text="其他设置" />
+                <auto:AutoGrid
+                    ChildMargin="5"
+                    Columns="*,*,*,*,*,*"
+                    RowCount="8">
+                    <TextBlock HorizontalAlignment="Right" Text="刀片角度" />
+                    <Controls:InputTextBox Text="{Binding Entity.BladeAngle}" />
+                    <Label Content="°" />
+                </auto:AutoGrid>
             </StackPanel>
             <!--<StackPanel Grid.Column="1" Margin="30">
                 <TextBlock Text="容许值" />

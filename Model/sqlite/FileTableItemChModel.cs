@@ -29,7 +29,7 @@ namespace 精密切割系统.database.db.modle
         public string CutMode { get; set; } = "A";
 
         [Column("cut_dir")]//切割方向
-        public string CutDir { get; set; } = "FRONT";
+        public string CutDir { get; set; } = "----";
 
         [Column("com_box_cut_method")]//切割方法
         public string ComBoxCutMethod { get; set; } = "相对";

@@ -166,6 +166,7 @@ namespace 精密切割系统.ViewModel
 
         private async Task MonitoringAlarmAsync(CancellationToken token)
         {
+            await Task.Delay(2000);
             while (!token.IsCancellationRequested)
             {
                 try
@@ -361,8 +362,6 @@ namespace 精密切割系统.ViewModel
             try
             {
                 FileTableItemModel fileTableItem = fileTableItemResult.Data;
-                _ = MonitoringAlarmAsync(_monitoringCts.Token);
-                _ = MonitoringCutProgressAsync(_monitoringCts.Token);
                 CutStep firtStep = cutSteps.First().CutSteps.First();
                 float cutY = firtStep.IsAbsolute ? firtStep.ChannelStartY : currentY.Value.ToActualY() - firtStep.ChannelStartY;
                 float measureHeightZ = 0;
@@ -394,7 +393,9 @@ namespace 精密切割系统.ViewModel
                     _semiAutoCutService.UpdatePreCutQueue(preCutSpeedLis);
                     MaterialSnack($"切割中...", SnackType.WARNING, 0, _eventAggregator);
                     float margin = Appsettings.AdditionalMargin ?? 20;
-                    RunResult cutResult = await _semiAutoCutService.RunAsync(cutSteps, workpiece, margin, measureHeightZ, GlobalParams.BladeLiftingHeight, _eventAggregator, _pauseCts.Token);
+                    _ = MonitoringAlarmAsync(_monitoringCts.Token);
+                    _ = MonitoringCutProgressAsync(_monitoringCts.Token);
+                    RunResult cutResult = await _semiAutoCutService.RunAsync(cutSteps, workpiece, margin, measureHeightZ, Appsettings.SafetyMarginZ1 ?? GlobalParams.BladeLiftingHeight, _eventAggregator, _pauseCts.Token);
                     if (!cutResult.IsSuccess)
                     {
                         MaterialSnack($"{cutResult.Message}", SnackType.WARNING, 0, _eventAggregator);
@@ -552,48 +553,6 @@ namespace 精密切割系统.ViewModel
             await AfterPauseThenMoveToPositionAsync(pauseData);
         }
 
-        private async Task AfterCompletedThenMoveToPositionAsync(CutServiceCompleteData completeData)
-        {
-            float runTime = 60;
-            try
-            {
-                // 超时自动取消
-                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(runTime));
-                await PlcControl.tagControl.cutting.ExitCuttingModeAsync(cts.Token);
-                LineSegment? line = completeData.Line;
-                // 轴不报警时移动到指定位置
-                if (line != null && !AlarmConfig.Instance.HasAxisErrorAlarms())
-                {
-                    // Z1安全余量
-                    float posZ = 0;
-                    CommonResult<FileTableItemModel> fileTableItemResult = await AutoCutUtils.GetFileTableItemModelAsync();
-                    if (fileTableItemResult.IsSuccess && fileTableItemResult.Data is not null)
-                    {
-                        FileTableItemModel fileTableItem = fileTableItemResult.Data;
-                        float workThickness = fileTableItem.WorkThickness.ToFloat();
-                        float tapeThickness = fileTableItem.TapeThickness.ToFloat();
-                        if (Appsettings.MeasureHeightLast is not null && Appsettings.SafetyMarginZ1 is not null)
-                        {
-                            posZ = Appsettings.MeasureHeightLast.Value - workThickness - tapeThickness - Appsettings.SafetyMarginZ1.Value;
-                        }
-                    }
-                    await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, cts.Token);
-                    await AutoCutUtils.WorkpieceBlowingAsync(line.StartPoint.Y.ToCameraY(), default, true, _eventAggregator, cts.Token);
-                    await Task.WhenAll(
-                        PlcControl.tagControl.Xaxis.StartAbsoluteAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), 30, cts.Token),
-                        PlcControl.tagControl.Yaxis.StartAbsoluteAsync(line.StartPoint.Y.ToCameraY(), 30, cts.Token));
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                Tools.LogDebug("结束切割超时");
-            }
-            catch (Exception ex)
-            {
-                Tools.LogDebug(ex.ToString());
-            }
-        }
-
         private async Task AfterPauseThenMoveToPositionAsync(CutServicePauseData pauseData)
         {
             MaterialSnack("正在暂停切割...", SnackType.WARNING, 0, _eventAggregator);
@@ -607,19 +566,6 @@ namespace 精密切割系统.ViewModel
                 // 轴不报警时移动到指定位置
                 if (line != null && !AlarmConfig.Instance.HasAxisErrorAlarms())
                 {
-                    // Z1安全余量
-                    float posZ = 0;
-                    CommonResult<FileTableItemModel> fileTableItemResult = await AutoCutUtils.GetFileTableItemModelAsync();
-                    if (fileTableItemResult.IsSuccess && fileTableItemResult.Data is not null)
-                    {
-                        FileTableItemModel fileTableItem = fileTableItemResult.Data;
-                        float workThickness = fileTableItem.WorkThickness.ToFloat();
-                        float tapeThickness = fileTableItem.TapeThickness.ToFloat();
-                        if (Appsettings.MeasureHeightLast is not null && Appsettings.SafetyMarginZ1 is not null)
-                        {
-                            posZ = Appsettings.MeasureHeightLast.Value - workThickness - tapeThickness - Appsettings.SafetyMarginZ1.Value;
-                        }
-                    }
                     await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, cts.Token);
                     await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
                     if (!pauseData.IsCompleted)
@@ -629,8 +575,6 @@ namespace 精密切割系统.ViewModel
                     await Task.WhenAll(
                         PlcControl.tagControl.Xaxis.StartAbsoluteAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), 50, cts.Token),
                         PlcControl.tagControl.Yaxis.StartAbsoluteAsync(line.StartPoint.Y.ToCameraY(), 30, cts.Token));
-                    // 执行默认动作
-                    //await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(posZ, default, cts.Token);
                 }
                 if (!AlarmConfig.Instance.HasActiveErrorAlarm())
                 {

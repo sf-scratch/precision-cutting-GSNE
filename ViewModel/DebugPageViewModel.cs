@@ -47,18 +47,7 @@ namespace 精密切割系统.ViewModel
 
         private void Sure()
         {
-            MainWindow? mainWindow = Application.Current.MainWindow as MainWindow;
-            if (mainWindow == null)
-            {
-                return;
-            }
-            RightPage? rightPage = mainWindow.rightFrame.Content as RightPage;
-            OperatePage? operatePage = mainWindow.operateFrame.Content as OperatePage;
-            if (rightPage == null || operatePage == null)
-            {
-                return;
-            }
-            operatePage.SetOperateShowType(3);
+            NavigateUtils.ToOperateButton();
             MaterialSnack("参数已确定！", SnackType.SUCCESS);
         }
 

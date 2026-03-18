@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Navigation;
 using 精密切割系统.Model.cut;
 using 精密切割系统.View.page.right;
@@ -12,6 +13,7 @@ using 精密切割系统.View.Pages.Auto;
 using 精密切割系统.View.Pages.common;
 using 精密切割系统.View.Pages.operate;
 using 精密切割系统.ViewModel;
+using static 精密切割系统.View.Pages.operate.OperatePage;
 
 namespace 精密切割系统.Helpers
 {
@@ -30,34 +32,21 @@ namespace 精密切割系统.Helpers
             mainWindow.NavigateToPage(pageName, paramsStr ?? string.Empty, isNavigateEmpty);
         }
 
-        //public static void NavigateToPage<T>(string pageName, T paramObj)
-        //{
-        //    //跳转界面
-        //    MainWindow? mainWindow = Application.Current.MainWindow as MainWindow;
-        //    if (mainWindow == null)
-        //    {
-        //        MaterialSnack("跳转界面失败", SnackType.WARNING, 0);
-        //        return;
-        //    }
-        //    if (paramObj != null)
-        //    {
-        //        mainWindow.NavigateToPage(pageName, paramObj);
-        //    }
-        //    else
-        //    {
-        //        mainWindow.NavigateToPage(pageName);
-        //    }
-        //}
-
-        public static bool TryParse<View, Data>(this NavigationEventArgs e, out View view, out Data data)
+        public static void ToOperateButton(OperateType type = OperateType.PrismOperationMenu)
         {
-            if (e is { Content: View v, ExtraData: Data d })
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                (view, data) = (v, d);
-                return true;
-            }
-            (view, data) = (default!, default!);
-            return false;
+                Keyboard.ClearFocus();
+                if (Application.Current.MainWindow is not MainWindow mainWindow)
+                {
+                    return;
+                }
+                if (mainWindow.rightFrame.Content is not RightPage rightPage || mainWindow.operateFrame.Content is not OperatePage operatePage)
+                {
+                    return;
+                }
+                operatePage.SetOperateShowType(type);
+            });
         }
 
         public static void ClearOperatePage()
@@ -73,7 +62,7 @@ namespace 精密切割系统.Helpers
             {
                 return;
             }
-            operatePage.SetOperateShowType(3);
+            operatePage.SetOperateShowType(OperateType.PrismOperationMenu);
             operatePage.UpdateOperate([]);
             rightPage.PanelAction.Visibility = Visibility.Visible;
         }

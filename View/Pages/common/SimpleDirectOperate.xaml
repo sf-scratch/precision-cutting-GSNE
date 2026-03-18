@@ -165,7 +165,7 @@
                                     <materialDesign:PackIcon
                                         Width="50"
                                         Height="50"
-                                        Foreground="Gray"
+                                        Foreground="#404B59"
                                         Kind="Speedometer" />
                                 </Button.Content>
                             </Button>

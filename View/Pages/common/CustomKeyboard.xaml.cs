@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Emgu.CV.Stitching;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing.Drawing2D;
@@ -27,13 +28,14 @@ namespace 精密切割系统.View.Pages.common
     {
         private MainWindow? mainWindow;
         private bool _upperFlag = true;
+
         public CustomKeyboard()
         {
             InitializeComponent();
             mainWindow = Application.Current.MainWindow as MainWindow;
         }
 
-        public void btnClick(object sender, string key)
+        public void btnClick(object? sender, string key)
         {
             // 处理按下事件
             KeyboardBtn btn = (KeyboardBtn)sender;
@@ -44,7 +46,7 @@ namespace 精密切割系统.View.Pages.common
             }
             else if (btn.BtnType.Equals("0"))
             {
-                // 0 
+                // 0
                 CustomKeyPress(btn.BtnValue);
             }
             else if (btn.BtnType.Equals("2"))
@@ -76,6 +78,10 @@ namespace 精密切割系统.View.Pages.common
                 {
                     sendKey = "del";
                 }
+                else if (btn.BtnValue == "Back")
+                {
+                    sendKey = "backspace ";
+                }
                 else if (btn.BtnValue == "+")
                 {
                     sendKey = "plus";
@@ -86,6 +92,7 @@ namespace 精密切割系统.View.Pages.common
                 }
                 else if (btn.BtnValue == "Down")
                 {
+                    Keyboard.ClearFocus();
                     mainWindow.ShowKeyboardPage(0);
                 }
                 if (!string.IsNullOrEmpty(sendKey))
@@ -145,7 +152,8 @@ namespace 精密切割系统.View.Pages.common
         {
             SetLettersCase(_upperFlag);
             List<KeyboardBtn> list = Tools.GetChildrenOfType<KeyboardBtn>(this);
-            list.ForEach(btn => {
+            list.ForEach(btn =>
+            {
                 btn.KeyPressed -= btnClick;
                 btn.KeyPressed += btnClick;
             });
@@ -154,7 +162,8 @@ namespace 精密切割系统.View.Pages.common
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
             List<KeyboardBtn> list = Tools.GetChildrenOfType<KeyboardBtn>(this);
-            list.ForEach(btn => {
+            list.ForEach(btn =>
+            {
                 btn.KeyPressed -= btnClick;
             });
         }

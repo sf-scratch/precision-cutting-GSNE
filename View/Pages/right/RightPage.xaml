@@ -6,7 +6,9 @@
     xmlns:auto="clr-namespace:WpfAutoGrid;assembly=WpfAutoGrid.Core"
     xmlns:behav="clr-namespace:精密切割系统.Behaviors"
     xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:cvert="clr-namespace:精密切割系统.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:精密切割系统.Helpers"
     xmlns:local="clr-namespace:精密切割系统.View.page.right"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -19,6 +21,18 @@
     Loaded="Page_Loaded"
     mc:Ignorable="d">
     <Page.Resources>
+        <cvert:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <cvert:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
+        <Style x:Key="Device551VisibilityStyle" TargetType="FrameworkElement">
+            <Setter Property="Visibility">
+                <Setter.Value>
+                    <Binding
+                        Converter="{StaticResource StringToVisibilityConverter}"
+                        ConverterParameter="{x:Static helpers:GlobalParams.Device_551}"
+                        Source="{x:Static helpers:GlobalParams.DeviceModel}" />
+                </Setter.Value>
+            </Setter>
+        </Style>
         <Style TargetType="Controls:RightButton">
             <Setter Property="Margin" Value="0,20,0,0" />
         </Style>
@@ -67,22 +81,33 @@
                     x:Name="spindleSpeedValue"
                     d:Content="20000"
                     Content="0" />
-                <Label Content="温度1" />
+                <Label Content="温度1" Visibility="{Binding Source={x:Static helpers:GlobalParams.DeviceModel}, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter={x:Static helpers:GlobalParams.Device_551}}" />
                 <Label
                     x:Name="temperatureSensor1"
                     d:Content="22.3"
-                    Content="0" />
-                <Label Content="温度2" />
+                    Content="0"
+                    Visibility="{Binding Source={x:Static helpers:GlobalParams.DeviceModel}, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter={x:Static helpers:GlobalParams.Device_551}}" />
+                <Label Content="温度2" Visibility="{Binding Source={x:Static helpers:GlobalParams.DeviceModel}, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter={x:Static helpers:GlobalParams.Device_551}}" />
                 <Label
                     x:Name="temperatureSensor2"
                     d:Content="22.3"
-                    Content="0" />
-                <Label Content="温度3" />
-                <Label x:Name="temperatureSensor3" Content="0" />
-                <Label Content="温度4" />
-                <Label x:Name="temperatureSensor4" Content="0" />
-                <Label Content="温度5" />
-                <Label x:Name="temperatureSensor5" Content="0" />
+                    Content="0"
+                    Visibility="{Binding Source={x:Static helpers:GlobalParams.DeviceModel}, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter={x:Static helpers:GlobalParams.Device_551}}" />
+                <Label Content="温度3" Visibility="{Binding Source={x:Static helpers:GlobalParams.DeviceModel}, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter={x:Static helpers:GlobalParams.Device_551}}" />
+                <Label
+                    x:Name="temperatureSensor3"
+                    Content="0"
+                    Visibility="{Binding Source={x:Static helpers:GlobalParams.DeviceModel}, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter={x:Static helpers:GlobalParams.Device_551}}" />
+                <Label Content="温度4" Visibility="{Binding Source={x:Static helpers:GlobalParams.DeviceModel}, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter={x:Static helpers:GlobalParams.Device_551}}" />
+                <Label
+                    x:Name="temperatureSensor4"
+                    Content="0"
+                    Visibility="{Binding Source={x:Static helpers:GlobalParams.DeviceModel}, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter={x:Static helpers:GlobalParams.Device_551}}" />
+                <Label Content="温度5" Visibility="{Binding Source={x:Static helpers:GlobalParams.DeviceModel}, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter={x:Static helpers:GlobalParams.Device_551}}" />
+                <Label
+                    x:Name="temperatureSensor5"
+                    Content="0"
+                    Visibility="{Binding Source={x:Static helpers:GlobalParams.DeviceModel}, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter={x:Static helpers:GlobalParams.Device_551}}" />
             </auto:AutoGrid>
             <materialDesign:Card>
                 <TabControl

@@ -16,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using 精密切割系统.Assets.config.buttom;
 using 精密切割系统.Assets.config.menu;
 using 精密切割系统.Driver;
@@ -173,46 +174,37 @@ namespace 精密切割系统.View.Pages.operate
         /// 设置显示类型
         /// </summary>
         /// <param name="type">0 操作菜单 1 方向操作菜单 2 自定义键盘</param>
-        public void SetOperateShowType(int type)
+        public void SetOperateShowType(OperateType type)
         {
-            // 延时释放触控设备
+            // 建立菜单项与对应类型的映射关系
+            var menuMappings = new Dictionary<OperateType, FrameworkElement>
+            {
+                [OperateType.OperationMenu] = OperateGrid,
+                [OperateType.DirectionMenu] = commonDirection,
+                [OperateType.KeyboardMenu] = costomKeyboardGrid,
+                [OperateType.PrismOperationMenu] = OperateButtonListBox
+            };
+
             Dispatcher.InvokeAsync(() =>
             {
-                // 设置可见性
-                OperateGrid.Visibility = type == 0 ? Visibility.Visible : Visibility.Collapsed;
-                commonDirection.Visibility = type == 1 ? Visibility.Visible : Visibility.Collapsed;
-                costomKeyboardGrid.Visibility = type == 2 ? Visibility.Visible : Visibility.Collapsed;
-                OperateButtonListBox.Visibility = type == 3 ? Visibility.Visible : Visibility.Collapsed;
-                // 设置触控响应
-                OperateGrid.IsHitTestVisible = type == 0;
-                commonDirection.IsHitTestVisible = type == 1;
-                costomKeyboardGrid.IsHitTestVisible = type == 2;
-                OperateButtonListBox.IsHitTestVisible = type == 3;
-                // 设置 ZIndex
-                Panel.SetZIndex(OperateGrid, type == 0 ? 1 : 0);
-                Panel.SetZIndex(commonDirection, type == 1 ? 1 : 0);
-                Panel.SetZIndex(costomKeyboardGrid, type == 2 ? 1 : 0);
-                Panel.SetZIndex(OperateButtonListBox, type == 3 ? 1 : 0);
-            }, System.Windows.Threading.DispatcherPriority.Background);
-            //Task.Run(() =>
-            //{
-            //    Thread.Sleep(500);
-            //    // 延时释放触控设备
-            //    Dispatcher.InvokeAsync(() =>
-            //    {
-            //        // 设置触控响应
-            //        OperateGrid.IsHitTestVisible = type == 0;
-            //        commonDirection.IsHitTestVisible = type == 1;
-            //        costomKeyboardGrid.IsHitTestVisible = type == 2;
-            //        OperateButtonListBox.IsHitTestVisible = type == 3;
+                foreach (var kvp in menuMappings)
+                {
+                    bool isActive = kvp.Key == type;
+                    var element = kvp.Value;
+                    // 批量设置三个属性
+                    element.Visibility = isActive ? Visibility.Visible : Visibility.Collapsed;
+                    element.IsHitTestVisible = isActive;
+                    Panel.SetZIndex(element, isActive ? 1 : 0);
+                }
+            }, DispatcherPriority.Background);
+        }
 
-            //        // 设置 ZIndex
-            //        Panel.SetZIndex(OperateGrid, type == 0 ? 1 : 0);
-            //        Panel.SetZIndex(commonDirection, type == 1 ? 1 : 0);
-            //        Panel.SetZIndex(costomKeyboardGrid, type == 2 ? 1 : 0);
-            //        Panel.SetZIndex(OperateButtonListBox, type == 3 ? 1 : 0);
-            //    }, System.Windows.Threading.DispatcherPriority.Background);
-            //});
+        public enum OperateType
+        {
+            OperationMenu,
+            DirectionMenu,
+            KeyboardMenu,
+            PrismOperationMenu
         }
 
         //动态创建多个菜单

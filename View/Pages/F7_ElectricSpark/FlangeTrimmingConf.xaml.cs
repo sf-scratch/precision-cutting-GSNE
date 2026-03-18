@@ -18,12 +18,15 @@ using 精密切割系统.Data;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Extensions;
 using 精密切割系统.Helpers;
+using 精密切割系统.Model.common;
 using 精密切割系统.Model.plc;
 using 精密切割系统.Model.sqlite;
 using 精密切割系统.Utils;
+using 精密切割系统.View.common;
 using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.operate;
 using 精密切割系统.ViewModel;
+using static NPOI.HSSF.Util.HSSFColor;
 
 namespace 精密切割系统.View.Pages.F7_ElectricSpark
 {
@@ -44,8 +47,6 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
             mainWindow = Application.Current.MainWindow as MainWindow; ;
         }
 
-        private bool positionLoadFlag = true;
-
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             rightPage = mainWindow.rightFrame.Content as RightPage;
@@ -63,20 +64,33 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
             rightPage.btnCutStop.Visibility = Visibility.Collapsed;
             rightPage.btnCutStop.SetRightClickedHandler(BtnCutPause_RightClicked);
 
-            operatePage = mainWindow.operateFrame.Content as OperatePage;
-            operatePage?.SetOperateShowType(1);
             loadAxisPosition();
             loadData();
+
+            NavigateUtils.ClearOperatePage();
+            WindowLayout.OperatePageButtons.Clear();
+            WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("Z轴抬起", "ArrowExpandUp", null, () => PlcControl.tagControl.Z1axis.StartJogAsync(1), PlcControl.tagControl.Z1axis.StopJogAsync));
+            WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
+            WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
+            WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
+            WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("", "", null, buttonVisibility: System.Windows.Visibility.Hidden));
+            WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("Z轴下降", "ArrowExpandDown", null, () => PlcControl.tagControl.Z1axis.StartJogAsync(0), PlcControl.tagControl.Z1axis.StopJogAsync));
+        }
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            _cts?.Cancel();
+            _axisPositionCts.Cancel();
+            WindowLayout.OperatePageButtons.Clear();
         }
 
         private void loadAxisPosition()
         {
             _ = Task.Run(async () =>
             {
-                using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(300));
                 try
                 {
-                    while (await timer.WaitForNextTickAsync(_axisPositionCts.Token))
+                    while (!_axisPositionCts.IsCancellationRequested)
                     {
                         var axisPostion = await AutoCutUtils.GetAxisPositionAsync();
                         await Application.Current.Dispatcher.InvokeAsync(() =>
@@ -85,6 +99,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
                             yCenterPosition.Text = MathF.Round(axisPostion.Y ?? 0, 3).ToString("F3");
                             zCenterPosition.Text = MathF.Round(axisPostion.Z1 ?? 0, 3).ToString("F3");
                         });
+                        await Task.Delay(200);
                     }
                 }
                 catch (OperationCanceledException)
@@ -155,31 +170,29 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
                 AxisPosition axisPostion = await AutoCutUtils.GetAxisPositionAsync();
                 float curX = axisPostion.X ?? 0;
                 float xLeft = curX + FlangeTrimmingData.Instance.XAxisTravel, xRight = curX;
-                //await PlcControl.tagControl.cutting.FlangeRepairBeginsAsync();
-                //while (!await PlcControl.tagControl.cutting.IsDetectedSparksAsync())
-                //{
-                //    await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(xLeft, FlangeTrimmingData.Instance.CutSpeed, token);
-                //    await PlcControl.tagControl.Yaxis.StartRelativeAsync(-0.5f, 1, token);
-                //    await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(xRight, FlangeTrimmingData.Instance.CutSpeed, token);
-                //    await PlcControl.tagControl.Yaxis.StartRelativeAsync(0.5f, 1, token);
-                //    await PlcControl.tagControl.Yaxis.StartRelativeAsync(FlangeTrimmingData.Instance.YStepDistance, 1, token);
-                //}
-                //await PlcControl.tagControl.cutting.FlangeRepairEndAsync();
+                bool isLeft = true;
                 for (int i = 0; i < FlangeTrimmingData.Instance.RepeatCount; i++)
                 {
                     int sparkFreeSteps = FlangeTrimmingData.Instance.SparkFreeStep;
-                    while (sparkFreeSteps > 0)
+                    if (yRollback.IsChecked == true)
                     {
-                        //await PlcControl.tagControl.cutting.FlangeRepairBeginsAsync();
-                        await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(xLeft, FlangeTrimmingData.Instance.CutSpeed, token);
-                        //if (!await PlcControl.tagControl.cutting.IsDetectedSparksAsync())
+                        while (sparkFreeSteps > 0)
                         {
+                            await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(xLeft, FlangeTrimmingData.Instance.CutSpeed, token);
+                            await PlcControl.tagControl.Yaxis.StartRelativeAsync(-0.5f, 5, token);
+                            await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(xRight, FlangeTrimmingData.Instance.CutSpeed, token);
+                            await PlcControl.tagControl.Yaxis.StartRelativeAsync(0.5f, 5, token);
                             sparkFreeSteps--;
                         }
-                        //await PlcControl.tagControl.cutting.FlangeRepairEndAsync();
-                        await PlcControl.tagControl.Yaxis.StartRelativeAsync(-0.5f, 5, token);
-                        await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(xRight, FlangeTrimmingData.Instance.CutSpeed, token);
-                        await PlcControl.tagControl.Yaxis.StartRelativeAsync(0.5f, 5, token);
+                    }
+                    else
+                    {
+                        while (sparkFreeSteps > 0)
+                        {
+                            await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(isLeft ? xLeft : xRight, FlangeTrimmingData.Instance.CutSpeed, token);
+                            isLeft = !isLeft;
+                            sparkFreeSteps--;
+                        }
                     }
                     await PlcControl.tagControl.Yaxis.StartRelativeAsync(FlangeTrimmingData.Instance.YStepDistance, 1, token);
                     currentCount.Text = (currentCount.Text.ToInt() + 1).ToString();
@@ -204,18 +217,6 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
                 float curX = axisPostion.X ?? 0;
                 float xLeft = curX + FlangeTrimmingData.Instance.XAxisTravel, xRight = curX;
                 bool isLeft = true;
-                //while (true)
-                //{
-                //    await PlcControl.tagControl.cutting.FlangeRepairBeginsAsync();
-                //    await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(isLeft ? xLeft : xRight, FlangeTrimmingData.Instance.CutSpeed, token);
-                //    isLeft = !isLeft;
-                //    if (await PlcControl.tagControl.cutting.IsDetectedSparksAsync())
-                //    {
-                //        break;
-                //    }
-                //    await PlcControl.tagControl.cutting.FlangeRepairEndAsync();
-                //    await PlcControl.tagControl.Yaxis.StartRelativeAsync(FlangeTrimmingData.Instance.YStepDistance, 1, token);
-                //}
                 for (int i = 0; i < FlangeTrimmingData.Instance.RepeatCount; i++)
                 {
                     int sparkFreeSteps = FlangeTrimmingData.Instance.SparkFreeStep;
@@ -225,8 +226,8 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
                         isLeft = !isLeft;
                         sparkFreeSteps--;
                     }
-                    currentCount.Text = (currentCount.Text.ToInt() + 1).ToString();
                     await PlcControl.tagControl.Yaxis.StartRelativeAsync(FlangeTrimmingData.Instance.YStepDistance, 1, token);
+                    currentCount.Text = (currentCount.Text.ToInt() + 1).ToString();
                 }
             }
             finally
@@ -257,22 +258,15 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
             FlangeTrimmingData.Instance.SpindleRev = spindleRev.Text.ToInt();
             FlangeTrimmingData.Instance.RepeatCount = repectCount.Text.ToInt();
             FlangeTrimmingData.Instance.SparkFreeStep = sparkFreeStep.Text.ToInt();
+            NavigateUtils.ToOperateButton();
             MaterialSnack("法兰修整参数确认完成!", SnackType.SUCCESS);
         }
 
         private void BtnBack_RightClicked(object? sender, bool e)
         {
-            positionLoadFlag = false;
             _cts?.Cancel();
             _axisPositionCts.Cancel();
             mainWindow.NavigateToPage("MainMenu");
-        }
-
-        private void Page_Unloaded(object sender, RoutedEventArgs e)
-        {
-            positionLoadFlag = false;
-            _cts?.Cancel();
-            _axisPositionCts.Cancel();
         }
     }
 }

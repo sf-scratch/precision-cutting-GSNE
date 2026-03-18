@@ -18,6 +18,7 @@ using 精密切割系统.View.Pages.F7_ElectricSpark;
 using 精密切割系统.View.Pages.operate;
 using 精密切割系统.ViewModel;
 using 精密切割系统.ViewModel.Dialogs;
+using static 精密切割系统.View.Pages.operate.OperatePage;
 
 namespace 精密切割系统
 {
@@ -45,7 +46,7 @@ namespace 精密切割系统
         {
             if (Application.Current.MainWindow is MainWindow mainWindow && mainWindow.operateFrame.Content is OperatePage operatePage)
             {
-                operatePage.SetOperateShowType(2);
+                operatePage.SetOperateShowType(OperateType.KeyboardMenu);
             }
         }
 

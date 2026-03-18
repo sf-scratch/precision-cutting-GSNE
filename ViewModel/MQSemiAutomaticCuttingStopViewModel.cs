@@ -21,6 +21,7 @@ using 精密切割系统.View.Pages.Auto;
 using 精密切割系统.View.Pages.common;
 using 精密切割系统.View.Pages.F2_ManualOperation;
 using 精密切割系统.View.Pages.operate;
+using static 精密切割系统.View.Pages.operate.OperatePage;
 
 namespace 精密切割系统.ViewModel
 {
@@ -308,7 +309,7 @@ namespace 精密切割系统.ViewModel
                     InitRightOnlyStopButton();
                     if (Application.Current.MainWindow is MainWindow mainWindow && mainWindow.operateFrame.Content is OperatePage operatePage)
                     {
-                        operatePage.SetOperateShowType(0);
+                        operatePage.SetOperateShowType(OperateType.OperationMenu);
                         mainWindow.ShortcutBtnClick();
                         operatePage.UpdateOperate(OperateData.GetTab01Operate());
                     }

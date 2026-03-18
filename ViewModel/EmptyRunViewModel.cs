@@ -18,6 +18,7 @@ namespace 精密切割系统.ViewModel
     public class EmptyRunViewModel : CustomBindableBase
     {
         private readonly IRegionManager _regionManager;
+        private CancellationTokenSource? _emptyRunCts;
 
         private bool _runX;
 
@@ -171,9 +172,6 @@ namespace 精密切割系统.ViewModel
             set { SetProperty(ref _hasAnyError, value); }
         }
 
-        private readonly SemaphoreSlim _emptyRunSemaphore = new(1, 1);
-        private CancellationTokenSource? _emptyRunCts;
-
         public EmptyRunViewModel()
         {
         }
@@ -194,13 +192,14 @@ namespace 精密切割系统.ViewModel
             _regionManager = regionManager;
         }
 
-        private void InitRightButton()
+        protected override void InitRightButton()
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
                 RightButtonCollection.Clear();
-                RightButtonCollection.Add(ButtonParams.GreenRightButton("空运行", "LocationEnter", ExecuteEmptyRun));
-                RightButtonCollection.Add(ButtonParams.YelloRightButton("返回", "/Assets/icon/right/back.png", Back));
+                RightButtonCollection.Add(ButtonParams.GreenRightButton("空运行", "LocationEnter", ExecuteEmptyRunAsync));
+                RightButtonCollection.Add(ButtonParams.Sure(Sure));
+                RightButtonCollection.Add(ButtonParams.Back(Back));
             });
         }
 
@@ -210,7 +209,7 @@ namespace 精密切割系统.ViewModel
             RightButtonCollection.Add(ButtonParams.RedRightButton("停止", "/Assets/icon/right/stop.png", Stop));
         }
 
-        private async void ExecuteEmptyRun()
+        private async Task ExecuteEmptyRunAsync()
         {
             if (RegionUtils.FormError(_regionManager))
             {
@@ -222,136 +221,115 @@ namespace 精密切割系统.ViewModel
                 MaterialSnack(AlarmConfig.HasErrorAlarmMessage, SnackType.WARNING);
                 return;
             }
-            if (!await _emptyRunSemaphore.WaitAsync(TimeSpan.Zero))
+            if (!RunX && !RunY && !RunZ1 && !RunZ2 && !RunTheta && !IsOpenWater && !IsFlowing)
             {
-                MaterialSnack("准备空运行中！", SnackType.WARNING);
+                MaterialSnack("请选择至少一个项进行空运行！", SnackType.WARNING);
                 return;
             }
+            if (_emptyRunCts != null && !_emptyRunCts.IsCancellationRequested)
+            {
+                MaterialSnack("空运行已在进行中！", SnackType.WARNING);
+                return;
+            }
+            _emptyRunCts = new CancellationTokenSource();
+            IsEnabledGrid = false;
+            InitRuningRightButton();
+            _ = AutoCutUtils.MonitoringAlarmAsync(Stop, () => AlarmConfig.Instance.HasActiveErrorAlarm(false), default, _emptyRunCts.Token);
             try
             {
-                if (!RunX && !RunY && !RunZ1 && !RunZ2 && !RunTheta && !IsOpenWater && !IsFlowing)
+                float speedX = _speedX.ToFloat();
+                float speedY = _speedY.ToFloat();
+                float speedZ1 = _speedZ1.ToFloat();
+                float speedZ2 = _speedZ2.ToFloat();
+                float speedTheta = _speedTheta.ToFloat();
+                int repeatCountX = RunX ? _repeatCountX.ToInt() : 0;
+                int repeatCountY = RunY ? _repeatCountY.ToInt() : 0;
+                int repeatCountZ1 = RunZ1 ? _repeatCountZ1.ToInt() : 0;
+                int repeatCountZ2 = RunZ2 ? _repeatCountZ2.ToInt() : 0;
+                int repeatCountTheta = RunTheta ? _repeatCountTheta.ToInt() : 0;
+                int currentRepeat = 0;
+                int maxRepeatCount = new int[] { repeatCountX, repeatCountY, repeatCountZ1, repeatCountZ2, repeatCountTheta }.Max();
+                if (IsOpenWater)
                 {
-                    MaterialSnack("请选择至少一个项进行空运行！", SnackType.WARNING);
-                    return;
+                    await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
                 }
-                if (_emptyRunCts != null && !_emptyRunCts.IsCancellationRequested)
+                if (IsFlowing)
                 {
-                    MaterialSnack("空运行已在进行中！", SnackType.WARNING);
-                    return;
+                    await PlcControl.tagControl.wholeDevice.OpenWorkpieceBlowingAsync();
                 }
-                _emptyRunCts?.Dispose();
-                _emptyRunCts = new CancellationTokenSource();
-                IsEnabledGrid = false;
-                InitRuningRightButton();
-                _ = AutoCutUtils.MonitoringAlarmAsync(Stop, () => AlarmConfig.Instance.HasActiveErrorAlarm(false), default, _emptyRunCts.Token);
-                _ = Task.Run(async () =>
+                List<Task> tasks = [];
+                while (!_emptyRunCts.IsCancellationRequested && currentRepeat < maxRepeatCount)
                 {
-                    try
+                    await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, speedZ1, _emptyRunCts.Token);
+                    await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, speedZ2, _emptyRunCts.Token);
+                    if (RunX && currentRepeat < repeatCountX)
                     {
-                        float speedX = _speedX.ToFloat();
-                        float speedY = _speedY.ToFloat();
-                        float speedZ1 = _speedZ1.ToFloat();
-                        float speedZ2 = _speedZ2.ToFloat();
-                        float speedTheta = _speedTheta.ToFloat();
-                        int repeatCountX = RunX ? _repeatCountX.ToInt() : 0;
-                        int repeatCountY = RunY ? _repeatCountY.ToInt() : 0;
-                        int repeatCountZ1 = RunZ1 ? _repeatCountZ1.ToInt() : 0;
-                        int repeatCountZ2 = RunZ2 ? _repeatCountZ2.ToInt() : 0;
-                        int repeatCountTheta = RunTheta ? _repeatCountTheta.ToInt() : 0;
-                        int currentRepeat = 0;
-                        int maxRepeatCount = new int[] { repeatCountX, repeatCountY, repeatCountZ1, repeatCountZ2, repeatCountTheta }.Max();
-                        if (IsOpenWater)
-                        {
-                            await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
-                        }
-                        if (IsFlowing)
-                        {
-                            await PlcControl.tagControl.wholeDevice.OpenWorkpieceBlowingAsync();
-                        }
-                        using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(500));
-                        List<Task> tasks = [];
-                        while (await timer.WaitForNextTickAsync() && currentRepeat < maxRepeatCount)
-                        {
-                            await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, speedZ1, _emptyRunCts.Token);
-                            await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, speedZ2, _emptyRunCts.Token);
-                            if (RunX && currentRepeat < repeatCountX)
-                            {
-                                tasks.Add(PlcControl.tagControl.Xaxis.StartAbsoluteAsync(Appsettings.PositiveLimitPositionX ?? 0, speedX, _emptyRunCts.Token));
-                            }
-                            if (RunY && currentRepeat < repeatCountY)
-                            {
-                                tasks.Add(PlcControl.tagControl.Yaxis.StartAbsoluteAsync(Appsettings.PositiveLimitPositionY ?? 0, speedY, _emptyRunCts.Token));
-                            }
-                            if (RunTheta && currentRepeat < repeatCountTheta)
-                            {
-                                tasks.Add(PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(Appsettings.PositiveLimitPositionTheta ?? 0, speedTheta, _emptyRunCts.Token));
-                            }
-                            await Task.WhenAll(tasks);
-                            if (RunX && currentRepeat < repeatCountX)
-                            {
-                                tasks.Add(PlcControl.tagControl.Xaxis.StartAbsoluteAsync(0, speedX, _emptyRunCts.Token));
-                            }
-                            if (RunY && currentRepeat < repeatCountY)
-                            {
-                                tasks.Add(PlcControl.tagControl.Yaxis.StartAbsoluteAsync(0, speedY, _emptyRunCts.Token));
-                            }
-                            if (RunTheta && currentRepeat < repeatCountTheta)
-                            {
-                                tasks.Add(PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0, speedTheta, _emptyRunCts.Token));
-                            }
-                            await Task.WhenAll(tasks);
-                            if (RunZ1 && currentRepeat < repeatCountZ1)
-                            {
-                                tasks.Add(PlcControl.tagControl.Z1axis.StartAbsoluteAsync(5, speedZ1, _emptyRunCts.Token));
-                            }
-                            if (RunZ2 && currentRepeat < repeatCountZ2)
-                            {
-                                tasks.Add(PlcControl.tagControl.Z2axis.StartAbsoluteAsync(5, speedZ2, _emptyRunCts.Token));
-                            }
-                            await Task.WhenAll(tasks);
-                            if (RunZ1 && currentRepeat < repeatCountZ1)
-                            {
-                                tasks.Add(PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, speedZ1, _emptyRunCts.Token));
-                            }
-                            if (RunZ2 && currentRepeat < repeatCountZ2)
-                            {
-                                tasks.Add(PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, speedZ2, _emptyRunCts.Token));
-                            }
-                            await Task.WhenAll(tasks);
-                            tasks.Clear();
-                            currentRepeat++;
-                        }
-                        MaterialSnack("空运行已完成！", SnackType.SUCCESS);
+                        tasks.Add(PlcControl.tagControl.Xaxis.StartAbsoluteAsync(Appsettings.PositiveLimitPositionX ?? 0, speedX, _emptyRunCts.Token));
                     }
-                    catch (OperationCanceledException)
+                    if (RunY && currentRepeat < repeatCountY)
                     {
-                        MaterialSnack("空运行已取消！", SnackType.WARNING);
+                        tasks.Add(PlcControl.tagControl.Yaxis.StartAbsoluteAsync(Appsettings.PositiveLimitPositionY ?? 0, speedY, _emptyRunCts.Token));
                     }
-                    catch (Exception ex)
+                    if (RunTheta && currentRepeat < repeatCountTheta)
                     {
-                        MaterialSnack($"空运行发生错误: {ex.Message}", SnackType.ERROR);
+                        tasks.Add(PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(Appsettings.PositiveLimitPositionTheta ?? 0, speedTheta, _emptyRunCts.Token));
                     }
-                    finally
+                    await Task.WhenAll(tasks);
+                    if (RunX && currentRepeat < repeatCountX)
                     {
-                        await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
-                        await PlcControl.tagControl.wholeDevice.CloseWorkpieceBlowingAsync();
-                        Stop();
+                        tasks.Add(PlcControl.tagControl.Xaxis.StartAbsoluteAsync(0, speedX, _emptyRunCts.Token));
                     }
-                }, _emptyRunCts.Token);
+                    if (RunY && currentRepeat < repeatCountY)
+                    {
+                        tasks.Add(PlcControl.tagControl.Yaxis.StartAbsoluteAsync(0, speedY, _emptyRunCts.Token));
+                    }
+                    if (RunTheta && currentRepeat < repeatCountTheta)
+                    {
+                        tasks.Add(PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0, speedTheta, _emptyRunCts.Token));
+                    }
+                    await Task.WhenAll(tasks);
+                    if (RunZ1 && currentRepeat < repeatCountZ1)
+                    {
+                        tasks.Add(PlcControl.tagControl.Z1axis.StartAbsoluteAsync(5, speedZ1, _emptyRunCts.Token));
+                    }
+                    if (RunZ2 && currentRepeat < repeatCountZ2)
+                    {
+                        tasks.Add(PlcControl.tagControl.Z2axis.StartAbsoluteAsync(5, speedZ2, _emptyRunCts.Token));
+                    }
+                    await Task.WhenAll(tasks);
+                    if (RunZ1 && currentRepeat < repeatCountZ1)
+                    {
+                        tasks.Add(PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, speedZ1, _emptyRunCts.Token));
+                    }
+                    if (RunZ2 && currentRepeat < repeatCountZ2)
+                    {
+                        tasks.Add(PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, speedZ2, _emptyRunCts.Token));
+                    }
+                    await Task.WhenAll(tasks);
+                    tasks.Clear();
+                    await Task.Delay(500);
+                    currentRepeat++;
+                }
+                MaterialSnack("空运行已完成！", SnackType.SUCCESS);
+            }
+            catch (OperationCanceledException)
+            {
+                MaterialSnack("空运行已取消！", SnackType.WARNING);
+            }
+            catch (Exception ex)
+            {
+                MaterialSnack($"空运行发生错误: {ex.Message}", SnackType.ERROR);
             }
             finally
             {
-                _emptyRunSemaphore.Release();
+                await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
+                await PlcControl.tagControl.wholeDevice.CloseWorkpieceBlowingAsync();
+                Stop();
             }
         }
 
         private async void Stop()
         {
-            if (!await _emptyRunSemaphore.WaitAsync(TimeSpan.Zero))
-            {
-                MaterialSnack("终止空运行中！", SnackType.WARNING);
-                return;
-            }
             try
             {
                 _emptyRunCts?.Cancel();
@@ -362,9 +340,12 @@ namespace 精密切割系统.ViewModel
                     PlcControl.tagControl.Xaxis.WaitAxisStopAsync(timeoutToken.Token),
                     PlcControl.tagControl.Yaxis.WaitAxisStopAsync(timeoutToken.Token),
                     PlcControl.tagControl.Z1axis.WaitAxisStopAsync(timeoutToken.Token),
-                    PlcControl.tagControl.Z2axis.WaitAxisStopAsync(timeoutToken.Token),
-                    PlcControl.tagControl.ThetaAxis.WaitAxisStopAsync(timeoutToken.Token)
+                    PlcControl.tagControl.Z2axis.WaitAxisStopAsync(timeoutToken.Token)
                 );
+                if (GlobalParams.DeviceModel == GlobalParams.Device_562 || GlobalParams.DeviceModel == GlobalParams.Device_321)
+                {
+                    await PlcControl.tagControl.ThetaAxis.WaitAxisStopAsync(timeoutToken.Token);
+                }
                 InitRightButton();
             }
             catch (OperationCanceledException)
@@ -378,8 +359,13 @@ namespace 精密切割系统.ViewModel
             finally
             {
                 NavigateUtils.SetWindowIsEnable(true);
-                _emptyRunSemaphore.Release();
             }
+        }
+
+        private void Sure()
+        {
+            NavigateUtils.ToOperateButton();
+            MaterialSnack("参数已确定！", SnackType.SUCCESS);
         }
 
         private void Back()
@@ -394,8 +380,8 @@ namespace 精密切割系统.ViewModel
 
         public override void OnNavigatedTo(NavigationContext navigationContext)
         {
+            base.OnNavigatedTo(navigationContext);
             NavigateUtils.ClearMainFrame();
-            InitRightButton();
         }
     }
 }

@@ -53,9 +53,9 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             rightPage.btnCutStart.Visibility = Visibility.Visible;
             rightPage.btnCutStart.SetRightClickedHandler(StartCut);
             rightPage.btnCutBackward.Visibility = Visibility.Visible;
-            rightPage.btnCutBackward.SetRightClickedHandler(CutBackward);
+            rightPage.btnCutBackward.SetRightClickedHandler((a, b) => CutBackward());
             rightPage.btnCutFront.Visibility = Visibility.Visible;
-            rightPage.btnCutFront.SetRightClickedHandler(CutFront);
+            rightPage.btnCutFront.SetRightClickedHandler((a, b) => CutFront());
             GlobalParams.cutStatusInfo = 0;
             UpdateDefineDataModel();
             // 初始化配置
@@ -108,6 +108,14 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             DataContext = _viewModel;
             // 设置切割初始参数
             CutOperateUtils.InitParams(1, mainWindow);
+            if (chModel.CutDir == "向前切")
+            {
+                CutFront();
+            }
+            else if (chModel.CutDir == "向后切")
+            {
+                CutBackward();
+            }
         }
 
         private async void OperateClickHandler(object? sender, int code)
@@ -208,8 +216,15 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             var currentY = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync();
             if (currentY is null)
             {
-                MaterialSnack("获取Y轴当前位置失败！", SnackType.WARNING);
-                return;
+                if (GlobalParams.OnlineFlag)
+                {
+                    MaterialSnack("获取Y轴当前位置失败！", SnackType.WARNING);
+                    return;
+                }
+                else
+                {
+                    currentY = 0;
+                }
             }
             var userDefineData = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
             float cutYPositiveLimit = userDefineData.CutYPositiveLimit.ToFloat();
@@ -260,14 +275,13 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             mainWindow.NavigateToPage("MainMenu");
         }
 
-        private void CutFront(object? sender, bool e)
+        private void CutFront()
         {
             _viewModel.CutDirection = "向前切";
             _semiAutoCutService.CutDirection = CutDirection.Forward;
-            //CutOperateUtils.cutDirection = cutDirection;
         }
 
-        private void CutBackward(object? sender, bool e)
+        private void CutBackward()
         {
             _viewModel.CutDirection = "向后切";
             _semiAutoCutService.CutDirection = CutDirection.Backward;

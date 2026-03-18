@@ -46,14 +46,14 @@ namespace 精密切割系统.ViewModel
             }
         }
 
-        private void InitRightButton()
+        protected override void InitRightButton()
         {
             RightButtonCollection.Clear();
             RightButtonCollection.Add(ButtonParams.Sure(Sure));
             RightButtonCollection.Add(ButtonParams.Back(Back));
         }
 
-        private void InitBottomButton()
+        protected override void InitBottomButton()
         {
             BottomButtonCollection.Clear();
             BottomButtonCollection.Add(ButtonParams.BlueButton("原点", "RotateRight", StartHomingAsync));
@@ -75,18 +75,7 @@ namespace 精密切割系统.ViewModel
                 MaterialSnack("参数异常，请检查参数格式！", SnackType.WARNING, 2);
                 return;
             }
-            MainWindow? mainWindow = Application.Current.MainWindow as MainWindow;
-            if (mainWindow == null)
-            {
-                return;
-            }
-            RightPage? rightPage = mainWindow.rightFrame.Content as RightPage;
-            OperatePage? operatePage = mainWindow.operateFrame.Content as OperatePage;
-            if (rightPage == null || operatePage == null)
-            {
-                return;
-            }
-            operatePage.SetOperateShowType(3);
+            NavigateUtils.ToOperateButton();
         }
 
         private void Back()
@@ -231,8 +220,6 @@ namespace 精密切割系统.ViewModel
             base.OnNavigatedTo(navigationContext);
             _cts = new CancellationTokenSource();
             _ = Task.Run(() => MonitiorAxisState(_cts.Token));
-            InitRightButton();
-            InitBottomButton();
         }
 
         public override async void OnNavigatedFrom(NavigationContext navigationContext)

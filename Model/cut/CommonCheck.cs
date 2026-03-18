@@ -12,28 +12,6 @@ namespace 精密切割系统.Driver
     internal class CommonCheck
     {
         /// <summary>
-        /// 检查全局运行状态
-        /// </summary>
-        /// <returns></returns>
-        public static bool CheckGlobalRunStatus()
-        {
-            return GlobalParams.globalRunFlag;
-        }
-
-        /// <summary>
-        /// 轴运动状态检查 1、全局运行状态 2 轴busy状态 3、报警状态
-        /// </summary>
-        /// <returns></returns>
-        public static bool AxisRunStatusCheck()
-        {
-            if (!CheckGlobalRunStatus() || AlarmConfig.Instance.HasActiveErrorAlarm())
-            {
-                return false;
-            }
-            return true;
-        }
-
-        /// <summary>
         /// 校准模式状态校验
         /// </summary>
         /// <returns></returns>

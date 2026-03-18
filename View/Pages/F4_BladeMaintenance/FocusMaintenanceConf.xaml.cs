@@ -121,7 +121,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             float? currentZ2 = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync();
             if (currentZ2 == null)
             {
-                MaterialSnack("获取当前位置失败，请检测PLC连接状态！", SnackType.SUCCESS);
+                MaterialSnack("获取当前位置失败，请检测PLC连接状态！", SnackType.WARNING);
             }
             else
             {
@@ -130,6 +130,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 Appsettings.FocusClearZ = null;
                 MaterialSnack("对焦点位置确认成功！", SnackType.SUCCESS);
             }
+            NavigateUtils.ToOperateButton();
         }
     }
 }

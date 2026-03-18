@@ -131,14 +131,14 @@
                 InputType="Decimal"
                 Text="{Binding Path=WarmUpTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 TextWrapping="Wrap"
-                XPrecision="0"
                 XMax="3600"
-                XMin="0" />
+                XMin="0"
+                XPrecision="0" />
             <Label
                 x:Name="labelWarmUpTimeUnit"
                 Grid.ColumnSpan="4"
                 HorizontalAlignment="Left"
-                Content="s" />
+                Content="min" />
 
             <Label Grid.Row="7" Content="暖机时X轴位置" />
             <Controls:InputTextBox

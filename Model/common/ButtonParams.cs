@@ -253,5 +253,10 @@ namespace 精密切割系统.Model.common
         {
             return YelloRightButton("返回", "/Assets/icon/right/back.png", action);
         }
+
+        internal static ButtonParams BlueButton(string v1, string v2, object value, Task task1, Task task2)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

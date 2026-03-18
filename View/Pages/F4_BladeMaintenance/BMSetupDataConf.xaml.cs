@@ -192,6 +192,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 var initialPosition = await SqlHelper.GetOrCreateEntityAsync(() => new InitialPositionModel());
                 initialPosition.BladeSetupInitZ1 = ViewModel.BladeSetupInitZ1;
                 await SqlHelper.UpdateAsync(initialPosition);
+                NavigateUtils.ToOperateButton();
                 MaterialSnack("测高参数已确认!", SnackType.SUCCESS);
             }
             catch (Exception ex)
