@@ -625,12 +625,12 @@ namespace 精密切割系统.ViewModel
                 CutParam.ChannelNum = process.ChannelNum;
                 if (process.IsCompleted)
                 {
-                    Appsettings.AfterReplaceBladeCutTimes++;
-                    Appsettings.AfterReplaceBladeCutLength += process.CutLength;
-                    Appsettings.AfterMeasureHeightCutTimes++;
-                    Appsettings.AfterMeasureHeightCutLength += process.CutLength;
-                    Appsettings.AfterClearDataCutTimes++;
-                    Appsettings.AfterClearDataCutLength += process.CutLength;
+                    Appsettings.AfterReplaceBladeCutTimes = (Appsettings.AfterReplaceBladeCutTimes ?? 0) + 1;
+                    Appsettings.AfterReplaceBladeCutLength = (Appsettings.AfterReplaceBladeCutLength ?? 0) + process.CutLength;
+                    Appsettings.AfterMeasureHeightCutTimes = (Appsettings.AfterMeasureHeightCutTimes ?? 0) + 1;
+                    Appsettings.AfterMeasureHeightCutLength = (Appsettings.AfterMeasureHeightCutLength ?? 0) + process.CutLength;
+                    Appsettings.AfterClearDataCutTimes = (Appsettings.AfterClearDataCutTimes ?? 0) + 1;
+                    Appsettings.AfterClearDataCutLength = (Appsettings.AfterClearDataCutLength ?? 0) + process.CutLength;
                     CutParam.AllCutLine = Appsettings.AfterReplaceBladeCutTimes ?? 0;
                     CutParam.AllCutLineLength = (Appsettings.AfterReplaceBladeCutLength / 1000 ?? 0).ToString("F2");
                     if (process.CutTimes > 1)

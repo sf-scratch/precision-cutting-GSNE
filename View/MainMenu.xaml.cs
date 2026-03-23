@@ -294,15 +294,24 @@ namespace 精密切割系统.View
                         MaterialSnack($"{nameof(mainWindow)}为空", SnackType.WARNING);
                         return;
                     }
+                    if (!GlobalParams.OnlineFlag)
+                    {
+                        mainWindow?.NavigateToPage(bean.PageUrl);
+                        return;
+                    }
                     try
                     {
                         mainWindow.IsEnabled = false;
                         await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(60));
-                        await AutoCutUtils.ReplaceBladeAsync(default, timeoutToken.Token);
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        MaterialSnack("换刀超时！", SnackType.WARNING);
+                        CommonResult replaceBladeResult = await AutoCutUtils.ReplaceBladeAsync(default, timeoutToken.Token);
+                        if (replaceBladeResult.IsSuccess)
+                        {
+                            mainWindow?.NavigateToPage(bean.PageUrl);
+                        }
+                        else
+                        {
+                            MaterialSnack(replaceBladeResult.Message, SnackType.WARNING);
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -312,7 +321,6 @@ namespace 精密切割系统.View
                     {
                         mainWindow.IsEnabled = true;
                     }
-                    mainWindow?.NavigateToPage(bean.PageUrl);
                     break;
 
                 case 439:

@@ -37,10 +37,9 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         // 操作类型 0 菜单进入 1 半自动进入 2 磨刀进入
         private int _operateType = 0;
 
-        // 相机操作对象
         private CameraCommon _cameraCommon;
-
         private CancellationTokenSource _cts;
+        private bool _isConfirmFocusPosition = false;
 
         public MQManualAlignmentConf()
         {
@@ -161,7 +160,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                             try
                             {
                                 await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(120), _cts.Token);
-                                var result = await AutoFocusService.GlobalFocusAsync(_eventAggregator, timeoutToken.Token);
+                                var result = await AutoFocusService.GlobalFocusAsync(_isConfirmFocusPosition ? Appsettings.FocusClearZ : null, _eventAggregator, timeoutToken.Token);
                                 if (!result.IsSuccess)
                                 {
                                     MaterialSnack(result.Message, SnackType.WARNING, default, _eventAggregator);
@@ -186,6 +185,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
 
                 // 确认Z1对焦位置
                 case 2445:
+                    _isConfirmFocusPosition = true;
                     Appsettings.FocusClearZ = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync();
                     MaterialSnack($"对焦位置已确认：{Appsettings.FocusClearZ}mm！", SnackType.WARNING, default, _eventAggregator);
                     break;

@@ -35,20 +35,23 @@ namespace 精密切割系统.Model.cut
         // 对焦起始抬起位置
         private const float FocusStartingLiftPosition = 0.5f;
 
-        public static async Task<CommonResult<float>> GlobalFocusAsync(IEventAggregator? eventAggregator, CancellationToken token)
+        public static async Task<CommonResult<float>> GlobalFocusAsync(float? focusClearPosition, IEventAggregator? eventAggregator, CancellationToken token)
         {
             try
             {
                 eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始相机对焦..."));
-                CommonResult<float> focusClearPositionResult = await AutoCutUtils.CalculateFocusClearPosition();
-                if (!focusClearPositionResult.IsSuccess)
+                if (focusClearPosition is null)
                 {
-                    return CommonResult<float>.Failure(focusClearPositionResult.Message);
+                    CommonResult<float> focusClearPositionResult = await AutoCutUtils.CalculateFocusClearPosition();
+                    if (!focusClearPositionResult.IsSuccess)
+                    {
+                        return CommonResult<float>.Failure(focusClearPositionResult.Message);
+                    }
+                    focusClearPosition = focusClearPositionResult.Data;
                 }
-                float focusClearPosition = focusClearPositionResult.Data;
-                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(focusClearPosition - FocusStartingLiftPosition, default, token);
-                MinLimitZ = focusClearPosition - FocusStartingLiftPosition;
-                MaxLimitZ = focusClearPosition + FocusStartingLiftPosition;
+                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(focusClearPosition.Value - FocusStartingLiftPosition, default, token);
+                MinLimitZ = focusClearPosition.Value - FocusStartingLiftPosition;
+                MaxLimitZ = focusClearPosition.Value + FocusStartingLiftPosition;
                 int direction = 1;
                 // 阶段1：快速粗调（正向扫描）
                 var coarseResult = await FindOptimalFocus(

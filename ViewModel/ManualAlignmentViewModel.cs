@@ -29,6 +29,7 @@ namespace 精密切割系统.ViewModel
         private CancellationTokenSource _cts;
         private Dictionary<string, ChData>? _chDictionary;
         private Queue<string>? _chQueue;
+        private bool _isConfirmFocusPosition = false;
 
         private DelegateCommand _loadedCommand;
 
@@ -195,6 +196,7 @@ namespace 精密切割系统.ViewModel
 
         private async Task FocusAutoSureAsync()
         {
+            _isConfirmFocusPosition = true;
             Appsettings.FocusClearZ = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync();
             MaterialSnack($"对焦位置已确认：{Appsettings.FocusClearZ}mm！", SnackType.WARNING, default, _eventAggregator);
         }
@@ -207,7 +209,7 @@ namespace 精密切割系统.ViewModel
                 try
                 {
                     await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(120), token);
-                    var result = await AutoFocusService.GlobalFocusAsync(_eventAggregator, timeoutToken.Token);
+                    var result = await AutoFocusService.GlobalFocusAsync(_isConfirmFocusPosition ? Appsettings.FocusClearZ : null, _eventAggregator, timeoutToken.Token);
                     if (!result.IsSuccess)
                     {
                         MaterialSnack(result.Message, SnackType.WARNING, default, _eventAggregator);

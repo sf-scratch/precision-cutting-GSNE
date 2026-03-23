@@ -78,7 +78,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                CommonResult<float> focusRusult = await AutoFocusService.GlobalFocusAsync(default, _cts?.Token ?? default);
+                CommonResult<float> focusRusult = await AutoFocusService.GlobalFocusAsync(default, default, _cts?.Token ?? default);
                 if (!focusRusult.IsSuccess)
                 {
                     MaterialSnack(focusRusult.Message, SnackType.WARNING);

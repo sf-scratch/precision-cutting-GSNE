@@ -169,7 +169,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
                 await PlcControl.tagControl.cutting.WaitSpindleRevReachAsync(token);
                 AxisPosition axisPostion = await AutoCutUtils.GetAxisPositionAsync();
                 float curX = axisPostion.X ?? 0;
-                float xLeft = curX + FlangeTrimmingData.Instance.XAxisTravel, xRight = curX;
+                float xLeft = curX - FlangeTrimmingData.Instance.XAxisTravel, xRight = curX;
                 bool isLeft = true;
                 for (int i = 0; i < FlangeTrimmingData.Instance.RepeatCount; i++)
                 {
@@ -215,7 +215,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
                 await PlcControl.tagControl.cutting.WaitSpindleRevReachAsync(token);
                 AxisPosition axisPostion = await AutoCutUtils.GetAxisPositionAsync();
                 float curX = axisPostion.X ?? 0;
-                float xLeft = curX + FlangeTrimmingData.Instance.XAxisTravel, xRight = curX;
+                float xLeft = curX - FlangeTrimmingData.Instance.XAxisTravel, xRight = curX;
                 bool isLeft = true;
                 for (int i = 0; i < FlangeTrimmingData.Instance.RepeatCount; i++)
                 {

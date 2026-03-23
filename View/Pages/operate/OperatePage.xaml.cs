@@ -1,4 +1,5 @@
-﻿using NPOI.SS.Formula.Functions;
+﻿using Newtonsoft.Json.Linq;
+using NPOI.SS.Formula.Functions;
 using SixLabors.ImageSharp.Metadata.Profiles.Exif;
 using System;
 using System.Collections.Generic;
@@ -630,30 +631,28 @@ namespace 精密切割系统.View.Pages.operate
             }
         }
 
-        private SemaphoreSlim _spindleSemaphore = new SemaphoreSlim(1, 1);
-
         private async Task SpindleManuallyRunAsync()
         {
-            if (!await _spindleSemaphore.WaitAsync(TimeSpan.Zero))
-            {
-                MaterialSnack("主轴加减速中，请勿重复点击！", SnackType.WARNING);
-                return;
-            }
             try
             {
+                TimeoutToken timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(60));
                 if (await PlcControl.tagControl.wholeDevice.GetSpindleSpeedAsync() == 0)
                 {
+                    MaterialSnack("主轴启动中...", SnackType.WARNING, 0);
                     await PlcControl.tagControl.wholeDevice.StartSpindleAsync();
+                    await PlcControl.tagControl.cutting.WaitSpindleRevReachAsync(timeoutToken.Token);
+                    MaterialSnack("主轴启动完成！", SnackType.SUCCESS);
                 }
                 else
                 {
+                    MaterialSnack("主轴停止中...", SnackType.WARNING, 0);
                     await PlcControl.tagControl.wholeDevice.StopSpindleAsync();
-                    await PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync();
+                    await PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync(timeoutToken.Token);
+                    MaterialSnack("主轴停止完成！", SnackType.SUCCESS);
                 }
             }
-            finally
+            catch (Exception ex)
             {
-                _spindleSemaphore.Release();
             }
         }
     }

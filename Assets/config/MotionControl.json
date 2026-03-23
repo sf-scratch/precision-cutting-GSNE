@@ -63,6 +63,12 @@
       "lowerValue": "0",
       "alarmPriority": 1
     },
+    "jogRelativeSlowSpeed": {
+      "valueType": "float",
+      "addr": "DM1004",
+      "name": "X点动和相对运动慢速度",
+      "describe": "X点动和相对运动慢速度"
+    },
     "jogRelativeHighSpeed": {
       "valueType": "float",
       "addr": "DM046",
@@ -71,11 +77,11 @@
       "upperValue": "150",
       "lowerValue": "0"
     },
-    "relativeDistance": {
+    "maxSpeed": {
       "valueType": "float",
-      "addr": "DM1004",
-      "name": "X轴相对运动距离",
-      "describe": "x轴相对运动距离"
+      "addr": "DM1006",
+      "name": "X轴最大运行速度",
+      "describe": "X轴最大运行速度"
     },
     "absoluteStart": {
       "valueType": "bool",
@@ -211,6 +217,12 @@
       "upperValue": "200",
       "lowerValue": "0"
     },
+    "jogRelativeSlowSpeed": {
+      "valueType": "float",
+      "addr": "DM1014",
+      "name": "Y点动和相对运动慢速度",
+      "describe": "Y点动和相对运动慢速度"
+    },
     "jogRelativeHighSpeed": {
       "valueType": "float",
       "addr": "DM146",
@@ -219,11 +231,11 @@
       "upperValue": "50",
       "lowerValue": "0"
     },
-    "relativeDistance": {
+    "maxSpeed": {
       "valueType": "float",
-      "addr": "DM1014",
-      "name": "Y轴相对运动距离",
-      "describe": "Y轴相对运动距离"
+      "addr": "DM1016",
+      "name": "Y轴最大运行速度",
+      "describe": "Y轴最大运行速度"
     },
     "absoluteStart": {
       "valueType": "bool",
@@ -359,6 +371,12 @@
       "upperValue": "200",
       "lowerValue": "0"
     },
+    "jogRelativeSlowSpeed": {
+      "valueType": "float",
+      "addr": "DM1024",
+      "name": "Z1点动和相对运动慢速度",
+      "describe": "Z1点动和相对运动慢速度"
+    },
     "jogRelativeHighSpeed": {
       "valueType": "float",
       "addr": "DM246",
@@ -367,11 +385,11 @@
       "upperValue": "40",
       "lowerValue": "0"
     },
-    "relativeDistance": {
+    "maxSpeed": {
       "valueType": "float",
-      "addr": "DM1024",
-      "name": "Z1轴相对运动距离",
-      "describe": "Z1轴相对运动距离"
+      "addr": "DM1026",
+      "name": "Z1轴最大运行速度",
+      "describe": "Z1轴最大运行速度"
     },
     "absoluteStart": {
       "valueType": "bool",
@@ -501,6 +519,12 @@
       "upperValue": "20",
       "lowerValue": "0"
     },
+    "jogRelativeSlowSpeed": {
+      "valueType": "float",
+      "addr": "DM1034",
+      "name": "Z2点动和相对运动慢速度",
+      "describe": "Z2点动和相对运动慢速度"
+    },
     "jogRelativeHighSpeed": {
       "valueType": "float",
       "addr": "DM346",
@@ -509,11 +533,11 @@
       "upperValue": "20",
       "lowerValue": "0"
     },
-    "relativeDistance": {
+    "maxSpeed": {
       "valueType": "float",
-      "addr": "DM1034",
-      "name": "Z2轴相对运动距离",
-      "describe": "Z2轴相对运动距离"
+      "addr": "DM1036",
+      "name": "Z2轴最大运行速度",
+      "describe": "Z2轴最大运行速度"
     },
     "absoluteStart": {
       "valueType": "bool",
@@ -637,6 +661,12 @@
       "upperValue": "20",
       "lowerValue": "0"
     },
+    "jogRelativeSlowSpeed": {
+      "valueType": "float",
+      "addr": "DM1044",
+      "name": "Theta点动和相对运动慢速度",
+      "describe": "Theta点动和相对运动慢速度"
+    },
     "jogRelativeHighSpeed": {
       "valueType": "float",
       "addr": "DM446",
@@ -645,11 +675,11 @@
       "upperValue": "100",
       "lowerValue": "0"
     },
-    "relativeDistance": {
+    "maxSpeed": {
       "valueType": "float",
-      "addr": "DM1044",
-      "name": "Theta轴相对运动距离",
-      "describe": "Theta轴相对运动距离"
+      "addr": "DM1046",
+      "name": "Theta轴最大运行速度",
+      "describe": "Theta轴最大运行速度"
     },
     "absoluteStart": {
       "valueType": "bool",
@@ -897,7 +927,7 @@
     },
     "measureHeightSlowSpeed": {
       "valueType": "float",
-      "addr": "DM1026",
+      "addr": "DM1024",
       "name": "测高低速段速度",
       "describe": "测高低速段速度"
     },

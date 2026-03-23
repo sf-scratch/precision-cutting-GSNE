@@ -249,7 +249,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                     await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, cts.Token);
                     await AutoCutUtils.WorkpieceBlowingAsync(default, default, true, default, cts.Token);
                     await PlcControl.tagControl.cutting.RunMotionAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), line.StartPoint.Y.ToCameraY(), cts.Token);
-                    await AutoFocusService.GlobalFocusAsync(default, cts.Token);
+                    await AutoFocusService.GlobalFocusAsync(default, default, cts.Token);
                     await AutoCutUtils.FineTuneAxisYAsync();
                     await AutoCutUtils.UpdateCameraCommonLineAsync();
                 }
@@ -374,7 +374,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
 
                 case 2442:
                     var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(120));
-                    var result = await AutoFocusService.GlobalFocusAsync(default, timeoutToken.Token);
+                    var result = await AutoFocusService.GlobalFocusAsync(default, default, timeoutToken.Token);
                     if (!result.IsSuccess)
                     {
                         MaterialSnack(result.Message, SnackType.WARNING);

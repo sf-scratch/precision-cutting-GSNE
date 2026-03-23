@@ -362,7 +362,11 @@ namespace 精密切割系统.ViewModel
         private async Task ReplaceBlade()
         {
             await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(60), _cts.Token);
-            await AutoCutUtils.ReplaceBladeAsync(default, timeoutToken.Token);
+            CommonResult replaceBladeResult = await AutoCutUtils.ReplaceBladeAsync(default, timeoutToken.Token);
+            if (!replaceBladeResult.IsSuccess)
+            {
+                MaterialSnack(replaceBladeResult.Message, SnackType.WARNING);
+            }
         }
 
         public override void OnNavigatedTo(NavigationContext navigationContext)

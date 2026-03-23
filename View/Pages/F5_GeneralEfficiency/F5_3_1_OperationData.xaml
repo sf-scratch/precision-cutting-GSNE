@@ -47,7 +47,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="80" />
-            <RowDefinition Height="250" />
+            <RowDefinition Height="260" />
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -76,225 +76,72 @@
                 Content="扫描速度"
                 FontSize="22"
                 FontWeight="Bold" />
-            <StackPanel Margin="5,5,0,0" Orientation="Horizontal">
+
+            <auto:AutoGrid
+                Grid.RowSpan="8"
+                Width="700"
+                HorizontalAlignment="Left"
+                ChildMargin="5"
+                Columns="60,auto,*,auto,auto,*,auto,*,auto"
+                RowCount="10">
+                <Label Content="X轴" />
+                <Label Content="高速" />
+                <Controls:InputTextBox Text="{Binding Path=XScanSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Label HorizontalAlignment="Left" Content="mm/s" />
+                <Label Content="低速" />
+                <Controls:InputTextBox Text="{Binding Path=XScanSlowSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Label HorizontalAlignment="Left" Content="mm/s" />
+                <Controls:InputTextBox Text="{Binding Path=XSscanDistance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" XPrecision="4" />
+                <Label HorizontalAlignment="Left" Content="mm" />
+                <Label Content="Y轴" />
+                <Label Content="高速" />
+                <Controls:InputTextBox Text="{Binding Path=YScanSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Label HorizontalAlignment="Left" Content="mm/s" />
+                <Label Content="低速" />
+                <Controls:InputTextBox Text="{Binding Path=YScanSlowSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Label HorizontalAlignment="Left" Content="mm/s" />
+                <Controls:InputTextBox Text="{Binding Path=YSscanDistance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" XPrecision="4" />
+                <Label HorizontalAlignment="Left" Content="mm" />
+                <Label Content="Z1轴" />
+                <Label Content="高速" />
+                <Controls:InputTextBox Text="{Binding Path=ZScanSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Label HorizontalAlignment="Left" Content="mm/s" />
+                <Label Content="低速" />
+                <Controls:InputTextBox Text="{Binding Path=ZScanSlowSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Label HorizontalAlignment="Left" Content="mm/s" />
+                <Controls:InputTextBox Text="{Binding Path=ZSscanDistance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" XPrecision="4" />
+                <Label HorizontalAlignment="Left" Content="mm" />
+                <Label Content="Z2轴" />
+                <Label Content="高速" />
+                <Controls:InputTextBox Text="{Binding Path=Z2ScanSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Label HorizontalAlignment="Left" Content="mm/s" />
+                <Label Content="低速" />
+                <Controls:InputTextBox Text="{Binding Path=Z2ScanSlowSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Label HorizontalAlignment="Left" Content="mm/s" />
+                <Controls:InputTextBox Text="{Binding Path=Z2SscanDistance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" XPrecision="4" />
+                <Label HorizontalAlignment="Left" Content="mm" />
+                <Label Content="θ轴" Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <Label Content="高速" Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <Controls:InputTextBox Text="{Binding Path=RScanSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
                 <Label
-                    Width="100"
-                    Height="35"
-                    Content="X轴"
-                    FontWeight="Bold" />
-                <Controls:InputTextBox
-                    Width="150"
-                    Height="35"
-                    InputType="Decimal"
-                    Text="{Binding Path=XScanSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    TextWrapping="Wrap"
-                    XAllowNull="False"
-                    XMin="0"
-                    XPrecision="3" />
-                <Label
-                    Width="160"
-                    Height="35"
+                    HorizontalAlignment="Left"
                     Content="mm/s"
-                    FontWeight="Bold" />
-                <Controls:InputTextBox
-                    Width="150"
-                    Height="35"
-                    InputType="Decimal"
-                    Text="{Binding Path=XSscanDistance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    TextWrapping="Wrap"
-                    XAllowNull="False"
-                    XMin="0"
-                    XPrecision="4" />
+                    Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <Label Content="低速" Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <Controls:InputTextBox Text="{Binding Path=ThetaScanSlowSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
                 <Label
-                    Width="60"
-                    Height="35"
-                    Content="mm"
-                    FontWeight="Bold" />
-            </StackPanel>
-            <StackPanel Margin="5,5,0,0" Orientation="Horizontal">
-                <Label
-                    Width="100"
-                    Height="35"
-                    Content="Y轴"
-                    FontWeight="Bold" />
-                <Controls:InputTextBox
-                    Width="150"
-                    Height="35"
-                    InputType="Decimal"
-                    Text="{Binding Path=YScanSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    TextWrapping="Wrap"
-                    XAllowNull="False"
-                    XMin="0"
-                    XPrecision="3" />
-                <Label
-                    Width="160"
-                    Height="35"
+                    HorizontalAlignment="Left"
                     Content="mm/s"
-                    FontWeight="Bold" />
+                    Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
                 <Controls:InputTextBox
-                    Width="150"
-                    Height="35"
-                    InputType="Decimal"
-                    Text="{Binding Path=YSscanDistance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    TextWrapping="Wrap"
-                    XAllowNull="False"
-                    XMin="0"
-                    XPrecision="4" />
-                <Label
-                    Width="60"
-                    Height="35"
-                    Content="mm"
-                    FontWeight="Bold" />
-            </StackPanel>
-            <StackPanel Margin="5,5,0,0" Orientation="Horizontal">
-                <Label
-                    Width="100"
-                    Height="35"
-                    Content="Z轴"
-                    FontWeight="Bold" />
-                <Controls:InputTextBox
-                    Width="150"
-                    Height="35"
-                    InputType="Decimal"
-                    Text="{Binding Path=ZScanSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    TextWrapping="Wrap"
-                    XAllowNull="False"
-                    XMin="0"
-                    XPrecision="3" />
-                <Label
-                    Width="160"
-                    Height="35"
-                    Content="mm/s"
-                    FontWeight="Bold" />
-                <Controls:InputTextBox
-                    Width="150"
-                    Height="35"
-                    InputType="Decimal"
-                    Text="{Binding Path=ZSscanDistance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    TextWrapping="Wrap"
-                    XAllowNull="False"
-                    XMin="0"
-                    XPrecision="4" />
-                <Label
-                    Width="60"
-                    Height="35"
-                    Content="mm"
-                    FontWeight="Bold" />
-            </StackPanel>
-            <StackPanel Margin="5,5,0,0" Orientation="Horizontal">
-                <Label
-                    Width="100"
-                    Height="35"
-                    Content="Z2轴"
-                    FontWeight="Bold" />
-                <Controls:InputTextBox
-                    Width="150"
-                    Height="35"
-                    InputType="Decimal"
-                    Text="{Binding Path=Z2ScanSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    TextWrapping="Wrap"
-                    XAllowNull="False"
-                    XMin="0"
-                    XPrecision="3" />
-                <Label
-                    Width="160"
-                    Height="35"
-                    Content="mm/s"
-                    FontWeight="Bold" />
-                <Controls:InputTextBox
-                    Width="150"
-                    Height="35"
-                    InputType="Decimal"
-                    Text="{Binding Path=Z2SscanDistance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    TextWrapping="Wrap"
-                    XAllowNull="False"
-                    XMin="0"
-                    XPrecision="4" />
-                <Label
-                    Width="60"
-                    Height="35"
-                    Content="mm"
-                    FontWeight="Bold" />
-            </StackPanel>
-            <StackPanel
-                Margin="5,5,0,0"
-                Orientation="Horizontal"
-                Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}">
-                <Label
-                    Width="100"
-                    Height="35"
-                    Content="θ轴"
-                    FontWeight="Bold" />
-                <Controls:InputTextBox
-                    Width="150"
-                    Height="35"
-                    InputType="Decimal"
-                    Text="{Binding Path=RScanSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    TextWrapping="Wrap"
-                    XAllowNull="False"
-                    XMin="0"
-                    XPrecision="3" />
-                <Label
-                    Width="160"
-                    Height="35"
-                    Content="度/s"
-                    FontWeight="Bold" />
-                <Controls:InputTextBox
-                    Width="150"
-                    Height="35"
-                    InputType="Decimal"
                     Text="{Binding Path=RSscanDistance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    TextWrapping="Wrap"
-                    XAllowNull="False"
-                    XMin="0"
+                    Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}"
                     XPrecision="4" />
                 <Label
-                    Width="60"
-                    Height="35"
-                    Content="度"
-                    FontWeight="Bold" />
-            </StackPanel>
-            <!--<StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                <Label x:Name="lbSmTime" Width="180" Height="35" Content="扫描速度" FontWeight="Bold" FontSize="16" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                <Label  Width="100"  Height="35" Content="低速" FontWeight="Bold" FontSize="16" />
-                <Controls:InputTextBox Text="{Binding Path=MoveLowTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XAllowNull="False" XPrecision="3" />
-                <Label  Width="100"  Height="35" Content="mm/s" FontWeight="Bold" FontSize="16" />
-                <Label  Width="60"  Height="35" Content="中速" FontWeight="Bold" FontSize="16" Visibility="Collapsed" />
-                <Controls:InputTextBox Text="{Binding Path=MoveHighTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Visibility="Collapsed" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Numeral" XMin="0" XAllowNull="False" XPrecision="0" />
-                <Label  Width="60"  Height="35" Content="mm/s" FontWeight="Bold" FontSize="16" Visibility="Collapsed" />
-            </StackPanel>-->
-            <!--<StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                <Label x:Name="lbPmMove" Width="180" Height="35" Content="屏幕移动量" FontWeight="Bold" FontSize="16" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                <Label   Width="100"  Height="35" Content="X轴" FontWeight="Bold" FontSize="16" />
-                <Controls:InputTextBox Text="{Binding Path=XScreenIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XAllowNull="False" XPrecision="4" />
-                <Label  Width="100"  Height="35" Content="mm" FontWeight="Bold" FontSize="16" />
-                <Label  Width="60"  Height="35" Content="Y轴" FontWeight="Bold" FontSize="16" />
-                <Controls:InputTextBox Text="{Binding Path=YScreenIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XMin="0" XAllowNull="False" XPrecision="4" />
-                <Label  Width="60"  Height="35" Content="mm" FontWeight="Bold" FontSize="16" />
-            </StackPanel>-->
-            <!--<StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                <Label x:Name="zAxisCompLabel" Width="180" Height="35" Content="Z轴补偿" FontWeight="Bold" FontSize="16" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                <Label   Width="100"  Height="35" Content="前几刀" FontWeight="Bold" FontSize="16" />
-                <Controls:InputTextBox Text="{Binding Path=zAxisCompNum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Numeral" XMin="0" XAllowNull="False" />
-                <Label  Width="100"  Height="35" Content="刀" FontWeight="Bold" FontSize="16" />
-                <Label  Width="60"  Height="35" Content="补偿量" FontWeight="Bold" FontSize="16" />
-                <Controls:InputTextBox Text="{Binding Path=zAxisCompValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"  TextWrapping="Wrap"  Height="35" InputType="Decimal" XAllowNull="False" XPrecision="4" />
-                <Label  Width="60"  Height="35" Content="mm" FontWeight="Bold" FontSize="16" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                <Label x:Name="cutBakInfoLabel" Width="180" Height="35" Content="切割回程速度" FontWeight="Bold" FontSize="16" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                <Label  Width="100"  Height="35" Content="X轴" FontWeight="Bold" FontSize="16" />
-                <Controls:InputTextBox Text="{Binding Path=cutXAxisBackSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150" XMax="300" TextWrapping="Wrap"  Height="35" InputType="Numeral" XAllowNull="False" />
-                <Label  Width="60"  Height="35" Content="mm/s" FontWeight="Bold" FontSize="16" />
-            </StackPanel>-->
+                    HorizontalAlignment="Left"
+                    Content="mm"
+                    Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
+            </auto:AutoGrid>
             <StackPanel
                 Margin="0,5,0,0"
                 Orientation="Horizontal"
@@ -799,7 +646,7 @@
                 Margin="30,0,0,0"
                 HorizontalAlignment="Left"
                 ChildMargin="5"
-                Columns="80,120,*,*,120,*,*,100,*,*"
+                Columns="60,120,*,*,120,*,*,100,*,*"
                 RowCount="10">
                 <Label Content="X轴" />
                 <Label Content="正限位位置" />
@@ -841,16 +688,31 @@
                 <Label Content="原点补偿" />
                 <Controls:InputTextBox Text="{Binding Path=OriginCompensationZ2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 <Label HorizontalAlignment="Left" Content="mm" />
-                <Label Content="θ轴" />
-                <Label Content="正限位位置" />
-                <Controls:InputTextBox x:Name="PositiveLimitPositionTheta" Text="{Binding Path=PositiveLimitPositionTheta, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <Label HorizontalAlignment="Left" Content="mm" />
-                <Label Content="负限位位置" />
-                <Controls:InputTextBox x:Name="NegativeLimitPositionTheta" Text="{Binding Path=NegativeLimitPositionTheta, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <Label HorizontalAlignment="Left" Content="mm" />
-                <Label Content="原点补偿" />
-                <Controls:InputTextBox Text="{Binding Path=OriginCompensationTheta, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <Label HorizontalAlignment="Left" Content="mm" />
+                <Label Content="θ轴" Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <Label Content="正限位位置" Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <Controls:InputTextBox
+                    x:Name="PositiveLimitPositionTheta"
+                    Text="{Binding Path=PositiveLimitPositionTheta, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <Label
+                    HorizontalAlignment="Left"
+                    Content="mm"
+                    Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <Label Content="负限位位置" Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <Controls:InputTextBox
+                    x:Name="NegativeLimitPositionTheta"
+                    Text="{Binding Path=NegativeLimitPositionTheta, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <Label
+                    HorizontalAlignment="Left"
+                    Content="mm"
+                    Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <Label Content="原点补偿" Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <Controls:InputTextBox Text="{Binding Path=OriginCompensationTheta, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <Label
+                    HorizontalAlignment="Left"
+                    Content="mm"
+                    Visibility="{Binding Source={x:Static helpers:GlobalParams.HasTheta}, Converter={StaticResource BoolToVisibilityConverter}}" />
             </auto:AutoGrid>
         </StackPanel>
     </Grid>

@@ -44,59 +44,6 @@ namespace 精密切割系统.Assets.config.buttom
             return list;
         }
 
-        //Tab0201
-        public static List<OperateBean> GetTab0201Operate()
-        {
-            var list = new List<OperateBean>();
-            list.Add(new OperateBean(1, "刀片测高", "/Assets/icon/tab_0/tab_01.png"));
-            list.Add(new OperateBean(2, "型号参数", "/Assets/icon/tab_0/tab_02.png", "Pages/F3_ModelCatalog/MCDeviceDataListConf"));
-            list.Add(new OperateBean(3, "C/T真空", "/Assets/icon/tab_0/tab_03.png"));
-            list.Add(new OperateBean(4, "主轴电机", "/Assets/icon/tab_0/tab_04.png"));
-            list.Add(new OperateBean(5, "切割水", "/Assets/icon/tab_0/tab_05.png"));
-            list.Add(new OperateBean(6, "系统初始化", "/Assets/icon/tab_0/tab_08.png"));
-            list.Add(new OperateBean(7, "安全门", "/Assets/icon/tab_0/tab_09.png"));
-            list.Add(new OperateBean(9, "相机吹气", "/Assets/icon/tab_0/tab_06.png"));
-            list.Add(new OperateBean(-1, "推拉门", "/Assets/icon/tab_0/tab_010.png"));
-            return list;
-        }
-
-        //Tab0202
-        public static List<OperateBean> GetTab0202Operate()
-        {
-            var list = new List<OperateBean>();
-            list.Add(new OperateBean(2021, "Measured Align Result", "/Assets/icon/tab_1/02/tab_19.png"));
-            list.Add(new OperateBean(2022, "高度辅助", "/Assets/icon/tab_1/02/tab_20.png"));
-            list.Add(new OperateBean(2023, "手动校准", "/Assets/icon/tab_1/02/tab_21.png"));
-            list.Add(new OperateBean(2024, "Chear No.of Work", "/Assets/icon/tab_1/02/tab_22.png"));
-            list.Add(new OperateBean(3, "C/T真空", "/Assets/icon/tab_1/02/tab_23.png"));
-            list.Add(new OperateBean(2026, "Dress", "/Assets/icon/tab_1/02/tab_24.png"));
-            list.Add(new OperateBean(2027, "速度更改", "/Assets/icon/tab_1/02/tab_25.png"));
-            list.Add(new OperateBean(2028, "型号参数", "/Assets/icon/tab_1/02/tab_26.png", "Pages/F3_ModelCatalog/MCDeviceDataListConf"));
-            list.Add(new OperateBean(2029, "Precut ON", "/Assets/icon/tab_1/02/tab_27.png"));
-            return list;
-        }
-
-        public static List<OperateBean> GetContactSetupOperate()
-        {
-            var list = new List<OperateBean>();
-            list.Add(new OperateBean(4001, "刀片更换", "/Assets/icon/tab_0/tab_01.png"));
-            list.Add(new OperateBean(4470, "刀片测高参数", "/Assets/icon/tab_1/02/tab_20.png"));
-            list.Add(new OperateBean(4471, "清零", "/Assets/icon/tab_5/tab_01.png"));
-            // list.Add(new OperateBean(8004, "面板按钮", "/Assets/icon/tab_8/tab_85.png"));
-            list.Add(new OperateBean(2422, "刀片状态信息", "/Assets/icon/tab_8/tab_85.png"));
-            return list;
-        }
-
-        /// <summary>
-        /// 获取空操作栏
-        /// </summary>
-        /// <returns></returns>
-        public static List<OperateBean> GetNullOperate()
-        {
-            var list = new List<OperateBean>();
-            return list;
-        }
-
         //Tab03
         public static List<OperateBean> GetTab03Operate()
         {

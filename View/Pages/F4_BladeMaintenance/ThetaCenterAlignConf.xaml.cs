@@ -400,7 +400,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                         try
                         {
                             await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(120));
-                            CommonResult<float> focusRusult = await AutoFocusService.GlobalFocusAsync(default, timeoutToken.Token);
+                            CommonResult<float> focusRusult = await AutoFocusService.GlobalFocusAsync(default, default, timeoutToken.Token);
                             if (!focusRusult.IsSuccess)
                             {
                                 MaterialSnack(focusRusult.Message, SnackType.WARNING);

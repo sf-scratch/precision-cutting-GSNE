@@ -75,13 +75,6 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             WindowLayout.OperatePageButtons.Clear();
         }
 
-        private async Task ReplaceBladeAsync()
-        {
-            await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(60), _cts.Token);
-            await AutoCutUtils.ReplaceBladeAsync(default, timeoutToken.Token);
-            await InitDataAsync();
-        }
-
         private async Task ReplaceWaferAsync()
         {
             await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(60), _cts.Token);
@@ -125,15 +118,11 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 MaterialSnack($"{nameof(_mainWindow)}为空", SnackType.WARNING);
                 return;
             }
-            if (!GlobalParams.OnlineFlag)
-            {
-                MaterialSnack("准备更换刀片,轴运动中！", SnackType.WARNING, 0);
-                _mainWindow.IsEnabled = false;
-                await Task.Delay(500);
-                _mainWindow.IsEnabled = true;
-                MaterialSnack("请打开切割安全门，更换刀片！", SnackType.SUCCESS, default);
-                return;
-            }
+            Appsettings.AfterReplaceBladeCutTimes = 0;
+            Appsettings.AfterReplaceBladeCutLength = 0;
+            Appsettings.MeasureHeightFirst = null;
+            Appsettings.MeasureHeightLast = null;
+            await InitDataAsync();
             var operateParams = await CurrentUtils.GetOperationParametersModelAsync();
             if (GlobalParams.DeviceModel == GlobalParams.Device_321 && operateParams.IsStartPreCuttingAfterChangeBlade)
             {

@@ -802,11 +802,14 @@ namespace 精密切割系统.Driver
         // 点动/相对模式速度
         public Tag jogRelativeSpeed { get; set; }
 
+        // 点动/相对模式慢速度
+        public Tag jogRelativeSlowSpeed { get; set; }
+
         // 高速-点动/相对模式速度
         public Tag jogRelativeHighSpeed { get; set; }
 
-        // 相对运动目标位置
-        public Tag relativeDistance { get; set; }
+        // 最大运行速度
+        public Tag maxSpeed { get; set; }
 
         // 绝对运动开始
         public Tag absoluteStart { get; set; }
@@ -836,6 +839,12 @@ namespace 精密切割系统.Driver
         /// 原点补偿
         /// </summary>
         public Tag originCompensation { get; set; }
+
+        public async Task SetMaxSpeedAsync(float speed)
+        {
+            maxSpeed.writeValue = speed.ToString("F3");
+            await keyencePlc.WriteTagAsync(maxSpeed);
+        }
 
         /// <summary>
         /// 设置软正限位
@@ -1030,6 +1039,16 @@ namespace 精密切割系统.Driver
         {
             jogRelativeSpeed.writeValue = speed.ToString();
             await keyencePlc.WriteTagAsync(jogRelativeSpeed);
+        }
+
+        /// <summary>
+        /// 设置点动和寸动的移动慢速度
+        /// </summary>
+        /// <param name="speed"></param>
+        public async Task SetJogRelativeSlowSpeedAsync(float speed)
+        {
+            jogRelativeSlowSpeed.writeValue = speed.ToString();
+            await keyencePlc.WriteTagAsync(jogRelativeSlowSpeed);
         }
 
         public async Task SetAbsoluteSpeedAsync(float speed)

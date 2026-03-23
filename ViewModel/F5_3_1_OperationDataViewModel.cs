@@ -696,5 +696,55 @@ namespace 精密切割系统.ViewModel
                 RaisePropertyChanged();
             }
         }
+
+        public string XScanSlowSpeed
+        {
+            get { return operationParameter.XScanSlowSpeed; }
+            set
+            {
+                operationParameter.XScanSlowSpeed = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public string YScanSlowSpeed
+        {
+            get { return operationParameter.YScanSlowSpeed; }
+            set
+            {
+                operationParameter.YScanSlowSpeed = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public string ZScanSlowSpeed
+        {
+            get { return operationParameter.ZScanSlowSpeed; }
+            set
+            {
+                operationParameter.ZScanSlowSpeed = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public string Z2ScanSlowSpeed
+        {
+            get { return operationParameter.Z2ScanSlowSpeed; }
+            set
+            {
+                operationParameter.Z2ScanSlowSpeed = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public string ThetaScanSlowSpeed
+        {
+            get { return operationParameter.ThetaScanSlowSpeed; }
+            set
+            {
+                operationParameter.ThetaScanSlowSpeed = value;
+                RaisePropertyChanged();
+            }
+        }
     }
 }

@@ -1,5 +1,7 @@
-﻿using System;
+﻿using NPOI.SS.Formula.Functions;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -48,12 +50,14 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             WindowLayout.RightPageButtons.Clear();
             WindowLayout.RightPageButtons.Add(ButtonParams.Back(Back));
             WindowLayout.OperatePageButtons.Clear();
+            WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("计数清零", "Numeric0BoxOutline", ResetCountAsync));
             WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("预切关闭", "/Assets/icon/tab_1/02/tab_27.png", ClosePrecut));
             await InitDataAsync();
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
+            WindowLayout.RightPageButtons.Clear();
             WindowLayout.OperatePageButtons.Clear();
         }
 
@@ -71,6 +75,14 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             measureHeightLast.Text = Appsettings.MeasureHeightLast?.ToString("F3");
             var bladeInfo = await SqlHelper.GetOrCreateEntityAsync(() => new BladeInfoEntity());
             toolHolderOuterDiameter.Text = bladeInfo.ToolHolderOuterDiameter;
+        }
+
+        private async Task ResetCountAsync()
+        {
+            Appsettings.AfterClearDataCutTimes = 0;
+            Appsettings.AfterClearDataCutLength = 0;
+            await InitDataAsync();
+            MaterialSnack("计数已清零！", SnackType.SUCCESS);
         }
 
         private void ClosePrecut()

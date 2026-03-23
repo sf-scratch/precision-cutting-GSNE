@@ -162,5 +162,11 @@ namespace 精密切割系统.database.db.modle
 
         [Column("cut_y_negative_limit")]
         public string CutYNegativeLimit { get; set; } = "0";
+
+        [Column("max_speed_x")]
+        public string MaxSpeedX { get; set; } = "0";
+
+        [Column("max_speed_y")]
+        public string MaxSpeedY { get; set; } = "0";
     }
 }

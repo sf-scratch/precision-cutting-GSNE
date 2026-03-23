@@ -286,7 +286,7 @@ namespace 精密切割系统.ViewModel
                 try
                 {
                     await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(120), token);
-                    var result = await AutoFocusService.GlobalFocusAsync(_eventAggregator, timeoutToken.Token);
+                    var result = await AutoFocusService.GlobalFocusAsync(default, _eventAggregator, timeoutToken.Token);
                     if (!result.IsSuccess)
                     {
                         MaterialSnack(result.Message, SnackType.WARNING, default, _eventAggregator);

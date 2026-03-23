@@ -129,6 +129,9 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             {
                 _rightPage.btnStartSetup.Visibility = Visibility.Visible;
                 _rightPage.btnCutStop.Visibility = Visibility.Collapsed;
+                BMParameterMaintenanceEntity bMParameter = await SqlHelper.GetOrCreateEntityAsync(() => new BMParameterMaintenanceEntity());
+                bMParameter.MeasureHeightHistory = string.Join(",", ViewModel.BladeMeasureList);
+                await SqlHelper.UpdateAsync(bMParameter);
                 _eventAggregator.GetEvent<AutoRuningMessageEvent>().Unsubscribe(OnMessageReceived);
             }
         }
@@ -214,7 +217,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             _mainWindow.NavigateToPage("MainMenu");
         }
 
-        private void heightMeasureTimes_TextChanged(object sender, TextChangedEventArgs e)
+        private async void heightMeasureTimes_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (this.HasFormError())
             {
@@ -223,14 +226,18 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             if (ViewModel is not null)
             {
                 ViewModel.BladeMeasureList.Clear();
+                BMParameterMaintenanceEntity bMParameter = await SqlHelper.GetOrCreateEntityAsync(() => new BMParameterMaintenanceEntity());
+                string[] historys = bMParameter.MeasureHeightHistory.Split(",");
                 for (int i = 1; i <= ViewModel.BMParameter.HeightMeasureTimes.ToInt(); i++)
                 {
+                    int index = i - 1;
                     ViewModel.BladeMeasureList.Add(new BladeMeasureData()
                     {
                         FieldName = i.ToString(),
-                        FieldValue = 0
+                        FieldValue = index < historys.Length ? historys[index].ToFloat() : 0
                     });
                 }
+                ViewModel.CurrentMeasureValue = ViewModel.BladeMeasureList.LastOrDefault()?.FieldValue ?? 0;
             }
         }
     }

@@ -213,5 +213,14 @@ namespace 精密切割系统.Entities
             get { return _measureHeightAllowableDeviationValue; }
             set { SetProperty(ref _measureHeightAllowableDeviationValue, value); }
         }
+
+        private string _measureHeightHistory;
+
+        [Column("measure_height_history")]
+        public string MeasureHeightHistory
+        {
+            get { return _measureHeightHistory; }
+            set { SetProperty(ref _measureHeightHistory, value); }
+        }
     }
 }

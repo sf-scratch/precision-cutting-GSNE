@@ -162,5 +162,20 @@ namespace 精密切割系统.database.db.modle
 
         [Column("is_must_calibrated")]
         public bool IsMustCalibrated { get; set; }
+
+        [Column("x_scan_slow_speed")]
+        public string XScanSlowSpeed { get; set; } = "0.001";
+
+        [Column("y_scan_slow_speed")]
+        public string YScanSlowSpeed { get; set; } = "0.001";
+
+        [Column("z_scan_slow_speed")]
+        public string ZScanSlowSpeed { get; set; } = "0.001";
+
+        [Column("z2_scan_slow_speed")]
+        public string Z2ScanSlowSpeed { get; set; } = "0.001";
+
+        [Column("theta_scan_slow_speed")]
+        public string ThetaScanSlowSpeed { get; set; } = "0.001";
     }
 }

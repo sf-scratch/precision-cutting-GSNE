@@ -1,5 +1,6 @@
 ﻿using HslCommunication.Profinet.OpenProtocol;
 using MaterialDesignThemes.Wpf;
+using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using ScottPlot.TickGenerators.TimeUnits;
 using System.Diagnostics;
@@ -320,6 +321,7 @@ namespace 精密切割系统.Model.cut
                 CutServiceProcess? preFirstCutServiceProcess = null;
                 CutServiceProcess? preNextCutServiceProcess = null;
                 bool isFirstCutAfterPause = true;
+                bool isXFromSmallToLarge = true;
                 int cutTimes = 0;
                 foreach (ChCutStep chCutStep in cutStepList)
                 {
@@ -373,7 +375,8 @@ namespace 精密切割系统.Model.cut
                             //    _isContinueBeyondWorkpiece = true;
                             //}
                             line = workpiece.CalculateCuttingLine();
-                            float actualCutHeight = cutStep.CutHeight + _depthCompensationValue - currentAutomaticCompensationCutHeight;
+                            float totaHeightlCompensation = _depthCompensationValue - currentAutomaticCompensationCutHeight;
+                            float actualCutHeight = cutStep.CutHeight + totaHeightlCompensation;
                             float targetEndZ = bladeContactWorkingDiscZ1 - actualCutHeight;
                             float startZ = bladeContactWorkingDiscZ1 - workpiece.WorkThickness - workpiece.TapeThickness - bladeLiftingHeight;
                             float depthEntry = bladeContactWorkingDiscZ1 - workpiece.WorkThickness - workpiece.TapeThickness - 0.5f;
@@ -405,15 +408,11 @@ namespace 精密切割系统.Model.cut
                             float cutLength = MathF.Abs(endX - startX);
                             //计算当前刀剩余时间
                             currentKnifeRemainTime = MathF.Abs(startX - endX) / (preCutSpeed is null ? cutSpeed : preCutSpeed.Value);
-                            //x方向交替切割
-                            if (cutStep.IsAlternatingCuttingStroke)
-                            {
-                                (startX, endX) = (endX, startX);
-                            }
+                            float justContactWork = bladeContactWorkingDiscZ1 - workpiece.WorkThickness - workpiece.TapeThickness - totaHeightlCompensation;
                             List<float> endZList = [];
                             if (cutStep.SingleCutDeep is not null && cutStep.SingleCutDeep > 0)
                             {
-                                for (float z = startZ + cutStep.SingleCutDeep.Value; z < targetEndZ; z += cutStep.SingleCutDeep.Value)
+                                for (float z = justContactWork + cutStep.SingleCutDeep.Value; z < targetEndZ; z += cutStep.SingleCutDeep.Value)
                                 {
                                     endZList.Add(z);
                                 }
@@ -423,6 +422,25 @@ namespace 精密切割系统.Model.cut
                             await PlcControl.tagControl.ThetaAxis.SetAbsoluteSpeedAsync(GlobalParams.ThetaDefaultSpeed);
                             foreach (float endZ in endZList)
                             {
+                                //x方向交替切割
+                                if (cutStep.IsAlternatingCuttingStroke)
+                                {
+                                    if (isXFromSmallToLarge)
+                                    {
+                                        if (startX > endX)
+                                        {
+                                            (startX, endX) = (endX, startX);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (startX < endX)
+                                        {
+                                            (startX, endX) = (endX, startX);
+                                        }
+                                    }
+                                    isXFromSmallToLarge = !isXFromSmallToLarge;
+                                }
                                 stopwatch.Restart();
                                 compensateY = await PlcControl.GetCompensateAsync(PlcControl.tagControl.Yaxis, line.StartPoint.Y);
                                 if (preFirstCutServiceProcess == null)

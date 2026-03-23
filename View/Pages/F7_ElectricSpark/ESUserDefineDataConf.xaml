@@ -49,8 +49,8 @@
             Grid.RowSpan="8"
             Margin="20"
             ChildMargin="5"
-            Columns="3*,2*,*,3*,2*,*"
-            RowCount="10">
+            Columns="3*,2*,100,3*,2*,100"
+            RowCount="11">
             <Label x:Name="inputMachineId" Content="机器ID" />
             <Controls:InputTextBox
                 Grid.ColumnSpan="2"
@@ -194,7 +194,24 @@
                 InputType="Decimal"
                 Text="{Binding Path=SafetyMarginZ1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 TextWrapping="Wrap" />
-            <Label HorizontalAlignment="Left" Content="mm" />
+            <Label
+                Grid.ColumnSpan="4"
+                HorizontalAlignment="Left"
+                Content="mm" />
+            <Label Content="X轴最大速度" />
+            <Controls:InputTextBox
+                x:Name="MaxSpeedX"
+                InputType="Decimal"
+                Text="{Binding Path=MaxSpeedX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                TextWrapping="Wrap" />
+            <Label HorizontalAlignment="Left" Content="mm/s" />
+            <Label Content="Y轴最大速度" />
+            <Controls:InputTextBox
+                x:Name="MaxSpeedY"
+                InputType="Decimal"
+                Text="{Binding Path=MaxSpeedY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                TextWrapping="Wrap" />
+            <Label HorizontalAlignment="Left" Content="mm/s" />
         </auto:AutoGrid>
 
         <!--<Label Content="暖机时X轴结束位置" HorizontalAlignment="Left" Grid.Row="7" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Margin="450,0,0,0" />

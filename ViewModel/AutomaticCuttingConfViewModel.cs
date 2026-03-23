@@ -206,12 +206,12 @@ namespace 精密切割系统.ViewModel
             Model.DirectoryName = "Root";
             Model.DeviceDataNo = fileTableItem.DeviceDataNo;
             Model.DeviceDataId = fileTableItem.DeviceDataId;
-            Model.AfterReplaceBladeCutTimes = (Appsettings.AfterReplaceBladeCutTimes ?? float.NaN).ToString();
-            Model.AfterReplaceBladeCutLength = (Appsettings.AfterReplaceBladeCutLength / 1000 ?? float.NaN).ToString("F2");
-            Model.AfterMeasureHeightCutTimes = (Appsettings.AfterMeasureHeightCutTimes ?? float.NaN).ToString();
-            Model.AfterMeasureHeightCutLength = (Appsettings.AfterMeasureHeightCutLength / 1000 ?? float.NaN).ToString("F2");
-            Model.AfterClearDataCutTimes = (Appsettings.AfterClearDataCutTimes ?? float.NaN).ToString();
-            Model.AfterClearDataCutLength = (Appsettings.AfterClearDataCutLength / 1000 ?? float.NaN).ToString("F2");
+            Model.AfterReplaceBladeCutTimes = (Appsettings.AfterReplaceBladeCutTimes ?? 0).ToString();
+            Model.AfterReplaceBladeCutLength = (Appsettings.AfterReplaceBladeCutLength / 1000 ?? 0).ToString("F2");
+            Model.AfterMeasureHeightCutTimes = (Appsettings.AfterMeasureHeightCutTimes ?? 0).ToString();
+            Model.AfterMeasureHeightCutLength = (Appsettings.AfterMeasureHeightCutLength / 1000 ?? 0).ToString("F2");
+            Model.AfterClearDataCutTimes = (Appsettings.AfterClearDataCutTimes ?? 0).ToString();
+            Model.AfterClearDataCutLength = (Appsettings.AfterClearDataCutLength / 1000 ?? 0).ToString("F2");
             Model.SpindleRev = fileTableItem.SpindleRev.ToString();
         }
 

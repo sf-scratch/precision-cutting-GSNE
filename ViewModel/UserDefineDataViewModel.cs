@@ -79,6 +79,15 @@ namespace 精密切割系统.ViewModel
             AlignSelectionsWhenSemiAutoCutting = new ObservableCollection<string> { "YES", "NO" };
         }
 
+        public UserDefineDataModel Model
+        {
+            get { return _model; }
+            set
+            {
+                _model = value;
+            }
+        }
+
         public long Id
         {
             get { return _model.Id; }
@@ -516,6 +525,32 @@ namespace 精密切割系统.ViewModel
                 if (_model.AtomizingNozzlePositionY != value)
                 {
                     _model.AtomizingNozzlePositionY = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        public string MaxSpeedX
+        {
+            get { return _model.MaxSpeedX; }
+            set
+            {
+                if (_model.MaxSpeedX != value)
+                {
+                    _model.MaxSpeedX = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        public string MaxSpeedY
+        {
+            get { return _model.MaxSpeedY; }
+            set
+            {
+                if (_model.MaxSpeedY != value)
+                {
+                    _model.MaxSpeedY = value;
                     RaisePropertyChanged();
                 }
             }
