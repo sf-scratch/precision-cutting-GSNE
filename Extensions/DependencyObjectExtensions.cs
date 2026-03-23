@@ -31,5 +31,14 @@ namespace 精密切割系统.Extensions
             }
             return result;
         }
+
+        public static void InitTbNumber(this DependencyObject dependencyObject)
+        {
+            List<InputTextBox> tbs = Tools.GetChildrenOfType<InputTextBox>(dependencyObject);
+            for (int i = 0; i < tbs.Count; i++)
+            {
+                tbs[i].initNumber();
+            }
+        }
     }
 }

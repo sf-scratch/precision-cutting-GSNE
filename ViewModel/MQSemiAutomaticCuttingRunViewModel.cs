@@ -23,6 +23,7 @@ using 精密切割系统.Helpers;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut;
 using 精密切割系统.Model.cut.Workpieces;
+using 精密切割系统.Model.logs;
 using 精密切割系统.Model.MeasureHeight;
 using 精密切割系统.Model.plc;
 using 精密切割系统.PubSubEvent;
@@ -185,6 +186,10 @@ namespace 精密切割系统.ViewModel
                                     {
                                         string alarmMessages = string.Join(",", alarmInfos.Select(a => a.Message));
                                         _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Error报警监控：{alarmMessages}"));
+                                        List<RunLogsViewModel> logs = [new(LogType.Error, "错误")];
+                                        var alarmLogs = alarmInfos.Select(p => new RunLogsViewModel("报警监控", p.Message));
+                                        logs.AddRange(alarmLogs);
+                                        RunLogsCommon.LogEvent(LogType.Error, logs);
                                         await PlcControl.tagControl.wholeDevice.OpenBuzzerAsync();
                                         await PauseAsync(PlcControl.tagControl.wholeDevice.OpenRedLightAsync);
                                         Tools.CuttingRecord(alarmMessages);
@@ -224,6 +229,10 @@ namespace 精密切割系统.ViewModel
                                     {
                                         string alarmMessages = string.Join(",", alarmInfos.Select(a => a.Message));
                                         _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create($"Warn报警监控：{alarmMessages}"));
+                                        List<RunLogsViewModel> logs = [new(LogType.Wring, "警告")];
+                                        var alarmLogs = alarmInfos.Select(p => new RunLogsViewModel("报警监控", p.Message));
+                                        logs.AddRange(alarmLogs);
+                                        RunLogsCommon.LogEvent(LogType.Error, logs);
                                         await PlcControl.tagControl.wholeDevice.OpenBuzzerAsync();
                                         await PauseAsync(PlcControl.tagControl.wholeDevice.OpenRedLightAsync);
                                         Tools.CuttingRecord(alarmMessages);

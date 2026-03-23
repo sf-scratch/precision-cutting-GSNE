@@ -1,4 +1,5 @@
 ﻿using Emgu.CV.Dnn;
+using HslCommunication.Profinet.OpenProtocol;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;

@@ -179,6 +179,19 @@ namespace 精密切割系统.ViewModel
             }
         }
 
+        public string SingleAdjustmentBaselineLineWidth
+        {
+            get { return _model.SingleAdjustmentBaselineLineWidth; }
+            set
+            {
+                if (_model.SingleAdjustmentBaselineLineWidth != value)
+                {
+                    _model.SingleAdjustmentBaselineLineWidth = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
         public string BlowTime
         {
             get { return _model.BlowTime; }

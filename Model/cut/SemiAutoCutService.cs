@@ -227,10 +227,12 @@ namespace 精密切割系统.Model.cut
             using (StreamWriter streamWriter = new StreamWriter(fs, Encoding.UTF8))
             {
                 // 写入标题
-                string cuttingRecord = string.Format("{0}{1}{2}{3}{4}{5}",
+                string cuttingRecord = string.Format("{0}{1}{2}{3}{4}{5}{6}{7}",
                     "切割次数".PadRightDisplay(colWidth),
                     "指令位置Y".PadRightDisplay(colWidth),
                     "平均位置Y".PadRightDisplay(colWidth),
+                    "切割进入时位置Y".PadRightDisplay(colWidth),
+                    "切割出来时位置Y".PadRightDisplay(colWidth),
                     "指令位置Z".PadRightDisplay(colWidth),
                     "平均位置Z".PadRightDisplay(colWidth),
                     "传感器温度");
@@ -245,7 +247,7 @@ namespace 精密切割系统.Model.cut
                     try
                     {
                         await PlcControl.tagControl.cutting.WaitReadyCuttingDataAsyncAsync(token);
-                        var (instructionPositionY, averagePositionY, instructionPositionZ1, averagePositionZ1) =
+                        var (instructionPositionY, averagePositionY, justEnterPositionY, justOutPositionY, instructionPositionZ1, averagePositionZ1) =
                             await PlcControl.tagControl.cutting.GetCuttingDataAsync();
 
                         await PlcControl.tagControl.cutting.SetIsReadyCuttingDataAsync(false);
@@ -255,10 +257,12 @@ namespace 精密切割系统.Model.cut
                             ? string.Join("  ", temperatures.Select(t => $"{t:F1}°C"))
                             : "N/A";
 
-                        cuttingRecord = string.Format("{0}{1}{2}{3}{4}{5}",
+                        cuttingRecord = string.Format("{0}{1}{2}{3}{4}{5}{6}{7}",
                             cutTimes.ToString().PadRightDisplay(colWidth),
                             instructionPositionY.ToString("F6").PadRightDisplay(colWidth),
                             averagePositionY.ToString("F6").PadRightDisplay(colWidth),
+                            justEnterPositionY.ToString("F6").PadRightDisplay(colWidth),
+                            justOutPositionY.ToString("F6").PadRightDisplay(colWidth),
                             instructionPositionZ1.ToString("F6").PadRightDisplay(colWidth),
                             averagePositionZ1.ToString("F6").PadRightDisplay(colWidth),
                             temperatureInfo);

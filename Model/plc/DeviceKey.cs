@@ -11,25 +11,33 @@ namespace 精密切割系统.Model.plc
 {
     internal static class DeviceKey
     {
-
         // θ轴名称
         public static string thetaName = "Theta轴";
+
         // X轴名称
         public static string xName = "X轴";
+
         // Y轴名称
         public static string yName = "Y轴";
+
         // Z1轴名称
         public static string z1Name = "Z1轴";
+
         // Z2轴名称
         public static string z2Name = "Z2轴";
+
         // 刀片维护
         public static string bladeMaintenance = "刀片维护";
+
         // 系统
         public static string systemName = "整机";
+
         // 校准
         public static string alignName = "校准";
+
         // 校准
         public static string cutName = "切割";
+
         // 校准
         public static string enterElectricalName = "电火花修刀";
 
@@ -101,7 +109,7 @@ namespace 精密切割系统.Model.plc
         public static string z2AbsoluteLocationKey = "Z2轴绝对运动目标位置";
         public static string z2HighSpeedKey = "Z2轴高速运动";
 
-        public static string thetaCurLocationKey = "Theta轴当前位置"; 
+        public static string thetaCurLocationKey = "Theta轴当前位置";
         public static string thetaCurSpeedKey = "Theta轴当前速度";
         public static string thetaJogSpeedKey = "Theta轴点动速度";
         public static string thetaCurStatusKey = "Theta轴当前状态";
@@ -145,22 +153,31 @@ namespace 精密切割系统.Model.plc
 
         // 真空
         public static string vacuumStateKey = "真空状态";
+
         public static string vacuumSwitchStatusKey = "真空打开状态";
+
         // 工作盘真空
         public static string workVacuumSwitchKey = "工作盘真空on/off";
 
         // 切削水
         public static string spindleCuttingWaterKey = "主轴切割水";
+
         public static string workpieceBlowingStatusKey = "相机吹气状态";
+
         // 主轴冷却水
         public static string spindleCoolingWaterKey = "主轴冷却水";
+
         public static string spindleManuallyRunStatusKey = "主轴运行";
+
         // 丝杆润源油
         public static string screwOilKey = "丝杆润源油";
+
         // 主轴气源
         public static string spindleAirKey = "主轴气源";
+
         // 主轴转速
         public static string spindleSpeedStatusKey = "主轴转速显示";
+
         public static string refuelingPumpResetKey = "油泵计数清零";
         public static string buzzerKey = "蜂鸣";
         public static string yellowLightFlashKey = "黄灯闪";
@@ -195,7 +212,6 @@ namespace 精密切割系统.Model.plc
         public static string xInitPositionKey = "进入切割模式X轴初始位置";
         public static string yInitPositionKey = "进入切割模式Y轴初始位置";
         public static string z1InitPositionKey = "进入切割模式z1轴初始位置";
-        public static string shutdownCheckKey = "停机检查";
         public static string xStopLocationKey = "x轴停机检查位置";
         public static string tStopLocationKey = "y轴停机检查位置";
         public static string z2StopLocationKey = "z2轴停机检查位置";

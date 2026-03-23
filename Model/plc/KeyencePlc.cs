@@ -1698,7 +1698,25 @@ namespace 精密切割系统.Driver
 
         public Tag spindleDirectionSwitch { get; set; }
 
-        // ============整机相关 END==========
+        /// <summary>
+        /// 精度确认
+        /// </summary>
+        public Tag accuracyConfirm { get; set; }
+
+        public async Task TriggerAccuracyConfirmAsync()
+        {
+            bool result = await IsOpenAccuracyConfirmAsync();
+            accuracyConfirm.writeValue = result ? "0" : "1";
+            await keyencePlc.WriteTagAsync(accuracyConfirm);
+        }
+
+        /// <summary>
+        /// 是否开启精度确认
+        /// </summary>
+        public async Task<bool> IsOpenAccuracyConfirmAsync()
+        {
+            return await PlcControl.plc.ReadDataAsync(accuracyConfirm.addr) == true;
+        }
 
         public async Task TriggerSpindleDirection()
         {
@@ -2421,9 +2439,6 @@ namespace 精密切割系统.Driver
         // 是否退出切割模式
         public Tag isExitCuttingMode { get; set; }
 
-        // 停机检查
-        public Tag shutdownCheck { get; set; }
-
         // Z1轴结束位置（切割位置）
         public Tag z1EndPosition { get; set; }
 
@@ -2480,6 +2495,8 @@ namespace 精密切割系统.Driver
         public Tag spindleRevReach { get; set; }
         public Tag instructionPositionY { get; set; }
         public Tag averagePositionY { get; set; }
+        public Tag justEnterPositionY { get; set; }
+        public Tag justOutPositionY { get; set; }
         public Tag instructionPositionZ1 { get; set; }
         public Tag averagePositionZ1 { get; set; }
         public Tag isReadyCuttingData { get; set; }
@@ -2500,13 +2517,15 @@ namespace 精密切割系统.Driver
             await TaskUtils.WaitExpectedResultAsync(IsReadyCuttingDataAsync, default, token);
         }
 
-        public async Task<(double instructionPositionY, double averagePositionY, double instructionPositionZ1, double averagePositionZ1)> GetCuttingDataAsync()
+        public async Task<(double instructionPositionY, double averagePositionY, double justEnterPositionY, double justOutPositionY, double instructionPositionZ1, double averagePositionZ1)> GetCuttingDataAsync()
         {
             var insY = await keyencePlc.ReadDataAsync<double>(instructionPositionY.addr) ?? 0;
             var aveY = await keyencePlc.ReadDataAsync<double>(averagePositionY.addr) ?? 0;
+            var enterY = await keyencePlc.ReadDataAsync<double>(justEnterPositionY.addr) ?? 0;
+            var outY = await keyencePlc.ReadDataAsync<double>(justOutPositionY.addr) ?? 0;
             var insZ1 = await keyencePlc.ReadDataAsync<double>(instructionPositionZ1.addr) ?? 0;
             var aveZ1 = await keyencePlc.ReadDataAsync<double>(averagePositionZ1.addr) ?? 0;
-            return (insY, aveY, insZ1, aveZ1);
+            return (insY, aveY, enterY, outY, insZ1, aveZ1);
         }
 
         /// <summary>
@@ -2890,7 +2909,6 @@ namespace 精密切割系统.Driver
                 $"X轴开始位置: {xStartLoaction}\r\n" +
                 $"X轴结束位置: {xEndLocation}\r\n" +
                 $"Y轴切割位置: {yCutLocation}\r\n" +
-                $"状态检查: {checkStatus}\r\n" +
                 $"theta角度: {thetaDeg}\r\n" +
                 $"主轴转速: {spindleRevValue}\r\n" +
                 $""
@@ -2913,9 +2931,6 @@ namespace 精密切割系统.Driver
             // z轴结束位置
             z1EndPosition.writeValue = zEndLocation.ToString();
             success &= await keyencePlc.WriteTagAsync(z1EndPosition);
-            // 停机检查
-            shutdownCheck.writeValue = checkStatus;
-            success &= await keyencePlc.WriteTagAsync(shutdownCheck);
             // 切割角度
             cutFaceAngle.writeValue = thetaDeg.ToString();
             success &= await keyencePlc.WriteTagAsync(cutFaceAngle);

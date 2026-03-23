@@ -35,6 +35,12 @@ namespace 精密切割系统.database.db.modle
         [Column("hairline_adjust_limit")]//基准线调整极限
         public string HairlineAdjustLimit { get; set; } = "0";
 
+        /// <summary>
+        /// 基准线宽单次调整
+        /// </summary>
+        [Column("single_adjustment_baseline_linewidth")]
+        public string SingleAdjustmentBaselineLineWidth { get; set; } = "0.001";
+
         [Column("blow_time")]//吹气时间
         public string BlowTime { get; set; } = "0";
 

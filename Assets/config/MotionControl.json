@@ -1220,6 +1220,12 @@
       "addr": "DM1226",
       "name": "温度传感器7",
       "describe": "温度传感器7"
+    },
+    "accuracyConfirm": {
+      "valueType": "bool",
+      "addr": "MR910",
+      "name": "精度确认",
+      "describe": "精度确认"
     }
   },
   "calibration": {
@@ -1326,12 +1332,6 @@
       "addr": "MR909",
       "name": "是否退出切割模式",
       "describe": "是否退出切割模式"
-    },
-    "shutdownCheck": {
-      "valueType": "bool",
-      "addr": "MR910",
-      "name": "停机检查",
-      "describe": "停机检查"
     },
     "yAxisCompStatus": {
       "valueType": "bool",
@@ -1515,6 +1515,20 @@
       "addr": "DM1300",
       "name": "切割时Y的平均位置",
       "describe": "切割时Y的平均位置"
+    },
+    "justEnterPositionY": {
+      "defaultValue": "0",
+      "valueType": "float",
+      "addr": "DM1316",
+      "name": "切割时X轴进入时Y的位置",
+      "describe": "切割时X轴进入时Y的位置"
+    },
+    "justOutPositionY": {
+      "defaultValue": "0",
+      "valueType": "float",
+      "addr": "DM1320",
+      "name": "切割时X轴出来时Y的位置",
+      "describe": "切割时X轴出来时Y的位置"
     },
     "instructionPositionZ1": {
       "defaultValue": "0",

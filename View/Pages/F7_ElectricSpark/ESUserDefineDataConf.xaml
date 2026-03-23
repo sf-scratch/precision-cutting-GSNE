@@ -81,7 +81,7 @@
                 XMin="-200" />
             <Label HorizontalAlignment="Left" Content="mm" />
 
-            <Label x:Name="labPosAfterEdgeDress" Content="刀座修整时Y轴位置" />
+            <Label x:Name="labPosAfterEdgeDress" Content="刀座修整Y轴位置" />
             <Controls:InputTextBox
                 x:Name="inputAfterEdgeDressPos"
                 InputType="Decimal"
@@ -91,7 +91,7 @@
                 XMin="-200" />
             <Label HorizontalAlignment="Left" Content="mm" />
 
-            <Label x:Name="labBladeExchangeYPos" Content="交换刀片时Y轴位置" />
+            <Label x:Name="labBladeExchangeYPos" Content="交换刀片Y轴位置" />
             <Controls:InputTextBox
                 x:Name="inputBladeExchangeYPos"
                 InputType="Decimal"
@@ -101,9 +101,8 @@
                 XMin="-200" />
             <Label HorizontalAlignment="Left" Content="mm" />
 
-            <Label x:Name="label14" Content="基准线调整极限" />
+            <Label Content="基准线调整极限" />
             <Controls:InputTextBox
-                x:Name="inputHairlineAdjustLimit"
                 InputType="Decimal"
                 Text="{Binding Path=HairlineAdjustLimit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 TextWrapping="Wrap"
@@ -111,19 +110,24 @@
                 XMin="-200" />
             <Label HorizontalAlignment="Left" Content="mm" />
 
-            <Label x:Name="labBlowTimeCT" Content="相机暂停吹气时间" />
+            <Label Content="基准线宽单次调整" />
             <Controls:InputTextBox
-                x:Name="inputBlowTime"
+                InputType="Decimal"
+                Text="{Binding Path=SingleAdjustmentBaselineLineWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                TextWrapping="Wrap"
+                XMax="300"
+                XMin="-200" />
+            <Label HorizontalAlignment="Left" Content="mm" />
+
+            <Label Content="相机暂停吹气时间" />
+            <Controls:InputTextBox
                 InputType="Decimal"
                 Text="{Binding Path=BlowTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 TextWrapping="Wrap"
                 XMax="300"
                 XMin="0"
                 XPrecision="0" />
-            <Label
-                x:Name="label18"
-                HorizontalAlignment="Left"
-                Content="s" />
+            <Label HorizontalAlignment="Left" Content="s" />
 
             <Label x:Name="labelWarmUpTime" Content="暖机时间" />
             <Controls:InputTextBox
@@ -136,7 +140,6 @@
                 XPrecision="0" />
             <Label
                 x:Name="labelWarmUpTimeUnit"
-                Grid.ColumnSpan="4"
                 HorizontalAlignment="Left"
                 Content="min" />
 
@@ -318,7 +321,6 @@
             FontSize="18"
             FontWeight="Bold"
             ItemsSource="{Binding Path=Languages}"
-            SelectionChanged="ComboBox_SelectionChanged"
             Text="{Binding Path=Language, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
         <Label
@@ -343,7 +345,6 @@
             FontSize="14"
             FontWeight="Bold"
             ItemsSource="{Binding Path=DeviceChangeCutSpeeds}"
-            SelectionChanged="ComboBox_SelectionChanged"
             Text="{Binding Path=DeviceChangeCutSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             Visibility="Collapsed" />
 
@@ -367,7 +368,6 @@
             FontSize="18"
             FontWeight="Bold"
             ItemsSource="{Binding Path=SpeedChanges}"
-            SelectionChanged="ComboBox_SelectionChanged"
             Text="{Binding Path=SpeedChange, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
         <Label
@@ -390,7 +390,6 @@
             FontSize="18"
             FontWeight="Bold"
             ItemsSource="{Binding Path=HeightChanges}"
-            SelectionChanged="ComboBox_SelectionChanged"
             Text="{Binding Path=HeightChange, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
         <Label
@@ -413,7 +412,6 @@
             FontSize="18"
             FontWeight="Bold"
             ItemsSource="{Binding Path=ZAxisCutModels}"
-            SelectionChanged="ComboBox_SelectionChanged"
             Text="{Binding Path=ZAxisCutModel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
         <Label
@@ -438,7 +436,6 @@
             FontSize="14"
             FontWeight="Bold"
             ItemsSource="{Binding Path=CutWorkCheckWhenAlignments}"
-            SelectionChanged="ComboBox_SelectionChanged"
             Text="{Binding Path=CutWorkCheckWhenAlignment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             Visibility="Collapsed" />
 
@@ -464,7 +461,6 @@
             FontSize="14"
             FontWeight="Bold"
             ItemsSource="{Binding Path=ContinueAfterBladeUserLimitErrors}"
-            SelectionChanged="ComboBox_SelectionChanged"
             Text="{Binding Path=ContinueAfterBladeUserLimitError, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             Visibility="Collapsed" />
 
@@ -490,7 +486,6 @@
             FontSize="14"
             FontWeight="Bold"
             ItemsSource="{Binding Path=ProcessingAfterBladeUserLimitErrors}"
-            SelectionChanged="ComboBox_SelectionChanged"
             Text="{Binding Path=ProcessingAfterBladeUserLimitError, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             Visibility="Collapsed" />
 
@@ -516,7 +511,6 @@
             FontSize="14"
             FontWeight="Bold"
             ItemsSource="{Binding Path=BBDTimings}"
-            SelectionChanged="ComboBox_SelectionChanged"
             Text="{Binding Path=BBDTiming, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             Visibility="Collapsed" />
 
@@ -542,7 +536,6 @@
             FontSize="14"
             FontWeight="Bold"
             ItemsSource="{Binding Path=HairlineAdjustments}"
-            SelectionChanged="ComboBox_SelectionChanged"
             Text="{Binding Path=HairlineAdjustment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             Visibility="Collapsed" />
 
@@ -568,7 +561,6 @@
             FontSize="14"
             FontWeight="Bold"
             ItemsSource="{Binding Path=LightingAdjustments}"
-            SelectionChanged="ComboBox_SelectionChanged"
             Text="{Binding Path=LightingAdjustment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             Visibility="Collapsed" />
 
@@ -594,7 +586,6 @@
             FontSize="14"
             FontWeight="Bold"
             ItemsSource="{Binding Path=BladeReplacementChecks}"
-            SelectionChanged="ComboBox_SelectionChanged"
             Text="{Binding Path=BladeReplacementCheck, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             Visibility="Collapsed" />
 
@@ -620,7 +611,6 @@
             FontSize="14"
             FontWeight="Bold"
             ItemsSource="{Binding Path=ZProcessingDataSelections}"
-            SelectionChanged="ComboBox_SelectionChanged"
             Text="{Binding Path=ZProcessingDataSelection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             Visibility="Collapsed" />
 
@@ -646,7 +636,6 @@
             FontSize="14"
             FontWeight="Bold"
             ItemsSource="{Binding Path=AlignSelectionsWhenSemiAutoCutting}"
-            SelectionChanged="ComboBox_SelectionChanged"
             Text="{Binding Path=AlignSelectionWhenSemiAutoCutting, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             Visibility="Collapsed" />
 

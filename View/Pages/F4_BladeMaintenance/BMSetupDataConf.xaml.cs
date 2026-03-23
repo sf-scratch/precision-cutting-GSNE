@@ -227,15 +227,18 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             {
                 ViewModel.BladeMeasureList.Clear();
                 BMParameterMaintenanceEntity bMParameter = await SqlHelper.GetOrCreateEntityAsync(() => new BMParameterMaintenanceEntity());
-                string[] historys = bMParameter.MeasureHeightHistory.Split(",");
-                for (int i = 1; i <= ViewModel.BMParameter.HeightMeasureTimes.ToInt(); i++)
+                if (bMParameter.MeasureHeightHistory != null)
                 {
-                    int index = i - 1;
-                    ViewModel.BladeMeasureList.Add(new BladeMeasureData()
+                    string[] historys = bMParameter.MeasureHeightHistory.Split(",");
+                    for (int i = 1; i <= ViewModel.BMParameter.HeightMeasureTimes.ToInt(); i++)
                     {
-                        FieldName = i.ToString(),
-                        FieldValue = index < historys.Length ? historys[index].ToFloat() : 0
-                    });
+                        int index = i - 1;
+                        ViewModel.BladeMeasureList.Add(new BladeMeasureData()
+                        {
+                            FieldName = i.ToString(),
+                            FieldValue = index < historys.Length ? historys[index].ToFloat() : 0
+                        });
+                    }
                 }
                 ViewModel.CurrentMeasureValue = ViewModel.BladeMeasureList.LastOrDefault()?.FieldValue ?? 0;
             }

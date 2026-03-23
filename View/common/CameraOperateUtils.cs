@@ -11,9 +11,14 @@ namespace 精密切割系统.Driver
     internal class CameraOperateUtils
     {
         /// <summary>
-        /// 基准线调整步长，单位毫米
+        /// 基准线调整步长（对应相机画面调整0.001mm）
         /// </summary>
-        public static float DatumLineChangeStep { get => (float)(PictureBoxHeight / (RealHeight * 2)); }
+        public static float DatumLineChangeStep { get => (float)(DatumLineChangeStepRatio * PictureBoxHeight / (RealHeight * 2)); }
+
+        /// <summary>
+        /// 基准线调整步长倍率
+        /// </summary>
+        public static int DatumLineChangeStepRatio = 1;
 
         private static double PictureBoxWidth = 765.0;
         private static double PictureBoxHeight = 640.0;
