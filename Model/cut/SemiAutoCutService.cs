@@ -416,9 +416,20 @@ namespace 精密切割系统.Model.cut
                             List<float> endZList = [];
                             if (cutStep.SingleCutDeep is not null && cutStep.SingleCutDeep > 0)
                             {
-                                for (float z = justContactWork + cutStep.SingleCutDeep.Value; z < targetEndZ; z += cutStep.SingleCutDeep.Value)
+                                if (chCutStep.CutMode == CutMode.B_A)
                                 {
-                                    endZList.Add(z);
+                                    float z = justContactWork + cutStep.SingleCutDeep.Value;
+                                    if (z < targetEndZ)
+                                    {
+                                        endZList.Add(z);
+                                    }
+                                }
+                                else
+                                {
+                                    for (float z = justContactWork + cutStep.SingleCutDeep.Value; z < targetEndZ; z += cutStep.SingleCutDeep.Value)
+                                    {
+                                        endZList.Add(z);
+                                    }
                                 }
                             }
                             endZList.Add(targetEndZ);
@@ -427,7 +438,7 @@ namespace 精密切割系统.Model.cut
                             foreach (float endZ in endZList)
                             {
                                 //x方向交替切割
-                                if (cutStep.IsAlternatingCuttingStroke)
+                                if (chCutStep.CutMode == CutMode.B_ZKEEP)
                                 {
                                     if (isXFromSmallToLarge)
                                     {
@@ -692,9 +703,9 @@ namespace 精密切割系统.Model.cut
         }
     }
 
-    public record CutStep(float CutHeight, float Speed, float NextStepDistance, float ThetaDeg, bool IsAbsolute, float ChannelStartY, float OffsetX = 0, bool IsAlternatingCuttingStroke = false, int ChannelNum = 1, float? SingleCutDeep = null);
+    public record CutStep(float CutHeight, float Speed, float NextStepDistance, float ThetaDeg, bool IsAbsolute, float ChannelStartY, float OffsetX = 0, int ChannelNum = 1, float? SingleCutDeep = null);
 
-    public record ChCutStep(string ChName, List<CutStep> CutSteps);
+    public record ChCutStep(string ChName, CutMode CutMode, List<CutStep> CutSteps);
 
     public record CutServicePauseData(LineSegment? Line, string? Message, float CurrentKnifeRemainTime, List<CutStep> RemainCutSteps, bool IsCompleted);
 

@@ -7,7 +7,6 @@ using System.Windows;
 using System.Windows.Documents;
 using 精密切割系统.Assets.config.buttom;
 using 精密切割系统.database.db.modle;
-using 精密切割系统.Driver;
 using 精密切割系统.Entities;
 using 精密切割系统.Extensions;
 using 精密切割系统.Helpers;

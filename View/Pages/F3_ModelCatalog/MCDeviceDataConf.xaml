@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:Controls="clr-namespace:精密切割系统.View.Controls"
     xmlns:auto="clr-namespace:WpfAutoGrid;assembly=WpfAutoGrid.Core"
+    xmlns:cut="clr-namespace:精密切割系统.Model.cut"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:精密切割系统.View.Pages.F3_ModelCatalog"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -17,6 +18,11 @@
             <Setter Property="Height" Value="50" />
             <Setter Property="Orientation" Value="Horizontal" />
         </Style>
+        <x:Array x:Key="CutMethodList" Type="{x:Type cut:CutMode}">
+            <x:Static Member="cut:CutMode.A" />
+            <x:Static Member="cut:CutMode.B_ZKEEP" />
+            <x:Static Member="cut:CutMode.B_A" />
+        </x:Array>
     </Page.Resources>
     <Grid Margin="30,30,30,10">
         <Grid.RowDefinitions>
@@ -263,10 +269,8 @@
                         <ComboBox
                             x:Name="ComBoxCutMode"
                             VerticalContentAlignment="Center"
-                            FontSize="18">
-                            <ComboBoxItem Height="35" Content="A" />
-                            <ComboBoxItem Height="35" Content="B_ZKEEP" />
-                        </ComboBox>
+                            FontSize="18"
+                            ItemsSource="{StaticResource CutMethodList}" />
                         <Label />
                         <!--  列数据  -->
                         <Label

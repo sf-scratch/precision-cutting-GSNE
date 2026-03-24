@@ -1,4 +1,5 @@
 ﻿using DryIoc.FastExpressionCompiler.LightExpression;
+using DryIoc.ImTools;
 using MaterialDesignThemes.Wpf;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -2141,7 +2142,7 @@ namespace 精密切割系统.Helpers
                     float offsetX = ch.OffsetX.ToFloat();
                     int channelNum = chSeq;
                     float? singleCutDeep = isDeep ? cutDepths[index] : null;
-                    tempCutSteps.Add(new CutStep(cutHeight, speed, offsetY, thetaDeg, isAbsolute, channelStartY, offsetX, ch.CutMode == CutOperateUtils.B_ZKEEP, channelNum, singleCutDeep));
+                    tempCutSteps.Add(new CutStep(cutHeight, speed, offsetY, thetaDeg, isAbsolute, channelStartY, offsetX, channelNum, singleCutDeep));
                 }
             }
             if (tempCutSteps.Count == 0)
@@ -2165,8 +2166,8 @@ namespace 精密切割系统.Helpers
             {
                 return CommonResult<ChCutStep>.Failure("未生成有效切割步骤！");
             }
-
-            return CommonResult<ChCutStep>.Success(new ChCutStep(chStr, cutSteps));
+            _ = Enum.TryParse(ch.ComBoxCutMethod, out CutMode mode);
+            return CommonResult<ChCutStep>.Success(new ChCutStep(chStr, mode, cutSteps));
         }
 
         public static async Task<CommonResult<List<ChCutStep>>> GenerateCutStepListAsync(Dictionary<string, ChData> chDictionary)
@@ -2237,25 +2238,26 @@ namespace 精密切割系统.Helpers
                         float offsetX = ch.OffsetX.ToFloat();
                         int channelNum = chSeq;
                         float? singleCutDeep = isDeep ? cutDepths[index] : null;
-                        tempCutSteps.Add(new CutStep(cutHeight, speed, offsetY, thetaDeg, true, channelStartY, offsetX, ch.CutMode == CutOperateUtils.B_ZKEEP, channelNum, singleCutDeep));
+                        tempCutSteps.Add(new CutStep(cutHeight, speed, offsetY, thetaDeg, true, channelStartY, offsetX, channelNum, singleCutDeep));
                     }
                 }
                 if (tempCutSteps.Count == 0)
                 {
                     continue;
                 }
+                _ = Enum.TryParse(ch.ComBoxCutMethod, out CutMode mode);
                 int chCutLines = Tools.GetIntStringValue(ch.CutLine);
                 if (chCutLines == 0)
                 {
-                    cutSteps.Add(new ChCutStep(chData.ChName, tempCutSteps));
+                    cutSteps.Add(new ChCutStep(chData.ChName, mode, tempCutSteps));
                 }
                 else if (chCutLines > tempCutSteps.Count)
                 {
-                    cutSteps.Add(new ChCutStep(chData.ChName, Enumerable.Range(0, chCutLines).Select(i => tempCutSteps[i % tempCutSteps.Count]).ToList()));
+                    cutSteps.Add(new ChCutStep(chData.ChName, mode, Enumerable.Range(0, chCutLines).Select(i => tempCutSteps[i % tempCutSteps.Count]).ToList()));
                 }
                 else
                 {
-                    cutSteps.Add(new ChCutStep(chData.ChName, tempCutSteps.GetRange(0, chCutLines)));
+                    cutSteps.Add(new ChCutStep(chData.ChName, mode, tempCutSteps.GetRange(0, chCutLines)));
                 }
             }
             if (cutSteps.Count == 0)
@@ -2330,7 +2332,7 @@ namespace 精密切割系统.Helpers
                     float offsetX = ch.OffsetX.ToFloat();
                     int channelNum = chNum;
                     float? singleCutDeep = isDeep ? cutDepths[index] : null;
-                    tempCutSteps.Add(new CutStep(cutHeight, speed, offsetY, thetaDeg, isAbsolute, channelStartY, offsetX, ch.CutMode == CutOperateUtils.B_ZKEEP, channelNum, singleCutDeep));
+                    tempCutSteps.Add(new CutStep(cutHeight, speed, offsetY, thetaDeg, isAbsolute, channelStartY, offsetX, channelNum, singleCutDeep));
                 }
             }
             if (tempCutSteps.Count == 0)

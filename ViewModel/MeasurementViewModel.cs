@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
 using 精密切割系统.Assets.config.buttom;
-using 精密切割系统.Driver;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.common;
 using 精密切割系统.Utils;

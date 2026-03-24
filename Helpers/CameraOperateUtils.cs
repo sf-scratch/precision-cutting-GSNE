@@ -2,10 +2,9 @@
 using Emgu.CV;
 using MathNet.Numerics;
 using OpenCvSharp.Extensions;
-using 精密切割系统.Helpers;
 using Ocs = OpenCvSharp;
 
-namespace 精密切割系统.Driver
+namespace 精密切割系统.Helpers
 {
     // 集成摄像头相关功能的api
     internal class CameraOperateUtils

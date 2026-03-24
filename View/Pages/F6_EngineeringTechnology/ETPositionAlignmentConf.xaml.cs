@@ -109,12 +109,12 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
         //数据显示
         private void initView()
         {
-            inputThetaCenterLocationX.Text = Appsettings.ThetaCenterPoint.X.ToString();
-            inputThetaCenterLocationY.Text = Appsettings.ThetaCenterPoint.Y.ToString();
-            inputThetaCameraLocationX.Text = Appsettings.CameraThetaCenterPoint.X.ToString();
-            inputThetaCameraLocationY.Text = Appsettings.CameraThetaCenterPoint.Y.ToString();
-            inputCameraToCutXOffset.Text = Appsettings.CameraRelativeBladePosition.X.ToString();
-            inputCameraToCutYOffset.Text = Appsettings.CameraRelativeBladePosition.Y.ToString();
+            inputThetaCenterLocationX.Text = Appsettings.ThetaCenterPoint.X.ToString(GlobalParams.RoughDecimalStringFormat);
+            inputThetaCenterLocationY.Text = Appsettings.ThetaCenterPoint.Y.ToString(GlobalParams.RoughDecimalStringFormat);
+            inputThetaCameraLocationX.Text = Appsettings.CameraThetaCenterPoint.X.ToString(GlobalParams.RoughDecimalStringFormat);
+            inputThetaCameraLocationY.Text = Appsettings.CameraThetaCenterPoint.Y.ToString(GlobalParams.RoughDecimalStringFormat);
+            inputCameraToCutXOffset.Text = Appsettings.CameraRelativeBladePosition.X.ToString(GlobalParams.RoughDecimalStringFormat);
+            inputCameraToCutYOffset.Text = Appsettings.CameraRelativeBladePosition.Y.ToString(GlobalParams.RoughDecimalStringFormat);
             inputCutZ1MaxLocation.Text = _model.CutZ1MaxLocation;
             MeasurementHeightCompensation.Text = _model.MeasurementHeightCompensation;
             //inputCameraOffsetX.Text = _model.CameraOffsetX;
@@ -127,8 +127,8 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
             //inputLightIntensityChannel.Text = _model.LightIntensityChannel + "";
             //inputLowLightIntensityChannel.Text = _model.LowLightIntensityChannel + "";
             //inputRingLightIntensityChannel.Text = _model.RingLightIntensityChannel + "";
-            inputWorkDiscFocusPosition.Text = (Appsettings.FocusWorkpiecesClearZ ?? 0).ToString();
-            inputFocusClearZPosition.Text = (Appsettings.FocusClearZ ?? 0).ToString();
+            inputWorkDiscFocusPosition.Text = (Appsettings.FocusWorkpiecesClearZ ?? 0).ToString(GlobalParams.RoughDecimalStringFormat);
+            inputFocusClearZPosition.Text = (Appsettings.FocusClearZ ?? 0).ToString(GlobalParams.RoughDecimalStringFormat);
 
             //如果是空或者小数位数不足-小数初始化为0
             initTbNumber();
