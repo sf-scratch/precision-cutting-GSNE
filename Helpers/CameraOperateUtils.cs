@@ -22,11 +22,9 @@ namespace 精密切割系统.Helpers
         private static double PictureBoxWidth = 765.0;
         private static double PictureBoxHeight = 640.0;
 
-        private static double RealWidth { get => (PictureBoxWidth / PictureBoxHeight) * RealHeight; }
+        private static double RealWidth { get => (RealHeight / PictureBoxHeight) * PictureBoxWidth; }
         private static double RealHeight { get => Appsettings.RealHeight ?? PictureBoxHeight; }
-        //private static double RealHeight = 337.2;
 
-        //private const double RealHeight = 710;
         private static double CameraHeight = 2048;
 
         /// <summary>

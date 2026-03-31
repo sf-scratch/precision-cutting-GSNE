@@ -322,10 +322,6 @@ namespace 精密切割系统.View.Pages.operate
                     break;
 
                 case 3:
-                    if (!GlobalParams.OnlineFlag)
-                    {
-                        return;
-                    }
                     var dataContext = RegionUtils.GetActiveViewDataContext();
                     if (dataContext is MQSemiAutomaticCuttingStopViewModel viewModel && viewModel.PauseData.IsCompleted)
                     {

@@ -69,8 +69,6 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             {
                 _operateType = int.Parse(type);
             }
-            // 设置相关参数
-            channelNo.Text = CurrentUtils.GetCurrentCh();
             CameraCommon? cameraCommon = AutoCutUtils.GetCameraCommon();
             if (cameraCommon is null)
             {
@@ -82,12 +80,29 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             {
                 MaterialSnack("进入校准模式成功！", SnackType.SUCCESS);
             }
+            _ = Task.Run(() => StartMonitorCurrentChAsync(_cts.Token));
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
             _eventAggregator?.GetEvent<AutoRuningMessageEvent>().Unsubscribe(ReceivedMessage);
             _intervalTimer.Dispose();
+        }
+
+        private async Task StartMonitorCurrentChAsync(CancellationToken token)
+        {
+            while (!token.IsCancellationRequested)
+            {
+                string currentCh = CurrentUtils.GetCurrentCh();
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    if (channelNo.Text != currentCh)
+                    {
+                        channelNo.Text = currentCh;
+                    }
+                });
+                await Task.Delay(500);
+            }
         }
 
         private void ReceivedMessage(MessageModel model)
@@ -298,15 +313,6 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 default:
                     break;
             }
-        }
-
-        /// <summary>
-        /// 设置当前通道
-        /// </summary>
-        /// <param name="channelNoValue"></param>
-        public void SetChannelNo(string channelNoValue)
-        {
-            channelNo.Text = channelNoValue;
         }
     }
 }

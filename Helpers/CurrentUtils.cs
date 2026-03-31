@@ -196,7 +196,7 @@ namespace 精密切割系统.Helpers
         /// 修改当前切割面
         /// </summary>
         /// <param name="currentChNo"></param>
-        public static async void UpdateCurrentCh(string currentChNo)
+        public static async Task UpdateCurrentChAsync(string currentChNo)
         {
             // 设置当前切割面
             CurrentConfigurationModel currentModel = GetCurrentConfiguration();

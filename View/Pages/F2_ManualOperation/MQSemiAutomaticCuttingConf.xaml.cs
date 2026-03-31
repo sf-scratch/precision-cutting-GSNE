@@ -34,19 +34,23 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
 
         private MainWindow mainWindow;
         private RightPage rightPage;
-        private OperatePage operatePage;
+        private CancellationTokenSource _cts;
 
         public MQSemiAutomaticCuttingConf()
         {
             InitializeComponent();
             _semiAutoCutService = SemiAutoCutService.Instance;
             mainWindow = Application.Current.MainWindow as MainWindow ?? new MainWindow();
+            _cts = new CancellationTokenSource();
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            if (_cts.IsCancellationRequested)
+            {
+                _cts = new CancellationTokenSource();
+            }
             rightPage = mainWindow.rightFrame.Content as RightPage ?? new RightPage();
-            operatePage = mainWindow.operateFrame.Content as OperatePage ?? new OperatePage();
             rightPage.PanelAction.Visibility = Visibility.Visible;
             rightPage.btnBack.Visibility = Visibility.Visible;
             rightPage.btnBack.SetRightClickedHandler(CutBack);
@@ -60,6 +64,23 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             UpdateDefineDataModel();
             // 初始化配置
             LoadConfigInfo();
+            _ = Task.Run(() => StartMonitorCurrentChAsync(_cts.Token));
+        }
+
+        private async Task StartMonitorCurrentChAsync(CancellationToken token)
+        {
+            while (!token.IsCancellationRequested)
+            {
+                string currentCh = CurrentUtils.GetCurrentCh();
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    if (_viewModel.ChannelNum != currentCh)
+                    {
+                        _viewModel.ChannelNum = currentCh;
+                    }
+                });
+                await Task.Delay(500);
+            }
         }
 
         //根据默认配置控制对应显示和隐藏
@@ -96,7 +117,6 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             _viewModel = new MQSemiAutomaticCuttingConfViewModel();
             _viewModel.DeviceDataNo = _model.DeviceDataNo + "";
             _viewModel.DeviceDataId = _model.DeviceDataId;
-            _viewModel.ChannelNum = CurrentUtils.GetCurrentCh();
             _viewModel.BladeHeight = bladeHeight;
             _viewModel.FeedSpeed = feedSpeed;
             _viewModel.CutLine = 0;
@@ -272,6 +292,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
                 _semiAutoCutService.DepthCompensationValue = 0;
             }
             _semiAutoCutService.FeedSpeedCompCompensationValue = 0;
+            _cts.Cancel();
             mainWindow.NavigateToPage("MainMenu");
         }
 
@@ -285,15 +306,6 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         {
             _viewModel.CutDirection = "向后切";
             _semiAutoCutService.CutDirection = CutDirection.Backward;
-        }
-
-        /// <summary>
-        /// 设置当前通道
-        /// </summary>
-        /// <param name="channelNoValue"></param>
-        public void SetChannelNo(string channelNoValue)
-        {
-            _viewModel.ChannelNum = channelNoValue;
         }
 
         private void repeatedCheckbox_Click(object sender, RoutedEventArgs e)

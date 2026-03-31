@@ -265,6 +265,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             }
             finally
             {
+                _semiAutoCutService.IsRuning = false;
                 UpdateToPauseStatus();
             }
         }

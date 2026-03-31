@@ -886,7 +886,11 @@ namespace 精密切割系统.ViewModel
                 }
                 try
                 {
-                    await PlcControl.tagControl.Xaxis.StartRelativeAsync(10, default, default);
+                    await IdxUtils.UpdateStepDistanceAsync();
+                    if (IdxUtils.StepDistanceX is not null && IdxUtils.StepDistanceX.Value != 0)
+                    {
+                        await PlcControl.tagControl.Xaxis.StartRelativeAsync(IdxUtils.StepDistanceX.Value, default, default);
+                    }
                 }
                 catch (OperationCanceledException) { }
                 finally
@@ -929,7 +933,11 @@ namespace 精密切割系统.ViewModel
                 }
                 try
                 {
-                    await PlcControl.tagControl.Xaxis.StartRelativeAsync(-10, default, default);
+                    await IdxUtils.UpdateStepDistanceAsync();
+                    if (IdxUtils.StepDistanceX is not null && IdxUtils.StepDistanceX.Value != 0)
+                    {
+                        await PlcControl.tagControl.Xaxis.StartRelativeAsync(-IdxUtils.StepDistanceX.Value, default, default);
+                    }
                 }
                 catch (OperationCanceledException) { }
                 finally
@@ -972,7 +980,11 @@ namespace 精密切割系统.ViewModel
                 }
                 try
                 {
-                    await PlcControl.tagControl.Yaxis.StartRelativeAsync(10, default, default);
+                    await IdxUtils.UpdateStepDistanceAsync();
+                    if (IdxUtils.StepDistanceY is not null && IdxUtils.StepDistanceY.Value != 0)
+                    {
+                        await PlcControl.tagControl.Yaxis.StartRelativeAsync(IdxUtils.StepDistanceY.Value, default, default);
+                    }
                 }
                 catch (OperationCanceledException) { }
                 finally
@@ -1015,7 +1027,11 @@ namespace 精密切割系统.ViewModel
                 }
                 try
                 {
-                    await PlcControl.tagControl.Yaxis.StartRelativeAsync(-10, default, default);
+                    await IdxUtils.UpdateStepDistanceAsync();
+                    if (IdxUtils.StepDistanceY is not null && IdxUtils.StepDistanceY.Value != 0)
+                    {
+                        await PlcControl.tagControl.Yaxis.StartRelativeAsync(-IdxUtils.StepDistanceY.Value, default, default);
+                    }
                 }
                 catch (OperationCanceledException) { }
                 finally
@@ -1058,7 +1074,11 @@ namespace 精密切割系统.ViewModel
                 }
                 try
                 {
-                    await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(90, 150, default);
+                    var thetaDeg = await IdxUtils.ToNextChThetaDegAsync();
+                    if (thetaDeg is not null)
+                    {
+                        await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(thetaDeg.Value, 150, default);
+                    }
                 }
                 catch (OperationCanceledException) { }
                 finally
@@ -1101,7 +1121,11 @@ namespace 精密切割系统.ViewModel
                 }
                 try
                 {
-                    await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(-90, 150, default);
+                    var thetaDeg = await IdxUtils.ToPrevChThetaDegAsync();
+                    if (thetaDeg is not null)
+                    {
+                        await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(-thetaDeg.Value, 150, default);
+                    }
                 }
                 catch (OperationCanceledException) { }
                 finally

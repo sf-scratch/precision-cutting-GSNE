@@ -584,6 +584,8 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 CurrentUtils.UpdateCurrentConfiguration(currentConfigurationModel);
                 CurrentUtils.UpdateParams();
                 NavigateUtils.ToOperateButton(OperatePage.OperateType.OperationMenu);
+                await IdxUtils.UpdateChThetaDegAsync();
+                await IdxUtils.UpdateStepDistanceAsync(true);
                 MaterialSnack("保存成功！", SnackType.SUCCESS);
             }
             else

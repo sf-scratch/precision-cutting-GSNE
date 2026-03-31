@@ -2079,7 +2079,7 @@ namespace 精密切割系统.Driver
 
         public async Task OpenCutSecurityDoorAsync()
         {
-            if (await GetSpindleSpeedAsync() != 0)
+            if (GlobalParams.HasFullyAutomatic && await GetSpindleSpeedAsync() != 0)
             {
                 MaterialSnack("打开安全门失败，主轴未停止！", SnackType.WARNING, 0);
                 return;

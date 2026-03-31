@@ -77,7 +77,7 @@ namespace 精密切割系统.Model.cut
         public bool IsRuning
         {
             get { return _isRuning; }
-            private set { _isRuning = value; }
+            set { _isRuning = value; }
         }
 
         private float _depthCompensationValue;
@@ -534,7 +534,7 @@ namespace 精密切割系统.Model.cut
                                 stopwatch.Stop();
                                 if (preLine is not null)
                                 {
-                                    pathCalculator.ReportPass(currentChCutTimes - 1, cutLength, (float)stopwatch.Elapsed.TotalSeconds);
+                                    pathCalculator.ReportPass(cutTimes - 1, cutLength, (float)stopwatch.Elapsed.TotalSeconds);
                                 }
                             }
                             if (preNextCutServiceProcess == null)
@@ -627,7 +627,6 @@ namespace 精密切割系统.Model.cut
 
         private async Task<(RunResult, CancellationToken)> WaitContinueAsync(LineSegment? line, IWorkpieces workpieces, float currentKnifeRemainTime, List<CutStep> remainCutSteps, bool isCompleted, string? message = null)
         {
-            _isRuning = false;
             CutServicePaused?.Invoke(new CutServicePauseData(line, message, currentKnifeRemainTime, remainCutSteps, isCompleted));
             _continueTcs = new TaskCompletionSource<ServicePauseResult>();
             ServicePauseResult result = await _continueTcs.Task;
@@ -645,6 +644,7 @@ namespace 精密切割系统.Model.cut
                         await PlcControl.tagControl.wholeDevice.CloseWorkpieceBlowingAsync();
                         var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromMinutes(10), usingPauseToken);
                         await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAndConfirmStatusAsync(timeoutToken.Token);
+                        _isRuning = true;
                         return (RunResult.Success(), usingPauseToken);
                     }
                     catch (Exception)

@@ -115,7 +115,7 @@
                         InputType="Decimal"
                         Text="{Binding Path=CutParam.DepthCompensation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         TextWrapping="Wrap"
-                        XMax="0.3"
+                        XMax="1"
                         XMin="-0.3"
                         XPrecision="5" />
                     <Label

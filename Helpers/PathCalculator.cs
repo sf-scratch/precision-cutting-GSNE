@@ -54,7 +54,7 @@ namespace 精密切割系统.Helpers
         // 记录通过信息
         public void ReportPass(int index, float pathLength, float actualTime)
         {
-            if (index >= _records.Count)
+            if (index < 0 || index >= _records.Count)
             {
                 return;
             }

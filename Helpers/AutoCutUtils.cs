@@ -2072,6 +2072,108 @@ namespace 精密切割系统.Helpers
             return CommonResult<FileTableItemChModel>.Success(chModels[chSeq - 1]);
         }
 
+        public static async Task<CommonResult<(float StepDistanceX, float StepDistanceY)>> GetCurrentStepDistance()
+        {
+            //获取功能选择数据
+            var selectionModels = await SqlHelper.TableAsync<FunctionSelectionModel>().Where(t => t.Id == 1).ToListAsync();
+            if (selectionModels.Count <= 0)
+            {
+                return CommonResult<(float, float)>.Failure("功能选择配置异常！");
+            }
+            FunctionSelectionModel functionModel = selectionModels[0];
+            bool isDeep = functionModel.DepthStepsFunction;
+            bool isLoop = functionModel.LoopFunction;
+            CommonResult<FileTableItemModel> fileTableItemResult = await GetFileTableItemModelAsync();
+            if (!fileTableItemResult.IsSuccess || fileTableItemResult.Data is null)
+            {
+                return CommonResult<(float, float)>.Failure(fileTableItemResult.Message);
+            }
+            FileTableItemModel fileTableItem = fileTableItemResult.Data;
+            string cuttingChSeq = fileTableItem.CuttingChSeq;
+            // 参数校验
+            if (fileTableItem.SpindleRev == 0 || fileTableItem.SpindleRev > 30000)
+            {
+                return CommonResult<(float, float)>.Failure("切割转速配置错误！");
+            }
+            List<CutStep> cutSteps = [];
+            // 查询通道信息
+            List<FileTableItemChModel> chModels = await SqlHelper.TableAsync<FileTableItemChModel>().Where(t => t.ItemId == fileTableItem.Id).ToListAsync();
+            string chStr = CurrentUtils.GetCurrentCh();
+            int? currentCh = RegexMatchUtils.ExtractChNumber(chStr);
+            if (currentCh is null)
+            {
+                return CommonResult<(float, float)>.Failure("当前通道信息错误！");
+            }
+            float thetaAlignDeg = ThetaAlignService.Instance.ThetaAlignCompletedDeg ?? await PlcControl.tagControl.ThetaAxis.GetCurrentLocationAsync() ?? 0;
+            int[] chSeqs = Tools.StringToIntegerArray(cuttingChSeq);
+            int chSeq = currentCh.Value;
+            FileTableItemChModel ch = chModels[chSeq - 1];
+            float[] setBladeHeight = Tools.StringToFloatArray(ch.BladeHeight);// 设置的刀片高度
+            float[] feedSpeeds = Tools.StringToFloatArray(ch.FeedSpeed); // 获取进给速度
+            float[] yIndexs = Tools.StringToFloatArray(ch.YIndex);       // 获取Y轴偏移
+            float[] repeatTimes = Tools.StringToFloatArray(ch.RepeatTimes); // 获取重复次数
+            float[] cutDepths = Tools.StringToFloatArray(ch.DepthSteps); // 获取切割深度
+            string[] loops = Tools.StringToStringArray(ch.Loop);         // 获取循环控制信息
+                                                                         // 检查索引是否连续
+            int maxIndex = AreIndexesContinuous(setBladeHeight, feedSpeeds, repeatTimes);
+            if (maxIndex == -1)
+            {
+                return CommonResult<(float, float)>.Failure("切割参数错误！");
+            }
+            if (cutDepths.Length <= maxIndex)
+            {
+                return CommonResult<(float, float)>.Failure("切割深度参数错误！");
+            }
+            if (maxIndex < 2)
+            {
+                return CommonResult<(float, float)>.Success((0, yIndexs[0]));
+            }
+            return CommonResult<(float, float)>.Success((yIndexs[1], yIndexs[0]));
+        }
+
+        public static async Task<CommonResult<IdxChData[]>> GetCurrentChThetaDegAsync()
+        {
+            //获取功能选择数据
+            var selectionModels = await SqlHelper.TableAsync<FunctionSelectionModel>().Where(t => t.Id == 1).ToListAsync();
+            if (selectionModels.Count <= 0)
+            {
+                return CommonResult<IdxChData[]>.Failure("功能选择配置异常！");
+            }
+            FunctionSelectionModel functionModel = selectionModels[0];
+            bool isDeep = functionModel.DepthStepsFunction;
+            bool isLoop = functionModel.LoopFunction;
+            CommonResult<FileTableItemModel> fileTableItemResult = await GetFileTableItemModelAsync();
+            if (!fileTableItemResult.IsSuccess || fileTableItemResult.Data is null)
+            {
+                return CommonResult<IdxChData[]>.Failure(fileTableItemResult.Message);
+            }
+            FileTableItemModel fileTableItem = fileTableItemResult.Data;
+            string cuttingChSeq = fileTableItem.CuttingChSeq;
+            // 参数校验
+            if (fileTableItem.SpindleRev == 0 || fileTableItem.SpindleRev > 30000)
+            {
+                return CommonResult<IdxChData[]>.Failure("切割转速配置错误！");
+            }
+            List<CutStep> cutSteps = [];
+            // 查询通道信息
+            List<FileTableItemChModel> chModels = await SqlHelper.TableAsync<FileTableItemChModel>().Where(t => t.ItemId == fileTableItem.Id).ToListAsync();
+            string chStr = CurrentUtils.GetCurrentCh();
+            int? currentCh = RegexMatchUtils.ExtractChNumber(chStr);
+            if (currentCh is null)
+            {
+                return CommonResult<IdxChData[]>.Failure("当前通道信息错误！");
+            }
+            float thetaAlignDeg = ThetaAlignService.Instance.ThetaAlignCompletedDeg ?? await PlcControl.tagControl.ThetaAxis.GetCurrentLocationAsync() ?? 0;
+            int[] chSeqs = Tools.StringToIntegerArray(cuttingChSeq);
+            List<IdxChData> thetaDegs = [];
+            foreach (int chSeq in chSeqs)
+            {
+                FileTableItemChModel ch = chModels[chSeq - 1];
+                thetaDegs.Add(new IdxChData(chSeq, ch.ThetaDeg.ToFloat()));
+            }
+            return CommonResult<IdxChData[]>.Success([.. thetaDegs]);
+        }
+
         public static async Task<CommonResult<ChCutStep>> GenerateSingleSideCutStepListAsync()
         {
             //获取功能选择数据

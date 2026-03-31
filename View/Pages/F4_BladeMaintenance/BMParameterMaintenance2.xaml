@@ -80,27 +80,39 @@
                     <Controls:InputTextBox Width="120" Text="{Binding MeasureHeightY}" />
                 </StackPanel>
                 <Label Content="mm" />
+            </auto:AutoGrid>
+            <auto:AutoGrid
+                Margin="20,0"
+                ChildMargin="5"
+                Columns="auto,auto,auto,auto"
+                RowCount="10">
                 <Label />
-                <Label HorizontalAlignment="Center" Content="机器预设值" />
-                <Label />
+                <Label HorizontalAlignment="Center" Content="安全设定范围" />
                 <Label HorizontalAlignment="Center" Content="当前值" />
                 <Label />
                 <Label Content="测高高速段速度" />
-                <Controls:InputTextBox Text="{Binding Entity.MeasureHeightHighSpeedPreset}" />
-                <Label Content="mm/s" />
-                <Controls:InputTextBox Text="{Binding Entity.MeasureHeightHighSpeed}" />
+                <Label HorizontalAlignment="Center" Content="5 ～ 10" />
+                <Controls:InputTextBox
+                    Text="{Binding Entity.MeasureHeightHighSpeed}"
+                    XMax="10"
+                    XMin="5" />
                 <Label Content="mm/s" />
                 <Label Content="测高低速段速度" />
-                <Controls:InputTextBox Text="{Binding Entity.MeasureHeightSlowSpeedPreset}" />
-                <Label Content="mm/s" />
-                <Controls:InputTextBox Text="{Binding Entity.MeasureHeightSlowSpeed}" XMax="0.08" />
+                <Label HorizontalAlignment="Center" Content="0.01 ～ 0.04" />
+                <Controls:InputTextBox
+                    Text="{Binding Entity.MeasureHeightSlowSpeed}"
+                    XMax="0.04"
+                    XMin="0.01" />
                 <Label Content="mm/s" />
                 <Label Content="测高低速段范围" />
-                <Controls:InputTextBox Text="{Binding Entity.MeasureHeightSlowSpeedRangePreset}" />
-                <Label Content="mm" />
-                <Controls:InputTextBox Text="{Binding Entity.MeasureHeightSlowSpeedRange}" />
+                <Label HorizontalAlignment="Center" Content="4 ～ 10" />
+                <Controls:InputTextBox
+                    Text="{Binding Entity.MeasureHeightSlowSpeedRange}"
+                    XMax="10"
+                    XMin="4" />
                 <Label Content="mm" />
             </auto:AutoGrid>
+            <Label Content="（注意：测高低速段范围，从法兰轮毂外径开始计算）" />
         </StackPanel>
         <auto:AutoGrid
             Grid.Row="1"

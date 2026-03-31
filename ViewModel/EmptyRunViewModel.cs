@@ -206,7 +206,7 @@ namespace 精密切割系统.ViewModel
         private void InitRuningRightButton()
         {
             RightButtonCollection.Clear();
-            RightButtonCollection.Add(ButtonParams.RedRightButton("停止", "/Assets/icon/right/stop.png", Stop));
+            RightButtonCollection.Add(ButtonParams.RedRightButton("停止", "/Assets/icon/right/stop.png", () => Stop(true)));
         }
 
         private async Task ExecuteEmptyRunAsync()
@@ -234,7 +234,7 @@ namespace 精密切割系统.ViewModel
             _emptyRunCts = new CancellationTokenSource();
             IsEnabledGrid = false;
             InitRuningRightButton();
-            _ = AutoCutUtils.MonitoringAlarmAsync(Stop, () => AlarmConfig.Instance.HasActiveErrorAlarm(false), default, _emptyRunCts.Token);
+            _ = AutoCutUtils.MonitoringAlarmAsync(() => Stop(false), () => AlarmConfig.Instance.HasActiveErrorAlarm(false), default, _emptyRunCts.Token);
             try
             {
                 float speedX = _speedX.ToFloat();
@@ -324,27 +324,30 @@ namespace 精密切割系统.ViewModel
             {
                 await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
                 await PlcControl.tagControl.wholeDevice.CloseWorkpieceBlowingAsync();
-                Stop();
+                _emptyRunCts?.Cancel();
             }
         }
 
-        private async void Stop()
+        private async void Stop(bool isWaitAxisStop)
         {
             try
             {
                 _emptyRunCts?.Cancel();
                 IsEnabledGrid = true;
                 NavigateUtils.SetWindowIsEnable(false);
-                var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(60));
-                await Task.WhenAll(
-                    PlcControl.tagControl.Xaxis.WaitAxisStopAsync(timeoutToken.Token),
-                    PlcControl.tagControl.Yaxis.WaitAxisStopAsync(timeoutToken.Token),
-                    PlcControl.tagControl.Z1axis.WaitAxisStopAsync(timeoutToken.Token),
-                    PlcControl.tagControl.Z2axis.WaitAxisStopAsync(timeoutToken.Token)
-                );
-                if (GlobalParams.DeviceModel == GlobalParams.Device_562 || GlobalParams.DeviceModel == GlobalParams.Device_321)
+                if (isWaitAxisStop)
                 {
-                    await PlcControl.tagControl.ThetaAxis.WaitAxisStopAsync(timeoutToken.Token);
+                    var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(60));
+                    await Task.WhenAll(
+                        PlcControl.tagControl.Xaxis.WaitAxisStopAsync(timeoutToken.Token),
+                        PlcControl.tagControl.Yaxis.WaitAxisStopAsync(timeoutToken.Token),
+                        PlcControl.tagControl.Z1axis.WaitAxisStopAsync(timeoutToken.Token),
+                        PlcControl.tagControl.Z2axis.WaitAxisStopAsync(timeoutToken.Token)
+                    );
+                    if (GlobalParams.DeviceModel == GlobalParams.Device_562 || GlobalParams.DeviceModel == GlobalParams.Device_321)
+                    {
+                        await PlcControl.tagControl.ThetaAxis.WaitAxisStopAsync(timeoutToken.Token);
+                    }
                 }
                 InitRightButton();
             }

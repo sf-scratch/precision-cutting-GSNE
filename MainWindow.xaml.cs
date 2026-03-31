@@ -285,6 +285,8 @@ namespace 精密切割系统
             PlcControl.tagControl.wholeDevice.SetPanelButtonsStauts(0);
             // 关闭Y轴光栅尺校准
             PlcControl.tagControl.cutting.SetYAxisCompStatus(0);
+            int? currentCh = RegexMatchUtils.ExtractChNumber(CurrentUtils.GetCurrentCh());
+            await IdxUtils.UpdateChThetaDegAsync(currentCh);
             // 记录异常日志
             //PlcControl.AddAlarmLog();
         }

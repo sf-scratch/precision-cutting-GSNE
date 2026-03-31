@@ -617,6 +617,7 @@ namespace 精密切割系统.ViewModel
             }
             finally
             {
+                _semiAutoCutService.IsRuning = false;
                 NavigationParameters parameters = new NavigationParameters { { nameof(MQSemiAutomaticCuttingRunViewModel), this }, { nameof(CutServicePauseData), pauseData } };
                 _regionManager.RequestNavigate(RegionName.MainRegion, nameof(MQSemiAutomaticCuttingStop), parameters);
             }
