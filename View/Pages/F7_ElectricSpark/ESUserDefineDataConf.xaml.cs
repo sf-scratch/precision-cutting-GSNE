@@ -38,9 +38,16 @@ namespace 精密切割系统.View.F7_ElectricSpark
     /// </summary>
     public partial class ESUserDefineDataConf : Page
     {
+        private readonly DispatcherTimer _timer;
+        private int _clickCount = 0;
+
         public ESUserDefineDataConf()
         {
             InitializeComponent();
+            // 初始化计时器
+            _timer = new DispatcherTimer();
+            _timer.Interval = TimeSpan.FromMilliseconds(500); // 500毫秒内连点5次
+            _timer.Tick += Timer_Tick;
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
@@ -53,7 +60,6 @@ namespace 精密切割系统.View.F7_ElectricSpark
             WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("设置时日", "/Assets/icon/tab_5/tab_04.png", () => NavigateUtils.NavigateToPage("Pages\\F7_ElectricSpark\\ESUserDefineSysTime")));
             WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("工作盘真空", "VacuumOutline", PlcControl.tagControl.wholeDevice.TriggerWorkVacuumSwitchAsync));
             WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("暖机", "/Assets/icon/menu_2/menu_2_3_white.png", () => { _ = WarmUpHelper.TriggerWarmUpAsync(); }));
-            WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("主轴方向切换", "Update", SpindleDirectionSwitchingAsync));
             WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("精度确认", "AbTesting", PlcControl.tagControl.wholeDevice.TriggerAccuracyConfirmAsync, isOpenFunc: PlcControl.tagControl.wholeDevice.IsOpenAccuracyConfirmAsync, openOrCloseVisibility: Visibility.Visible));
 
             UserDefineDataModel userDefineData = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
@@ -113,6 +119,49 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 MaterialSnack($"保存失败: {ex}", SnackType.ERROR);
             }
             NavigateUtils.ToOperateButton(OperatePage.OperateType.OperationMenu);
+        }
+
+        private void Timer_Tick(object? sender, EventArgs e)
+        {
+            // 超时未完成连点，重置计数
+            _timer.Stop();
+            _clickCount = 0;
+        }
+
+        private void Down()
+        {
+            _clickCount++;
+
+            // 重置计时器
+            _timer.Stop();
+            _timer.Start();
+
+            if (_clickCount >= 8)
+            {
+                _timer.Stop();
+                WindowLayout.OperatePageButtons.Clear();
+                WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("设置时日", "/Assets/icon/tab_5/tab_04.png", () => NavigateUtils.NavigateToPage("Pages\\F7_ElectricSpark\\ESUserDefineSysTime")));
+                WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("工作盘真空", "VacuumOutline", PlcControl.tagControl.wholeDevice.TriggerWorkVacuumSwitchAsync));
+                WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("暖机", "/Assets/icon/menu_2/menu_2_3_white.png", () => { _ = WarmUpHelper.TriggerWarmUpAsync(); }));
+                WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("精度确认", "AbTesting", PlcControl.tagControl.wholeDevice.TriggerAccuracyConfirmAsync, isOpenFunc: PlcControl.tagControl.wholeDevice.IsOpenAccuracyConfirmAsync, openOrCloseVisibility: Visibility.Visible));
+                WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("主轴方向切换", "Update", SpindleDirectionSwitchingAsync));
+                _clickCount = 0; // 重置计数
+            }
+        }
+
+        private void labUserDefineData_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Down();
+        }
+
+        private void labUserDefineData_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Down();
+        }
+
+        private void labUserDefineData_TouchDown(object sender, TouchEventArgs e)
+        {
+            Down();
         }
     }
 }

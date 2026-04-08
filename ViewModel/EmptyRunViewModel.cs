@@ -264,15 +264,15 @@ namespace 精密切割系统.ViewModel
                     await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, speedZ2, _emptyRunCts.Token);
                     if (RunX && currentRepeat < repeatCountX)
                     {
-                        tasks.Add(PlcControl.tagControl.Xaxis.StartAbsoluteAsync(Appsettings.PositiveLimitPositionX ?? 0, speedX, _emptyRunCts.Token));
+                        tasks.Add(PlcControl.tagControl.Xaxis.StartAbsoluteAsync(Appsettings.PositiveLimitPositionX - 10 ?? 0, speedX, _emptyRunCts.Token));
                     }
                     if (RunY && currentRepeat < repeatCountY)
                     {
-                        tasks.Add(PlcControl.tagControl.Yaxis.StartAbsoluteAsync(Appsettings.PositiveLimitPositionY ?? 0, speedY, _emptyRunCts.Token));
+                        tasks.Add(PlcControl.tagControl.Yaxis.StartAbsoluteAsync(Appsettings.PositiveLimitPositionY - 10 ?? 0, speedY, _emptyRunCts.Token));
                     }
                     if (RunTheta && currentRepeat < repeatCountTheta)
                     {
-                        tasks.Add(PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(Appsettings.PositiveLimitPositionTheta ?? 0, speedTheta, _emptyRunCts.Token));
+                        tasks.Add(PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(Appsettings.PositiveLimitPositionTheta - 10 ?? 0, speedTheta, _emptyRunCts.Token));
                     }
                     await Task.WhenAll(tasks);
                     if (RunX && currentRepeat < repeatCountX)

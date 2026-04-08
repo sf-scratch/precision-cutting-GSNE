@@ -91,17 +91,17 @@
                 <Label HorizontalAlignment="Center" Content="当前值" />
                 <Label />
                 <Label Content="测高高速段速度" />
-                <Label HorizontalAlignment="Center" Content="5 ～ 10" />
+                <Label HorizontalAlignment="Center" Content="1 ～ 5" />
                 <Controls:InputTextBox
                     Text="{Binding Entity.MeasureHeightHighSpeed}"
-                    XMax="10"
-                    XMin="5" />
+                    XMax="5"
+                    XMin="1" />
                 <Label Content="mm/s" />
                 <Label Content="测高低速段速度" />
-                <Label HorizontalAlignment="Center" Content="0.01 ～ 0.04" />
+                <Label HorizontalAlignment="Center" Content="0.01 ～ 0.1" />
                 <Controls:InputTextBox
                     Text="{Binding Entity.MeasureHeightSlowSpeed}"
-                    XMax="0.04"
+                    XMax="0.1"
                     XMin="0.01" />
                 <Label Content="mm/s" />
                 <Label Content="测高低速段范围" />

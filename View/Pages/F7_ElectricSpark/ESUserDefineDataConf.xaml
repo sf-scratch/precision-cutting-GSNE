@@ -43,6 +43,9 @@
             VerticalAlignment="Center"
             Content="功能参数设定（5.4）"
             FontSize="30"
+            MouseDown="labUserDefineData_MouseDown"
+            PreviewMouseDown="labUserDefineData_PreviewMouseDown"
+            TouchDown="labUserDefineData_TouchDown"
             FontWeight="Bold" />
         <auto:AutoGrid
             Grid.Row="1"
