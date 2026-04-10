@@ -429,7 +429,7 @@ namespace 精密切割系统.ViewModel
                 {
                     _semiAutoCutService.CutServiceProcessChanged -= CutService_CutServiceProcessChanged;
                     _semiAutoCutService.CutServicePaused -= CutService_CutServicePaused;
-                    _semiAutoCutService.CutServiceCompleted -= CutService_CutServiceCompleted; ;
+                    _semiAutoCutService.CutServiceCompleted -= CutService_CutServiceCompleted;
                     _monitoringCts.Cancel();
                     _pauseCts.Cancel();
                     completeStopwatch.Stop();

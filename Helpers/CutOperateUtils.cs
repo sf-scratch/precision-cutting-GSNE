@@ -169,34 +169,6 @@ namespace 精密切割系统.Driver
                 _ => 0 // 默认值
             };
         }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="targetLocation">目标切割位置（电机）</param>
-        /// <param name="directionType">方向 0 正向 1 反向</param>
-        public static string GetAxisCompensate(float targetLocation, int directionType, float stepIndex)
-        {
-            // 获取当前点位(上一点位)的补偿数据
-            float lastLocationComp = PlcControl.CalculateCompensation(axisModel, lastYCurrentPosition, directionType);
-            float compTargetLocation = lastYCurrentPosition + (directionType == 0 ? stepIndex : -stepIndex);
-            float targetLocationComp = PlcControl.CalculateCompensation(axisModel, compTargetLocation, directionType);
-            // 用目标点位的补偿值 - 上一目标值的补偿值 = 2个点之间的差值
-            float tempComp = (float)Math.Round(targetLocationComp - lastLocationComp, GlobalParams.decimalPlaces);
-            float comp = tempComp / 2;
-            float tempTargetLocation = targetLocation;
-            if (directionType == 0)
-            {
-                tempTargetLocation += comp;
-            }
-            else if (directionType == 1)
-            {
-                tempTargetLocation -= comp;
-            }
-            Tools.WriteLineToFile($"{DateTime.Now}\t{lastYCurrentPosition}\t{compTargetLocation}\t{lastLocationComp}\t{targetLocationComp}" +
-                $"\t{targetLocation}\t{tempTargetLocation}\t{tempComp}\t{comp}\t{directionType}", "logs/compInfo.txt");
-            return tempTargetLocation.ToString("F6");
-        }
     }
 
     public class PrecutItem

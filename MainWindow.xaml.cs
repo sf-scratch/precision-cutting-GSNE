@@ -132,6 +132,7 @@ namespace 精密切割系统
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            await PlcControl.GetCompensateAsync(PlcControl.tagControl.Yaxis, 119.5f, CutDirection.Backward);
             // 禁用触摸到鼠标事件的转换
             Touch.FrameReported += (s, e) => { /* 防止触摸触发鼠标事件 */ };
             AlarmConfig alarmConfig = AlarmConfig.Instance;

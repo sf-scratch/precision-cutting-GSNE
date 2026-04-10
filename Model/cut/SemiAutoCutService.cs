@@ -220,21 +220,19 @@ namespace 精密切割系统.Model.cut
             string fileName = "cuttingRecord" + format1 + ".txt";
             string filePath = Path.Combine(parentPath, fileName); // 使用Path.Combine更安全
 
-            int colWidth = 30;
-
             // 使用using语句确保资源释放
             using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read))
             using (StreamWriter streamWriter = new StreamWriter(fs, Encoding.UTF8))
             {
                 // 写入标题
-                string cuttingRecord = string.Format("{0}{1}{2}{3}{4}{5}{6}{7}",
-                    "切割次数".PadRightDisplay(colWidth),
-                    "指令位置Y".PadRightDisplay(colWidth),
-                    "平均位置Y".PadRightDisplay(colWidth),
-                    "切割进入时位置Y".PadRightDisplay(colWidth),
-                    "切割出来时位置Y".PadRightDisplay(colWidth),
-                    "指令位置Z".PadRightDisplay(colWidth),
-                    "平均位置Z".PadRightDisplay(colWidth),
+                string cuttingRecord = string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}",
+                    "切割次数",
+                    "指令位置Y",
+                    "平均位置Y\t",
+                    "切割进入时位置Y",
+                    "切割出来时位置Y",
+                    "指令位置Z",
+                    "平均位置Z",
                     "传感器温度");
 
                 await streamWriter.WriteLineAsync(cuttingRecord);
@@ -257,14 +255,14 @@ namespace 精密切割系统.Model.cut
                             ? string.Join("  ", temperatures.Select(t => $"{t:F1}°C"))
                             : "N/A";
 
-                        cuttingRecord = string.Format("{0}{1}{2}{3}{4}{5}{6}{7}",
-                            cutTimes.ToString().PadRightDisplay(colWidth),
-                            instructionPositionY.ToString("F6").PadRightDisplay(colWidth),
-                            averagePositionY.ToString("F6").PadRightDisplay(colWidth),
-                            justEnterPositionY.ToString("F6").PadRightDisplay(colWidth),
-                            justOutPositionY.ToString("F6").PadRightDisplay(colWidth),
-                            instructionPositionZ1.ToString("F6").PadRightDisplay(colWidth),
-                            averagePositionZ1.ToString("F6").PadRightDisplay(colWidth),
+                        cuttingRecord = string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}",
+                            cutTimes.ToString(),
+                            instructionPositionY,
+                            averagePositionY,
+                            justEnterPositionY,
+                            justOutPositionY,
+                            instructionPositionZ1,
+                            averagePositionZ1,
                             temperatureInfo);
 
                         await streamWriter.WriteLineAsync(cuttingRecord);
@@ -457,7 +455,7 @@ namespace 精密切割系统.Model.cut
                                     isXFromSmallToLarge = !isXFromSmallToLarge;
                                 }
                                 stopwatch.Restart();
-                                compensateY = await PlcControl.GetCompensateAsync(PlcControl.tagControl.Yaxis, line.StartPoint.Y);
+                                compensateY = await PlcControl.GetCompensateAsync(PlcControl.tagControl.Yaxis, line.StartPoint.Y, _cutDirection);
                                 if (preFirstCutServiceProcess == null)
                                 {
                                     preFirstCutServiceProcess = new CutServiceProcess(actualCutHeight, cutSpeed, compensateY, cutSteps.Count, currentChCutTimes + 1, chCutStep.ChName);

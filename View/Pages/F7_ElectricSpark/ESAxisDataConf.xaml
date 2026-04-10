@@ -14,6 +14,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="80" />
+            <RowDefinition Height="auto" />
             <RowDefinition Height="550" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -77,12 +78,35 @@
                 Content="数据导入" />
         </StackPanel>
         <!--  第2行 第1列  -->
-        <ScrollViewer
+        <StackPanel
             Grid.Row="1"
+            HorizontalAlignment="Right"
+            Orientation="Horizontal">
+            <Label
+                HorizontalContentAlignment="Right"
+                Content="补偿使用状态"
+                FontSize="22"
+                FontWeight="Bold" />
+            <ComboBox
+                x:Name="cmbUsageStatus"
+                Width="200"
+                Height="30"
+                Margin="10,0,0,0"
+                VerticalContentAlignment="Center">
+                <ComboBox.ItemContainerStyle>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="Height" Value="35" />
+                    </Style>
+                </ComboBox.ItemContainerStyle>
+            </ComboBox>
+        </StackPanel>
+        <!--  第3行 第1列  -->
+        <ScrollViewer
+            Grid.Row="2"
             Grid.Column="0"
             Margin="30,0,0,10"
             VerticalScrollBarVisibility="Auto">
-            <Grid>
+            <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
@@ -91,8 +115,6 @@
                 <!--  wpf listview虚拟化IsVirtualizing  Recycling和Standard  -->
                 <ListView
                     x:Name="pre_listView"
-                    Grid.Row="0"
-                    Grid.Column="0"
                     Width="500"
                     ItemsSource="{Binding Col0_99}"
                     VirtualizingPanel.IsVirtualizing="True"

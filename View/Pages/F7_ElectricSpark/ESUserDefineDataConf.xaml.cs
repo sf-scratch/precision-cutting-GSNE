@@ -60,7 +60,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
             WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("设置时日", "/Assets/icon/tab_5/tab_04.png", () => NavigateUtils.NavigateToPage("Pages\\F7_ElectricSpark\\ESUserDefineSysTime")));
             WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("工作盘真空", "VacuumOutline", PlcControl.tagControl.wholeDevice.TriggerWorkVacuumSwitchAsync));
             WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("暖机", "/Assets/icon/menu_2/menu_2_3_white.png", () => { _ = WarmUpHelper.TriggerWarmUpAsync(); }));
-            WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("精度确认", "AbTesting", PlcControl.tagControl.wholeDevice.TriggerAccuracyConfirmAsync, isOpenFunc: PlcControl.tagControl.wholeDevice.IsOpenAccuracyConfirmAsync, openOrCloseVisibility: Visibility.Visible));
+            WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("精度确认", "AbTesting", PlcControl.tagControl.wholeDevice.TriggerAccuracyConfirmAsync, isOpenFunc: async () => !await PlcControl.tagControl.wholeDevice.IsOpenAccuracyConfirmAsync(), openOrCloseVisibility: Visibility.Visible));
 
             UserDefineDataModel userDefineData = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
             UserDefineDataViewModel viewModel = new UserDefineDataViewModel(userDefineData);

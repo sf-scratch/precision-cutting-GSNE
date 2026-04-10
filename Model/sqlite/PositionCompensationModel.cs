@@ -21,6 +21,9 @@ namespace 精密切割系统.database.db.modle
         [Column("axis_type")]   //轴类型
         public string AxisType { get; set; } = "X轴";
 
+        [Column("usage_status")]
+        public string UsageStatus { get; set; } = "不启用";
+
         [Column("axis_position")]   //轴位置，每个位置使用英文逗号分隔，初始化0到399共400个位置
         public string AxisPosition { get; set; } = initPostion(0, 500, 1);
 

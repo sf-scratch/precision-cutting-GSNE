@@ -49,7 +49,9 @@ namespace 精密切割系统.View.F7_ElectricSpark
 
         private ObservableCollection<PositionCompensationModel> Col100_199 { get; set; } = new ObservableCollection<PositionCompensationModel>();
         private ObservableCollection<PositionCompensationModel> Col200_299 { get; set; } = new ObservableCollection<PositionCompensationModel>();
-        private ObservableCollection<string> AxisTypeList { get; set; } = [];
+        private ObservableCollection<string> AxisTypeList { get; set; } = ["X轴", "Y轴", "Z1轴", "X轴-反向", "Y轴-反向", "Z1轴-反向"];
+
+        private ObservableCollection<string> UsageStatusList { get; set; } = ["启用", "启用（调用相反方向补偿值）", "不启用"];
 
         public ESAxisDataConf()
         {
@@ -57,15 +59,8 @@ namespace 精密切割系统.View.F7_ElectricSpark
             pre_listView.ItemsSource = Col0_99;//将数据绑定到列表
             pre_listView1.ItemsSource = Col100_199;//将数据绑定到列表
             pre_listView2.ItemsSource = Col200_299;//将数据绑定到列表
-            AxisTypeList.Add("X轴");
-            AxisTypeList.Add("Y轴");
-            AxisTypeList.Add("Z1轴");
-            AxisTypeList.Add("X轴-反向");
-            AxisTypeList.Add("Y轴-反向");
-            AxisTypeList.Add("Z1轴-反向");
             cbbAxis.ItemsSource = AxisTypeList;
-
-            //cbShowAxis.ItemsSource= AxisTypeList;
+            cmbUsageStatus.ItemsSource = UsageStatusList;
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -79,18 +74,8 @@ namespace 精密切割系统.View.F7_ElectricSpark
             rightPage.btnBack.Visibility = Visibility.Visible; //右侧显示 - 返回按钮显示
             rightPage.btnBack.BackFlag = false;
             rightPage.btnBack.SetRightClickedHandler(BtnBack_RightClicked);
-            //rightPage.btnSure.Visibility = Visibility.Visible; //右侧显示 - 确定按钮显示
-            //rightPage.btnSure.BackFlag = false;
-            //rightPage.btnSure.SetRightClickedHandler(BtnSure_RightClicked); //确定按钮事件
-
-            //cbbAxis.SelectedIndex = 0;
-            //string AxisType = cbbAxis.SelectedItem.ToString();
-            //_ = initData(AxisType);
         }
 
-        //private void BtnSure_RightClicked(object? sender, bool e)
-        //{
-        //}
         private void BtnBack_RightClicked(object? sender, bool e)
         {
             mainWindow.NavigateToPage("MainMenu");
@@ -122,15 +107,14 @@ namespace 精密切割系统.View.F7_ElectricSpark
         //数据显示
         private void initView()
         {
+            if (_model == null) return;
+            cmbUsageStatus.SelectedItem = _model.UsageStatus;
             string[] pos = new string[500];
             string[] comp = new string[500];
             string[] gratingRuler = new string[500];
-            if (_model != null)
-            {
-                pos = _model.AxisPosition.Split(',');
-                comp = _model.AxisCompensate.Split(',');
-                gratingRuler = _model.AxisGratingRuler.Split(',');
-            }
+            pos = _model.AxisPosition.Split(',');
+            comp = _model.AxisCompensate.Split(',');
+            gratingRuler = _model.AxisGratingRuler.Split(',');
             Col0_99.Clear();
             Col100_199.Clear();
             Col200_299.Clear();
@@ -139,9 +123,9 @@ namespace 精密切割系统.View.F7_ElectricSpark
             {
                 PositionCompensationModel temp = new PositionCompensationModel();
                 temp.Id = i;
-                string AxisPosition = _model != null && pos != null && (pos.Length) > i ? pos[i] : "0.0000";        // _model.AxisPosition;
-                string AxisCompensate = _model != null && comp != null && (comp.Length) > i ? comp[i] : "0.0000";    // _model.AxisCompensate;
-                string AxisGratingRuler = _model != null && gratingRuler != null && (gratingRuler.Length) > i ? gratingRuler[i] : "0.0000";    //  _model.AxisGratingRuler;
+                string AxisPosition = pos.Length > i ? pos[i] : "0.0000";        // _model.AxisPosition;
+                string AxisCompensate = comp.Length > i ? comp[i] : "0.0000";    // _model.AxisCompensate;
+                string AxisGratingRuler = gratingRuler.Length > i ? gratingRuler[i] : "0.0000";    //  _model.AxisGratingRuler;
                 if (string.IsNullOrEmpty(AxisPosition))
                 {
                     AxisPosition = "0";
@@ -171,15 +155,6 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 }
                 else if (i >= 334 && i < 500)
                 {
-                    //if (Col200_299.Count == 100)
-                    //{
-                    //    Col200_299[i - 200].AxisPosition = temp.AxisPosition;
-                    //    Col200_299[i - 200].AxisCompensate = temp.AxisCompensate;
-                    //}
-                    //else
-                    //{
-                    //    Col200_299.Add(temp);
-                    //}
                     Col200_299.Add(temp);
                 }
             }
@@ -194,7 +169,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
         {
             ComboBox comboBox = (ComboBox)sender;
             // 获取选中的项
-            string AxisType = comboBox.SelectedItem.ToString();
+            string? AxisType = comboBox.SelectedItem.ToString();
             // 需要的业务逻辑处理
             if (AxisType != null)
             {
@@ -247,6 +222,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 _model = new PositionCompensationModel();
             }
             _model.AxisType = AxisType;
+            _model.UsageStatus = cmbUsageStatus.Text;
             //位置
             string[] pos = new string[500];
             string[] comp = new string[500];

@@ -8,10 +8,13 @@ using System.Reflection;
 using System.Threading.Tasks;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
+using 精密切割系统.Extensions;
 using 精密切割系统.Helpers;
+using 精密切割系统.Model.cut;
 using 精密切割系统.Model.logs;
 using 精密切割系统.Model.plc;
 using 精密切割系统.Utils;
+using static 精密切割系统.Extensions.ArrayExtensions;
 
 namespace 精密切割系统.ViewModel
 {
@@ -140,7 +143,7 @@ namespace 精密切割系统.ViewModel
             }
         }
 
-        public static async Task<float> GetCompensateAsync(Axis axis, float location)
+        public static async Task<float> GetCompensateAsync(Axis axis, float location, CutDirection directionType)
         {
             // 获取补偿数据模型
             List<PositionCompensationModel> models = CurrentUtils.GetPositionCompensationModels();
@@ -148,11 +151,46 @@ namespace 精密切割系统.ViewModel
             {
                 return location;
             }
-            float currLocation = await axis.GetCurrentLocationAsync() ?? 0;
             // 确定补偿方向
-            PositionCompensationModel? axisModel;
-            int directionType = location > currLocation ? 0 : 1;
-            axisModel = models.Find(item => item.AxisType.Equals(axis.axisName + (directionType == 1 ? "-反向" : "")));
+            PositionCompensationModel? axisModel = null;
+            PositionCompensationModel? positiveModel = models.Find(item => item.AxisType.Equals(axis.axisName));
+            PositionCompensationModel? reverseModel = models.Find(item => item.AxisType.Equals(axis.axisName + "-反向"));
+            if (directionType == CutDirection.Forward)
+            {
+                if (positiveModel == null)
+                {
+                    return location;
+                }
+                if (positiveModel.UsageStatus == "不启用")
+                {
+                    if (reverseModel != null && reverseModel.UsageStatus == "启用（调用相反方向补偿值）")
+                    {
+                        axisModel = reverseModel;
+                    }
+                }
+                else
+                {
+                    axisModel = positiveModel;
+                }
+            }
+            else if (directionType == CutDirection.Backward)
+            {
+                if (reverseModel == null)
+                {
+                    return location;
+                }
+                if (reverseModel.UsageStatus == "不启用")
+                {
+                    if (positiveModel != null && positiveModel.UsageStatus == "启用（调用相反方向补偿值）")
+                    {
+                        axisModel = reverseModel;
+                    }
+                }
+                else
+                {
+                    axisModel = reverseModel;
+                }
+            }
             // 无法找到对应轴的补偿信息
             if (axisModel == null)
             {
@@ -161,11 +199,11 @@ namespace 精密切割系统.ViewModel
             float targetLocation = MathF.Round(location, GlobalParams.decimalPlaces);
             // 调用补偿计算函数
             float adjustedLocation = CalculateCompensation(axisModel, targetLocation, directionType);
-            if (directionType == 0)
+            if (directionType == CutDirection.Forward)
             {
                 targetLocation -= adjustedLocation;
             }
-            else if (directionType == 1)
+            else if (directionType == CutDirection.Backward)
             {
                 targetLocation += adjustedLocation;
             }
@@ -179,7 +217,7 @@ namespace 精密切割系统.ViewModel
         /// <param name="targetLocation">目标位置</param>
         /// <param name="directionType">方向类型：0-正向，1-反向</param>
         /// <returns>补偿后的目标位置</returns>
-        public static float CalculateCompensation(PositionCompensationModel axisModel, float targetLocation, int directionType)
+        public static float CalculateCompensation(PositionCompensationModel axisModel, float targetLocation, CutDirection directionType)
         {
             float compensation = 0;
             try
@@ -187,14 +225,32 @@ namespace 精密切割系统.ViewModel
                 // 将位置和补偿数据解析为数组
                 float[] positionNumbers = axisModel.AxisPosition.Split(",").Select(float.Parse).ToArray();
                 float[] compensateNumbers = axisModel.AxisCompensate.Split(",").Select(float.Parse).ToArray();
+                int validEndIndex = Array.FindLastIndex(positionNumbers, x => x != 0);
+                TrendType trend = positionNumbers.Take(validEndIndex + 1).ToArray().GetTrend();
+                if (directionType == CutDirection.Forward)
+                {
+                    if (trend == TrendType.Decreasing)
+                    {
+                        Array.Reverse(positionNumbers, 0, validEndIndex + 1);
+                        Array.Reverse(compensateNumbers, 0, validEndIndex + 1);
+                    }
+                }
+                else
+                {
+                    if (trend == TrendType.Increasing)
+                    {
+                        Array.Reverse(positionNumbers, 0, validEndIndex + 1);
+                        Array.Reverse(compensateNumbers, 0, validEndIndex + 1);
+                    }
+                }
                 // 确保数据长度一致
                 if (positionNumbers.Length != compensateNumbers.Length) return targetLocation;
 
                 // 查找范围并进行线性插值
                 for (int i = 0; i < positionNumbers.Length - 1; i++)
                 {
-                    if ((directionType == 0 && targetLocation <= positionNumbers[i]) ||
-                        (directionType == 1 && targetLocation >= positionNumbers[i]))
+                    if ((directionType == CutDirection.Forward && targetLocation <= positionNumbers[i]) ||
+                        (directionType == CutDirection.Backward && targetLocation >= positionNumbers[i]))
                     {
                         // 判断i值，如果targetLocation == positionNumbers[i]  补偿开始就是i，如果是正向且是小于，则是补偿开始是i-1
                         int startIndex = -1;
@@ -226,6 +282,7 @@ namespace 精密切割系统.ViewModel
                         }
                         // 计算出2个位置之间的差
                         float positionComp = x2 - x1;
+
                         // 计算实际补偿量：插值计算出目标位置的补偿后位置
                         float interpolatedCompensate = y1 + (y2 - y1) * (targetLocation - x1) / (x2 - x1);
 
