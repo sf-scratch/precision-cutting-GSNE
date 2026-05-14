@@ -154,6 +154,16 @@ namespace 精密切割系统.ViewModel
             }
         }
 
+        public bool IsAllowedCutting
+        {
+            get { return _model.IsAllowedCutting; }
+            set
+            {
+                _model.IsAllowedCutting = value;
+                RaisePropertyChanged();
+            }
+        }
+
         public string CutYPositiveLimit
         {
             get { return _model.CutYPositiveLimit; }

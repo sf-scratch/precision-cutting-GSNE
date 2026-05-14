@@ -762,26 +762,42 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 string[] strs = list[i].data.Split(",");
                 DataBean bean = new DataBean();
                 bean.type = list[i].type;
-                if (list[i].type == 2 || list[i].type == 4)
+                switch (list[i].type)
                 {
-                    bean.intputType = "Numeral";
-                }
-                else if (list[i].type == 6)
-                {
-                    bean.intputType = "Default";
-                }
-                else
-                {
-                    bean.intputType = "Decimal";
-                }
+                    case 1:
+                        bean.intputType = "Decimal";
+                        bean.XPrecision = 5;
+                        break;
 
-                if (list[i].type == 2)
-                {
-                    bean.XPrecision = 4;
-                }
-                else
-                {
-                    bean.XPrecision = 5;
+                    case 2:
+                        bean.intputType = "Decimal";
+                        bean.XPrecision = 1;
+                        break;
+
+                    case 3:
+                        bean.intputType = "Decimal";
+                        bean.XPrecision = 5;
+                        break;
+
+                    case 4:
+                        bean.intputType = "Numeral";
+                        bean.XPrecision = 5;
+                        break;
+
+                    case 5:
+                        bean.intputType = "Decimal";
+                        bean.XPrecision = 5;
+                        break;
+
+                    case 6:
+                        bean.intputType = "Default";
+                        bean.XPrecision = 5;
+                        break;
+
+                    default:
+                        bean.intputType = "Decimal";
+                        bean.XPrecision = 5;
+                        break;
                 }
                 for (int n = 0; n < strs.Length; n++)
                 {
@@ -1050,7 +1066,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                         string value = properties[k].GetValue(bean).ToString();
                         if (bean.type == 1)
                         {
-                            if (cutWay.Equals("深度") && bean.type == 1 && Tools.GetDoubleStringValue(value) != 0)
+                            if (cutWay.Equals("深度") && bean.type == 1)
                             {
                                 // 把深度换算为高度 = 工件1.5 + 膜0.7 - 切割深度0.155 = 1.415
                                 double tempValue = Tools.GetDoubleStringValue(currentModel.WorkThickness)

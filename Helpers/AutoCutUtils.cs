@@ -1,5 +1,6 @@
 ﻿using DryIoc.FastExpressionCompiler.LightExpression;
 using DryIoc.ImTools;
+using Emgu.CV.Dnn;
 using MaterialDesignThemes.Wpf;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -177,7 +178,7 @@ namespace 精密切割系统.Helpers
                 bool isReady =
                     await PlcControl.tagControl.Xaxis.IsReadyAsync() &&
                     await PlcControl.tagControl.Yaxis.IsReadyAsync() &&
-                    await PlcControl.tagControl.ThetaAxis.IsReadyAsync();
+                    (!GlobalParams.HasTheta || await PlcControl.tagControl.ThetaAxis.IsReadyAsync());
                 if (!isReady)
                 {
                     MaterialSnack("轴未准备好，请检查轴状态！", SnackType.WARNING, 0, eventAggregator);
@@ -2226,6 +2227,7 @@ namespace 精密切割系统.Helpers
             {
                 return CommonResult<ChCutStep>.Failure("切割深度参数错误！");
             }
+            CutDirection direction = ch.CutDir == "向前切" ? CutDirection.Forward : ch.CutDir == "向后切" ? CutDirection.Backward : CutDirection.Backward;
             // 生成子序列
             List<string> repetitions = [.. loops];
             List<int> sequences = [.. Enumerable.Range(0, maxIndex + 1)];
@@ -2269,7 +2271,7 @@ namespace 精密切割系统.Helpers
                 return CommonResult<ChCutStep>.Failure("未生成有效切割步骤！");
             }
             _ = Enum.TryParse(ch.ComBoxCutMethod, out CutMode mode);
-            return CommonResult<ChCutStep>.Success(new ChCutStep(chStr, mode, cutSteps));
+            return CommonResult<ChCutStep>.Success(new ChCutStep(chStr, mode, direction, cutSteps));
         }
 
         public static async Task<CommonResult<List<ChCutStep>>> GenerateCutStepListAsync(Dictionary<string, ChData> chDictionary)
@@ -2322,6 +2324,7 @@ namespace 精密切割系统.Helpers
                 {
                     return CommonResult<List<ChCutStep>>.Failure("切割深度参数错误！");
                 }
+                CutDirection direction = ch.CutDir == "向前切" ? CutDirection.Forward : ch.CutDir == "向后切" ? CutDirection.Backward : CutDirection.Backward;
                 // 生成子序列
                 List<string> repetitions = [.. loops];
                 List<int> sequences = [.. Enumerable.Range(0, maxIndex + 1)];
@@ -2351,15 +2354,15 @@ namespace 精密切割系统.Helpers
                 int chCutLines = Tools.GetIntStringValue(ch.CutLine);
                 if (chCutLines == 0)
                 {
-                    cutSteps.Add(new ChCutStep(chData.ChName, mode, tempCutSteps));
+                    cutSteps.Add(new ChCutStep(chData.ChName, mode, direction, tempCutSteps));
                 }
                 else if (chCutLines > tempCutSteps.Count)
                 {
-                    cutSteps.Add(new ChCutStep(chData.ChName, mode, Enumerable.Range(0, chCutLines).Select(i => tempCutSteps[i % tempCutSteps.Count]).ToList()));
+                    cutSteps.Add(new ChCutStep(chData.ChName, mode, direction, Enumerable.Range(0, chCutLines).Select(i => tempCutSteps[i % tempCutSteps.Count]).ToList()));
                 }
                 else
                 {
-                    cutSteps.Add(new ChCutStep(chData.ChName, mode, tempCutSteps.GetRange(0, chCutLines)));
+                    cutSteps.Add(new ChCutStep(chData.ChName, mode, direction, tempCutSteps.GetRange(0, chCutLines)));
                 }
             }
             if (cutSteps.Count == 0)

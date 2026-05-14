@@ -83,6 +83,9 @@ namespace 精密切割系统.database.db.modle
         [Column("has_edge_line")]
         public bool HasEdgeLine { get; set; } = false;
 
+        [Column("is_allowed_cutting")]
+        public bool IsAllowedCutting { get; set; } = false;
+
         [Column("warm_up_time")]//暖机时间
         public string WarmUpTime { get; set; }
 
@@ -174,5 +177,8 @@ namespace 精密切割系统.database.db.modle
 
         [Column("max_speed_y")]
         public string MaxSpeedY { get; set; } = "0";
+
+        [Column("spindle_direction")]
+        public bool SpindleDirection { get; set; } = false;
     }
 }

@@ -228,7 +228,7 @@ namespace 精密切割系统.Model.cut
                 string cuttingRecord = string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}",
                     "切割次数",
                     "指令位置Y",
-                    "平均位置Y\t",
+                    "平均位置Y",
                     "切割进入时位置Y",
                     "切割出来时位置Y",
                     "指令位置Z",
@@ -257,12 +257,12 @@ namespace 精密切割系统.Model.cut
 
                         cuttingRecord = string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}",
                             cutTimes.ToString(),
-                            instructionPositionY,
-                            averagePositionY,
-                            justEnterPositionY,
-                            justOutPositionY,
-                            instructionPositionZ1,
-                            averagePositionZ1,
+                            instructionPositionY.ToString("F6"),
+                            averagePositionY.ToString("F6"),
+                            justEnterPositionY.ToString("F6"),
+                            justOutPositionY.ToString("F6"),
+                            instructionPositionZ1.ToString("F6"),
+                            averagePositionZ1.ToString("F6"),
                             temperatureInfo);
 
                         await streamWriter.WriteLineAsync(cuttingRecord);
@@ -331,6 +331,7 @@ namespace 精密切割系统.Model.cut
                     {
                         break;
                     }
+                    _cutDirection = chCutStep.Direction;
                     List<CutStep> cutSteps = chCutStep.CutSteps;
                     _currentChannelNum = cutSteps.First().ChannelNum;
                     if (cutSteps.First().IsAbsolute)
@@ -414,7 +415,7 @@ namespace 精密切割系统.Model.cut
                             List<float> endZList = [];
                             if (cutStep.SingleCutDeep is not null && cutStep.SingleCutDeep > 0)
                             {
-                                if (chCutStep.CutMode == CutMode.B_A)
+                                if (chCutStep.Mode == CutMode.B_A)
                                 {
                                     float z = justContactWork + cutStep.SingleCutDeep.Value;
                                     if (z < targetEndZ)
@@ -436,7 +437,7 @@ namespace 精密切割系统.Model.cut
                             foreach (float endZ in endZList)
                             {
                                 //x方向交替切割
-                                if (chCutStep.CutMode == CutMode.B_ZKEEP)
+                                if (chCutStep.Mode == CutMode.B_ZKEEP)
                                 {
                                     if (isXFromSmallToLarge)
                                     {
@@ -703,7 +704,7 @@ namespace 精密切割系统.Model.cut
 
     public record CutStep(float CutHeight, float Speed, float NextStepDistance, float ThetaDeg, bool IsAbsolute, float ChannelStartY, float OffsetX = 0, int ChannelNum = 1, float? SingleCutDeep = null);
 
-    public record ChCutStep(string ChName, CutMode CutMode, List<CutStep> CutSteps);
+    public record ChCutStep(string ChName, CutMode Mode, CutDirection Direction, List<CutStep> CutSteps);
 
     public record CutServicePauseData(LineSegment? Line, string? Message, float CurrentKnifeRemainTime, List<CutStep> RemainCutSteps, bool IsCompleted);
 

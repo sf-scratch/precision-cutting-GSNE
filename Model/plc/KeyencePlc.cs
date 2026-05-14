@@ -20,6 +20,7 @@ using 精密切割系统.PubSubEvent;
 using 精密切割系统.Utils;
 using 精密切割系统.ViewModel;
 using static Org.BouncyCastle.Math.EC.ECCurve;
+using static SQLite.SQLite3;
 
 namespace 精密切割系统.Driver
 {
@@ -1718,13 +1719,23 @@ namespace 精密切割系统.Driver
             return await PlcControl.plc.ReadDataAsync(accuracyConfirm.addr) == true;
         }
 
+        public async Task<bool> GetSpindleDirectionAsync()
+        {
+            return await PlcControl.plc.ReadDataAsync(spindleDirectionSwitch.addr) == true;
+        }
+
+        public async Task SetSpindleDirectionAsync(bool direction)
+        {
+            spindleDirectionSwitch.writeValue = direction ? "1" : "0";
+            await keyencePlc.WriteTagAsync(spindleDirectionSwitch);
+        }
+
         public async Task TriggerSpindleDirection()
         {
             if (await PlcControl.tagControl.wholeDevice.GetSpindleSpeedAsync() == 0)
             {
-                bool result = await PlcControl.plc.ReadDataAsync(spindleDirectionSwitch.addr) == true;
-                spindleDirectionSwitch.writeValue = result ? "0" : "1";
-                await keyencePlc.WriteTagAsync(spindleDirectionSwitch);
+                bool result = await GetSpindleDirectionAsync();
+                await SetSpindleDirectionAsync(!result);
             }
         }
 

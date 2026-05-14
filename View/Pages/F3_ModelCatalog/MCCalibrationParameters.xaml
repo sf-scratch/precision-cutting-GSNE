@@ -129,10 +129,10 @@
 
         <auto:AutoGrid
             Grid.Row="7"
-            Width="400"
+            Width="1200"
             HorizontalAlignment="Left"
             ChildMargin="5"
-            Columns="*,*,auto"
+            Columns="3*,3*,*,3*,3*,*,3*,3*,*"
             RowCount="7">
             <Label Content="崩边线是否开启" />
             <CheckBox
@@ -143,12 +143,22 @@
                 Style="{StaticResource MaterialDesignFilterChipSecondaryCheckBox}">
                 <TextBlock Text="{Binding ElementName=hasEdgeLine, Path=IsChecked, Converter={StaticResource BoolToStringConverter}}" />
             </CheckBox>
+            <Label Grid.ColumnSpan="6" />
             <Label Content="切割Y正限位" />
             <Controls:InputTextBox Text="{Binding Path=CutYPositiveLimit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <Label Content="mm" />
             <Label Content="切割Y负限位" />
             <Controls:InputTextBox Text="{Binding Path=CutYNegativeLimit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <Label Content="mm" />
+            <Label Content="超出限位允许切割" />
+            <CheckBox
+                x:Name="isAllowedCutting"
+                Grid.ColumnSpan="2"
+                FontSize="18"
+                IsChecked="{Binding IsAllowedCutting}"
+                Style="{StaticResource MaterialDesignFilterChipSecondaryCheckBox}">
+                <TextBlock Text="{Binding ElementName=isAllowedCutting, Path=IsChecked, Converter={StaticResource BoolToStringConverter}}" />
+            </CheckBox>
             <Label Content="横向拉直距离" />
             <Controls:InputTextBox Text="{Binding Path=HorizontalStraighteningStroke, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <Label Content="mm" />

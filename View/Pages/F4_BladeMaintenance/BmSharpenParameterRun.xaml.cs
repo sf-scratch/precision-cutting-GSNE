@@ -350,7 +350,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 }
             }
 
-            return CommonResult<List<ChCutStep>>.Success([new ChCutStep(GlobalParams.CH1, CutMode.A, cutSteps)]);
+            return CommonResult<List<ChCutStep>>.Success([new ChCutStep(GlobalParams.CH1, CutMode.A, CutDirection.Backward, cutSteps)]);
         }
 
         private async Task<CommonResult<BmSharpenParameterModel>> GetBmSharpenParameterModelAsync()

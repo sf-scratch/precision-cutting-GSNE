@@ -249,20 +249,45 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             var userDefineData = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
             float cutYPositiveLimit = userDefineData.CutYPositiveLimit.ToFloat();
             float cutYNegativeLimit = userDefineData.CutYNegativeLimit.ToFloat();
-            var chCutStep = cutStepResult.Data;
+            ChCutStep chCutStep = cutStepResult.Data;
+            if (chCutStep is null || chCutStep.CutSteps == null || chCutStep.CutSteps.Count == 0)
+            {
+                MaterialSnack("生成切割步骤失败！", SnackType.WARNING);
+                return;
+            }
             CutStep firtStep = chCutStep.CutSteps.First();
             float yPositon = firtStep.IsAbsolute ? firtStep.ChannelStartY : currentY.Value.ToActualY() - firtStep.ChannelStartY;
             for (int i = 0; i < chCutStep.CutSteps.Count; i++)
             {
                 if (yPositon > cutYPositiveLimit)
                 {
-                    MaterialSnack($"{chCutStep.ChName}面 第{i + 1}刀，将超出切割正限位！", SnackType.WARNING);
-                    return;
+                    if (userDefineData.IsAllowedCutting)
+                    {
+                        var newCutSteps = chCutStep.CutSteps.Take(i).ToList();
+                        chCutStep.CutSteps.Clear();
+                        chCutStep.CutSteps.AddRange(newCutSteps);
+                        break;
+                    }
+                    else
+                    {
+                        MaterialSnack($"{chCutStep.ChName}面 第{i + 1}刀，将超出切割正限位！", SnackType.WARNING);
+                        return;
+                    }
                 }
                 else if (yPositon < cutYNegativeLimit)
                 {
-                    MaterialSnack($"{chCutStep.ChName}面 第{i + 1}刀，将超出切割负限位！", SnackType.WARNING);
-                    return;
+                    if (userDefineData.IsAllowedCutting)
+                    {
+                        var newCutSteps = chCutStep.CutSteps.Take(i).ToList();
+                        chCutStep.CutSteps.Clear();
+                        chCutStep.CutSteps.AddRange(newCutSteps);
+                        break;
+                    }
+                    else
+                    {
+                        MaterialSnack($"{chCutStep.ChName}面 第{i + 1}刀，将超出切割负限位！", SnackType.WARNING);
+                        return;
+                    }
                 }
                 CutStep cutStep = chCutStep.CutSteps[i];
                 switch (_semiAutoCutService.CutDirection)
@@ -280,7 +305,8 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             }
             _semiAutoCutService.CutLine = _viewModel.CutLine;
             _semiAutoCutService.SpindleRev = _viewModel.SpindleRev;
-            NavigationParameters parameters = new() { { "cutSteps", new List<ChCutStep>() { cutStepResult.Data } } };
+            ChCutStep updateChCutStep = chCutStep with { Direction = _semiAutoCutService.CutDirection };
+            NavigationParameters parameters = new() { { "cutSteps", new List<ChCutStep>() { updateChCutStep } } };
             ContainerLocator.Container.Resolve<IRegionManager>().RequestNavigate(RegionName.MainRegion, nameof(MQSemiAutomaticCuttingRun), parameters);
         }
 

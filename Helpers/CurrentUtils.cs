@@ -66,12 +66,19 @@ namespace 精密切割系统.Helpers
 
         public static async Task InitPlcDataAsync()
         {
-            // 各轴运动速度 点动高速/低速速度  绝对运动速度
-            await InitAxisSpeedIndexAsync(operationParametersModel);
             // 设置位置校准
             InitPositionAlignment(positionAlignmentModel);
             InitInitialPositionModel(initialPositionModel);
+            // 各轴运动速度 点动高速/低速速度  绝对运动速度
+            await InitAxisSpeedIndexAsync(operationParametersModel);
+            await InitUserDefineDataAsync();
             await AutoCutUtils.SetFunctionalParameters();
+        }
+
+        private static async Task InitUserDefineDataAsync()
+        {
+            UserDefineDataModel userDefineData = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
+            await PlcControl.tagControl.wholeDevice.SetSpindleDirectionAsync(userDefineData.SpindleDirection);
         }
 
         public static void InitInitialPositionModel(InitialPositionModel _model)

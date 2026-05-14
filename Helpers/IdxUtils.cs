@@ -35,7 +35,20 @@ namespace 精密切割系统.Helpers
             var degResult = await AutoCutUtils.GetCurrentChThetaDegAsync();
             if (degResult.IsSuccess)
             {
-                ChThetaDeg = degResult.Data ?? [];
+                if (degResult.Data is not null)
+                {
+                    // 排序 + 去重（按 Ch 升序，保留第一个）
+                    var result = degResult.Data
+                        .OrderBy(x => x.Ch)              // 按 Ch 升序排序
+                        .GroupBy(x => x.Ch)              // 按 Ch 分组
+                        .Select(g => g.First())          // 每组取第一个
+                        .ToArray();
+                    ChThetaDeg = result;
+                }
+                else
+                {
+                    ChThetaDeg = [];
+                }
             }
             else
             {
