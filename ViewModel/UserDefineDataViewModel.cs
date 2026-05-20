@@ -569,6 +569,19 @@ namespace 精密切割系统.ViewModel
             }
         }
 
+        public string VacuumBreakingTime
+        {
+            get { return _model.VacuumBreakingTime; }
+            set
+            {
+                if (_model.VacuumBreakingTime != value)
+                {
+                    _model.VacuumBreakingTime = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
         private string _axisToWorkingDiscDistance;
 
         public string AxisToWorkingDiscDistance

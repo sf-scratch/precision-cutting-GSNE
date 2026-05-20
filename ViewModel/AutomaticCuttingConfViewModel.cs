@@ -75,7 +75,6 @@ namespace 精密切割系统.ViewModel
                 MaterialSnack(cutStepResult.Message, SnackType.WARNING);
                 return;
             }
-            _semiAutoCutService.CutDirection = CutDirection.Backward;
             var userDefineData = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
             float cutYPositiveLimit = userDefineData.CutYPositiveLimit.ToFloat();
             float cutYNegativeLimit = userDefineData.CutYNegativeLimit.ToFloat();
@@ -87,16 +86,36 @@ namespace 精密切割系统.ViewModel
                 {
                     if (yPositon > cutYPositiveLimit)
                     {
-                        MaterialSnack($"{chCutStep.ChName}面 第{i + 1}刀，将超出切割正限位！", SnackType.WARNING);
-                        return;
+                        if (userDefineData.IsAllowedCutting)
+                        {
+                            var newCutSteps = chCutStep.CutSteps.Take(i).ToList();
+                            chCutStep.CutSteps.Clear();
+                            chCutStep.CutSteps.AddRange(newCutSteps);
+                            break;
+                        }
+                        else
+                        {
+                            MaterialSnack($"{chCutStep.ChName}面 第{i + 1}刀，将超出切割正限位！", SnackType.WARNING);
+                            return;
+                        }
                     }
                     else if (yPositon < cutYNegativeLimit)
                     {
-                        MaterialSnack($"{chCutStep.ChName}面 第{i + 1}刀，将超出切割负限位！", SnackType.WARNING);
-                        return;
+                        if (userDefineData.IsAllowedCutting)
+                        {
+                            var newCutSteps = chCutStep.CutSteps.Take(i).ToList();
+                            chCutStep.CutSteps.Clear();
+                            chCutStep.CutSteps.AddRange(newCutSteps);
+                            break;
+                        }
+                        else
+                        {
+                            MaterialSnack($"{chCutStep.ChName}面 第{i + 1}刀，将超出切割负限位！", SnackType.WARNING);
+                            return;
+                        }
                     }
                     CutStep cutStep = chCutStep.CutSteps[i];
-                    switch (_semiAutoCutService.CutDirection)
+                    switch (chCutStep.Direction)
                     {
                         case CutDirection.Backward:
                             yPositon -= cutStep.NextStepDistance;

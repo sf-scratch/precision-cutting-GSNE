@@ -198,7 +198,7 @@
         </StackPanel>
 
         <ListBox
-            Margin="0,0,0,115"
+            Margin="0,0,0,55"
             HorizontalAlignment="Center"
             VerticalAlignment="Bottom"
             d:ItemsSource="{d:SampleData}"
@@ -249,7 +249,7 @@
         <!--  -底部按钮项项  -->
         <StackPanel
             x:Name="PanelAction"
-            Margin="0,0,0,125"
+            Margin="0,0,0,65"
             HorizontalAlignment="Center"
             VerticalAlignment="Bottom"
             Visibility="Collapsed">

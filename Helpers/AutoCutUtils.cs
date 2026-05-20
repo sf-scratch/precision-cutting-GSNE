@@ -2059,18 +2059,11 @@ namespace 精密切割系统.Helpers
             }
             FileTableItemModel fileTableItem = fileTableItemResult.Data;
             List<FileTableItemChModel> chModels = await SqlHelper.TableAsync<FileTableItemChModel>().Where(t => t.ItemId == fileTableItem.Id).ToListAsync();
-            string cuttingChSeq = fileTableItem.CuttingChSeq;
-            int[] chSeqs = Tools.StringToIntegerArray(cuttingChSeq);
-            if (chSeqs.Length == 0)
+            if (chModels.Count == 0)
             {
-                return CommonResult<FileTableItemChModel>.Failure("通道序号配置错误！");
+                return CommonResult<FileTableItemChModel>.Failure("通道信息未配置！");
             }
-            int chSeq = chSeqs[0];
-            if (chSeq <= 0)
-            {
-                return CommonResult<FileTableItemChModel>.Failure("通道序号配置错误！");
-            }
-            return CommonResult<FileTableItemChModel>.Success(chModels[chSeq - 1]);
+            return CommonResult<FileTableItemChModel>.Success(chModels.First());
         }
 
         public static async Task<CommonResult<(float StepDistanceX, float StepDistanceY)>> GetCurrentStepDistance()
@@ -2270,7 +2263,7 @@ namespace 精密切割系统.Helpers
             {
                 return CommonResult<ChCutStep>.Failure("未生成有效切割步骤！");
             }
-            _ = Enum.TryParse(ch.ComBoxCutMethod, out CutMode mode);
+            _ = Enum.TryParse(ch.CutMode, out CutMode mode);
             return CommonResult<ChCutStep>.Success(new ChCutStep(chStr, mode, direction, cutSteps));
         }
 
@@ -2350,7 +2343,7 @@ namespace 精密切割系统.Helpers
                 {
                     continue;
                 }
-                _ = Enum.TryParse(ch.ComBoxCutMethod, out CutMode mode);
+                _ = Enum.TryParse(ch.CutMode, out CutMode mode);
                 int chCutLines = Tools.GetIntStringValue(ch.CutLine);
                 if (chCutLines == 0)
                 {

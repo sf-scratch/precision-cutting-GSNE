@@ -1226,6 +1226,12 @@
       "addr": "MR910",
       "name": "精度确认",
       "describe": "精度确认"
+    },
+    "vacuumBreakingTime": {
+      "valueType": "int16",
+      "addr": "DM1400",
+      "name": "破真空时间",
+      "describe": "破真空时间"
     }
   },
   "calibration": {

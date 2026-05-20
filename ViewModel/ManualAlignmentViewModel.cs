@@ -285,6 +285,11 @@ namespace 精密切割系统.ViewModel
             {
                 MaterialSnack(chDataResult.Message, SnackType.WARNING);
             }
+
+            if (!GlobalParams.OnlineFlag)
+            {
+                ThetaAlignService.ChDictionary = _chDictionary;
+            }
             //RegexMatchUtils.ExtractChNumber(CurrentUtils.GetCurrentCh())?.ToString();
         }
 

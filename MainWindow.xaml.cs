@@ -211,8 +211,11 @@ namespace 精密切割系统
                 KeyboardSimulator.SimulateKeyPress("capslock");
             }
             await SqlHelper.InitDatabaseAsync();
+            await CameraOperateUtils.EnsureInitializedAsync();
             if (!GlobalParams.OnlineFlag)
             {
+                await CurrentUtils.UpdateCurrentChAsync(GlobalParams.CH1);
+                await IdxUtils.UpdateChThetaDegAsync(RegexMatchUtils.ExtractChNumber(GlobalParams.CH1));
                 return;
             }
             var taskStartTime = DateTime.Now;
@@ -285,7 +288,9 @@ namespace 精密切割系统
             PlcControl.tagControl.wholeDevice.SetPanelButtonsStauts(0);
             // 关闭Y轴光栅尺校准
             PlcControl.tagControl.cutting.SetYAxisCompStatus(0);
-            int? currentCh = RegexMatchUtils.ExtractChNumber(CurrentUtils.GetCurrentCh());
+            //重置当前切割面为CH1
+            await CurrentUtils.UpdateCurrentChAsync(GlobalParams.CH1);
+            int? currentCh = RegexMatchUtils.ExtractChNumber(GlobalParams.CH1);
             await IdxUtils.UpdateChThetaDegAsync(currentCh);
             // 记录异常日志
             //PlcControl.AddAlarmLog();

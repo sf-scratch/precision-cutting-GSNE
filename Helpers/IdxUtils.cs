@@ -71,7 +71,10 @@ namespace 精密切割系统.Helpers
                     _degIndex = 0; // 未找到，重置索引
                 }
             }
-            await CurrentUtils.UpdateCurrentChAsync(string.Format(GlobalParams.StringFormatCH, ChThetaDeg[_degIndex].Ch));
+            if (ChThetaDeg.Length > 0)
+            {
+                await CurrentUtils.UpdateCurrentChAsync(string.Format(GlobalParams.StringFormatCH, ChThetaDeg[_degIndex].Ch));
+            }
         }
 
         public static async Task<float?> ToNextChThetaDegAsync()

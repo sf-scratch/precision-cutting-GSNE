@@ -1,7 +1,9 @@
-﻿using System.Drawing;
-using Emgu.CV;
+﻿using Emgu.CV;
 using MathNet.Numerics;
 using OpenCvSharp.Extensions;
+using System.Drawing;
+using 精密切割系统.database.db.modle;
+using 精密切割系统.ViewModel;
 using Ocs = OpenCvSharp;
 
 namespace 精密切割系统.Helpers
@@ -9,6 +11,20 @@ namespace 精密切割系统.Helpers
     // 集成摄像头相关功能的api
     internal class CameraOperateUtils
     {
+        private static readonly Lazy<Task> _initTask = new Lazy<Task>(InitializeAsync);
+
+        private static async Task InitializeAsync()
+        {
+            UserDefineDataModel originUserDefineData = await SqlHelper.GetOrCreateEntityAsync(static () => new UserDefineDataModel());
+            DatumLineChangeStepRatio = (int)Math.Round(originUserDefineData.SingleAdjustmentBaselineLineWidth.ToFloat() / 0.001, MidpointRounding.AwayFromZero);
+        }
+
+        // 使用前先调用这个方法确保初始化完成
+        public static async Task EnsureInitializedAsync()
+        {
+            await _initTask.Value;
+        }
+
         /// <summary>
         /// 基准线调整步长（对应相机画面调整0.001mm）
         /// </summary>

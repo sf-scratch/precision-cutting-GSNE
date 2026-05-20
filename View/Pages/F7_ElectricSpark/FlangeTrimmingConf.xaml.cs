@@ -129,6 +129,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
             rightPage.btnCutStart.Visibility = Visibility.Collapsed;
             rightPage.btnCutStop.Visibility = Visibility.Visible;
             currentCount.Text = "0";
+            Action messageAction = () => MaterialSnack("修整已停止!", SnackType.WARNING);
             try
             {
                 await PlcControl.tagControl.bladeMantance.StartContactHeightMeasurement();
@@ -136,22 +137,33 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
                 {
                     await StartFlangeTrimmingHardKnife(_cts.Token);
                 }
+                else
                 {
                     await StartFlangeTrimmingSoftKnife(_cts.Token);
                 }
             }
             catch (OperationCanceledException)
             {
-                MaterialSnack("修整已停止!", SnackType.WARNING);
-                return;
+                messageAction = () => MaterialSnack("修整已停止!", SnackType.WARNING);
             }
             catch (Exception ex)
             {
-                MaterialSnack($"修整异常：{ex.Message}", SnackType.ERROR);
-                return;
+                messageAction = () => MaterialSnack($"修整异常：{ex.Message}", SnackType.ERROR);
             }
             finally
             {
+                try
+                {
+                    MaterialSnack("主轴停止中...", SnackType.WARNING, 0);
+                    TimeoutToken timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(60));
+                    await PlcControl.tagControl.wholeDevice.StopSpindleAsync();
+                    await PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync(timeoutToken.Token);
+                    messageAction.Invoke();
+                }
+                catch (Exception ex)
+                {
+                    MaterialSnack($"修整过程中停止主轴发生异常：{ex.Message}", SnackType.ERROR);
+                }
                 rightPage.btnCutStart.Visibility = Visibility.Visible;
                 rightPage.btnCutStop.Visibility = Visibility.Collapsed;
                 currentCount.Text = "0";
@@ -169,7 +181,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
                 await PlcControl.tagControl.cutting.WaitSpindleRevReachAsync(token);
                 AxisPosition axisPostion = await AutoCutUtils.GetAxisPositionAsync();
                 float curX = axisPostion.X ?? 0;
-                float xLeft = curX - FlangeTrimmingData.Instance.XAxisTravel, xRight = curX;
+                float xLeft = curX + FlangeTrimmingData.Instance.XAxisTravel, xRight = curX;
                 bool isLeft = true;
                 for (int i = 0; i < FlangeTrimmingData.Instance.RepeatCount; i++)
                 {
@@ -215,7 +227,7 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
                 await PlcControl.tagControl.cutting.WaitSpindleRevReachAsync(token);
                 AxisPosition axisPostion = await AutoCutUtils.GetAxisPositionAsync();
                 float curX = axisPostion.X ?? 0;
-                float xLeft = curX - FlangeTrimmingData.Instance.XAxisTravel, xRight = curX;
+                float xLeft = curX + FlangeTrimmingData.Instance.XAxisTravel, xRight = curX;
                 bool isLeft = true;
                 for (int i = 0; i < FlangeTrimmingData.Instance.RepeatCount; i++)
                 {

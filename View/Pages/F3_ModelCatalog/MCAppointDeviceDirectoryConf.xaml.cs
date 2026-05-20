@@ -28,6 +28,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
         private MainWindow? mainWindow;
         private RightPage? rightPage;
         private FileTableItemModel currentModel;//当前配置
+
         public MCAppointDeviceDirectoryConf()
         {
             InitializeComponent();
@@ -49,13 +50,14 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
 
             _ = initView();
         }
+
         private void BtnBack_RightClicked(object? sender, bool e)
         {
             mainWindow.NavigateToPage("Pages/F3_ModelCatalog/MCDeviceDataListConf");
         }
+
         private async Task initView()
         {
-
             int id = int.Parse(QueryUtils.getQuery(this)["id"]);
 
             //查询数据
@@ -67,16 +69,14 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 currentModel = tableList[0];
                 inputText.Text = tableList[0].DeviceDataNo;
             }
-
-
         }
 
-        private void BtnSure_RightClicked(object? sender, bool e)
+        private async void BtnSure_RightClicked(object? sender, bool e)
         {
             //查询文件名是否已存在
             CurrentConfigurationModel currentConfigurationModel = CurrentUtils.GetCurrentConfiguration();
             currentConfigurationModel.DeviceDataId = currentModel.Id;
-            CurrentUtils.UpdateCurrentConfiguration(currentConfigurationModel);
+            await SqlHelper.UpdateAsync(currentConfigurationModel);
             mainWindow.NavigateToPage("Pages/F3_ModelCatalog/MCDeviceDataListConf");
         }
     }

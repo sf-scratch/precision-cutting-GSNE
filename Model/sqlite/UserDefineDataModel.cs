@@ -44,6 +44,9 @@ namespace 精密切割系统.database.db.modle
         [Column("blow_time")]//吹气时间
         public string BlowTime { get; set; } = "0";
 
+        [Column("vacuum_breaking_time")]//破真空时间
+        public string VacuumBreakingTime { get; set; } = "0";
+
         [Column("baseline_width_ch1")]
         public string BaselineWidthCh1 { get; set; } = "0";
 

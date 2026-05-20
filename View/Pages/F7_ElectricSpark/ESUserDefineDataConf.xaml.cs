@@ -1,5 +1,6 @@
 using Emgu.CV.Dnn;
 using MathNet.Numerics.RootFinding;
+using NPOI.SS.Formula.Functions;
 using Org.BouncyCastle.Asn1.Tsp;
 using System;
 using System.Collections.Generic;
@@ -103,7 +104,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
             Appsettings.HorizontalStraighteningStroke = viewModel.HorizontalStraighteningStroke.ToFloat();
             Appsettings.VerticalStraighteningStroke = viewModel.VerticalStraighteningStroke.ToFloat();
             Appsettings.SafetyMarginZ1 = viewModel.SafetyMarginZ1.ToFloat();
-            CameraOperateUtils.DatumLineChangeStepRatio = (int)(viewModel.SingleAdjustmentBaselineLineWidth.ToFloat() / 0.001);
+            CameraOperateUtils.DatumLineChangeStepRatio = (int)Math.Round(viewModel.SingleAdjustmentBaselineLineWidth.ToFloat() / 0.001, MidpointRounding.AwayFromZero);
             // 如果密码为空，保持原密码不变
             if (string.IsNullOrEmpty(model.SystemPassword))
             {
@@ -114,6 +115,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 // 轴最大速度
                 await PlcControl.tagControl.Xaxis.SetMaxSpeedAsync(model.MaxSpeedX.ToFloat());
                 await PlcControl.tagControl.Yaxis.SetMaxSpeedAsync(model.MaxSpeedY.ToFloat());
+                await PlcControl.tagControl.wholeDevice.SetVacuumBreakingTimeAsync(model.VacuumBreakingTime.ToInt());
                 await SqlHelper.UpdateAsync(model);
                 MaterialSnack("保存成功", SnackType.SUCCESS);
             }

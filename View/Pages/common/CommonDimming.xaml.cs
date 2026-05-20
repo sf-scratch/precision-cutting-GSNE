@@ -37,15 +37,16 @@ namespace 精密切割系统.View.Pages.common
             {
                 return;
             }
+            int maxExposureTime = 5000;
             double currentExposureTime = CameraUtils.GetCameraExposureTime();
-            if ((currentExposureTime == 1000 && updateExposureTime > 0) || (currentExposureTime == 1 && updateExposureTime < 0))
+            if ((currentExposureTime == maxExposureTime && updateExposureTime > 0) || (currentExposureTime == 1 && updateExposureTime < 0))
             {
                 return;
             }
             double newExposureTime = currentExposureTime + updateExposureTime;
-            if (newExposureTime > 1000)
+            if (newExposureTime > maxExposureTime)
             {
-                newExposureTime = 1000;
+                newExposureTime = maxExposureTime;
             }
             await CameraUtils.SetCameraExposureTimeAsync(newExposureTime);
         }

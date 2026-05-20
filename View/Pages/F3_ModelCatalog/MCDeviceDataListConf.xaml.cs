@@ -362,7 +362,7 @@ namespace 精密切割系统.View.F3_ModelCatalog
             }
         }
 
-        private void OperatePage_onClicked(object? sender, int code)
+        private async void OperatePage_onClicked(object? sender, int code)
         {
             Uri uri;
             FileTableItemModel itemModel = null;
@@ -482,7 +482,7 @@ namespace 精密切割系统.View.F3_ModelCatalog
                     CurrentConfigurationModel currentConfigurationModel = CurrentUtils.GetCurrentConfiguration();
                     currentConfigurationModel.DeviceDataId = itemModel.Id;
                     currentConfigurationModel.ChannelNum = GlobalParams.CH1;
-                    CurrentUtils.UpdateCurrentConfiguration(currentConfigurationModel);
+                    await SqlHelper.UpdateAsync(currentConfigurationModel);
                     MaterialSnack("保存成功！", SnackType.SUCCESS);
                     break;
 

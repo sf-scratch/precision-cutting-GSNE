@@ -144,19 +144,6 @@ namespace 精密切割系统.Driver
             _mainWindow = mainWindow;
         }
 
-        /// <summary>
-        /// 设置清零后的刀数和长度信息
-        /// </summary>
-        /// <param name="cutDistance">切割长度</param>
-        public static void SetClearedCutInfo(float cutDistance)
-        {
-            CurrentConfigurationModel currentConfigurationModel = CurrentUtils.GetCurrentConfiguration();
-            currentConfigurationModel.ClearedCutAllNum++;
-            currentConfigurationModel.ClearedCutAllDistance += cutDistance;
-            CurrentUtils.UpdateCurrentConfiguration(currentConfigurationModel);
-            CurrentUtils.UpdateParams();
-        }
-
         public const string A = "A";
         public const string B_ZKEEP = "B_ZKEEP";
 

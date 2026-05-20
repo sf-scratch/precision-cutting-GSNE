@@ -1704,6 +1704,20 @@ namespace 精密切割系统.Driver
         /// </summary>
         public Tag accuracyConfirm { get; set; }
 
+        /// <summary>
+        /// 破真空时间
+        /// </summary>
+        public Tag vacuumBreakingTime { get; set; }
+
+        /// <summary>
+        /// 设置破真空时间
+        /// </summary>
+        public async Task SetVacuumBreakingTimeAsync(int time)
+        {
+            vacuumBreakingTime.writeValue = time.ToString();
+            await keyencePlc.WriteTagAsync(vacuumBreakingTime);
+        }
+
         public async Task TriggerAccuracyConfirmAsync()
         {
             bool result = await IsOpenAccuracyConfirmAsync();

@@ -43,10 +43,10 @@
             VerticalAlignment="Center"
             Content="功能参数设定（5.4）"
             FontSize="30"
+            FontWeight="Bold"
             MouseDown="labUserDefineData_MouseDown"
             PreviewMouseDown="labUserDefineData_PreviewMouseDown"
-            TouchDown="labUserDefineData_TouchDown"
-            FontWeight="Bold" />
+            TouchDown="labUserDefineData_TouchDown" />
         <auto:AutoGrid
             Grid.Row="1"
             Grid.RowSpan="8"
@@ -200,10 +200,14 @@
                 InputType="Decimal"
                 Text="{Binding Path=SafetyMarginZ1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 TextWrapping="Wrap" />
-            <Label
-                Grid.ColumnSpan="4"
-                HorizontalAlignment="Left"
-                Content="mm" />
+            <Label HorizontalAlignment="Left" Content="mm" />
+            <Label Content="破真空时间" />
+            <Controls:InputTextBox
+                x:Name="VacuumBreakingTime"
+                InputType="Decimal"
+                Text="{Binding Path=VacuumBreakingTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                TextWrapping="Wrap" />
+            <Label HorizontalAlignment="Left" Content="s" />
             <Label Content="X轴最大速度" />
             <Controls:InputTextBox
                 x:Name="MaxSpeedX"

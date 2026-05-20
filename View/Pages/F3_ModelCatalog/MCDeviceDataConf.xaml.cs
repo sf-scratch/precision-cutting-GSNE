@@ -581,7 +581,7 @@ namespace 精密切割系统.View.Pages.F3_ModelCatalog
                 }
                 currentConfigurationModel.DeviceDataId = currentModel.Id;
                 currentConfigurationModel.ChannelNum = GlobalParams.CH1;
-                CurrentUtils.UpdateCurrentConfiguration(currentConfigurationModel);
+                await SqlHelper.UpdateAsync(currentConfigurationModel);
                 CurrentUtils.UpdateParams();
                 NavigateUtils.ToOperateButton(OperatePage.OperateType.OperationMenu);
                 await IdxUtils.UpdateChThetaDegAsync();

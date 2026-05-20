@@ -1047,7 +1047,7 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteStartThetaCorotationScrOrIdxCommand()
         {
-            if (!await PlcControl.tagControl.ThetaAxis.IsReadyAsync())
+            if (GlobalParams.OnlineFlag && !await PlcControl.tagControl.ThetaAxis.IsReadyAsync())
             {
                 return;
             }
@@ -1094,7 +1094,7 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteStartThetaReversalScrOrIdxCommand()
         {
-            if (!await PlcControl.tagControl.ThetaAxis.IsReadyAsync())
+            if (GlobalParams.OnlineFlag && !await PlcControl.tagControl.ThetaAxis.IsReadyAsync())
             {
                 return;
             }
