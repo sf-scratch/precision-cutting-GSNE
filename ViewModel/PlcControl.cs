@@ -10,6 +10,7 @@ using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
 using 精密切割系统.Extensions;
 using 精密切割系统.Helpers;
+using 精密切割系统.Helpers.CompensationAlgorithm;
 using 精密切割系统.Model.cut;
 using 精密切割系统.Model.logs;
 using 精密切割系统.Model.plc;
@@ -143,6 +144,101 @@ namespace 精密切割系统.ViewModel
             }
         }
 
+        public static async Task<float> GetCompensateByLagrangeInterpolationAsync(Axis axis, float location, CutDirection directionType)
+        {
+            // 获取补偿数据模型
+            List<PositionCompensationModel> models = CurrentUtils.GetPositionCompensationModels();
+            if (models == null || models.Count == 0)
+            {
+                return location;
+            }
+            // 确定补偿方向
+            PositionCompensationModel? axisModel = null;
+            PositionCompensationModel? positiveModel = models.Find(item => item.AxisType.Equals(axis.axisName));
+            PositionCompensationModel? reverseModel = models.Find(item => item.AxisType.Equals(axis.axisName + "-反向"));
+            if (directionType == CutDirection.Forward)
+            {
+                if (positiveModel == null)
+                {
+                    return location;
+                }
+                if (positiveModel.UsageStatus == "不启用")
+                {
+                    if (reverseModel != null && reverseModel.UsageStatus == "启用（调用相反方向补偿值）")
+                    {
+                        axisModel = reverseModel;
+                    }
+                }
+                else
+                {
+                    axisModel = positiveModel;
+                }
+            }
+            else if (directionType == CutDirection.Backward)
+            {
+                if (reverseModel == null)
+                {
+                    return location;
+                }
+                if (reverseModel.UsageStatus == "不启用")
+                {
+                    if (positiveModel != null && positiveModel.UsageStatus == "启用（调用相反方向补偿值）")
+                    {
+                        axisModel = reverseModel;
+                    }
+                }
+                else
+                {
+                    axisModel = reverseModel;
+                }
+            }
+            // 无法找到对应轴的补偿信息
+            if (axisModel == null)
+            {
+                return location;
+            }
+            float targetLocation = MathF.Round(location, GlobalParams.decimalPlaces);
+
+            // 将位置和补偿数据解析为数组
+            float[] positionNumbers = axisModel.AxisPosition.Split(",").Select(float.Parse).ToArray();
+            float[] compensateNumbers = axisModel.AxisCompensate.Split(",").Select(float.Parse).ToArray();
+            int lastPositionNumbersIndex = FindLastZeroBeforeFirstNonZeroFromEnd(positionNumbers);
+            int lastCompensateNumbersIndex = FindLastZeroBeforeFirstNonZeroFromEnd(compensateNumbers);
+            if (lastPositionNumbersIndex == lastCompensateNumbersIndex)
+            {
+                positionNumbers = positionNumbers.Take(lastPositionNumbersIndex).ToArray();
+                compensateNumbers = compensateNumbers.Take(lastCompensateNumbersIndex).ToArray();
+            }
+            else
+            {
+                int validLength = Math.Min(lastPositionNumbersIndex, lastCompensateNumbersIndex);
+                positionNumbers = positionNumbers.Take(validLength).ToArray();
+                compensateNumbers = compensateNumbers.Take(validLength).ToArray();
+            }
+
+            return LagrangeInterpolationActualLaserPosition.Compensate3FromActual(positionNumbers, compensateNumbers, targetLocation);
+        }
+
+        public static int FindLastZeroBeforeFirstNonZeroFromEnd(float[] array)
+        {
+            int lastZeroIndex = -1;
+
+            for (int i = array.Length - 1; i >= 0; i--)
+            {
+                if (array[i] == 0)
+                {
+                    lastZeroIndex = i;  // 记录当前遇到的零
+                }
+                else
+                {
+                    // 遇到第一个非零，返回之前记录的最后一个零
+                    return lastZeroIndex;
+                }
+            }
+
+            return -1; // 全是零或数组为空
+        }
+
         public static async Task<float> GetCompensateAsync(Axis axis, float location, CutDirection directionType)
         {
             // 获取补偿数据模型
@@ -207,6 +303,7 @@ namespace 精密切割系统.ViewModel
             {
                 targetLocation += adjustedLocation;
             }
+            Tools.LogDebug(adjustedLocation.ToString());
             return targetLocation; // 返回调整后的目标位置，保留6位小数
         }
 

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -107,25 +108,27 @@ namespace 精密切割系统.View.F7_ElectricSpark
         //数据显示
         private void initView()
         {
-            if (_model == null) return;
-            cmbUsageStatus.SelectedItem = _model.UsageStatus;
-            string[] pos = new string[500];
-            string[] comp = new string[500];
-            string[] gratingRuler = new string[500];
-            pos = _model.AxisPosition.Split(',');
-            comp = _model.AxisCompensate.Split(',');
-            gratingRuler = _model.AxisGratingRuler.Split(',');
+            int len = 500;
+            string[] pos = new string[len];
+            string[] comp = new string[len];
+            string[] gratingRuler = new string[len];
+            if (_model != null)
+            {
+                pos = _model.AxisPosition.Split(',');
+                comp = _model.AxisCompensate.Split(',');
+                gratingRuler = _model.AxisGratingRuler.Split(',');
+            }
             Col0_99.Clear();
             Col100_199.Clear();
             Col200_299.Clear();
             //页面控件
-            for (int i = 0; i < 500; i++)
+            for (int i = 0; i < len; i++)
             {
                 PositionCompensationModel temp = new PositionCompensationModel();
                 temp.Id = i;
-                string AxisPosition = pos.Length > i ? pos[i] : "0.0000";        // _model.AxisPosition;
-                string AxisCompensate = comp.Length > i ? comp[i] : "0.0000";    // _model.AxisCompensate;
-                string AxisGratingRuler = gratingRuler.Length > i ? gratingRuler[i] : "0.0000";    //  _model.AxisGratingRuler;
+                string AxisPosition = _model != null && pos != null && (pos.Length) > i ? pos[i] : "0.0000";        // _model.AxisPosition;
+                string AxisCompensate = _model != null && comp != null && (comp.Length) > i ? comp[i] : "0.0000";    // _model.AxisCompensate;
+                string AxisGratingRuler = _model != null && gratingRuler != null && (gratingRuler.Length) > i ? gratingRuler[i] : "0.0000";    //  _model.AxisGratingRuler;
                 if (string.IsNullOrEmpty(AxisPosition))
                 {
                     AxisPosition = "0";
@@ -401,21 +404,21 @@ namespace 精密切割系统.View.F7_ElectricSpark
                                 msg += "；数据行运作轴名称)与系统选中值不一致,第" + (i + 1) + "行";
                             }
                             //判断位置是否是数字
-                            bool isNumber = decimal.TryParse(reportDatas[i].AxisPosition, out decimal targetVal);
+                            bool isNumber = double.TryParse(reportDatas[i].AxisPosition, out double targetVal);
                             if (!isNumber)
                             {
                                 checkSucess = false;
                                 msg += "；数据行位置(毫米)必须是数字,第" + (i + 1) + "行";
                             }
                             //判断位置是否是数字
-                            isNumber = decimal.TryParse(reportDatas[i].AxisCompensate, out decimal targetVal2);
+                            isNumber = double.TryParse(reportDatas[i].AxisCompensate, out double targetVal2);
                             if (!isNumber)
                             {
                                 checkSucess = false;
                                 msg += "；数据行实际位置激光(毫米)必须是数字,第" + (i + 1) + "行";
                             }
                             //判断位置是否是数字
-                            isNumber = decimal.TryParse(reportDatas[i].AxisGratingRuler, out decimal targetVal3);
+                            isNumber = double.TryParse(reportDatas[i].AxisGratingRuler, out double targetVal3);
                             if (!isNumber)
                             {
                                 checkSucess = false;
@@ -442,10 +445,22 @@ namespace 精密切割系统.View.F7_ElectricSpark
                                 {
                                     AxisGratingRuler = "0";
                                 }
-                                // 格式化文本 4根据页面来
-                                string _Value1 = Tools.FormatDecimalString(AxisPosition, 6);
-                                string _Value2 = Tools.FormatDecimalString(AxisCompensate, 6);
-                                string _Value3 = Tools.FormatDecimalString(AxisGratingRuler, 6);
+
+                                string _Value1 = AxisPosition;
+                                string _Value2 = AxisCompensate;
+                                string _Value3 = AxisGratingRuler;
+                                if (double.TryParse(AxisPosition, NumberStyles.Float, CultureInfo.InvariantCulture, out double axisPositionDoubleValue))
+                                {
+                                    _Value1 = axisPositionDoubleValue.ToString("F6");
+                                }
+                                if (double.TryParse(AxisCompensate, NumberStyles.Float, CultureInfo.InvariantCulture, out double axisCompensateDoubleValue))
+                                {
+                                    _Value2 = axisCompensateDoubleValue.ToString("F6");
+                                }
+                                if (double.TryParse(AxisGratingRuler, NumberStyles.Float, CultureInfo.InvariantCulture, out double axisGratingRulerDoubleValue))
+                                {
+                                    _Value3 = axisGratingRulerDoubleValue.ToString("F6");
+                                }
 
                                 if (i < 167 && Col0_99.Count >= i)
                                 {

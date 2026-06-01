@@ -456,7 +456,7 @@ namespace 精密切割系统.Model.cut
                                     isXFromSmallToLarge = !isXFromSmallToLarge;
                                 }
                                 stopwatch.Restart();
-                                compensateY = await PlcControl.GetCompensateAsync(PlcControl.tagControl.Yaxis, line.StartPoint.Y, _cutDirection);
+                                compensateY = await PlcControl.GetCompensateByLagrangeInterpolationAsync(PlcControl.tagControl.Yaxis, line.StartPoint.Y, _cutDirection);
                                 if (preFirstCutServiceProcess == null)
                                 {
                                     preFirstCutServiceProcess = new CutServiceProcess(actualCutHeight, cutSpeed, compensateY, cutSteps.Count, currentChCutTimes + 1, chCutStep.ChName);

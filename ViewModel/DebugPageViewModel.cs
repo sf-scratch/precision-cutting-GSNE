@@ -8,8 +8,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using 精密切割系统.Helpers;
 using 精密切割系统.Model.common;
+using 精密切割系统.Model.cut;
 using 精密切割系统.Model.plc;
 using 精密切割系统.Model.position;
+using 精密切割系统.Utils;
 using 精密切割系统.View.page.right;
 using 精密切割系统.View.Pages.operate;
 using static MaterialDesignThemes.Wpf.Theme.ToolBar;
@@ -19,9 +21,66 @@ namespace 精密切割系统.ViewModel
 {
     internal class DebugPageViewModel : CustomBindableBase
     {
+        private AsyncDelegateCommand _runCompensateStepCommand;
+
+        public AsyncDelegateCommand RunCompensateStepCommand =>
+            _runCompensateStepCommand ?? (_runCompensateStepCommand = new AsyncDelegateCommand(ExecuteRunCompensateStepCommandAsync));
+
+        private async Task ExecuteRunCompensateStepCommandAsync()
+        {
+            float singleStep = SingleStepDistance.ToFloat();
+            float startPosition = StartPosition.ToFloat();
+            float endPosition = EndPosition.ToFloat();
+            if (singleStep == 0)
+            {
+                MaterialSnack("单步距离不能为0！", SnackType.WARNING);
+                return;
+            }
+            CutDirection direction = singleStep < 0 ? CutDirection.Forward : CutDirection.Backward;
+            for (float i = startPosition; i <= endPosition; i += singleStep)
+            {
+                float compensate = await PlcControl.GetCompensateByLagrangeInterpolationAsync(PlcControl.tagControl.Yaxis, i, direction);
+                TimeoutToken timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(120));
+                await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(compensate, Speed.ToFloat(), timeoutToken.Token);
+                //await Task.Delay(3000);
+            }
+        }
+
         public ObservableCollection<DebugItem> DebugItemList { get; } = new ObservableCollection<DebugItem>();
 
         private CancellationTokenSource _cts;
+
+        private string _singleStepDistance = "0.2";
+
+        public string SingleStepDistance
+        {
+            get { return _singleStepDistance; }
+            set { SetProperty(ref _singleStepDistance, value); }
+        }
+
+        private string _startPosition = "0";
+
+        public string StartPosition
+        {
+            get { return _startPosition; }
+            set { SetProperty(ref _startPosition, value); }
+        }
+
+        private string _endPosition = "60";
+
+        public string EndPosition
+        {
+            get { return _endPosition; }
+            set { SetProperty(ref _endPosition, value); }
+        }
+
+        private string _speed = "1";
+
+        public string Speed
+        {
+            get { return _speed; }
+            set { SetProperty(ref _speed, value); }
+        }
 
         public DebugPageViewModel()
         {

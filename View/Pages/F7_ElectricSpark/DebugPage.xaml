@@ -30,83 +30,103 @@
                 FontSize="30"
                 FontWeight="Bold" />
         </Grid>
-        <ListBox
-            Grid.Row="1"
-            Width="1300"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            d:ItemsSource="{d:SampleData ItemCount=3}"
-            ItemsSource="{Binding DebugItemList}"
-            ScrollViewer.HorizontalScrollBarVisibility="Auto"
-            ScrollViewer.VerticalScrollBarVisibility="Auto"
-            SelectionMode="Extended"
-            VirtualizingPanel.ScrollUnit="Pixel"
-            Visibility="Visible">
-            <ListBox.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <StackPanel Orientation="Horizontal" />
-                </ItemsPanelTemplate>
-            </ListBox.ItemsPanel>
-            <ListBox.ItemContainerStyle>
-                <Style TargetType="ListBoxItem">
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="ListBoxItem">
-                                <ContentPresenter />
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                    <Setter Property="Background" Value="Transparent" />
-                    <Style.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="Transparent" />
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </ListBox.ItemContainerStyle>
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <auto:AutoGrid
-                        Margin="5"
-                        ChildMargin="20,20"
-                        ColumnCount="2"
-                        Columns="*,auto"
-                        Orientation="Horizontal"
-                        RowCount="7">
-                        <auto:AutoGrid.Resources>
-                            <Style BasedOn="{StaticResource MaterialDesignFloatingHintTextBox}" TargetType="TextBox">
-                                <Setter Property="Width" Value="200" />
-                                <Setter Property="Margin" Value="10" />
-                                <Setter Property="FontSize" Value="20" />
-                            </Style>
-                        </auto:AutoGrid.Resources>
-                        <CheckBox
-                            Grid.ColumnSpan="2"
-                            Width="220"
-                            HorizontalAlignment="Center"
-                            Content="{Binding ItemName}"
-                            FontSize="22"
-                            FontWeight="Bold"
-                            IsChecked="{Binding IsChecked}"
-                            Style="{StaticResource MaterialDesignChoiceChipSecondaryRadioButton}" />
-                        <TextBox materialDesign:HintAssist.Hint="X轴位置(mm)" Text="{Binding XPosition}" />
-                        <CheckBox IsChecked="{Binding IsCheckedX}" />
-                        <TextBox materialDesign:HintAssist.Hint="Y轴位置(mm)" Text="{Binding YPosition}" />
-                        <CheckBox IsChecked="{Binding IsCheckedY}" />
-                        <TextBox materialDesign:HintAssist.Hint="Z1轴位置(mm)" Text="{Binding Z1Position}" />
-                        <CheckBox IsChecked="{Binding IsCheckedZ1}" />
-                        <TextBox materialDesign:HintAssist.Hint="Z2轴位置(mm)" Text="{Binding Z2Position}" />
-                        <CheckBox IsChecked="{Binding IsCheckedZ2}" />
-                        <TextBox materialDesign:HintAssist.Hint="θ轴位置(mm)" Text="{Binding ThetaPosition}" />
-                        <CheckBox IsChecked="{Binding IsCheckedTheta}" />
-                        <Button
-                            Grid.ColumnSpan="2"
-                            Command="{Binding SetCurrentPositionCommand}"
-                            Content="设置为当前位置"
-                            FontSize="18" />
-                    </auto:AutoGrid>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <ListBox
+                Width="550"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                d:ItemsSource="{d:SampleData ItemCount=3}"
+                ItemsSource="{Binding DebugItemList}"
+                ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                SelectionMode="Extended"
+                VirtualizingPanel.ScrollUnit="Pixel"
+                Visibility="Visible">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListBoxItem">
+                                    <ContentPresenter />
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Setter Property="Background" Value="Transparent" />
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="Transparent" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <auto:AutoGrid
+                            Margin="5"
+                            ChildMargin="20,20"
+                            ColumnCount="2"
+                            Columns="*,auto"
+                            Orientation="Horizontal"
+                            RowCount="7">
+                            <auto:AutoGrid.Resources>
+                                <Style BasedOn="{StaticResource MaterialDesignFloatingHintTextBox}" TargetType="TextBox">
+                                    <Setter Property="Width" Value="200" />
+                                    <Setter Property="Margin" Value="10" />
+                                    <Setter Property="FontSize" Value="20" />
+                                </Style>
+                            </auto:AutoGrid.Resources>
+                            <CheckBox
+                                Grid.ColumnSpan="2"
+                                Width="220"
+                                HorizontalAlignment="Center"
+                                Content="{Binding ItemName}"
+                                FontSize="22"
+                                FontWeight="Bold"
+                                IsChecked="{Binding IsChecked}"
+                                Style="{StaticResource MaterialDesignChoiceChipSecondaryRadioButton}" />
+                            <TextBox materialDesign:HintAssist.Hint="X轴位置(mm)" Text="{Binding XPosition}" />
+                            <CheckBox IsChecked="{Binding IsCheckedX}" />
+                            <TextBox materialDesign:HintAssist.Hint="Y轴位置(mm)" Text="{Binding YPosition}" />
+                            <CheckBox IsChecked="{Binding IsCheckedY}" />
+                            <TextBox materialDesign:HintAssist.Hint="Z1轴位置(mm)" Text="{Binding Z1Position}" />
+                            <CheckBox IsChecked="{Binding IsCheckedZ1}" />
+                            <TextBox materialDesign:HintAssist.Hint="Z2轴位置(mm)" Text="{Binding Z2Position}" />
+                            <CheckBox IsChecked="{Binding IsCheckedZ2}" />
+                            <TextBox materialDesign:HintAssist.Hint="θ轴位置(mm)" Text="{Binding ThetaPosition}" />
+                            <CheckBox IsChecked="{Binding IsCheckedTheta}" />
+                            <Button
+                                Grid.ColumnSpan="2"
+                                Command="{Binding SetCurrentPositionCommand}"
+                                Content="设置为当前位置"
+                                FontSize="18" />
+                        </auto:AutoGrid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <Grid Grid.Column="1">
+                <auto:AutoGrid
+                    Margin="5"
+                    ChildMargin="20,20"
+                    ColumnCount="4"
+                    Columns="*,*,*,*,*"
+                    Orientation="Horizontal"
+                    RowCount="7">
+                    <TextBox materialDesign:HintAssist.Hint="单次步进距离" Text="{Binding SingleStepDistance}" />
+                    <TextBox materialDesign:HintAssist.Hint="开始位置" Text="{Binding StartPosition}" />
+                    <TextBox materialDesign:HintAssist.Hint="结束位置" Text="{Binding EndPosition}" />
+                    <TextBox materialDesign:HintAssist.Hint="速度" Text="{Binding Speed}" />
+                    <Button Command="{Binding RunCompensateStepCommand}" Content="开始" />
+                </auto:AutoGrid>
+            </Grid>
+        </Grid>
     </Grid>
 </UserControl>

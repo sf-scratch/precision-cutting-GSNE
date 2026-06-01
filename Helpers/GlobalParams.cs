@@ -12,10 +12,10 @@ namespace 精密切割系统.Helpers
         public const string Device_562 = "562";
 
         // true 在线版本 false 离线版本
-        public static bool OnlineFlag { get; set; } = true;
+        public static bool OnlineFlag { get; set; } = false;
 
         // 是否全屏显示
-        public static bool IsFullDcreen { get; set; } = true;
+        public static bool IsFullDcreen { get; set; } = false;
 
         // 是否带Theta轴
         public static bool HasTheta { get; set; } = true;
