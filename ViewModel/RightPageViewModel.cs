@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using 精密切割系统.Driver;
 using 精密切割系统.Helpers;
+using 精密切割系统.Helpers.GTN;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut;
 using 精密切割系统.Model.plc;
@@ -70,18 +71,16 @@ namespace 精密切割系统.ViewModel
                             await PlcControl.tagControl.wholeDevice.OpenYellowLightAsync();
                         }
                     }
-                    bool[]? alarms = AlarmConfig.Instance.GetNewestAlarms();
-                    if (alarms != null && AlarmConfig.Instance.TryGetActiveAlarms(alarms, out List<AlarmInfo> alarmInfos))
+                    var allAxisAlarms = await GsneMotion.Instance.GetAllAxisAlarmsAsync();
+                    if (allAxisAlarms.Count > 0)
                     {
-                        if (!IsSamely(alarmInfos, ActiveAlarms))
+                        bool areEqual = allAxisAlarms.SequenceEqual(ActiveAlarms);
+                        if (!areEqual)
                         {
                             Application.Current.Dispatcher.Invoke(() =>
                             {
                                 ActiveAlarms.Clear();
-                                foreach (AlarmInfo alarmInfo in alarmInfos)
-                                {
-                                    ActiveAlarms.Add(new ActiveAlarmModel() { Address = alarmInfo.Address, Level = alarmInfo.Level, Message = alarmInfo.Message });
-                                }
+                                ActiveAlarms.AddRange(allAxisAlarms);
                                 AlarmVisibility = Visibility.Visible;
                             });
                         }
@@ -113,7 +112,7 @@ namespace 精密切割系统.ViewModel
                 {
                     Tools.LogError($"报警监控异常: {ex.Message}");
                 }
-                await Task.Delay(300);
+                await Task.Delay(20);
             }
         }
 

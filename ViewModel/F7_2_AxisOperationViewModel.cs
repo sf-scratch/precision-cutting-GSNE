@@ -12,7 +12,9 @@ using System.Windows.Data;
 using 精密切割系统.Behaviors;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
+using 精密切割系统.Extensions;
 using 精密切割系统.Helpers;
+using 精密切割系统.Helpers.GTN;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut;
 using 精密切割系统.Model.plc;
@@ -36,13 +38,13 @@ namespace 精密切割系统.ViewModel
         public F7_2_AxisOperationViewModel()
         {
             AxisOperationList.AddRange([
-                new AxisOperationModel(PlcControl.tagControl.Xaxis, async (a,b) => { if(!b) await a.AxisObject.StopJogAsync();}){IsChecked = true, AxisSlowSpeed = "0.1", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", Unit = "mm", SpeedUnit = "mm/s"},
-                new AxisOperationModel(PlcControl.tagControl.Yaxis, async (a,b) => { if(!b) await a.AxisObject.StopJogAsync();}){AxisSlowSpeed = "0.1", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", Unit = "mm", SpeedUnit = "mm/s"},
-                new AxisOperationModel(PlcControl.tagControl.Z1axis, async(a, b) => { if(!b) await a.AxisObject.StopJogAsync();}){AxisSlowSpeed = "0.1", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", Unit = "mm", SpeedUnit = "mm/s"},
-                new AxisOperationModel(PlcControl.tagControl.Z2axis, async(a, b) => { if(! b) await a.AxisObject.StopJogAsync(); }){AxisSlowSpeed = "0.1", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", Unit = "mm", SpeedUnit = "mm/s"}]);
+                new AxisOperationModel(AxisType.X, async (a,b) => { if(!b) await GsneMotion.Instance.Axis.StopJogAsync(a.Axis);}){IsChecked = true, AxisSlowSpeed = "0.1", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", Unit = "mm", SpeedUnit = "mm/s"},
+                new AxisOperationModel(AxisType.Y, async (a,b) => { if(!b) await GsneMotion.Instance.Axis.StopJogAsync(a.Axis);}){AxisSlowSpeed = "0.1", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", Unit = "mm", SpeedUnit = "mm/s"},
+                new AxisOperationModel(AxisType.Z1, async(a, b) => { if(!b) await GsneMotion.Instance.Axis.StopJogAsync(a.Axis);}){AxisSlowSpeed = "0.1", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", Unit = "mm", SpeedUnit = "mm/s"},
+                new AxisOperationModel(AxisType.Z2, async(a, b) => { if(! b) await GsneMotion.Instance.Axis.StopJogAsync(a.Axis); }){AxisSlowSpeed = "0.1", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", Unit = "mm", SpeedUnit = "mm/s"}]);
             if (GlobalParams.HasTheta)
             {
-                AxisOperationList.Add(new AxisOperationModel(PlcControl.tagControl.ThetaAxis, async (a, b) => { if (!b) await a.AxisObject.StopJogAsync(); }) { AxisSlowSpeed = "0.1", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", IsReady = true, Unit = "deg", SpeedUnit = "deg/s" });
+                AxisOperationList.Add(new AxisOperationModel(AxisType.Theta, async (a, b) => { if (!b) await GsneMotion.Instance.Axis.StopJogAsync(a.Axis); }) { AxisSlowSpeed = "0.1", AxisSpeed = "10", RelativeDistance = "5", CurPosition = "0", IsReady = true, Unit = "deg", SpeedUnit = "deg/s" });
             }
         }
 
@@ -88,7 +90,7 @@ namespace 精密切割系统.ViewModel
             var selectedAxis = AxisOperationList.FirstOrDefault(a => a.IsChecked);
             if (selectedAxis != null)
             {
-                await selectedAxis.AxisObject.StartHomingAsync();
+                await GsneMotion.Instance.Axis.StartHomingAsync(selectedAxis.Axis);
             }
         }
 
@@ -97,7 +99,18 @@ namespace 精密切割系统.ViewModel
             var selectedAxis = AxisOperationList.FirstOrDefault(a => a.IsChecked);
             if (selectedAxis != null)
             {
-                await selectedAxis.AxisObject.RelaxAxisAsync();
+                var result = await GsneMotion.Instance.GetAxisStatusAsync(selectedAxis.Axis, AxisStatusBits.MotorEnabled);
+                if (result.IsSuccess)
+                {
+                    if (result.Data)
+                    {
+                        await GsneMotion.Instance.Axis.AxisOffAsync(selectedAxis.Axis);
+                    }
+                    else
+                    {
+                        await GsneMotion.Instance.Axis.AxisOnAsync(selectedAxis.Axis);
+                    }
+                }
             }
         }
 
@@ -111,7 +124,7 @@ namespace 精密切割系统.ViewModel
             var selectedAxis = AxisOperationList.FirstOrDefault(a => a.IsChecked);
             if (selectedAxis != null)
             {
-                await selectedAxis.AxisObject.StartRelativeAsync(isPositive ? selectedAxis.RelativeDistance.ToFloat() : -selectedAxis.RelativeDistance.ToFloat(), selectedAxis.AxisSlowSpeed.ToFloat(), _cts.Token);
+                await GsneMotion.Instance.Axis.StartRelativeAsync(selectedAxis.Axis, isPositive ? selectedAxis.RelativeDistance.ToFloat() : -selectedAxis.RelativeDistance.ToFloat(), selectedAxis.AxisSlowSpeed.ToFloat(), _cts.Token);
             }
         }
 
@@ -125,7 +138,7 @@ namespace 精密切割系统.ViewModel
             var selectedAxis = AxisOperationList.FirstOrDefault(a => a.IsChecked);
             if (selectedAxis != null)
             {
-                await selectedAxis.AxisObject.StartRelativeAsync(isPositive ? selectedAxis.RelativeDistance.ToFloat() : -selectedAxis.RelativeDistance.ToFloat(), selectedAxis.AxisSpeed.ToFloat(), _cts.Token);
+                await GsneMotion.Instance.Axis.StartRelativeAsync(selectedAxis.Axis, isPositive ? selectedAxis.RelativeDistance.ToFloat() : -selectedAxis.RelativeDistance.ToFloat(), selectedAxis.AxisSpeed.ToFloat(), _cts.Token);
             }
         }
 
@@ -140,8 +153,7 @@ namespace 精密切割系统.ViewModel
             if (selectedAxis != null)
             {
                 SpeedManager.IsHighSpeed = true;
-                await selectedAxis.AxisObject.SetJogRelativeSpeedAsync(selectedAxis.AxisSlowSpeed.ToFloat());
-                await selectedAxis.AxisObject.StartJogAsync(isPositive ? 0 : 1);
+                await GsneMotion.Instance.Axis.StartJogAsync(selectedAxis.Axis, (isPositive ? 1 : -1) * selectedAxis.AxisSlowSpeed.ToFloat());
             }
         }
 
@@ -156,8 +168,7 @@ namespace 精密切割系统.ViewModel
             if (selectedAxis != null)
             {
                 SpeedManager.IsHighSpeed = true;
-                await selectedAxis.AxisObject.SetJogRelativeSpeedAsync(selectedAxis.AxisSpeed.ToFloat());
-                await selectedAxis.AxisObject.StartJogAsync(isPositive ? 0 : 1);
+                await GsneMotion.Instance.Axis.StartJogAsync(selectedAxis.Axis, (isPositive ? 1 : -1) * selectedAxis.AxisSpeed.ToFloat());
             }
         }
 
@@ -166,47 +177,50 @@ namespace 精密切割系统.ViewModel
             var selectedAxis = AxisOperationList.FirstOrDefault(a => a.IsChecked);
             if (selectedAxis != null)
             {
-                await selectedAxis.AxisObject.StopJogAsync();
+                await GsneMotion.Instance.Axis.StopJogAsync(selectedAxis.Axis);
             }
         }
 
         private async Task MonitiorAxisState(CancellationToken token)
         {
-            using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
-            while (await timer.WaitForNextTickAsync(token))
+            while (!token.IsCancellationRequested)
             {
                 var axisPostion = await AutoCutUtils.GetAxisPositionAsync();
                 var axisState = await AutoCutUtils.GetAxisStateAsync();
-                var xAxis = AxisOperationList.Where(p => p.AxisName == AxisNameType.X).FirstOrDefault();
-                if (xAxis is not null)
+                var xAxis = AxisOperationList.Where(p => p.Axis == AxisType.X).FirstOrDefault();
+                var yAxis = AxisOperationList.Where(p => p.Axis == AxisType.Y).FirstOrDefault();
+                var zAxis = AxisOperationList.Where(p => p.Axis == AxisType.Z1).FirstOrDefault();
+                var z2Axis = AxisOperationList.Where(p => p.Axis == AxisType.Z2).FirstOrDefault();
+                var thetaAxis = AxisOperationList.Where(p => p.Axis == AxisType.Theta).FirstOrDefault();
+                Application.Current.Dispatcher.Invoke(() =>
                 {
-                    xAxis.CurPosition = axisPostion.X?.ToString("F3") ?? "N";
-                    xAxis.IsReady = axisState.X == true;
-                }
-                var yAxis = AxisOperationList.Where(p => p.AxisName == AxisNameType.Y).FirstOrDefault();
-                if (yAxis is not null)
-                {
-                    yAxis.CurPosition = axisPostion.Y?.ToString("F3") ?? "N";
-                    yAxis.IsReady = axisState.Y == true;
-                }
-                var zAxis = AxisOperationList.Where(p => p.AxisName == AxisNameType.Z1).FirstOrDefault();
-                if (zAxis is not null)
-                {
-                    zAxis.CurPosition = axisPostion.Z1?.ToString("F3") ?? "N";
-                    zAxis.IsReady = axisState.Z1 == true;
-                }
-                var z2Axis = AxisOperationList.Where(p => p.AxisName == AxisNameType.Z2).FirstOrDefault();
-                if (z2Axis is not null)
-                {
-                    z2Axis.CurPosition = axisPostion.Z2?.ToString("F3") ?? "N";
-                    z2Axis.IsReady = axisState.Z2 == true;
-                }
-                var thetaAxis = AxisOperationList.Where(p => p.AxisName == AxisNameType.Theta).FirstOrDefault();
-                if (thetaAxis is not null)
-                {
-                    thetaAxis.CurPosition = axisPostion.Theta?.ToString("F3") ?? "N";
-                    thetaAxis.IsReady = axisState.Theta == true;
-                }
+                    if (xAxis is not null)
+                    {
+                        xAxis.CurPosition = axisPostion.X?.ToString("F3") ?? "N";
+                        xAxis.IsReady = axisState.X == true;
+                    }
+                    if (yAxis is not null)
+                    {
+                        yAxis.CurPosition = axisPostion.Y?.ToString("F3") ?? "N";
+                        yAxis.IsReady = axisState.Y == true;
+                    }
+                    if (zAxis is not null)
+                    {
+                        zAxis.CurPosition = axisPostion.Z1?.ToString("F3") ?? "N";
+                        zAxis.IsReady = axisState.Z1 == true;
+                    }
+                    if (z2Axis is not null)
+                    {
+                        z2Axis.CurPosition = axisPostion.Z2?.ToString("F3") ?? "N";
+                        z2Axis.IsReady = axisState.Z2 == true;
+                    }
+                    if (thetaAxis is not null)
+                    {
+                        thetaAxis.CurPosition = axisPostion.Theta?.ToString("F3") ?? "N";
+                        thetaAxis.IsReady = axisState.Theta == true;
+                    }
+                });
+                await Task.Delay(200);
             }
         }
 

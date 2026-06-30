@@ -28,6 +28,7 @@ using 精密切割系统.Assets.config.menu;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
 using 精密切割系统.Helpers;
+using 精密切割系统.Helpers.GTN;
 using 精密切割系统.Model.bunkering;
 using 精密切割系统.Model.cut;
 using 精密切割系统.Model.logs;
@@ -131,12 +132,30 @@ namespace 精密切割系统
         private OperatePage operatePage;
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
-        {
+        {   
             // 禁用触摸到鼠标事件的转换
             Touch.FrameReported += (s, e) => { /* 防止触摸触发鼠标事件 */ };
             AlarmConfig alarmConfig = AlarmConfig.Instance;
             await Dispatcher.BeginInvoke(new Action(async () =>
             {
+                GsneConfig gsneConfig = GsneConfig.Instance;
+                await GsneMotion.Instance.ConnectServerAsync();
+                //await GsneMotion.Instance.Axis.StartJogAsync(AxisType.X, -1000);
+                //await Task.Delay(5000);
+
+
+                var Domanager = new OutputConfig();
+                Domanager.SetTrayVacuum(true);
+                await  Task.Delay(2000);
+                Domanager.SetProductVacuum(false);
+                var a = Domanager.ReadAllDo(); 
+                if (a.TrayVacuum)
+                {
+                    MessageBox.Show("黄色灯亮了");
+                }
+
+
+                //await GsneMotion.Instance.Axis.StopJogAsync(AxisType.X);
                 string logDirectory = "logs";
                 int daysThreshold = 30; // 清理超过 30 天的日志
                 TimeSpan interval = TimeSpan.FromDays(1); // 每天触发一次
@@ -153,7 +172,7 @@ namespace 精密切割系统
                 // 初始化设备
                 initThread = new Thread(InitDevice);
                 initThread.IsBackground = true;
-                initThread.Start();
+                //initThread.Start();
                 operateFrame.Navigated += OperateFrame_Navigated;
                 if (DevicesUtis.IsTouchSupported())
                 {

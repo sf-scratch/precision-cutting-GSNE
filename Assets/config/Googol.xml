@@ -1,0 +1,2545 @@
+<?xml version="1.0"?>
+<GoogolConfig ver="1.1">
+	<Setting>
+		<McMode>
+			<EtherCATMode>0</EtherCATMode>
+			<NetResetMode>0</NetResetMode>
+			<NetTopologyCheckMode>0</NetTopologyCheckMode>
+		</McMode>
+	</Setting>
+	<Device>
+		<DeviceInfo type="0x096b" name="GSNE-08-A-032-V-00">
+			<Config>
+				<DeviceShareMax count="4" />
+				<ExtModuleAccess mode="0" />
+			</Config>
+			<NetToplogy>
+				<PortInfo>
+					<PortA type="-1" />
+					<PortB type="-1" />
+					<PortC type="-1" />
+					<PortD type="-1" />
+				</PortInfo>
+				<StationInfo>
+					<Station link="0" type="0x9000" subType="0x0000" netType="6" coreIndex="1" stationId="0" name="Local" />
+					<Station link="0" type="0xffff" subType="0xffff" vendorId="0x100000" productCode="0xc010d" revisionNo="0x10000" BusIndex="2" netType="8" coreIndex="2" stationId="0" name="SV660_1Axis_V0.08" />
+					<Station link="1" type="0xffff" subType="0xffff" vendorId="0x100000" productCode="0xc010d" revisionNo="0x10000" BusIndex="2" netType="8" coreIndex="2" stationId="1" name="SV660_1Axis_V0.08" />
+					<Station link="2" type="0xffff" subType="0xffff" vendorId="0x100000" productCode="0xc010d" revisionNo="0x10000" BusIndex="2" netType="8" coreIndex="2" stationId="2" name="SV660_1Axis_V0.08" />
+					<Station link="3" type="0xffff" subType="0xffff" vendorId="0x0168" productCode="0x000b" revisionNo="0x0001" BusIndex="2" netType="8" coreIndex="2" stationId="3" name="STF-ECX-H" />
+					<Station link="4" type="0xffff" subType="0xffff" vendorId="0xffffffff99998888" productCode="0x9254" revisionNo="0x10000" BusIndex="2" netType="8" coreIndex="2" stationId="4" name="OMG6 EtherCAT Drive" />
+				</StationInfo>
+			</NetToplogy>
+			<ResourceMap>
+				<Core index="1" period="250">
+					<AxisInfo />
+					<GpiInfo />
+					<GpoInfo />
+					<AuAdcInfo />
+					<AuDacInfo />
+					<AuEncoderExInfo />
+					<AuTriggerInfo />
+					<AxisActTorqueInfo />
+					<AxisActVelInfo />
+					<AxisAdcInfo />
+					<AxisAlarmInfo />
+					<AxisArriveInfo />
+					<AxisClearInfo />
+					<AxisDacInfo />
+					<AxisDriverFollowErrorInfo />
+					<AxisEnableInfo />
+					<AxisEncoderInfo />
+					<AxisHomeInfo />
+					<AxisLmtNegativeInfo />
+					<AxisLmtPositiveInfo />
+					<AxisPrfPosInfo />
+					<AxisPrfTorqueInfo />
+					<AxisPrfVelInfo />
+					<AxisPulseInfo />
+					<EXTAIInfo />
+					<EXTAOInfo />
+					<EXTDIInfo />
+					<EXTDOInfo />
+					<LaserInfo />
+					<MpgDiInfo />
+					<MpgEncoderInfo />
+					<PosCompareInfo />
+					<ScanCrdInfo />
+					<TriggerInfo />
+				</Core>
+				<Core index="2" period="1000">
+					<AxisInfo>
+						<Axis index="1" count="1">
+							<PhysicalInfo netType="8" stationId="0" id="0">MC_AXIS</PhysicalInfo>
+						</Axis>
+						<Axis index="2" count="1">
+							<PhysicalInfo netType="8" stationId="1" id="0">MC_AXIS</PhysicalInfo>
+						</Axis>
+						<Axis index="3" count="1">
+							<PhysicalInfo netType="8" stationId="2" id="0">MC_AXIS</PhysicalInfo>
+						</Axis>
+						<Axis index="4" count="1">
+							<PhysicalInfo netType="8" stationId="3" id="0">MC_AXIS</PhysicalInfo>
+						</Axis>
+						<Axis index="5" count="1">
+							<PhysicalInfo netType="8" stationId="4" id="0">MC_AXIS</PhysicalInfo>
+						</Axis>
+					</AxisInfo>
+					<GpiInfo />
+					<GpoInfo />
+					<AuAdcInfo />
+					<AuDacInfo />
+					<AuEncoderExInfo />
+					<AuTriggerInfo />
+					<AxisActTorqueInfo />
+					<AxisActVelInfo />
+					<AxisAdcInfo />
+					<AxisAlarmInfo />
+					<AxisArriveInfo />
+					<AxisClearInfo />
+					<AxisDacInfo />
+					<AxisDriverFollowErrorInfo />
+					<AxisEnableInfo />
+					<AxisEncoderInfo />
+					<AxisHomeInfo />
+					<AxisLmtNegativeInfo />
+					<AxisLmtPositiveInfo />
+					<AxisPrfPosInfo />
+					<AxisPrfTorqueInfo />
+					<AxisPrfVelInfo />
+					<AxisPulseInfo />
+					<EXTAIInfo />
+					<EXTAOInfo />
+					<EXTDIInfo />
+					<EXTDOInfo />
+					<LaserInfo />
+					<MpgDiInfo />
+					<MpgEncoderInfo />
+					<PosCompareInfo />
+					<ScanCrdInfo />
+					<TriggerInfo />
+				</Core>
+			</ResourceMap>
+		</DeviceInfo>
+	</Device>
+	<EtherCAT>
+		<EtherCATConfig CardIndex="1" ConfigCount="2">
+			<Config BusIndex="2">
+				<Master AdapterIndex="0" IoUpdateFreq="4" StackDebugLevel="0">
+					<PdoMapMode>0</PdoMapMode>
+					<Info>
+						<Name>GOOGOL EtherCAT Master</Name>
+						<Destination>FFFFFFFFFFFF</Destination>
+						<Source>000000000000</Source>
+						<EtherType>A488</EtherType>
+					</Info>
+				</Master>
+				<Slave>
+					<Info>
+						<Name>SV660_1Axis_00913</Name>
+						<VendorId>1048576</VendorId>
+						<ProductCode>786701</ProductCode>
+						<RevisionNo>65536</RevisionNo>
+						<SerialNo>0</SerialNo>
+						<DevType>1</DevType>
+						<NChannel>1</NChannel>
+						<UseLrdLwr>0</UseLrdLwr>
+						<SlaveId>0</SlaveId>
+					</Info>
+					<ProcessData PdoAssign="true" PdoConfig="true">
+						<Sm2>
+							<Type>Outputs</Type>
+							<DefaultSize>12</DefaultSize>
+							<StartAddress>6144</StartAddress>
+							<ControlByte>100</ControlByte>
+							<Enable>true</Enable>
+							<Pdo>5889</Pdo>
+						</Sm2>
+						<Sm3>
+							<Type>Inputs</Type>
+							<DefaultSize>28</DefaultSize>
+							<StartAddress>7168</StartAddress>
+							<ControlByte>32</ControlByte>
+							<Enable>true</Enable>
+							<Pdo>6913</Pdo>
+						</Sm3>
+						<RxPdo Fixed="true" Mandatory="false" Sm="2" Virtual="false">
+							<Index>#x1701</Index>
+							<Name LcId="1033">Outputs</Name>
+							<Exclude>#x1600</Exclude>
+							<Exclude>#x1702</Exclude>
+							<Exclude>#x1703</Exclude>
+							<Exclude>#x1704</Exclude>
+							<Exclude>#x1705</Exclude>
+							<Entry Fixed="true">
+								<Index>#x6040</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>16</BitLen>
+								<Name LcId="1033">Controlword</Name>
+								<Comment></Comment>
+								<DataType>UINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x607a</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Target position</Name>
+								<Comment></Comment>
+								<DataType>DINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x60b8</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>16</BitLen>
+								<Name LcId="1033">Touch probe function</Name>
+								<Comment></Comment>
+								<DataType>UINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x60fe</Index>
+								<SubIndex>#x1</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Physical outputs</Name>
+								<Comment></Comment>
+								<DataType>UDINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+						</RxPdo>
+						<TxPdo Fixed="true" Mandatory="false" Sm="3" Virtual="false">
+							<Index>#x1b01</Index>
+							<Name LcId="1033">Inputs</Name>
+							<Exclude>#x1a00</Exclude>
+							<Exclude>#x1b02</Exclude>
+							<Exclude>#x1b03</Exclude>
+							<Exclude>#x1b04</Exclude>
+							<Entry Fixed="true">
+								<Index>#x603f</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>16</BitLen>
+								<Name LcId="1033">Error code</Name>
+								<Comment></Comment>
+								<DataType>UINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x6041</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>16</BitLen>
+								<Name LcId="1033">Statusword</Name>
+								<Comment></Comment>
+								<DataType>UINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x6064</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Position actual value</Name>
+								<Comment></Comment>
+								<DataType>DINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x6077</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>16</BitLen>
+								<Name LcId="1033">Torque actual value</Name>
+								<Comment></Comment>
+								<DataType>INT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x60f4</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Following error actual value</Name>
+								<Comment></Comment>
+								<DataType>DINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x60b9</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>16</BitLen>
+								<Name LcId="1033">Touch probe status</Name>
+								<Comment></Comment>
+								<DataType>UINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x60ba</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Touch probe pos1 pos value</Name>
+								<Comment></Comment>
+								<DataType>DINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x60bc</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Touch probe pos2 pos value</Name>
+								<Comment></Comment>
+								<DataType>DINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x60fd</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Digital inputs</Name>
+								<Comment></Comment>
+								<DataType>UDINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+						</TxPdo>
+					</ProcessData>
+					<Mailbox>
+						<Send>
+							<Start>4096</Start>
+							<Length>256</Length>
+						</Send>
+						<Recv>
+							<Start>5120</Start>
+							<Length>256</Length>
+						</Recv>
+						<Protocol>CoE</Protocol>
+						<CoE PdoCheck="0">
+							<InitCmds>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>clear sm pdos 0x1c12</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7186</Index>
+									<SubIndex>0</SubIndex>
+									<Data>00</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>clear sm pdos 0x1c13</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7187</Index>
+									<SubIndex>0</SubIndex>
+									<Data>00</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>clear pdo 0x1a00 entries</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>0</SubIndex>
+									<Data>00</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>1</SubIndex>
+									<Data>10004160</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>2</SubIndex>
+									<Data>20006460</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>3</SubIndex>
+									<Data>1000b960</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>4</SubIndex>
+									<Data>2000ba60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>5</SubIndex>
+									<Data>2000bc60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>6</SubIndex>
+									<Data>10003f60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>7</SubIndex>
+									<Data>2000fd60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry count</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>0</SubIndex>
+									<Data>07</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>clear pdo 0x1600 entries</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>0</SubIndex>
+									<Data>00</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1600 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>1</SubIndex>
+									<Data>10004060</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1600 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>2</SubIndex>
+									<Data>20007a60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1600 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>3</SubIndex>
+									<Data>1000b860</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1600 entry count</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>0</SubIndex>
+									<Data>03</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdos 0x1c12:1</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7186</Index>
+									<SubIndex>1</SubIndex>
+									<Data>0117</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdos 0x1c12 count</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7186</Index>
+									<SubIndex>0</SubIndex>
+									<Data>01</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdos 0x1c13:1</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7187</Index>
+									<SubIndex>1</SubIndex>
+									<Data>011b</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdos 0x1c13 count</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7187</Index>
+									<SubIndex>0</SubIndex>
+									<Data>01</Data>
+								</InitCmd>
+								<InitCmd Fixed="false">
+									<Transition>PS</Transition>
+									<Comment></Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>24672</Index>
+									<SubIndex>0</SubIndex>
+									<Data>08</Data>
+								</InitCmd>
+							</InitCmds>
+						</CoE>
+					</Mailbox>
+					<DC Index="0">
+						<AssignActivate>768</AssignActivate>
+						<CycleTime0>1000000</CycleTime0>
+						<ShiftTime0>0</ShiftTime0>
+						<CycleTime1>1000000</CycleTime1>
+						<ShiftTime1>0</ShiftTime1>
+					</DC>
+					<IOKeep>
+						<Enable>0</Enable>
+						<Type>sdo</Type>
+					</IOKeep>
+					<Slots MaxSlotCount="0" />
+				</Slave>
+				<Slave>
+					<Info>
+						<Name>SV660_1Axis_00913</Name>
+						<VendorId>1048576</VendorId>
+						<ProductCode>786701</ProductCode>
+						<RevisionNo>65536</RevisionNo>
+						<SerialNo>0</SerialNo>
+						<DevType>1</DevType>
+						<NChannel>1</NChannel>
+						<UseLrdLwr>0</UseLrdLwr>
+						<SlaveId>0</SlaveId>
+					</Info>
+					<ProcessData PdoAssign="true" PdoConfig="true">
+						<Sm2>
+							<Type>Outputs</Type>
+							<DefaultSize>12</DefaultSize>
+							<StartAddress>6144</StartAddress>
+							<ControlByte>100</ControlByte>
+							<Enable>true</Enable>
+							<Pdo>5889</Pdo>
+						</Sm2>
+						<Sm3>
+							<Type>Inputs</Type>
+							<DefaultSize>28</DefaultSize>
+							<StartAddress>7168</StartAddress>
+							<ControlByte>32</ControlByte>
+							<Enable>true</Enable>
+							<Pdo>6913</Pdo>
+						</Sm3>
+						<RxPdo Fixed="true" Mandatory="false" Sm="2" Virtual="false">
+							<Index>#x1701</Index>
+							<Name LcId="1033">Outputs</Name>
+							<Exclude>#x1600</Exclude>
+							<Exclude>#x1702</Exclude>
+							<Exclude>#x1703</Exclude>
+							<Exclude>#x1704</Exclude>
+							<Exclude>#x1705</Exclude>
+							<Entry Fixed="true">
+								<Index>#x6040</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>16</BitLen>
+								<Name LcId="1033">Controlword</Name>
+								<Comment></Comment>
+								<DataType>UINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x607a</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Target position</Name>
+								<Comment></Comment>
+								<DataType>DINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x60b8</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>16</BitLen>
+								<Name LcId="1033">Touch probe function</Name>
+								<Comment></Comment>
+								<DataType>UINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x60fe</Index>
+								<SubIndex>#x1</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Physical outputs</Name>
+								<Comment></Comment>
+								<DataType>UDINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+						</RxPdo>
+						<TxPdo Fixed="true" Mandatory="false" Sm="3" Virtual="false">
+							<Index>#x1b01</Index>
+							<Name LcId="1033">Inputs</Name>
+							<Exclude>#x1a00</Exclude>
+							<Exclude>#x1b02</Exclude>
+							<Exclude>#x1b03</Exclude>
+							<Exclude>#x1b04</Exclude>
+							<Entry Fixed="true">
+								<Index>#x603f</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>16</BitLen>
+								<Name LcId="1033">Error code</Name>
+								<Comment></Comment>
+								<DataType>UINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x6041</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>16</BitLen>
+								<Name LcId="1033">Statusword</Name>
+								<Comment></Comment>
+								<DataType>UINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x6064</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Position actual value</Name>
+								<Comment></Comment>
+								<DataType>DINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x6077</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>16</BitLen>
+								<Name LcId="1033">Torque actual value</Name>
+								<Comment></Comment>
+								<DataType>INT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x60f4</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Following error actual value</Name>
+								<Comment></Comment>
+								<DataType>DINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x60b9</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>16</BitLen>
+								<Name LcId="1033">Touch probe status</Name>
+								<Comment></Comment>
+								<DataType>UINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x60ba</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Touch probe pos1 pos value</Name>
+								<Comment></Comment>
+								<DataType>DINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x60bc</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Touch probe pos2 pos value</Name>
+								<Comment></Comment>
+								<DataType>DINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x60fd</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Digital inputs</Name>
+								<Comment></Comment>
+								<DataType>UDINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+						</TxPdo>
+					</ProcessData>
+					<Mailbox>
+						<Send>
+							<Start>4096</Start>
+							<Length>256</Length>
+						</Send>
+						<Recv>
+							<Start>5120</Start>
+							<Length>256</Length>
+						</Recv>
+						<Protocol>CoE</Protocol>
+						<CoE PdoCheck="0">
+							<InitCmds>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>clear sm pdos 0x1c12</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7186</Index>
+									<SubIndex>0</SubIndex>
+									<Data>00</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>clear sm pdos 0x1c13</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7187</Index>
+									<SubIndex>0</SubIndex>
+									<Data>00</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>clear pdo 0x1a00 entries</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>0</SubIndex>
+									<Data>00</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>1</SubIndex>
+									<Data>10004160</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>2</SubIndex>
+									<Data>20006460</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>3</SubIndex>
+									<Data>1000b960</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>4</SubIndex>
+									<Data>2000ba60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>5</SubIndex>
+									<Data>2000bc60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>6</SubIndex>
+									<Data>10003f60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>7</SubIndex>
+									<Data>2000fd60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry count</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>0</SubIndex>
+									<Data>07</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>clear pdo 0x1600 entries</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>0</SubIndex>
+									<Data>00</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1600 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>1</SubIndex>
+									<Data>10004060</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1600 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>2</SubIndex>
+									<Data>20007a60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1600 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>3</SubIndex>
+									<Data>1000b860</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1600 entry count</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>0</SubIndex>
+									<Data>03</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdos 0x1c12:1</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7186</Index>
+									<SubIndex>1</SubIndex>
+									<Data>0117</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdos 0x1c12 count</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7186</Index>
+									<SubIndex>0</SubIndex>
+									<Data>01</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdos 0x1c13:1</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7187</Index>
+									<SubIndex>1</SubIndex>
+									<Data>011b</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdos 0x1c13 count</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7187</Index>
+									<SubIndex>0</SubIndex>
+									<Data>01</Data>
+								</InitCmd>
+								<InitCmd Fixed="false">
+									<Transition>PS</Transition>
+									<Comment></Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>24672</Index>
+									<SubIndex>0</SubIndex>
+									<Data>08</Data>
+								</InitCmd>
+							</InitCmds>
+						</CoE>
+					</Mailbox>
+					<DC Index="0">
+						<AssignActivate>768</AssignActivate>
+						<CycleTime0>1000000</CycleTime0>
+						<ShiftTime0>0</ShiftTime0>
+						<CycleTime1>1000000</CycleTime1>
+						<ShiftTime1>0</ShiftTime1>
+					</DC>
+					<IOKeep>
+						<Enable>0</Enable>
+						<Type>sdo</Type>
+					</IOKeep>
+					<Slots MaxSlotCount="0" />
+				</Slave>
+				<Slave>
+					<Info>
+						<Name>SV660_1Axis_00913</Name>
+						<VendorId>1048576</VendorId>
+						<ProductCode>786701</ProductCode>
+						<RevisionNo>65536</RevisionNo>
+						<SerialNo>0</SerialNo>
+						<DevType>1</DevType>
+						<NChannel>1</NChannel>
+						<UseLrdLwr>0</UseLrdLwr>
+						<SlaveId>0</SlaveId>
+					</Info>
+					<ProcessData PdoAssign="true" PdoConfig="true">
+						<Sm2>
+							<Type>Outputs</Type>
+							<DefaultSize>12</DefaultSize>
+							<StartAddress>6144</StartAddress>
+							<ControlByte>100</ControlByte>
+							<Enable>true</Enable>
+							<Pdo>5889</Pdo>
+						</Sm2>
+						<Sm3>
+							<Type>Inputs</Type>
+							<DefaultSize>28</DefaultSize>
+							<StartAddress>7168</StartAddress>
+							<ControlByte>32</ControlByte>
+							<Enable>true</Enable>
+							<Pdo>6913</Pdo>
+						</Sm3>
+						<RxPdo Fixed="true" Mandatory="false" Sm="2" Virtual="false">
+							<Index>#x1701</Index>
+							<Name LcId="1033">Outputs</Name>
+							<Exclude>#x1600</Exclude>
+							<Exclude>#x1702</Exclude>
+							<Exclude>#x1703</Exclude>
+							<Exclude>#x1704</Exclude>
+							<Exclude>#x1705</Exclude>
+							<Entry Fixed="true">
+								<Index>#x6040</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>16</BitLen>
+								<Name LcId="1033">Controlword</Name>
+								<Comment></Comment>
+								<DataType>UINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x607a</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Target position</Name>
+								<Comment></Comment>
+								<DataType>DINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x60b8</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>16</BitLen>
+								<Name LcId="1033">Touch probe function</Name>
+								<Comment></Comment>
+								<DataType>UINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x60fe</Index>
+								<SubIndex>#x1</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Physical outputs</Name>
+								<Comment></Comment>
+								<DataType>UDINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+						</RxPdo>
+						<TxPdo Fixed="true" Mandatory="false" Sm="3" Virtual="false">
+							<Index>#x1b01</Index>
+							<Name LcId="1033">Inputs</Name>
+							<Exclude>#x1a00</Exclude>
+							<Exclude>#x1b02</Exclude>
+							<Exclude>#x1b03</Exclude>
+							<Exclude>#x1b04</Exclude>
+							<Entry Fixed="true">
+								<Index>#x603f</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>16</BitLen>
+								<Name LcId="1033">Error code</Name>
+								<Comment></Comment>
+								<DataType>UINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x6041</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>16</BitLen>
+								<Name LcId="1033">Statusword</Name>
+								<Comment></Comment>
+								<DataType>UINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x6064</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Position actual value</Name>
+								<Comment></Comment>
+								<DataType>DINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x6077</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>16</BitLen>
+								<Name LcId="1033">Torque actual value</Name>
+								<Comment></Comment>
+								<DataType>INT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x60f4</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Following error actual value</Name>
+								<Comment></Comment>
+								<DataType>DINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x60b9</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>16</BitLen>
+								<Name LcId="1033">Touch probe status</Name>
+								<Comment></Comment>
+								<DataType>UINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x60ba</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Touch probe pos1 pos value</Name>
+								<Comment></Comment>
+								<DataType>DINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x60bc</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Touch probe pos2 pos value</Name>
+								<Comment></Comment>
+								<DataType>DINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="true">
+								<Index>#x60fd</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Digital inputs</Name>
+								<Comment></Comment>
+								<DataType>UDINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+						</TxPdo>
+					</ProcessData>
+					<Mailbox>
+						<Send>
+							<Start>4096</Start>
+							<Length>256</Length>
+						</Send>
+						<Recv>
+							<Start>5120</Start>
+							<Length>256</Length>
+						</Recv>
+						<Protocol>CoE</Protocol>
+						<CoE PdoCheck="0">
+							<InitCmds>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>clear sm pdos 0x1c12</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7186</Index>
+									<SubIndex>0</SubIndex>
+									<Data>00</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>clear sm pdos 0x1c13</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7187</Index>
+									<SubIndex>0</SubIndex>
+									<Data>00</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>clear pdo 0x1a00 entries</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>0</SubIndex>
+									<Data>00</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>1</SubIndex>
+									<Data>10004160</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>2</SubIndex>
+									<Data>20006460</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>3</SubIndex>
+									<Data>1000b960</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>4</SubIndex>
+									<Data>2000ba60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>5</SubIndex>
+									<Data>2000bc60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>6</SubIndex>
+									<Data>10003f60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>7</SubIndex>
+									<Data>2000fd60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry count</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>0</SubIndex>
+									<Data>07</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>clear pdo 0x1600 entries</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>0</SubIndex>
+									<Data>00</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1600 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>1</SubIndex>
+									<Data>10004060</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1600 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>2</SubIndex>
+									<Data>20007a60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1600 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>3</SubIndex>
+									<Data>1000b860</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1600 entry count</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>0</SubIndex>
+									<Data>03</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdos 0x1c12:1</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7186</Index>
+									<SubIndex>1</SubIndex>
+									<Data>0117</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdos 0x1c12 count</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7186</Index>
+									<SubIndex>0</SubIndex>
+									<Data>01</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdos 0x1c13:1</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7187</Index>
+									<SubIndex>1</SubIndex>
+									<Data>011b</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdos 0x1c13 count</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7187</Index>
+									<SubIndex>0</SubIndex>
+									<Data>01</Data>
+								</InitCmd>
+								<InitCmd Fixed="false">
+									<Transition>PS</Transition>
+									<Comment></Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>24672</Index>
+									<SubIndex>0</SubIndex>
+									<Data>08</Data>
+								</InitCmd>
+							</InitCmds>
+						</CoE>
+					</Mailbox>
+					<DC Index="0">
+						<AssignActivate>768</AssignActivate>
+						<CycleTime0>1000000</CycleTime0>
+						<ShiftTime0>0</ShiftTime0>
+						<CycleTime1>1000000</CycleTime1>
+						<ShiftTime1>0</ShiftTime1>
+					</DC>
+					<IOKeep>
+						<Enable>0</Enable>
+						<Type>sdo</Type>
+					</IOKeep>
+					<Slots MaxSlotCount="0" />
+				</Slave>
+				<Slave>
+					<Info>
+						<Name>STF-ECX-H</Name>
+						<VendorId>360</VendorId>
+						<ProductCode>11</ProductCode>
+						<RevisionNo>1</RevisionNo>
+						<SerialNo>0</SerialNo>
+						<DevType>1</DevType>
+						<NChannel>1</NChannel>
+						<UseLrdLwr>0</UseLrdLwr>
+						<SlaveId>0</SlaveId>
+					</Info>
+					<ProcessData PdoAssign="true" PdoConfig="true">
+						<Sm2>
+							<Type>Outputs</Type>
+							<MaxSize>68</MaxSize>
+							<DefaultSize>13</DefaultSize>
+							<StartAddress>6144</StartAddress>
+							<ControlByte>100</ControlByte>
+							<Enable>true</Enable>
+							<Pdo>5632</Pdo>
+						</Sm2>
+						<Sm3>
+							<Type>Inputs</Type>
+							<MaxSize>68</MaxSize>
+							<DefaultSize>35</DefaultSize>
+							<StartAddress>7168</StartAddress>
+							<ControlByte>32</ControlByte>
+							<Enable>true</Enable>
+							<Pdo>6656</Pdo>
+						</Sm3>
+						<RxPdo Fixed="false" Mandatory="false" Sm="2" Virtual="false">
+							<Index>#x1600</Index>
+							<Name LcId="1033">RxPDO 1</Name>
+							<Entry Fixed="false">
+								<Index>#x6040</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>16</BitLen>
+								<Name LcId="1033">ControlWord</Name>
+								<Comment></Comment>
+								<DataType>UINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="false">
+								<Index>#x6060</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>8</BitLen>
+								<Name LcId="1033">Modes of operation</Name>
+								<Comment></Comment>
+								<DataType>SINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="false">
+								<Index>#x607a</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Target position</Name>
+								<Comment></Comment>
+								<DataType>DINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="false">
+								<Index>#x60b8</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>16</BitLen>
+								<Name LcId="1033">Touch probe function</Name>
+								<Comment></Comment>
+								<DataType>UINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="false">
+								<Index>#x60fe</Index>
+								<SubIndex>#x1</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Digital outputs</Name>
+								<Comment></Comment>
+								<DataType>UDINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+						</RxPdo>
+						<TxPdo Fixed="false" Mandatory="false" Sm="3" Virtual="false">
+							<Index>#x1a00</Index>
+							<Name LcId="1033">TxPDO 1</Name>
+							<Entry Fixed="false">
+								<Index>#x603f</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>16</BitLen>
+								<Name LcId="1033">ErrorCode</Name>
+								<Comment></Comment>
+								<DataType>UINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="false">
+								<Index>#x6041</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>16</BitLen>
+								<Name LcId="1033">StatusWord</Name>
+								<Comment></Comment>
+								<DataType>UINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="false">
+								<Index>#x6061</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>8</BitLen>
+								<Name LcId="1033">Modes of operation display</Name>
+								<Comment></Comment>
+								<DataType>SINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="false">
+								<Index>#x6064</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Position actual value</Name>
+								<Comment></Comment>
+								<DataType>DINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="false">
+								<Index>#x606c</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Velocity actual value</Name>
+								<Comment></Comment>
+								<DataType>DINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="false">
+								<Index>#x60b9</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>16</BitLen>
+								<Name LcId="1033">Touch probe status</Name>
+								<Comment></Comment>
+								<DataType>UINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="false">
+								<Index>#x60ba</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Touch probe pos1 pos value</Name>
+								<Comment></Comment>
+								<DataType>DINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="false">
+								<Index>#x60bb</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Touch probe pos1 neg value</Name>
+								<Comment></Comment>
+								<DataType>DINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="false">
+								<Index>#x60bc</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Touch probe pos2 pos value</Name>
+								<Comment></Comment>
+								<DataType>DINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="false">
+								<Index>#x60bd</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Touch probe pos2 neg value</Name>
+								<Comment></Comment>
+								<DataType>DINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="false">
+								<Index>#x60fd</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Digital inputs</Name>
+								<Comment></Comment>
+								<DataType>UDINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+						</TxPdo>
+					</ProcessData>
+					<Mailbox>
+						<Send>
+							<Start>4608</Start>
+							<Length>128</Length>
+						</Send>
+						<Recv>
+							<Start>5120</Start>
+							<Length>128</Length>
+						</Recv>
+						<Protocol>CoE</Protocol>
+						<CoE PdoCheck="0">
+							<InitCmds>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>clear sm pdos 0x1c12</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7186</Index>
+									<SubIndex>0</SubIndex>
+									<Data>00</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>clear sm pdos 0x1c13</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7187</Index>
+									<SubIndex>0</SubIndex>
+									<Data>00</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>clear pdo 0x1a00 entries</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>0</SubIndex>
+									<Data>00</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>1</SubIndex>
+									<Data>10003f60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>2</SubIndex>
+									<Data>10004160</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>3</SubIndex>
+									<Data>08006160</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>4</SubIndex>
+									<Data>20006460</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>5</SubIndex>
+									<Data>20006c60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>6</SubIndex>
+									<Data>1000b960</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>7</SubIndex>
+									<Data>2000ba60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>8</SubIndex>
+									<Data>2000bb60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>9</SubIndex>
+									<Data>2000bc60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>10</SubIndex>
+									<Data>2000bd60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>11</SubIndex>
+									<Data>2000fd60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry count</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>0</SubIndex>
+									<Data>0b</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>clear pdo 0x1a01 entries</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6657</Index>
+									<SubIndex>0</SubIndex>
+									<Data>00</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a01 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6657</Index>
+									<SubIndex>1</SubIndex>
+									<Data>10003f60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a01 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6657</Index>
+									<SubIndex>2</SubIndex>
+									<Data>10004160</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a01 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6657</Index>
+									<SubIndex>3</SubIndex>
+									<Data>08006160</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a01 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6657</Index>
+									<SubIndex>4</SubIndex>
+									<Data>20006460</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a01 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6657</Index>
+									<SubIndex>5</SubIndex>
+									<Data>20006c60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a01 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6657</Index>
+									<SubIndex>6</SubIndex>
+									<Data>2000fd60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a01 entry count</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6657</Index>
+									<SubIndex>0</SubIndex>
+									<Data>06</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>clear pdo 0x1a02 entries</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6658</Index>
+									<SubIndex>0</SubIndex>
+									<Data>00</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a02 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6658</Index>
+									<SubIndex>1</SubIndex>
+									<Data>10003f60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a02 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6658</Index>
+									<SubIndex>2</SubIndex>
+									<Data>10004160</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a02 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6658</Index>
+									<SubIndex>3</SubIndex>
+									<Data>08006160</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a02 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6658</Index>
+									<SubIndex>4</SubIndex>
+									<Data>20006460</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a02 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6658</Index>
+									<SubIndex>5</SubIndex>
+									<Data>20006c60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a02 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6658</Index>
+									<SubIndex>6</SubIndex>
+									<Data>2000fd60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a02 entry count</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6658</Index>
+									<SubIndex>0</SubIndex>
+									<Data>06</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>clear pdo 0x1a03 entries</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6659</Index>
+									<SubIndex>0</SubIndex>
+									<Data>00</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a03 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6659</Index>
+									<SubIndex>1</SubIndex>
+									<Data>10003f60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a03 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6659</Index>
+									<SubIndex>2</SubIndex>
+									<Data>1000b960</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a03 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6659</Index>
+									<SubIndex>3</SubIndex>
+									<Data>2000ba60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a03 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6659</Index>
+									<SubIndex>4</SubIndex>
+									<Data>2000bb60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a03 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6659</Index>
+									<SubIndex>5</SubIndex>
+									<Data>2000bc60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a03 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6659</Index>
+									<SubIndex>6</SubIndex>
+									<Data>2000bd60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a03 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6659</Index>
+									<SubIndex>7</SubIndex>
+									<Data>2000fd60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a03 entry count</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6659</Index>
+									<SubIndex>0</SubIndex>
+									<Data>07</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>clear pdo 0x1600 entries</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>0</SubIndex>
+									<Data>00</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1600 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>1</SubIndex>
+									<Data>10004060</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1600 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>2</SubIndex>
+									<Data>08006060</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1600 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>3</SubIndex>
+									<Data>20007a60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1600 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>4</SubIndex>
+									<Data>1000b860</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1600 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>5</SubIndex>
+									<Data>2001fe60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1600 entry count</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>0</SubIndex>
+									<Data>05</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>clear pdo 0x1601 entries</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5633</Index>
+									<SubIndex>0</SubIndex>
+									<Data>00</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1601 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5633</Index>
+									<SubIndex>1</SubIndex>
+									<Data>10004060</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1601 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5633</Index>
+									<SubIndex>2</SubIndex>
+									<Data>08006060</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1601 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5633</Index>
+									<SubIndex>3</SubIndex>
+									<Data>20007a60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1601 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5633</Index>
+									<SubIndex>4</SubIndex>
+									<Data>20008160</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1601 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5633</Index>
+									<SubIndex>5</SubIndex>
+									<Data>2001fe60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1601 entry count</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5633</Index>
+									<SubIndex>0</SubIndex>
+									<Data>05</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>clear pdo 0x1602 entries</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5634</Index>
+									<SubIndex>0</SubIndex>
+									<Data>00</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1602 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5634</Index>
+									<SubIndex>1</SubIndex>
+									<Data>10004060</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1602 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5634</Index>
+									<SubIndex>2</SubIndex>
+									<Data>08006060</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1602 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5634</Index>
+									<SubIndex>3</SubIndex>
+									<Data>2000ff60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1602 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5634</Index>
+									<SubIndex>4</SubIndex>
+									<Data>2001fe60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1602 entry count</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5634</Index>
+									<SubIndex>0</SubIndex>
+									<Data>04</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>clear pdo 0x1603 entries</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5635</Index>
+									<SubIndex>0</SubIndex>
+									<Data>00</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1603 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5635</Index>
+									<SubIndex>1</SubIndex>
+									<Data>1000b860</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1603 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5635</Index>
+									<SubIndex>2</SubIndex>
+									<Data>2001fe60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1603 entry count</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5635</Index>
+									<SubIndex>0</SubIndex>
+									<Data>02</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdos 0x1c12:1</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7186</Index>
+									<SubIndex>1</SubIndex>
+									<Data>0016</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdos 0x1c12 count</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7186</Index>
+									<SubIndex>0</SubIndex>
+									<Data>01</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdos 0x1c13:1</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7187</Index>
+									<SubIndex>1</SubIndex>
+									<Data>001a</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdos 0x1c13 count</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7187</Index>
+									<SubIndex>0</SubIndex>
+									<Data>01</Data>
+								</InitCmd>
+							</InitCmds>
+						</CoE>
+					</Mailbox>
+					<DC Index="0">
+						<AssignActivate>768</AssignActivate>
+						<CycleTime0>1000000</CycleTime0>
+						<ShiftTime0>0</ShiftTime0>
+						<CycleTime1>1000000</CycleTime1>
+						<ShiftTime1>0</ShiftTime1>
+					</DC>
+					<IOKeep>
+						<Enable>0</Enable>
+						<Type>sdo</Type>
+					</IOKeep>
+					<Slots MaxSlotCount="0" />
+				</Slave>
+				<Slave>
+					<Info>
+						<Name>OMG6 EtherCAT Drive</Name>
+						<VendorId>-1717991288</VendorId>
+						<ProductCode>37460</ProductCode>
+						<RevisionNo>65536</RevisionNo>
+						<SerialNo>0</SerialNo>
+						<DevType>1</DevType>
+						<NChannel>1</NChannel>
+						<UseLrdLwr>0</UseLrdLwr>
+						<SlaveId>0</SlaveId>
+					</Info>
+					<ProcessData PdoAssign="true" PdoConfig="true">
+						<Sm2>
+							<Type>Outputs</Type>
+							<DefaultSize>12</DefaultSize>
+							<StartAddress>5120</StartAddress>
+							<ControlByte>100</ControlByte>
+							<Enable>true</Enable>
+							<Pdo>5632</Pdo>
+						</Sm2>
+						<Sm3>
+							<Type>Inputs</Type>
+							<DefaultSize>24</DefaultSize>
+							<StartAddress>5632</StartAddress>
+							<ControlByte>32</ControlByte>
+							<Enable>true</Enable>
+							<Pdo>6656</Pdo>
+						</Sm3>
+						<RxPdo Fixed="false" Mandatory="false" Sm="2" Virtual="false">
+							<Index>#x1600</Index>
+							<Name LcId="1033">receive pdo1</Name>
+							<Entry Fixed="false">
+								<Index>#x6040</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>16</BitLen>
+								<Name LcId="1033">controlword</Name>
+								<Comment></Comment>
+								<DataType>UINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="false">
+								<Index>#x6060</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>8</BitLen>
+								<Name LcId="1033">Modes of operation</Name>
+								<Comment></Comment>
+								<DataType>SINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="false">
+								<Index>#x607a</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">target position</Name>
+								<Comment></Comment>
+								<DataType>DINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="false">
+								<Index>#x60ff</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">target velocity</Name>
+								<Comment></Comment>
+								<DataType>DINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="false">
+								<Index>#x6071</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>16</BitLen>
+								<Name LcId="1033">Target torque</Name>
+								<Comment></Comment>
+								<DataType>INT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+						</RxPdo>
+						<TxPdo Fixed="false" Mandatory="false" Sm="3" Virtual="false">
+							<Index>#x1a00</Index>
+							<Name LcId="1033">transmit pdo1</Name>
+							<Entry Fixed="false">
+								<Index>#x603f</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>16</BitLen>
+								<Name LcId="1033">Error code</Name>
+								<Comment></Comment>
+								<DataType>UINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="false">
+								<Index>#x6041</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>16</BitLen>
+								<Name LcId="1033">statusword</Name>
+								<Comment></Comment>
+								<DataType>UINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="false">
+								<Index>#x6061</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>8</BitLen>
+								<Name LcId="1033">Modes of operation display</Name>
+								<Comment></Comment>
+								<DataType>SINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="false">
+								<Index>#x6064</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">position actual value</Name>
+								<Comment></Comment>
+								<DataType>DINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="false">
+								<Index>#x606c</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">velocity actual value</Name>
+								<Comment></Comment>
+								<DataType>DINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="false">
+								<Index>#x60f4</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Following error actual value</Name>
+								<Comment></Comment>
+								<DataType>DINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+							<Entry Fixed="false">
+								<Index>#x60fd</Index>
+								<SubIndex>#x0</SubIndex>
+								<BitLen>32</BitLen>
+								<Name LcId="1033">Digital input</Name>
+								<Comment></Comment>
+								<DataType>UDINT</DataType>
+								<DefaultValue>0</DefaultValue>
+								<EndBehavior>0</EndBehavior>
+							</Entry>
+						</TxPdo>
+					</ProcessData>
+					<Mailbox>
+						<Send>
+							<Start>4096</Start>
+							<Length>256</Length>
+						</Send>
+						<Recv>
+							<Start>4608</Start>
+							<Length>256</Length>
+						</Recv>
+						<Protocol>CoE</Protocol>
+						<CoE PdoCheck="0">
+							<InitCmds>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>clear sm pdos 0x1c12</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7186</Index>
+									<SubIndex>0</SubIndex>
+									<Data>00</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>clear sm pdos 0x1c13</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7187</Index>
+									<SubIndex>0</SubIndex>
+									<Data>00</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>clear pdo 0x1a00 entries</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>0</SubIndex>
+									<Data>00</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>1</SubIndex>
+									<Data>10003f60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>2</SubIndex>
+									<Data>10004160</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>3</SubIndex>
+									<Data>08006160</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>4</SubIndex>
+									<Data>20006460</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>5</SubIndex>
+									<Data>20006c60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>6</SubIndex>
+									<Data>2000f460</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>7</SubIndex>
+									<Data>2000fd60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1a00 entry count</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>6656</Index>
+									<SubIndex>0</SubIndex>
+									<Data>07</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>clear pdo 0x1600 entries</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>0</SubIndex>
+									<Data>00</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1600 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>1</SubIndex>
+									<Data>10004060</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1600 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>2</SubIndex>
+									<Data>08006060</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1600 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>3</SubIndex>
+									<Data>20007a60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1600 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>4</SubIndex>
+									<Data>2000ff60</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1600 entry</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>5</SubIndex>
+									<Data>10007160</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdo 0x1600 entry count</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>5632</Index>
+									<SubIndex>0</SubIndex>
+									<Data>05</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdos 0x1c12:1</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7186</Index>
+									<SubIndex>1</SubIndex>
+									<Data>0016</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdos 0x1c12 count</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7186</Index>
+									<SubIndex>0</SubIndex>
+									<Data>01</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdos 0x1c13:1</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7187</Index>
+									<SubIndex>1</SubIndex>
+									<Data>001a</Data>
+								</InitCmd>
+								<InitCmd Fixed="true">
+									<Transition>PS</Transition>
+									<Comment>download pdos 0x1c13 count</Comment>
+									<Timeout>0</Timeout>
+									<Ccs>1</Ccs>
+									<Index>7187</Index>
+									<SubIndex>0</SubIndex>
+									<Data>01</Data>
+								</InitCmd>
+							</InitCmds>
+						</CoE>
+					</Mailbox>
+					<DC Index="0">
+						<AssignActivate>768</AssignActivate>
+						<CycleTime0>1000000</CycleTime0>
+						<ShiftTime0>0</ShiftTime0>
+						<CycleTime1>0</CycleTime1>
+						<ShiftTime1>0</ShiftTime1>
+					</DC>
+					<IOKeep>
+						<Enable>0</Enable>
+						<Type>sdo</Type>
+					</IOKeep>
+					<Slots MaxSlotCount="0" />
+				</Slave>
+			</Config>
+		</EtherCATConfig>
+	</EtherCAT>
+</GoogolConfig>

@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using 精密切割系统.Behaviors;
 using 精密切割系统.database.db.modle;
+using 精密切割系统.Driver;
 using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
+using 精密切割系统.Helpers.GTN;
 using 精密切割系统.Model.plc;
 using 精密切割系统.Utils;
 
@@ -32,11 +34,13 @@ namespace 精密切割系统.ViewModel
         {
             if (IsAbsMoveX)
             {
-                await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(TargetPositionX, SpeedX, default);
+                //await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(TargetPositionX, SpeedX, default);
+                await GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.X, TargetPositionX, SpeedX, default);
             }
             else
             {
-                await PlcControl.tagControl.Xaxis.StartRelativeAsync(TargetPositionX, SpeedX, default);
+                //await PlcControl.tagControl.Xaxis.StartRelativeAsync(TargetPositionX, SpeedX, default);
+                await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.X, TargetPositionX, SpeedX, default);
             }
         }
 
@@ -47,7 +51,8 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteStartHomingXCommand()
         {
-            await PlcControl.tagControl.Xaxis.StartHomingAsync();
+            //await PlcControl.tagControl.Xaxis.StartHomingAsync();\
+            await GsneMotion.Instance.Axis.StartHomingAsync(AxisType.X);
         }
 
         private bool CanExecuteStartHomingXCommand()
@@ -62,7 +67,9 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteRelaxXCommand()
         {
-            await PlcControl.tagControl.Xaxis.RelaxAxisAsync();
+           // await PlcControl.tagControl.Xaxis.RelaxAxisAsync();
+           await GsneMotion.Instance.Axis.AxisOffAsync(AxisType.X);
+
         }
 
         private float _currentPositionX;
@@ -130,11 +137,13 @@ namespace 精密切割系统.ViewModel
         {
             if (IsAbsMoveY)
             {
-                await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(TargetPositionY, SpeedY, default);
+              //  await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(TargetPositionY, SpeedY, default);
+                await GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.Y,TargetPositionY, SpeedY, default);
             }
             else
             {
-                await PlcControl.tagControl.Yaxis.StartRelativeAsync(TargetPositionY, SpeedY, default);
+              //  await PlcControl.tagControl.Yaxis.StartRelativeAsync(TargetPositionY, SpeedY, default);
+                await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.Y, TargetPositionY, SpeedY, default);
             }
         }
 
@@ -145,7 +154,8 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteStartHomingYCommand()
         {
-            await PlcControl.tagControl.Yaxis.StartHomingAsync();
+            //await PlcControl.tagControl.Yaxis.StartHomingAsync();
+            await GsneMotion.Instance.Axis.StartHomingAsync(AxisType.Y);
         }
 
         private bool CanExecuteStartHomingYCommand()
@@ -160,7 +170,8 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteRelaxYCommand()
         {
-            await PlcControl.tagControl.Yaxis.RelaxAxisAsync();
+           // await PlcControl.tagControl.Yaxis.RelaxAxisAsync();
+            await GsneMotion.Instance.Axis.AxisOffAsync(AxisType.Y);
         }
 
         private float _currentPositionY;
@@ -228,11 +239,13 @@ namespace 精密切割系统.ViewModel
         {
             if (IsAbsMoveZ1)
             {
-                await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(TargetPositionZ1, SpeedZ1, default);
+                //await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(TargetPositionZ1, SpeedZ1, default);
+                await GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.Z1, TargetPositionZ1, SpeedZ1, default);
             }
             else
             {
-                await PlcControl.tagControl.Z1axis.StartRelativeAsync(TargetPositionZ1, SpeedZ1, default);
+                //await PlcControl.tagControl.Z1axis.StartRelativeAsync(TargetPositionZ1, SpeedZ1, default);
+                await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.Z1, TargetPositionZ1, SpeedZ1, default);
             }
         }
 
@@ -243,7 +256,8 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteStartHomingZ1Command()
         {
-            await PlcControl.tagControl.Z1axis.StartHomingAsync();
+           // await PlcControl.tagControl.Z1axis.StartHomingAsync();
+            await GsneMotion.Instance.Axis.StartHomingAsync(AxisType.Z1);
         }
 
         private bool CanExecuteStartHomingZ1Command()
@@ -258,7 +272,8 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteRelaxZ1Command()
         {
-            await PlcControl.tagControl.Z1axis.RelaxAxisAsync();
+            //await PlcControl.tagControl.Z1axis.RelaxAxisAsync();
+            await GsneMotion.Instance.Axis.AxisOffAsync(AxisType.Z1);
         }
 
         private float _currentPositionZ1;
@@ -326,11 +341,13 @@ namespace 精密切割系统.ViewModel
         {
             if (IsAbsMoveZ2)
             {
-                await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(TargetPositionZ2, SpeedZ2, default);
+               // await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(TargetPositionZ2, SpeedZ2, default);
+                await GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.Z2, TargetPositionZ2, SpeedZ2, default);
             }
             else
             {
-                await PlcControl.tagControl.Z2axis.StartRelativeAsync(TargetPositionZ2, SpeedZ2, default);
+               //await PlcControl.tagControl.Z2axis.StartRelativeAsync(TargetPositionZ2, SpeedZ2, default);
+                await GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.Z2, TargetPositionZ2, SpeedZ2, default);
             }
         }
 
@@ -341,7 +358,9 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteStartHomingZ2Command()
         {
-            await PlcControl.tagControl.Z2axis.StartHomingAsync();
+            //await PlcControl.tagControl.Z2axis.StartHomingAsync();
+
+            await GsneMotion.Instance.Axis.StartHomingAsync(AxisType.Z2);
         }
 
         private bool CanExecuteStartHomingZ2Command()
@@ -356,7 +375,8 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteRelaxZ2Command()
         {
-            await PlcControl.tagControl.Z2axis.RelaxAxisAsync();
+            //await PlcControl.tagControl.Z2axis.RelaxAxisAsync();
+            await GsneMotion.Instance.Axis.AxisOffAsync(AxisType.Z2);
         }
 
         private float _currentPositionZ2;
@@ -422,7 +442,9 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteStartThetaCommand()
         {
-            await PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(TargetPositionTheta, SpeedTheta, default);
+            // await PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(TargetPositionTheta, SpeedTheta, default);
+            await GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.Theta, TargetPositionTheta, SpeedTheta, default);
+
         }
 
         private DelegateCommand _startHomingThetaCommand;
@@ -432,7 +454,8 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteStartHomingThetaCommand()
         {
-            await PlcControl.tagControl.ThetaAxis.StartHomingAsync();
+            //await PlcControl.tagControl.ThetaAxis.StartHomingAsync();
+            await GsneMotion.Instance.Axis.StartHomingAsync(AxisType.Theta);
         }
 
         private bool CanExecuteStartHomingThetaCommand()
@@ -447,7 +470,8 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteRelaxThetaCommand()
         {
-            await PlcControl.tagControl.ThetaAxis.RelaxAxisAsync();
+            //await PlcControl.tagControl.ThetaAxis.RelaxAxisAsync();
+            await GsneMotion.Instance.Axis.AxisOffAsync(AxisType.Theta);
         }
 
         private float _currentPositionTheta;
@@ -523,7 +547,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await PlcControl.tagControl.Xaxis.StartRelativeUseToJogAsync(-RelativeDistance, RelativeSpeed, token);
+                await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.X,-RelativeDistance, RelativeSpeed, token);
             }
             catch (OperationCanceledException)
             {
@@ -539,7 +563,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await PlcControl.tagControl.Xaxis.StartRelativeUseToJogAsync(RelativeDistance, RelativeSpeed, token);
+                await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.X,RelativeDistance, RelativeSpeed, token);
             }
             catch (OperationCanceledException)
             {
@@ -553,7 +577,8 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteStartXCorotationCommand()
         {
-            await PlcControl.tagControl.Xaxis.StartJogAsync(0);
+            await GsneMotion.Instance.Axis.StartJogAsync(AxisType.X, SpeedX);
+            //await PlcControl.tagControl.Xaxis.StartJogAsync(0);
         }
 
         private DelegateCommand _startXReversalCommand;
@@ -563,7 +588,8 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteStartXReversalCommand()
         {
-            await PlcControl.tagControl.Xaxis.StartJogAsync(1);
+            await GsneMotion.Instance.Axis.StartJogAsync(AxisType.X, -SpeedX);
+            //await PlcControl.tagControl.Xaxis.StartJogAsync(1);
         }
 
         private DelegateCommand _stopJogXCommand;
@@ -575,8 +601,9 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken();
-                await PlcControl.tagControl.Xaxis.WaitStopJogAsync(timeoutToken.Token);
+                //await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken();
+                //await PlcControl.tagControl.Xaxis.WaitStopJogAsync(timeoutToken.Token);
+                await GsneMotion.Instance.Axis.StopJogAsync(AxisType.X);
             }
             catch (OperationCanceledException) { }
         }
@@ -590,7 +617,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await PlcControl.tagControl.Yaxis.StartRelativeUseToJogAsync(-RelativeDistance, RelativeSpeed, token);
+                await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.Y,-RelativeDistance, RelativeSpeed, token);
             }
             catch (OperationCanceledException)
             {
@@ -606,7 +633,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await PlcControl.tagControl.Yaxis.StartRelativeUseToJogAsync(RelativeDistance, RelativeSpeed, token);
+                await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.Y, RelativeDistance, RelativeSpeed, token);
             }
             catch (OperationCanceledException)
             {
@@ -620,7 +647,8 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteStartYCorotationCommand()
         {
-            await PlcControl.tagControl.Yaxis.StartJogAsync(0);
+            // await PlcControl.tagControl.Yaxis.StartJogAsync(0);
+            await GsneMotion.Instance.Axis.StartJogAsync(AxisType.Y, SpeedY);
         }
 
         private DelegateCommand _startYReversalCommand;
@@ -630,7 +658,8 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteStartYReversalCommand()
         {
-            await PlcControl.tagControl.Yaxis.StartJogAsync(1);
+            // await PlcControl.tagControl.Yaxis.StartJogAsync(1);
+            await GsneMotion.Instance.Axis.StartJogAsync(AxisType.Y, -SpeedY);
         }
 
         private DelegateCommand _stopJogYCommand;
@@ -642,8 +671,9 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken();
-                await PlcControl.tagControl.Yaxis.WaitStopJogAsync(timeoutToken.Token);
+                //await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken();
+                //await PlcControl.tagControl.Yaxis.WaitStopJogAsync(timeoutToken.Token);
+                await GsneMotion.Instance.Axis.StopJogAsync(AxisType.Y);
             }
             catch (OperationCanceledException) { }
         }
@@ -655,7 +685,8 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteStartThetaCorotationCommand()
         {
-            await PlcControl.tagControl.ThetaAxis.StartJogAsync(0);
+            //await PlcControl.tagControl.ThetaAxis.StartJogAsync(0);
+            await GsneMotion.Instance.Axis.StartJogAsync(AxisType.Theta, SpeedTheta);
         }
 
         private DelegateCommand _startThetaReversalCommand;
@@ -665,7 +696,8 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteStartThetaReversalCommand()
         {
-            await PlcControl.tagControl.ThetaAxis.StartJogAsync(1);
+            // await PlcControl.tagControl.ThetaAxis.StartJogAsync(1);
+            await GsneMotion.Instance.Axis.StartJogAsync(AxisType.Theta, -SpeedTheta);
         }
 
         private DelegateCommand _stopJogThetaCommand;
@@ -677,8 +709,9 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken();
-                await PlcControl.tagControl.ThetaAxis.WaitStopJogAsync(timeoutToken.Token);
+                //await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken();
+                //await PlcControl.tagControl.ThetaAxis.WaitStopJogAsync(timeoutToken.Token);
+                await GsneMotion.Instance.Axis.StopJogAsync(AxisType.Theta);
             }
             catch (OperationCanceledException) { }
         }
@@ -690,7 +723,8 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteStartRaiseZ1Command()
         {
-            await PlcControl.tagControl.Z1axis.StartJogAsync(1);
+            // await PlcControl.tagControl.Z1axis.StartJogAsync(1);
+            await GsneMotion.Instance.Axis.StartJogAsync(AxisType.Z1, SpeedZ1);
         }
 
         private DelegateCommand _startDropZ1Command;
@@ -700,7 +734,8 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteStartDropZ1Command()
         {
-            await PlcControl.tagControl.Z1axis.StartJogAsync(0);
+            // await PlcControl.tagControl.Z1axis.StartJogAsync(0);\
+            await GsneMotion.Instance.Axis.StartJogAsync(AxisType.Z1, -SpeedZ1);
         }
 
         private DelegateCommand _stopJogZ1Command;
@@ -712,8 +747,9 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken();
-                await PlcControl.tagControl.Z1axis.WaitStopJogAsync(timeoutToken.Token);
+                //await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken();
+                //await PlcControl.tagControl.Z1axis.WaitStopJogAsync(timeoutToken.Token);
+                await GsneMotion.Instance.Axis.StopJogAsync(AxisType.Z1);
             }
             catch (OperationCanceledException) { }
         }
@@ -725,7 +761,8 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteStartRaiseZ2Command()
         {
-            await PlcControl.tagControl.Z2axis.StartJogAsync(1);
+            // await PlcControl.tagControl.Z2axis.StartJogAsync(1);
+            await GsneMotion.Instance.Axis.StartJogAsync(AxisType.Z2, SpeedZ2);
         }
 
         private DelegateCommand _startDropZ2Command;
@@ -735,7 +772,8 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteStartDropZ2Command()
         {
-            await PlcControl.tagControl.Z2axis.StartJogAsync(0);
+            //  await PlcControl.tagControl.Z2axis.StartJogAsync(0);
+            await GsneMotion.Instance.Axis.StartJogAsync(AxisType.Z2, -SpeedZ2);
         }
 
         private DelegateCommand _stopJogZ2Command;
@@ -747,8 +785,9 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken();
-                await PlcControl.tagControl.Z2axis.WaitStopJogAsync(timeoutToken.Token);
+                //await using var timeoutToken = TaskUtils.GetTimeoutCancellationToken();
+                //await PlcControl.tagControl.Z2axis.WaitStopJogAsync(timeoutToken.Token);
+                await GsneMotion.Instance.Axis.StopJogAsync(AxisType.Z2);
             }
             catch (OperationCanceledException) { }
         }
@@ -762,7 +801,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await PlcControl.tagControl.Z1axis.StartRelativeUseToJogAsync(RelativeDistance, RelativeSpeed, token);
+                await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.Z1, RelativeDistance, RelativeSpeed, token);
             }
             catch (OperationCanceledException)
             {
@@ -778,7 +817,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await PlcControl.tagControl.Z1axis.StartRelativeUseToJogAsync(-RelativeDistance, RelativeSpeed, token);
+                await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.Z1, -RelativeDistance, RelativeSpeed, token);
             }
             catch (OperationCanceledException)
             {
@@ -794,7 +833,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await PlcControl.tagControl.Z2axis.StartRelativeUseToJogAsync(RelativeDistance, RelativeSpeed, token);
+                await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.Z2, RelativeDistance, RelativeSpeed, token);
             }
             catch (OperationCanceledException)
             {
@@ -810,7 +849,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await PlcControl.tagControl.Z2axis.StartRelativeUseToJogAsync(-RelativeDistance, RelativeSpeed, token);
+                await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.Z2,-RelativeDistance, RelativeSpeed, token);
             }
             catch (OperationCanceledException)
             {
@@ -826,7 +865,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await PlcControl.tagControl.ThetaAxis.StartRelativeUseToJogAsync(RelativeDeg, RelativeSpeed, token);
+                await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.Theta, RelativeDistance, RelativeSpeed, token);
             }
             catch (OperationCanceledException)
             {
@@ -842,7 +881,7 @@ namespace 精密切割系统.ViewModel
         {
             try
             {
-                await PlcControl.tagControl.ThetaAxis.StartRelativeUseToJogAsync(-RelativeDeg, RelativeSpeed, token);
+                await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.Theta, -RelativeDistance, RelativeSpeed, token);
             }
             catch (OperationCanceledException)
             {
@@ -859,7 +898,8 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteStartXCorotationScrOrIdxCommand()
         {
-            if (!await PlcControl.tagControl.Xaxis.IsReadyAsync())
+           // if (!await PlcControl.tagControl.Xaxis.IsReadyAsync())
+            if (!await GsneMotion.Instance.Axis.IsReadyAsync(AxisType.X))
             {
                 return;
             }
@@ -868,12 +908,14 @@ namespace 精密切割系统.ViewModel
             {
                 _cancelScrOrIdxCts = new CancellationTokenSource();
                 CancellationToken token = _cancelScrOrIdxCts.Token;
-                await PlcControl.tagControl.Xaxis.StartRelativeAsync(1, default, default);
+             //   await PlcControl.tagControl.Xaxis.StartRelativeAsync(1, default, default);
+                await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.X,1, default, default);
                 while (!token.IsCancellationRequested)
                 {
                     try
                     {
-                        await PlcControl.tagControl.Xaxis.StartRelativeAsync(1, default, token);
+                       // await PlcControl.tagControl.Xaxis.StartRelativeAsync(1, default, token);
+                        await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.X,1, default, token);
                     }
                     catch (OperationCanceledException) { }
                 }
@@ -889,7 +931,8 @@ namespace 精密切割系统.ViewModel
                     await IdxUtils.UpdateStepDistanceAsync();
                     if (IdxUtils.StepDistanceX is not null && IdxUtils.StepDistanceX.Value != 0)
                     {
-                        await PlcControl.tagControl.Xaxis.StartRelativeAsync(IdxUtils.StepDistanceX.Value, default, default);
+                        //await PlcControl.tagControl.Xaxis.StartRelativeAsync(IdxUtils.StepDistanceX.Value, default, default);
+                        await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.X, IdxUtils.StepDistanceX.Value, default, default);
                     }
                 }
                 catch (OperationCanceledException) { }
@@ -906,7 +949,8 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteStartXReversalScrOrIdxCommand()
         {
-            if (!await PlcControl.tagControl.Xaxis.IsReadyAsync())
+            //if (!await PlcControl.tagControl.Xaxis.IsReadyAsync())
+            if (!await GsneMotion.Instance.Axis.IsReadyAsync(AxisType.X))
             {
                 return;
             }
@@ -915,12 +959,14 @@ namespace 精密切割系统.ViewModel
             {
                 _cancelScrOrIdxCts = new CancellationTokenSource();
                 CancellationToken token = _cancelScrOrIdxCts.Token;
-                await PlcControl.tagControl.Xaxis.StartRelativeAsync(-1, default, default);
+                //await PlcControl.tagControl.Xaxis.StartRelativeAsync(-1, default, default);
+                await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.X, -1, default, default);
                 while (!token.IsCancellationRequested)
                 {
                     try
                     {
-                        await PlcControl.tagControl.Xaxis.StartRelativeAsync(-1, default, token);
+                        //await PlcControl.tagControl.Xaxis.StartRelativeAsync(-1, default, token);
+                        await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.X, -1, default, token);
                     }
                     catch (OperationCanceledException) { }
                 }
@@ -936,7 +982,8 @@ namespace 精密切割系统.ViewModel
                     await IdxUtils.UpdateStepDistanceAsync();
                     if (IdxUtils.StepDistanceX is not null && IdxUtils.StepDistanceX.Value != 0)
                     {
-                        await PlcControl.tagControl.Xaxis.StartRelativeAsync(-IdxUtils.StepDistanceX.Value, default, default);
+                        //await PlcControl.tagControl.Xaxis.StartRelativeAsync(-IdxUtils.StepDistanceX.Value, default, default);
+                        await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.X, -IdxUtils.StepDistanceX.Value, default, default);
                     }
                 }
                 catch (OperationCanceledException) { }
@@ -953,7 +1000,8 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteStartYCorotationScrOrIdxCommand()
         {
-            if (!await PlcControl.tagControl.Yaxis.IsReadyAsync())
+            //if (!await PlcControl.tagControl.Yaxis.IsReadyAsync())
+            if (!await GsneMotion.Instance.Axis.IsReadyAsync(AxisType.Y)) ;
             {
                 return;
             }
@@ -962,12 +1010,14 @@ namespace 精密切割系统.ViewModel
             {
                 _cancelScrOrIdxCts = new CancellationTokenSource();
                 CancellationToken token = _cancelScrOrIdxCts.Token;
-                await PlcControl.tagControl.Yaxis.StartRelativeAsync(1, default, default);
+                //await PlcControl.tagControl.Yaxis.StartRelativeAsync(1, default, default);
+                await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.Y,1, default, default);
                 while (!token.IsCancellationRequested)
                 {
                     try
                     {
-                        await PlcControl.tagControl.Yaxis.StartRelativeAsync(1, default, token);
+                        //await PlcControl.tagControl.Yaxis.StartRelativeAsync(1, default, token);
+                        await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.Y, 1, default, default);
                     }
                     catch (OperationCanceledException) { }
                 }
@@ -983,7 +1033,9 @@ namespace 精密切割系统.ViewModel
                     await IdxUtils.UpdateStepDistanceAsync();
                     if (IdxUtils.StepDistanceY is not null && IdxUtils.StepDistanceY.Value != 0)
                     {
-                        await PlcControl.tagControl.Yaxis.StartRelativeAsync(IdxUtils.StepDistanceY.Value, default, default);
+                        //  await PlcControl.tagControl.Yaxis.StartRelativeAsync(IdxUtils.StepDistanceY.Value, default, default);
+                        await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.Y,IdxUtils.StepDistanceY.Value, default, default);
+
                     }
                 }
                 catch (OperationCanceledException) { }
@@ -1000,7 +1052,8 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteStartYReversalScrOrIdxCommand()
         {
-            if (!await PlcControl.tagControl.Yaxis.IsReadyAsync())
+            //if (!await PlcControl.tagControl.Yaxis.IsReadyAsync())
+            if (!await GsneMotion.Instance.Axis.IsReadyAsync(AxisType.Y))
             {
                 return;
             }
@@ -1009,12 +1062,14 @@ namespace 精密切割系统.ViewModel
             {
                 _cancelScrOrIdxCts = new CancellationTokenSource();
                 CancellationToken token = _cancelScrOrIdxCts.Token;
-                await PlcControl.tagControl.Yaxis.StartRelativeAsync(-1, default, default);
+                //await PlcControl.tagControl.Yaxis.StartRelativeAsync(-1, default, default);
+                await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.Y, -1, default, default);
                 while (!token.IsCancellationRequested)
                 {
                     try
                     {
-                        await PlcControl.tagControl.Yaxis.StartRelativeAsync(-1, default, token);
+                        //await PlcControl.tagControl.Yaxis.StartRelativeAsync(-1, default, token);
+                        await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.Y, -1, default, default);
                     }
                     catch (OperationCanceledException) { }
                 }
@@ -1030,7 +1085,8 @@ namespace 精密切割系统.ViewModel
                     await IdxUtils.UpdateStepDistanceAsync();
                     if (IdxUtils.StepDistanceY is not null && IdxUtils.StepDistanceY.Value != 0)
                     {
-                        await PlcControl.tagControl.Yaxis.StartRelativeAsync(-IdxUtils.StepDistanceY.Value, default, default);
+                        //await PlcControl.tagControl.Yaxis.StartRelativeAsync(-IdxUtils.StepDistanceY.Value, default, default);
+                        await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.Y, -IdxUtils.StepDistanceY.Value, default, default);
                     }
                 }
                 catch (OperationCanceledException) { }
@@ -1047,7 +1103,8 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteStartThetaCorotationScrOrIdxCommand()
         {
-            if (GlobalParams.OnlineFlag && !await PlcControl.tagControl.ThetaAxis.IsReadyAsync())
+            //if (GlobalParams.OnlineFlag && !await PlcControl.tagControl.ThetaAxis.IsReadyAsync())
+            if (GlobalParams.OnlineFlag && !await GsneMotion.Instance.Axis.IsReadyAsync(AxisType.Theta))
             {
                 return;
             }
@@ -1056,12 +1113,14 @@ namespace 精密切割系统.ViewModel
             {
                 _cancelScrOrIdxCts = new CancellationTokenSource();
                 CancellationToken token = _cancelScrOrIdxCts.Token;
-                await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(1, default, default);
+                //await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(1, default, default);
+                await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.Theta, 1, default, default);
                 while (!token.IsCancellationRequested)
                 {
                     try
                     {
-                        await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(1, default, token);
+                        //await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(1, default, token);
+                        await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.Theta, 1, default, default);
                     }
                     catch (OperationCanceledException) { }
                 }
@@ -1077,7 +1136,8 @@ namespace 精密切割系统.ViewModel
                     var thetaDeg = await IdxUtils.ToNextChThetaDegAsync();
                     if (thetaDeg is not null)
                     {
-                        await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(thetaDeg.Value, 150, default);
+                        //await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(thetaDeg.Value, 150, default);
+                        await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.Theta,thetaDeg.Value, 150, default);
                     }
                 }
                 catch (OperationCanceledException) { }
@@ -1094,7 +1154,7 @@ namespace 精密切割系统.ViewModel
 
         private async void ExecuteStartThetaReversalScrOrIdxCommand()
         {
-            if (GlobalParams.OnlineFlag && !await PlcControl.tagControl.ThetaAxis.IsReadyAsync())
+            if (GlobalParams.OnlineFlag && !await GsneMotion.Instance.Axis.IsReadyAsync(AxisType.Theta))
             {
                 return;
             }
@@ -1103,12 +1163,12 @@ namespace 精密切割系统.ViewModel
             {
                 _cancelScrOrIdxCts = new CancellationTokenSource();
                 CancellationToken token = _cancelScrOrIdxCts.Token;
-                await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(-1, default, default);
+                await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.Theta, -1, default, default);
                 while (!token.IsCancellationRequested)
                 {
                     try
                     {
-                        await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(-1, default, token);
+                        await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.Theta, -1, default, token);
                     }
                     catch (OperationCanceledException) { }
                 }
@@ -1124,7 +1184,7 @@ namespace 精密切割系统.ViewModel
                     var thetaDeg = await IdxUtils.ToPrevChThetaDegAsync();
                     if (thetaDeg is not null)
                     {
-                        await PlcControl.tagControl.ThetaAxis.StartRelativeAsync(-thetaDeg.Value, 150, default);
+                        await GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.Theta, -thetaDeg.Value, 150, default);
                     }
                 }
                 catch (OperationCanceledException) { }
@@ -1199,12 +1259,11 @@ namespace 精密切割系统.ViewModel
                 {
                     try
                     {
-                        var axisPostion = await AutoCutUtils.GetAxisPositionAsync();
-                        CurrentPositionX = MathF.Round(axisPostion.X ?? float.NaN, 3);
-                        CurrentPositionY = MathF.Round(axisPostion.Y ?? float.NaN, 3);
-                        CurrentPositionZ1 = MathF.Round(axisPostion.Z1 ?? float.NaN, 3);
-                        CurrentPositionZ2 = MathF.Round(axisPostion.Z2 ?? float.NaN, 3);
-                        CurrentPositionTheta = MathF.Round(axisPostion.Theta ?? float.NaN, 3);
+                        CurrentPositionX = MathF.Round(await GsneMotion.Instance.Axis.GetCurrentLocationAsync(AxisType.X) ?? 0, 5);
+                        CurrentPositionY = MathF.Round(await GsneMotion.Instance.Axis.GetCurrentLocationAsync(AxisType.Y) ?? 0, 5);
+                        CurrentPositionZ1 = MathF.Round(await GsneMotion.Instance.Axis.GetCurrentLocationAsync(AxisType.Z1) ?? 0, 5);
+                        CurrentPositionZ2 = MathF.Round(await GsneMotion.Instance.Axis.GetCurrentLocationAsync(AxisType.Z2) ?? 0, 5);
+                        CurrentPositionTheta = MathF.Round(await GsneMotion.Instance.Axis.GetCurrentLocationAsync(AxisType.Theta) ?? 0, 5);
                         //CurrentSpeedX = await PlcControl.tagControl.Xaxis.GetAbsoluteSpeedAsync() ?? float.NaN;
                         //CurrentSpeedY = await PlcControl.tagControl.Yaxis.GetAbsoluteSpeedAsync() ?? float.NaN;
                         //CurrentSpeedZ1 = await PlcControl.tagControl.Z1axis.GetAbsoluteSpeedAsync() ?? float.NaN;

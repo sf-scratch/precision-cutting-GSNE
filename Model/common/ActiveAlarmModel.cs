@@ -44,5 +44,22 @@ namespace 精密切割系统.Model.common
                 };
             }
         }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+
+            var other = (ActiveAlarmModel)obj;
+
+            return Address == other.Address
+                && Message == other.Message
+                && Level == other.Level;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Address, Message, Level);
+        }
     }
 }

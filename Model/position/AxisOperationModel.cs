@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using 精密切割系统.Driver;
+using 精密切割系统.Helpers.GTN;
 
 namespace 精密切割系统.Model.position
 {
@@ -11,9 +12,9 @@ namespace 精密切割系统.Model.position
     {
         private WeakReference<Action<AxisOperationModel, bool>> _onCheckedChangedWeakRef;
 
-        public AxisOperationModel(Axis axisObject, Action<AxisOperationModel, bool> onCheckedChanged)
+        public AxisOperationModel(AxisType axisType, Action<AxisOperationModel, bool> onCheckedChanged)
         {
-            AxisObject = axisObject;
+            Axis = axisType;
             if (onCheckedChanged != null)
             {
                 _onCheckedChangedWeakRef = new WeakReference<Action<AxisOperationModel, bool>>(onCheckedChanged);
@@ -50,11 +51,11 @@ namespace 精密切割系统.Model.position
             _onCheckedChangedWeakRef = null;
         }
 
-        public Axis AxisObject { get; set; }
+        public AxisType Axis { get; set; }
 
         public string AxisName
         {
-            get { return AxisObject.axisName; }
+            get { return Axis.ToString(); }
         }
 
         private string _axisSlowSpeed;

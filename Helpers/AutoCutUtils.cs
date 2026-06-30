@@ -33,6 +33,7 @@ using 精密切割系统.Driver;
 using 精密切割系统.DTOs;
 using 精密切割系统.Entities;
 using 精密切割系统.Extensions;
+using 精密切割系统.Helpers.GTN;
 using 精密切割系统.HttpClients;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut;
@@ -59,21 +60,22 @@ namespace 精密切割系统.Helpers
 
         public static async Task<AxisPosition> GetAxisPositionAsync()
         {
-            var curX = await PlcControl.tagControl.Xaxis.GetCurrentLocationAsync();
-            var curY = await PlcControl.tagControl.Yaxis.GetCurrentLocationAsync();
-            var curZ1 = await PlcControl.tagControl.Z1axis.GetCurrentLocationAsync();
-            var curZ2 = await PlcControl.tagControl.Z2axis.GetCurrentLocationAsync();
-            var curTheta = await PlcControl.tagControl.ThetaAxis.GetCurrentLocationAsync();
+
+            var curX = await GsneMotion.Instance.Axis.GetCurrentLocationAsync(AxisType.X);
+            var curY = await GsneMotion.Instance.Axis.GetCurrentLocationAsync(AxisType.Y);
+            var curZ1 = await GsneMotion.Instance.Axis.GetCurrentLocationAsync(AxisType.Z1);
+            var curZ2 = await GsneMotion.Instance.Axis.GetCurrentLocationAsync(AxisType.Z2);
+            var curTheta = await GsneMotion.Instance.Axis.GetCurrentLocationAsync(AxisType.Theta);
             return new AxisPosition(curX, curY, curZ1, curZ2, curTheta);
         }
 
         public static async Task<AxisState> GetAxisStateAsync()
         {
-            var isReadyX = await PlcControl.tagControl.Xaxis.IsReadyAsync();
-            var isReadyY = await PlcControl.tagControl.Yaxis.IsReadyAsync();
-            var isReadyZ1 = await PlcControl.tagControl.Z1axis.IsReadyAsync();
-            var isReadyZ2 = await PlcControl.tagControl.Z2axis.IsReadyAsync();
-            var isReadyTheta = await PlcControl.tagControl.ThetaAxis.IsReadyAsync();
+            var isReadyX = await GsneMotion.Instance.Axis.IsReadyAsync(AxisType.X);
+            var isReadyY = await GsneMotion.Instance.Axis.IsReadyAsync(AxisType.Y);
+            var isReadyZ1 = await GsneMotion.Instance.Axis.IsReadyAsync(AxisType.Z1);
+            var isReadyZ2 = await GsneMotion.Instance.Axis.IsReadyAsync(AxisType.Z2);
+            var isReadyTheta = await GsneMotion.Instance.Axis.IsReadyAsync(AxisType.Theta);
             return new AxisState(isReadyX, isReadyY, isReadyZ1, isReadyZ2, isReadyTheta);
         }
 
@@ -96,7 +98,8 @@ namespace 精密切割系统.Helpers
                 float speedX = initPos.CutReplaceInitSpeedX.ToFloat();
                 float speedY = initPos.CutReplaceInitSpeedY.ToFloat();
                 float speedZ1 = initPos.CutReplaceInitSpeedZ1.ToFloat();
-                if (!await PlcControl.tagControl.Z1axis.IsReadyAsync())
+                //if (!await PlcControl.tagControl.Z1axis.IsReadyAsync())
+                if(!await GsneMotion.Instance.Axis.IsReadyAsync(AxisType.Z1))
                 {
                     return CommonResult.Failure("轴未准备好，请检查轴状态！");
                 }
