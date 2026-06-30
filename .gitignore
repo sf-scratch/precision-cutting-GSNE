@@ -1,9 +1,14 @@
-bin
-obj
-.idea
-.vs
-.cache
-.lref
-/obj
-/bin
-/DrvLog
+# build output
+bin/
+obj/
+
+# IDE
+.vs/
+.idea/
+*.sln.DotSettings.user
+*.csproj.user
+
+# cache / temp
+.cache/
+.lref/
+DrvLog/
