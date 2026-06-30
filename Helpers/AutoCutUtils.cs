@@ -98,8 +98,7 @@ namespace 精密切割系统.Helpers
                 float speedX = initPos.CutReplaceInitSpeedX.ToFloat();
                 float speedY = initPos.CutReplaceInitSpeedY.ToFloat();
                 float speedZ1 = initPos.CutReplaceInitSpeedZ1.ToFloat();
-                //if (!await PlcControl.tagControl.Z1axis.IsReadyAsync())
-                if(!await GsneMotion.Instance.Axis.IsReadyAsync(AxisType.Z1))
+                if (!await PlcControl.tagControl.Z1axis.IsReadyAsync())
                 {
                     return CommonResult.Failure("轴未准备好，请检查轴状态！");
                 }

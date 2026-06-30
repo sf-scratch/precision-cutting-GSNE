@@ -209,557 +209,557 @@ namespace 精密切割系统.Helpers.GTN
         /* Basic function                                            */
         /*-----------------------------------------------------------*/
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetCardNo(short index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCardNo(out short index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_Open(short channel, short param);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_Close();
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetCore(short core);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCore(out short pCore);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetVersion(out System.IntPtr pVersion);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetVersionEx(short type, out TVersion pVersion);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_Reset();
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetClock(out UInt32 pClock, out UInt32 pLoop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetClockHighPrecision(out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ClearTime(ETimeElapse item);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetTime(ETimeElapse item, out UInt32 pTime, out UInt32 pTimeMax, out UInt32 pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetSts(short axis, out Int32 pSts, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ClrSts(short axis, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_AxisOn(short axis);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_AxisOff(short axis);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_MultiAxisOn(UInt32 mask);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_MultiAxisOff(UInt32 mask);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetAxisOnDelayTime(ushort ms);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetAxisOnDelayTime(out ushort pMs);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_Stop(Int32 mask, Int32 option);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetPrfPos(short profile, Int32 prfPos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SynchAxisPos(Int32 mask);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ZeroPos(short axis, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetLimitStatus(short axis, out short pLimitPositive, out short pLimitNegative);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetSoftLimitMode(short axis, short mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetSoftLimitMode(short axis, out short pMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetSoftLimit(short axis, Int32 positive, Int32 negative);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetSoftLimit(short axis, out Int32 pPositive, out Int32 pNegative);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetAxisBand(short axis, Int32 band, Int32 time);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetAxisBand(short axis, out Int32 pBand, out Int32 pTime);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetPrfPos(short profile, out double Value, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetPrfVel(short profile, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetPrfAcc(short profile, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetPrfMode(short profile, out Int32 pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetAxisPrfPos(short axis, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetAxisPrfPosCompensate(short axis, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetAxisPrfVel(short axis, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetAxisPrfAcc(short axis, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetAxisEncPos(short axis, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetAxisEncVel(short axis, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetAxisEncAcc(short axis, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetAxisError(short axis, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetControlFilter(short control, short index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetControlFilter(short control, out short pIndex);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetControlSuperimposed(short control, short superimposedType, short superimposedIndex);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetControlSuperimposed(short control, out short pSuperimposedType, out short pSuperimposedIndex);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetPid(short control, short index, ref TPid pPid);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetPid(short control, short index, out TPid pPid);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetKvffFilter(short control, short index, short kvffFilterExp, double accMax);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetKvffFilter(short control, short index, out short pKvffFilterExp, out double pAccMax);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_Delay(ushort ms);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_DelayHighPrecision(ushort profile);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_Open(short channel, short param);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_OpenRingNet(short channel, short param, string pFile, short index, Int32 count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_Close();
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetChannel(out short pChannel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetVersion(short core, out string pVersion);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetVersionEx(short core, short type, out TVersion pVersion);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetVersion(short core, short type, ref TVersion pVersion);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_Reset(short core);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetClock(short core, out UInt32 pClock, out UInt32 pLoop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetClockHighPrecision(short core, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ClearTime(short core, ETimeElapse item);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTime(short core, ETimeElapse item, out UInt32 pTime, out UInt32 pTimeMax, out UInt32 pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetCoreMode(short core, short mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCoreMode(short core, out short pMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetCoreShare(short core, short type, short index, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCoreShare(short core, short type, out short pIndex, out short pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetCoreTask(short core, short task);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCoreTask(short core, out short pTask);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetResMax(short core, short type, out short pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetResCount(short core, short type, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetResCount(short core, short type, out short pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetSts(short core, short axis, out Int32 pSts, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ClrSts(short core, short axis, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_AxisOn(short core, short axis);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_AxisOff(short core, short axis);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_MultiAxisOn(short core, UInt32 mask);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_MultiAxisOff(short core, UInt32 mask);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAxisOnDelayTime(short core, ushort delayTime);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAxisOnDelayTime(short core, out ushort pDelayTime);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_Stop(short core, Int32 mask, Int32 option);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPrfPos(short core, short profile, Int32 prfPos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SynchAxisPos(short core, Int32 mask);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ZeroPos(short core, short axis, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetLimitStatus(short core, short axis, out short pLimitPositive, out short pLimitNegative);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetSoftLimitMode(short core, short axis, short mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetSoftLimitMode(short core, short axis, out short pMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetSoftLimit(short core, short axis, Int32 positive, Int32 negative);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetSoftLimit(short core, short axis, out Int32 pPositive, out Int32 pNegative);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAxisBand(short core, short axis, Int32 band, Int32 time);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAxisBand(short core, short axis, out Int32 pBand, out Int32 pTime);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPrfPos(short core, short profile, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPrfVel(short core, short profile, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPrfAcc(short core, short profile, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPrfMode(short core, short profile, out Int32 pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAxisPrfPos(short core, short axis, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAxisPrfPosCompensate(short core, short axis, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAxisPrfVel(short core, short axis, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAxisPrfAcc(short core, short axis, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAxisEncPos(short core, short axis, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAxisEncVel(short core, short axis, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAxisEncAcc(short core, short axis, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAxisError(short core, short axis, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetControlFilter(short core, short control, short index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetControlFilter(short core, short control, out short pIndex);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetControlSuperimposed(short core, short control, short superimposedType, short superimposedIndex);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetControlSuperimposed(short core, short control, out short pSuperimposedType, out short pSuperimposedIndex);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPid(short core, short control, short index, ref TPid pPid);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPid(short core, short control, short index, out TPid pPid);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetKvffFilter(short core, short control, short index, short kvffFilterExp, double accMax);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetKvffFilter(short core, short control, short index, out short pKvffFilterExp, out double pAccMax);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_Delay(short core, ushort ms);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_DelayHighPrecision(short core, ushort profile);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPosCompareReference(short core, short index, ref TPosCompareReferencePrm pPrm);
 
         public const short STEP_DIR = 0;
         public const short STEP_PULSE = 1;
         public const short STEP_ORTHOGONAL = 2;
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LoadConfig(string pFile);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_AlarmOff(short axis);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_AlarmOn(short axis);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LmtsOn(short axis, short limitType);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LmtsOff(short axis, short limitType);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_StepDir(short step);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_StepPulse(short step);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_StepOrthogonal(short step);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetMtrBias(short dac, short bias);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetMtrBias(short dac, out short pBias);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetMtrLmt(short dac, short limit);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetMtrLmt(short dac, out short pLimit);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_EncOn(short encoder);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_EncOff(short encoder);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetPosErr(short control, Int32 error);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetPosErr(short control, out Int32 pError);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetStopDec(short profile, double decSmoothStop, double decAbruptStop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetStopDec(short profile, out double pDecSmoothStop, out double pDecAbruptStop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_CtrlMode(short axis, short mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetStopIo(short axis, short stopType, short inputType, short inputIndex);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetAdcFilterPrm(short adc, double k);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetAdcFilterPrm(short adc, out double pk);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetAxisPrfVelFilter(short axis, short filterNumExp);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetAxisPrfVelFilter(short axis, out short pFilterNumExp);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetAxisEncVelFilter(short axis, short filterNumExp);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetAxisEncVelFilter(short axis, out short pFilterNumExp);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetProfileScale(short i, Int32 alpha, Int32 beta);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetProfileScale(short i, out Int32 pAlhpa, out Int32 pBeta);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetEncoderScale(short i, Int32 alpha, Int32 beta);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEncoderScale(short i, out Int32 pAlhpa, out Int32 pBeta);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LoadConfig(short core, string pFile);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_AlarmOn(short core, short axis);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_AlarmOff(short core, short axis);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LmtsOn(short core, short axis, short limitType);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LmtsOff(short core, short axis, short limitType);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_StepDir(short core, short step);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_StepPulse(short core, short step);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_StepOrthogonal(short core, short step);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetMtrBias(short core, short dac, short bias);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetMtrBias(short core, short dac, out short pBias);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetMtrLmt(short core, short dac, short limit);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetMtrLmt(short core, short dac, out short pLimit);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetSense(short core, short dataType, short dataIndex, short value);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetSense(short core, short dataType, short dataIndex, out short pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_EncOn(short core, short encoder);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_EncOff(short core, short encoder);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPosErr(short core, short control, Int32 error);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPosErr(short core, short control, out Int32 pError);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetStopDec(short core, short profile, double decSmoothStop, double decAbruptStop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetStopDec(short core, short profile, out double pDecSmoothStop, out double pDecAbruptStop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_CtrlMode(short core, short axis, short mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetStopIo(short core, short axis, short stopType, short inputType, short inputIndex);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAdcFilterPrm(short core, short adc, double k);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAdcFilterPrm(short core, short adc, out double pk);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAxisPrfVelFilter(short core, short axis, short filterNumExp);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAxisPrfVelFilter(short core, short axis, out short pFilterNumExp);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAxisEncVelFilter(short core, short axis, short filterNumExp);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAxisEncVelFilter(short core, short axis, out short pFilterNumExp);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetProfileScale(short core, short i, Int32 alpha, Int32 beta);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetProfileScale(short core, short i, out Int32 pAlhpa, out Int32 pBeta);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetEncoderScale(short core, short i, Int32 alpha, Int32 beta);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEncoderScale(short core, short i, out Int32 pAlhpa, out Int32 pBeta);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAuEncoderScale(short core, short i, Int32 alpha, Int32 beta);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAuEncoderScale(short core, short i, out Int32 pAlhpa, out Int32 pBeta);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetLeadScrewCompMode(short core, short axis, short cycleMode, short revCompCycle);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetLeadScrewCompMode(short core, short axis, out short pCycleMode, out short pRevCompCycle);
 
         /*-----------------------------------------------------------*/
@@ -828,112 +828,112 @@ namespace 精密切割系统.Helpers.GTN
             public UInt32 loopCount;
         }
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetTrigger(short i, ref TTrigger pTrigger);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetTrigger(short i, out TTrigger pTrigger);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetTriggerStatus(short i, out TTriggerStatus pTriggerStatus, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ClearTriggerStatus(short i);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetCaptureMode(short encoder, short mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCaptureMode(short encoder, out short pMode, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCaptureStatus(short encoder, out short pStatus, out Int32 pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetCaptureSense(short encoder, short mode, short sense);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ClearCaptureStatus(short encoder);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetCaptureRepeat(short encoder, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCaptureRepeatStatus(short encoder, out short pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCaptureRepeatPos(short encoder, out Int32 pValue, short startNum, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetCaptureRepeatFifoMode(short encoder, short mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCaptureRepeatFifoMode(short encoder, out short pMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAuTrigger(short core, short i, ref TTriggerEx pTrigger);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAuTrigger(short core, short i, out TTriggerEx pTrigger);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ClearAuTriggerStatus(short core, short i);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAuTriggerStatus(short core, short i, out TTriggerStatusEx pTriggerStatusEx, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetTrigger(short core, short i, ref TTrigger pTrigger);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTrigger(short core, short i, out TTrigger pTrigger);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetTriggerEx(short core, short i, ref TTriggerEx pTrigger);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTriggerEx(short core, short i, out TTriggerEx pTrigger);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTriggerStatus(short core, short i, out TTriggerStatus pTriggerStatus, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTriggerStatusEx(short core, short i, out TTriggerStatusEx pTriggerStatusEx, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ClearTriggerStatus(short core, short i);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_DisableTrigger(short core, short i);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetCaptureMode(short core, short encoder, short mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCaptureMode(short core, short encoder, out short pMode, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCaptureStatus(short core, short encoder, out short pStatus, out Int32 pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetCaptureSense(short core, short encoder, short mode, short sense);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ClearCaptureStatus(short core, short encoder);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetCaptureRepeat(short core, short encoder, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCaptureRepeatStatus(short core, short encoder, out short pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCaptureRepeatPos(short core, short encoder, out Int32 pValue, short startNum, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetCaptureRepeatFifoMode(short core, short encoder, short mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCaptureRepeatFifoMode(short core, short encoder, out short pMode);
 
         public struct TLatchValueInfo
@@ -967,13 +967,13 @@ namespace 精密切割系统.Helpers.GTN
             public double pad3;
         };
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetTriggerPrm(short core, short i, ref TTriggerPrm pTriggerPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTriggerPrm(short core, short i, out TTriggerPrm pTriggerPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTriggerLatchValue(short core, short i, Int32 count, out Int32 pValue, out Int32 pCount, ref TLatchValueInfo pInfo);
 
         public const short TRIGGER_DELTA_MODE_DEFAULT = 0;
@@ -1008,94 +1008,94 @@ namespace 精密切割系统.Helpers.GTN
             public short lostCount;
         }
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ClearTriggerDelta(short index, short mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_AddTriggerDeltaCheckpoint(short index, short mode, Int32 offset, short fifo, ref short pIndex);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ReadTriggerDeltaCheckpointData(short index, short checkpointIndex, out Int32 pBuf, short count, out short pReadCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_WriteTriggerDeltaCheckpointData(short index, short checkpointIndex, ref Int32 pBuf, short count, ref short pWriteCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetTriggerDeltaPrm(short index, ref TTriggerDeltaPrm pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetTriggerDeltaPrm(short index, out TTriggerDeltaPrm pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetTriggerDeltaCheckpoint(short index, short checkpointIndex, out TCheckpoint pCheckpoint);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetTriggerDeltaInfo(short index, out TTriggerDeltaInfo pTriggerDelta);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_TriggerDeltaOn(short index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_TriggerDeltaOff(short index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ClearTriggerDelta(short core, short index, short mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_AddTriggerDeltaCheckpoint(short core, short index, short mode, Int32 offset, short fifo, ref short pIndex);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ReadTriggerDeltaCheckpointData(short core, short index, short checkpointIndex, out Int32 pBuf, short count, out short pReadCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_WriteTriggerDeltaCheckpointData(short core, short index, short checkpointIndex, ref Int32 pBuf, short count, ref short pWriteCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetTriggerDeltaPrm(short core, short index, ref TTriggerDeltaPrm pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTriggerDeltaPrm(short core, short index, out TTriggerDeltaPrm pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTriggerDeltaCheckpoint(short core, short index, short checkpointIndex, out TCheckpoint pCheckpoint);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTriggerDeltaInfo(short core, short index, out TTriggerDeltaInfo pTriggerDelta);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_TriggerDeltaOn(short core, short index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_TriggerDeltaOff(short core, short index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LinkCaptureOffset(short encoder, short source);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetCaptureOffset(short encoder, ref Int32 pOffset, short count, Int32 loop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCaptureOffset(short encoder, out Int32 pOffset, out short pCount, out Int32 pLoop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCaptureOffsetStatus(short encoder, out short pCount, out Int32 pLoop, out Int32 pCapturePos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetCaptureEncoder(short trigger, short encoder);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCaptureWidth(short trigger, out short pWidth, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LinkCaptureOffset(short core, short encoder, short source);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetCaptureOffset(short core, short encoder, ref Int32 pOffset, short count, Int32 loop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCaptureOffset(short core, short encoder, out Int32 pOffset, out short pCount, out Int32 pLoop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCaptureOffsetStatus(short core, short encoder, out short pCount, out Int32 pLoop, out Int32 pCapturePos);
 
         /*-----------------------------------------------------------*/
@@ -1110,52 +1110,52 @@ namespace 精密切割系统.Helpers.GTN
             public short smoothTime;   //平滑时间 单位ms
         }
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_Update(Int32 mask);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetPos(short profile, Int32 pos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetPos(short profile, out Int32 pPos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetVel(short profile, double vel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetVel(short profile, out double pVel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PrfTrap(short profile);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetTrapPrm(short profile, ref TTrapPrm pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetTrapPrm(short profile, out TTrapPrm pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_Update(short core, Int32 mask);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPos(short core, short profile, Int32 pos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPos(short core, short profile, out Int32 pPos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetVel(short core, short profile, double vel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetVel(short core, short profile, out double pVel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PrfTrap(short core, short profile);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetTrapPrm(short core, short profile, ref TTrapPrm pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTrapPrm(short core, short profile, out TTrapPrm pPrm);
 
         public struct TJogPrm
@@ -1165,22 +1165,22 @@ namespace 精密切割系统.Helpers.GTN
             public double smooth;
         }
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PrfJog(short profile);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetJogPrm(short profile, ref TJogPrm pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetJogPrm(short profile, out TJogPrm pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PrfJog(short core, short profile);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetJogPrm(short core, short profile, ref TJogPrm pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetJogPrm(short core, short profile, out TJogPrm pPrm);
 
         public const short PT_MODE_STATIC = 0;
@@ -1208,109 +1208,109 @@ namespace 精密切割系统.Helpers.GTN
             public UInt32 bufferExecute2;
         }
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PrfPt(short profile, short mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetPtLoop(short profile, Int32 loop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetPtLoop(short profile, out Int32 pLoop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PtSpace(short profile, out short pSpace, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PtSpaceEx(short profile, out short pSpace, out short pListSpace, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PtData(short profile, double pos, Int32 time, short type);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PtClear(short profile, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PtStart(Int32 mask, Int32 option);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetPtMemory(short profile, short memory);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetPtMemory(short profile, out short pMemory);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetPtPrecisionMode(short profile, short precisionMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetPtPrecisionMode(short profile, out short pPrecisionMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetPtInfo(short profile, out TPtInfo pPtInfo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetPtLink(short profile, short fifo, short list);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetPtLink(short profile, short fifo, out short pList);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PtDoBit(short profile, short doType, short index, short value, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PtAo(short profile, short aoType, short index, double value, short fifo);
 
-        //[DllImport("gxn.dll")]
+        //[DllImport(@"Assets\config\gxn.dll")]
         //public static extern short GTN_PosCurrFeedForward(short core,short profile,double pos,Int32 time,short torque,short type,short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PrfPt(short core, short profile, short mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPtLoop(short core, short profile, Int32 loop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPtLoop(short core, short profile, out Int32 pLoop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PtSpace(short core, short profile, out short pSpace, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PtSpaceEx(short core, short profile, out short pSpace, out short pListSpace, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PtData(short core, short profile, double pos, Int32 time, short type, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PtClear(short core, short profile, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PtStart(short core, Int32 mask, Int32 option);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPtMemory(short core, short profile, short memory);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPtMemory(short core, short profile, out short pMemory);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPtPrecisionMode(short core, short profile, short precisionMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPtPrecisionMode(short core, short profile, out short pPrecisionMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPtInfo(short core, short profile, out TPtInfo pPtInfo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPtLink(short core, short profile, short fifo, short list);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPtLink(short core, short profile, short fifo, out short pList);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PtDoBit(short core, short profile, short doType, short index, short value, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PtAo(short core, short profile, short aoType, short index, double value, short fifo);
 
         public struct TPvtTableMovePrm
@@ -1323,127 +1323,127 @@ namespace 精密切割系统.Helpers.GTN
             public double time;
         }
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PrfPvt(short profile);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetPvtLoop(short profile, Int32 loop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetPvtLoop(short profile, out Int32 pLoopCount, out Int32 pLoop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PvtStatus(short profile, out short pTableId, out double pTime, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PvtStart(Int32 mask);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PvtTableSelect(short profile, short tableId);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PvtTable(short tableId, Int32 count, ref double pTime, ref double pPos, ref double pVel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PvtTableEx(short tableId, Int32 count, ref double pTime, ref double pPos, ref double pVelBegin, ref double pVelEnd);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PvtTableComplete(short tableId, Int32 count, ref double pTime, ref double pPos, ref double pA, ref double pB, ref double pC, double velBegin, double velEnd);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PvtTablePercent(short tableId, Int32 count, ref double pTime, ref double pPos, ref double pPercent, double velBegin);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PvtPercentCalculate(Int32 n, ref double pTime, ref double pPos, ref double pPercent, double velBegin, ref double pVel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PvtTableContinuousEx(short tableId, Int32 n, ref double pPos, ref double pVel, ref double pAccPercent, ref double pDecPercent, ref double pVelMax, ref double pAcc, ref double pDec, double timeBegin);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PvtTableContinuous(short tableId, Int32 count, ref double pPos, ref double pVel, ref double pPercent, ref double pVelMax, ref double pAcc, ref double pDec, double timeBegin);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PvtContinuousCalculate(Int32 n, ref double pPos, ref double pVel, ref double pPercent, ref double pVelMax, ref double pAcc, ref double pDec, ref double pTime);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PvtTableMove(short tableId, Int32 distance, double vm, double am, double jm, ref double pTime);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PvtTableMove2(short tableId, Int32 distance, double vm, double am, double jm, ref double pTime);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PvtTableMovePercent(short tableId, Int32 distance, double vm, double acc, double pa1, double pa2, double dec, double pd1, double pd2, ref double pVel, ref double pAcc, ref double pDec, ref double pTime);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PvtTableMovePercentEx(short tableId, Int32 distance, double vm,
         double acc, double pa1, double pa2, double ma,
         double dec, double pd1, double pd2, double md,
         ref double pVel, ref double pAcc, ref double pDec, ref double pTime);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PvtTableMoveTogether(short tableCount, ref TPvtTableMovePrm pPvtTableMovePrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PrfPvt(short core, short profile);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPvtLoop(short core, short profile, Int32 loop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPvtLoop(short core, short profile, out Int32 pLoopCount, out Int32 pLoop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PvtStatus(short core, short profile, out short pTableId, out double pTime, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PvtStart(short core, Int32 mask);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PvtTableSelect(short core, short profile, short tableId);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PvtTable(short core, short tableId, Int32 count, ref double pTime, ref double pPos, ref double pVel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PvtTableEx(short core, short tableId, Int32 count, ref double pTime, ref double pPos, ref double pVelBegin, ref double pVelEnd);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PvtTableComplete(short core, short tableId, Int32 count, ref double pTime, ref double pPos, ref double pA, ref double pB, ref double pC, double velBegin, double velEnd);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PvtTablePercent(short core, short tableId, Int32 count, ref double pTime, ref double pPos, ref double pPercent, double velBegin);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PvtPercentCalculate(short core, Int32 n, ref double pTime, ref double pPos, ref double pPercent, double velBegin, ref double pVel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PvtTableContinuous(short core, short tableId, Int32 count, ref double pPos, ref double pVel, ref double pPercent, ref double pVelMax, ref double pAcc, ref double pDec, double timeBegin);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PvtContinuousCalculate(short core, Int32 n, ref double pPos, ref double pVel, ref double pPercent, ref double pVelMax, ref double pAcc, ref double pDec, ref double pTime);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PvtTableMove(short core, short tableId, Int32 distance, double vm, double am, double jm, ref double pTime);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PvtTableMove2(short core, short tableId, Int32 distance, double vm, double am, double jm, ref double pTime);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PvtTableMoveAbsoluteJerk(short core, short profile, short tableId, ref double pPos, ref double pVel, ref double pAcc, ref double jm, out double pTime, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PvtTableMovePercent(short core, short tableId, Int32 distance, double vm,
         double acc, double pa1, double pa2,
         double dec, double pd1, double pd2,
         ref double pVel, ref double pAcc, ref double pDec, ref double pTime);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PvtTableMovePercentEx(short core, short tableId, Int32 distance, double vm,
         double acc, double pa1, double pa2, double ma,
         double dec, double pd1, double pd2, double md,
         ref double pVel, ref double pAcc, ref double pDec, ref double pTime);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PvtTableMoveTogether(short core, short tableCount, ref TPvtTableMovePrm pPvtTableMovePrm);
 
         public const short GEAR_MASTER_ENCODER = 1;
@@ -1458,52 +1458,52 @@ namespace 精密切割系统.Helpers.GTN
         public const short GEAR_EVENT_PASS = 2;
         public const short GEAR_EVENT_AREA = 5;
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PrfGear(short profile, short dir);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetGearMaster(short profile, short masterIndex, short masterType, short masterItem);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetGearMaster(short profile, out short pMasterIndex, out short pMasterType, out short pMasterItem);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetGearRatio(short profile, Int32 masterEven, Int32 slaveEven, Int32 masterSlope);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetGearRatio(short profile, out Int32 pMasterEven, out Int32 pSlaveEven, out Int32 pMasterSlope);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GearStart(Int32 mask);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetGearEvent(short profile, short gearevent, Int32 startPara0, Int32 startPara1);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetGearEvent(short profile, out short pEvent, out Int32 pStartPara0, out Int32 pStartPara1);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PrfGear(short core, short profile, short dir);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetGearMaster(short core, short profile, short masterIndex, short masterType, short masterItem);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetGearMaster(short core, short profile, out short pMasterIndex, out short pMasterType, out short pMasterItem);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetGearRatio(short core, short profile, Int32 masterEven, Int32 slaveEven, Int32 masterSlope);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetGearRatio(short core, short profile, out Int32 pMasterEven, out Int32 pSlaveEven, out Int32 pMasterSlope);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GearStart(short core, Int32 mask);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetGearEvent(short core, short profile, short gearevent, Int32 startPara0, Int32 startPara1);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetGearEvent(short core, short profile, out short pEvent, out Int32 pStartPara0, out Int32 pStartPara1);
 
         public const short FOLLOW_SWITCH_SEGMENT = 1;
@@ -1525,256 +1525,256 @@ namespace 精密切割系统.Helpers.GTN
         public const short FOLLOW_SEGMENT_STOP = 2;
         public const short FOLLOW_SEGMENT_CONTINUE = 3;
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PrfFollow(short profile, short dir);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetFollowMaster(short profile, short masterIndex, short masterType, short masterItem);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetFollowMaster(short profile, out short pMasterIndex, out short pMasterType, out short pMasterItem);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetFollowLoop(short profile, Int32 loop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetFollowLoop(short profile, out Int32 pLoop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetFollowEvent(short profile, short followevent, short masterDir, Int32 pos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetFollowEvent(short profile, out short pEvent, out short pMasterDir, out Int32 pPos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_FollowSpace(short profile, out short pSpace, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_FollowData(short profile, Int32 masterSegment, double slaveSegment, short type, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_FollowClear(short profile, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_FollowStart(Int32 mask, Int32 option);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_FollowSwitch(Int32 mask);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetFollowMemory(short profile, short memory);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetFollowMemory(short profile, out short pMemory);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetFollowStatus(short profile, out short pFifoNum, out short pSwitchStatus);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetFollowPhasing(short profile, short profilePhasing);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetFollowPhasing(short profile, out short pProfilePhasing);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PrfFollowEx(short profile, short dir);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetFollowMasterEx(short profile, short masterIndex, short masterType, short masterItem);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetFollowMasterEx(short profile, out short pMasterIndex, out short pMasterType, out short pMasterItem);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetFollowLoopEx(short profile, Int32 loop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetFollowLoopEx(short profile, out Int32 pLoop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetFollowEventEx(short profile, short followevent, short masterDir, Int32 pos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetFollowEventEx(short profile, out short pEvent, out short pMasterDir, out Int32 pPos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_FollowSpaceEx(short profile, out short pSpace, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_FollowDataPercentEx(short profile, double masterSegment, double slaveSegment, short type, short percent, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_FollowClearEx(short profile, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_FollowStartEx(Int32 mask, Int32 option);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_FollowSwitchEx(Int32 mask);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetFollowMemoryEx(short profile, short memory);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetFollowMemoryEx(short profile, out short pMemory);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetFollowStatusEx(short profile, out short pFifoNum, out short pSwitchStatus);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetFollowPhasingEx(short profile, short profilePhasing);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetFollowPhasingEx(short profile, out short pProfilePhasing);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_FollowSwitchNowEx(short profile, short method, short buffer, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_FollowDataPercent2Ex(short profile, double masterSegment, double slaveSegment, double velBeginRatio, double velEndRatio, short percent, out short pPercent1, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetFollowDataPercent2Ex(double masterPos, double v1, double v2, double p, double p1, out double pSlavePos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_FollowDoBitEx(short profile, short doType, short index, short value, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_FollowDelayEx(short profile, UInt32 delayTime, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_FollowDiBitEx(short profile, short diType, short index, short value, UInt32 time, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PrfFollow(short core, short profile, short dir);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetFollowMaster(short core, short profile, short masterIndex, short masterType, short masterItem);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetFollowMaster(short core, short profile, out short pMasterIndex, out short pMasterType, out short pMasterItem);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetFollowLoop(short core, short profile, Int32 loop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetFollowLoop(short core, short profile, out Int32 pLoop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetFollowEvent(short core, short profile, short followevent, short masterDir, Int32 pos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetFollowEvent(short core, short profile, out short pEvent, out short pMasterDir, out Int32 pPos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_FollowSpace(short core, short profile, out short pSpace, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_FollowData(short core, short profile, Int32 masterSegment, double slaveSegment, short type, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_FollowClear(short core, short profile, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_FollowStart(short core, Int32 mask, Int32 option);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_FollowSwitch(short core, Int32 mask);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetFollowMemory(short core, short profile, short memory);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetFollowMemory(short core, short profile, out short pMemory);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetFollowStatus(short core, short profile, out short pFifoNum, out short pSwitchStatus);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetFollowPhasing(short core, short profile, short profilePhasing);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetFollowPhasing(short core, short profile, out short pProfilePhasing);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PrfFollowEx(short core, short profile, short dir);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetFollowMasterEx(short core, short profile, short masterIndex, short masterType, short masterItem);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetFollowMasterEx(short core, short profile, out short pMasterIndex, out short pMasterType, out short pMasterItem);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetFollowLoopEx(short core, short profile, Int32 loop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetFollowLoopEx(short core, short profile, out Int32 pLoop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetFollowEventEx(short core, short profile, short followevent, short masterDir, Int32 pos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetFollowEventEx(short core, short profile, out short pEvent, out short pMasterDir, out Int32 pPos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_FollowSpaceEx(short core, short profile, out short pSpace, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_FollowDataPercentEx(short core, short profile, double masterSegment, double slaveSegment, short type, short percent, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_FollowClearEx(short core, short profile, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_FollowStartEx(short core, Int32 mask, Int32 option);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_FollowSwitchEx(short core, Int32 mask);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetFollowMemoryEx(short core, short profile, short memory);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetFollowMemoryEx(short core, short profile, out short pMemory);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetFollowStatusEx(short core, short profile, out short pFifoNum, out short pSwitchStatus);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetFollowPhasingEx(short core, short profile, short profilePhasing);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetFollowPhasingEx(short core, short profile, out short pProfilePhasing);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_FollowSwitchNowEx(short core, short profile, short method, short buffer, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_FollowDataPercent2Ex(short core, short profile, double masterSegment, double slaveSegment, double velBeginRatio, double velEndRatio, short percent, out short pPercent1, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetFollowDataPercent2Ex(short core, double masterPos, double v1, double v2, double p, double p1, out double pSlavePos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_FollowDoBitEx(short core, short profile, short doType, short index, short value, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_FollowDelayEx(short core, short profile, UInt32 delayTime, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_FollowDiBitEx(short core, short profile, short diType, short index, short value, UInt32 time, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetFollowVirtualSeg(short profile, short segment, short axis, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetFollowVirtualSeg(short profile, out short pSegment, out short pAxis, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetFollowVirtualErr(short profile, out double pVirtualErr);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ClearFollowVirtualErr(short profile);
 
         public struct TMoveAbsolutePrm
@@ -1786,16 +1786,16 @@ namespace 精密切割系统.Helpers.GTN
             public short percent;
         }
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_MoveAbsolute(short profile, ref TMoveAbsolutePrm pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetMoveAbsolute(short profile, out TMoveAbsolutePrm pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_MoveAbsolute(short core, short profile, ref TMoveAbsolutePrm pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetMoveAbsolute(short core, short profile, out TMoveAbsolutePrm pPrm);
 
         public struct TTransformOrthogonal
@@ -1807,22 +1807,22 @@ namespace 精密切割系统.Helpers.GTN
             public double theta;
         }
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetTransformOrthogonal(short index, ref TTransformOrthogonal pOrthogonal);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetTransformOrthogonal(short index, out TTransformOrthogonal pOrthogonal);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetTransformOrthogonalPosition(short index, out double pPositionX, out double pPositionY);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetTransformOrthogonal(short core, short index, ref TTransformOrthogonal pOrthogonal);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTransformOrthogonal(short core, short index, out TTransformOrthogonal pOrthogonal);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTransformOrthogonalPosition(short core, short index, out double pPositionX, out double pPositionY);
 
         /*-----------------------------------------------------------*/
@@ -1872,22 +1872,22 @@ namespace 精密切割系统.Helpers.GTN
             public double[] reserve2;
         }
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PrfComp(short core, short profile, ref TPrfComp pComp);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PrfCompEnable(short core, short profile, short enable, short enableType);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufPrfCompEnable(short core, short crd, short fifo, short profile, short enable, short enableType);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetCoordSyncCompPrm(short core, short index, ref TCoordSyncCompPrm pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCoordSyncCompPrm(short core, short index, out TCoordSyncCompPrm pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCoordSyncCompValue(short core, short index, double x, double y, out double pCompX, out double pCompY);
 
         /*-----------------------------------------------------------*/
@@ -1977,46 +1977,46 @@ namespace 精密切割系统.Helpers.GTN
             public Int32 targetPos;
         }
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GoHome(short axis, ref THomePrm pHomePrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetHomePrm(short profile, out THomePrm pHomePrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetHomeStatus(short profile, out THomeStatus pHomeStatus);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GoHome(short core, short axis, ref THomePrm pHomePrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetHomePrm(short core, short axis, out THomePrm pHomePrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetHomeStatus(short core, short axis, out THomeStatus pHomeStatus);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HandwheelInit(short mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetHandwheelStopDec(short slave, double decSmoothStop, double decAbruptStop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_StartHandwheel(short slave, short master, short masterEven, short slaveEven, short intervalTime, double acc, double dec, double vel, short stopWaitTime);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_EndHandwheel(short slave);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_HandwheelInit(short core, short mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetHandwheelStopDec(short core, short slave, double decSmoothStop, double decAbruptStop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_StartHandwheel(short core, short slave, short master, short masterEven, short slaveEven, short intervalTime, double acc, double dec, double vel, short stopWaitTime);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_EndHandwheel(short core, short slave);
 
         /*-----------------------------------------------------------*/
@@ -2125,196 +2125,196 @@ namespace 精密切割系统.Helpers.GTN
             public short line;
         }
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_Compile(string pFileName, out TCompileInfo pWrongInfo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_Download(string pFileName);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetFunId(string pFunName, out short pFunId);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetVarId(string pFunName, string pVarName, out TVarInfo pVarInfo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_Bind(short thread, short funId, short page);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_RunThread(short thread);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_RunThreadPeriod(short thread, short ms, short priority);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_StopThread(short thread);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PauseThread(short thread);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetThreadSts(short thread, out TThreadSts pThreadSts);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetThreadTime(short thread, out short pPeriod, out double pExecuteTime, out double pExecuteTimeMax);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetVarValue(short page, ref TVarInfo pVarInfo, out double pValue, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetVarValue(short page, ref TVarInfo pVarInfo, out double pValue, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_UnbindVar(short thread);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BindDi(short thread, ref TVarInfo pVarInfo, ref TBindDi pBindDi);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BindDo(short thread, ref TVarInfo pVarInfo, ref TBindDo pBindDo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BindTimer(short thread, ref TVarInfo pVarInfo, ref TBindTimer pBindTimer);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BindCounter(short thread, ref TVarInfo pVarInfo, ref TBindCounter pBindCounter);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BindFlank(short thread, ref TVarInfo pVarInfo, ref TBindFlank pBindFlank);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BindSrff(short thread, ref TVarInfo pVarInfo, ref TBindSrff pBindSrff);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetBindDi(out TVarInfo pVarInfo, out TBindDi pBindDi);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetBindDo(out TVarInfo pVarInfo, out TBindDo pBindDo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetBindTimer(out TVarInfo pVarInfo, out TBindTimer pBindTimer, out Int32 pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetBindCounter(out TVarInfo pVarInfo, out TBindCounter pBindCounter, out Int32 pUnitCount, out Int32 pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetBindFlank(out TVarInfo pVarInfo, out TBindFlank pBindFlank);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetBindSrff(out TVarInfo pVarInfo, out TBindSrff pBindSrff);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_Compile(string pFileName, ref TCompileInfo pWrongInfo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_Download(short core, string pFileName);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetFunId(string pFunName, out short pFunId);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetVarId(string pFunName, string pVarName, out TVarInfo pVarInfo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_Bind(short core, short thread, short funId, short page);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_RunThread(short core, short thread);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_RunThreadPeriod(short core, short thread, short ms, short priority);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_StopThread(short core, short thread);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PauseThread(short core, short thread);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetThreadSts(short core, short thread, out TThreadSts pThreadSts);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetThreadTime(short core, short thread, out short pPeriod, out double pExecuteTime, out double pExecuteTimeMax);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetVarValue(short core, short page, ref TVarInfo pVarInfo, ref double pValue, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetVarValue(short core, short page, ref TVarInfo pVarInfo, out double pValue, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_UnbindVar(short core, short thread);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BindDi(short core, short thread, ref TVarInfo pVarInfo, ref TBindDi pBindDi);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BindDo(short core, short thread, ref TVarInfo pVarInfo, ref TBindDo pBindDo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BindTimer(short core, short thread, ref TVarInfo pVarInfo, ref TBindTimer pBindTimer);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BindCounter(short core, short thread, ref TVarInfo pVarInfo, ref TBindCounter pBindCounter);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BindFlank(short core, short thread, ref TVarInfo pVarInfo, ref TBindFlank pBindFlank);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BindSrff(short core, short thread, ref TVarInfo pVarInfo, ref TBindSrff pBindSrff);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetBindDi(short core, out TVarInfo pVarInfo, out TBindDi pBindDi);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetBindDo(short core, out TVarInfo pVarInfo, out TBindDo pBindDo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetBindTimer(short core, out TVarInfo pVarInfo, out TBindTimer pBindTimer, out Int32 pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetBindCounter(short core, out TVarInfo pVarInfo, out TBindCounter pBindCounter, out Int32 pUnitCount, out Int32 pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetBindFlank(short core, out TVarInfo pVarInfo, out TBindFlank pBindFlank);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetBindSrff(short core, out TVarInfo pVarInfo, out TBindSrff pBindSrff);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetBindDiCount(short core, short thread, out short pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetBindDoCount(short core, short thread, out short pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetBindTimerCount(short core, short thread, out short pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetBindCounterCount(short core, short thread, out short pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetBindFlankCount(short core, short thread, out short pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetBindSrffCount(short core, short thread, out short pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetBindDiInfo(short core, short thread, short index, out short pVar, out TBindDi pBindDi);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetBindDoInfo(short core, short thread, short index, out short pVar, out TBindDo pBindDo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetBindTimerInfo(short core, short thread, short index, out short pVar, out TBindTimer pBindTimer);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetBindCounterInfo(short core, short thread, short index, out short pVar, out TBindCounter pBindCounter);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetBindFlankInfo(short core, short thread, short index, out short pVar, out TBindFlank pBindFlank);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetBindSrffInfo(short core, short thread, short index, out short pVar, out TBindSrff pBindSrff);
 
         public struct TThreadStatus
@@ -2339,25 +2339,25 @@ namespace 精密切割系统.Helpers.GTN
             public short function;
         }
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ClearPlc();
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LoadPlc(short id, short returnType);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LoadPlcCommand(short id, short count, ref short pData);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_StepThread(short thread);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_RunThreadToBreakpoint(short thread, short line);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetThread(short thread, out TThreadStatus pThread);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_StepThread(short core, short thread);
 
         /*-----------------------------------------------------------*/
@@ -2505,908 +2505,908 @@ namespace 精密切割系统.Helpers.GTN
             public UInt32 loopCount;
         }
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetCrdPrm(short crd, ref TCrdPrm pCrdPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCrdPrm(short crd, out TCrdPrm pCrdPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_CrdSpace(short crd, out Int32 pSpace, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_CrdData(short crd, IntPtr pCrdData, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXY(short crd, Int32 x, Int32 y, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYOverride2(short crd, Int32 x, Int32 y, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYWN(short crd, Int32 x, Int32 y, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYOverride2WN(short crd, Int32 x, Int32 y, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYG0(short crd, Int32 x, Int32 y, double synVel, double synAcc, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYG0Override2(short crd, Int32 x, Int32 y, double synVel, double synAcc, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYG0WN(short crd, Int32 x, Int32 y, double synVel, double synAcc, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYG0Override2WN(short crd, Int32 x, Int32 y, double synVel, double synAcc, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYZ(short crd, Int32 x, Int32 y, Int32 z, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYZOverride2(short crd, Int32 x, Int32 y, Int32 z, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYZWN(short crd, Int32 x, Int32 y, Int32 z, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYZOverride2WN(short crd, Int32 x, Int32 y, Int32 z, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYZG0(short crd, Int32 x, Int32 y, Int32 z, double synVel, double synAcc, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYZG0Override2(short crd, Int32 x, Int32 y, Int32 z, double synVel, double synAcc, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYZG0WN(short crd, Int32 x, Int32 y, Int32 z, double synVel, double synAcc, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYZG0Override2WN(short crd, Int32 x, Int32 y, Int32 z, double synVel, double synAcc, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYZA(short crd, Int32 x, Int32 y, Int32 z, Int32 a, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYZAOverride2(short crd, Int32 x, Int32 y, Int32 z, Int32 a, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYZAWN(short crd, Int32 x, Int32 y, Int32 z, Int32 a, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYZAOverride2WN(short crd, Int32 x, Int32 y, Int32 z, Int32 a, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYZAG0(short crd, Int32 x, Int32 y, Int32 z, Int32 a, double synVel, double synAcc, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYZAG0Override2(short crd, Int32 x, Int32 y, Int32 z, Int32 a, double synVel, double synAcc, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYZAG0WN(short crd, Int32 x, Int32 y, Int32 z, Int32 a, double synVel, double synAcc, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYZAG0Override2WN(short crd, Int32 x, Int32 y, Int32 z, Int32 a, double synVel, double synAcc, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYZACUVW(short crd, ref Int32 pPos, short posMask, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYZACUVWWN(short crd, ref Int32 pPos, short posMask, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYZACUVWOverride2(short crd, ref Int32 pPos, short posMask, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYZACUVWOverride2WN(short crd, ref Int32 pPos, short posMask, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcXYR(short crd, Int32 x, Int32 y, double radius, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcXYROverride2(short crd, Int32 x, Int32 y, double radius, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcXYRWN(short crd, Int32 x, Int32 y, double radius, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcXYROverride2WN(short crd, Int32 x, Int32 y, double radius, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcXYC(short crd, Int32 x, Int32 y, double xCenter, double yCenter, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcXYCOverride2(short crd, Int32 x, Int32 y, double xCenter, double yCenter, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcXYCWN(short crd, Int32 x, Int32 y, double xCenter, double yCenter, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcXYCOverride2WN(short crd, Int32 x, Int32 y, double xCenter, double yCenter, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcYZR(short crd, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcYZROverride2(short crd, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcYZRWN(short crd, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcYZROverride2WN(short crd, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcYZC(short crd, Int32 y, Int32 z, double yCenter, double zCenter, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcYZCOverride2(short crd, Int32 y, Int32 z, double yCenter, double zCenter, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcYZCWN(short crd, Int32 y, Int32 z, double yCenter, double zCenter, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcYZCOverride2WN(short crd, Int32 y, Int32 z, double yCenter, double zCenter, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcZXR(short crd, Int32 z, Int32 x, double radius, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcZXROverride2(short crd, Int32 z, Int32 x, double radius, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcZXRWN(short crd, Int32 z, Int32 x, double radius, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcZXROverride2WN(short crd, Int32 z, Int32 x, double radius, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcZXC(short crd, Int32 z, Int32 x, double zCenter, double xCenter, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcZXCOverride2(short crd, Int32 z, Int32 x, double zCenter, double xCenter, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcZXCWN(short crd, Int32 z, Int32 x, double zCenter, double xCenter, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcZXCOverride2WN(short crd, Int32 z, Int32 x, double zCenter, double xCenter, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixXYRZ(short crd, Int32 x, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixXYRZOverride2(short crd, Int32 x, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixXYRZWN(short crd, Int32 x, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixXYRZOverride2WN(short crd, Int32 x, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixXYCZ(short crd, Int32 x, Int32 y, Int32 z, double xCenter, double yCenter, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixXYCZOverride2(short crd, Int32 x, Int32 y, Int32 z, double xCenter, double yCenter, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixXYCZWN(short crd, Int32 x, Int32 y, Int32 z, double xCenter, double yCenter, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixXYCZOverride2WN(short crd, Int32 x, Int32 y, Int32 z, double xCenter, double yCenter, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixYZRX(short crd, Int32 x, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixYZRXOverride2(short crd, Int32 x, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixYZRXWN(short crd, Int32 x, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixYZRXOverride2WN(short crd, Int32 x, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixYZCX(short crd, Int32 x, Int32 y, Int32 z, double yCenter, double zCenter, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixYZCXOverride2(short crd, Int32 x, Int32 y, Int32 z, double yCenter, double zCenter, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixYZCXWN(short crd, Int32 x, Int32 y, Int32 z, double yCenter, double zCenter, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixYZCXOverride2WN(short crd, Int32 x, Int32 y, Int32 z, double yCenter, double zCenter, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixZXRY(short crd, Int32 x, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixZXRYOverride2(short crd, Int32 x, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixZXRYWN(short crd, Int32 x, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixZXRYOverride2WN(short crd, Int32 x, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixZXCY(short crd, Int32 x, Int32 y, Int32 z, double zCenter, double xCenter, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixZXCYOverride2(short crd, Int32 x, Int32 y, Int32 z, double zCenter, double xCenter, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixZXCYWN(short crd, Int32 x, Int32 y, Int32 z, double zCenter, double xCenter, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixZXCYOverride2WN(short crd, Int32 x, Int32 y, Int32 z, double zCenter, double xCenter, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufIO(short crd, UInt32 doType, UInt32 doMask, UInt32 doValue, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufDelay(short crd, UInt32 delayTime, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufDA(short crd, short chn, short daValue, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufIOWN(short crd, Int16 doType, Int16 doMask, Int16 doValue, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufDelayWN(short crd, Int16 delayTime, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufDAWN(short crd, short chn, short daValue, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufLmtsOn(short crd, short axis, short limitType, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufLmtsOff(short crd, short axis, short limitType, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufSetStopIo(short crd, short axis, short stopType, short inputType, short inputIndex, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufMove(short crd, short moveAxis, Int32 pos, double vel, double acc, short modal, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufGear(short crd, short gearAxis, Int32 pos, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufGearPercent(short crd, short gearAxis, Int32 pos, short accPercent, short decPercent, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufStopMotion(short crd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufStopMotionWN(short crd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufSetVarValue(short crd, short pageId, ref TVarInfo pVarInfo, double value, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufJumpNextSeg(short crd, short axis, short limitType, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufSynchPrfPos(short crd, short encoder, short profile, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufVirtualToActual(short crd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_CrdStart(short mask, short option);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_CrdStartStep(short mask, short option);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_CrdStepMode(short mask, short option);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetOverride(short crd, double synVelRatio);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetOverride2(short crd, double synVelRatio);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_InitLookAhead(short crd, short fifo, double T, double accMax, short n, ref TCrdData pLookAheadBuf);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetLookAheadSpace(short crd, out Int32 pSpace, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetLookAheadSegCount(short crd, out Int32 pSegCount, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_CrdClear(short crd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_CrdStatus(short crd, out short pRun, out Int32 pSegment, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetUserSegNum(short crd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetUserSegNum(short crd, out Int32 pSegment, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetUserSegNumWN(short crd, out Int32 pSegment, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetRemainderSegNum(short crd, out Int32 pSegment, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetCrdStopDec(short crd, double decSmoothStop, double decAbruptStop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCrdStopDec(short crd, out double pDecSmoothStop, out double pDecAbruptStop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetCrdLmtStopMode(short crd, short lmtStopMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCrdLmtStopMode(short crd, out short pLmtStopMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetUserTargetVel(short crd, out double pTargetVel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetSegTargetPos(short crd, out Int32 pTargetPos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCrdPos(short crd, out double pPos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCrdVel(short crd, out double pSynVel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufLaserOn(short crd, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufLaserOff(short crd, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufLaserPrfCmd(short crd, double laserPower, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetG0Mode(short crd, short mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetG0Mode(short crd, out short pMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetCrdMapBase(short crd, short Mapbase);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCrdMapBase(short crd, out short pBase);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetCrdBufferMode(short crd, short bufferMode, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCrdBufferMode(short crd, out short pBufferMode, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCrdSegmentTime(short crd, Int32 segmentIndex, out double pSegmentTime, out Int32 pSegmentNumber, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCrdTime(short crd, out TCrdTime pTime, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufFollowMaster(short crd, ref TBufFollowMaster pBufFollowMaster, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufFollowEventCross(short crd, ref TBufFollowEventCross pEventCross, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufFollowEventTrigger(short crd, ref TBufFollowEventTrigger pEventTrigger, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufFollowStart(short crd, Int32 masterSegment, Int32 slaveSegment, Int32 masterFrameWidth, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufFollowNext(short crd, Int32 width, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufFollowReturn(short crd, double vel, double acc, short smoothPercent, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufLaserFollowMode(short crd, short source, short fifo, short channel, double startPower);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufLaserFollowRatio(short crd, double ratio, double minPower, double maxPower, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufLaserFollowOff(short crd, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufLaserFollowSpline(short crd, short tableId, double minPower, double maxPower, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufLaserFollowTable(short crd, short tableId, double minPower, double maxPower, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetCrdPrm(short core, short crd, ref TCrdPrm pCrdPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCrdPrm(short core, short crd, out TCrdPrm pCrdPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_CrdSpace(short core, short crd, out Int32 pSpace, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_CrdData(short core, short crd, IntPtr pCrdData, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXY(short core, short crd, Int32 x, Int32 y, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYOverride2(short core, short crd, Int32 x, Int32 y, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYWN(short core, short crd, Int32 x, Int32 y, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYOverride2WN(short core, short crd, Int32 x, Int32 y, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYG0(short core, short crd, Int32 x, Int32 y, double synVel, double synAcc, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYG0Override2(short core, short crd, Int32 x, Int32 y, double synVel, double synAcc, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYG0WN(short core, short crd, Int32 x, Int32 y, double synVel, double synAcc, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYG0Override2WN(short core, short crd, Int32 x, Int32 y, double synVel, double synAcc, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYZ(short core, short crd, Int32 x, Int32 y, Int32 z, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYZOverride2(short core, short crd, Int32 x, Int32 y, Int32 z, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYZWN(short core, short crd, Int32 x, Int32 y, Int32 z, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYZOverride2WN(short core, short crd, Int32 x, Int32 y, Int32 z, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYZG0(short core, short crd, Int32 x, Int32 y, Int32 z, double synVel, double synAcc, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYZG0Override2(short core, short crd, Int32 x, Int32 y, Int32 z, double synVel, double synAcc, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYZG0WN(short core, short crd, Int32 x, Int32 y, Int32 z, double synVel, double synAcc, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYZG0Override2WN(short core, short crd, Int32 x, Int32 y, Int32 z, double synVel, double synAcc, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYZA(short core, short crd, Int32 x, Int32 y, Int32 z, Int32 a, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYZAOverride2(short core, short crd, Int32 x, Int32 y, Int32 z, Int32 a, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYZAWN(short core, short crd, Int32 x, Int32 y, Int32 z, Int32 a, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYZAOverride2WN(short core, short crd, Int32 x, Int32 y, Int32 z, Int32 a, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYZAG0(short core, short crd, Int32 x, Int32 y, Int32 z, Int32 a, double synVel, double synAcc, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYZAG0Override2(short core, short crd, Int32 x, Int32 y, Int32 z, Int32 a, double synVel, double synAcc, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYZAG0WN(short core, short crd, Int32 x, Int32 y, Int32 z, Int32 a, double synVel, double synAcc, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYZAG0Override2WN(short core, short crd, Int32 x, Int32 y, Int32 z, Int32 a, double synVel, double synAcc, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYZACUVW(short core, short crd, ref Int32 pPos, short posMask, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYZACUVWOverride2(short core, short crd, ref Int32 pPos, short posMask, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYZACUVWWN(short core, short crd, ref Int32 pPos, short posMask, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYZACUVWOverride2WN(short core, short crd, ref Int32 pPos, short posMask, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcXYR(short core, short crd, Int32 x, Int32 y, double radius, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcXYROverride2(short core, short crd, Int32 x, Int32 y, double radius, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcXYRWN(short core, short crd, Int32 x, Int32 y, double radius, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcXYROverride2WN(short core, short crd, Int32 x, Int32 y, double radius, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcXYC(short core, short crd, Int32 x, Int32 y, double xCenter, double yCenter, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcXYCOverride2(short core, short crd, Int32 x, Int32 y, double xCenter, double yCenter, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcXYCWN(short core, short crd, Int32 x, Int32 y, double xCenter, double yCenter, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcXYCOverride2WN(short core, short crd, Int32 x, Int32 y, double xCenter, double yCenter, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcYZR(short core, short crd, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcYZROverride2(short core, short crd, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcYZRWN(short core, short crd, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcYZROverride2WN(short core, short crd, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcYZC(short core, short crd, Int32 y, Int32 z, double yCenter, double zCenter, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcYZCOverride2(short core, short crd, Int32 y, Int32 z, double yCenter, double zCenter, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcYZCWN(short core, short crd, Int32 y, Int32 z, double yCenter, double zCenter, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcYZCOverride2WN(short core, short crd, Int32 y, Int32 z, double yCenter, double zCenter, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcZXR(short core, short crd, Int32 z, Int32 x, double radius, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcZXROverride2(short core, short crd, Int32 z, Int32 x, double radius, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcZXRWN(short core, short crd, Int32 z, Int32 x, double radius, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcZXROverride2WN(short core, short crd, Int32 z, Int32 x, double radius, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcZXC(short core, short crd, Int32 z, Int32 x, double zCenter, double xCenter, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcZXCOverride2(short core, short crd, Int32 z, Int32 x, double zCenter, double xCenter, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcZXCWN(short core, short crd, Int32 z, Int32 x, double zCenter, double xCenter, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcZXCOverride2WN(short core, short crd, Int32 z, Int32 x, double zCenter, double xCenter, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_HelixXYRZ(short core, short crd, Int32 x, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_HelixXYRZOverride2(short core, short crd, Int32 x, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_HelixXYRZWN(short core, short crd, Int32 x, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_HelixXYRZOverride2WN(short core, short crd, Int32 x, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_HelixXYCZ(short core, short crd, Int32 x, Int32 y, Int32 z, double xCenter, double yCenter, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_HelixXYCZOverride2(short core, short crd, Int32 x, Int32 y, Int32 z, double xCenter, double yCenter, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_HelixXYCZWN(short core, short crd, Int32 x, Int32 y, Int32 z, double xCenter, double yCenter, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_HelixXYCZOverride2WN(short core, short crd, Int32 x, Int32 y, Int32 z, double xCenter, double yCenter, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_HelixYZRX(short core, short crd, Int32 x, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_HelixYZRXOverride2(short core, short crd, Int32 x, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_HelixYZRXWN(short core, short crd, Int32 x, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_HelixYZRXOverride2WN(short core, short crd, Int32 x, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_HelixYZCX(short core, short crd, Int32 x, Int32 y, Int32 z, double yCenter, double zCenter, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_HelixYZCXOverride2(short core, short crd, Int32 x, Int32 y, Int32 z, double yCenter, double zCenter, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_HelixYZCXWN(short core, short crd, Int32 x, Int32 y, Int32 z, double yCenter, double zCenter, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_HelixYZCXOverride2WN(short core, short crd, Int32 x, Int32 y, Int32 z, double yCenter, double zCenter, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_HelixZXRY(short core, short crd, Int32 x, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_HelixZXRYOverride2(short core, short crd, Int32 x, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_HelixZXRYWN(short core, short crd, Int32 x, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_HelixZXRYOverride2WN(short core, short crd, Int32 x, Int32 y, Int32 z, double radius, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_HelixZXCY(short core, short crd, Int32 x, Int32 y, Int32 z, double zCenter, double xCenter, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_HelixZXCYOverride2(short core, short crd, Int32 x, Int32 y, Int32 z, double zCenter, double xCenter, short circleDir, double synVel, double synAcc, double velEnd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_HelixZXCYWN(short core, short crd, Int32 x, Int32 y, Int32 z, double zCenter, double xCenter, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_HelixZXCYOverride2WN(short core, short crd, Int32 x, Int32 y, Int32 z, double zCenter, double xCenter, short circleDir, double synVel, double synAcc, double velEnd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufIO(short core, short crd, short doType, ushort doMask, ushort doValue, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufDelay(short core, short crd, ushort delayTime, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufDA(short core, short crd, short chn, short daValue, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufIOWN(short core, short crd, Int16 doType, Int16 doMask, Int16 doValue, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufDelayWN(short core, short crd, Int16 delayTime, Int32 segNum, short fifo = 0);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufDAWN(short core, short crd, short chn, short daValue, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufLmtsOn(short core, short crd, short axis, short limitType, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufLmtsOff(short core, short crd, short axis, short limitType, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufSetStopIo(short core, short crd, short axis, short stopType, short inputType, short inputIndex, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufMove(short core, short crd, short moveAxis, Int32 pos, double vel, double acc, short modal, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufGear(short core, short crd, short gearAxis, Int32 pos, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufGearPercent(short core, short crd, short gearAxis, Int32 pos, short accPercent, short decPercent, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufStopMotion(short core, short crd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufSetVarValue(short core, short crd, short pageId, ref TVarInfo pVarInfo, double value, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufJumpNextSeg(short core, short crd, short axis, short limitType, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufSynchPrfPos(short core, short crd, short encoder, short profile, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufVirtualToActual(short core, short crd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_CrdStart(short core, short mask, short option);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_CrdStartStep(short core, short mask, short option);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_CrdStepMode(short core, short mask, short option);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetOverride(short core, short crd, double synVelRatio);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetOverride2(short core, short crd, double synVelRatio);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_InitLookAhead(short core, short crd, short fifo, double T, double accMax, short n, ref TCrdData pLookAheadBuf);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetLookAheadSpace(short core, short crd, out Int32 pSpace, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetLookAheadSegCount(short core, short crd, out Int32 pSegCount, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_CrdClear(short core, short crd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_CrdStatus(short core, short crd, out short pRun, out Int32 pSegment, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetUserSegNum(short core, short crd, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetUserSegNum(short core, short crd, out Int32 pSegment, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetUserSegNumWN(short core, short crd, out Int32 pSegment, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetRemainderSegNum(short core, short crd, out Int32 pSegment, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetCrdStopDec(short core, short crd, double decSmoothStop, double decAbruptStop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCrdStopDec(short core, short crd, out double pDecSmoothStop, out double pDecAbruptStop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetCrdLmtStopMode(short core, short crd, short lmtStopMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCrdLmtStopMode(short core, short crd, out short pLmtStopMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetUserTargetVel(short core, short crd, out double pTargetVel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetSegTargetPos(short core, short crd, out Int32 pTargetPos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCrdPos(short core, short crd, out double pPos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCrdVel(short core, short crd, out double pSynVel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufLaserOn(short core, short crd, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufLaserOff(short core, short crd, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufLaserPrfCmd(short core, short crd, double laserPower, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufLaserFollowMode(short core, short crd, short source, short fifo, short channel, double startPower);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufLaserFollowRatio(short core, short crd, double ratio, double minPower, double maxPower, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufLaserFollowOff(short core, short crd, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufLaserFollowSpline(short core, short crd, short tableId, double minPower, double maxPower, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufLaserFollowTable(short core, short crd, short tableId, double minPower, double maxPower, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufFollowMaster(short core, short crd, ref TBufFollowMaster pBufFollowMaster, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufFollowEventCross(short core, short crd, ref TBufFollowEventCross pEventCross, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufFollowEventTrigger(short core, short crd, ref TBufFollowEventTrigger pEventTrigger, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufFollowStart(short core, short crd, Int32 masterSegment, Int32 slaveSegment, Int32 masterFrameWidth, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufFollowNext(short core, short crd, Int32 width, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufFollowReturn(short core, short crd, double vel, double acc, short smoothPercent, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetG0Mode(short core, short crd, short mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetG0Mode(short core, short crd, out short pMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetCrdMapBase(short core, short crd, short Mapbase);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCrdMapBase(short core, short crd, out short pBase);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetCrdBufferMode(short core, short crd, short bufferMode, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCrdBufferMode(short core, short crd, out short pBufferMode, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCrdSegmentTime(short core, short crd, Int32 segmentIndex, out double pSegmentTime, out Int32 pSegmentNumber, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCrdTime(short core, short crd, out TCrdTime pTime, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCmdCount(short crd, out short pResult, short fifo);
 
         /*-----------------------------------------------------------*/
         /* Compensate                                                */
         /*-----------------------------------------------------------*/
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetBacklash(short axis, Int32 value, double changeValue, Int32 dir);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetBacklash(short axis, out Int32 pValue, out double pChangeValue, out Int32 pDir);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetLeadScrewComp(short axis, short n, Int32 startPos, Int32 lenPos, ref Int32 pPositive, ref Int32 pNegative);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetLeadScrewCompEx(short axis, short n, Int32 startPos, Int32 lenPos, ref Int32 pPositive, ref Int32 pNegative, double compChangeValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_EnableLeadScrewComp(short axis, short mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetLeadScrewCrossComp(short axis, short n, Int32 startPos, Int32 lenPos, ref Int32 pPositive, ref Int32 pNegative, short link);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_EnableLeadScrewCrossComp(short axis, short mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCompensate(short axis, out double pPitchError, out double pCrossError, out double pBacklashError, out double pEncPos, out double pPrfPos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetBacklash(short core, short axis, Int32 value, double changeValue, Int32 dir);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetBacklash(short core, short axis, out Int32 pValue, out double pChangeValue, out Int32 pDir);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetLeadScrewComp(short core, short axis, short n, Int32 startPos, Int32 lenPos, ref Int32 pPositive, ref Int32 pNegative);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_EnableLeadScrewComp(short core, short axis, short mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetLeadScrewCrossComp(short core, short axis, short n, Int32 startPos, Int32 lenPos, ref Int32 pPositive, out Int32 pNegative, short link);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_EnableLeadScrewCrossComp(short core, short axis, short mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCompensate(short core, short axis, out double pPitchError, out double pCrossError, out double pBacklashError, ref double pEncPos, ref double pPrfPos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_RN_GetServoAlarmInfo(short core, short axis, out ushort alarm_code);
 
         public struct TLeadScrewPrm
@@ -3418,40 +3418,40 @@ namespace 精密切割系统.Helpers.GTN
             public Int32 pCompNeg;
         }
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetLeadScrewTable(short axis, ref TLeadScrewPrm pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_EnableLeadScrewTable(short axis, Int32 error);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_DisableLeadScrewTable(short axis);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetLeadScrewTablePrfPosCount(Int32 encPos, out TLeadScrewPrm pPrm, out short pCountPositive, out short pCountNegative);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetLeadScrewTablePrfPosPositive(Int32 encPos, out TLeadScrewPrm pPrm, short index, out Int32 pPrfPosPositive);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetLeadScrewTablePrfPosNegative(Int32 encPos, out TLeadScrewPrm pPrm, short index, out Int32 pPrfPosNegative);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetLeadScrewTable(short core, short axis, ref TLeadScrewPrm pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_EnableLeadScrewTable(short core, short axis, Int32 error);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_DisableLeadScrewTable(short core, short axis);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetLeadScrewTablePrfPosCount(short core, Int32 encPos, out TLeadScrewPrm pPrm, out short pCountPositive, out short pCountNegative);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetLeadScrewTablePrfPosPositive(short core, Int32 encPos, out TLeadScrewPrm pPrm, short index, out Int32 pPrfPosPositive);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetLeadScrewTablePrfPosNegative(short core, Int32 encPos, out TLeadScrewPrm pPrm, short index, out Int32 pPrfPosNegative);
 
         public struct TCompensate2DTable
@@ -3474,282 +3474,282 @@ namespace 精密切割系统.Helpers.GTN
             public short axisIndex2;                            // 查表轴索引
         }
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetCompensate2DTable(short tableIndex, ref TCompensate2DTable pTable, ref Int32 pData, short extend);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCompensate2DTable(short tableIndex, out TCompensate2DTable pTable, out short pExtend);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetCompensate2D(short axis, ref TCompensate2D pComp2d);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCompensate2D(short axis, out TCompensate2D pComp2d);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCompensate2DValue(short axis, out double pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetCompensate2DTable(short core, short tableIndex, ref TCompensate2DTable pTable, ref Int32 pData, short extend);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCompensate2DTable(short core, short tableIndex, out TCompensate2DTable pTable, out short pExtend);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetCompensate2D(short core, short axis, ref TCompensate2D pComp2d);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCompensate2D(short core, short axis, out TCompensate2D pComp2d);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCompensate2DValue(short core, short axis, out double pValue);
 
         /*-----------------------------------------------------------*/
         /* IO and Encoder                                            */
         /*-----------------------------------------------------------*/
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetDo(short doType, Int32 value);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetDoBit(short doType, short doIndex, short value);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetDo(short doType, out Int32 pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetDoBitReverse(short doType, short doIndex, short value, short reverseTime);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetDi(short diType, out Int32 pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetDiReverseCount(short diType, short diIndex, out UInt32 pReverseCount, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetDiReverseCount(short diType, short diIndex, ref UInt32 pReverseCount, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetDiRaw(short diType, out Int32 pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetDiEx(short diType, out Int32 pValue, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetDac(short dac, ref short pValue, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetDac(short dac, out short pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetAdc(short adc, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetAdcValue(short adc, out short pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetAuAdc(short adc, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetAuAdcValue(short adc, out short pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetEncPos(short encoder, Int32 encPos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEncPos(short encoder, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEncPosPre(short encoder, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEncVel(short encoder, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEncVelEx(short encoder, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetPlsPos(short encoder, Int32 encPos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetPlsPos(short pulse, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetPlsVel(short pulse, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetAuEncPos(short encoder, Int32 encPos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetAuEncPos(short encoder, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetAuEncVel(short encoder, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetDo(short core, short doType, Int32 value);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetDoEx(short core, short doType, ref Int32 pValue, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetDoBit(short core, short doType, short doIndex, short value);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetDo(short core, short doType, out Int32 pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetDoBitReverse(short core, short doType, short doIndex, short value, short reverseTime);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetDi(short core, short diType, out Int32 pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetDiReverseCount(short core, short diType, short diIndex, out UInt32 pReverseCount, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetDiReverseCount(short core, short diType, short diIndex, ref UInt32 pReverseCount, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetDiRaw(short core, short diType, out Int32 pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetDiEx(short core, short diType, out Int32 pValue, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_WriteAo(short core, Int32 aoType, short aoIndex, ref double pValue, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetDac(short core, short dac, ref short pValue, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetDac(short core, short dac, out short pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAuDac(short core, short dac, ref short pValue, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAuDac(short core, short dac, out short pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAdc(short core, short adc, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAdcValue(short core, short adc, out short pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAuAdc(short core, short adc, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAuAdcValue(short core, short adc, out short pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEncLineNum(short core, short encoder, out Int32 pLineNum, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEncType(short core, short encoder, out short pType, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetEncPos(short core, short encoder, Int32 encPos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEncPos(short core, short encoder, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEncPosPre(short core, short encoder, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEncVel(short core, short encoder, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPlsPos(short core, short encoder, Int32 encPos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPlsPos(short core, short pulse, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPlsVel(short core, short pulse, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAuEncPos(short core, short encoder, Int32 encPos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAuEncPos(short core, short encoder, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAuEncVel(short core, short encoder, out double pValue, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAbsEncPos(short core, short encoder, out Int32 pValue, short mode, short param);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_InitFPGAEncoder(short core);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetFPGAEncoder(short core, short enable, Int32 intervalTime, short reverseMask);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetFPGAEncoder(short core, out Int32 pDataChn1, out Int32 pDataChn2, out Int32 pDataChn3, out Int32 pDataChn4, out Int32 pCount, out Int32 pOverFlowFlag);
 
         /*-----------------------------------------------------------*/
         /* ExtModule                                                 */
         /*-----------------------------------------------------------*/
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ExtModuleInit(short core, short method);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetILinkManuMode(short core, short station);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetILinkManuId(short core, short station, short autoId, out short manuId);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetILinkAutoId(short core, short station, short manuId, out short autoId);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetExtDoBit(short core, short doIndex, short value);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetExtDoBit(short core, short doIndex, out short pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetExtDo(short core, short doIndex, Int32 value, Int32 mask);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetExtDo(short core, short doIndex, out Int32 pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetExtDiBit(short core, short diIndex, out short pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetExtDi(short core, short diIndex, out Int32 pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetExtAoValue(short core, short index, out short pValue, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetExtAiValue(short core, short index, out short pValue, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetExtAo(short core, short index, ref double pValue, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetExtAo(short core, short index, out double pValue, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetExtAi(short core, short index, out double pValue, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetILinkDo(short core, short station, short module, ushort data, ushort mask);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetILinkDi(short core, short station, short module, ushort data);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetILinkAo(short core, short station, short module, short channel, short data);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetILinkAi(short core, short station, short module, short channel, out short data);
 
         /*-----------------------------------------------------------*/
@@ -3905,130 +3905,130 @@ namespace 精密切割系统.Helpers.GTN
             public double[] reserve2;
         };
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PosCompareStart(short core, short index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PosCompareStop(short core, short index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PosCompareClear(short core, short index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PosCompareStatus(short core, short index, out TPosCompareStatus pStatus);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PosCompareData(short core, short index, ref TPosCompareData pData);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PosCompareData2D(short core, short index, ref TPosCompareData2D pData);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PosComparePulse(short core, short index, short outputMode, short level, UInt16 outputPulseWidth);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPosComparePulseCount(short core, short index, Int32 count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PosComparePulseEx(short core, short index, ref TPosComparePulse pPosComparePulse);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPosComparePulseStatus(short core, short index, out TPosComparePulseStatus pPosComparePulseStatus);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetPosCompareMode(short core, short index, ref TPosCompareMode pMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetPosCompareMode(short core, short index, out TPosCompareMode pMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetPosCompareLinear(short core, short index, ref TPosCompareLinear pLinear);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetPosCompareLinear(short core, short index, out TPosCompareLinear pLinear);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetPosCompareLinear2D(short core, short index, ref TPosCompareLinear2D pLinear);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetPosCompareLinear2D(short core, short index, out TPosCompareLinear2D pLinear);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PosCompareInfo(short core, short index, out TPosCompareInfo pInfo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetPosComparePsoPrm(short core, short index, ref TPosComparePsoPrm pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetPosComparePsoPrm(short core, short index, out TPosComparePsoPrm pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PosCompareStart(short core, short index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PosCompareStop(short core, short index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PosCompareClear(short core, short index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PosCompareStatus(short core, short index, out TPosCompareStatus pStatus);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PosCompareData(short core, short index, ref TPosCompareData pData);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PosCompareData2D(short core, short index, ref TPosCompareData2D pData);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPosCompareMode(short core, short index, ref TPosCompareMode pMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPosCompareMode(short core, short index, out TPosCompareMode pMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPosCompareContinueMode(short core, short index, ref TPosCompareContinueMode pMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPosCompareContinueMode(short core, short index, out TPosCompareContinueMode pMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPosCompareLinear(short core, short index, ref TPosCompareLinear pLinear);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPosCompareLinear(short core, short index, out TPosCompareLinear pLinear);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPosCompareLinear2D(short core, short index, ref TPosCompareLinear2D pLinear);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPosCompareLinear2D(short core, short index, out TPosCompareLinear2D pLinear);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PosCompareInfo(short core, short index, out TPosCompareInfo pInfo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PosCompareHsOn(short core, short index, short link, Int16 threshold);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PosCompareHsOff(short core, short index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PosCompareSpace(short core, short index, out Int16 pSpace);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPosComparePsoPrm(short core, short index, ref TPosComparePsoPrm pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPosComparePsoPrm(short core, short index, out TPosComparePsoPrm pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPosCompareStartLevel(short core, short index, short type, short startLevel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetHsoPulsePrm(short core, short station, short hsoIndex, ref THsoPulsePrm pPem, short hsoCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetHsoPulsePrm(short core, short station, short hsoIndex, out THsoPulsePrm pPem, short hsoCount);
 
         public const short COMPARE_SEND_DATA_MAX = 30;
@@ -4036,20 +4036,20 @@ namespace 精密切割系统.Helpers.GTN
         public const Int32 COMPARE_STEP_MAX = 0x1fff;
         public const Int32 COMPARE_MAX_NUM = 0x3fffffff;
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ComparePulse(short level, short outputType, short time);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_CompareStop();
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_CompareStatus(out short pStatus, out Int32 pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_CompareData(short encoder, short source, short pulseType, short startLevel, short time,
             ref Int32 pBuf1, short count1, ref Int32 pBuf2, short count2);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_CompareLinear(short encoder, short channel, Int32 startPos, Int32 repeatTimes, Int32 interval, short time, short source);
 
         /*-----------------------------------------------------------*/
@@ -4128,213 +4128,213 @@ namespace 精密切割系统.Helpers.GTN
         //    short corrY[65][65];
         //}TScanCorrectionTableData;
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LaserAo(short value, Int16 laserChannel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetHSIOOpt(Int16 value, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetHSIOOpt(ref Int16 pValue, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetLaserMode(Int16 laserMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LaserPowerMode(short laserPowerMode, double maxValue, double minValue, short laserChannel, short delayMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LaserPrfCmd(double power, Int16 laserChannel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LaserOutFrq(double outFrq, Int16 laserChannel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetPulseWidth(Int16 width1, Int16 laserChannel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetLevelDelay(Int16 highLevelDelay, Int16 lowLevelDelay, Int16 laserChannel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LaserInfo(out TLaserInfo pLaserInfo, short crd);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanInit(short core, ref TScanInit pScanInit, double jumpAcc, double markAcc, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanCrdDataEnd(short core, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetScanLaserLink(short core, short link, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetScanLaserLink(short core, out short pLink, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetScanMode(short core, short mode, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetScanMode(short core, out short pMode, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ClearScanStatus(short core, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanGetCrdPos(short core, out short pPos, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanJump(short core, short x, short y, double vel, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanJumpPoint(short core, short x, short y, double vel, Int32 motionDelayTime, Int32 laserDelayTime, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanTimeJump(short core, short x, short y, ushort time, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanTimeJumpPoint(short core, short x, short y, ushort time, Int32 motionDelayTime, Int32 laserDelayTime, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanMark(short core, short x, short y, double vel, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanTimeMark(short core, short x, short y, ushort time, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanBufLaserPrfCmd(short core, double laserPower, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanBufIO(short core, ushort doType, ushort doMask, ushort doValue, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanBufDelay(short core, Int32 time, short crd);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanBufDA(short core, ushort chn, short value, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanBufAO(short core, Int16 chn, double voltage, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanBufLaserDelay(short core, short laserOnDelay, short laserOffDelay, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanBufLaserOutFrq(short core, double outFrq, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanBufSetPulseWidth(short core, ushort width, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanBufLaserOn(short core, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanBufLaserOff(short core, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanBufStop(short core, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanLaserIntervalOnList(short core, Int32 time, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetScanDelayTime(short core, ushort maxJumpDelay, ushort markDelay, ushort multiMarkDelayConst, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetScanDelayMode(short core, short multiMarkDelayMode, ushort multiMarkLaserOffDelay, ushort minJumpDelay, ushort jumpDelayLengthLimit, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanStop(short core, short stopType, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanCrdSpace(short core, out short pSpace, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanCrdStart(short core, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanCrdClear(short core, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanCrdStatus(short core, out short pRun, out short pStatus, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetScanPosSuperposeParameter(short core, short crd, TScanPosSuperposeParameter param);
 
-        //[DllImport("gxn.dll")]
+        //[DllImport(@"Assets\config\gxn.dll")]
         //public static extern short GTN_ScanSetCorrectionTable(short core,short crd,ref TScanCorrectionTableData pParam);
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanCorrectionOn(short core, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanCorrectionOff(short core, short scan);
 
-        //[DllImport("gxn.dll")]
+        //[DllImport(@"Assets\config\gxn.dll")]
         //public static extern short GTN_ScanGenerateCorrectionTable(short core,double paraX,double paraY,short rangeX,short rangeY,ref TScanCorrectionTableData pParam);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LaserOn(short core, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LaserOff(short core, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LaserOnStatus(short core, out ushort pValue, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LaserPowerMode(short core, short laserPowerMode, double maxValue, double minValue, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LaserPrfCmd(short core, double power, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LaserOutFrq(short core, double outFrq, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPulseWidth(short core, ushort width, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetLevelDelay(short core, UInt32 highLevelDelay, UInt32 lowLevelDelay, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LaserInfo(short core, out TLaserInfo pLaserInfo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanInfo(short core, ref TScanInfo pScanInfo, short crd);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanHsOn(short core, short crd, short link, Int16 threshold);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanHsOff(short core, short crd);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanLaserOn(short core, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanLaserOff(short core, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanLaserOnStatus(short core, out Int16 pValue, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanSetLaserMode(short core, Int16 laserMode, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanLaserPowerMode(short core, short laserPowerMode, double maxValue, double minValue, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanLaserPrfCmd(short core, double power, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanLaserOutFrq(short core, double outFrq, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanSetPulseWidth(short core, Int16 width, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanSetLevelDelay(short core, Int16 highLevelDelay, Int16 lowLevelDelay, short scan);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ScanLaserInfo(short core, ref TLaserInfo pLaserInfo, short scan);
 
         /*-----------------------------------------------------------*/
@@ -4377,112 +4377,112 @@ namespace 精密切割系统.Helpers.GTN
             public Int32 value;
         }
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LoadDlm(Int32 vender, Int32 module, string fileName, out short pId);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ProgramDlm(short id, short loadMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetDlmLoadMode(short id, out short pLoadMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_RunDlm(short id);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_StopDlm(short id);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetDlmStatus(short id, out TDlmStatus pStatus);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetDlmFunction(short id, ref TDlmFunction pFunction);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetDlmFunction(short id, out TDlmFunction pFunction);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_DlmCommandInit(short code, Int32 index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_DlmCommandAdd16(short value);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_DlmCommandAdd32(Int32 value);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_DlmCommandAddFloat(float value);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_DlmCommandAddDouble(double value);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SendDlmCommand(short id, out short pReturnValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_DlmCommandGet16(out short pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_DlmCommandGet32(out Int32 pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_DlmCommandGetFloat(out float pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_DlmCommandGetDouble(out double pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LoadDlm(short core, Int32 vender, Int32 module, string fileName, out short pId);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ProgramDlm(short core, short id, short loadMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetDlmLoadMode(short core, short id, out short pLoadMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_RunDlm(short core, short id);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_StopDlm(short core, short id);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetDlmStatus(short core, short id, out TDlmStatus pStatus);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetDlmFunction(short core, short id, ref TDlmFunction pFunction);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetDlmFunction(short core, short id, out TDlmFunction pFunction);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_DlmCommandInit(short core, short code, Int32 index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_DlmCommandAdd16(short core, short value);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_DlmCommandAdd32(short core, Int32 value);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_DlmCommandAddFloat(short core, float value);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_DlmCommandAddDouble(short core, double value);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SendDlmCommand(short core, short id, out short pReturnValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_DlmCommandGet16(short core, out short pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_DlmCommandGet32(short core, out Int32 pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_DlmCommandGetFloat(short core, ref float pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_DlmCommandGetDouble(short core, out double pValue);
 
         /*-----------------------------------------------------------*/
@@ -4629,88 +4629,88 @@ namespace 精密切割系统.Helpers.GTN
             public double value;
         }
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ClearEvent();
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ClearTask();
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ClearEventTaskLink();
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_AddTask(short taskType, IntPtr pTaskData, out short pTaskIndex);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_AddEvent(ref TEvent pEvent, out short pEventIndex);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_AddEventTaskLink(short eventIndex, short taskIndex, out short pLinkIndex);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEventCount(out short pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEvent(short eventIndex, out TEvent pEvent);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEventLoop(short eventIndex, out UInt32 pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetTaskCount(out short pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEventTaskLinkCount(out short pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEventTaskLink(short linkIndex, out short pEventIndex, out short pTaskIndex);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_EventOn(short eventIndex, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_EventOff(short eventIndex, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ClearEvent(short core);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ClearTask(short core);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ClearEventTaskLink(short core);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_AddTask(short core, short taskType, IntPtr pTaskData, out short pTaskIndex);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_AddEvent(short core, ref TEvent pEvent, out short pEventIndex);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_AddEventTaskLink(short core, short eventIndex, short taskIndex, out short pLinkIndex);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEventCount(short core, out short pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEvent(short core, short eventIndex, out TEvent pEvent);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEventLoop(short core, short eventIndex, out UInt32 pEventLoop);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTaskCount(short core, out short pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEventTaskLinkCount(short core, out short pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEventTaskLink(short core, short linkIndex, out short pEventIndex, out short pTaskIndex);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_EventOn(short core, short eventIndex, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_EventOff(short core, short eventIndex, short count);
 
         /*--------- -------------------------------------------------*/
@@ -4720,43 +4720,43 @@ namespace 精密切割系统.Helpers.GTN
         public const short GANTRY_MODE_OPEN_LOOP_GANTRY = 1;
         public const short GANTRY_MODE_DECOUPLE_POSITION_LOOP = 2;
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetGantryMode(short group, short master, short slave, short mode, Int32 syncErrorLimit);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetGantryModePro(short core, short group, short master, short slave, short mode, long syncErrorLimit);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetGantryMode(short group, out short pMaster, out short pSlave, out short pMode, out Int32 pSyncErrorLimit);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetGantryPid(short group, ref TPid pGantryPid, ref TPid pYawPid);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetGantryPid(short group, out TPid pGantryPid, out TPid pYawPid);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GantryAxisOn(short group);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GantryAxisOff(short group);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetGantryMode(short core, short group, short master, short slave, short mode, Int32 syncErrorLimit);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetGantryMode(short core, short group, out short pMaster, out short pSlave, out short pMode, out Int32 pSyncErrorLimit);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetGantryPid(short core, short group, ref TPid pGantryPid, ref TPid pYawPid);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetGantryPid(short core, short group, out TPid pGantryPid, out TPid pYawPid);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GantryAxisOn(short core, short group);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GantryAxisOff(short core, short group);
 
         public struct TSecondOrderFilterPara
@@ -4775,16 +4775,16 @@ namespace 精密切割系统.Helpers.GTN
         public const short TYPE_YAW_CONTROL_OUTPUT_FILTER = 2;
         public const short FILTER_COUNT_MAX = 2;
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetSecondOrderFilterPara(short control, short type, short index, ref TSecondOrderFilterPara pFilterPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetSecondOrderFilterPara(short control, short type, short index, out TSecondOrderFilterPara pFilterPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetSecondOrderFilterPara(short core, short control, short type, short index, ref TSecondOrderFilterPara pFilterPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetSecondOrderFilterPara(short core, short control, short type, short index, out TSecondOrderFilterPara pFilterPrm);
 
         public struct OCA_CTRL_GEN
@@ -4819,93 +4819,93 @@ namespace 精密切割系统.Helpers.GTN
         public const short SIGNAL_TYPE_TRAP = 0x11;
         public const short SIGNAL_TYPE_NOTHING = 0xFF;
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetGenerator(ref OCA_CTRL_GEN pGenStr);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetGenerator(out OCA_CTRL_GEN pGenStr);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_StepResponse(short control, short gain, double time);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetExctLoopMode(short control, short exciteLoopMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetExctLoopMode(short control, out short pExciteLoopMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetExcitation(short axis, short objectValue, short type, short pParameter);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetGenerator(short core, ref OCA_CTRL_GEN pGenStr);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_StepResponse(short core, short control, short gain, double time);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetExctLoopMode(short core, short control, short exciteLoopMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetExctLoopMode(short core, short control, out short pExciteLoopMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetExcitation(short core, short axis, short objectValue, short type, short pParameter);
 
         /*-----------------------------------------------------------*/
         /* DMA                                                       */
         /*-----------------------------------------------------------*/
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_CrdHsOn(short crd, short fifo, short link, Int16 threshold, short lookAheadInMc);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_CrdHsOff(short crd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_CrdHsOn(short core, short crd, short fifo, short link, Int16 threshold, short lookAheadInMc);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_CrdHsOff(short core, short crd, short fifo);
 
         /*-----------------------------------------------------------*/
         /* Others                                                    */
         /*-----------------------------------------------------------*/
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetRetainValue(short core, UInt32 address, short count, ref short pData);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetRetainValue(short core, UInt32 address, short count, out short pData);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetGPIOConfig(short core, short effectiveLevel, short direction);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPrfTorque(short core, short axis, short prfTorque);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAtlTorque(short core, short axis, out short atlTorque);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PosCurrFeedForward(short core, short profile, double pos, Int32 gtime, short torque, short gtype, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetMotionMode(short core, short axis, short motionMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetMotionMode(short core, short axis, out short motionMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetProfileTime(short core, Int32 profileTime, Int32 delay, Int32 stepCoef);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetProfileTime(short core, out Int32 pProfileTime, out Int32 pDelay, out Int32 pStepCoef);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetCoreTime(short core, Int32 profileTime, Int32 delay, Int32 stepCoef);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCoreTime(short core, out Int32 pProfileTime, out Int32 pDelay, out Int32 pStepCoef);
 
         public struct TControlInfo
@@ -4936,133 +4936,133 @@ namespace 精密切割系统.Helpers.GTN
             public UInt32 echo;
         }
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ClearCommandCount();
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCommandCount(out TCommandCount pCommandCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetServoTime(Int32 servoTime, Int32 delay, Int32 stepCoef);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetServoTime(out Int32 pServoTime, out Int32 pDelay, out Int32 pStepCoef);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetControlInfo(short control, out TControlInfo pControlInfo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ClearCommandCount(short core);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCommandCount(short core, out TCommandCount pCommandCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetServoTime(short core, Int32 servoTime, Int32 delay, Int32 stepCoef);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetServoTime(short core, out Int32 pServoTime, out Int32 pDelay, out Int32 pStepCoef);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetControlInfo(short core, short control, out TControlInfo pControlInfo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetLongVar(short index, Int32 value);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetLongVar(short index, out Int32 pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetDoubleVar(short index, double value);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetDoubleVar(short index, out double pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetBufWaitDiStatus(short crd, out short pDiType, out Int16 pDiIndex, out Int16 pLevel, out short pContinueTime, out Int32 pOverTime, out short pFlagMode, out Int32 pSegNum, out short pEnable, out Int32 pCount, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetBufWaitLongVarStatus(short crd, out short pIndex, out Int32 pValue, out short pFlagMode, out Int32 pSegNum, out short pEnable, out short pStatus, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ClearBufWaitStatus(short crd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufWaitDi(short crd, short diType, Int16 diIndex, Int16 level, short continueTime, Int32 overTime, short flagMode, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufWaitLongVar(short crd, short index, Int32 value, Int32 overTime, short flagMode, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetLongVar(short core, short index, Int32 value);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetLongVar(short core, short index, out Int32 pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetDoubleVar(short core, short index, double value);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetDoubleVar(short core, short index, out double pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetBufWaitDiStatus(short core, short crd, out short pDiType, out Int16 pDiIndex, out Int16 pLevel, out Int16 pContinueTime, out Int32 pOverTime, out short pFlagMode, out Int32 pSegNum, out short pEnable, out Int32 pCount, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetBufWaitLongVarStatus(short core, short crd, out short pIndex, out Int32 pValue, out short pFlagMode, out Int32 pSegNum, out short pEnable, out short pStatus, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ClearBufWaitStatus(short core, short crd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufWaitDi(short core, short crd, short diType, Int16 diIndex, Int16 level, short continueTime, Int32 overTime, short flagMode, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufWaitLongVar(short core, short crd, short index, Int32 value, Int32 overTime, short flagMode, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetAxisMotionSmooth(short axis, double time, double k);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetAxisMotionSmooth(short axis, out double pTime, out double pK);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAxisMotionSmooth(short core, short axis, double time, double k);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAxisMotionSmooth(short core, short axis, out double pTime, out double pK);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufDoBit(short crd, Int16 doType, Int16 index, short value, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufDoBit(short core, short crd, Int16 doType, Int16 index, short value, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufDoBitDelay(short core, short crd, Int16 doType, Int16 index, short value, Int32 delayTime, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetCrdJerk(short crd, double jerkMax);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCrdJerk(short crd, out double pJerkMax);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetCrdJerk(short core, short crd, double jerkMax);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCrdJerk(short core, short crd, out double pJerkMax);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetCrdJerkTime(short crd, double jerkTime, double coef);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCrdJerkTime(short crd, out double pJerkTime, out double pCoef);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetCrdJerkTime(short core, short crd, double jerkTime, double coef);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCrdJerkTime(short core, short crd, out double pJerkTime, out double pCoef);
 
         public struct TCrdSmooth
@@ -5073,28 +5073,28 @@ namespace 精密切割系统.Helpers.GTN
             public double reserve;
         }
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetCrdSmooth(short crd, ref TCrdSmooth pCrdSmooth);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCrdSmooth(short crd, out TCrdSmooth pCrdSmooth);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetCrdSmoothTime(short crd, short smoothType, ref double pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCrdSmoothTime(short crd, out short pSmoothType, ref double pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetCrdSmooth(short core, short crd, ref TCrdSmooth pCrdSmooth);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCrdSmooth(short core, short crd, out TCrdSmooth pCrdSmooth);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetCrdSmoothTime(short core, short crd, short smoothType, ref double pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCrdSmoothTime(short core, short crd, out short pSmoothType, out double pPrm);
 
         //////////////////////////////////////////////////////////////////////////
@@ -5148,22 +5148,22 @@ namespace 精密切割系统.Helpers.GTN
             public Int32 targetPos;     // 需要运动到的目标位置（原点位置或者原点位置+偏移量），在搜索Limit时或者搜索Home或Index时，设置的搜索距离为0，那么该值显示为805306368
         }
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ExecuteStandardHome(short axis, ref TStandardHomePrm pHomePrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetStandardHomePrm(short axis, out TStandardHomePrm pHomePrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetStandardHomeStatus(short axis, out TStandardHomeStatus pHomeStatus);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ExecuteStandardHome(short core, short axis, ref TStandardHomePrm pHomePrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetStandardHomePrm(short core, short axis, out TStandardHomePrm pHomePrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetStandardHomeStatus(short core, short axis, out TStandardHomeStatus pHomeStatus);
 
         public struct TLaserOnOffCount
@@ -5177,40 +5177,40 @@ namespace 精密切割系统.Helpers.GTN
             public UInt32[] pad;
         }
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetLaserOnOffCount(short core, short channel, out TLaserOnOffCount pLaserCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ClearLaserOnOffCount(short core, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufPosComparePsoPrm(short core, short crd, short index, ref TPosComparePsoPrm pPrm, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetAxisInputShaping(short axis, short enable, short count, double k);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAxisInputShaping(short core, short axis, short enable, short count, double k);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetGantrySynchErrorCompensate2DTable(short tableIndex, ref TCompensate2DTable pTable, ref Int32 pData, short extend);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetGantrySynchErrorCompensate2DTable(short tableIndex, out TCompensate2DTable pTable, out short pExtend);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetGantrySynchErrorCompensate2D(short group, ref TCompensate2D pComp2d);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetGantrySynchErrorCompensate2D(short group, out TCompensate2D pComp2d);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetGantrySynchErrorCompensate2DValue(short group, out double pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetGantrySynchErrorCompensate2DTable(short core, short tableIndex, ref TCompensate2DTable pTable, ref Int32 pData, short extend);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetGantrySynchErrorCompensate2D(short core, short group, ref TCompensate2D pComp2d);
 
         public struct TLaserFollowPrm
@@ -5228,19 +5228,19 @@ namespace 精密切割系统.Helpers.GTN
             public double[] pad2;
         };
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetLaserFollowMode(short core, ref TLaserFollowPrm pPrm, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetLaserFollowTable(short core, short tableId, Int32 n, ref double pVel, ref double pPower, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LaserFollowOff(short crd, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LaserFollowOff(short core, short crd, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetLaserOnOffSmooth(short core, short crd, short fifo, short channel, short mask);
 
         public struct TBufWaitDiStatusEx
@@ -5263,16 +5263,16 @@ namespace 精密切割系统.Helpers.GTN
             public short pad12;
         };
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetBufWaitDiStatusEx(short core, short crd, short fifo, out TBufWaitDiStatusEx pStatus);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPosCompareFifoMode(short core, short index, short mode, short enable);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPosCompareFifoMode(short core, short index, out short pMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPosCompareLatchValue(short core, short index, Int32 count, out Int32 pDataX, out Int32 pDataY, out Int32 pCount, out TLatchValueInfo pInfo);
 
         public struct TTaskMoveEscape
@@ -5307,37 +5307,37 @@ namespace 精密切割系统.Helpers.GTN
             public double pad32;
         };
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEventStatus(short core, short index, out TEventStatus pStatus);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTaskStatus(short core, short index, out TaskStatus pStatus);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetTriggerMoveEscape(short core, short trigger, ref TTaskMoveEscape pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufPosCompareStart(short core, short crd, short fifo, short index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufPosCompareStop(short core, short crd, short fifo, short index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufPosCompareStartEx(short core, short crd, short fifo, short index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufPosCompareStopEx(short core, short crd, short fifo, short index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCrdHsPrm(short core, short crd, short fifo, out short pEnable, out short pLink, out UInt16 pThreshold, out short pLookAheadInMc);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPrfPosEx(short core, short profile, double pos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetEncPosEx(short core, short encoder, double pos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetDiBit(short core, short diType, short diIndex, out short pValue);
 
         public struct TMpgInfo
@@ -5352,73 +5352,73 @@ namespace 精密切割系统.Helpers.GTN
             public Int32 reserve1_3;
         };
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ReadMpgInfo(short core, short mpg, out TMpgInfo pMpgInfo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_WriteMpgPos(short core, short mpg, ref double pPos, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ReadAuEncPos(short core, short encoder, out double pPos, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_WriteAuEncPos(short core, short encoder, ref double pPos, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_OpenExtMdl(string pDllName);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_CloseExtMdl();
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LoadExtConfig(string pFileName);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ResetExtMdl();
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_DeleteEvent(short core, short eventIndex);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_DeleteTask(short core, short taskIndex);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_DeleteEventTaskLink(short core, short linkIndex);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetEvent(short core, ref TEvent pEvent, short eventIndex);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetTask(short core, short taskType, IntPtr pTaskData, short taskIndex);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetEventTaskLink(short core, short eventIndex, short taskIndex, short linkIndex);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ClearMcStatus(short core);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetMcInfo(short core, Int32 info, Int32 index, UInt32 data);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetMcInfo(short core, Int32 info, Int32 index, out UInt32 cpData);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetRNMasterInfo(short core, out UInt16 pPhyId, out UInt16 pType, out UInt16 pInfo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetRNMasterInfo(short core, UInt16 phyId, UInt16 type, UInt16 info);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_RN_MltPcPduRd(short core, string pData, Byte des_id, UInt16 byte_start_offset, UInt16 byte_num);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_RN_MltPcPduRdUpdate(short core, Byte des_id);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_RN_MltPcPduWr(short core, String pData, Byte des_id, UInt16 byte_start_offset, UInt16 byte_num);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_RN_MltPcPduWrUpdate(short core, Byte des_id);
 
         public struct TLaserStatus
@@ -5436,7 +5436,7 @@ namespace 精密切割系统.Helpers.GTN
             public short[] pad2;
         };
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetLaserStatus(short core, short channel, out TLaserStatus pStatus);
 
         /*-----------------------------------------------------------*/
@@ -5477,31 +5477,31 @@ namespace 精密切割系统.Helpers.GTN
             public Int32[] reserve2;
         };
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCommandListSpace(short core, short list, out Int32 pSpace);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCommandListStatus(short core, short list, out TCommandListStatus pStatus);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ClearCommandListData(short core, short list, ref TListInfo pListInfo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_CommandListDataEnd(short core, short list);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_StartCommandList(short core, short list, ref TListInfo pListInfo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_StartMultiCommandList(short core, UInt32 mask, ref TListInfo pListInfo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_StopCommandList(short core, short index, short stopMode, ref TListInfo pListInfo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_StopMultiCommandList(short core, UInt32 mask, short stopMode, ref TListInfo pListInfo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ClearCommandListStatus(short core, short list);
 
         public const short WAIT_TIMEOUT_MODE_INFINITY = 0;
@@ -5544,22 +5544,22 @@ namespace 精密切割系统.Helpers.GTN
             public double[] reserve2;
         };
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetVarBoolCondition(short core, short varIndex, ref TWatchCondition pWatchCondition);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LoadVarCalculate(short core, ref TVarCalculate pVarCalculate, short count, ref TListInfo pListInfo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_MoveTrap(short core, short profile, double pos, double vel, ref TTrapPrm pPrm, ref TListInfo pList);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetVarCondition(short core, ref TVarCondition pVarCondition, short count, ref TListInfo pListInfo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_WaitForCondition(short core, ref TWatchCondition pWatchCondition, short conditionCount, short operation, ref TWaitTimeout pTimeout, ref TListInfo pListInfo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetWaitForCondition(short core, short list, out TWatchCondition pWatchCondition, out short pConditionCount, out short pOperation, out TWaitTimeout pTimeout, out short pConditionResult, out short pConditionDone);
 
         public static short DIGITAL_OUTPUT_MODE_NORMAL = 0;
@@ -5621,10 +5621,10 @@ namespace 精密切割系统.Helpers.GTN
             public double[] reserve3;
         };
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_WriteDigitalOutputBit(short core, ref TDigitalOutputBit pDoBit, ref TListInfo pListInfo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetDelay(short core, ref TDelay pDelay, ref TListInfo pListInfo);
 
         public struct TProfileScale
@@ -5641,32 +5641,32 @@ namespace 精密切割系统.Helpers.GTN
             public double[] beta;
         };
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAxisScale(short core, short profile, ref TProfileScale pScale, ref TListInfo pListInfo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAxisScale(short core, short profile, out TProfileScale pScale);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTrapSts(short core, short profile, out short prfsts);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ClearTrapSts(short core, short profile);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetMcMode(short core, short mode, short value);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetMcMode(short core, short mode, out short pValue);
 
         /*-----------------------------------------------------------*/
         /* New Watch  Code                                           */
         /*-----------------------------------------------------------*/
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LoadReadHsConfig(short core, string pFile);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ReadHsOn(short core, short enable, short mode, double interval);
 
         public struct TAxisArrivePrm
@@ -5680,13 +5680,13 @@ namespace 精密切割系统.Helpers.GTN
             public Int32[] pad1;
         };
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetStsEx(short core, short axis, out Int32 pSts, short count, out UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAxisArriveMode(short core, short axis, ref TAxisArrivePrm pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAxisArriveMode(short core, short axis, out TAxisArrivePrm pPrm);
 
         public struct TCrdStatusEx
@@ -5705,16 +5705,16 @@ namespace 精密切割系统.Helpers.GTN
             public double[] pad3;
         };
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_CrdStatusEx(short crd, out TCrdStatusEx pCrdStatus, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_CrdStatusEx(short core, short crd, out TCrdStatusEx pCrdStatus, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetCrdMPGMode(short core, short crd, short enable, short master, Int32 masterEven, Int32 slaveEven, short filterTime, short mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCrdMPGMode(short core, short crd, out short pEnable, out short pMaster, out Int32 pMasterEven, out Int32 pSlaveEven, out short pFilterTime, out short pMode, out short pFifoEnd);
 
         public struct TMoveContinuousAbsolutePrm
@@ -5731,16 +5731,16 @@ namespace 精密切割系统.Helpers.GTN
             public short[] reserve;
         };
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_MoveContinuousAbsolute(short core, short profile, ref TMoveContinuousAbsolutePrm pPrm, ref TListInfo pListInfo, short group);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetReadHs(short core, short enable, short mode, short interval);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ReadHsReadBuffer(short core, out short pData, Int32 count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_RN_GeneralCommand(short core, short stationId, Int32 cmdId, Int32 prmSizeCount, IntPtr pPrm, Int32 resultSizeCount, IntPtr pResult);
 
         /*-----------------------------------------------------------*/
@@ -5763,13 +5763,13 @@ namespace 精密切割系统.Helpers.GTN
             public short sts;
         };
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_WriteUserSlotDataEncrypt(short core, short slotIndex, ref TEncryptOperatePrm pWritePrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ReadUserSlotDataEncrypt(short core, short slotIndex, out TEncryptOperatePrm pReadPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_EncryptionFunConfig(short core, short slotIndex, ref Byte pOldKey, ref Byte pNewKey, ref Byte pUserData, out short pSts, out short pConfigured);
 
         public struct TTriggerProfilePrm
@@ -5801,25 +5801,25 @@ namespace 精密切割系统.Helpers.GTN
             public Int32[] reserve;
         };
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetTriggerProfilePrm(short core, short profile, ref TTriggerProfilePrm pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTriggerProfileStatus(short core, short profile, out TTriggerProfileStatus pSts);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LmtsOnEx(short core, short axis, short limitType, short limitMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LmtsOffEx(short core, short axis, short limitType, short limitMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PrintLogInfo(short core, string pFileName, Int32 start, Int32 count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PrintMcStsInfo(short core, string pFileName, short type, short index, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PrintCommandInfo(short core, string pFileName, Int32 start, Int32 count);
 
         /*-----------------------------------------------------------*/
@@ -5839,19 +5839,19 @@ namespace 精密切割系统.Helpers.GTN
             public short[] pad2;
         };
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_InitIlc(short core);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_StartIlc(short core, short crd);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_StopIlc(short core, short crd, ref TIlcResult pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SaveIlcFile(short core, string pIlcFile);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LoadIlcFile(short core, short crd, string filePath);
 
         /*-----------------------------------------------------------*/
@@ -5952,10 +5952,10 @@ namespace 精密切割系统.Helpers.GTN
             public TMovePosUnion data;
         };
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_MovePos(short core, short profile, ref TMovePosParameter pMovePos, ref TListInfo pListInfo, short group = 0);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_MovePosTwoSegment(short core, short profile, ref TMovePosTwoSegmentParameter pMovePos, ref TListInfo pListInfo, short group);
 
         public struct TMotionTimeRestrictDirect
@@ -6007,9 +6007,9 @@ namespace 精密切割系统.Helpers.GTN
         //    public short[] pad2;
         //    public TMotionTimeRestrictUnion parameter;
         //};
-        //[DllImport("gxn.dll")]
+        //[DllImport(@"Assets\config\gxn.dll")]
         //public static extern short GTN_SetMotionTimeRestrict(short core, short restrictIndex, ref TMotionTimeRestrict pRestrict, ref TListInfo pListInfo);
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetWaitForCondition(short core, short list, out TWatchCondition pWatchCondition, out short pConditionCount, short pOperation, out TWaitTimeout pTimeout, out short pConditionResult);
 
         /*-----------------------------------------------------------*/
@@ -6119,61 +6119,61 @@ namespace 精密切割系统.Helpers.GTN
         };
 
         // 环路模式
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetLoopMode(short core, short axis, ref TLoopMode pMode); // 设置环路模式，压力闭环还是位置闭环，
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetLoopMode(short core, short axis, out TLoopMode pMode); // 读取环路模式，压力闭环还是位置闭环，
 
         // 设置、读取力控功能相关参数
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPressPrm(short core, short pressAxis, ref TPressPrm pPressPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPressPrm(short core, short pressAxis, out TPressPrm pPressPrm);
 
         // 单组目标压力
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPressTarget(short core, short pressProfile, double value, ref TPressTargetPrm pPressTargetPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPressTarget(short core, short pressProfile, out double pValue, out TPressTargetPrm pPressTargetPrm);
 
         // 多组目标压力
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPressArray(short core, short pressProfile, ref TPressArray pPressArray);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPressArray(short core, short pressProfile, out TPressArray pPressArray);
 
         // 压力环PID
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPressPid(short core, short pressControl, ref TPressPid pPid);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPressPid(short core, short pressControl, out TPressPid pPid);
 
         // 读取规划压力
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPrfPress(short core, short pressProfile, out double pValue, out double pValueFilter);
 
         // 读取反馈压力
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAtlPress(short core, short pressProfile, out double pValue);
 
         // 获取压力状态
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPressStatus(short core, short pressAxis, out Int32 pStatus);
 
         // 设置规划压力
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPrfPress(short core, short axis, double prfPressValue);
 
         // 设置压力反馈源
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPressFeedbackType(short core, short pressAxis, out short pFbType, out short pFbIndex);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPressFeedbackType(short core, short pressAxis, short fbType, short fbIndex);
 
         public struct TPressLimit
@@ -6193,17 +6193,17 @@ namespace 精密切割系统.Helpers.GTN
         };
 
         // 设置力矩超限停止参数		// 保护功能
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetLimit(short core, short axis, short type, System.IntPtr pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetLimit(short core, short axis, short type, System.IntPtr pPrm);
 
         // 保护功能触发后回退参数
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetStopOffset(short core, short axis, out TStopOffset pStopOffset);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetStopOffset(short core, short axis, ref TStopOffset pStopOffset);
 
         public struct TPressAutoSwitchPrm
@@ -6220,47 +6220,47 @@ namespace 精密切割系统.Helpers.GTN
         };
 
         // 设置力/位自动切换参数
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPressAutoSwitchPrm(short core, short pressAxis, ref TPressAutoSwitchPrm pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPressAutoSwitchPrm(short core, short pressAxis, out TPressAutoSwitchPrm pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PressAutoSwitchEnable(short core, short pressAxis, short enable);
 
         // 设置压力闭环模式下的工作空间
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPressRange(short core, short pressAxis, short centerSynch, Int32 range);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPressRange(short core, short pressAxis, out Int32 pCenterPos, out Int32 pRange);
 
         // 设置压力闭环模式下位置穿越保护
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPressCross(short core, short pressAxis, short dir, Int32 pos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPressCross(short core, short pressAxis, out short pDir, out Int32 pPos);
 
         // 设置压力捕获参数
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPressTrigger(short core, short pressAxis, short pressThread, short triggerCondition);
 
         // 读取压力捕获参数
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPressTrigger(short core, short pressAxis, out short pPressThread, out short pTriggerCondition);
 
         // 打开压力捕获功能
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PressTriggerOn(short core, short pressAxis);
 
         // 关闭压力捕获功能
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PressTriggerOff(short core, short pressAxis);
 
         // 读取压力捕获位置
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPressTriggeredPos(short core, short pressAxis, out short pEnable, out double pCntPos, out short pTriggeredPress);
 
         /************************************************************************/
@@ -6305,49 +6305,49 @@ namespace 精密切割系统.Helpers.GTN
             public double[] reserve3;
         };
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAxisPrfPosRotary(short core, short axis, out double pTheta, out double pRound, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetProfileRotaryConfig(short core, short profile, out TRotaryConfig pConfig);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPrfPosRotary(short core, short profile, out double pTheta, out double pRound, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetCrdScale(short core, short crd, short dimension, double alpha, double beta);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCrdScale(short core, short crd, short dimension, out double pAlpha, out double pBeta);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCrdRotaryConfig(short core, short crd, short dimension, out TRotaryConfig pConfig);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCrdPosRotary(short core, short crd, short dimension, out double pTheta, out double pRound, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEncoderRotaryConfig(short core, short encoder, out TRotaryConfig pConfig);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEncPosRotary(short core, short encoder, out double pTheta, out double pRound, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAxisRotaryConfig(short core, short axis, ref TRotaryConfig pConfig);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAxisRotaryConfig(short core, short axis, out TRotaryConfig pConfig);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ZeroAxisRotaryRound(short core, short axis, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LineAbsoluteEx(short core, short crd, ref double pPos, ref short pDir, ref TLineAbsolutePrm pPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAxisRotaryDirectionSelectMode(short core, short axis, short mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAxisRotaryDirectionSelectMode(short core, short axis, out short pMode);
 
         public struct TBufMoveAbsPrm
@@ -6375,20 +6375,20 @@ namespace 精密切割系统.Helpers.GTN
             public Int32[] reserve3;
         };
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufMoveAbsoluteEx(short core, short crd, short moveAxis, ref TBufMoveAbsPrm pPrm);
 
         /*-----------------------------------------------------------*/
         /* 绝对值辅助编码器相关                                      */
         /*-----------------------------------------------------------*/
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAuAbsEncMultiTurnRange(short core, short encoder, double range);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ReadAuAbsEncPos(short core, short encoder, ref double pPos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetCrdUserDataEndVelLa(short core, short crd, short crdUserDataType, double endVel);
 
         /*-----------------------------------------------------------*/
@@ -6447,7 +6447,7 @@ namespace 精密切割系统.Helpers.GTN
             public double startPower;
         };
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PvtTableUserData(short core, short tableId, short userDataType, double time, System.IntPtr pData);
     }
 
@@ -6654,172 +6654,172 @@ namespace 精密切割系统.Helpers.GTN
             public TDiConfig[] mpg;
         }
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SaveConfig(out string pFile);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetDiConfig(short diType, short diIndex, ref TDiConfig pDi);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetDiConfig(short diType, short diIndex, out TDiConfig pDi);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetDoConfig(short doType, short doIndex, ref TDoConfig pDo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetDoConfig(short doType, short doIndex, out TDoConfig pDo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetStepConfig(short step, ref TStepConfig pStep);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetStepConfig(short step, out TStepConfig pStep);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetDacConfig(short dac, ref TDacConfig pDac);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetDacConfig(short dac, out TDacConfig pDac);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetAdcConfig(short adc, ref TAdcConfig pAdc);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetAdcConfig(short adc, out TAdcConfig pAdc);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetCountConfig(short countType, short countIndex, ref TCountConfig pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetCountConfig(short countType, short countIndex, out TCountConfig pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetControlConfig(short control, ref TControlConfig pControl);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetControlConfig(short control, out TControlConfig pControl);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetControlConfigEx(short control, ref TControlConfigEx pControl);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetControlConfigEx(short control, out TControlConfigEx pControl);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetProfileConfig(short profile, ref TProfileConfig pProfile);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetProfileConfig(short profile, out TProfileConfig pProfile);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetAxisConfig(short axis, ref TAxisConfig pAxis);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetAxisConfig(short axis, out TAxisConfig pAxis);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ProfileScale(short axis, short alpha, short beta);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_EncScale(short axis, short alpha, short beta);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_EncSns(ushort sense);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LmtSns(ushort sense);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GpiSns(ushort sense);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetAdcFilter(short adc, short filterTime);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetConfigTable(short type, out short pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetConfigTableAll();
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetMcConfig(ref TMcConfig pMc);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetMcConfig(out TMcConfig pMc);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetMcConfigToFile(ref TMcConfig pMc, ref char pFile);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetMcConfigFromFile(out TMcConfig pMc, out char pFile);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SaveConfig(short core, out string pFile);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetDiConfig(short core, short diType, short diIndex, ref TDiConfig pDi);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetDiConfig(short core, short diType, short diIndex, out TDiConfig pDi);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetDoConfig(short core, short doType, short doIndex, ref TDoConfig pDo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetDoConfig(short core, short doType, short doIndex, out TDoConfig pDo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetStepConfig(short core, short step, ref TStepConfig pStep);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetStepConfig(short core, short step, out TStepConfig pStep);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetDacConfig(short core, short dac, ref TDacConfig pDac);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetDacConfig(short core, short dac, out TDacConfig pDac);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAdcConfig(short core, short adc, ref TAdcConfig pAdc);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAdcConfig(short core, short adc, out TAdcConfig pAdc);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetCountConfig(short core, short countType, short countIndex, ref TCountConfig pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetCountConfig(short core, short countType, short countIndex, out TCountConfig pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetControlConfig(short core, short control, ref TControlConfig pControl);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetControlConfig(short core, short control, out TControlConfig pControl);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetControlConfigEx(short core, short control, ref TControlConfigEx pControl);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetControlConfigEx(short core, short control, out TControlConfigEx pControl);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetProfileConfig(short core, short profile, ref TProfileConfig pProfile);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetProfileConfig(short core, short profile, out TProfileConfig pProfile);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAxisConfig(short core, short axis, ref TAxisConfig pAxis);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAxisConfig(short core, short axis, out TAxisConfig pAxis);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ProfileScale(short core, short axis, short alpha, short beta);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_EncScale(short core, short axis, short alpha, short beta);
 
         /*-----------------------------------------------------------*/
@@ -6851,58 +6851,58 @@ namespace 精密切割系统.Helpers.GTN
             public short index;
         }
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LoadExtModuleConfig(short core, string pFile);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SaveExtModuleConfig(short core, string pFile);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ExtModuleOn(short core, short station);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ExtModuleOff(short core, short station);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetExtModuleStatus(short core, short station, out TExtModuleStatus pStatus);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetExtModuleId(short core, short station, short count, ref short pId);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetExtModuleId(short core, short station, short count, out short pId);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetExtModuleReverse(short core, short station, short module, short inputCount, ref short pInputReverse, short outputCount, ref short pOutputReverse);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetExtModuleReverse(short core, short station, short module, short inputCount, out short pInputReverse, short outputCount, out short pOutputReverse);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetExtModuleCount(short core, short station, out short pCount);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetExtModuleType(short core, short station, short module, out TExtModuleType pModuleType);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetExtIoMap(short core, short type, short index, ref TExtIoMap pMap);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetExtIoMap(short core, short type, short index, out TExtIoMap pMap);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ClearExtIoMap(short core, short type);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetExtAoRange(short core, short index, double max, double min);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetExtAoRange(short core, short index, out double pMax, out double pMin);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetExtAiRange(short core, short index, double max, double min);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetExtAiRange(short core, short index, out double pMax, out double pMin);
 
         /*-----------------------------------------------------------*/
@@ -6976,16 +6976,16 @@ namespace 精密切割系统.Helpers.GTN
             public short fifo;
         }
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetScanMap(short core, short index, ref TScanMap pMap);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetScanMap(short core, short index, out TScanMap pMap);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ClearScanMap(short core);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_UpdateScanMap(short core);
 
         /*-----------------------------------------------------------*/
@@ -6998,13 +6998,13 @@ namespace 精密切割系统.Helpers.GTN
             public short fifo;
         }
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPosCompareMap(short core, short index, ref TPosCompareMap pMap);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPosCompareMap(short core, short index, out TPosCompareMap pMap);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ClearPosCompareMap(short core);
     }
 
@@ -7102,49 +7102,49 @@ namespace 精密切割系统.Helpers.GTN
         public const short RTN_DLL_WIN32 = -801;
         public const short RTN_XML_STATION_ERR = -900;                  //dma config file confilit with slave type
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_RN_GetEncPos(short encoder, out double pValue, short count, ref UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_RN_GetAxisError(short axis, out double pValue, short count, ref UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_RN_GetPrfMode(short axis, out Int32 pValue, short count, ref UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_RN_GetAuEncPos(short encoder, out double pValue, short count, ref UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_RN_GetCaptureStatus(short encoder, out short pStatus, out Int32 pValue, short count, ref UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_RN_GetSts(short axis, out Int32 pSts, short count, ref UInt32 pClock);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_RN_GetPowerSts(out Int32 pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_RN_GetEcatAxisACTArray(short axis, ref short pCur, out short pTorque, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_RN_PtSpaceArray(short profile, out short pSpace, short fifo, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_RN_GetDoEx(short doType, out Int32 pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_RN_GetDiEx(short diType, out Int32 pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_RN_GetDo(short doType, out Int32 pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_RN_GetDi(short diType, out Int32 pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LoadRingNetConfig(short core, string pFile);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SaveRingNetConfig(short core, string pFile);
 
         public const short TERMINAL_LOAD_MODE_NONE = 0;
@@ -7168,52 +7168,52 @@ namespace 精密切割系统.Helpers.GTN
             public UInt32 reserve7;
         }
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_TerminalInit(short core, short detect);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTerminalVersion(short core, short index, out GTN.mc.TVersion pTerminalVersion);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetTerminalPermit(short core, short index, short dataType, UInt16 permit);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetTerminalPermitEx(short core, short station, short dataType, ref short permit, short index, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTerminalPermitEx(short core, short station, short dataType, out short pPermit, short index, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_FindStation(short core, short station, UInt32 time);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTerminalPermit(short core, short index, short dataType, out UInt16 pPermit);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ProgramTerminalConfig(short core, short loadMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTerminalConfigLoadMode(short core, out short pLoadMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ReadPhysicalMap();
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short ConvertPhysical(short core, short dataType, short terminal, short index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetTerminalSafeMode(short core, short index, short safeMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTerminalSafeMode(short core, short index, ref short pSafeMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ClearTerminalSafeMode(short core, short index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTerminalStatus(short core, short index, out TTerminalStatus pTerminalStatus);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTerminalType(short core, short count, out UInt16 pType, ref short pTypeConnect);
 
         /*-----------------------------------------------------------*/
@@ -7230,7 +7230,7 @@ namespace 精密切割系统.Helpers.GTN
             public UInt32[] terminalRxBuf;
         };
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ReadTerminalData(short core, out TTerminalData pTerminalData);
 
         /*-----------------------------------------------------------*/
@@ -7270,77 +7270,77 @@ namespace 精密切割系统.Helpers.GTN
             public short dataCount;
         }
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetMailbox(short core, short station, UInt16 byteAddress, ref UInt16 pData, UInt16 wordCount, UInt16 dataMode, UInt16 desId, UInt16 type);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetMailbox(short core, short station, UInt16 byteAddress, out UInt16 pData, UInt16 wordCount, UInt16 dataMode, UInt16 desId, UInt16 type);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LoadTerminalConfig(short core, string pFile);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SaveTerminalConfig(short core, string pFile);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_TerminalOn(short core, short index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_TerminalSynch(short core, short index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetRingNetCrcStatus(short core, short index, out TRingNetCrcStatus pRingNetCrcStatus);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTerminalError(short core, short index, out TTerminalError pTerminalError);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetTerminalType(short core, short count, ref short pType);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTerminalLinkStatus(short core, short count, out short ringNetType, out short pLinkStatus);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetTerminalMap(short core, short dataType, short moduleIndex, ref TTerminalMap pMap);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTerminalMap(short core, short dataType, short moduleIndex, out TTerminalMap pMap);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ClearTerminalMap(short core, short dataType);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetTerminalMode(short core, short station, UInt16 mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTerminalMode(short core, short station, out UInt16 pMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetTerminalTest(short core, short station, short index, UInt16 value);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTerminalTest(short core, short station, short index, out UInt16 pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetTerminalOperation(short core, short operation);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTerminalOperation(short core, out short pOperation);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetMailbox(short core, short station, UInt16 byteAddress, ref UInt16 pData, UInt16 wordCount, UInt16 dataMode, UInt16 desId, UInt16 type);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetMailbox(short core, short station, UInt16 byteAddress, out UInt16 pData, UInt16 wordCount, UInt16 dataMode, UInt16 desId, UInt16 type);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetUuid(short core, string pCode, short count);
 
         /*-----------------------------------------------------------*/
         /* 网络恢复指令                                              */
         /*-----------------------------------------------------------*/
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_RN_Recover(short cardIndex);
 
         /*-----------------------------------------------------------*/
@@ -7358,10 +7358,10 @@ namespace 精密切割系统.Helpers.GTN
             public double[] reserve2;
         };
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_RN_SetTorqueLimit(short core, short axis, ref TTorqueLimit pTorqueLimit);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_RN_GetTorqueLimit(short core, short axis, out TTorqueLimit pTorqueLimit);
 
         /*-----------------------------------------------------------*/
@@ -7387,32 +7387,32 @@ namespace 精密切割系统.Helpers.GTN
             public TServoPosLoopPidUnion servoPosLoopPidPrm;
         };
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetServoPosLoopPid(short core, short axis, ref TServoPosLoopPid pServoPosLoopPid);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetServoPosLoopPid(short core, short axis, out TServoPosLoopPid pServoPosLoopPid);
 
         /*-----------------------------------------------------------*/
         /* 安全模式设置                                              */
         /*-----------------------------------------------------------*/
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_RN_SetStationSafeModeControl(short cardIndex, short stationPhyId, short enable, short clearMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_RN_ClearStationSafeModeStatus(short cardIndex, short stationPhyId);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_RN_SetStationSafeModeOut(short cardIndex, short stationPhyId, short type, short index, ref short pEnable, ref double pValue, short count);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_RN_IlinkSetSafeModeControl(short cardIndex, short stationPhyId, short modulePhyId, short enable, short clearMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_RN_IlinkClearSafeModeStatus(short cardIndex, short stationPhyId, short modulePhyId);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_RN_IlinkSetSafeModeOut(short cardIndex, short stationPhyId, short modulePhyId, short type, short index, ref short pEnable, ref double pValue, short count);
     }
 
@@ -7729,500 +7729,500 @@ namespace 精密切割系统.Helpers.GTN
             public short[] pad2;
         }
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetupLookAheadCrd(short crd, EMachineMode machineMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetVelDefineModeLa(short crd, EVelSettingDef velDefMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetAccDefineModeLa(short crd, EAccSettingDef accDefMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetAxisLimitModeLa(short crd, ref int pAxisLimitMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetWorkLimitModeLa(short crd, EWorkLimitMode workLimitMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetAxisFollowModeLa(short crd, ref int pFollowMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetAxisVelValidModeLa(short crd, int velValidAxis);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetArcAllowErrorLa(short crd, double error);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetMinEvenVelTime(short crd, double evenTime);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetMinDccAngle(short crd, double dccAngle);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetProfilePeriod(short crd, double profilePeriod);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetFilterTime(short crd, Int32 filtNum);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetPrecisionControl(short crd, short mode, double error);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetVelSmoothModeLa(short crd, short smoothMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetVelModeLa(short crd, EVelMode velMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_InitLookAheadEx(short crd, ref TLookAheadParameter pLookAheadPara, short fifo, short motionMode, ref TPreStartPos pPreStartPos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_PrintLACmdLa(short crd, int printFlag, int clearFile);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetLookAheadSegCountEx(short crd, out int pSegCount, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetMotionTimeEx(short crd, out double pTime, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetUserSegNumEx(short crd, int segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_CrdDataEx(short crd, System.IntPtr pCrdData, short fifo);  //调用时传入 IntPtr.Zero GTN_CrdDataEx(1, System.IntPtr.Zero, 0);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYEx(short crd, double x, double y, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYG0Ex(short crd, double x, double y, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYZEx(short crd, double x, double y, double z, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYZG0Ex(short crd, double x, double y, double z, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYZAEx(short crd, double x, double y, double z, double a, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYZAG0Ex(short crd, double x, double y, double z, double a, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYZACEx(short crd, ref double pPos, short posMask, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYZACG0Ex(short crd, ref double pPos, short posMask, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYZACUVWEx(short crd, ref double pPos, short posMask, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_LnXYZACUVWG0Ex(short crd, ref double pPos, short posMask, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcXYREx(short crd, double x, double y, double radius, short circleDir, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcYZREx(short crd, double y, double z, double radius, short circleDir, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcZXREx(short crd, double z, double x, double radius, short circleDir, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcXYCEx(short crd, double x, double y, double xCenter, double yCenter, short circleDir, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcYZCEx(short crd, double y, double z, double yCenter, double zCenter, short circleDir, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcZXCEx(short crd, double z, double x, double zCenter, double xCenter, short circleDir, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_ArcXYZEx(short crd, double x, double y, double z, double interX, double interY, double interZ, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixXYRZEx(short crd, double x, double y, double z, double radius, short circleDir, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixXYCZEx(short crd, double x, double y, double z, double xCenter, double yCenter, short circleDir, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixYZRXEx(short crd, double x, double y, double z, double radius, short circleDir, double synVel, double synAcc, Int32 segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixYZCXEx(short crd, double x, double y, double z, double yCenter, double zCenter, short circleDir, double synVel, double synAcc, Int32 segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixZXRYEx(short crd, double x, double y, double z, double radius, short circleDir, double synVel, double synAcc, Int32 segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixZXCYEx(short crd, double x, double y, double z, double zCenter, double xCenter, short circleDir, double synVel, double synAcc, Int32 segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixXYRMultiZEx(short crd, ref double pPos, double radius, short circleDir, double synVel, double synAcc, Int32 segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixXYCMultiZEx(short crd, ref double pPos, double xCenter, double yCenter, short circleDir, double synVel, double synAcc, Int32 segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixYZRMultiXEx(short crd, ref double pPos, double radius, short circleDir, double synVel, double synAcc, Int32 segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixYZCMultiXEx(short crd, ref double pPos, double yCenter, double zCenter, short circleDir, double synVel, double synAcc, Int32 segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixZXRMultiYEx(short crd, ref double pPos, double radius, short circleDir, double synVel, double synAcc, Int32 segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_HelixZXCMultiYEx(short crd, ref double pPos, double zCenter, double xCenter, short circleDir, double synVel, double synAcc, Int32 segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufDelayEx(short crd, ushort delayTime, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufIOEx(short crd, ushort doType, ushort doMask, ushort doValue, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufDAEx(short crd, short chn, short daValue, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufEnableDoBitPulseEx(short crd, short doType, short doIndex, ushort highLevelTime, ushort lowLevelTime, int pulseNum, short firstLevel, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufDisableDoBitPulseEx(short crd, short doType, short doIndex, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufGearEx(short crd, short gearAxis, double deltaPos, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufMoveEx(short crd, short moveAxis, double pos, double vel, double acc, short modal, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufFollowMasterEx(short crd, ref GTN.mc.TBufFollowMaster pBufFollowMaster, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufFollowEventCrossEx(short crd, ref GTN.mc.TBufFollowEventCross pEventCross, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufFollowEventTriggerEx(short crd, ref GTN.mc.TBufFollowEventTrigger pEventTrigger, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufFollowStartEx(short crd, Int32 masterSegment, Int32 slaveSegment, Int32 masterFrameWidth, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufFollowNextEx(short crd, Int32 width, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufFollowReturnEx(short crd, double vel, double acc, short smoothPercent, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufSmartCutterOnEx(short crd, short index, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufSmartCutterOffEx(short crd, short index, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufLaserOnEx(short crd, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufLaserOffEx(short crd, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufLaserFollowModeEx(short crd, short source, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufLaserFollowTableEx(short crd, short tableId, double minPower, double maxPower, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufLaserFollowOffEx(short crd, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufLaserPrfCmdEx(short crd, double laserPower, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufLaserFollowRatioEx(short crd, double ratio, double minPower, double maxPower, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetupLookAheadCrd(short core, short crd, EMachineMode machineMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAxisFollowModeLa(short core, short crd, ref Int32 pFollowMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetVelDefineModeLa(short core, short crd, EVelSettingDef velDefMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAccDefineModeLa(short core, short crd, EAccSettingDef accDefMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAxisLimitModeLa(short core, short crd, ref Int32 pAxisLimitMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetWorkLimitModeLa(short core, short crd, EWorkLimitMode workLimitMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAxisVelValidModeLa(short core, short crd, Int32 velValidAxis);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetVelModeLa(short core, short crd, EVelMode velMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetVelSmoothModeLa(short core, short crd, short smoothMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetVelSmoothMode(short core, short crd, Int32 smoothMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_PrintLACmdLa(short core, short crd, Int32 printFlag, Int32 clearFile);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_UpdateMachineBuildingFileLa(short core, short crd, int update);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_InitialMachineBuildingEx(short core, short crd, string pMachineCfgFileName, ref double machineCoordCenter, ref double workCoordCenter, double toolLength);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_InitialMachineBuildingPara(short core, short crd, ref TMachCfgInfo pMachCfgInfo, ref double machineCoordCenter, ref double workCoordCenter, double toolLength);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_CrdRTCPOn(short core, short crd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_CrdRTCPOff(short core, short crd, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetNonlinearErrorControl(short core, short crd, Int32 enable, double nonlinearError);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_EnableDiscreateArc(short core, short crd, short enable, double arcError);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAxisVelValidCompModeLa(short core, short crd, Int32 enable, ref Int32 pCompAxis);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetFollowAxisProcessModeLa(short core, short crd, Int32 AxisFollowMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetCmdVelLimitLa(short core, short crd, Int32 enable, Int32 n1, Int32 n2, Int32 mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_InitLookAheadEx(short core, short crd, ref TLookAheadParameter pLookAheadPara, short fifo, short motionMode, ref TPreStartPos pPreStartPos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_InitLookAheadPara(short core, short crd, Int32 lookAheadNum, double time, double radiusRatio, double scale, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetFollowAxisParaLa(short core, short crd, ref Int32 pAxisLimitMode, ref double pVmax, ref double pAmax, ref double pDVmax);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetCompToolLength(short core, short crd, double compToolLength);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetCompWorkCoordOffset(short core, short crd, ref double pCompWorkOffset);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetLookAheadSegCountEx(short core, short crd, out int pSegCount, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetMotionTimeEx(short core, short crd, out double pTime, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetUserSegNumEx(short core, short crd, int segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_CrdDataEx(short core, short crd, System.IntPtr pCrdData, short fifo);  //调用时传入 IntPtr.Zero GTN_CrdDataEx(1, System.IntPtr.Zero, 0);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYEx(short core, short crd, double x, double y, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYG0Ex(short core, short crd, double x, double y, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYZEx(short core, short crd, double x, double y, double z, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYZG0Ex(short core, short crd, double x, double y, double z, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYZAEx(short core, short crd, double x, double y, double z, double a, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYZAG0Ex(short core, short crd, double x, double y, double z, double a, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYZACEx(short core, short crd, ref double pPos, short posMask, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYZACG0Ex(short core, short crd, ref double pPos, short posMask, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYZACUVWEx(short core, short crd, ref double pPos, short posMask, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_LnXYZACUVWG0Ex(short core, short crd, ref double pPos, short posMask, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcXYREx(short core, short crd, double x, double y, double radius, short circleDir, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcYZREx(short core, short crd, double y, double z, double radius, short circleDir, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcZXREx(short core, short crd, double z, double x, double radius, short circleDir, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcXYCEx(short core, short crd, double x, double y, double xCenter, double yCenter, short circleDir, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcYZCEx(short core, short crd, double y, double z, double yCenter, double zCenter, short circleDir, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcZXCEx(short core, short crd, double z, double x, double zCenter, double xCenter, short circleDir, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcXYZEx(short core, short crd, double x, double y, double z, double interX, double interY, double interZ, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcXYRACEx(short core, short crd, double x, double y, double a, double c, double radius, short circleDir, double synVel, double synAcc, long segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcXYCACEx(short core, short crd, double x, double y, double a, double c, double xCenter, double yCenter, short circleDir, double synVel, double synAcc, long segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_ArcXYZACEx(short core, short crd, double x, double y, double z, double a, double c, double interX, double interY, double interZ, double interA, double interC, double synVel, double synAcc, long segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_HelixXYRZEx(short core, short crd, double x, double y, double z, double radius, short circleDir, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_HelixXYCZEx(short core, short crd, double x, double y, double z, double xCenter, double yCenter, short circleDir, double synVel, double synAcc, int segNum, short override2, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufDelayEx(short core, short crd, ushort delayTime, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufGearEx(short core, short crd, short gearAxis, double deltaPos, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufMoveEx(short core, short crd, short moveAxis, double pos, double vel, double acc, short modal, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufIOEx(short core, short crd, ushort doType, ushort doMask, ushort doValue, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufEnableDoBitPulseEx(short core, short crd, short doType, short doIndex, ushort highLevelTime, ushort lowLevelTime, int pulseNum, short firstLevel, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufDisableDoBitPulseEx(short core, short crd, short doType, short doIndex, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufDAEx(short core, short crd, short chn, short daValue, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufFollowMasterEx(short core, short crd, ref GTN.mc.TBufFollowMaster pBufFollowMaster, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufFollowEventCrossEx(short core, short crd, ref GTN.mc.TBufFollowEventCross pEventCross, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufFollowEventTriggerEx(short core, short crd, ref GTN.mc.TBufFollowEventTrigger pEventTrigger, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufFollowStartEx(short core, short crd, Int32 masterSegment, Int32 slaveSegment, Int32 masterFrameWidth, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufFollowNextEx(short core, short crd, Int32 width, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufFollowReturnEx(short core, short crd, double vel, double acc, short smoothPercent, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufSmartCutterOnEx(short core, short crd, short index, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufSmartCutterOffEx(short core, short crd, short index, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufLaserOnEx(short core, short crd, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufLaserOffEx(short core, short crd, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufLaserFollowModeEx(short core, short crd, short source, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufLaserFollowTableEx(short core, short crd, short tableId, double minPower, double maxPower, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufLaserFollowOffEx(short core, short crd, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufLaserPrfCmdEx(short core, short crd, double laserPower, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufLaserFollowRatioEx(short core, short crd, double ratio, double minPower, double maxPower, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufWaitDiEx(short crd, short diType, UInt16 diIndex, UInt16 level, short continueTime, Int32 overTime, short flagMode, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufWaitLongVarEx(short crd, short index, Int32 value, Int32 overTime, short flagMode, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufWaitDiEx(short core, short crd, short diType, UInt16 diIndex, UInt16 level, short continueTime, Int32 overTime, short flagMode, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufWaitLongVarEx(short core, short crd, short index, Int32 value, Int32 overTime, short flagMode, Int32 segNum, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufDoBitEx(short crd, UInt16 doType, UInt16 index, short value, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufDoBitEx(short core, short crd, Int32 doType, UInt16 index, short value, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufDoBitDelayEx(short core, short crd, UInt16 doType, UInt16 index, short value, Int32 delayTime, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufPosCompareStartEx(short core, short crd, short fifo, short index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufPosCompareStopEx(short core, short crd, short fifo, short index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufPosComparePsoPrmEx(short core, short crd, short index, ref GTN.mc.TPosComparePsoPrm pPrm, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufPosCompareStartEx(short core, short crd, short fifo, short index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufPosCompareStopEx(short core, short crd, short fifo, short index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufMoveJogEx(short core, short crd, short moveAxis, double vel, double acc, short modal, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufStopEx(short core, short crd, Int32 mask, Int32 option, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufLaserFollowDuoTableEx(short core, short crd, ref TLaserFollowDuoTablePrm pPrm, short fifo, short channel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetRadiusRatioTableLa(short core, short crd, short count, ref double pRadius, ref double pRatio);
 
         /*-----------------------------------------------------------*/
         /* Comp                                                      */
         /*-----------------------------------------------------------*/
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_BufPrfCompEnableEx(short crd, short fifo, short profile, short enable, short enableType);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufPrfCompEnableEx(short core, short crd, short fifo, short profile, short enable, short enableType);
 
         public struct TAxisPressPid
@@ -8286,28 +8286,28 @@ namespace 精密切割系统.Helpers.GTN
             public Int32[] pad3;
         };
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetAxisPressCompensate(short axis, ref TAxisPressCompensate pPressComp);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetAxisPressCompensate(short axis, out TAxisPressCompensate pPressComp);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAxisPressCompensate(short core, short axis, ref TAxisPressCompensate pPressComp);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAxisPressCompensate(short core, short axis, out TAxisPressCompensate pPressComp);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetAxisPressCompensateTable(short axis, short index, Int32 count, ref double pPressData, ref double pPosData);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SelectAxisPressCompensateTable(short axis, short index);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAxisPressCompensateTable(short core, short axis, short index, Int32 count, ref double pPressData, ref double pPosData);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SelectAxisPressCompensateTable(short core, short axis, short index);
 
         public struct TAxisPressCompensateFixFactor
@@ -8333,16 +8333,16 @@ namespace 精密切割系统.Helpers.GTN
             public Int32[] tmp;
         };
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_StartAxisPressCompensateFixFactor(short axis, ref TAxisPressCompensateFixFactor pPressComp);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetAxisPressCompensateFixFactorStatus(short axis, out short pFixFactorSts, out TAxisPressCompensateFixFactor pPressComp);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_StartAxisPressCompensateFixFactor(short core, short axis, ref TAxisPressCompensateFixFactor pPressComp);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAxisPressCompensateFixFactorStatus(short core, short axis, out short pFixFactorSts, out TAxisPressCompensateFixFactor pPressComp);
 
         public struct TAxisPressCompensateFixPid
@@ -8380,46 +8380,46 @@ namespace 精密切割系统.Helpers.GTN
             public double[] tmp;
         };
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_StartAxisPressCompensateFixPid(short axis, ref TAxisPressCompensateFixPid pPressComp);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetAxisPressCompensateFixPidStatus(short axis, out short pFixPidSts, out TAxisPressCompensateFixPid pPressComp);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_StartAxisPressCompensateFixPid(short core, short axis, ref TAxisPressCompensateFixPid pPressComp);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAxisPressCompensateFixPidStatus(short core, short axis, out short pFixPidSts, out TAxisPressCompensateFixPid pPressComp);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_AxisPressCompensateEnable(short core, short axis, short enable, double deadZone, double factor, ref GTN.mc.TListInfo pListInfo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAxisPressCompensateTarget(short core, short axis, double target, double thredshold, ref GTN.mc.TListInfo pListInfo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufAxisPressCompensatePrmEx(short core, short crd, short axis, double target, double thredshold, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_BufAxisPressCompensateEx(short core, short crd, short axis, short enable, double deadZone, double factor, short fifo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAdcBias(short core, short adc, short bias);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAdcBias(short core, short adc, out short pBias);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAuAdcBias(short core, short auAdc, short bias);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAuAdcBias(short core, short auAdc, out short pBias);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_OpenCard(short channel, short prm, char pFileName);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_NetInit(short mode, string pFileName, short overTime, out Int32 pStatus);
 
         //EtherCAT
@@ -8446,340 +8446,340 @@ namespace 精密切割系统.Helpers.GTN
         public const short ECAT_ACT_TORQUE = (3);
         public const short ECAT_ACT_CT = (4);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetEcatHomingPrm(short axis, short method, double speed1, double speed2, double acc, int offset, ushort probeFunction);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_StartEcatHoming(short axis);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetHomingMode(short axis, short mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEcatHomingStatus(short axis, out ushort homingStatus);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_StopEcatHoming(short axis);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetTouchProbeFunction(short axis, short ProbePrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetTouchProbeFunctionEx(short axis, short Probe1Enable, short Probe1TriggerType, short Probe1TriggerLevel, short Probe2Enable, short Probe2TriggerType, short Probe2TriggerLevel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetTouchProbeStatus(short axis, out ushort probeStatus, out int probe1PosValue, out int probe1NegValue, out int probe2PosValue, out int probe2NegValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetEcatGpioConfig(short effectiveLevel, short direction);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetEcatAxisOnThreshold(short axis, ushort threshold);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEcatAxisOnThreshold(short axis, out ushort threshold);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_InitEcatComm();
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_StartEcatComm();
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_IsEcatReady(out short pStatus);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_TerminateEcatComm();
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_TerminateEcatCommEx();
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEcatErrorCode(short axis, out ushort pErrorCode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetDcError(out short pError);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetEcatAxisMode(short axis, short mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEcatAxisMode(short axis, out ushort drvMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetEcatAxisPV(short axis, int velocity);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetEcatAxisPT(short axis, short torque);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEcatEncPos(short axis, out int pEncPos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEcatEncVel(short axis, out int pVelocity);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEcatAxisAtlCurrent(short axis, out short pCur);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEcatAxisAtlTorque(short axis, out short pTorque);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEcatAxisAV(short axis, out int pVel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEcatAxisACT(short axis, out short pCur, out short pTorque);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEcatMCType(out short pType);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetPosScale(short axis, ushort posScale);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetPosScale(short axis, out ushort posScale);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEcatAxisAI(short axis, short channel, out short pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEcatAxisDI(short axis, out uint pDi);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetEcatAxisDO(short axis, uint DoValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEcatAxisDO(short axis, out uint pDo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEcatSlaves(out short SlaveMotionCnt, out short SlaveIOCnt);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEcatAxisPE(short axis, out int pPosErr);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetEcatRawData(ushort offset, ushort nByteSize, ref byte pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEcatRawData(ushort offset, ushort nByteSize, out byte pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetEcatAxisTorqueOffset(short axis, short torqueOffset);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEcatAxisTorqueOffset(short axis, out short pTorqueOffset);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetEcatPdoLength(out short pPdoLen);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetAuxEncoderCapture(short encoder, short CapPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_SetAuxEncoderCaptureEx(short encoder, short CapUpEnable, short CapUpIO, short CapDnEnable, short CapDnIO);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_GetAuxEncoderCaptureStatus(short encoder, out ushort CapSts, out int PosValue, out int NegValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_EcatSDODownload(ushort slave_position, ushort index, byte subindex, ref byte data, uint data_size, out uint abort_code);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_EcatSDOUpload(ushort slave_position, ushort index, byte subindex, out byte target, uint target_size, out uint result_size, out uint abort_code);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_EcatIOReadInput(ushort slaveno, ushort offset, ushort nSize, out byte pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GT_EcatIOWriteOutput(ushort slaveno, ushort offset, ushort nSize, ref byte pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetEcatHomingPrm(short core, short axis, short method, double speed1, double speed2, double acc, int offset, ushort probeFunction);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetEcatHomingPrmEx(short core, short axis, ref short method, ref double speed1, ref double speed2, ref double acc, System.IntPtr offset, ref ushort probeFunction);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_StartEcatHoming(short core, short axis);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetHomingMode(short core, short axis, short mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEcatHomingStatus(short core, short axis, out ushort homingStatus);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_StopEcatHoming(short core, short axis);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetTouchProbeFunction(short core, short axis, short ProbePrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetTouchProbeFunctionEx(short core, short axis, short Probe1Enable, short Probe1TriggerType, short Probe1TriggerLevel, short Probe2Enable, short Probe2TriggerType, short Probe2TriggerLevel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetTouchProbeStatus(short core, short axis, out ushort probeStatus, out int probe1PosValue, out int probe1NegValue, out int probe2PosValue, out int probe2NegValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetEcatGpioConfig(short core, short effectiveLevel, short direction);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetEcatAxisOnThreshold(short core, short axis, ushort threshold);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEcatAxisOnThreshold(short core, short axis, out ushort threshold);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_InitEcatComm(short core);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_InitEcatCommEx(short core, string eniFilePath);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_StartEcatComm(short core);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_IsEcatReady(short core, out short pStatus);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_TerminateEcatComm(short core);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_TerminateEcatCommEx(short core);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEcatErrorCode(short core, short axis, out ushort pErrorCode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetDcError(short core, out short pError);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetEcatAxisMode(short core, short axis, short mode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEcatAxisMode(short core, short axis, out ushort drvMode);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetEcatAxisPV(short core, short axis, int velocity);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetEcatAxisPT(short core, short axis, short torque);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEcatEncPos(short core, short axis, out int pEncPos);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEcatEncVel(short core, short axis, out int pVelocity);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEcatAxisAtlCurrent(short core, short axis, out short pCur);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEcatAxisAtlTorque(short core, short axis, out short pTorque);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEcatAxisAV(short core, short axis, out int pVel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEcatAxisACT(short core, short axis, out short pCur, out short pTorque);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEcatMCType(short core, out short pType);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetPosScale(short core, short axis, ushort posScale);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetPosScale(short core, short axis, out ushort posScale);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEcatAxisAI(short core, short axis, short channel, out short pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEcatAxisDI(short core, short axis, out uint pDi);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetEcatAxisDO(short core, short axis, uint DoValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEcatAxisDO(short core, short axis, out uint pDo);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEcatSlaves(short core, out short SlaveMotionCnt, out short SlaveIOCnt);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEcatAxisPE(short core, short axis, out int pPosErr);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetEcatRawData(short core, ushort offset, ushort nByteSize, ref byte pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEcatRawData(short core, ushort offset, ushort nByteSize, out byte pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetEcatAxisTorqueOffset(short core, short axis, short torqueOffset);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEcatAxisTorqueOffset(short core, short axis, out short pTorqueOffset);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEcatPdoLength(short core, out short pPdoLen);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAuxEncoderCapture(short core, short encoder, short CapPrm);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetAuxEncoderCaptureEx(short core, short encoder, short CapUpEnable, short CapUpIO, short CapDnEnable, short CapDnIO);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetAuxEncoderCaptureStatus(short core, short encoder, out ushort CapSts, out int PosValue, out int NegValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_EcatSDODownload(short core, ushort slave_position, ushort index, byte subindex, ref byte data, uint data_size, out uint abort_code);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_EcatSDOUpload(short core, ushort slave_position, ushort index, byte subindex, out byte target, uint target_size, out uint result_size, out uint abort_code);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_EcatIOReadInput(short core, ushort slaveno, ushort offset, ushort nSize, out byte pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_EcatIOReadOutput(short core, ushort slaveno, ushort offset, ushort nSize, out byte pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_EcatIOWriteOutput(short core, ushort slaveno, ushort offset, ushort nSize, ref byte pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetEcatAxisMaxTargetVel(short core, short axis, int targetMaxVel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEcatAxisMaxTargetVel(short core, short axis, out int targetMaxVel);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_EcatIOBitWriteOutput(short core, ushort slaveno, ushort offset, ushort Index, Byte value);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_EcatIOSynch(short core);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_EcatIOBitReadInput(short core, ushort slaveno, ushort offset, ushort Index, out Byte pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_EcatIOBitReadOutput(short core, ushort slaveno, ushort offset, ushort Index, out Byte pValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetEcatSlavePdo(short core, ushort station, ushort index, byte subIndex, ref byte pData, uint data_size);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEcatSlavePdo(short core, ushort station, ushort index, byte subIndex, out byte pData, uint data_size);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEcatAxisLmtHomeIndex(short core, short axis, out short index_LimitN, out short index_LimitP, out short index_Home);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_SetEcatAxisDOBit(short core, short axis, short bitOffset, byte DoBitValue);
 
-        [DllImport("gxn.dll")]
+        [DllImport(@"Assets\config\gxn.dll")]
         public static extern short GTN_GetEcatAxisDOBit(short core, short axis, short bitOffset, out byte pDoBitValue);
     }
 }

@@ -120,12 +120,7 @@ namespace 精密切割系统.Model.cut
         }
 
         // ========== 预留接口==========
-        /// <summary>
-        /// 接收切割参数
-        /// </summary>
-        /// <param name="parameters"></param>
-        /// <param name="token"></param>
-        /// <returns></returns>
+
         private async Task<bool> ReceiveCuttingParametersAsync(CuttingParameters parameters, CancellationToken token)
         {
             // TODO: 实现参数接收
