@@ -58,7 +58,7 @@ namespace 精密切割系统.Helpers.GTN
                 {
                     return CommonResult.Failure("网络初始化失败: " + rtn);
                 }
-                rtn = GTN.mc.GTN_LoadConfig(1, $"Assets\\config\\gtn_core1.cfg");
+                rtn = GTN.mc.GTN_LoadConfig(1, "Assets\\config\\gtn_core1.cfg");
                 if (rtn != 0)
                 {
                     return CommonResult.Failure($"加载核1配置文件失败");
