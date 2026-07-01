@@ -21,6 +21,7 @@ namespace 精密切割系统.Helpers.GTN
         /// </summary>
         public class OutputConfig
         {
+            public static OutputConfig Instance { get; } = new OutputConfig();
             #region 全部DO点位属性（对应100.00 ~ 100.15）
             /// <summary>100.00 产品真空</summary>
             public IoConfig ProductVacuum { get; set; }

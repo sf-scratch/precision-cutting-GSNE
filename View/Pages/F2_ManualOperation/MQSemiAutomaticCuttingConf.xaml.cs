@@ -10,6 +10,7 @@ using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
 using 精密切割系统.Extensions;
 using 精密切割系统.Helpers;
+using 精密切割系统.Helpers.GTN;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut;
 using 精密切割系统.Model.MeasureHeight;
@@ -107,8 +108,6 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
             BladeHeightModel bladeHeightModel = CurrentUtils.GetBladeHeightModel();
             // 获取当前channel
             FileTableItemChModel chModel = CurrentUtils.GetFileTableItemChModel();
-            // 设置当前配置信息的切割方法
-            PlcControl.tagControl.cutting.StartCutMethod(CutOperateUtils.GetCutMethod(chModel.CutMode));
             // 获取刀片高度、进刀速度
             string bladeHeightStr = chModel.BladeHeight;
             string feedSpeedStr = chModel.FeedSpeed;
@@ -206,10 +205,17 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
 
         // 开始切割
         private async void StartCut(object? sender, bool e)
-        {
-            if (AlarmConfig.Instance.HasActiveErrorAlarm())
+        {   //真空报警合集
+            if (await IoAlarm.Instance.ScanAllIoAlarmAsync())
             {
                 MaterialSnack(AlarmConfig.HasErrorAlarmMessage, SnackType.WARNING);
+                return;
+            }
+
+            bool axisReady = await GsneMotion.Instance.WaitReadyCuttingAsync();
+            if (!axisReady)
+            {
+                MaterialSnack("轴未就绪，请检查！", SnackType.WARNING);
                 return;
             }
             if (WarmUpHelper.IsRuning)
@@ -341,22 +347,18 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
 
         private void z1CompCheckbox_Checked(object sender, RoutedEventArgs e)
         {
-            PlcControl.tagControl.cutting.SetZ1AxisCompStatus(0);
         }
 
         private void yCompCheckbox_Checked(object sender, RoutedEventArgs e)
         {
-            PlcControl.tagControl.cutting.SetYAxisCompStatus(1);
         }
 
         private void yCompCheckbox_Unchecked(object sender, RoutedEventArgs e)
         {
-            PlcControl.tagControl.cutting.SetYAxisCompStatus(0);
         }
 
         private void z1CompCheckbox_Unchecked(object sender, RoutedEventArgs e)
         {
-            PlcControl.tagControl.cutting.SetZ1AxisCompStatus(1);
         }
     }
 }

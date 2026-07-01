@@ -69,7 +69,6 @@ namespace 精密切割系统.Helpers
         {
             // 设置位置校准
             InitPositionAlignment(positionAlignmentModel);
-            InitInitialPositionModel(initialPositionModel);
             // 各轴运动速度 点动高速/低速速度  绝对运动速度
             await InitAxisSpeedIndexAsync(operationParametersModel);
             await InitUserDefineDataAsync();
@@ -83,18 +82,6 @@ namespace 精密切割系统.Helpers
             await PlcControl.tagControl.Xaxis.SetMaxSpeedAsync(userDefineData.MaxSpeedX.ToFloat());
             await PlcControl.tagControl.Yaxis.SetMaxSpeedAsync(userDefineData.MaxSpeedY.ToFloat());
             await PlcControl.tagControl.wholeDevice.SetVacuumBreakingTimeAsync(userDefineData.VacuumBreakingTime.ToInt());
-        }
-
-        public static void InitInitialPositionModel(InitialPositionModel _model)
-        {
-            // 测高初始位置
-            PlcControl.tagControl.bladeMantance.SetBladeSetuInitPosition(_model.BladeSetupInitX, _model.BladeSetupInitY, _model.BladeSetupInitZ1, _model.BladeSetupInitZ2);
-            // 校准初始位置
-            PlcControl.tagControl.calibration.SetAlignInitPosition(_model.AlignInitX, _model.AlignInitY, _model.AlignInitZ1, _model.AlignInitZ2);
-            // 刀片更换位置
-            PlcControl.tagControl.bladeMantance.SetCutReplaceInitPosition(_model.CutReplaceInitX, _model.CutReplaceInitY, _model.CutReplaceInitZ1, _model.CutReplaceInitZ2);
-            // 切割位置
-            PlcControl.tagControl.cutting.SetCutInitPosition(_model.CutInitX, _model.CutInitY, _model.CutInitZ1);
         }
 
         public static void InitPositionAlignment(PositionAlignmentModel _model)

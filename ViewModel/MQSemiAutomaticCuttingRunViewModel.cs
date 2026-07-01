@@ -517,7 +517,6 @@ namespace 精密切割系统.ViewModel
             MaterialSnack("正在继续切割...", SnackType.WARNING, 0, _eventAggregator);
             _pauseCts = new CancellationTokenSource();
             await PlcControl.tagControl.wholeDevice.OpenGreenLightAsync();
-            await PlcControl.tagControl.cutting.EnterCuttingModeAsync(_pauseCts.Token);
             SemiAutoCutService.Instance.Continue(_pauseCts.Token);
             MaterialSnack("切割中...", SnackType.WARNING, 0, _eventAggregator);
         }
@@ -531,7 +530,6 @@ namespace 精密切割系统.ViewModel
             }
             MaterialSnack("正在继续切割...", SnackType.WARNING, 0, _eventAggregator);
             _pauseCts = new CancellationTokenSource();
-            await PlcControl.tagControl.cutting.EnterCuttingModeAsync(_pauseCts.Token);
             SemiAutoCutService.Instance.ContinueAndResetCutY(_pauseCts.Token);
             MaterialSnack("切割中...", SnackType.WARNING, 0, _eventAggregator);
         }
@@ -546,8 +544,6 @@ namespace 精密切割系统.ViewModel
             }
             SemiAutoCutService.Instance.Stop(pauseResult);
             await PlcControl.tagControl.wholeDevice.OpenYellowLightAsync();
-            //结束切割
-            await PlcControl.tagControl.cutting.ExitCuttingModeAsync(default);
             NavigateToHome();
             ShowMessage();
         }
@@ -570,7 +566,6 @@ namespace 精密切割系统.ViewModel
             {
                 // 超时自动取消
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(runTime));
-                await PlcControl.tagControl.cutting.ExitCuttingModeAsync(cts.Token);
                 LineSegment? line = pauseData.Line;
                 // 轴不报警时移动到指定位置
                 if (line != null && !AlarmConfig.Instance.HasAxisErrorAlarms())

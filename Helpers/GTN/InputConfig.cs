@@ -16,6 +16,7 @@ namespace 精密切割系统.Helpers.GTN
     /// </summary>
     public class InputConfig
     {
+        public static InputConfig Instance { get; } = new InputConfig();
         // ========== 全部DI点位定义（对应你提供的0.00~0.15）==========
         /// <summary>0.00 工件真空按钮</summary>
         public IoConfig WorkpieceVacuumBtn { get; set; }
@@ -63,9 +64,9 @@ namespace 精密切割系统.Helpers.GTN
             ushort byteOff = 2;
 
             WorkpieceVacuumBtn = new IoConfig(slaveId, byteOff, 0, "工件真空按钮");
-            EmgStop = new IoConfig(slaveId, byteOff, 1, "急停按钮");
+            EmgStop = new IoConfig(slaveId, byteOff, 1, "急停按钮");//单独用
             EmergencyLift = new IoConfig(slaveId, byteOff, 2, "紧急抬起");
-            ResetBtn = new IoConfig(slaveId, byteOff, 3, "复位按钮");
+            ResetBtn = new IoConfig(slaveId, byteOff, 3, "复位按钮");//单独用
             WorkpieceVacuumDetect = new IoConfig(slaveId, byteOff, 5, "工件真空度");
             AirFloatPressureDetect = new IoConfig(slaveId, byteOff, 6, "气浮气压值");
             SpindleBrakePressure = new IoConfig(slaveId, byteOff, 7, "主轴抱闸压力");
@@ -73,7 +74,7 @@ namespace 精密切割系统.Helpers.GTN
             CutWaterDetectNO = new IoConfig(slaveId, (ushort)(byteOff + 1), 1, "切割水检测开关NO");
             CoolWaterDetectNO = new IoConfig(slaveId, (ushort)(byteOff + 1), 2, "冷却水检测开关NO");
             HeightRelayCloseDetect = new IoConfig(slaveId, (ushort)(byteOff + 1), 3, "测高继电器闭合检测");
-            HeightContactDetect = new IoConfig(slaveId, (ushort)(byteOff + 1), 4, "测高接触");
+            HeightContactDetect = new IoConfig(slaveId, (ushort)(byteOff + 1), 4, "测高接触");//单独用
             SpindleBrushCheck = new IoConfig(slaveId, (ushort)(byteOff + 1), 5, "主轴电刷检查");
             CameraSafetyDoor = new IoConfig(slaveId, (ushort)(byteOff + 1), 6, "相机安全门");
             CutSafetyDoor = new IoConfig(slaveId, (ushort)(byteOff + 1), 7, "切割安全门");

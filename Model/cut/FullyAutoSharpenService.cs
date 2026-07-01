@@ -113,8 +113,6 @@ namespace 精密切割系统.Model.cut
             {
                 //打开切割水
                 await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
-                //进入全自动切割模式
-                await PlcControl.tagControl.cutting.EnterCuttingModeAsync(usingPauseToken);
                 float abAverageThickness = lunguSksj.ABAverageThickness / 1000;
                 int curSharpenTimes = 0;
                 //开始磨刀，磨指定刀数
@@ -178,7 +176,7 @@ namespace 精密切割系统.Model.cut
                             usingPauseToken = token.Value;
                         }
                         //当前磨刀次数
-                        int? curCutNum = await PlcControl.tagControl.cutting.GetCutNumAsync();
+                        int? curCutNum = CuttingAutomation.Instance.CutCount;
                         if (curCutNum == null)
                         {
                             return RunResult.Fail("读取磨刀次数失败！");

@@ -185,7 +185,6 @@ namespace 精密切割系统.View.F6_EngineeringTechnology
                 await SqlHelper.UpdateAsync(_model);
 
                 // 测高初始位置
-                CurrentUtils.InitInitialPositionModel(_model);
             }
             else
             {

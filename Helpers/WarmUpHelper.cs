@@ -7,6 +7,7 @@ using System.Windows.Threading;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
 using 精密切割系统.FrmWindow.common;
+using 精密切割系统.Helpers.GTN;
 using 精密切割系统.Model.plc;
 using 精密切割系统.Utils;
 using 精密切割系统.ViewModel;
@@ -54,7 +55,7 @@ namespace 精密切割系统.Helpers
                         Task z1Task = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, _warmUpCts.Token);
                         Task z2Task = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, default, _warmUpCts.Token);
                         await Task.WhenAll(z1Task, z2Task);
-                        await PlcControl.tagControl.cutting.RunMotionAsync(userDefine.WarmUpStartX.ToFloat(), userDefine.WarmUpStartY.ToFloat(), _warmUpCts.Token);
+                        await GsneMotion.Instance.Axis.RunMotionAsync(userDefine.WarmUpStartX.ToFloat(), userDefine.WarmUpStartY.ToFloat(), _warmUpCts.Token);
                         await _warmUpTcs.Task;
                     }
                     catch (OperationCanceledException)

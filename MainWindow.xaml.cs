@@ -306,7 +306,7 @@ namespace 精密切割系统
             // 设置面板禁用
             PlcControl.tagControl.wholeDevice.SetPanelButtonsStauts(0);
             // 关闭Y轴光栅尺校准
-            PlcControl.tagControl.cutting.SetYAxisCompStatus(0);
+            //PlcControl.tagControl.cutting.SetYAxisCompStatus(0);
             //重置当前切割面为CH1
             await CurrentUtils.UpdateCurrentChAsync(GlobalParams.CH1);
             int? currentCh = RegexMatchUtils.ExtractChNumber(GlobalParams.CH1);

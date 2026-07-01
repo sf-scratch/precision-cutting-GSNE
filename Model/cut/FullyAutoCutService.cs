@@ -138,7 +138,6 @@ namespace 精密切割系统.Model.cut
                 //打开切割水
                 await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
                 //进入全自动切割模式
-                await PlcControl.tagControl.cutting.EnterCuttingModeAsync(_usingPauseToken);
                 float abAverageThickness = lunguSksj.ABAverageThickness;
                 int chekcTimes = 0;
                 while (cutTime < needCutTimes)
@@ -203,7 +202,8 @@ namespace 精密切割系统.Model.cut
                             await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
                         }
                         //当前切割次数
-                        int? curCutNum = await PlcControl.tagControl.cutting.GetCutNumAsync();
+                        //int? curCutNum = await PlcControl.tagControl.cutting.GetCutNumAsync();
+                        int? curCutNum = CuttingAutomation.Instance.CutCount;
                         if (curCutNum == null)
                         {
                             return RunResult.Fail("获取当前切割次数失败！");
@@ -213,13 +213,34 @@ namespace 精密切割系统.Model.cut
                         //加上边距
                         var (startX, endX) = CalculateCuttingX(line, _thetaDegQueue.Peek(), cutParams.OffsetX);
                         await PlcControl.tagControl.ThetaAxis.SetAbsoluteSpeedAsync(GlobalParams.ThetaDefaultSpeed);
+
                         //设置切割参数
-                        await PlcControl.tagControl.cutting.SetCutParamsAsync(cutSpeed, endZ, startZ, startX, endX, line.StartPoint.Y, "0", _thetaDegQueue.Peek() + cutCalibratTheta, cutParams.SpindleRev, depthEntry);
+                        var cutParam = new CuttingParameters()
+                        {
+                            // 完整切割位置
+                            TargetPositionX = startX,
+                            TargetPositionEndX = endX,
+                            TargetPositionY = line.StartPoint.Y,
+                            TargetPositionZ1 = endZ,
+                            TargetPositionZ1Safe = startZ,
+                            TargetPositionTheta = _thetaDegQueue.Peek() + cutCalibratTheta,
+
+                            // 各轴速度
+                            SpeedX = 60f,
+                            SpeedY = 60f,
+                            SpeedZ1 = 22f,
+                            SpeedTheta = 30f,
+                            SpindleRev = cutParams.SpindleRev
+                        };
+
+
                         //开始切割信号
-                        await PlcControl.tagControl.cutting.StartCutAsync();
-                        //等待切割次数变化
-                        await PlcControl.tagControl.cutting.WaitCutNumUdatedAsync(curCutNum.Value + 1, _usingPauseToken);
-                        cutTime++;
+                        bool rtn = await CuttingAutomation.Instance.ExecuteCuttingAsync(cutParam, _usingPauseToken);
+                        //等待切割动作完成
+                        if (rtn)
+                        {
+                            cutTime++;
+                        }
                         //触发切割进度更新事件
                         CutServiceProcessChanged?.Invoke(new CutServiceProcess(endZ, cutSpeed, line.StartPoint.Y, needCutTimes + _finishedCutTimes, cutTime + _finishedCutTimes, GlobalParams.CH1, 0, 0, true));
                         //停止切割前
@@ -253,7 +274,6 @@ namespace 精密切割系统.Model.cut
                                 else
                                 {
                                     //退出全自动切割模式
-                                    await PlcControl.tagControl.cutting.ExitCuttingModeAsync(_usingPauseToken);
                                     //刀痕检查
                                     MaterialSnack("检查刀痕中...", SnackType.WARNING, 0, eventAggregator);
                                     ImagesAnalysisResult result = await AutoCutUtils.CheckKnifeMarksStatus(line, eventAggregator, _usingPauseToken);
@@ -330,8 +350,6 @@ namespace 精密切割系统.Model.cut
                             {
                                 //打开切割水
                                 await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
-                                //进入全自动切割模式
-                                await PlcControl.tagControl.cutting.EnterCuttingModeAsync(_usingPauseToken);
                             }
                             MaterialSnack("刀痕合格！", SnackType.WARNING, 0, eventAggregator);
                             MaterialSnack("切割进行中...", SnackType.SUCCESS, 0, eventAggregator);
@@ -356,7 +374,6 @@ namespace 精密切割系统.Model.cut
             finally
             {
                 //退出全自动切割模式
-                await PlcControl.tagControl.cutting.ExitCuttingModeAsync(default);
                 _finishedCutTimes = cutTime;
                 AutoCutHistoryUtils.SetCutCount(cutTime);
             }

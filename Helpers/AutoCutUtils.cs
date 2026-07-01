@@ -98,7 +98,8 @@ namespace 精密切割系统.Helpers
                 float speedX = initPos.CutReplaceInitSpeedX.ToFloat();
                 float speedY = initPos.CutReplaceInitSpeedY.ToFloat();
                 float speedZ1 = initPos.CutReplaceInitSpeedZ1.ToFloat();
-                if (!await PlcControl.tagControl.Z1axis.IsReadyAsync())
+                //if (!await PlcControl.tagControl.Z1axis.IsReadyAsync())
+                if(!await GsneMotion.Instance.Axis.IsReadyAsync(AxisType.Z1))
                 {
                     return CommonResult.Failure("轴未准备好，请检查轴状态！");
                 }
@@ -137,7 +138,7 @@ namespace 精密切割系统.Helpers
                 Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, token);
                 Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, default, token);
                 await Task.WhenAll(taskZ1, taskZ2);
-                Task taskXY = PlcControl.tagControl.cutting.RunMotionAsync(0, 0, token);
+                Task taskXY = GsneMotion.Instance.Axis.RunMotionAsync(0,0, token);
                 Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0, default, token);
                 Task speedZero = PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync(token);
                 await Task.WhenAll(taskXY, taskTheta, speedZero);
@@ -186,7 +187,7 @@ namespace 精密切割系统.Helpers
                     MaterialSnack("轴未准备好，请检查轴状态！", SnackType.WARNING, 0, eventAggregator);
                     return;
                 }
-                Task taskXY = PlcControl.tagControl.cutting.RunMotionAsync(0, 0, token);
+                Task taskXY = GsneMotion.Instance.Axis.RunMotionAsync(0, 0, token);
                 Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0, default, token);
                 await Task.WhenAll(taskXY, taskTheta);
                 SemiAutoCutService.Instance.HasNotTakenOutWorkpiecesAfterCuttingCompleted = false;
@@ -219,11 +220,12 @@ namespace 精密切割系统.Helpers
             {
                 return CommonResult<float>.Failure("获取测高参数失败！");
             }
-            await PlcControl.tagControl.cutting.SetSpindleSpeedAsync(bmParameter.SpindleRev.ToInt());
+            await SpindleMotionSet.Instance.SetSpindleSpeedAsync(bmParameter.SpindleRev.ToInt());
             await PlcControl.tagControl.bladeMantance.SetHeightMeasureTimes(bmParameter.HeightMeasureTimes.ToInt());
             CommonResult<float> curHeightZ;
             if (Appsettings.MeasureHeightLast == null)
             {
+                if (Appsettings.BladeOuterDiameter == null || Appsettings.BladeOuterDiameter.Value == 0)
                 if (Appsettings.BladeOuterDiameter == null || Appsettings.BladeOuterDiameter.Value == 0)
                 {
                     return CommonResult<float>.Failure("未设置刀片外径，无法测高！");
@@ -338,7 +340,7 @@ namespace 精密切割系统.Helpers
                             eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("光纤传感器开始吹气"));
                             float startBlowX = 127f, endBlowX = 135f;
                             //测高前移动到初始位置，主轴旋转，开始吹水吹气
-                            await PlcControl.tagControl.cutting.RunMotionAsync(startBlowX, 50, useToken);
+                            await GsneMotion.Instance.Axis.RunMotionAsync(startBlowX, 50, useToken);
                             await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingAsync();
                             for (int count = 0; count < 5; count++)
                             {
@@ -578,7 +580,7 @@ namespace 精密切割系统.Helpers
         public static async Task WaitManualBlowing(IDialogService dialogService, CancellationToken token)
         {
             await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, token);
-            await PlcControl.tagControl.cutting.RunMotionAsync(100, 0, token);
+            await GsneMotion.Instance.Axis.RunMotionAsync(100, 0, token);
             await PlcControl.tagControl.wholeDevice.OpenBuzzerAsync();
             await dialogService.ShowDialogWindowAsync(nameof(ConfirmDialog), new DialogParameters() { { "ButtonContent", "测高多次失败，请手动吹水!" } }, r => { }, nameof(ConfirmDialogWindow));
             await PlcControl.tagControl.wholeDevice.CloseBuzzerAsync();
@@ -869,7 +871,7 @@ namespace 精密切割系统.Helpers
         {
             DataPoint<float> cameraThetaCenterPoint = Appsettings.CameraThetaCenterPoint;
             float thetaDeg = Appsettings.CutThetaDegList?.FirstOrDefault() ?? 0f;
-            Task focusxyTask = PlcControl.tagControl.cutting.RunMotionAsync(cameraThetaCenterPoint.X - 10, Appsettings.CutY?.ToCameraY() ?? (cameraThetaCenterPoint.Y + 30), token);
+            Task focusxyTask = GsneMotion.Instance.Axis.RunMotionAsync(cameraThetaCenterPoint.X - 10, Appsettings.CutY?.ToCameraY() ?? (cameraThetaCenterPoint.Y + 30), token);
             Task focusThetaTask = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(thetaDeg, default, token);
             await Task.WhenAll(focusxyTask, focusThetaTask);
         }
@@ -878,7 +880,7 @@ namespace 精密切割系统.Helpers
         {
             DataPoint<float> cameraThetaCenterPoint = Appsettings.CameraThetaCenterPoint;
             float thetaDeg = Appsettings.SharpenThetaDegList?.FirstOrDefault() ?? 0f;
-            Task focusxyTask = PlcControl.tagControl.cutting.RunMotionAsync(cameraThetaCenterPoint.X - 10, Appsettings.SharpenY?.ToCameraY() ?? (cameraThetaCenterPoint.Y - 10), token);
+            Task focusxyTask = GsneMotion.Instance.Axis.RunMotionAsync(cameraThetaCenterPoint.X - 10, Appsettings.SharpenY?.ToCameraY() ?? (cameraThetaCenterPoint.Y - 10), token);
             Task focusThetaTask = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(thetaDeg, default, token);
             await Task.WhenAll(focusxyTask, focusThetaTask);
         }
@@ -966,7 +968,7 @@ namespace 精密切割系统.Helpers
             await Task.WhenAll(xTask, yTask);
             float curX = xTask.Result ?? 0, curY = yTask.Result ?? 0;
             await WorkpieceBlowingAsync(default, default, true, eventAggregator, token);
-            await PlcControl.tagControl.cutting.RunMotionAsync(curX, curY, token);
+            await GsneMotion.Instance.Axis.RunMotionAsync(curX, curY, token);
         }
 
         /// <summary>

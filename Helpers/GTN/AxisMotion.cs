@@ -29,7 +29,7 @@ namespace 精密切割系统.Helpers.GTN
         /// 轴是否准备好
         /// </summary>
         /// <returns></returns>
-        public async Task<bool> IsReadyAsync(AxisType axis)
+        public async Task<bool> IsReadyAsync(AxisType axis, params AxisStatusBits[] ignore)
         {
             return await Task.Run(() =>
             {
@@ -39,6 +39,10 @@ namespace 精密切割系统.Helpers.GTN
                     return false;
                 }
                 AxisStatusBits bitsOff = AxisStatusBits.DriverAlarm | AxisStatusBits.FollowingError | AxisStatusBits.PositiveLimit | AxisStatusBits.NegativeLimit | AxisStatusBits.SmoothStop | AxisStatusBits.EmergencyStop | AxisStatusBits.MotionActive;
+                foreach (var bit in ignore)
+                {
+                    bitsOff &= ~bit;
+                }
                 return (pSts & (int)bitsOff) == 0;
             });
         }
@@ -61,9 +65,9 @@ namespace 精密切割系统.Helpers.GTN
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        public async Task WaitAxisReadyAsync(AxisType axis, CancellationToken token)
+        public async Task WaitAxisReadyAsync(AxisType axis, CancellationToken token, params AxisStatusBits[] ignore)
         {
-            await TaskUtils.WaitExpectedResultAsync(() => IsReadyAsync(axis), default, token);
+            await TaskUtils.WaitExpectedResultAsync(() => IsReadyAsync(axis,ignore), default, token);
         }
 
         /// <summary>
@@ -291,7 +295,7 @@ namespace 精密切割系统.Helpers.GTN
         /// <param name="xInterpolationMotionValue"></param>
         /// <param name="yInterpolationMotionValue"></param>
         /// <returns></returns>
-        public async Task RunMotionAsync(float xInterpolationMotionValue, float yInterpolationMotionValue, CancellationToken token)
+        public async Task RunMotionAsync(float xInterpolationMotionValue, float yInterpolationMotionValue, CancellationToken token = default)
         {
             if (!GlobalParams.OnlineFlag) return;
             await Task.Run(() =>

@@ -20,8 +20,10 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using 精密切割系统.Assets.config.buttom;
 using 精密切割系统.Assets.config.menu;
+using 精密切割系统.Data;
 using 精密切割系统.Driver;
 using 精密切割系统.Helpers;
+using 精密切割系统.Helpers.GTN;
 using 精密切割系统.Model.cut;
 using 精密切割系统.Model.plc;
 using 精密切割系统.Utils;
@@ -635,15 +637,15 @@ namespace 精密切割系统.View.Pages.operate
                 if (await PlcControl.tagControl.wholeDevice.GetSpindleSpeedAsync() == 0)
                 {
                     MaterialSnack("主轴启动中...", SnackType.WARNING, 0);
-                    await PlcControl.tagControl.wholeDevice.StartSpindleAsync();
-                    await PlcControl.tagControl.cutting.WaitSpindleRevReachAsync(timeoutToken.Token);
+                    await SpindleMotionSet.Instance.StartSpindleAsync(FlangeTrimmingData.Instance.SpindleRev, true);
+                    await SpindleMotionSet.Instance.WaitSpindleSpeedReachedAsync(FlangeTrimmingData.Instance.SpindleRev, timeoutToken.Token);
                     MaterialSnack("主轴启动完成！", SnackType.SUCCESS);
                 }
                 else
                 {
                     MaterialSnack("主轴停止中...", SnackType.WARNING, 0);
-                    await PlcControl.tagControl.wholeDevice.StopSpindleAsync();
-                    await PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync(timeoutToken.Token);
+                    await SpindleMotionSet.Instance.StartSpindleAsync(FlangeTrimmingData.Instance.SpindleRev, true);
+                    await SpindleMotionSet.Instance.WaitSpindleSpeedReachedAsync(0, timeoutToken.Token);
                     MaterialSnack("主轴停止完成！", SnackType.SUCCESS);
                 }
             }

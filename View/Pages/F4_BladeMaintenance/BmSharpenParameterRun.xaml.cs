@@ -23,6 +23,7 @@ using 精密切割系统.Assets.config.buttom;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
 using 精密切割系统.Helpers;
+using 精密切割系统.Helpers.GTN;
 using 精密切割系统.Model.cut;
 using 精密切割系统.Model.cut.Workpieces;
 using 精密切割系统.Model.MeasureHeight;
@@ -165,7 +166,6 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             }
             MaterialSnack("正在准备继续磨刀...", SnackType.WARNING, 0);
             _pauseCts = new CancellationTokenSource();
-            await PlcControl.tagControl.cutting.EnterCuttingModeAsync(_pauseCts.Token);
             _semiAutoCutService.Continue(_pauseCts.Token);
             UpdateToRunStatus();
         }
@@ -203,8 +203,6 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 return;
             }
             _semiAutoCutService.Stop(ServicePauseResult.Stop);
-            //结束切割
-            await PlcControl.tagControl.cutting.ExitCuttingModeAsync(default);
             mainWindow?.NavigateToPage("Pages/F4_BladeMaintenance/BmSharpenParameterForm", "Id=" + idStr + "&Flag=" + flag + "&BladeLotID=" + bladeLotID);
         }
 
@@ -241,14 +239,13 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             try
             {
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(runTime)); // 超时自动取消
-                await PlcControl.tagControl.cutting.ExitCuttingModeAsync(cts.Token);
                 // 轴不报警时移动到指定位置
                 if (line != null && !AlarmConfig.Instance.HasAxisErrorAlarms())
                 {
                     // 执行默认动作
                     await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, cts.Token);
                     await AutoCutUtils.WorkpieceBlowingAsync(default, default, true, default, cts.Token);
-                    await PlcControl.tagControl.cutting.RunMotionAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), line.StartPoint.Y.ToCameraY(), cts.Token);
+                    await GsneMotion.Instance.Axis.RunMotionAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), line.StartPoint.Y.ToCameraY(), cts.Token);
                     await AutoFocusService.GlobalFocusAsync(default, default, cts.Token);
                     await AutoCutUtils.FineTuneAxisYAsync();
                     await AutoCutUtils.UpdateCameraCommonLineAsync();

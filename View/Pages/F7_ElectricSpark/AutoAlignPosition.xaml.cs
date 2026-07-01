@@ -208,8 +208,6 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
         private void BtnBack_RightClicked(object? sender, bool e)
         {
             GlobalParams.globalRunFlag = true;
-            // 退出切割模式
-            PlcControl.tagControl.cutting.EnterFullAutoInit(0);
             GlobalParams.globalRunFlag = false;
             mainWindow.NavigateToPage("MainMenu");
         }

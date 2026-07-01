@@ -25,6 +25,7 @@ using 精密切割系统.Driver;
 using 精密切割系统.DTOs;
 using 精密切割系统.Extensions;
 using 精密切割系统.Helpers;
+using 精密切割系统.Helpers.GTN;
 using 精密切割系统.HttpClients;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut;
@@ -713,7 +714,6 @@ namespace 精密切割系统.ViewModel
             try
             {
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(runTime)); // 超时自动取消
-                await PlcControl.tagControl.cutting.ExitCuttingModeAsync(cts.Token);
                 switch (RunStatus)
                 {
                     case AutoRunStatus.ReplaceWafer:
@@ -731,7 +731,7 @@ namespace 精密切割系统.ViewModel
                             // 执行默认动作
                             await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, cts.Token);
                             await AutoCutUtils.WorkpieceBlowingAsync(default, default, true, _eventAggregator, cts.Token);
-                            await PlcControl.tagControl.cutting.RunMotionAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), line.StartPoint.Y.ToCameraY(), cts.Token);
+                            await GsneMotion.Instance.Axis.RunMotionAsync(((line.StartPoint.X + line.EndPoint.X) / 2).ToCameraX(), line.StartPoint.Y.ToCameraY(), cts.Token);
                             await AutoFocusService.GlobalFocusAsync(default, _eventAggregator, cts.Token);
                             await AutoCutUtils.FineTuneAxisYAsync();
                             await AutoCutUtils.UpdateCameraCommonLineAsync();
@@ -831,7 +831,6 @@ namespace 精密切割系统.ViewModel
         {
             MaterialSnack("正在继续切割...", SnackType.WARNING, 0, _eventAggregator);
             _pauseCts = new CancellationTokenSource();
-            await PlcControl.tagControl.cutting.EnterCuttingModeAsync(_pauseCts.Token);
             _sharpenService.Continue(_pauseCts.Token);
             _cutService.Continue(_pauseCts.Token);
             if (RunStatus == AutoRunStatus.ReplaceSharpenBoard)
@@ -861,8 +860,6 @@ namespace 精密切割系统.ViewModel
             _cutService.Stop(pauseResult);
             if (RunStatus == AutoRunStatus.SharpeningInProgress || RunStatus == AutoRunStatus.CutingInProgress)
             {
-                //结束切割
-                await PlcControl.tagControl.cutting.ExitCuttingModeAsync(default);
             }
             else
             {

@@ -10,6 +10,7 @@ using System.Windows.Threading;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
 using 精密切割系统.Helpers;
+using 精密切割系统.Helpers.GTN;
 using 精密切割系统.Model.cut;
 using 精密切割系统.Utils;
 using 精密切割系统.ViewModel;
@@ -399,7 +400,7 @@ namespace 精密切割系统.View.Pages.common
                 yPos = Math.Clamp(yPos.Value, yLowerValue, yUpperValue);
                 if (await PlcControl.tagControl.Xaxis.IsReadyAsync() && await PlcControl.tagControl.Yaxis.IsReadyAsync())
                 {
-                    await PlcControl.tagControl.cutting.RunMotionNoWaitAsync(xPos.Value, yPos.Value);
+                    await GsneMotion.Instance.Axis.RunMotionAsync(xPos.Value, yPos.Value);
                 }
             }
             finally

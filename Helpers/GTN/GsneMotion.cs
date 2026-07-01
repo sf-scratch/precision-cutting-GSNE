@@ -193,5 +193,44 @@ namespace 精密切割系统.Helpers.GTN
 
             return indices;
         }
+
+        /// <summary>
+        /// 判断轴切割条件是否准备好
+        /// 1.轴准备好了 2.轴原点ok 
+        /// </summary>
+        /// <returns>全部轴原点完成+轴就绪返回true</returns>
+        public async Task<bool> WaitReadyCuttingAsync()
+        {
+            AxisType[] checkAxisList = new[] { AxisType.X, AxisType.Y, AxisType.Z1, AxisType.Theta };
+
+            while (true)
+            {
+                bool allHomeOk = true;
+
+                // 校验所有轴回零完成
+                foreach (var axis in checkAxisList)
+                {
+                    bool homeFinish = await GsneMotion.Instance.Axis.IsCompleteHomingAsync(axis);
+                    if (!homeFinish)
+                    {
+                        allHomeOk = false;
+                        break;
+                    }
+                }
+
+                if (allHomeOk)
+                {
+                    // 等待所有轴就绪
+                    foreach (var axis in checkAxisList)
+                    {
+                        await GsneMotion.Instance.Axis.WaitAxisReadyAsync(axis, CancellationToken.None, AxisStatusBits.MotionActive);
+                    }
+                    return true;
+                }
+
+                await Task.Delay(200);
+            }
+        }
+
     }
 }

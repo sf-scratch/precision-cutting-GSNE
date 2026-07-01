@@ -18,6 +18,7 @@ using 精密切割系统.Data;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Extensions;
 using 精密切割系统.Helpers;
+using 精密切割系统.Helpers.GTN;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.plc;
 using 精密切割系统.Model.sqlite;
@@ -172,79 +173,61 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
 
         private async Task StartFlangeTrimmingSoftKnife(CancellationToken token)
         {
-            try
+            //// 设置主轴转速
+            await SpindleMotionSet.Instance.StartSpindleAsync(FlangeTrimmingData.Instance.SpindleRev, true);
+            await SpindleMotionSet.Instance.WaitSpindleSpeedReachedAsync(FlangeTrimmingData.Instance.SpindleRev, token);
+            AxisPosition axisPostion = await AutoCutUtils.GetAxisPositionAsync();
+            float curX = axisPostion.X ?? 0;
+            float xLeft = curX + FlangeTrimmingData.Instance.XAxisTravel, xRight = curX;
+            bool isLeft = true;
+            for (int i = 0; i < FlangeTrimmingData.Instance.RepeatCount; i++)
             {
-                await PlcControl.tagControl.cutting.FlangeRepairBeginsAsync();
-                //// 设置主轴转速
-                await PlcControl.tagControl.cutting.SetSpindleSpeedAsync(FlangeTrimmingData.Instance.SpindleRev);
-                await PlcControl.tagControl.wholeDevice.StartSpindleAsync();
-                await PlcControl.tagControl.cutting.WaitSpindleRevReachAsync(token);
-                AxisPosition axisPostion = await AutoCutUtils.GetAxisPositionAsync();
-                float curX = axisPostion.X ?? 0;
-                float xLeft = curX + FlangeTrimmingData.Instance.XAxisTravel, xRight = curX;
-                bool isLeft = true;
-                for (int i = 0; i < FlangeTrimmingData.Instance.RepeatCount; i++)
+                int sparkFreeSteps = FlangeTrimmingData.Instance.SparkFreeStep;
+                if (yRollback.IsChecked == true)
                 {
-                    int sparkFreeSteps = FlangeTrimmingData.Instance.SparkFreeStep;
-                    if (yRollback.IsChecked == true)
+                    while (sparkFreeSteps > 0)
                     {
-                        while (sparkFreeSteps > 0)
-                        {
-                            await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(xLeft, FlangeTrimmingData.Instance.CutSpeed, token);
-                            await PlcControl.tagControl.Yaxis.StartRelativeAsync(-0.5f, 5, token);
-                            await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(xRight, FlangeTrimmingData.Instance.CutSpeed, token);
-                            await PlcControl.tagControl.Yaxis.StartRelativeAsync(0.5f, 5, token);
-                            sparkFreeSteps--;
-                        }
+                        await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(xLeft, FlangeTrimmingData.Instance.CutSpeed, token);
+                        await PlcControl.tagControl.Yaxis.StartRelativeAsync(-0.5f, 5, token);
+                        await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(xRight, FlangeTrimmingData.Instance.CutSpeed, token);
+                        await PlcControl.tagControl.Yaxis.StartRelativeAsync(0.5f, 5, token);
+                        sparkFreeSteps--;
                     }
-                    else
-                    {
-                        while (sparkFreeSteps > 0)
-                        {
-                            await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(isLeft ? xLeft : xRight, FlangeTrimmingData.Instance.CutSpeed, token);
-                            isLeft = !isLeft;
-                            sparkFreeSteps--;
-                        }
-                    }
-                    await PlcControl.tagControl.Yaxis.StartRelativeAsync(FlangeTrimmingData.Instance.YStepDistance, 1, token);
-                    currentCount.Text = (currentCount.Text.ToInt() + 1).ToString();
                 }
-            }
-            finally
-            {
-                await PlcControl.tagControl.cutting.FlangeRepairEndAsync();
-            }
-        }
-
-        private async Task StartFlangeTrimmingHardKnife(CancellationToken token)
-        {
-            try
-            {
-                await PlcControl.tagControl.cutting.FlangeRepairBeginsAsync();
-                // 设置主轴转速
-                await PlcControl.tagControl.cutting.SetSpindleSpeedAsync(FlangeTrimmingData.Instance.SpindleRev);
-                await PlcControl.tagControl.wholeDevice.StartSpindleAsync();
-                await PlcControl.tagControl.cutting.WaitSpindleRevReachAsync(token);
-                AxisPosition axisPostion = await AutoCutUtils.GetAxisPositionAsync();
-                float curX = axisPostion.X ?? 0;
-                float xLeft = curX + FlangeTrimmingData.Instance.XAxisTravel, xRight = curX;
-                bool isLeft = true;
-                for (int i = 0; i < FlangeTrimmingData.Instance.RepeatCount; i++)
+                else
                 {
-                    int sparkFreeSteps = FlangeTrimmingData.Instance.SparkFreeStep;
                     while (sparkFreeSteps > 0)
                     {
                         await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(isLeft ? xLeft : xRight, FlangeTrimmingData.Instance.CutSpeed, token);
                         isLeft = !isLeft;
                         sparkFreeSteps--;
                     }
-                    await PlcControl.tagControl.Yaxis.StartRelativeAsync(FlangeTrimmingData.Instance.YStepDistance, 1, token);
-                    currentCount.Text = (currentCount.Text.ToInt() + 1).ToString();
                 }
+                await PlcControl.tagControl.Yaxis.StartRelativeAsync(FlangeTrimmingData.Instance.YStepDistance, 1, token);
+                currentCount.Text = (currentCount.Text.ToInt() + 1).ToString();
             }
-            finally
+        }
+
+        private async Task StartFlangeTrimmingHardKnife(CancellationToken token)
+        {
+            // 设置主轴转速
+            await SpindleMotionSet.Instance.StartSpindleAsync(FlangeTrimmingData.Instance.SpindleRev, true);
+            await SpindleMotionSet.Instance.WaitSpindleSpeedReachedAsync(FlangeTrimmingData.Instance.SpindleRev, token);
+            AxisPosition axisPostion = await AutoCutUtils.GetAxisPositionAsync();
+            float curX = axisPostion.X ?? 0;
+            float xLeft = curX + FlangeTrimmingData.Instance.XAxisTravel, xRight = curX;
+            bool isLeft = true;
+            for (int i = 0; i < FlangeTrimmingData.Instance.RepeatCount; i++)
             {
-                await PlcControl.tagControl.cutting.FlangeRepairEndAsync();
+                int sparkFreeSteps = FlangeTrimmingData.Instance.SparkFreeStep;
+                while (sparkFreeSteps > 0)
+                {
+                    await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(isLeft ? xLeft : xRight, FlangeTrimmingData.Instance.CutSpeed, token);
+                    isLeft = !isLeft;
+                    sparkFreeSteps--;
+                }
+                await PlcControl.tagControl.Yaxis.StartRelativeAsync(FlangeTrimmingData.Instance.YStepDistance, 1, token);
+                currentCount.Text = (currentCount.Text.ToInt() + 1).ToString();
             }
         }
 

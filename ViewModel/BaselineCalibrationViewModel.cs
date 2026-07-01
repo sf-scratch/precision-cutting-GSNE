@@ -10,6 +10,7 @@ using 精密切割系统.database.db.modle;
 using 精密切割系统.Entities;
 using 精密切割系统.Extensions;
 using 精密切割系统.Helpers;
+using 精密切割系统.Helpers.GTN;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut;
 using 精密切割系统.Model.cut.Workpieces;
@@ -318,8 +319,6 @@ namespace 精密切割系统.ViewModel
             await PlcControl.tagControl.wholeDevice.CloseCameraLensCapAsync();
             //打开切割水
             await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
-            //进入全自动切割模式
-            await PlcControl.tagControl.cutting.EnterCuttingModeAsync(token);
             float endZ = _measureHeigthY - Entity.BladeHeight.ToFloat();
             float startZ = _measureHeigthY - Entity.WorkThickness.ToFloat() - Entity.TapeThickness.ToFloat() - GlobalParams.BladeLiftingHeight;
             float depthEntry = _measureHeigthY - Entity.WorkThickness.ToFloat() - Entity.TapeThickness.ToFloat() - 0.5f;
@@ -332,27 +331,45 @@ namespace 精密切割系统.ViewModel
             try
             {
                 //当前切割次数
-                int? curCutNum = await PlcControl.tagControl.cutting.GetCutNumAsync();
+                int? curCutNum = CuttingAutomation.Instance.CutCount;
                 if (curCutNum == null)
                 {
                     MaterialSnack("获取当前切割次数失败！", SnackType.WARNING, 0);
                     return;
                 }
+
                 await PlcControl.tagControl.ThetaAxis.SetAbsoluteSpeedAsync(GlobalParams.ThetaDefaultSpeed);
                 //设置切割参数
-                await PlcControl.tagControl.cutting.SetCutParamsAsync(Entity.CutSpeed.ToFloat(), endZ, startZ, startX, endX, startY, "0", thetaDeg, Entity.SpindleRev.ToInt(), depthEntry);
+                var cutParam = new CuttingParameters()
+                {
+                    // 完整切割位置
+                    TargetPositionX = startX,
+                    TargetPositionEndX = endX,
+                    TargetPositionY = line.StartPoint.Y,
+                    TargetPositionZ1 = endZ,
+                    TargetPositionZ1Safe = startZ,
+                    TargetPositionTheta = thetaDeg,
+
+                    // 各轴速度
+                    SpeedX = 60f,
+                    SpeedY = 60f,
+                    SpeedZ1 = 22f,
+                    SpeedTheta = 30f,
+                    SpindleRev = Entity.SpindleRev.ToInt()
+                };
                 //开始切割信号
-                await PlcControl.tagControl.cutting.StartCutAsync();
-                //等待切割次数变化
-                await PlcControl.tagControl.cutting.WaitCutNumUdatedAsync(curCutNum.Value + 1, token);
+                bool rtn = await CuttingAutomation.Instance.ExecuteCuttingAsync(cutParam, token);
+                if (!rtn)
+                {
+                    //切割失败，提示看整么处理
+                }
             }
             finally
             {
-                await PlcControl.tagControl.cutting.ExitCuttingModeAsync(token);
                 await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
                 // 工作盘吹气
                 await AutoCutUtils.WorkpieceBlowingAsync(default, default, true, default, token);
-                await PlcControl.tagControl.cutting.RunMotionAsync(((startX + endX) / 2).ToCameraX(), startY.ToCameraY(), token);
+                await GsneMotion.Instance.Axis.RunMotionAsync(((startX + endX) / 2).ToCameraX(), startY.ToCameraY(), token);
                 await PlcControl.tagControl.wholeDevice.OpenCameraLensCapAsync();
                 _cutY = startY.ToCameraY();
             }

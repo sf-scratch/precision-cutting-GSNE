@@ -590,7 +590,6 @@ namespace 精密切割系统.Driver
         {
             PlcControl.tagControl.bladeMantance.RunBladeSetup(0);
             PlcControl.tagControl.bladeMantance.RunBladeReplace(0);
-            PlcControl.tagControl.cutting.EnterFullAutoInit(0);
             PlcControl.tagControl.sparkRepairKnife.EnterElectrical(0);
             PlcControl.tagControl.wholeDevice.IoModelSet(0);
             PlcControl.tagControl.flange.JoinTrimming(0);
