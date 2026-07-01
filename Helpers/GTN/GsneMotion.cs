@@ -122,51 +122,65 @@ namespace 精密切割系统.Helpers.GTN
             return CommonResult<bool>.Failure("状态获取失败！");
         }
 
+
+
+        private Dictionary<AxisType, int> _dic = new Dictionary<AxisType, int>();
+
+
+        public async Task StartMonitorAxisStatusAsync()
+        {
+            foreach (AxisType axis in Enum.GetValues(typeof(AxisType)))
+            {
+                _dic.Add(axis, 0);
+            }
+            while (true)
+            {
+                foreach (var axis in _dic.Keys)
+                {
+                    // 在后台线程执行同步 API 调用
+                    var status = await Task.Run(() =>
+                    {
+                        short rtn = GTN_GetStsEx(_core, (short)axis, out int pSts, 1, out uint _);
+                        return (rtn, pSts);
+                    });
+                    if (status.rtn == 0)
+                    {
+                        if (_dic[axis] != status.pSts)
+                        {
+                            _dic[axis] = status.pSts;
+                        }
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// 获取所有轴的报警状态
         /// </summary>
         /// <returns>各轴的报警列表</returns>
-        public async Task<List<ActiveAlarmModel>> GetAllAxisAlarmsAsync()
+        public List<ActiveAlarmModel> GetAllAxisAlarms()
         {
             var result = new List<ActiveAlarmModel>();
             var descriptions = GsneConfig.Instance.AxisStatusDescription;
 
-            foreach (AxisType axis in Enum.GetValues(typeof(AxisType)))
+            foreach (AxisType axis in _dic.Keys)
             {
-                // 在后台线程执行同步 API 调用
-                var status = await Task.Run(() =>
-                {
-                    short rtn = GTN_GetStsEx(_core, (short)axis, out int pSts, 1, out uint _);
-                    return (rtn, pSts);
-                });
-
                 var axisAlarms = new List<string>();
-
-                // rtn == 0 表示成功
-                if (status.rtn == 0)
+                int pSts = _dic[axis];
+                // 获取所有为 1 的位索引
+                var alarmIndices = GetSetBitIndices(pSts);
+                foreach (int index in alarmIndices)
                 {
-                    // 获取所有为 1 的位索引
-                    var alarmIndices = GetSetBitIndices(status.pSts);
-
-                    foreach (int index in alarmIndices)
+                    // 确保索引有效
+                    if (index >= 0 && index < descriptions.Length)
                     {
-                        // 确保索引有效
-                        if (index >= 0 && index < descriptions.Length)
+                        string description = descriptions[index];
+                        if (!string.IsNullOrEmpty(description) && description != "保留")
                         {
-                            string description = descriptions[index];
-                            if (!string.IsNullOrEmpty(description) && description != "保留")
-                            {
-                                axisAlarms.Add($"{axis}轴{description}");
-                            }
+                            axisAlarms.Add($"{axis}轴{description}");
                         }
                     }
                 }
-                else
-                {
-                    // 读取失败时记录错误
-                    axisAlarms.Add($"{axis}轴读取状态失败 (错误码: {status.rtn})");
-                }
-
                 foreach (var alarm in axisAlarms)
                 {
                     result.Add(new ActiveAlarmModel() { Message = alarm });

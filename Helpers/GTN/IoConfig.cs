@@ -25,6 +25,7 @@ namespace 精密切割系统.Helpers.GTN
         public ushort ByteOffset { get; set; }
         /// <summary>当前字节内的bit位 0~7</summary>
         public ushort BitIndex { get; set; }
+        public string ByteAddress => $"{ByteOffset}.{BitIndex}";
         /// <summary>IO名称备注</summary>
         public string Name { get; set; }
         /// <summary>报警提示消息</summary>
@@ -32,9 +33,9 @@ namespace 精密切割系统.Helpers.GTN
         /// <summary>
         /// 是否激活报警的回调函数，参数为true表示激活报警，false表示解除报警
         /// </summary>
-        public Func<Task<bool>>? IsActiviteAlarm { get; set; }
+        public Func<AllDiState,Task<bool>>? IsActiviteAlarm { get; set; }
 
-        public IoConfig(ushort slave, ushort byteOffset, ushort bitIndex, string name, string alarmMessage = "", Func<Task<bool>>? action = null)
+        public IoConfig(ushort slave, ushort byteOffset, ushort bitIndex, string name, string alarmMessage = "", Func<AllDiState, Task<bool>>? action = null)
         {
             Slave = slave;
             ByteOffset = byteOffset;

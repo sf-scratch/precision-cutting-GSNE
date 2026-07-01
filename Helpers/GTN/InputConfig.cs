@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static 精密切割系统.Helpers.GTN.mc;
+using static 精密切割系统.Helpers.GTN.mc_la;
+
 
 namespace 精密切割系统.Helpers.GTN
 {/// <summary>
@@ -88,20 +91,20 @@ namespace 精密切割系统.Helpers.GTN
             ushort byteOff = 2;
 
             WorkpieceVacuumBtn = new IoConfig(slaveId, byteOff, 0, "工件真空按钮");
-            EmgStop = new IoConfig(slaveId, byteOff, 1, "急停按钮", "设备急停按钮按下，请复位急停！",() => { return IoAlarm.Instance.CheckEmgStopAlarmAsync(); });
-            EmergencyLift = new IoConfig(slaveId, byteOff, 2, "紧急抬起", "收到紧急抬起信号", () => { return IoAlarm.Instance.CheckEmergencyLiftAlarmAsync(); });
+            EmgStop = new IoConfig(slaveId, byteOff, 1, "急停按钮", "设备急停按钮按下，请复位急停！", IoAlarm.Instance.CheckEmgStopAlarmAsync);
+            EmergencyLift = new IoConfig(slaveId, byteOff, 2, "紧急抬起", "收到紧急抬起信号", IoAlarm.Instance.CheckEmergencyLiftAlarmAsync);
             ResetBtn = new IoConfig(slaveId, byteOff, 3, "复位按钮");//单独用
-            WorkpieceVacuumDetect = new IoConfig(slaveId, byteOff, 5, "工件真空度", "工件真空度不足，请检查真空发生器！", () => { return IoAlarm.Instance.CheckWorkpieceVacuumDetectAlarmAsync(); });
-            AirFloatPressureDetect = new IoConfig(slaveId, byteOff, 6, "气浮气压值", "气浮气压异常，请检查气源！", () => { return IoAlarm.Instance.CheckAirFloatPressureAlarmAsync(); });
-            SpindleBrakePressure = new IoConfig(slaveId, byteOff, 7, "主轴抱闸压力", "主轴抱闸压力不足！", () => { return IoAlarm.Instance.CheckSpindleBrakePressureAlarmAsync(); });
-            SpindleAirPressure = new IoConfig(slaveId, (ushort)(byteOff + 1), 0, "主轴气压值", "主轴冷却气压不足！", () => { return IoAlarm.Instance.CheckSpindleAirPressureAlarmAsync(); });
-            CutWaterDetectNO = new IoConfig(slaveId, (ushort)(byteOff + 1), 1, "切割水检测开关NO", "切割水流量不足，无法切割！", () => { return IoAlarm.Instance.CheckCutWaterDetectAlarmAsync(); });
-            CoolWaterDetectNO = new IoConfig(slaveId, (ushort)(byteOff + 1), 2, "冷却水检测开关NO", "主轴冷却水异常！", () => { return IoAlarm.Instance.CheckCoolWaterDetectAlarmAsync(); });
-            HeightRelayCloseDetect = new IoConfig(slaveId, (ushort)(byteOff + 1), 3, "测高继电器闭合检测", "测高继电器未闭合，请检查测高模组！", () => { return IoAlarm.Instance.CheckHeightRelayAlarmAsync(); });
+            WorkpieceVacuumDetect = new IoConfig(slaveId, byteOff, 5, "工件真空度", "工件真空度不足，请检查真空发生器！", IoAlarm.Instance.CheckWorkpieceVacuumDetectAlarmAsync);
+            AirFloatPressureDetect = new IoConfig(slaveId, byteOff, 6, "气浮气压值", "气浮气压异常，请检查气源！", IoAlarm.Instance.CheckAirFloatPressureAlarmAsync);
+            SpindleBrakePressure = new IoConfig(slaveId, byteOff, 7, "主轴抱闸压力", "主轴抱闸压力不足！", IoAlarm.Instance.CheckSpindleBrakePressureAlarmAsync);
+            SpindleAirPressure = new IoConfig(slaveId, (ushort)(byteOff + 1), 0, "主轴气压值", "主轴冷却气压不足！", IoAlarm.Instance.CheckSpindleAirPressureAlarmAsync);
+            CutWaterDetectNO = new IoConfig(slaveId, (ushort)(byteOff + 1), 1, "切割水检测开关NO", "切割水流量不足，无法切割！", IoAlarm.Instance.CheckCutWaterDetectAlarmAsync);
+            CoolWaterDetectNO = new IoConfig(slaveId, (ushort)(byteOff + 1), 2, "冷却水检测开关NO", "主轴冷却水异常！", IoAlarm.Instance.CheckCoolWaterDetectAlarmAsync);
+            HeightRelayCloseDetect = new IoConfig(slaveId, (ushort)(byteOff + 1), 3, "测高继电器闭合检测", "测高继电器未闭合，请检查测高模组！", IoAlarm.Instance.CheckHeightRelayAlarmAsync);
             HeightContactDetect = new IoConfig(slaveId, (ushort)(byteOff + 1), 4, "测高接触");//单独用
-            SpindleBrushCheck = new IoConfig(slaveId, (ushort)(byteOff + 1), 5, "主轴电刷检查", "主轴电刷磨损，请更换电刷！", () => { return IoAlarm.Instance.CheckSpindleBrushAlarmAsync(); });
-            CameraSafetyDoor = new IoConfig(slaveId, (ushort)(byteOff + 1), 6, "相机安全门", "相机安全门未关闭，禁止运行！", () => { return IoAlarm.Instance.CheckCameraSafetyDoorAlarmAsync(); });
-            CutSafetyDoor = new IoConfig(slaveId, (ushort)(byteOff + 1), 7, "切割安全门", "切割仓安全门打开，请关门后再启动！", () => { return IoAlarm.Instance.CheckCutSafetyDoorAlarmAsync(); });
+            SpindleBrushCheck = new IoConfig(slaveId, (ushort)(byteOff + 1), 5, "主轴电刷检查", "主轴电刷磨损，请更换电刷！", IoAlarm.Instance.CheckSpindleBrushAlarmAsync);
+            CameraSafetyDoor = new IoConfig(slaveId, (ushort)(byteOff + 1), 6, "相机安全门", "相机安全门未关闭，禁止运行！", IoAlarm.Instance.CheckCameraSafetyDoorAlarmAsync);
+            CutSafetyDoor = new IoConfig(slaveId, (ushort)(byteOff + 1), 7, "切割安全门", "切割仓安全门打开，请关门后再启动！", IoAlarm.Instance.CheckCutSafetyDoorAlarmAsync);
         }
 
         #region 底层封装 GTN_EcatIOReadInput 读取单个DI
@@ -117,10 +120,10 @@ namespace 精密切割系统.Helpers.GTN
             byte[] buf = new byte[1];
             int ret = GTN_EcatIOReadInput(
                 core: _core,
-                slave: io.Slave,
+                slaveno: io.Slave,
                 offset: io.ByteOffset,
                 nSize: 2,
-                pValue: buf
+                pValue: out buf[0]
             );
 
             // 返回值1=从站异常，其他非0=指令错误
@@ -196,10 +199,10 @@ namespace 精密切割系统.Helpers.GTN
         /// <summary>同步批量读取全部DI（0~15bit，2字节）</summary>
         public AllDiState ReadAllDi()
         {
-            byte[] buf = new byte[2];
-            int ret = GTN_EcatIOReadInput(_core, 5, 2, 2, buf);
-            if (ret != 0)
-                throw new Exception($"批量读取DI失败，错误码：{ret}");
+            byte[] buf = new byte[4];
+            int ret = GTN_EcatIOReadInput(_core, 5, 2, 2, out buf[0]);
+            //if (ret != 0)
+            //    throw new Exception($"批量读取DI失败，错误码：{ret}");
 
             byte byte0 = buf[0]; // bit0~bit7
             byte byte1 = buf[1]; // bit8~bit15
@@ -228,7 +231,7 @@ namespace 精密切割系统.Helpers.GTN
         public byte[] ReadAllDiBytes()
         {
             byte[] buf = new byte[2];
-            int ret = GTN_EcatIOReadInput(_core, 5, 2, 2, buf);
+            int ret = GTN_EcatIOReadInput(_core, 5, 2, 2, out buf[0]);
             if (ret != 0)
                 throw new Exception($"批量读取DI失败，错误码：{ret}");
             return buf;
@@ -239,16 +242,6 @@ namespace 精密切割系统.Helpers.GTN
         {
             return await Task.Run(() => ReadAllDi());
         }
-        #endregion
-
-        #region 
-        private static extern int GTN_EcatIOReadInput(
-            short core,
-            ushort slave,
-            ushort offset,
-            ushort nSize,
-            byte[] pValue
-        );
         #endregion
     }
 

@@ -48,6 +48,8 @@ namespace 精密切割系统.ViewModel
             RightButtonParams = WindowLayout.RightPageButtons;
             ActiveAlarms = new ObservableCollection<ActiveAlarmModel>();
             WaitingFuncNames = new ObservableCollection<string>();
+            Task.Factory.StartNew(IoAlarm.Instance.StartMonitorAlarmsAsync, TaskCreationOptions.LongRunning);
+            Task.Factory.StartNew(GsneMotion.Instance.StartMonitorAxisStatusAsync, TaskCreationOptions.LongRunning);
             Task.Factory.StartNew(StartMonitorAlarmsAsync, TaskCreationOptions.LongRunning);
             Task.Factory.StartNew(TemperatureSensorUtils.StartRecordingAsync, TaskCreationOptions.LongRunning);
         }
@@ -58,21 +60,21 @@ namespace 精密切割系统.ViewModel
             {
                 try
                 {
-                    if (!AtomicConfig.IsCutProcessing)
-                    {
-                        if (AlarmConfig.Instance.HasActiveErrorAlarm(false))
-                        {
-                            // 不在切割状态下，且有报警时，三色灯报警红色
-                            await PlcControl.tagControl.wholeDevice.OpenRedLightAsync();
-                        }
-                        else
-                        {
-                            // 不在切割状态下，且有没报警时，三色灯报警黄色
-                            await PlcControl.tagControl.wholeDevice.OpenYellowLightAsync();
-                        }
-                    }
+                    //if (!AtomicConfig.IsCutProcessing)
+                    //{
+                    //    if (AlarmConfig.Instance.HasActiveErrorAlarm(false))
+                    //    {
+                    //        // 不在切割状态下，且有报警时，三色灯报警红色
+                    //        await PlcControl.tagControl.wholeDevice.OpenRedLightAsync();
+                    //    }
+                    //    else
+                    //    {
+                    //        // 不在切割状态下，且有没报警时，三色灯报警黄色
+                    //        await PlcControl.tagControl.wholeDevice.OpenYellowLightAsync();
+                    //    }
+                    //}
                     var allIoAlarms = await IoAlarm.Instance.GetAllIoAlarmDescribeAsync();
-                    var allAxisAlarms = await GsneMotion.Instance.GetAllAxisAlarmsAsync();
+                    var allAxisAlarms = GsneMotion.Instance.GetAllAxisAlarms();
                     List<ActiveAlarmModel> activeAlarms = [];
                     activeAlarms.AddRange(allIoAlarms);
                     activeAlarms.AddRange(allAxisAlarms);
