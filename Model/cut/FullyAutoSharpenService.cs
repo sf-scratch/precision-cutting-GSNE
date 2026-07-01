@@ -220,8 +220,6 @@ namespace 精密切割系统.Model.cut
             }
             finally
             {
-                //退出全自动切割模式
-                await PlcControl.tagControl.cutting.ExitCuttingModeAsync(default);
                 //记录本次磨刀完成的刀数
                 _finishedSharpenTimes += currentSharpenTimes;
             }

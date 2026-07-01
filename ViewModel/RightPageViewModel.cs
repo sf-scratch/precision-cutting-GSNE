@@ -71,16 +71,20 @@ namespace 精密切割系统.ViewModel
                             await PlcControl.tagControl.wholeDevice.OpenYellowLightAsync();
                         }
                     }
+                    var allIoAlarms = await IoAlarm.Instance.GetAllIoAlarmDescribeAsync();
                     var allAxisAlarms = await GsneMotion.Instance.GetAllAxisAlarmsAsync();
-                    if (allAxisAlarms.Count > 0)
+                    List<ActiveAlarmModel> activeAlarms = [];
+                    activeAlarms.AddRange(allIoAlarms);
+                    activeAlarms.AddRange(allAxisAlarms);
+                    if (activeAlarms.Count > 0)
                     {
-                        bool areEqual = allAxisAlarms.SequenceEqual(ActiveAlarms);
+                        bool areEqual = activeAlarms.SequenceEqual(ActiveAlarms);
                         if (!areEqual)
                         {
                             Application.Current.Dispatcher.Invoke(() =>
                             {
                                 ActiveAlarms.Clear();
-                                ActiveAlarms.AddRange(allAxisAlarms);
+                                ActiveAlarms.AddRange(activeAlarms);
                                 AlarmVisibility = Visibility.Visible;
                             });
                         }

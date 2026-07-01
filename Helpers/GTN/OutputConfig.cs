@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using 精密切割系统.Model.cut;
 using static 精密切割系统.Helpers.GTN.mc_la;
 
 namespace 精密切割系统.Helpers.GTN
@@ -21,10 +22,15 @@ namespace 精密切割系统.Helpers.GTN
         /// </summary>
         public class OutputConfig
         {
-            public static OutputConfig Instance { get; } = new OutputConfig();
-            #region 全部DO点位属性（对应100.00 ~ 100.15）
-            /// <summary>100.00 产品真空</summary>
-            public IoConfig ProductVacuum { get; set; }
+        private static readonly Lazy<OutputConfig> _lazy = new(() => new OutputConfig());
+
+        public static OutputConfig Instance
+        {
+            get { return _lazy.Value; }
+        }
+        #region 全部DO点位属性（对应100.00 ~ 100.15）
+        /// <summary>100.00 产品真空</summary>
+        public IoConfig ProductVacuum { get; set; }
             /// <summary>100.01 工作盘真空</summary>
             public IoConfig TrayVacuum { get; set; }
             /// <summary>100.02 真空破</summary>

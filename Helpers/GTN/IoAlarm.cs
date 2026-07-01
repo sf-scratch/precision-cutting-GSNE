@@ -1,13 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using 精密切割系统.Helpers.GTN;
+using 精密切割系统.Model.common;
+using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace 精密切割系统.Helpers.GTN
 {
     public class IoAlarm
     {
-        public static IoAlarm Instance { get; } = new IoAlarm();
+        private static readonly Lazy<IoAlarm> _lazy = new(() => new IoAlarm());
+
+        public static IoAlarm Instance
+        {
+            get { return _lazy.Value; }
+        }
+
+        public bool HasAnyAlarm { get; set; }
+
         private readonly InputConfig _diInput = InputConfig.Instance;
 
         // 存储当前激活的报警
@@ -26,22 +37,56 @@ namespace 精密切割系统.Helpers.GTN
             ActiveAlarmList.Clear();
             bool hasAnyAlarm = false;
             AllDiState diState = await _diInput.ReadAllDiAsync();
+            byte[] diBytes = InputConfig.Instance.ReadAllDiBytes();
+            var allDiConfigs = InputConfig.Instance.AllDiConfigs;
+            foreach (var config in allDiConfigs)
+            {
+                byte byteValue = diBytes[config.ByteOffset];
+                bool activity = (byteValue & 1 << config.ByteOffset) != 0;
+                if (activity)
+                {
 
-            // 逐个校验，存在报警则标记
-            if (await CheckEmgStopAlarmAsync(diState)) hasAnyAlarm = true;
-            if (await CheckEmergencyLiftAlarmAsync(diState)) hasAnyAlarm = true;
-            if (await CheckWorkpieceVacuumDetectAlarmAsync(diState)) hasAnyAlarm = true;
-            if (await CheckAirFloatPressureAlarmAsync(diState)) hasAnyAlarm = true;
-            if (await CheckSpindleBrakePressureAlarmAsync(diState)) hasAnyAlarm = true;
-            if (await CheckSpindleAirPressureAlarmAsync(diState)) hasAnyAlarm = true;
-            if (await CheckCutWaterDetectAlarmAsync(diState)) hasAnyAlarm = true;
-            if (await CheckCoolWaterDetectAlarmAsync(diState)) hasAnyAlarm = true;
-            if (await CheckHeightRelayAlarmAsync(diState)) hasAnyAlarm = true;
-            if (await CheckSpindleBrushAlarmAsync(diState)) hasAnyAlarm = true;
-            if (await CheckCameraSafetyDoorAlarmAsync(diState)) hasAnyAlarm = true;
-            if (await CheckCutSafetyDoorAlarmAsync(diState)) hasAnyAlarm = true;
+                }
+            }
+            //// 逐个校验，存在报警则标记
+            //if (await CheckEmgStopAlarmAsync(diState)) hasAnyAlarm = true;
+            //if (await CheckEmergencyLiftAlarmAsync(diState)) hasAnyAlarm = true;
+            //if (await CheckWorkpieceVacuumDetectAlarmAsync(diState)) hasAnyAlarm = true;
+            //if (await CheckAirFloatPressureAlarmAsync(diState)) hasAnyAlarm = true;
+            //if (await CheckSpindleBrakePressureAlarmAsync(diState)) hasAnyAlarm = true;
+            //if (await CheckSpindleAirPressureAlarmAsync(diState)) hasAnyAlarm = true;
+            //if (await CheckCutWaterDetectAlarmAsync(diState)) hasAnyAlarm = true;
+            //if (await CheckCoolWaterDetectAlarmAsync(diState)) hasAnyAlarm = true;
+            //if (await CheckHeightRelayAlarmAsync(diState)) hasAnyAlarm = true;
+            //if (await CheckSpindleBrushAlarmAsync(diState)) hasAnyAlarm = true;
+            //if (await CheckCameraSafetyDoorAlarmAsync(diState)) hasAnyAlarm = true;
+            //if (await CheckCutSafetyDoorAlarmAsync(diState)) hasAnyAlarm = true;
 
             return hasAnyAlarm;
+        }
+
+        /// <summary>
+        /// 获取所有IO报警描述
+        /// </summary>
+        /// <returns>true=存在任意IO报警；false=全部正常</returns>
+        public async Task<List<ActiveAlarmModel>> GetAllIoAlarmDescribeAsync()
+        {
+            bool shield = true;// 这里可以设置一个开关，true=屏蔽报警，false=不屏蔽报警
+            if (shield)
+            {
+                return [];
+            }
+            List<ActiveAlarmModel> result = new List<ActiveAlarmModel>();
+            var allDiConfigs = InputConfig.Instance.AllDiConfigs;
+            foreach (var config in allDiConfigs)
+            {
+                if (config.IsActiviteAlarm is not null &&  await config.IsActiviteAlarm.Invoke())
+                {
+                    result.Add(new ActiveAlarmModel() { Message = config.AlarmMessage });
+                }
+            }
+            HasAnyAlarm = result.Count != 0;
+            return result;
         }
 
         #region 全部改为公共异步方法，外部可单独调用，返回bool（true=报警触发）

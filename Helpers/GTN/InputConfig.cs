@@ -16,7 +16,12 @@ namespace 精密切割系统.Helpers.GTN
     /// </summary>
     public class InputConfig
     {
-        public static InputConfig Instance { get; } = new InputConfig();
+        private static readonly Lazy<InputConfig> _lazy = new(() => new InputConfig());
+
+        public static InputConfig Instance
+        {
+            get { return _lazy.Value; }
+        }
         // ========== 全部DI点位定义（对应你提供的0.00~0.15）==========
         /// <summary>0.00 工件真空按钮</summary>
         public IoConfig WorkpieceVacuumBtn { get; set; }
@@ -51,6 +56,25 @@ namespace 精密切割系统.Helpers.GTN
 
         private short _core = 2;
 
+        public List<IoConfig> AllDiConfigs =>
+        [
+            WorkpieceVacuumBtn,
+            EmgStop,
+            EmergencyLift,
+            ResetBtn,
+            WorkpieceVacuumDetect,
+            AirFloatPressureDetect,
+            SpindleBrakePressure,
+            SpindleAirPressure,
+            CutWaterDetectNO,
+            CoolWaterDetectNO,
+            HeightRelayCloseDetect,
+            HeightContactDetect,
+            SpindleBrushCheck,
+            CameraSafetyDoor,
+            CutSafetyDoor
+        ];
+
         public InputConfig()
         {
             // 构造函数自动初始化所有IO点位（从站0，字节偏移0，bit对应）
@@ -64,20 +88,20 @@ namespace 精密切割系统.Helpers.GTN
             ushort byteOff = 2;
 
             WorkpieceVacuumBtn = new IoConfig(slaveId, byteOff, 0, "工件真空按钮");
-            EmgStop = new IoConfig(slaveId, byteOff, 1, "急停按钮");//单独用
-            EmergencyLift = new IoConfig(slaveId, byteOff, 2, "紧急抬起");
+            EmgStop = new IoConfig(slaveId, byteOff, 1, "急停按钮", "设备急停按钮按下，请复位急停！",() => { return IoAlarm.Instance.CheckEmgStopAlarmAsync(); });
+            EmergencyLift = new IoConfig(slaveId, byteOff, 2, "紧急抬起", "收到紧急抬起信号", () => { return IoAlarm.Instance.CheckEmergencyLiftAlarmAsync(); });
             ResetBtn = new IoConfig(slaveId, byteOff, 3, "复位按钮");//单独用
-            WorkpieceVacuumDetect = new IoConfig(slaveId, byteOff, 5, "工件真空度");
-            AirFloatPressureDetect = new IoConfig(slaveId, byteOff, 6, "气浮气压值");
-            SpindleBrakePressure = new IoConfig(slaveId, byteOff, 7, "主轴抱闸压力");
-            SpindleAirPressure = new IoConfig(slaveId, (ushort)(byteOff + 1), 0, "主轴气压值");
-            CutWaterDetectNO = new IoConfig(slaveId, (ushort)(byteOff + 1), 1, "切割水检测开关NO");
-            CoolWaterDetectNO = new IoConfig(slaveId, (ushort)(byteOff + 1), 2, "冷却水检测开关NO");
-            HeightRelayCloseDetect = new IoConfig(slaveId, (ushort)(byteOff + 1), 3, "测高继电器闭合检测");
+            WorkpieceVacuumDetect = new IoConfig(slaveId, byteOff, 5, "工件真空度", "工件真空度不足，请检查真空发生器！", () => { return IoAlarm.Instance.CheckWorkpieceVacuumDetectAlarmAsync(); });
+            AirFloatPressureDetect = new IoConfig(slaveId, byteOff, 6, "气浮气压值", "气浮气压异常，请检查气源！", () => { return IoAlarm.Instance.CheckAirFloatPressureAlarmAsync(); });
+            SpindleBrakePressure = new IoConfig(slaveId, byteOff, 7, "主轴抱闸压力", "主轴抱闸压力不足！", () => { return IoAlarm.Instance.CheckSpindleBrakePressureAlarmAsync(); });
+            SpindleAirPressure = new IoConfig(slaveId, (ushort)(byteOff + 1), 0, "主轴气压值", "主轴冷却气压不足！", () => { return IoAlarm.Instance.CheckSpindleAirPressureAlarmAsync(); });
+            CutWaterDetectNO = new IoConfig(slaveId, (ushort)(byteOff + 1), 1, "切割水检测开关NO", "切割水流量不足，无法切割！", () => { return IoAlarm.Instance.CheckCutWaterDetectAlarmAsync(); });
+            CoolWaterDetectNO = new IoConfig(slaveId, (ushort)(byteOff + 1), 2, "冷却水检测开关NO", "主轴冷却水异常！", () => { return IoAlarm.Instance.CheckCoolWaterDetectAlarmAsync(); });
+            HeightRelayCloseDetect = new IoConfig(slaveId, (ushort)(byteOff + 1), 3, "测高继电器闭合检测", "测高继电器未闭合，请检查测高模组！", () => { return IoAlarm.Instance.CheckHeightRelayAlarmAsync(); });
             HeightContactDetect = new IoConfig(slaveId, (ushort)(byteOff + 1), 4, "测高接触");//单独用
-            SpindleBrushCheck = new IoConfig(slaveId, (ushort)(byteOff + 1), 5, "主轴电刷检查");
-            CameraSafetyDoor = new IoConfig(slaveId, (ushort)(byteOff + 1), 6, "相机安全门");
-            CutSafetyDoor = new IoConfig(slaveId, (ushort)(byteOff + 1), 7, "切割安全门");
+            SpindleBrushCheck = new IoConfig(slaveId, (ushort)(byteOff + 1), 5, "主轴电刷检查", "主轴电刷磨损，请更换电刷！", () => { return IoAlarm.Instance.CheckSpindleBrushAlarmAsync(); });
+            CameraSafetyDoor = new IoConfig(slaveId, (ushort)(byteOff + 1), 6, "相机安全门", "相机安全门未关闭，禁止运行！", () => { return IoAlarm.Instance.CheckCameraSafetyDoorAlarmAsync(); });
+            CutSafetyDoor = new IoConfig(slaveId, (ushort)(byteOff + 1), 7, "切割安全门", "切割仓安全门打开，请关门后再启动！", () => { return IoAlarm.Instance.CheckCutSafetyDoorAlarmAsync(); });
         }
 
         #region 底层封装 GTN_EcatIOReadInput 读取单个DI
@@ -199,6 +223,15 @@ namespace 精密切割系统.Helpers.GTN
                 CameraSafetyDoor = (byte1 & 1 << 6) != 0,
                 CutSafetyDoor = (byte1 & 1 << 7) != 0,
             };
+        }
+
+        public byte[] ReadAllDiBytes()
+        {
+            byte[] buf = new byte[2];
+            int ret = GTN_EcatIOReadInput(_core, 5, 2, 2, buf);
+            if (ret != 0)
+                throw new Exception($"批量读取DI失败，错误码：{ret}");
+            return buf;
         }
 
         /// <summary>异步批量读取全部DI</summary>

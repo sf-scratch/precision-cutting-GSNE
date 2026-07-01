@@ -27,13 +27,21 @@ namespace 精密切割系统.Helpers.GTN
         public ushort BitIndex { get; set; }
         /// <summary>IO名称备注</summary>
         public string Name { get; set; }
+        /// <summary>报警提示消息</summary>
+        public string AlarmMessage { get; set; }
+        /// <summary>
+        /// 是否激活报警的回调函数，参数为true表示激活报警，false表示解除报警
+        /// </summary>
+        public Func<Task<bool>>? IsActiviteAlarm { get; set; }
 
-        public IoConfig(ushort slave, ushort byteOffset, ushort bitIndex, string name)
+        public IoConfig(ushort slave, ushort byteOffset, ushort bitIndex, string name, string alarmMessage = "", Func<Task<bool>>? action = null)
         {
             Slave = slave;
             ByteOffset = byteOffset;
             BitIndex = bitIndex;
             Name = name;
+            AlarmMessage = alarmMessage;
+            IsActiviteAlarm = action;
         }
     }
 }

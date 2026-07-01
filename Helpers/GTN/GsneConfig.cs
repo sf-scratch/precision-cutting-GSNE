@@ -54,8 +54,8 @@ namespace 精密切割系统.Helpers.GTN
 
         public string[] AxisStatusDescription { get; set; }
 
-        public InputConfig Inputs { get; set; }
+        //public InputConfig Inputs { get; set; }
 
-        public OutputConfig Outputs { get; set; }
+        //public OutputConfig Outputs { get; set; }
     }
 }
