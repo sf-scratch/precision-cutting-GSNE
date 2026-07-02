@@ -73,6 +73,7 @@ namespace 精密切割系统.Helpers
                 db.CreateTable<CameraEntity>();
                 db.CreateTable<TemperatureSensorEntity>();
                 db.CreateTable<TemperatureLogEntity>();
+                db.CreateTable<AxisSettingEntity>();
             }
             catch (Exception ex)
             {

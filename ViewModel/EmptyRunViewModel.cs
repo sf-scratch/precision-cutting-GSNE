@@ -6,7 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using 精密切割系统.Entities;
 using 精密切割系统.Helpers;
+using 精密切割系统.Helpers.GTN;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.plc;
 using 精密切割系统.View.Controls;
@@ -258,21 +260,25 @@ namespace 精密切割系统.ViewModel
                     await PlcControl.tagControl.wholeDevice.OpenWorkpieceBlowingAsync();
                 }
                 List<Task> tasks = [];
+
+                var axisX = await SqlHelper.GetOrCreateEntityAsync(() => new AxisSettingEntity(), (long)AxisType.X);
+                var axisY = await SqlHelper.GetOrCreateEntityAsync(() => new AxisSettingEntity(), (long)AxisType.Y);
+                var axisTheta = await SqlHelper.GetOrCreateEntityAsync(() => new AxisSettingEntity(), (long)AxisType.Theta);
                 while (!_emptyRunCts.IsCancellationRequested && currentRepeat < maxRepeatCount)
                 {
                     await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, speedZ1, _emptyRunCts.Token);
                     await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, speedZ2, _emptyRunCts.Token);
                     if (RunX && currentRepeat < repeatCountX)
                     {
-                        tasks.Add(PlcControl.tagControl.Xaxis.StartAbsoluteAsync(Appsettings.PositiveLimitPositionX - 10 ?? 0, speedX, _emptyRunCts.Token));
+                        tasks.Add(PlcControl.tagControl.Xaxis.StartAbsoluteAsync(axisX.PositiveSoftLimit.ToFloat() - 10, speedX, _emptyRunCts.Token));
                     }
                     if (RunY && currentRepeat < repeatCountY)
                     {
-                        tasks.Add(PlcControl.tagControl.Yaxis.StartAbsoluteAsync(Appsettings.PositiveLimitPositionY - 10 ?? 0, speedY, _emptyRunCts.Token));
+                        tasks.Add(PlcControl.tagControl.Yaxis.StartAbsoluteAsync(axisY.PositiveSoftLimit.ToFloat() - 10, speedY, _emptyRunCts.Token));
                     }
                     if (RunTheta && currentRepeat < repeatCountTheta)
                     {
-                        tasks.Add(PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(Appsettings.PositiveLimitPositionTheta - 10 ?? 0, speedTheta, _emptyRunCts.Token));
+                        tasks.Add(PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(axisTheta.PositiveSoftLimit.ToFloat() - 10, speedTheta, _emptyRunCts.Token));
                     }
                     await Task.WhenAll(tasks);
                     if (RunX && currentRepeat < repeatCountX)

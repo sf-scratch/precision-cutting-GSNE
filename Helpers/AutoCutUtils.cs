@@ -60,7 +60,6 @@ namespace 精密切割系统.Helpers
 
         public static async Task<AxisPosition> GetAxisPositionAsync()
         {
-
             var curX = await GsneMotion.Instance.Axis.GetCurrentLocationAsync(AxisType.X);
             var curY = await GsneMotion.Instance.Axis.GetCurrentLocationAsync(AxisType.Y);
             var curZ1 = await GsneMotion.Instance.Axis.GetCurrentLocationAsync(AxisType.Z1);
@@ -99,7 +98,7 @@ namespace 精密切割系统.Helpers
                 float speedY = initPos.CutReplaceInitSpeedY.ToFloat();
                 float speedZ1 = initPos.CutReplaceInitSpeedZ1.ToFloat();
                 //if (!await PlcControl.tagControl.Z1axis.IsReadyAsync())
-                if(!await GsneMotion.Instance.Axis.IsReadyAsync(AxisType.Z1))
+                if (!await GsneMotion.Instance.Axis.IsReadyAsync(AxisType.Z1))
                 {
                     return CommonResult.Failure("轴未准备好，请检查轴状态！");
                 }
@@ -138,7 +137,7 @@ namespace 精密切割系统.Helpers
                 Task taskZ1 = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, token);
                 Task taskZ2 = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, default, token);
                 await Task.WhenAll(taskZ1, taskZ2);
-                Task taskXY = GsneMotion.Instance.Axis.RunMotionAsync(0,0, token);
+                Task taskXY = GsneMotion.Instance.Axis.RunMotionAsync(0, 0, token);
                 Task taskTheta = PlcControl.tagControl.ThetaAxis.StartAbsoluteAsync(0, default, token);
                 Task speedZero = PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync(token);
                 await Task.WhenAll(taskXY, taskTheta, speedZero);
@@ -226,10 +225,10 @@ namespace 精密切割系统.Helpers
             if (Appsettings.MeasureHeightLast == null)
             {
                 if (Appsettings.BladeOuterDiameter == null || Appsettings.BladeOuterDiameter.Value == 0)
-                if (Appsettings.BladeOuterDiameter == null || Appsettings.BladeOuterDiameter.Value == 0)
-                {
-                    return CommonResult<float>.Failure("未设置刀片外径，无法测高！");
-                }
+                    if (Appsettings.BladeOuterDiameter == null || Appsettings.BladeOuterDiameter.Value == 0)
+                    {
+                        return CommonResult<float>.Failure("未设置刀片外径，无法测高！");
+                    }
                 var caculateResult = await CaculateActulMeasureHeightSlowSpeedRangedAsync(bmParameter.MeasureHeightSlowSpeedRange.ToFloat());
                 if (caculateResult.IsSuccess)
                 {
@@ -2019,16 +2018,16 @@ namespace 精密切割系统.Helpers
         public static async Task SetFunctionalParameters()
         {
             // 极限位置
-            await PlcControl.tagControl.Xaxis.SetSoftUpperLimit(Appsettings.PositiveLimitPositionX ?? 0);
-            await PlcControl.tagControl.Xaxis.SetSoftLowerLimit(Appsettings.NegativeLimitPositionX ?? 0);
-            await PlcControl.tagControl.Yaxis.SetSoftUpperLimit(Appsettings.PositiveLimitPositionY ?? 0);
-            await PlcControl.tagControl.Yaxis.SetSoftLowerLimit(Appsettings.NegativeLimitPositionY ?? 0);
-            await PlcControl.tagControl.Z1axis.SetSoftUpperLimit(Appsettings.PositiveLimitPositionZ1 ?? 0);
-            await PlcControl.tagControl.Z1axis.SetSoftLowerLimit(Appsettings.NegativeLimitPositionZ1 ?? 0);
-            await PlcControl.tagControl.Z2axis.SetSoftUpperLimit(Appsettings.PositiveLimitPositionZ2 ?? 0);
-            await PlcControl.tagControl.Z2axis.SetSoftLowerLimit(Appsettings.NegativeLimitPositionZ2 ?? 0);
-            await PlcControl.tagControl.ThetaAxis.SetSoftUpperLimit(Appsettings.PositiveLimitPositionTheta ?? 0);
-            await PlcControl.tagControl.ThetaAxis.SetSoftLowerLimit(Appsettings.NegativeLimitPositionTheta ?? 0);
+            //await PlcControl.tagControl.Xaxis.SetSoftUpperLimit(Appsettings.PositiveLimitPositionX ?? 0);
+            //await PlcControl.tagControl.Xaxis.SetSoftLowerLimit(Appsettings.NegativeLimitPositionX ?? 0);
+            //await PlcControl.tagControl.Yaxis.SetSoftUpperLimit(Appsettings.PositiveLimitPositionY ?? 0);
+            //await PlcControl.tagControl.Yaxis.SetSoftLowerLimit(Appsettings.NegativeLimitPositionY ?? 0);
+            //await PlcControl.tagControl.Z1axis.SetSoftUpperLimit(Appsettings.PositiveLimitPositionZ1 ?? 0);
+            //await PlcControl.tagControl.Z1axis.SetSoftLowerLimit(Appsettings.NegativeLimitPositionZ1 ?? 0);
+            //await PlcControl.tagControl.Z2axis.SetSoftUpperLimit(Appsettings.PositiveLimitPositionZ2 ?? 0);
+            //await PlcControl.tagControl.Z2axis.SetSoftLowerLimit(Appsettings.NegativeLimitPositionZ2 ?? 0);
+            //await PlcControl.tagControl.ThetaAxis.SetSoftUpperLimit(Appsettings.PositiveLimitPositionTheta ?? 0);
+            //await PlcControl.tagControl.ThetaAxis.SetSoftLowerLimit(Appsettings.NegativeLimitPositionTheta ?? 0);
             var operationParameter = await CurrentUtils.GetOperationParametersModelAsync();
             // 原点补偿
             await PlcControl.tagControl.Xaxis.SetOriginCompensation(operationParameter.OriginCompensationX.ToFloat());
