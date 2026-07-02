@@ -5,7 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using 精密切割系统.database.db.modle;
+using 精密切割系统.Entities;
 using 精密切割系统.Helpers;
+using 精密切割系统.Helpers.GTN;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.plc;
 using 精密切割系统.PubSubEvent;
@@ -102,6 +104,7 @@ namespace 精密切割系统.Model.cut
         {
             try
             {
+                var axisZ2 = await SqlHelper.GetOrCreateEntityAsync(() => new AxisSettingEntity(), (long)AxisType.Z2);
                 eventAggregator?.GetEvent<AutoRuningMessageEvent>().Publish(MessageModel.Create("开始相机对焦..."));
                 CommonResult<float> focusClearPositionResult = await AutoCutUtils.CalculateFocusClearPosition();
                 if (!focusClearPositionResult.IsSuccess)
@@ -111,7 +114,7 @@ namespace 精密切割系统.Model.cut
                 float focusClearPosition = focusClearPositionResult.Data;
                 await PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, default, token);
                 MinLimitZ = 0;
-                MaxLimitZ = Appsettings.PositiveLimitPositionY ?? 3;
+                MaxLimitZ = axisZ2.PositiveSoftLimit.ToFloat();
                 int direction = 1;
                 // 阶段1：快速粗调（正向扫描）
                 var coarseResult = await FindOptimalFocus(

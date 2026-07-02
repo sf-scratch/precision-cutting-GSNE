@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using 精密切割系统.Driver;
+using 精密切割系统.Entities;
 using 精密切割系统.Extensions;
 using 精密切割系统.Model.cut;
 using 精密切割系统.Utils;
@@ -114,6 +115,30 @@ namespace 精密切割系统.Helpers.GTN
         /// <summary>
         /// 回零点
         /// </summary>
+        //public async Task StartHomingAsync(AxisType axis)
+        //{
+        //    await Task.Run(() =>
+        //    {
+        //        short rtn;
+        //        int offset = GsneConfig.Instance.Axes[axis].OffsetMM.MMToPulseF(axis);
+        //        short model = GsneConfig.Instance.Axes[axis].HomingModel;
+        //        double speed1 = GsneConfig.Instance.Axes[axis].HighSpeed.MMToPulse(axis);
+        //        double speed2 = GsneConfig.Instance.Axes[axis].LowSpeed.MMToPulse(axis);
+        //        ushort probeFunc = 0;
+
+        //        rtn = GTN_SetEcatHomingPrm(_core, (short)axis, model, speed1, speed2, speed2, offset, probeFunc);
+        //        rtn = GTN_SetHomingMode(_core, (short)axis, 6);
+        //        rtn = GTN_StartEcatHoming(_core, (short)axis);
+
+
+
+        //    });
+        //    bool isHomingComplete = await IsCompleteHomingAsync((short)axis);
+        //    if (isHomingComplete)
+        //    {
+        //        GTN_SetHomingMode(_core, (short)axis, 8);
+        //    }
+        //}
         public async Task StartHomingAsync(AxisType axis)
         {
             // 1. 在后台线程执行初始化（同步部分）
@@ -173,18 +198,22 @@ namespace 精密切割系统.Helpers.GTN
         }
 
         /// <summary>
-        /// 设置软限位
+        /// 设置所有轴的软限位
         /// </summary>
         /// <param name="axis"></param>
         /// <param name="positive"></param>
         /// <param name="negative"></param>
         /// <returns></returns>
-        public async Task SetSoftLimit(AxisType axis, float positive, float negative)
+        public async Task SetAllAxisSoftLimit()
         {
-            await Task.Run(() =>
+            foreach (AxisType axis in Enum.GetValues(typeof(AxisType)))
             {
-                GTN_SetSoftLimit(_core, (short)axis, positive.MMToPulseF(axis), negative.MMToPulseF(axis));
-            });
+                var axisEntity = await SqlHelper.GetOrCreateEntityAsync(() => new AxisSettingEntity(), (long)axis);
+                if (axisEntity != null)
+                {
+                    GTN_SetSoftLimit(_core, (short)axis, axisEntity.PositiveSoftLimit.ToDouble().MMToPulse(axis), axisEntity.NegativeSoftLimit.ToDouble().MMToPulse(axis));
+                }
+            }
         }
 
         /// <summary>
@@ -325,117 +354,6 @@ namespace 精密切割系统.Helpers.GTN
                 rtn = GTN.mc_la.GTN_CrdDataEx(_core, crd, IntPtr.Zero, 0);                                  //将前瞻缓存区中的数据压入控制器
                 rtn = GTN.mc.GTN_CrdStart(_core, crd, 0);
             });
-        }
-
-        /// <summary>
-        /// 设置切割需要的参数
-        /// </summary>
-        /// <param name="feedSpeedValue">切割速度</param>
-        /// <param name="zEndIndex">Z轴切割位置</param>
-        /// <param name="xEndLocation">X轴结束位置</param>
-        /// <param name="yCutLocation">Y轴切割位置</param>
-        /// <param name="spindleRev">主轴转速</param>
-        public async Task SetCutParamsAsync(float feedSpeedValue, float zEndLocation, float zStartLocation, float xStartLoaction, float xEndLocation,
-            float yCutLocation, float thetaDeg, int spindleRevValue, float depthEntry, CancellationToken token)
-        {
-            float xSoftUpperLimit = Appsettings.PositiveLimitPositionX ?? 0;
-            if (xEndLocation > xSoftUpperLimit)
-            {
-                xEndLocation = xSoftUpperLimit;
-            }
-            float ySoftUpperLimit = Appsettings.PositiveLimitPositionY ?? 0;
-            if (yCutLocation > ySoftUpperLimit)
-            {
-                yCutLocation = ySoftUpperLimit;
-            }
-            Tools.LogDebug(
-                $"\r\n" +
-                $"切割速度: {feedSpeedValue}\r\n" +
-                $"Z轴开始位置: {zStartLocation}\r\n" +
-                $"Z轴结束位置: {zEndLocation}\r\n" +
-                $"X轴开始位置: {xStartLoaction}\r\n" +
-                $"X轴结束位置: {xEndLocation}\r\n" +
-                $"Y轴切割位置: {yCutLocation}\r\n" +
-                $"theta角度: {thetaDeg}\r\n" +
-                $"主轴转速: {spindleRevValue}\r\n" +
-                $""
-                );
-            TMoveAbsolutePrm prmStartZ = new()
-            {
-                pos = ((zStartLocation - depthEntry).MMToPulseF(AxisType.Z1)),
-                vel = 50,
-                acc = 0.5,
-                dec = 0.5,
-                percent = 10
-            };
-            GTN_MoveAbsolute(_core, (short)AxisType.Z1, ref prmStartZ);
-            await WaitAxisReadyAsync(AxisType.Z1, token);
-
-            TMoveAbsolutePrm prmX = new()
-            {
-                pos = (xStartLoaction.MMToPulseF(AxisType.X)),
-                vel = 50,
-                acc = 0.5,
-                dec = 0.5,
-                percent = 10
-            };
-            GTN_MoveAbsolute(_core, (short)AxisType.X, ref prmX);
-
-            TMoveAbsolutePrm prmY = new()
-            {
-                pos = (yCutLocation.MMToPulseF(AxisType.Y)),
-                vel = 50,
-                acc = 0.5,
-                dec = 0.5,
-                percent = 10
-            };
-            GTN_MoveAbsolute(_core, (short)AxisType.Y, ref prmY);
-
-            TMoveAbsolutePrm prmTheta = new()
-            {
-                pos = (thetaDeg.MMToPulseF(AxisType.Theta)),
-                vel = 50,
-                acc = 0.5,
-                dec = 0.5,
-                percent = 10
-            };
-            GTN_MoveAbsolute(_core, (short)AxisType.Theta, ref prmTheta);
-
-            await Task.WhenAll(WaitAxisReadyAsync(AxisType.X, token), WaitAxisReadyAsync(AxisType.Y, token), WaitAxisReadyAsync(AxisType.Theta, token));
-
-            TMoveAbsolutePrm prmZ = new()
-            {
-                pos = (zStartLocation.MMToPulseF(AxisType.Z1)),
-                vel = 50,
-                acc = 0.5,
-                dec = 0.5,
-                percent = 10
-            };
-            GTN_MoveAbsolute(_core, (short)AxisType.Z1, ref prmZ);
-            await WaitAxisReadyAsync(AxisType.Z1, token);
-
-            TMoveAbsolutePrm prmEndX = new()
-            {
-                pos = (xEndLocation.MMToPulseF(AxisType.X)),
-                vel = feedSpeedValue,
-                acc = 0.5,
-                dec = 0.5,
-                percent = 10
-            };
-            GTN_MoveAbsolute(_core, (short)AxisType.X, ref prmEndX);
-            await WaitAxisReadyAsync(AxisType.X, token);
-
-            await StartRelativeAsync(AxisType.Z1, depthEntry, 10, token);
-
-            TMoveAbsolutePrm prmEndZ = new()
-            {
-                pos = (zEndLocation.MMToPulseF(AxisType.Z1)),
-                vel = 50,
-                acc = 0.5,
-                dec = 0.5,
-                percent = 10
-            };
-            GTN_MoveAbsolute(_core, (short)AxisType.Z1, ref prmEndZ);
         }
     }
 }

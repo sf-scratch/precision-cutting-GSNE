@@ -9,6 +9,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
+using 精密切割系统.Entities;
 using 精密切割系统.Helpers;
 using 精密切割系统.Helpers.GTN;
 using 精密切割系统.Model.cut;
@@ -366,7 +367,9 @@ namespace 精密切割系统.View.Pages.common
 
         private async Task CameraPictureRunAsync(double x, double y)
         {
-            if (Appsettings.PositiveLimitPositionX is null || Appsettings.NegativeLimitPositionX is null || Appsettings.PositiveLimitPositionY is null || Appsettings.NegativeLimitPositionY is null)
+            var axisX = await SqlHelper.GetEntityAsync<AxisSettingEntity>((long)AxisType.X);
+            var axisY = await SqlHelper.GetEntityAsync<AxisSettingEntity>((long)AxisType.Y);
+            if (axisX is null || axisY is null)
             {
                 MaterialSnack("未设置轴极限位置！", SnackType.WARNING, 2);
                 return;
@@ -391,10 +394,10 @@ namespace 精密切割系统.View.Pages.common
                 if (newY.HasValue) yPos = newY;
 
                 //// 判断X 和Y是否超限，超限则保留最大或者最小值
-                float xUpperValue = Appsettings.PositiveLimitPositionX.Value;
-                float xLowerValue = Appsettings.NegativeLimitPositionX.Value;
-                float yUpperValue = Appsettings.PositiveLimitPositionY.Value;
-                float yLowerValue = Appsettings.NegativeLimitPositionY.Value;
+                float xUpperValue = axisX.PositiveSoftLimit.ToFloat();
+                float xLowerValue = axisX.NegativeSoftLimit.ToFloat();
+                float yUpperValue = axisY.PositiveSoftLimit.ToFloat();
+                float yLowerValue = axisY.NegativeSoftLimit.ToFloat();
                 // 使用 Math.Clamp 限制范围
                 xPos = Math.Clamp(xPos.Value, xLowerValue, xUpperValue);
                 yPos = Math.Clamp(yPos.Value, yLowerValue, yUpperValue);

@@ -13,7 +13,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using 精密切割系统.database.db.modle;
+using 精密切割系统.Entities;
 using 精密切割系统.Helpers;
+using 精密切割系统.Helpers.GTN;
 using 精密切割系统.Utils;
 using 精密切割系统.View.common;
 using 精密切割系统.View.Controls;
@@ -58,16 +60,21 @@ namespace 精密切割系统.View.Pages
 
             var operationParameter = await CurrentUtils.GetOperationParametersModelAsync();
             ViewModel.operationParameter = operationParameter;
-            ViewModel.PositiveLimitPositionX = (Appsettings.PositiveLimitPositionX ?? 0).ToString();
-            ViewModel.NegativeLimitPositionX = (Appsettings.NegativeLimitPositionX ?? 0).ToString();
-            ViewModel.PositiveLimitPositionY = (Appsettings.PositiveLimitPositionY ?? 0).ToString();
-            ViewModel.NegativeLimitPositionY = (Appsettings.NegativeLimitPositionY ?? 0).ToString();
-            ViewModel.PositiveLimitPositionZ1 = (Appsettings.PositiveLimitPositionZ1 ?? 0).ToString();
-            ViewModel.NegativeLimitPositionZ1 = (Appsettings.NegativeLimitPositionZ1 ?? 0).ToString();
-            ViewModel.PositiveLimitPositionZ2 = (Appsettings.PositiveLimitPositionZ2 ?? 0).ToString();
-            ViewModel.NegativeLimitPositionZ2 = (Appsettings.NegativeLimitPositionZ2 ?? 0).ToString();
-            ViewModel.PositiveLimitPositionTheta = (Appsettings.PositiveLimitPositionTheta ?? 0).ToString();
-            ViewModel.NegativeLimitPositionTheta = (Appsettings.NegativeLimitPositionTheta ?? 0).ToString();
+            var axisX = await SqlHelper.GetOrCreateEntityAsync(() => new AxisSettingEntity(), (long)AxisType.X);
+            var axisY = await SqlHelper.GetOrCreateEntityAsync(() => new AxisSettingEntity(), (long)AxisType.Y);
+            var axisZ1 = await SqlHelper.GetOrCreateEntityAsync(() => new AxisSettingEntity(), (long)AxisType.Z1);
+            var axisZ2 = await SqlHelper.GetOrCreateEntityAsync(() => new AxisSettingEntity(), (long)AxisType.Z2);
+            var axisTheta = await SqlHelper.GetOrCreateEntityAsync(() => new AxisSettingEntity(), (long)AxisType.Theta);
+            ViewModel.PositiveLimitPositionX = axisX.PositiveSoftLimit;
+            ViewModel.NegativeLimitPositionX = axisX.NegativeSoftLimit;
+            ViewModel.PositiveLimitPositionY = axisY.PositiveSoftLimit;
+            ViewModel.NegativeLimitPositionY = axisY.NegativeSoftLimit;
+            ViewModel.PositiveLimitPositionZ1 = axisZ1.PositiveSoftLimit;
+            ViewModel.NegativeLimitPositionZ1 = axisZ1.NegativeSoftLimit;
+            ViewModel.PositiveLimitPositionZ2 = axisZ2.PositiveSoftLimit;
+            ViewModel.NegativeLimitPositionZ2 = axisZ2.NegativeSoftLimit;
+            ViewModel.PositiveLimitPositionTheta = axisTheta.PositiveSoftLimit;
+            ViewModel.NegativeLimitPositionTheta = axisTheta.NegativeSoftLimit;
             DataContext = ViewModel;
 
             //如果是空或者小数位数不足-小数初始化为0
@@ -108,17 +115,28 @@ namespace 精密切割系统.View.Pages
                 // 设置Z轴补偿量
                 GlobalParams.zAxisCompNum = ViewModel.zAxisCompNum;
                 GlobalParams.zAxisCompValue = Tools.GetFloatStringValue(ViewModel.zAxisCompValue);
-                Appsettings.PositiveLimitPositionX = ViewModel.PositiveLimitPositionX.ToFloat();
-                Appsettings.NegativeLimitPositionX = ViewModel.NegativeLimitPositionX.ToFloat();
-                Appsettings.PositiveLimitPositionY = ViewModel.PositiveLimitPositionY.ToFloat();
-                Appsettings.NegativeLimitPositionY = ViewModel.NegativeLimitPositionY.ToFloat();
-                Appsettings.PositiveLimitPositionZ1 = ViewModel.PositiveLimitPositionZ1.ToFloat();
-                Appsettings.NegativeLimitPositionZ1 = ViewModel.NegativeLimitPositionZ1.ToFloat();
-                Appsettings.PositiveLimitPositionZ2 = ViewModel.PositiveLimitPositionZ2.ToFloat();
-                Appsettings.NegativeLimitPositionZ2 = ViewModel.NegativeLimitPositionZ2.ToFloat();
-                Appsettings.PositiveLimitPositionTheta = ViewModel.PositiveLimitPositionTheta.ToFloat();
-                Appsettings.NegativeLimitPositionTheta = ViewModel.NegativeLimitPositionTheta.ToFloat();
-                await AutoCutUtils.SetFunctionalParameters();
+                var axisX = await SqlHelper.GetOrCreateEntityAsync(() => new AxisSettingEntity(), (long)AxisType.X);
+                var axisY = await SqlHelper.GetOrCreateEntityAsync(() => new AxisSettingEntity(), (long)AxisType.Y);
+                var axisZ1 = await SqlHelper.GetOrCreateEntityAsync(() => new AxisSettingEntity(), (long)AxisType.Z1);
+                var axisZ2 = await SqlHelper.GetOrCreateEntityAsync(() => new AxisSettingEntity(), (long)AxisType.Z2);
+                var axisTheta = await SqlHelper.GetOrCreateEntityAsync(() => new AxisSettingEntity(), (long)AxisType.Theta);
+                axisX.PositiveSoftLimit = ViewModel.PositiveLimitPositionX;
+                axisX.NegativeSoftLimit = ViewModel.NegativeLimitPositionX;
+                axisY.PositiveSoftLimit = ViewModel.PositiveLimitPositionY;
+                axisY.NegativeSoftLimit = ViewModel.NegativeLimitPositionY;
+                axisZ1.PositiveSoftLimit = ViewModel.PositiveLimitPositionZ1;
+                axisZ1.NegativeSoftLimit = ViewModel.NegativeLimitPositionZ1;
+                axisZ2.PositiveSoftLimit = ViewModel.PositiveLimitPositionZ2;
+                axisZ2.NegativeSoftLimit = ViewModel.NegativeLimitPositionZ2;
+                axisTheta.PositiveSoftLimit = ViewModel.PositiveLimitPositionTheta;
+                axisTheta.NegativeSoftLimit = ViewModel.NegativeLimitPositionTheta;
+                await SqlHelper.UpdateAsync(axisX);
+                await SqlHelper.UpdateAsync(axisY);
+                await SqlHelper.UpdateAsync(axisZ1);
+                await SqlHelper.UpdateAsync(axisZ2);
+                await SqlHelper.UpdateAsync(axisTheta);
+                await GsneMotion.Instance.Axis.SetAllAxisSoftLimit();
+                //await AutoCutUtils.SetFunctionalParameters();
             }
         }
 

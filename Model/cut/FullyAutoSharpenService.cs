@@ -184,8 +184,6 @@ namespace 精密切割系统.Model.cut
                         //触发磨刀进度更新事件
                         SharpenServiceProcessChanged?.Invoke(new SharpenServiceProcess(endZ, sharpenSpeed, sharpenTimes + _finishedSharpenTimes, currentSharpenTimes + _finishedSharpenTimes));
                         await PlcControl.tagControl.ThetaAxis.SetAbsoluteSpeedAsync(GlobalParams.ThetaDefaultSpeed);
-                        //设置磨刀参数
-                        await PlcControl.tagControl.cutting.SetCutParamsAsync(sharpenSpeed, endZ, startZ, line.StartPoint.X, line.EndPoint.X, line.StartPoint.Y, "0", _thetaDegQueue.Peek(), sharpenParams.SpindleRev, depthEntry);
                         //开始磨刀
                         await PlcControl.tagControl.cutting.StartCutAsync();
                         try

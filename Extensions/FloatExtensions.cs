@@ -42,6 +42,30 @@ namespace 精密切割系统.Helpers
         }
 
         /// <summary>
+        /// 将字符串转换为 double，转换失败时返回默认值。
+        /// </summary>
+        /// <param name="str">要转换的字符串</param>
+        /// <param name="defaultValue">转换失败时的默认值（默认为 0d）</param>
+        /// <param name="cultureInfo">文化信息（默认为 CultureInfo.InvariantCulture）</param>
+        /// <returns>转换成功返回对应的 double 值，失败返回 defaultValue</returns>
+        public static double ToDouble(this string str, double defaultValue = 0d, CultureInfo? cultureInfo = null)
+        {
+            if (string.IsNullOrWhiteSpace(str))
+                return defaultValue;
+
+            cultureInfo = cultureInfo ?? CultureInfo.InvariantCulture;
+
+            bool success = double.TryParse(
+                str,
+                NumberStyles.Float | NumberStyles.AllowThousands,
+                cultureInfo,
+                out double result
+            );
+
+            return success ? result : defaultValue;
+        }
+
+        /// <summary>
         /// 将字符串转换为 int，转换失败时返回默认值。
         /// </summary>
         /// <param name="str">要转换的字符串</param>
