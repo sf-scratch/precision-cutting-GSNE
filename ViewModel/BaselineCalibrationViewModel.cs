@@ -316,9 +316,9 @@ namespace 精密切割系统.ViewModel
                 _monitorCts = new CancellationTokenSource();
                 _ = AutoCutUtils.MonitoringAlarmAsync(Stop, AlarmConfig.Instance.HasAutoRunUnexpectedAlarms, default, _monitorCts.Token);
             }
-            await PlcControl.tagControl.wholeDevice.CloseCameraLensCapAsync();
+            await OutputConfig.Instance.CameraCylinderClose();
             //打开切割水
-            await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
+            await OutputConfig.Instance.SetCutWaterOpenAsync(true);
             float endZ = _measureHeigthY - Entity.BladeHeight.ToFloat();
             float startZ = _measureHeigthY - Entity.WorkThickness.ToFloat() - Entity.TapeThickness.ToFloat() - GlobalParams.BladeLiftingHeight;
             float depthEntry = _measureHeigthY - Entity.WorkThickness.ToFloat() - Entity.TapeThickness.ToFloat() - 0.5f;
@@ -366,11 +366,11 @@ namespace 精密切割系统.ViewModel
             }
             finally
             {
-                await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
+                await OutputConfig.Instance.SetCutWaterOpenAsync(false);
                 // 工作盘吹气
                 await AutoCutUtils.WorkpieceBlowingAsync(default, default, true, default, token);
                 await GsneMotion.Instance.Axis.RunMotionAsync(((startX + endX) / 2).ToCameraX(), startY.ToCameraY(), token);
-                await PlcControl.tagControl.wholeDevice.OpenCameraLensCapAsync();
+                await OutputConfig.Instance.CameraCylinderOpened();
                 _cutY = startY.ToCameraY();
             }
         }
@@ -401,7 +401,7 @@ namespace 精密切割系统.ViewModel
             _intervalTimer = new DynamicIntervalTimer(TimeSpan.FromMilliseconds(500), TimeSpan.FromMilliseconds(30));
             Entity = await SqlHelper.GetOrCreateEntityAsync(() => new BaselineCalibrationEntity());
             CameraRelativeBladePositionY = Appsettings.CameraRelativeBladePosition.Y;
-            await PlcControl.tagControl.wholeDevice.OpenCameraLensCapAsync();
+            await OutputConfig.Instance.CameraCylinderOpened();
         }
 
         public override void OnNavigatedFrom(NavigationContext navigationContext)

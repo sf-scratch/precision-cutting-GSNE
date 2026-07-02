@@ -477,8 +477,6 @@ namespace 精密切割系统.Model.cut
                                 {
                                     monitorResult = monitorResult.GetRange(0, actualMonitorCount);
                                 }
-                                var temperatures = await PlcControl.tagControl.wholeDevice.GetTemperatureSensorsAsync();
-                                string temperatureInfo = temperatures != null ? string.Join("  ", temperatures.Select(t => $"{t:F1}°C")) : "N/A";
                                 // 记录日志
                                 RunLogsCommon.LogEvent(
                                     LogType.Cut,
@@ -498,7 +496,6 @@ namespace 精密切割系统.Model.cut
                                     new RunLogsViewModel("步进距离", cutStep.NextStepDistance.ToString()),
                                     new RunLogsViewModel("theta角度", cutStep.ThetaDeg.ToString()),
                                     new RunLogsViewModel("主轴转速", _spindleRev.ToString()),
-                                    new RunLogsViewModel("传感器温度", temperatureInfo),
                                     new RunLogsViewModel("震动幅度", string.Join(" ", monitorResult))
                                     );
                                 stopwatch.Stop();

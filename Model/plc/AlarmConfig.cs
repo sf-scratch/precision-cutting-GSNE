@@ -67,7 +67,7 @@ namespace 精密切割系统.Model.plc
             }
             TotalAlarmCount = _alarmInfos.Length;
             StartAddress = _alarmInfos.FirstOrDefault()?.Address ?? string.Empty;
-            Task.Factory.StartNew(() => StartAlarmMonitoring(default), TaskCreationOptions.LongRunning);
+            //Task.Factory.StartNew(() => StartAlarmMonitoring(default), TaskCreationOptions.LongRunning);
         }
 
         private async Task StartAlarmMonitoring(CancellationToken token)
@@ -76,7 +76,7 @@ namespace 精密切割系统.Model.plc
             {
                 try
                 {
-                    _newestAlarms = await PlcControl.tagControl.wholeDevice.ReadTotalAlarmsAsync();
+                    //_newestAlarms = await PlcControl.tagControl.wholeDevice.ReadTotalAlarmsAsync();
                 }
                 catch (Exception ex)
                 {

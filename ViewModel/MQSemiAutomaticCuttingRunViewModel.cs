@@ -20,6 +20,7 @@ using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
 using 精密切割系统.Entities;
 using 精密切割系统.Helpers;
+using 精密切割系统.Helpers.GTN;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut;
 using 精密切割系统.Model.cut.Workpieces;
@@ -190,8 +191,8 @@ namespace 精密切割系统.ViewModel
                                         var alarmLogs = alarmInfos.Select(p => new RunLogsViewModel("报警监控", p.Message));
                                         logs.AddRange(alarmLogs);
                                         RunLogsCommon.LogEvent(LogType.Error, logs);
-                                        await PlcControl.tagControl.wholeDevice.OpenBuzzerAsync();
-                                        await PauseAsync(PlcControl.tagControl.wholeDevice.OpenRedLightAsync);
+                                        await OutputConfig.Instance.SetBuzzerAsync(true);
+                                        await PauseAsync(OutputConfig.Instance.OpenRedLightAsync);
                                         Tools.CuttingRecord(alarmMessages);
                                     }
                                     else
@@ -233,8 +234,8 @@ namespace 精密切割系统.ViewModel
                                         var alarmLogs = alarmInfos.Select(p => new RunLogsViewModel("报警监控", p.Message));
                                         logs.AddRange(alarmLogs);
                                         RunLogsCommon.LogEvent(LogType.Error, logs);
-                                        await PlcControl.tagControl.wholeDevice.OpenBuzzerAsync();
-                                        await PauseAsync(PlcControl.tagControl.wholeDevice.OpenRedLightAsync);
+                                        await OutputConfig.Instance.SetBuzzerAsync(true);
+                                        await PauseAsync(OutputConfig.Instance.OpenRedLightAsync);
                                         Tools.CuttingRecord(alarmMessages);
                                     }
                                     else
@@ -364,10 +365,10 @@ namespace 精密切割系统.ViewModel
             }
             if (!GlobalParams.HasFullyAutomatic)
             {
-                await PlcControl.tagControl.wholeDevice.CloseCameraLensCapAsync();
+                await OutputConfig.Instance.CameraCylinderClose();
             }
             AtomicConfig.IsCutProcessing = true;
-            await PlcControl.tagControl.wholeDevice.OpenGreenLightAsync();
+            await OutputConfig.Instance.OpenGreenLightAsync();
             try
             {
                 FileTableItemModel fileTableItem = fileTableItemResult.Data;
@@ -416,7 +417,7 @@ namespace 精密切割系统.ViewModel
                         TimeSpan timeSpan = TimeSpan.FromSeconds(completeStopwatch.Elapsed.TotalSeconds);
                         string formattedTime = $"{timeSpan.Hours:D2}:{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}";
                         await PlcControl.tagControl.Xaxis.StartAbsoluteAsync(Appsettings.ThetaCenterPoint.X, 80, _pauseCts.Token);
-                        _ = PlcControl.tagControl.wholeDevice.OpenBuzzerAsync(5);
+                        _ = OutputConfig.Instance.OpenBuzzerAsync(5);
                         MaterialSnack($"切割完成！ 总用时：{formattedTime}", SnackType.SUCCESS, 0);
                     }
                 }
@@ -516,7 +517,7 @@ namespace 精密切割系统.ViewModel
             }
             MaterialSnack("正在继续切割...", SnackType.WARNING, 0, _eventAggregator);
             _pauseCts = new CancellationTokenSource();
-            await PlcControl.tagControl.wholeDevice.OpenGreenLightAsync();
+            await OutputConfig.Instance.OpenGreenLightAsync();
             SemiAutoCutService.Instance.Continue(_pauseCts.Token);
             MaterialSnack("切割中...", SnackType.WARNING, 0, _eventAggregator);
         }
@@ -543,7 +544,7 @@ namespace 精密切割系统.ViewModel
                 return;
             }
             SemiAutoCutService.Instance.Stop(pauseResult);
-            await PlcControl.tagControl.wholeDevice.OpenYellowLightAsync();
+            await OutputConfig.Instance.SetLightYellowAsync(true);
             NavigateToHome();
             ShowMessage();
         }
@@ -571,7 +572,7 @@ namespace 精密切割系统.ViewModel
                 if (line != null && !AlarmConfig.Instance.HasAxisErrorAlarms())
                 {
                     await PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, cts.Token);
-                    await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
+                    await OutputConfig.Instance.SetCutWaterOpenAsync(false);
                     if (!pauseData.IsCompleted)
                     {
                         await AutoCutUtils.WorkpieceBlowingAsync(line.StartPoint.Y.ToCameraY(), default, false, _eventAggregator, cts.Token);
@@ -582,11 +583,11 @@ namespace 精密切割系统.ViewModel
                 }
                 if (!AlarmConfig.Instance.HasActiveErrorAlarm())
                 {
-                    await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
+                    await OutputConfig.Instance.SetCutWaterOpenAsync(false);
                 }
                 if (pauseData.IsCompleted)
                 {
-                    _ = PlcControl.tagControl.wholeDevice.OpenBuzzerAsync(5);
+                    _ = OutputConfig.Instance.OpenBuzzerAsync(5);
                     MaterialSnack(pauseData.Message ?? "切割完成...", SnackType.SUCCESS, 0, _eventAggregator);
                 }
                 else

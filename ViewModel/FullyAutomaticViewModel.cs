@@ -23,6 +23,7 @@ using 精密切割系统.DTOs;
 using 精密切割系统.Entities;
 using 精密切割系统.Extensions;
 using 精密切割系统.Helpers;
+using 精密切割系统.Helpers.GTN;
 using 精密切割系统.HttpClients;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut;
@@ -278,22 +279,22 @@ namespace 精密切割系统.ViewModel
                 _regionManager.RequestNavigate(RegionName.MainRegion, nameof(AutoCut), paramet);
                 return;
             }
-            if (!await PlcControl.tagControl.wholeDevice.IsCompletedSystemInitAsync())
+            if (!GsneMotion.Instance.Axis.IsMachineInitComplete)
             {
                 MaterialSnack("请完成系统初始化！", SnackType.WARNING, 0, _eventAggregator);
                 return;
             }
-            if (!await PlcControl.tagControl.wholeDevice.IsOpenVacuumSwitchAsync())
+            if (!await OutputConfig.Instance.GetTrayVacuumAsync())
             {
                 MaterialSnack("请打开工作盘真空！", SnackType.WARNING, 0, _eventAggregator);
                 return;
             }
-            if (await PlcControl.tagControl.wholeDevice.IsOpenCutSecurityDoorAsync())
+            if (await IoAlarm.Instance.CheckCutSafetyDoorAlarmAsync())
             {
                 MaterialSnack("请关闭切割安全门！", SnackType.WARNING, 0, _eventAggregator);
                 return;
             }
-            if (await PlcControl.tagControl.wholeDevice.IsOpenCameraSecurityDoorAsync())
+            if (await IoAlarm.Instance.CheckCameraSafetyDoorAlarmAsync())
             {
                 MaterialSnack("请关闭相机安全门！", SnackType.WARNING, 0, _eventAggregator);
                 return;

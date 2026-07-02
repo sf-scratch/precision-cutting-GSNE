@@ -248,9 +248,9 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                         //float startY = _measureHeigthY - _viewModel.WorkThickness.ToFloat() - _viewModel.TapeThickness.ToFloat() - 0.2f;
                         //await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(startY, default, _stopCts.Token);
                         //float endY = _measureHeigthY - _viewModel.WorkThickness.ToFloat() - _viewModel.TapeThickness.ToFloat() + 0.1f;
-                        //await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
+                        //await OutputConfig.Instance.SetCutWaterOpenAsync(true);
                         //await PlcControl.tagControl.Yaxis.StartAbsoluteAsync(endY, 0.001f, _stopCts.Token);
-                        //await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
+                        //await OutputConfig.Instance.SetCutWaterOpenAsync(false);
                         //await AutoCutUtils.WorkpieceBlowingAsync(default, default, _stopCts.Token);
                         //await PlcControl.tagControl.cutting.RunMotionAsync(x.ToCameraX(), y.ToCameraY(), _stopCts.Token);
                         //_step = ThetaCenterAlignStep.FindRightEndpoint;

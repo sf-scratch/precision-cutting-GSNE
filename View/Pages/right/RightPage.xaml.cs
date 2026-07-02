@@ -16,6 +16,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Xml.Linq;
 using 精密切割系统.Helpers;
+using 精密切割系统.Helpers.GTN;
 using 精密切割系统.Model.plc;
 using 精密切割系统.Utils;
 using 精密切割系统.View.Controls;
@@ -60,12 +61,12 @@ namespace 精密切割系统.View.page.right
             });
             while (true)
             {
-                bool tempVacuumStateStatus = await PlcControl.tagControl.wholeDevice.IsOpenVacuumSwitchAsync();
-                bool tempSpindleAirStatus = await PlcControl.tagControl.wholeDevice.IsOpenSpindleAirAsync();
-                bool tempSpindleCoolingWaterStatus = await PlcControl.tagControl.wholeDevice.IsOpenSpindleCoolingWaterAsync();
-                bool tempSpindleCuttingWaterStatus = await PlcControl.tagControl.wholeDevice.IsOpenSpindleCuttingWaterAsync();
-                int? tempSpindleSpeedPlcValue = await PlcControl.tagControl.wholeDevice.GetSpindleSpeedAsync();
-                var temperatures = await PlcControl.tagControl.wholeDevice.GetTemperatureSensorsAsync();
+                bool tempVacuumStateStatus = await IoAlarm.Instance.CheckWorkpieceVacuumDetectAlarmAsync();
+                bool tempSpindleAirStatus = await IoAlarm.Instance.CheckAirFloatPressureAlarmAsync();
+                bool tempSpindleCoolingWaterStatus = await IoAlarm.Instance.CheckCoolWaterDetectAlarmAsync();
+                bool tempSpindleCuttingWaterStatus = await OutputConfig.Instance.GetCutWaterOpenAsync();
+                int? tempSpindleSpeedPlcValue = await SpindleMotionSet.Instance.SpindleSpeedDisplayAsync();
+                //var temperatures = await PlcControl.tagControl.wholeDevice.GetTemperatureSensorsAsync();
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     if (vacuumStateStatus != tempVacuumStateStatus || firstFlag)
@@ -97,14 +98,14 @@ namespace 精密切割系统.View.page.right
                         spindleSpeedPlcValue = tempSpindleSpeedPlcValue.Value.ToString();
                         spindleSpeedValue.Content = spindleSpeedPlcValue;
                     }
-                    if (temperatures is not null && temperatures.Length >= 5)
-                    {
-                        temperatureSensor1.Content = temperatures[0].ToString("F1");
-                        temperatureSensor2.Content = temperatures[1].ToString("F1");
-                        temperatureSensor3.Content = temperatures[2].ToString("F1");
-                        temperatureSensor4.Content = temperatures[3].ToString("F1");
-                        temperatureSensor5.Content = temperatures[4].ToString("F1");
-                    }
+                    //if (temperatures is not null && temperatures.Length >= 5)
+                    //{
+                    //    temperatureSensor1.Content = temperatures[0].ToString("F1");
+                    //    temperatureSensor2.Content = temperatures[1].ToString("F1");
+                    //    temperatureSensor3.Content = temperatures[2].ToString("F1");
+                    //    temperatureSensor4.Content = temperatures[3].ToString("F1");
+                    //    temperatureSensor5.Content = temperatures[4].ToString("F1");
+                    //}
                 });
                 firstFlag = false;
                 await Task.Delay(500);

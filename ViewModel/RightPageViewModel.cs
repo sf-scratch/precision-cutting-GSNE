@@ -51,7 +51,7 @@ namespace 精密切割系统.ViewModel
             Task.Factory.StartNew(IoAlarm.Instance.StartMonitorAlarmsAsync, TaskCreationOptions.LongRunning);
             Task.Factory.StartNew(GsneMotion.Instance.StartMonitorAxisStatusAsync, TaskCreationOptions.LongRunning);
             Task.Factory.StartNew(StartMonitorAlarmsAsync, TaskCreationOptions.LongRunning);
-            Task.Factory.StartNew(TemperatureSensorUtils.StartRecordingAsync, TaskCreationOptions.LongRunning);
+            //Task.Factory.StartNew(TemperatureSensorUtils.StartRecordingAsync, TaskCreationOptions.LongRunning);
         }
 
         private async Task StartMonitorAlarmsAsync()
@@ -65,12 +65,12 @@ namespace 精密切割系统.ViewModel
                     //    if (AlarmConfig.Instance.HasActiveErrorAlarm(false))
                     //    {
                     //        // 不在切割状态下，且有报警时，三色灯报警红色
-                    //        await PlcControl.tagControl.wholeDevice.OpenRedLightAsync();
+                    //        await OutputConfig.Instance.OpenRedLightAsync();
                     //    }
                     //    else
                     //    {
                     //        // 不在切割状态下，且有没报警时，三色灯报警黄色
-                    //        await PlcControl.tagControl.wholeDevice.OpenYellowLightAsync();
+                    //        await OutputConfig.Instance.SetLightYellowAsync(true);
                     //    }
                     //}
                     var allIoAlarms = await IoAlarm.Instance.GetAllIoAlarmDescribeAsync();

@@ -112,7 +112,7 @@ namespace 精密切割系统.Model.cut
             try
             {
                 //打开切割水
-                await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
+                await OutputConfig.Instance.SetCutWaterOpenAsync(true);
                 float abAverageThickness = lunguSksj.ABAverageThickness / 1000;
                 int curSharpenTimes = 0;
                 //开始磨刀，磨指定刀数
@@ -139,7 +139,7 @@ namespace 精密切割系统.Model.cut
                                 {
                                     return RunResult.Fail("停止切割");
                                 }
-                                await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
+                                await OutputConfig.Instance.SetCutWaterOpenAsync(true);
                                 usingPauseToken = token.Value;
                                 InitThetaDegQueue(sharpenCalibratTheta);
                             }
@@ -172,7 +172,7 @@ namespace 精密切割系统.Model.cut
                             {
                                 return RunResult.Fail("停止磨刀");
                             }
-                            await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
+                            await OutputConfig.Instance.SetCutWaterOpenAsync(true);
                             usingPauseToken = token.Value;
                         }
                         //当前磨刀次数
@@ -206,7 +206,7 @@ namespace 精密切割系统.Model.cut
                         {
                             return RunResult.Fail("停止切割");
                         }
-                        await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
+                        await OutputConfig.Instance.SetCutWaterOpenAsync(true);
                         usingPauseToken = token.Value;
                     }
                     catch (Exception ex)

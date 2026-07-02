@@ -273,6 +273,11 @@ namespace 精密切割系统.Helpers.GTN
             }
         }
 
+        /// <summary>
+        /// 清所有报警，包含伺服轴报警、主轴报警、IO报警
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async Task<bool> AlarmResetAsync(CancellationToken token = default)
         {
             try
@@ -304,6 +309,11 @@ namespace 精密切割系统.Helpers.GTN
             }
         }
 
+        /// <summary>
+        /// 紧急抬起
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async Task EmergencyLiftSpindleAsync(CancellationToken token = default)
         {
             Task Z1 = GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.Z1, 1, 20, token);

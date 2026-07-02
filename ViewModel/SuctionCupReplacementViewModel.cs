@@ -5,6 +5,7 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using 精密切割系统.Helpers;
+using 精密切割系统.Helpers.GTN;
 using 精密切割系统.Model.common;
 using static NPOI.HSSF.Util.HSSFColor;
 
@@ -26,7 +27,7 @@ namespace 精密切割系统.ViewModel
         protected override void InitBottomButton()
         {
             base.InitBottomButton();
-            AddBottomButton(ButtonParams.BlueButton("工作盘真空", "VacuumOutline", PlcControl.tagControl.wholeDevice.TriggerWorkVacuumSwitchAsync));
+            AddBottomButton(ButtonParams.BlueButton("工作盘真空", "VacuumOutline", OutputConfig.Instance.TriggerWorkVacuumSwitchAsync));
         }
     }
 }

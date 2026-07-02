@@ -253,11 +253,11 @@ namespace 精密切割系统.ViewModel
                 int maxRepeatCount = new int[] { repeatCountX, repeatCountY, repeatCountZ1, repeatCountZ2, repeatCountTheta }.Max();
                 if (IsOpenWater)
                 {
-                    await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
+                    await OutputConfig.Instance.SetCutWaterOpenAsync(true);
                 }
                 if (IsFlowing)
                 {
-                    await PlcControl.tagControl.wholeDevice.OpenWorkpieceBlowingAsync();
+                    await OutputConfig.Instance.SetProductBlowAsync(true);
                 }
                 List<Task> tasks = [];
 
@@ -328,8 +328,8 @@ namespace 精密切割系统.ViewModel
             }
             finally
             {
-                await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
-                await PlcControl.tagControl.wholeDevice.CloseWorkpieceBlowingAsync();
+                await OutputConfig.Instance.SetCutWaterOpenAsync(false);
+                await OutputConfig.Instance.SetProductBlowAsync(false);
                 _emptyRunCts?.Cancel();
             }
         }

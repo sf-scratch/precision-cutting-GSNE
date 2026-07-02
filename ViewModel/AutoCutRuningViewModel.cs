@@ -219,7 +219,7 @@ namespace 精密切割系统.ViewModel
                 return;
             }
             //清报警列表
-            await PlcControl.tagControl.wholeDevice.AlarmResetAsync();
+            await GsneMotion.Instance.AlarmResetAsync();
             //暂停页面跳转回来会触发InitCommand，调继续切割
             if (RunStatus == AutoRunStatus.SharpeningInProgress || RunStatus == AutoRunStatus.CutingInProgress || RunStatus == AutoRunStatus.ReplaceSharpenBoard || RunStatus == AutoRunStatus.ReplaceWafer)
             {
@@ -418,7 +418,7 @@ namespace 精密切割系统.ViewModel
                 TimeSpan timeSpan = TimeSpan.FromSeconds(stopwatch.Elapsed.TotalSeconds);
                 string formattedTime = $"{timeSpan.Hours:D2}:{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}";
                 MaterialSnack($"切割完成，请更换刀片！  总用时：{formattedTime}", SnackType.SUCCESS, 0, _eventAggregator);
-                await PlcControl.tagControl.wholeDevice.OpenBuzzerAsync();
+                await OutputConfig.Instance.SetBuzzerAsync(true);
             }
             catch (OperationCanceledException)
             {
@@ -668,7 +668,7 @@ namespace 精密切割系统.ViewModel
         //                return;
         //            }
         //            MaterialSnack($"切割完成！请更换刀片", SnackType.SUCCESS, 0, _eventAggregator);
-        //            await PlcControl.tagControl.wholeDevice.OpenBuzzerAsync();
+        //            await OutputConfig.Instance.SetBuzzerAsync(true);
         //        }
         //    }
         //    catch (OperationCanceledException)

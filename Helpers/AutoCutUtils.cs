@@ -111,9 +111,9 @@ namespace 精密切割系统.Helpers
                     return CommonResult.Failure("轴未准备好，请检查轴状态！");
                 }
                 await SpindleMotionSet.Instance.StartSpindleAsync(0, true);
-                Task taskX = GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.X,posX, speedX, token);
-                Task taskY = GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.Y,posY, speedY, token);
-                Task speedZero = SpindleMotionSet.Instance.WaitSpindleSpeedReachedAsync(0,token);
+                Task taskX = GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.X, posX, speedX, token);
+                Task taskY = GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.Y, posY, speedY, token);
+                Task speedZero = SpindleMotionSet.Instance.WaitSpindleSpeedReachedAsync(0, token);
                 await Task.WhenAll(taskX, taskY, speedZero);
                 MaterialSnack("请打开切割安全门更换刀片！", SnackType.SUCCESS, default, eventAggregator);
                 return CommonResult.Success();
@@ -134,10 +134,10 @@ namespace 精密切割系统.Helpers
             {
                 MaterialSnack("请准备更换磨刀板,轴运动中！", SnackType.WARNING, 0, eventAggregator);
                 await SpindleMotionSet.Instance.StartSpindleAsync(0, false);
-                Task taskZ1 = GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.X,0, default, token);
-                Task taskZ2 = GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.X,0, default, token);
+                Task taskZ1 = GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.X, 0, default, token);
+                Task taskZ2 = GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.X, 0, default, token);
                 await Task.WhenAll(taskZ1, taskZ2);
-                Task taskXY = GsneMotion.Instance.Axis.RunMotionAsync(0,0, token);
+                Task taskXY = GsneMotion.Instance.Axis.RunMotionAsync(0, 0, token);
                 Task taskTheta = GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.Theta, 0, default, token);
                 Task taskSpindle = SpindleMotionSet.Instance.WaitSpindleSpeedReachedAsync(0, token);
                 await Task.WhenAll(taskXY, taskTheta, taskSpindle);
@@ -219,7 +219,7 @@ namespace 精密切割系统.Helpers
             {
                 return CommonResult<float>.Failure("获取测高参数失败！");
             }
-            await SpindleMotionSet.Instance.StartSpindleAsync(bmParameter.SpindleRev.ToInt(),true);
+            await SpindleMotionSet.Instance.StartSpindleAsync(bmParameter.SpindleRev.ToInt(), true);
             await PlcControl.tagControl.bladeMantance.SetHeightMeasureTimes(bmParameter.HeightMeasureTimes.ToInt());
             CommonResult<float> curHeightZ;
             if (Appsettings.MeasureHeightLast == null)
@@ -578,7 +578,7 @@ namespace 精密切割系统.Helpers
 
         public static async Task WaitManualBlowing(IDialogService dialogService, CancellationToken token)
         {
-            await GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.Z1,0, default, token);
+            await GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.Z1, 0, default, token);
             await GsneMotion.Instance.Axis.RunMotionAsync(100, 0, token);
             await OutputConfig.Instance.SetBuzzerAsync(true);
             await dialogService.ShowDialogWindowAsync(nameof(ConfirmDialog), new DialogParameters() { { "ButtonContent", "测高多次失败，请手动吹水!" } }, r => { }, nameof(ConfirmDialogWindow));
@@ -989,8 +989,8 @@ namespace 精密切割系统.Helpers
             try
             {
                 await OutputConfig.Instance.SetProductBlowAsync(true);
-                await GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.X,userDefineData.AtomizingNozzlePositionX.ToFloat(), xSpeed, token);
-                await GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.Y,atomizingNozzlePositionY ?? userDefineData.AtomizingNozzlePositionY.ToFloat(), ySpeed, token);
+                await GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.X, userDefineData.AtomizingNozzlePositionX.ToFloat(), xSpeed, token);
+                await GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.Y, atomizingNozzlePositionY ?? userDefineData.AtomizingNozzlePositionY.ToFloat(), ySpeed, token);
                 int blowDuration = blowTime ?? userDefineData.BlowTime.ToInt();
                 await Task.Delay(TimeSpan.FromSeconds(blowDuration), token);
             }
@@ -1161,7 +1161,7 @@ namespace 精密切割系统.Helpers
                 float leftCheckX = line.StartPoint.X.ToCameraX() + 20;
                 float checkY = line.EndPoint.Y.ToCameraY();
                 await OutputConfig.Instance.SetProductBlowAsync(true);
-                await GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.X,190, 80, token);
+                await GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.X, 190, 80, token);
                 await GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.X, rightCheckX, 7f, token);
                 await GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.Y, checkY, 50, token);
                 await AutoFocusService.GlobalFocusAsync(default, eventAggregator, token);
@@ -2576,11 +2576,11 @@ namespace 精密切割系统.Helpers
             }
             FileTableItemChModel fileTableItemCh = fileTableItemResult.Data;
             if (!await PlcControl.tagControl.Z1axis.IsReadyAsync())
-            if (!await GsneMotion.Instance.Axis.IsReadyAsync(AxisType.Z1))
-            {
-                return CommonResult.Failure("轴未准备好，请检查轴状态！");
-            }
-            await GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.Z1,0, 30, default);
+                if (!await GsneMotion.Instance.Axis.IsReadyAsync(AxisType.Z1))
+                {
+                    return CommonResult.Failure("轴未准备好，请检查轴状态！");
+                }
+            await GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.Z1, 0, 30, default);
             bool isReady = await GsneMotion.Instance.WaitReadyCuttingAsync();
             if (!isReady)
             {
@@ -2626,8 +2626,7 @@ namespace 精密切割系统.Helpers
                     moveTasks.Add(PlcControl.tagControl.Z2axis.StartAbsoluteAsync(moveZ2.Value, default, timeoutToken.Token));
                 }
                 await Task.WhenAll(moveTasks);
-                await OutputConfig.Instance.SetCameraCylinderBackAsync(false);
-                await OutputConfig.Instance.SetCameraCylinderOutAsync(true);
+                await OutputConfig.Instance.CameraCylinderOpened();
                 return CommonResult.Success();
             }
             catch (OperationCanceledException)

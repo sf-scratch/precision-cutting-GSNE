@@ -9,6 +9,7 @@ using System.Windows.Documents;
 using 精密切割系统.Assets.config.buttom;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Helpers;
+using 精密切割系统.Helpers.GTN;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut;
 using 精密切割系统.Model.plc;
@@ -154,12 +155,12 @@ namespace 精密切割系统.ViewModel
             AddBottomButton(ButtonParams.BlueButton("高度补偿", "/Assets/icon/tab_1/02/tab_20.png", UpdateDepthCompensation));
             AddBottomButton(ButtonParams.BlueButton("型号参数", "/Assets/icon/tab_0/tab_02.png", () => NavigateUtils.NavigateToPage("Pages/F3_ModelCatalog/MCDeviceDataConf", $"id={CurrentUtils.GetCurrentConfiguration().DeviceDataId}&look={false}")));
             AddBottomButton(ButtonParams.BlueButton("手动校准", "/Assets/icon/tab_1/02/tab_21.png", NavigateToManualAlignmentAsync));
-            AddBottomButton(ButtonParams.BlueButton("切割水", "/Assets/icon/tab_0/tab_05.png", PlcControl.tagControl.wholeDevice.TriggerCuttingWaterAsync, isOpenFunc: PlcControl.tagControl.wholeDevice.IsOpenSpindleCuttingWaterAsync, openOrCloseVisibility: System.Windows.Visibility.Visible));
+            AddBottomButton(ButtonParams.BlueButton("切割水", "/Assets/icon/tab_0/tab_05.png", OutputConfig.Instance.TriggerCuttingWaterAsync, isOpenFunc: () => IoAlarm.Instance.CheckCutWaterDetectAlarmAsync(), openOrCloseVisibility: System.Windows.Visibility.Visible));
             AddBottomButton(ButtonParams.BlueButton("暖机", "/Assets/icon/menu_2/menu_2_3_white.png", WarmUpHelper.TriggerWarmUpAsync));
             AddBottomButton(ButtonParams.BlueButton("速度更改", "/Assets/icon/tab_1/02/tab_25.png", UpdateFeedSpeedCompCompensation));
             AddBottomButton(ButtonParams.BlueButton("刀片状态信息", "/Assets/icon/tab_1/03/tab_03.png", () => NavigateUtils.NavigateToPage("Pages/F4_BladeMaintenance/BladeInfo")));
             AddBottomButton(ButtonParams.BlueButton("预切启动", "/Assets/icon/tab_1/02/tab_27.png", TirggerPrecut));
-            AddBottomButton(ButtonParams.BlueButton("C/T真空", "/Assets/icon/tab_1/02/tab_23.png", TriggerVacuumSwitchAsync, isOpenFunc: PlcControl.tagControl.wholeDevice.IsOpenVacuumSwitchAsync, openOrCloseVisibility: System.Windows.Visibility.Visible));
+            AddBottomButton(ButtonParams.BlueButton("C/T真空", "/Assets/icon/tab_1/02/tab_23.png", TriggerVacuumSwitchAsync, isOpenFunc: () => IoAlarm.Instance.CheckWorkpieceVacuumDetectAlarmAsync(), openOrCloseVisibility: System.Windows.Visibility.Visible));
         }
 
         private async Task TriggerVacuumSwitchAsync()
@@ -167,13 +168,13 @@ namespace 精密切割系统.ViewModel
             var operationParameter = await CurrentUtils.GetOperationParametersModelAsync();
             if (!operationParameter.IsAutoShutOffWaterWhenCuttingCompleted && operationParameter.IsAutoShutOffWaterWhenCloseVacuum)
             {
-                await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
+                await OutputConfig.Instance.SetCutWaterOpenAsync(false);
             }
             if (SemiAutoCutService.Instance.HasNotTakenOutWorkpiecesAfterCuttingCompleted)
             {
                 await AutoCutUtils.ReplaceWaferAsync(default, TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(120)).Token);
             }
-            await PlcControl.tagControl.wholeDevice.TriggerVacuumSwitchAsync();
+            await OutputConfig.Instance.SetProductVacuumAsync(false);
         }
 
         private void TirggerPrecut()

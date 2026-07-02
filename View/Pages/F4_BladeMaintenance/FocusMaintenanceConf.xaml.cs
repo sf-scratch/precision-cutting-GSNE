@@ -65,8 +65,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             InitData();
             LoadPosition(_cts.Token);
             // 打开镜头盖
-            await OutputConfig.Instance.SetCameraCylinderBackAsync(false);
-            await OutputConfig.Instance.SetCameraCylinderOutAsync(true);
+            await OutputConfig.Instance.CameraCylinderOpened();
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)

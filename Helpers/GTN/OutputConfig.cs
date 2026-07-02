@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using 精密切割系统.database.db.modle;
+using 精密切割系统.Extensions;
 using 精密切割系统.Model.cut;
 using 精密切割系统.ViewModel;
 using static 精密切割系统.Helpers.GTN.mc_la;
@@ -317,7 +319,7 @@ namespace 精密切割系统.Helpers.GTN
 
         #endregion 批量读取全部DO状态
 
-        #region 输出组合
+        #region 输出组合//////////////////////////////////////////////////////////////////////////////////////////
 
         /// <summary>
         /// 打开切割水并确认切割水检测报警状态
@@ -331,22 +333,125 @@ namespace 精密切割系统.Helpers.GTN
             return !await IoAlarm.Instance.CheckCutWaterDetectAlarmAsync();
         }
 
-        /// <summary>
-        /// 操作工件吹气
-        /// </summary>
         public async Task TriggerWorkVacuumSwitchAsync()
         {
-            if (await GetCameraCylinderBackAsync())
+            if (await GetTrayVacuumAsync())
             {
-                await SetCameraCylinderBackAsync(false);
+                await SetTrayVacuumAsync(false);
             }
             else
             {
-                await SetCameraCylinderBackAsync(true);
+                await SetTrayVacuumAsync(true);
             }
         }
 
-        #endregion 输出组合
+        /// <summary>
+        /// 切割水打开或者关闭切换
+        /// </summary>
+        /// <returns></returns>
+        public async Task TriggerCuttingWaterAsync()
+        {
+            if (await GetCutWaterOpenAsync())
+            {
+                await SetCutWaterOpenAsync(false);
+            }
+            else
+            {
+                await SetCutWaterOpenAsync(true);
+            }
+        }
+
+        /// <summary>
+        /// 镜头打开
+        /// </summary>
+        /// <returns></returns>
+        public async Task CameraCylinderOpened()
+        {
+            Task io1 = OutputConfig.Instance.SetCameraCylinderBackAsync(false);
+            Task io2 = OutputConfig.Instance.SetCameraCylinderOutAsync(true);
+            await Task.WhenAll(io1, io2);
+        }
+
+        /// <summary>
+        /// 镜头关闭
+        /// </summary>
+        /// <returns></returns>
+        public async Task CameraCylinderClose()
+        {
+            Task io1 = OutputConfig.Instance.SetCameraCylinderBackAsync(true);
+            Task io2 = OutputConfig.Instance.SetCameraCylinderOutAsync(false);
+            await Task.WhenAll(io1, io2);
+        }
+
+        private SemaphoreSlim _lightSemaph = new SemaphoreSlim(1, 1);
+
+        /// <summary>
+        /// 打开绿灯闪烁
+        /// </summary>
+        /// <returns></returns>
+        public async Task OpenGreenLightAsync()
+        {
+            await _lightSemaph.ExecuteAsync(async () =>
+            {
+                await SetLightGreenAsync(false);
+                await SetLightYellowAsync(false);
+                await SetLightRedAsync(true);
+            });
+        }
+
+        /// <summary>
+        /// 打开黄灯闪烁
+        /// </summary>
+        /// <returns></returns>
+        public async Task OpenYellowLightAsync()
+        {
+            await _lightSemaph.ExecuteAsync(async () =>
+            {
+                await SetLightGreenAsync(false);
+                await SetLightYellowAsync(true);
+                await SetLightRedAsync(false);
+            });
+        }
+
+        /// <summary>
+        /// 打开红灯闪烁
+        /// </summary>
+        /// <returns></returns>
+        public async Task OpenRedLightAsync()
+        {
+            await _lightSemaph.ExecuteAsync(async () =>
+            {
+                await SetLightGreenAsync(false);
+                await SetLightYellowAsync(false);
+                await SetLightRedAsync(true);
+            });
+        }
+
+        public async Task OpenBuzzerAsync(int seconds)
+        {
+            await SetBuzzerAsync(true);
+            await Task.Delay(TimeSpan.FromSeconds(seconds));
+            await SetBuzzerAsync(false);
+        }
+
+        public async Task OpenVacuumBreakingAsync(int? seconds = null)
+        {
+            int breakTime;
+            if (seconds is null)
+            {
+                UserDefineDataModel userDefine = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
+                breakTime = userDefine.VacuumBreakingTime.ToInt(3);
+            }
+            else
+            {
+                breakTime = seconds.Value;
+            }
+            await SetBreakVacuumAsync(true);
+            await Task.Delay(TimeSpan.FromSeconds(breakTime));
+            await SetBreakVacuumAsync(false);
+        }
+
+        #endregion 输出组合//////////////////////////////////////////////////////////////////////////////////////////
 
         /// <summary>
         /// 批量读取do

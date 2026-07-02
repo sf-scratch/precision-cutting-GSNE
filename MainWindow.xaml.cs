@@ -196,7 +196,7 @@ namespace 精密切割系统
                     new RunLogsViewModel(LogType.INIT, "初始化"),
                     new RunLogsViewModel("结果", "初始化成功！")
                 });
-                await PlcControl.tagControl.wholeDevice.OpenYellowLightAsync();
+                await OutputConfig.Instance.SetLightYellowAsync(true);
             }), DispatcherPriority.ContextIdle);
         }
 

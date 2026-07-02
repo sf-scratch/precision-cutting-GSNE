@@ -96,10 +96,10 @@ namespace 精密切割系统.View.Pages.operate
                 bool tempSpindleCuttingWater = !await IoAlarm.Instance.CheckCutWaterDetectAlarmAsync();
                 //bool tempIsOpenOpticalFiberSensorBlowing = await PlcControl.tagControl.bladeMantance.GetOpticalFiberSensorBlowingAsync();
                 //bool tempIsOpenOpticalFiberSensorBlowingWater = await PlcControl.tagControl.bladeMantance.GetOpticalFiberSensorBlowingWaterAsync();
-                bool tempWorkpieceBlowingStatus = await PlcControl.tagControl.wholeDevice.IsOpenWorkpieceBlowingAsync();
-                bool tempSystemInitFlagStatus = await PlcControl.tagControl.wholeDevice.IsCompletedSystemInitAsync();
-                bool tempIsOpenWorkVacuumSwitchStatus = await PlcControl.tagControl.wholeDevice.IsOpenWorkVacuumSwitchAsync();
-                bool tempIsRuningSpindle = await PlcControl.tagControl.wholeDevice.GetSpindleSpeedAsync() != 0;
+                bool tempWorkpieceBlowingStatus = await OutputConfig.Instance.GetProductBlowAsync();
+                bool tempSystemInitFlagStatus = GsneMotion.Instance.Axis.IsMachineInitComplete;
+                bool tempIsOpenWorkVacuumSwitchStatus = await OutputConfig.Instance.GetTrayVacuumAsync();
+                bool tempIsRuningSpindle = await SpindleMotionSet.Instance.WaitSpindleSpeedReachedAsync(0, default);
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     //if (tempIsOpenOpticalFiberSensorBlowing != isOpenOpticalFiberSensorBlowing || firstJoin)
@@ -337,7 +337,7 @@ namespace 精密切割系统.View.Pages.operate
                     var operationParameter = await CurrentUtils.GetOperationParametersModelAsync();
                     if (!operationParameter.IsAutoShutOffWaterWhenCuttingCompleted && operationParameter.IsAutoShutOffWaterWhenCloseVacuum)
                     {
-                        await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
+                        await OutputConfig.Instance.SetCutWaterOpenAsync(false);
                     }
                     if (SemiAutoCutService.Instance.HasNotTakenOutWorkpiecesAfterCuttingCompleted)
                     {
@@ -348,7 +348,6 @@ namespace 精密切割系统.View.Pages.operate
                     break;
 
                 case 4:
-                    await OperateCameraSecurityDoorAsync();
                     break;
 
                 case 5:
@@ -390,7 +389,7 @@ namespace 精密切割系统.View.Pages.operate
                         return;
                     }
                     // 操作相机镜头盖
-                    await OperateCutSecurityDoorAsync();
+                    await OperateCameraCylinderAsync();
                     break;
 
                 case 8:
@@ -492,7 +491,7 @@ namespace 精密切割系统.View.Pages.operate
         // CT 真空
         private async Task VacuumOperateAsync()
         {
-            await PlcControl.tagControl.wholeDevice.TriggerVacuumSwitchAsync();
+            await OutputConfig.Instance.SetProductVacuumAsync(true);
         }
 
         /// <summary>
@@ -500,7 +499,7 @@ namespace 精密切割系统.View.Pages.operate
         /// </summary>
         private async Task CutWaterOperateAsync()
         {
-            await PlcControl.tagControl.wholeDevice.TriggerCuttingWaterAsync();
+            await OutputConfig.Instance.TriggerCuttingWaterAsync();
         }
 
         /// <summary>
@@ -508,14 +507,15 @@ namespace 精密切割系统.View.Pages.operate
         /// </summary>
         private async Task OpticalFiberSensorBlowingAsync()
         {
-            if (await PlcControl.tagControl.bladeMantance.GetOpticalFiberSensorBlowingAsync())
-            {
-                await PlcControl.tagControl.bladeMantance.CloseOpticalFiberSensorBlowingAsync();
-            }
-            else
-            {
-                await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingAsync();
-            }
+            //if (await PlcControl.tagControl.bladeMantance.GetOpticalFiberSensorBlowingAsync())
+            //{
+            //    await PlcControl.tagControl.bladeMantance.CloseOpticalFiberSensorBlowingAsync();
+            //}
+            //else
+            //{
+            //    await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingAsync();
+            //}
+            return;
         }
 
         /// <summary>
@@ -523,14 +523,15 @@ namespace 精密切割系统.View.Pages.operate
         /// </summary>
         private async Task OpticalFiberSensorBlowingWaterAsync()
         {
-            if (await PlcControl.tagControl.bladeMantance.GetOpticalFiberSensorBlowingWaterAsync())
-            {
-                await PlcControl.tagControl.bladeMantance.CloseOpticalFiberSensorBlowingWaterAsync();
-            }
-            else
-            {
-                await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingWaterAsync();
-            }
+            //if (await PlcControl.tagControl.bladeMantance.GetOpticalFiberSensorBlowingWaterAsync())
+            //{
+            //    await PlcControl.tagControl.bladeMantance.CloseOpticalFiberSensorBlowingWaterAsync();
+            //}
+            //else
+            //{
+            //    await PlcControl.tagControl.bladeMantance.OpenOpticalFiberSensorBlowingWaterAsync();
+            //}
+            return;
         }
 
         /// <summary>
@@ -576,36 +577,17 @@ namespace 精密切割系统.View.Pages.operate
         }
 
         /// <summary>
-        /// 操作切割安全门
+        /// 操作相机镜头盖
         /// </summary>
-        private async Task OperateCutSecurityDoorAsync()
+        private async Task OperateCameraCylinderAsync()
         {
-            if (await PlcControl.tagControl.wholeDevice.GetCutSecurityDoorAddressAsync())
+            if (await OutputConfig.Instance.GetCameraCylinderBackAsync())
             {
-                await PlcControl.tagControl.wholeDevice.CloseCutSecurityDoorAsync();
+                await OutputConfig.Instance.CameraCylinderOpened();
             }
             else
             {
-                Task cameraSecurityDoorTask = PlcControl.tagControl.wholeDevice.LockCameraSecurityDoorAsync();
-                Task cutSecurityDoorTask = PlcControl.tagControl.wholeDevice.OpenCutSecurityDoorAsync();
-                await Task.WhenAll(cameraSecurityDoorTask, cutSecurityDoorTask);
-            }
-        }
-
-        /// <summary>
-        /// 操作相机安全门
-        /// </summary>
-        private async Task OperateCameraSecurityDoorAsync()
-        {
-            if (await PlcControl.tagControl.wholeDevice.GetCameraSecurityDoorAddressAsync())
-            {
-                await PlcControl.tagControl.wholeDevice.LockCameraSecurityDoorAsync();
-            }
-            else
-            {
-                Task cutSecurityDoorTask = PlcControl.tagControl.wholeDevice.CloseCutSecurityDoorAsync();
-                Task cameraSecurityDoorTask = PlcControl.tagControl.wholeDevice.UnlockCameraSecurityDoorAsync();
-                await Task.WhenAll(cameraSecurityDoorTask, cutSecurityDoorTask);
+                await OutputConfig.Instance.CameraCylinderClose();
             }
         }
 
@@ -614,7 +596,7 @@ namespace 精密切割系统.View.Pages.operate
         /// </summary>
         private async Task OperateWorkVacuumSwitchAsync()
         {
-            await PlcControl.tagControl.wholeDevice.TriggerWorkVacuumSwitchAsync();
+            await OutputConfig.Instance.TriggerWorkVacuumSwitchAsync();
         }
 
         /// <summary>
@@ -622,13 +604,13 @@ namespace 精密切割系统.View.Pages.operate
         /// </summary>
         private async Task CameraBlowingOperateAsync()
         {
-            if (await PlcControl.tagControl.wholeDevice.IsOpenWorkpieceBlowingAsync())
+            if (await OutputConfig.Instance.GetProductBlowAsync())
             {
-                await PlcControl.tagControl.wholeDevice.CloseWorkpieceBlowingAsync();
+                await OutputConfig.Instance.SetProductBlowAsync(false);
             }
             else
             {
-                await PlcControl.tagControl.wholeDevice.OpenWorkpieceBlowingAsync();
+                await OutputConfig.Instance.SetProductBlowAsync(true);
             }
         }
 
@@ -637,7 +619,7 @@ namespace 精密切割系统.View.Pages.operate
             try
             {
                 TimeoutToken timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(60));
-                if (await PlcControl.tagControl.wholeDevice.GetSpindleSpeedAsync() == 0)
+                if (await SpindleMotionSet.Instance.WaitSpindleSpeedReachedAsync(0, default))
                 {
                     MaterialSnack("主轴启动中...", SnackType.WARNING, 0);
                     await SpindleMotionSet.Instance.StartSpindleAsync(FlangeTrimmingData.Instance.SpindleRev, true);

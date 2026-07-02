@@ -162,7 +162,6 @@ namespace 精密切割系统.ViewModel
             try
             {
                 operatePage.IsEnabled = false;
-                await PlcControl.tagControl.wholeDevice.OpenDebugModeAsync();
                 if (tempItem.IsCheckedX)
                 {
                     if (!await PlcControl.tagControl.Xaxis.IsReadyAsync())
@@ -242,7 +241,6 @@ namespace 精密切割系统.ViewModel
             }
             finally
             {
-                await PlcControl.tagControl.wholeDevice.CloseDebugModeAsync();
                 operatePage.IsEnabled = true;
             }
         }

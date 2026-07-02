@@ -116,7 +116,6 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 // 轴最大速度
                 await PlcControl.tagControl.Xaxis.SetMaxSpeedAsync(model.MaxSpeedX.ToFloat());
                 await PlcControl.tagControl.Yaxis.SetMaxSpeedAsync(model.MaxSpeedY.ToFloat());
-                await PlcControl.tagControl.wholeDevice.SetVacuumBreakingTimeAsync(model.VacuumBreakingTime.ToInt());
                 await SqlHelper.UpdateAsync(model);
                 MaterialSnack("保存成功", SnackType.SUCCESS);
             }

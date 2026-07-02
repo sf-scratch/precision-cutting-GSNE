@@ -287,7 +287,7 @@ namespace 精密切割系统.ViewModel
                 MaterialSnack("请先处理错误报警！", SnackType.WARNING);
                 return;
             }
-            await PlcControl.tagControl.wholeDevice.CloseWorkpieceBlowingAsync();
+            await OutputConfig.Instance.SetProductBlowAsync(false);
             await _operatCts.CancelAsync();
             await _semiAutomaticCuttingRunViewModel.ContinueAsync();
             NavigationParameters parameters = new NavigationParameters { { "isContinue", true } };
@@ -340,15 +340,15 @@ namespace 精密切割系统.ViewModel
             // 设置三色灯
             if (AlarmConfig.Instance.HasAutoRunUnexpectedAlarms())
             {
-                await PlcControl.tagControl.wholeDevice.OpenRedLightAsync();
+                await OutputConfig.Instance.OpenRedLightAsync();
             }
             else
             {
-                await PlcControl.tagControl.wholeDevice.OpenYellowLightAsync();
+                await OutputConfig.Instance.SetLightYellowAsync(true);
             }
             if (!GlobalParams.HasFullyAutomatic)
             {
-                await PlcControl.tagControl.wholeDevice.OpenCameraLensCapAsync();
+                await OutputConfig.Instance.CameraCylinderOpened();
             }
         }
 
@@ -359,7 +359,7 @@ namespace 精密切割系统.ViewModel
             _intervalTimer.Dispose();
             if (!GlobalParams.HasFullyAutomatic)
             {
-                await PlcControl.tagControl.wholeDevice.CloseCameraLensCapAsync();
+                await OutputConfig.Instance.CameraCylinderClose();
             }
         }
 

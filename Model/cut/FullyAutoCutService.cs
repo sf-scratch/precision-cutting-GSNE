@@ -13,6 +13,7 @@ using System.Windows.Shapes;
 using 精密切割系统.Driver;
 using 精密切割系统.DTOs;
 using 精密切割系统.Helpers;
+using 精密切割系统.Helpers.GTN;
 using 精密切割系统.HttpClients;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut.Workpieces;
@@ -136,7 +137,7 @@ namespace 精密切割系统.Model.cut
             try
             {
                 //打开切割水
-                await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
+                await OutputConfig.Instance.SetCutWaterOpenAsync(true);
                 //进入全自动切割模式
                 float abAverageThickness = lunguSksj.ABAverageThickness;
                 int chekcTimes = 0;
@@ -168,7 +169,7 @@ namespace 精密切割系统.Model.cut
                                 {
                                     return runResult;
                                 }
-                                await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
+                                await OutputConfig.Instance.SetCutWaterOpenAsync(true);
                                 InitThetaDegQueue(cutCalibratTheta);
                             }
                             //保存切割参数
@@ -199,7 +200,7 @@ namespace 精密切割系统.Model.cut
                             {
                                 return runResult;
                             }
-                            await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
+                            await OutputConfig.Instance.SetCutWaterOpenAsync(true);
                         }
                         //当前切割次数
                         //int? curCutNum = await PlcControl.tagControl.cutting.GetCutNumAsync();
@@ -233,7 +234,6 @@ namespace 精密切割系统.Model.cut
                             SpindleRev = cutParams.SpindleRev
                         };
 
-
                         //开始切割信号
                         bool rtn = await CuttingAutomation.Instance.ExecuteCuttingAsync(cutParam, _usingPauseToken);
                         //等待切割动作完成
@@ -258,7 +258,8 @@ namespace 精密切割系统.Model.cut
                                 // 如果是第一次检查刀痕，且需要检查基准线位置，则提示检查基准线位置
                                 if (chekcTimes == 1)
                                 {
-                                    await PlcControl.tagControl.wholeDevice.OpenBuzzerAsync();
+                                    await OutputConfig.Instance.SetBuzzerAsync(true);
+
                                     RunResult runResult = await WaitContinueAsync(line, "请检查基准线位置！");
                                     if (!runResult.IsSuccess)
                                     {
@@ -285,7 +286,7 @@ namespace 精密切割系统.Model.cut
                                     //if (!result.IsSuccess)
                                     if (true)
                                     {
-                                        await PlcControl.tagControl.wholeDevice.OpenBuzzerAsync();
+                                        await OutputConfig.Instance.SetBuzzerAsync(true);
                                         //刀痕检查结果失败，表示未检测到刀痕
                                         RunResult runResult = await WaitContinueAsync(line, result.Message);
                                         if (!runResult.IsSuccess)
@@ -349,7 +350,7 @@ namespace 精密切割系统.Model.cut
                             finally
                             {
                                 //打开切割水
-                                await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
+                                await OutputConfig.Instance.SetCutWaterOpenAsync(true);
                             }
                             MaterialSnack("刀痕合格！", SnackType.WARNING, 0, eventAggregator);
                             MaterialSnack("切割进行中...", SnackType.SUCCESS, 0, eventAggregator);
@@ -362,7 +363,7 @@ namespace 精密切割系统.Model.cut
                         {
                             return runResult;
                         }
-                        await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
+                        await OutputConfig.Instance.SetCutWaterOpenAsync(true);
                     }
                     catch (Exception ex)
                     {

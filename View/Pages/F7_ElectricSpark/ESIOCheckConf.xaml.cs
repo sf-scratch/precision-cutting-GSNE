@@ -23,9 +23,6 @@ using 精密切割系统.ViewModel;
 
 namespace 精密切割系统.View.F7_ElectricSpark
 {
-
-    
-
     /// <summary>
     /// ESIOCheckConf.xaml 的交互逻辑
     /// </summary>
@@ -39,7 +36,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
 
         public ObservableCollection<ESIOCheckConfDataModel> DataItems2 { get; set; }
 
-        public SolidColorBrush brush3 = new SolidColorBrush(System.Windows.Media.Color.FromRgb(23, 124, 250)); //// 字体颜色 
+        public SolidColorBrush brush3 = new SolidColorBrush(System.Windows.Media.Color.FromRgb(23, 124, 250)); //// 字体颜色
         private int pageIndexIn = (int)Math.Ceiling((double)IOTags.ioTagsDI.Count / 16);
         private int pageIndexOut = (int)Math.Ceiling((double)IOTags.ioTagsDO.Count / 16);
         private int displayStatus = 0; //0: di and do, 1: di, 2: do
@@ -49,7 +46,6 @@ namespace 精密切割系统.View.F7_ElectricSpark
         {
             InitializeComponent();
         }
-
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
@@ -64,11 +60,9 @@ namespace 精密切割系统.View.F7_ElectricSpark
             //rightPage.btnSure.Visibility = Visibility.Visible; //右侧显示 - 确定按钮显示
             //rightPage.btnSure.SetRightClickedHandler(BtnSure_RightClicked); //确定按钮事件
 
-            SolidColorBrush brush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(23, 124, 250)); //// 字体颜色 
+            SolidColorBrush brush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(23, 124, 250)); //// 字体颜色
             DataItems = new ObservableCollection<ESIOCheckConfDataModel>();
             DataItems2 = new ObservableCollection<ESIOCheckConfDataModel>();
-            // 进入IO调试模式
-            PlcControl.tagControl.wholeDevice.IoModelSet(1);
             GotoPage();
 
             // 设置数据上下文
@@ -79,8 +73,8 @@ namespace 精密切割系统.View.F7_ElectricSpark
 
         private void GotoPage()
         {
-            SolidColorBrush brush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(23, 124, 250)); //// 字体颜色 
-            SolidColorBrush brush2 = new SolidColorBrush(System.Windows.Media.Color.FromRgb(23, 124, 250)); //// 字体颜色 
+            SolidColorBrush brush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(23, 124, 250)); //// 字体颜色
+            SolidColorBrush brush2 = new SolidColorBrush(System.Windows.Media.Color.FromRgb(23, 124, 250)); //// 字体颜色
             if (displayStatus == 0 || displayStatus == 1)
             {
                 DataItems.Clear();
@@ -91,12 +85,19 @@ namespace 精密切割系统.View.F7_ElectricSpark
                         break;
                     }
                     string tmpV = "On";
-                    if (IOTags.ioTagsDI[i].value=="" || IOTags.ioTagsDI[i].value == "0" || IOTags.ioTagsDI[i].value.ToLower() == "false")
+                    if (IOTags.ioTagsDI[i].value == "" || IOTags.ioTagsDI[i].value == "0" || IOTags.ioTagsDI[i].value.ToLower() == "false")
                     {
                         tmpV = "Off";
                     }
-                    DataItems.Add(new ESIOCheckConfDataModel { No = IOTags.ioTagsDI[i].addr, WriteNo = IOTags.ioTagsDI[i].writeAddr
-                        , Desc = IOTags.ioTagsDI[i].name, Status = tmpV, Brush = brush });
+                    DataItems.Add(new ESIOCheckConfDataModel
+                    {
+                        No = IOTags.ioTagsDI[i].addr,
+                        WriteNo = IOTags.ioTagsDI[i].writeAddr
+                        ,
+                        Desc = IOTags.ioTagsDI[i].name,
+                        Status = tmpV,
+                        Brush = brush
+                    });
                 }
             }
             if (displayStatus == 0 || displayStatus == 2)
@@ -113,8 +114,15 @@ namespace 精密切割系统.View.F7_ElectricSpark
                     {
                         tmpV = "Off";
                     }
-                    DataItems2.Add(new ESIOCheckConfDataModel { No = IOTags.ioTagsDO[i].addr, WriteNo = IOTags.ioTagsDO[i].writeAddr
-                        , Desc = IOTags.ioTagsDO[i].name, Status = tmpV, Brush = brush2 });
+                    DataItems2.Add(new ESIOCheckConfDataModel
+                    {
+                        No = IOTags.ioTagsDO[i].addr,
+                        WriteNo = IOTags.ioTagsDO[i].writeAddr
+                        ,
+                        Desc = IOTags.ioTagsDO[i].name,
+                        Status = tmpV,
+                        Brush = brush2
+                    });
                 }
             }
             if (displayStatus == 1)
@@ -140,6 +148,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
                     curIndexPage--;
                     GotoPage();
                     break;
+
                 case 7201:// 下一页
                     if (displayStatus == 0 && curIndexPage < (maxPage - 1))
                     {
@@ -158,6 +167,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
                     }
                     GotoPage();
                     break;
+
                 case 7202:// 首页
                     if (curIndexPage != 0)
                     {
@@ -165,6 +175,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
                         GotoPage();
                     }
                     break;
+
                 case 7203:// 中间页
                     if (displayStatus == 0 && maxPage > 2)
                     {
@@ -182,6 +193,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
                         GotoPage();
                     }
                     break;
+
                 case 7204:// 最后页
                     if (displayStatus == 0 && curIndexPage != (maxPage - 1))
                     {
@@ -199,21 +211,25 @@ namespace 精密切割系统.View.F7_ElectricSpark
                         GotoPage();
                     }
                     break;
+
                 case 7205:// 输出和输入
                     displayStatus = 0;
                     curIndexPage = 0;
                     GotoPage();
                     break;
+
                 case 7206:// 输入
                     displayStatus = 1;
                     curIndexPage = 0;
                     GotoPage();
                     break;
+
                 case 7207:// 输出
                     displayStatus = 2;
                     curIndexPage = 0;
                     GotoPage();
                     break;
+
                 default:
                     break;
             }
@@ -221,16 +237,17 @@ namespace 精密切割系统.View.F7_ElectricSpark
 
         private void BtnSure_RightClicked(object? sender, bool e)
         {
-
         }
+
         private void BtnBack_RightClicked(object? sender, bool e)
         {
             mainWindow.NavigateToPage("MainMenu");
         }
+
         private void sepBd_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             var clickedItem = (sender as Border)?.DataContext as ESIOCheckConfDataModel;
-            //MessageBox.Show($"You clicked on: {clickedItem?.No}");             
+            //MessageBox.Show($"You clicked on: {clickedItem?.No}");
         }
 
         private void sepBd_MouseLeftButtonDown_1(object sender, MouseButtonEventArgs e)
@@ -241,8 +258,6 @@ namespace 精密切割系统.View.F7_ElectricSpark
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            // 退出IO调试模式
-            PlcControl.tagControl.wholeDevice.IoModelSet(0);
         }
 
         private void Label_TouchDown(object sender, TouchEventArgs e)
@@ -254,7 +269,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
         {
             OperateDO(sender);
         }
-        
+
         private void OperateDO(object sender)
         {
             // 确保 sender 是 Label
@@ -278,10 +293,11 @@ namespace 精密切割系统.View.F7_ElectricSpark
     {
         //
         public string No { get; set; }
+
         public string Desc { get; set; }
         public string Status { get; set; }
         public string WriteNo { get; set; }
 
         public SolidColorBrush Brush { get; set; }
-}
+    }
 }

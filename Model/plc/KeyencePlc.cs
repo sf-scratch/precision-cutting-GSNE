@@ -591,7 +591,6 @@ namespace 精密切割系统.Driver
             PlcControl.tagControl.bladeMantance.RunBladeSetup(0);
             PlcControl.tagControl.bladeMantance.RunBladeReplace(0);
             PlcControl.tagControl.sparkRepairKnife.EnterElectrical(0);
-            PlcControl.tagControl.wholeDevice.IoModelSet(0);
             PlcControl.tagControl.flange.JoinTrimming(0);
         }
 
@@ -1491,12 +1490,12 @@ namespace 精密切割系统.Driver
         /// </summary>
         public async Task StartBladeSetupAsync()
         {
-            //关闭切割水
-            await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
-            bladeSetup.writeValue = "0";
-            await keyencePlc.WriteTagAsync(bladeSetup);
-            bladeSetup.writeValue = "1";
-            await keyencePlc.WriteTagAsync(bladeSetup);
+            ////关闭切割水
+            //await OutputConfig.Instance.SetCutWaterOpenAsync(false);
+            //bladeSetup.writeValue = "0";
+            //await keyencePlc.WriteTagAsync(bladeSetup);
+            //bladeSetup.writeValue = "1";
+            //await keyencePlc.WriteTagAsync(bladeSetup);
         }
 
         /// <summary>
@@ -1736,7 +1735,6 @@ namespace 精密切割系统.Driver
         {
             return await PlcControl.plc.ReadDataAsync(spindleDirectionSwitch.addr) == true;
         }
-
 
         public async Task TriggerSpindleDirection()
         {
@@ -1990,14 +1988,14 @@ namespace 精密切割系统.Driver
         /// </summary>
         public async Task TriggerCuttingWaterAsync()
         {
-            if (await PlcControl.tagControl.wholeDevice.IsOpenCuttingWaterAsync())
-            {
-                await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
-            }
-            else
-            {
-                await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
-            }
+            //if (await PlcControl.tagControl.wholeDevice.IsOpenCuttingWaterAsync())
+            //{
+            //    await OutputConfig.Instance.SetCutWaterOpenAsync(false);
+            //}
+            //else
+            //{
+            //    await OutputConfig.Instance.SetCutWaterOpenAsync(true);
+            //}
         }
 
         /// <summary>
@@ -2106,6 +2104,10 @@ namespace 精密切割系统.Driver
             await keyencePlc.WriteTagAsync(cutSecurityDoor);
         }
 
+        /// <summary>
+        /// 锁门
+        /// </summary>
+        /// <returns></returns>
         public async Task CloseCutSecurityDoorAsync()
         {
             cutSecurityDoor.writeValue = "1";
