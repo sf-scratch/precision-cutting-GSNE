@@ -84,7 +84,7 @@ namespace 精密切割系统.Helpers.GTN
                     GTN_LmtsOnEx(_core, (short)axis, 1, 0x03);
                     GTN_AxisOn(_core, (short)axis);
                 }
-                
+
                 return CommonResult.Success();
             });
         }
@@ -94,13 +94,13 @@ namespace 精密切割系统.Helpers.GTN
         /// </summary>
         public async Task SystemInitAsync()
         {
-            await Axis.StartHomingAsync(AxisType.Z1);
-            await Task.WhenAll(
-                Axis.StartHomingAsync(AxisType.X),
-                Axis.StartHomingAsync(AxisType.Y),
-                Axis.StartHomingAsync(AxisType.Z2),
-                Axis.StartHomingAsync(AxisType.Theta)
-            );
+            //await Axis.StartHomingAsync(AxisType.Z1);
+            //await Task.WhenAll(
+            //    Axis.StartHomingAsync(AxisType.X),
+            //    Axis.StartHomingAsync(AxisType.Y),
+            //    Axis.StartHomingAsync(AxisType.Z2),
+            //    Axis.StartHomingAsync(AxisType.Theta)
+            //);
         }
 
         public async Task<CommonResult<bool>> GetAxisStatusAsync(AxisType axisType, AxisStatusBits axisStatus)
@@ -122,10 +122,7 @@ namespace 精密切割系统.Helpers.GTN
             return CommonResult<bool>.Failure("状态获取失败！");
         }
 
-
-
         private Dictionary<AxisType, int> _dic = new Dictionary<AxisType, int>();
-
 
         public async Task StartMonitorAxisStatusAsync()
         {
@@ -210,41 +207,113 @@ namespace 精密切割系统.Helpers.GTN
 
         /// <summary>
         /// 判断轴切割条件是否准备好
-        /// 1.轴准备好了 2.轴原点ok 
+        /// 1.轴准备好了 2.轴原点ok
         /// </summary>
         /// <returns>全部轴原点完成+轴就绪返回true</returns>
         public async Task<bool> WaitReadyCuttingAsync()
         {
-            AxisType[] checkAxisList = new[] { AxisType.X, AxisType.Y, AxisType.Z1, AxisType.Theta };
+            AxisType[] checkAxisList = new[] { AxisType.X, AxisType.Y, AxisType.Z1, AxisType.Z2, AxisType.Theta };
 
-            while (true)
+            // 校验所有轴回零完成
+            foreach (var axis in checkAxisList)
             {
-                bool allHomeOk = true;
-
-                // 校验所有轴回零完成
-                foreach (var axis in checkAxisList)
+                bool homeFinish = await GsneMotion.Instance.Axis.IsCompleteHomingAsync(axis);
+                if (!homeFinish)
                 {
-                    bool homeFinish = await GsneMotion.Instance.Axis.IsCompleteHomingAsync(axis);
-                    if (!homeFinish)
-                    {
-                        allHomeOk = false;
-                        break;
-                    }
+                    return false;
                 }
-
-                if (allHomeOk)
+            }
+            foreach (var axis in checkAxisList)
+            {
+                bool axisReady = await GsneMotion.Instance.Axis.IsReadyAsync(axis, AxisStatusBits.MotionActive);
+                if (!axisReady)
                 {
-                    // 等待所有轴就绪
-                    foreach (var axis in checkAxisList)
-                    {
-                        await GsneMotion.Instance.Axis.WaitAxisReadyAsync(axis, CancellationToken.None, AxisStatusBits.MotionActive);
-                    }
-                    return true;
+                    return false;
                 }
+            }
+            // 全部轴回零完成 + 全部轴无故障就绪
+            return true;
+        }
 
-                await Task.Delay(200);
+        /// <summary>
+        /// 轴是否有硬件报警
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> VerAxisAlarm()
+        {
+            AxisType[] checkAxisList = new[] { AxisType.X, AxisType.Y, AxisType.Z1, AxisType.Z2, AxisType.Theta };
+
+            foreach (var axis in checkAxisList)
+            {
+                bool axisReady = await GsneMotion.Instance.Axis.IsReadyAsync(axis, AxisStatusBits.MotionActive);
+                if (!axisReady)
+                {
+                    return false;
+                }
+            }
+            //全部轴无故障就绪
+            return true;
+        }
+
+        public async Task<bool> ResetAllAxisAlarmAsync()
+        {
+            try
+            {
+                // 同步硬件操作丢后台，不卡主线程
+                await Task.Run(() =>
+                {
+                    GTN.mc.GTN_ClrSts(_core, 1, 12);
+                });
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MaterialSnack($"轴报警复位失败：{ex.Message}", SnackType.ERROR);
+                return false;
             }
         }
 
+        public async Task<bool> AlarmResetAsync(CancellationToken token = default)
+        {
+            try
+            {
+                token.ThrowIfCancellationRequested();
+
+                // 1. 复位伺服轴报警
+                await ResetAllAxisAlarmAsync();
+
+                token.ThrowIfCancellationRequested();
+                // 2. 复位主轴报警
+                await SpindleMotionSet.Instance.ResetSpindleAlarmAsync();
+                // 3. 清空IO报警缓存标志与列表
+                IoAlarm.Instance.ActiveAlarmList.Clear();
+                // 重置IO报警标记
+                IoAlarm.Instance.HasAnyAlarm = false;
+
+                return true;
+            }
+            catch (OperationCanceledException)
+            {
+                MaterialSnack("报警复位操作被取消", SnackType.WARNING);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                MaterialSnack($"报警复位失败：{ex.Message}", SnackType.ERROR);
+                return false;
+            }
+        }
+
+        public async Task EmergencyLiftSpindleAsync(CancellationToken token = default)
+        {
+            Task Z1 = GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.Z1, 1, 20, token);
+            AxisType[] checkAxisList = new[] { AxisType.X, AxisType.Y, AxisType.Theta };
+            List<Task> axisTasks = new List<Task> { Z1 };
+            foreach (var axis in checkAxisList)
+            {
+                axisTasks.Add(GsneMotion.Instance.Axis.StopJogAsync(axis));
+            }
+            await Task.WhenAll(axisTasks);
+        }
     }
 }

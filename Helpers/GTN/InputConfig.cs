@@ -6,17 +6,16 @@ using System.Threading.Tasks;
 using static 精密切割系统.Helpers.GTN.mc;
 using static 精密切割系统.Helpers.GTN.mc_la;
 
-
 namespace 精密切割系统.Helpers.GTN
 {/// <summary>
  /// EtherCAT数字输入点位配置
  /// slave：从站号，offset：字节偏移，bit：字节内bit位(0~7)
  /// </summary>
-   
-    /// <summary>
-    /// 整机所有EtherCAT数字输入DI配置容器
-    /// 全部DI位于从站0，字节偏移0，bit0~bit15（占用2个字节）
-    /// </summary>
+
+ /// <summary>
+ /// 整机所有EtherCAT数字输入DI配置容器
+ /// 全部DI位于从站0，字节偏移0，bit0~bit15（占用2个字节）
+ /// </summary>
     public class InputConfig
     {
         private static readonly Lazy<InputConfig> _lazy = new(() => new InputConfig());
@@ -25,35 +24,50 @@ namespace 精密切割系统.Helpers.GTN
         {
             get { return _lazy.Value; }
         }
+
         // ========== 全部DI点位定义（对应你提供的0.00~0.15）==========
         /// <summary>0.00 工件真空按钮</summary>
         public IoConfig WorkpieceVacuumBtn { get; set; }
+
         /// <summary>0.01 急停按钮</summary>
         public IoConfig EmgStop { get; set; }
+
         /// <summary>0.02 紧急抬起</summary>
         public IoConfig EmergencyLift { get; set; }
+
         /// <summary>0.03 复位按钮</summary>
         public IoConfig ResetBtn { get; set; }
+
         /// <summary>0.05 工件真空度检测</summary>
         public IoConfig WorkpieceVacuumDetect { get; set; }
+
         /// <summary>0.06 气浮气压值检测</summary>
         public IoConfig AirFloatPressureDetect { get; set; }
+
         /// <summary>0.07 主轴抱闸压力</summary>
         public IoConfig SpindleBrakePressure { get; set; }
+
         /// <summary>0.08 主轴气压值</summary>
         public IoConfig SpindleAirPressure { get; set; }
+
         /// <summary>0.09 切割水检测开关NO</summary>
         public IoConfig CutWaterDetectNO { get; set; }
+
         /// <summary>0.10 冷却水检测开关NO</summary>
         public IoConfig CoolWaterDetectNO { get; set; }
+
         /// <summary>0.11 测高继电器闭合检测</summary>
         public IoConfig HeightRelayCloseDetect { get; set; }
+
         /// <summary>0.12 测高接触</summary>
         public IoConfig HeightContactDetect { get; set; }
+
         /// <summary>0.13 主轴电刷检查</summary>
         public IoConfig SpindleBrushCheck { get; set; }
+
         /// <summary>0.14 相机安全门</summary>
         public IoConfig CameraSafetyDoor { get; set; }
+
         /// <summary>0.15 切割安全门</summary>
         public IoConfig CutSafetyDoor { get; set; }
 
@@ -108,6 +122,7 @@ namespace 精密切割系统.Helpers.GTN
         }
 
         #region 底层封装 GTN_EcatIOReadInput 读取单个DI
+
         /// <summary>
         /// 同步读取单个DI点位电平
         /// 返回true：IO高电平导通；false：断开
@@ -142,67 +157,80 @@ namespace 精密切割系统.Helpers.GTN
         {
             return await Task.Run(() => ReadSingleDi(io));
         }
-        #endregion
 
-        #region 对外暴露 单个IO读取同步/异步方法
+        #endregion 底层封装 GTN_EcatIOReadInput 读取单个DI
 
-        public bool GetWorkpieceVacuumBtn() => ReadSingleDi(WorkpieceVacuumBtn);
+        #region 对外暴露 单个IO读取方法
+
+        /// <summary>读取工件真空按钮DI状态</summary>
+        /// <returns>true高电平导通，false断开</returns>
         public async Task<bool> GetWorkpieceVacuumBtnAsync() => await ReadSingleDiAsync(WorkpieceVacuumBtn);
 
-        public bool GetEmgStop() => ReadSingleDi(EmgStop);
+        /// <summary>读取急停按钮DI状态</summary>
+        /// <returns>true高电平导通，false断开</returns>
         public async Task<bool> GetEmgStopAsync() => await ReadSingleDiAsync(EmgStop);
 
-        public bool GetEmergencyLift() => ReadSingleDi(EmergencyLift);
+        /// <summary>读取主轴紧急抬起触发DI信号</summary>
+        /// <returns>true高电平导通，false断开</returns>
         public async Task<bool> GetEmergencyLiftAsync() => await ReadSingleDiAsync(EmergencyLift);
 
-        public bool GetResetBtn() => ReadSingleDi(ResetBtn);
+        /// <summary>读取复位按钮DI状态</summary>
+        /// <returns>true高电平导通，false断开</returns>
         public async Task<bool> GetResetBtnAsync() => await ReadSingleDiAsync(ResetBtn);
-        /// <summary>
-        /// 读工件真空度
-        /// </summary>
-        /// <returns></returns>
-        public bool GetWorkpieceVacuumDetect() => ReadSingleDi(WorkpieceVacuumDetect);
+
+        /// <summary>读取工件真空检测DI信号</summary>
+        /// <returns>true高电平导通，false断开</returns>
         public async Task<bool> GetWorkpieceVacuumDetectAsync() => await ReadSingleDiAsync(WorkpieceVacuumDetect);
 
-        public bool GetAirFloatPressureDetect() => ReadSingleDi(AirFloatPressureDetect);
+        /// <summary>读取气浮压力检测DI信号</summary>
+        /// <returns>true高电平导通，false断开</returns>
         public async Task<bool> GetAirFloatPressureDetectAsync() => await ReadSingleDiAsync(AirFloatPressureDetect);
 
-        public bool GetSpindleBrakePressure() => ReadSingleDi(SpindleBrakePressure);
+        /// <summary>读取主轴刹车压力检测DI信号</summary>
+        /// <returns>true高电平导通，false断开</returns>
         public async Task<bool> GetSpindleBrakePressureAsync() => await ReadSingleDiAsync(SpindleBrakePressure);
 
-        public bool GetSpindleAirPressure() => ReadSingleDi(SpindleAirPressure);
+        /// <summary>读取主轴气源压力检测DI信号</summary>
+        /// <returns>true高电平导通，false断开</returns>
         public async Task<bool> GetSpindleAirPressureAsync() => await ReadSingleDiAsync(SpindleAirPressure);
 
-        public bool GetCutWaterDetectNO() => ReadSingleDi(CutWaterDetectNO);
+        /// <summary>切割水常开检测DI信号</summary>
+        /// <returns>true高电平导通，false断开</returns>
         public async Task<bool> GetCutWaterDetectNOAsync() => await ReadSingleDiAsync(CutWaterDetectNO);
 
-        public bool GetCoolWaterDetectNO() => ReadSingleDi(CoolWaterDetectNO);
+        /// <summary>冷却水常开检测DI信号</summary>
+        /// <returns>true高电平导通，false断开</returns>
         public async Task<bool> GetCoolWaterDetectNOAsync() => await ReadSingleDiAsync(CoolWaterDetectNO);
 
-        public bool GetHeightRelayCloseDetect() => ReadSingleDi(HeightRelayCloseDetect);
+        /// <summary>测高继电器闭合检测DI信号</summary>
+        /// <returns>true高电平导通，false断开</returns>
         public async Task<bool> GetHeightRelayCloseDetectAsync() => await ReadSingleDiAsync(HeightRelayCloseDetect);
 
-        public bool GetHeightContactDetect() => ReadSingleDi(HeightContactDetect);
+        /// <summary>测高接触导电检测DI信号</summary>
+        /// <returns>true高电平导通，false断开</returns>
         public async Task<bool> GetHeightContactDetectAsync() => await ReadSingleDiAsync(HeightContactDetect);
 
-        public bool GetSpindleBrushCheck() => ReadSingleDi(SpindleBrushCheck);
+        /// <summary>主轴电刷在位检测DI信号</summary>
+        /// <returns>true高电平导通，false断开</returns>
         public async Task<bool> GetSpindleBrushCheckAsync() => await ReadSingleDiAsync(SpindleBrushCheck);
 
-        public bool GetCameraSafetyDoor() => ReadSingleDi(CameraSafetyDoor);
+        /// <summary>镜头安全门DI检测信号</summary>
+        /// <returns>true高电平导通，false断开</returns>
         public async Task<bool> GetCameraSafetyDoorAsync() => await ReadSingleDiAsync(CameraSafetyDoor);
 
-        public bool GetCutSafetyDoor() => ReadSingleDi(CutSafetyDoor);
+        /// <summary>切割仓安全门DI检测信号</summary>
+        /// <returns>true高电平导通，false断开</returns>
         public async Task<bool> GetCutSafetyDoorAsync() => await ReadSingleDiAsync(CutSafetyDoor);
-        #endregion
+
+        #endregion 对外暴露 单个IO读取方法
 
         #region 一次性读取全部DI（批量读取2字节，性能更高）
+
         /// <summary>同步批量读取全部DI（0~15bit，2字节）</summary>
         public AllDiState ReadAllDi()
         {
             byte[] buf = new byte[4];
             int ret = GTN_EcatIOReadInput(_core, 5, 2, 2, out buf[0]);
-            //if (ret != 0)
-            //    throw new Exception($"批量读取DI失败，错误码：{ret}");
 
             byte byte0 = buf[0]; // bit0~bit7
             byte byte1 = buf[1]; // bit8~bit15
@@ -232,8 +260,6 @@ namespace 精密切割系统.Helpers.GTN
         {
             byte[] buf = new byte[2];
             int ret = GTN_EcatIOReadInput(_core, 5, 2, 2, out buf[0]);
-            if (ret != 0)
-                throw new Exception($"批量读取DI失败，错误码：{ret}");
             return buf;
         }
 
@@ -242,7 +268,8 @@ namespace 精密切割系统.Helpers.GTN
         {
             return await Task.Run(() => ReadAllDi());
         }
-        #endregion
+
+        #endregion 一次性读取全部DI（批量读取2字节，性能更高）
     }
 
     /// <summary>批量读取全部DI后存储所有IO状态的载体</summary>

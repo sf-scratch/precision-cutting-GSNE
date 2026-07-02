@@ -18,6 +18,7 @@ using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
 using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
+using 精密切割系统.Helpers.GTN;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut;
 using 精密切割系统.Model.plc;
@@ -64,7 +65,8 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             InitData();
             LoadPosition(_cts.Token);
             // 打开镜头盖
-            await PlcControl.tagControl.wholeDevice.OpenCameraLensCapAsync();
+            await OutputConfig.Instance.SetCameraCylinderBackAsync(false);
+            await OutputConfig.Instance.SetCameraCylinderOutAsync(true);
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)

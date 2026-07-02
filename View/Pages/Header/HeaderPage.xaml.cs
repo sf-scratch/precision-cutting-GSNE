@@ -17,6 +17,7 @@ using System.Windows.Threading;
 using 精密切割系统.database.db.modle;
 using 精密切割系统.Driver;
 using 精密切割系统.Helpers;
+using 精密切割系统.Helpers.GTN;
 using 精密切割系统.Model.plc;
 using 精密切割系统.Utils;
 using 精密切割系统.View.page.right;
@@ -129,8 +130,8 @@ namespace 精密切割系统.View.Pages.Hader
 
         private async void ClearAlarmInfo()
         {
-            await PlcControl.tagControl.wholeDevice.CloseBuzzerAsync();
-            await PlcControl.tagControl.wholeDevice.AlarmResetAsync();
+            await OutputConfig.Instance.SetBuzzerAsync(false);
+            await GsneMotion.Instance.AlarmResetAsync();
         }
 
         //退出系统；连续10下退出系统或最小化窗口
@@ -205,12 +206,12 @@ namespace 精密切割系统.View.Pages.Hader
 
         private async void urgentRaiseBtn_TouchDown(object sender, TouchEventArgs e)
         {
-            await PlcControl.tagControl.wholeDevice.UrgentRaise();
+            await GsneMotion.Instance.EmergencyLiftSpindleAsync();
         }
 
         private async void urgentRaiseBtn_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            await PlcControl.tagControl.wholeDevice.UrgentRaise();
+            await GsneMotion.Instance.EmergencyLiftSpindleAsync();
         }
     }
 }

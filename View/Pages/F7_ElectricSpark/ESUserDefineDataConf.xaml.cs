@@ -23,6 +23,7 @@ using 精密切割系统.database.db.modle;
 using 精密切割系统.Extensions;
 using 精密切割系统.FrmWindow.common;
 using 精密切割系统.Helpers;
+using 精密切割系统.Helpers.GTN;
 using 精密切割系统.Model.common;
 using 精密切割系统.Utils;
 using 精密切割系统.View.common;
@@ -59,7 +60,7 @@ namespace 精密切割系统.View.F7_ElectricSpark
             WindowLayout.RightPageButtons.Add(ButtonParams.Back(() => NavigateUtils.NavigateToPage("MainMenu")));
             WindowLayout.OperatePageButtons.Clear();
             WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("设置时日", "/Assets/icon/tab_5/tab_04.png", () => NavigateUtils.NavigateToPage("Pages\\F7_ElectricSpark\\ESUserDefineSysTime")));
-            WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("工作盘真空", "VacuumOutline", PlcControl.tagControl.wholeDevice.TriggerWorkVacuumSwitchAsync));
+            WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("工作盘真空", "VacuumOutline", async () => await OutputConfig.Instance.SetTrayVacuumAsync(true)));
             WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("暖机", "/Assets/icon/menu_2/menu_2_3_white.png", () => { _ = WarmUpHelper.TriggerWarmUpAsync(); }));
 
             UserDefineDataModel userDefineData = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
@@ -73,20 +74,20 @@ namespace 精密切割系统.View.F7_ElectricSpark
             this.InitTbNumber();
         }
 
-        private async Task SpindleDirectionSwitchingAsync()
-        {
-            if (await PlcControl.tagControl.wholeDevice.GetSpindleSpeedAsync() != 0)
-            {
-                MaterialSnack("主轴完全停止后，再进行主轴方向切换", SnackType.WARNING);
-                return;
-            }
-            await PlcControl.tagControl.wholeDevice.TriggerSpindleDirection();
-            bool spindleDirection = await PlcControl.tagControl.wholeDevice.GetSpindleDirectionAsync();
-            UserDefineDataModel userDefineData = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
-            userDefineData.SpindleDirection = spindleDirection;
-            await SqlHelper.UpdateAsync(userDefineData);
-            MaterialSnack("主轴方向切换成功！", SnackType.SUCCESS);
-        }
+        //private async Task SpindleDirectionSwitchingAsync()
+        //{
+        //    if (await PlcControl.tagControl.wholeDevice.GetSpindleSpeedAsync() != 0)
+        //    {
+        //        MaterialSnack("主轴完全停止后，再进行主轴方向切换", SnackType.WARNING);
+        //        return;
+        //    }
+        //    await PlcControl.tagControl.wholeDevice.TriggerSpindleDirection();
+        //    bool spindleDirection = await PlcControl.tagControl.wholeDevice.GetSpindleDirectionAsync();
+        //    UserDefineDataModel userDefineData = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
+        //    userDefineData.SpindleDirection = spindleDirection;
+        //    await SqlHelper.UpdateAsync(userDefineData);
+        //    MaterialSnack("主轴方向切换成功！", SnackType.SUCCESS);
+        //}
 
         private async Task SaveAsync()
         {
@@ -146,10 +147,10 @@ namespace 精密切割系统.View.F7_ElectricSpark
                 _timer.Stop();
                 WindowLayout.OperatePageButtons.Clear();
                 WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("设置时日", "/Assets/icon/tab_5/tab_04.png", () => NavigateUtils.NavigateToPage("Pages\\F7_ElectricSpark\\ESUserDefineSysTime")));
-                WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("工作盘真空", "VacuumOutline", PlcControl.tagControl.wholeDevice.TriggerWorkVacuumSwitchAsync));
+                WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("工作盘真空", "VacuumOutline", OutputConfig.Instance.TriggerWorkVacuumSwitchAsync));
                 WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("暖机", "/Assets/icon/menu_2/menu_2_3_white.png", () => { _ = WarmUpHelper.TriggerWarmUpAsync(); }));
-                WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("精度确认", "AbTesting", PlcControl.tagControl.wholeDevice.TriggerAccuracyConfirmAsync, isOpenFunc: PlcControl.tagControl.wholeDevice.IsOpenAccuracyConfirmAsync, openOrCloseVisibility: Visibility.Visible));
-                WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("主轴方向切换", "Update", SpindleDirectionSwitchingAsync));
+                //WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("精度确认", "AbTesting", PlcControl.tagControl.wholeDevice.TriggerAccuracyConfirmAsync, isOpenFunc: PlcControl.tagControl.wholeDevice.IsOpenAccuracyConfirmAsync, openOrCloseVisibility: Visibility.Visible));
+                //WindowLayout.OperatePageButtons.Add(ButtonParams.BlueButton("主轴方向切换", "Update", SpindleDirectionSwitchingAsync));
                 _clickCount = 0; // 重置计数
             }
         }

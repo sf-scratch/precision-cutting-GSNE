@@ -78,7 +78,6 @@ namespace 精密切割系统.Helpers
         private static async Task InitUserDefineDataAsync()
         {
             UserDefineDataModel userDefineData = await SqlHelper.GetOrCreateEntityAsync(() => new UserDefineDataModel());
-            await PlcControl.tagControl.wholeDevice.SetSpindleDirectionAsync(userDefineData.SpindleDirection);
             await PlcControl.tagControl.Xaxis.SetMaxSpeedAsync(userDefineData.MaxSpeedX.ToFloat());
             await PlcControl.tagControl.Yaxis.SetMaxSpeedAsync(userDefineData.MaxSpeedY.ToFloat());
             await PlcControl.tagControl.wholeDevice.SetVacuumBreakingTimeAsync(userDefineData.VacuumBreakingTime.ToInt());

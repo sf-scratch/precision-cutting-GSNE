@@ -206,7 +206,7 @@ namespace 精密切割系统.View.Pages.F2_ManualOperation
         // 开始切割
         private async void StartCut(object? sender, bool e)
         {   //真空报警合集
-            if (await IoAlarm.Instance.ScanAllIoAlarmAsync())
+            if (IoAlarm.Instance.HasAnyAlarm)
             {
                 MaterialSnack(AlarmConfig.HasErrorAlarmMessage, SnackType.WARNING);
                 return;

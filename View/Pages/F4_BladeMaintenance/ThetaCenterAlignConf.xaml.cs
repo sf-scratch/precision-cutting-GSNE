@@ -325,7 +325,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
                 _ = AutoCutUtils.MonitoringAlarmAsync(Stop, AlarmConfig.Instance.HasAutoRunUnexpectedAlarms, default, _monitorCts.Token);
             }
             //打开切割水
-            await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
+            await OutputConfig.Instance.SetCutWaterOpenAsync(true);
             float endZ = _measureHeigthY - _viewModel.BladeHeight.ToFloat();
             float startZ = _measureHeigthY - _viewModel.WorkThickness.ToFloat() - _viewModel.TapeThickness.ToFloat() - GlobalParams.BladeLiftingHeight;
             float depthEntry = _measureHeigthY - _viewModel.WorkThickness.ToFloat() - _viewModel.TapeThickness.ToFloat() - 0.5f;
@@ -361,7 +361,7 @@ namespace 精密切割系统.View.Pages.F4_BladeMaintenance
             }
             finally
             {
-                await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
+                await OutputConfig.Instance.SetCutWaterOpenAsync(false);
                 // 工作盘吹气
                 await AutoCutUtils.WorkpieceBlowingAsync(default, default, true, default, token);
                 await GsneMotion.Instance.Axis.RunMotionAsync(((_startX + _endX) / 2).ToCameraX(), startY.ToCameraY(), token);

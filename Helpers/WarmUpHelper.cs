@@ -51,9 +51,9 @@ namespace 精密切割系统.Helpers
                     _ = AutoCutUtils.MonitoringAlarmAsync(StopWarmUp, AlarmConfig.Instance.HasAutoRunUnexpectedAlarms, default, _warmUpCts.Token);
                     try
                     {
-                        await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
-                        Task z1Task = PlcControl.tagControl.Z1axis.StartAbsoluteAsync(0, default, _warmUpCts.Token);
-                        Task z2Task = PlcControl.tagControl.Z2axis.StartAbsoluteAsync(0, default, _warmUpCts.Token);
+                        await OutputConfig.Instance.SetCutWaterOpenAsync(true);
+                        Task z1Task = GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.Z1,0, default, _warmUpCts.Token);
+                        Task z2Task = GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.Z2, 0, default, _warmUpCts.Token);
                         await Task.WhenAll(z1Task, z2Task);
                         await GsneMotion.Instance.Axis.RunMotionAsync(userDefine.WarmUpStartX.ToFloat(), userDefine.WarmUpStartY.ToFloat(), _warmUpCts.Token);
                         await _warmUpTcs.Task;
@@ -62,7 +62,7 @@ namespace 精密切割系统.Helpers
                     { }
                     finally
                     {
-                        await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
+                        await OutputConfig.Instance.SetCutWaterOpenAsync(false);
                         _timer.Stop();
                         MaterialSnack("暖机结束！", SnackType.SUCCESS);
                     }

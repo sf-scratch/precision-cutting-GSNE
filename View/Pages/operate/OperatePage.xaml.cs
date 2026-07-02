@@ -90,28 +90,28 @@ namespace 精密切割系统.View.Pages.operate
             bool firstJoin = true;
             while (true)
             {
-                bool tempCutSecurityDoor = !await PlcControl.tagControl.wholeDevice.IsOpenCutSecurityDoorAsync();
-                bool tempCameraSecurityDoor = !await PlcControl.tagControl.wholeDevice.IsOpenCameraSecurityDoorAsync();
-                bool tempVacuumState = await PlcControl.tagControl.wholeDevice.IsOpenVacuumSwitchAsync();
-                bool tempSpindleCuttingWater = await PlcControl.tagControl.wholeDevice.IsOpenSpindleCuttingWaterAsync();
-                bool tempIsOpenOpticalFiberSensorBlowing = await PlcControl.tagControl.bladeMantance.GetOpticalFiberSensorBlowingAsync();
-                bool tempIsOpenOpticalFiberSensorBlowingWater = await PlcControl.tagControl.bladeMantance.GetOpticalFiberSensorBlowingWaterAsync();
+                bool tempCutSecurityDoor = !await IoAlarm.Instance.CheckCutSafetyDoorAlarmAsync();
+                bool tempCameraSecurityDoor = !await IoAlarm.Instance.CheckCameraSafetyDoorAlarmAsync();
+                bool tempVacuumState = !await IoAlarm.Instance.CheckWorkpieceVacuumDetectAlarmAsync();
+                bool tempSpindleCuttingWater = !await IoAlarm.Instance.CheckCutWaterDetectAlarmAsync();
+                //bool tempIsOpenOpticalFiberSensorBlowing = await PlcControl.tagControl.bladeMantance.GetOpticalFiberSensorBlowingAsync();
+                //bool tempIsOpenOpticalFiberSensorBlowingWater = await PlcControl.tagControl.bladeMantance.GetOpticalFiberSensorBlowingWaterAsync();
                 bool tempWorkpieceBlowingStatus = await PlcControl.tagControl.wholeDevice.IsOpenWorkpieceBlowingAsync();
                 bool tempSystemInitFlagStatus = await PlcControl.tagControl.wholeDevice.IsCompletedSystemInitAsync();
                 bool tempIsOpenWorkVacuumSwitchStatus = await PlcControl.tagControl.wholeDevice.IsOpenWorkVacuumSwitchAsync();
                 bool tempIsRuningSpindle = await PlcControl.tagControl.wholeDevice.GetSpindleSpeedAsync() != 0;
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    if (tempIsOpenOpticalFiberSensorBlowing != isOpenOpticalFiberSensorBlowing || firstJoin)
-                    {
-                        isOpenOpticalFiberSensorBlowing = tempIsOpenOpticalFiberSensorBlowing;
-                        isSwitchOpen(isOpenOpticalFiberSensorBlowing, 1);
-                    }
-                    if (tempIsOpenOpticalFiberSensorBlowingWater != isOpenOpticalFiberSensorBlowingWater || firstJoin)
-                    {
-                        isOpenOpticalFiberSensorBlowingWater = tempIsOpenOpticalFiberSensorBlowingWater;
-                        isSwitchOpen(isOpenOpticalFiberSensorBlowingWater, 2);
-                    }
+                    //if (tempIsOpenOpticalFiberSensorBlowing != isOpenOpticalFiberSensorBlowing || firstJoin)
+                    //{
+                    //    isOpenOpticalFiberSensorBlowing = tempIsOpenOpticalFiberSensorBlowing;
+                    //    isSwitchOpen(isOpenOpticalFiberSensorBlowing, 1);
+                    //}
+                    //if (tempIsOpenOpticalFiberSensorBlowingWater != isOpenOpticalFiberSensorBlowingWater || firstJoin)
+                    //{
+                    //    isOpenOpticalFiberSensorBlowingWater = tempIsOpenOpticalFiberSensorBlowingWater;
+                    //    isSwitchOpen(isOpenOpticalFiberSensorBlowingWater, 2);
+                    //}
                     if (tempVacuumState != vacuumState || firstJoin)
                     {
                         vacuumState = tempVacuumState;
@@ -538,29 +538,32 @@ namespace 精密切割系统.View.Pages.operate
         /// </summary>
         private async Task SystemInitOperateAsync()
         {
-            await PlcControl.tagControl.wholeDevice.AlarmResetAsync();
-            await PlcControl.tagControl.wholeDevice.AlarmResetAsync();
-            await PlcControl.tagControl.wholeDevice.AlarmResetAsync();
-            if (await PlcControl.tagControl.wholeDevice.IsSystemInitingAsync())
+            if (false)
             {
                 MaterialSnack("初始化中，请等待初始化完成！", SnackType.WARNING);
                 return;
             }
-            if (!await PlcControl.tagControl.wholeDevice.CanSystemInitAsync())
+            if (IoAlarm.Instance.HasAnyAlarm || await GsneMotion.Instance.VerAxisAlarm())
             {
                 MaterialSnack("初始化未准备好！", SnackType.WARNING);
                 return;
             }
-            // 退出所有模式
-            PlcControl.plc.exitAllModel();
-            await PlcControl.tagControl.wholeDevice.SystemInitAsync();
+            //开始初始化
             MaterialSnack("系统初始化中...", SnackType.SUCCESS, 0);
+            bool allHomeOk = await GsneMotion.Instance.Axis.AllAxisHomingAsync();
+            if (!allHomeOk)
+            {
+                MaterialSnack("整机轴回零失败，终止系统初始化！", SnackType.ERROR, 0, null);
+                return;
+            }
             try
             {
-                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(90));
-                await PlcControl.tagControl.wholeDevice.WaitSystemInitCompletedAsync(cts.Token);
-                GlobalParams.systemInitFlag = true;
-                MaterialSnack("系统初始化完成！", SnackType.SUCCESS);
+                if (allHomeOk)
+                {
+                    using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(90));
+                    GlobalParams.systemInitFlag = true;
+                    MaterialSnack("系统初始化完成！", SnackType.SUCCESS);
+                }
             }
             catch (OperationCanceledException)
             {

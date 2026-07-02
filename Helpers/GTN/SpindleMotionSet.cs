@@ -12,17 +12,13 @@ namespace 精密切割系统.Helpers.GTN
     public class SpindleMotionSet
     {
         public static SpindleMotionSet Instance { get; } = new SpindleMotionSet();
-        public async Task SetSpindleSpeedAsync(int spindleRevValue)
-        {
-           string SpindelSpeed  = spindleRevValue.ToString();
-            await Task.Delay(100);
-        }
+
         /// <summary>
-        /// 主轴启动
+        /// 主轴启停 启动true 停止false
         /// </summary>
-        public async Task<bool> StartSpindleAsync(int spindleRev,bool start)
+        public async Task<bool> StartSpindleAsync(int spindleRev, bool start)
         {
-           
+
             return await Task.FromResult(true);
         }
 
@@ -32,8 +28,15 @@ namespace 精密切割系统.Helpers.GTN
         public async Task<bool> WaitSpindleSpeedReachedAsync(int spindleRev, CancellationToken token)
         {
 
+            //return await Task.FromResult(true);
+            return true;
+        }
+
+        public async Task<bool> ResetSpindleAlarmAsync()
+        {   
+
             return await Task.FromResult(true);
         }
-    }
 
+    }
 }

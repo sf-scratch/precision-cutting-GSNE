@@ -53,7 +53,7 @@ namespace 精密切割系统.Model.cut
                 await WaitAxisStopAsync(AxisType.Z1);
 
                 // 步骤3: X轴与Y轴同时运行到切割开始位置
-                var xTask = GsneMotion.Instance.Axis.StartRelativeAsync(AxisType.X, TargetPositionX, SpeedX, token);
+                var xTask = GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.X, TargetPositionX, SpeedX, token);
                 var yTask = GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.Y, TargetPositionY, SpeedY, token);
                 var ThetaTask = GsneMotion.Instance.Axis.StartAbsoluteAsync(AxisType.Theta, TargetPositionTheta, SpeedTheta, token);
                 await Task.WhenAll(xTask, yTask,ThetaTask);//同时启动

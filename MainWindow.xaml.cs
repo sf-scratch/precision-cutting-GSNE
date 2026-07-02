@@ -132,7 +132,7 @@ namespace 精密切割系统
         private OperatePage operatePage;
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
-        {   
+        {
             // 禁用触摸到鼠标事件的转换
             Touch.FrameReported += (s, e) => { /* 防止触摸触发鼠标事件 */ };
             AlarmConfig alarmConfig = AlarmConfig.Instance;
@@ -143,17 +143,15 @@ namespace 精密切割系统
                 //await GsneMotion.Instance.Axis.StartJogAsync(AxisType.X, -1000);
                 //await Task.Delay(5000);
 
-
                 var Domanager = new OutputConfig();
-                Domanager.SetTrayVacuum(true);
-                await  Task.Delay(2000);
-                Domanager.SetProductVacuum(false);
-                var a = Domanager.ReadAllDo(); 
+                await Domanager.SetProductVacuumAsync(true);
+                await Task.Delay(2000);
+                await Domanager.SetProductVacuumAsync(false);
+                var a = Domanager.ReadAllDo();
                 if (a.TrayVacuum)
                 {
                     MessageBox.Show("黄色灯亮了");
                 }
-
 
                 //await GsneMotion.Instance.Axis.StopJogAsync(AxisType.X);
                 string logDirectory = "logs";
@@ -303,8 +301,8 @@ namespace 精密切割系统
             PlcControl.plc.exitAllModel();
             await Task.Delay(1000);
             await CurrentUtils.InitPlcDataAsync();
-            // 设置面板禁用
-            PlcControl.tagControl.wholeDevice.SetPanelButtonsStauts(0);
+            //// 设置面板禁用
+            //PlcControl.tagControl.wholeDevice.SetPanelButtonsStauts(0);
             // 关闭Y轴光栅尺校准
             //PlcControl.tagControl.cutting.SetYAxisCompStatus(0);
             //重置当前切割面为CH1

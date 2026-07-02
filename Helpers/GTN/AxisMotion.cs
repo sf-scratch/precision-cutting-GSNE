@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using 精密切割系统.Driver;
 using 精密切割系统.Extensions;
+using 精密切割系统.Model.cut;
 using 精密切割系统.Utils;
 using 精密切割系统.ViewModel;
 using static 精密切割系统.Helpers.GTN.mc;
@@ -24,6 +25,24 @@ namespace 精密切割系统.Helpers.GTN
     public class AxisMotion
     {
         private short _core = GsneConfig.Instance.Core;
+        private readonly AxisOrigin _axisOrigin = new AxisOrigin();
+
+        /// <summary>
+        /// 全局整机初始化完成标记
+        /// </summary>
+        public bool IsMachineInitComplete { get; set; }//是否整机初始化完成
+
+        // 对外整机回零接口
+        public async Task<bool> AllAxisHomingAsync(CancellationToken token = default, int timeoutMs = 90000)
+        {
+            bool rtu = await _axisOrigin.AllAxisHomingAsync(token, timeoutMs);
+            if (rtu)
+            {
+                IsMachineInitComplete = true;
+                return true;
+            }
+            return false;
+        }
 
         /// <summary>
         /// 轴是否准备好
@@ -46,6 +65,7 @@ namespace 精密切割系统.Helpers.GTN
                 return (pSts & (int)bitsOff) == 0;
             });
         }
+
         /// <summary>
         /// 轴到位完成
         /// </summary>
@@ -60,6 +80,7 @@ namespace 精密切割系统.Helpers.GTN
                 return (pSts & bit11Mask) != 0;//按位与判断
             });
         }
+
         /// <summary>
         /// 等待轴准备好
         /// </summary>
@@ -67,7 +88,7 @@ namespace 精密切割系统.Helpers.GTN
         /// <returns></returns>
         public async Task WaitAxisReadyAsync(AxisType axis, CancellationToken token, params AxisStatusBits[] ignore)
         {
-            await TaskUtils.WaitExpectedResultAsync(() => IsReadyAsync(axis,ignore), default, token);
+            await TaskUtils.WaitExpectedResultAsync(() => IsReadyAsync(axis, ignore), default, token);
         }
 
         /// <summary>
@@ -87,36 +108,12 @@ namespace 精密切割系统.Helpers.GTN
         /// <returns></returns>
         public async Task AxisOnAsync(AxisType axis)
         {
-            var rtn = GTN_AxisOn(_core,(short)axis);
+            var rtn = GTN_AxisOn(_core, (short)axis);
         }
 
         /// <summary>
         /// 回零点
         /// </summary>
-        //public async Task StartHomingAsync(AxisType axis)
-        //{
-        //    await Task.Run(() =>
-        //    {
-        //        short rtn;
-        //        int offset = GsneConfig.Instance.Axes[axis].OffsetMM.MMToPulseF(axis);
-        //        short model = GsneConfig.Instance.Axes[axis].HomingModel;
-        //        double speed1 = GsneConfig.Instance.Axes[axis].HighSpeed.MMToPulse(axis);
-        //        double speed2 = GsneConfig.Instance.Axes[axis].LowSpeed.MMToPulse(axis);
-        //        ushort probeFunc = 0;
-
-        //        rtn = GTN_SetEcatHomingPrm(_core, (short)axis, model, speed1, speed2, speed2, offset, probeFunc);
-        //        rtn = GTN_SetHomingMode(_core, (short)axis, 6);
-        //        rtn = GTN_StartEcatHoming(_core, (short)axis);
-
-
-
-        //    });
-        //    bool isHomingComplete = await IsCompleteHomingAsync((short)axis);
-        //    if (isHomingComplete)
-        //    {
-        //        GTN_SetHomingMode(_core, (short)axis, 8);
-        //    }
-        //}
         public async Task StartHomingAsync(AxisType axis)
         {
             // 1. 在后台线程执行初始化（同步部分）
@@ -145,7 +142,7 @@ namespace 精密切割系统.Helpers.GTN
             await Task.Run(() =>
             {
                 short rtn = GTN_SetHomingMode(_core, (short)axis, 8);
-                GTN_ZeroPos(_core, (short)axis,(short)axis);
+                GTN_ZeroPos(_core, (short)axis, (short)axis);
             });
         }
 
@@ -235,9 +232,6 @@ namespace 精密切割系统.Helpers.GTN
         /// <returns></returns>
         public async Task StartAbsoluteAsync(AxisType axisType, float location, float speed, CancellationToken token)
         {
-            // 等待轴准备好
-            //await WaitAxisReadyAsync(token.WithDefaultTimeout());
-
             short sCore = _core;
             short axis = (short)axisType;
             GTN.mc.TTrapPrm trap;

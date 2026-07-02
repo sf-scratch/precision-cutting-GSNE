@@ -13,6 +13,7 @@ using 精密切割系统.Driver;
 using 精密切割系统.Entities;
 using 精密切割系统.Extensions;
 using 精密切割系统.Helpers;
+using 精密切割系统.Helpers.GTN;
 using 精密切割系统.Model.common;
 using 精密切割系统.Model.cut.Workpieces;
 using 精密切割系统.Model.logs;
@@ -177,22 +178,14 @@ namespace 精密切割系统.Model.cut
         public static async Task<CommonResult> CheckCutAsync()
         {
             if (!GlobalParams.OnlineFlag) return CommonResult.Success();
-            if (!await PlcControl.tagControl.wholeDevice.IsCompletedSystemInitAsync())
+            if (!GsneMotion.Instance.Axis.IsMachineInitComplete)
             {
                 return CommonResult.Failure("请完成系统初始化！");
             }
-            if (!await PlcControl.tagControl.wholeDevice.IsOpenVacuumSwitchAsync())
+            if (await IoAlarm.Instance.CheckWorkpieceVacuumDetectAlarmAsync())
             {
-                return CommonResult.Failure("请打开工作盘真空！");
+                return CommonResult.Failure("请检测工作盘真空与工件真空！");
             }
-            //if (await PlcControl.tagControl.wholeDevice.IsOpenCutSecurityDoorAsync())
-            //{
-            //    return CommonResult.Failure("请关闭切割安全门！");
-            //}
-            //if (await PlcControl.tagControl.wholeDevice.IsOpenCameraSecurityDoorAsync())
-            //{
-            //    return CommonResult.Failure("请关闭相机安全门！");
-            //}
             return CommonResult.Success();
         }
 
@@ -300,15 +293,13 @@ namespace 精密切割系统.Model.cut
             Stopwatch stopwatch = new();
             Stopwatch completeStopwatch = Stopwatch.StartNew();
             CancellationTokenSource cuttingRecordCts = new CancellationTokenSource();
-            _ = StartCuttingRecord(cuttingRecordCts.Token);
+            //_ = StartCuttingRecord(cuttingRecordCts.Token);
             try
             {
                 _isReady = false;
                 _isRuning = true;
                 var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromMinutes(30));
-                await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAndConfirmStatusAsync(timeoutToken.Token);
-                //打开切割水
-                await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAsync();
+                await OutputConfig.Instance.OpenCuttingWaterAndConfirmStatusAsync(token: timeoutToken.Token);
                 List<CutStep> steps = cutStepList.SelectMany(ch => ch.CutSteps).ToList();
                 int cutLine = steps.Count;
                 //切割刀数（0 = all）
@@ -561,11 +552,11 @@ namespace 精密切割系统.Model.cut
                 _isContinueBeyondWorkpiece = false;
                 _currentChannelNum = 1;
                 completeStopwatch.Stop();
-                await PlcControl.tagControl.wholeDevice.CloseWorkpieceBlowingAsync();
+                await OutputConfig.Instance.SetProductBlowAsync(false);
                 var operationParameter = await CurrentUtils.GetOperationParametersModelAsync();
                 if (operationParameter.IsAutoShutOffWaterWhenCuttingCompleted)
                 {
-                    await PlcControl.tagControl.wholeDevice.CloseCuttingWaterAsync();
+                    await OutputConfig.Instance.SetCutWaterOpenAsync(false);
                 }
                 HasNotTakenOutWorkpiecesAfterCuttingCompleted = true;
                 stopwatch.Stop();
@@ -597,7 +588,7 @@ namespace 精密切割系统.Model.cut
             CutServicePaused?.Invoke(new CutServicePauseData(line, message, currentKnifeRemainTime, remainCutSteps, isCompleted));
             _continueTcs = new TaskCompletionSource<ServicePauseResult>();
             ServicePauseResult result = await _continueTcs.Task;
-            await PlcControl.tagControl.wholeDevice.CloseWorkpieceBlowingAsync();
+            await OutputConfig.Instance.SetProductBlowAsync(false);
             switch (result.Type)
             {
                 case ServicePauseResultType.ContinueAndResetCutY:
@@ -608,9 +599,10 @@ namespace 精密切割系统.Model.cut
                     CancellationToken usingPauseToken = result.Token ?? default;
                     try
                     {
-                        await PlcControl.tagControl.wholeDevice.CloseWorkpieceBlowingAsync();
+                        await OutputConfig.Instance.SetProductBlowAsync(false);
                         var timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromMinutes(10), usingPauseToken);
-                        await PlcControl.tagControl.wholeDevice.OpenCuttingWaterAndConfirmStatusAsync(timeoutToken.Token);
+                        await OutputConfig.Instance.OpenCuttingWaterAndConfirmStatusAsync(token: timeoutToken.Token);
+
                         _isRuning = true;
                         return (RunResult.Success(), usingPauseToken);
                     }

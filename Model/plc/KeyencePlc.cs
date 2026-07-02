@@ -1737,18 +1737,12 @@ namespace 精密切割系统.Driver
             return await PlcControl.plc.ReadDataAsync(spindleDirectionSwitch.addr) == true;
         }
 
-        public async Task SetSpindleDirectionAsync(bool direction)
-        {
-            spindleDirectionSwitch.writeValue = direction ? "1" : "0";
-            await keyencePlc.WriteTagAsync(spindleDirectionSwitch);
-        }
 
         public async Task TriggerSpindleDirection()
         {
             if (await PlcControl.tagControl.wholeDevice.GetSpindleSpeedAsync() == 0)
             {
                 bool result = await GetSpindleDirectionAsync();
-                await SetSpindleDirectionAsync(!result);
             }
         }
 

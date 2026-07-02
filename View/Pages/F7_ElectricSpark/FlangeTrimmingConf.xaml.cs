@@ -157,8 +157,8 @@ namespace 精密切割系统.View.Pages.F7_ElectricSpark
                 {
                     MaterialSnack("主轴停止中...", SnackType.WARNING, 0);
                     TimeoutToken timeoutToken = TaskUtils.GetTimeoutCancellationToken(TimeSpan.FromSeconds(60));
-                    await PlcControl.tagControl.wholeDevice.StopSpindleAsync();
-                    await PlcControl.tagControl.wholeDevice.WaitSpindleSpeedToZeroAsync(timeoutToken.Token);
+                    await SpindleMotionSet.Instance.StartSpindleAsync(0, false);
+                    await SpindleMotionSet.Instance.WaitSpindleSpeedReachedAsync(0, timeoutToken.Token);
                     messageAction.Invoke();
                 }
                 catch (Exception ex)
