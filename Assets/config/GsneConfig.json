@@ -1,118 +1,126 @@
 {
-    "Core": 2,
-    "X": {
-        "Type": 1,
-        "PulsePerMM": 1398101.333,
-        "OffsetMM": 0.0,
-        "HomingModel": 28,
-        "HighSpeed": 10000,
-        "LowSpeed": 5000
+  "Core": 2,
+  "X": {
+    "Type": 1,
+    "PulsePerMM": 1398101.333,
+    "OffsetMM": 0.0,
+    "HomingModel": 28,
+    "HighSpeed": 10000,
+    "LowSpeed": 5000,
+    "PositiveSoftLimit": 200,
+    "NegativeSoftLimit": 0
+  },
+  "Y": {
+    "Type": 2,
+    "PulsePerMM": 1677721.6,
+    "OffsetMM": 0,
+    "HomingModel": 28,
+    "HighSpeed": 10.0,
+    "LowSpeed": 5.0,
+    "PositiveSoftLimit": 200,
+    "NegativeSoftLimit": 0
+  },
+  "Z1": {
+    "Type": 3,
+    "PulsePerMM": 8388608,
+    "OffsetMM": 0,
+    "HomingModel": 28,
+    "HighSpeed": 4.0,
+    "LowSpeed": 1.0,
+    "PositiveSoftLimit": 200,
+    "NegativeSoftLimit": 0
+  },
+  "Z2": {
+    "Type": 4,
+    "PulsePerMM": 1000,
+    "OffsetMM": 0,
+    "HomingModel": 28,
+    "HighSpeed": 10.0,
+    "LowSpeed": 1.0,
+    "PositiveSoftLimit": 200,
+    "NegativeSoftLimit": 0
+  },
+  "Theta": {
+    "Type": 5,
+    "PulsePerMM": 3019898880,
+    "OffsetMM": 0,
+    "HomingModel": 28,
+    "HighSpeed": 10.0,
+    "LowSpeed": 1.0,
+    "PositiveSoftLimit": 200,
+    "NegativeSoftLimit": 0
+  },
+  "AxisStatusDescription": [
+    "保留",
+    "驱动器报警标志",
+    "保留",
+    "保留",
+    "跟随误差越限标志",
+    "正限位触发标志",
+    "负限位触发标志",
+    "IO平滑停止触发标志",
+    "IO急停触发标志",
+    "电机使能标志",
+    "规划运动标志",
+    "电机到位标志",
+    "驱动器的电机到位信号",
+    "保留",
+    "保留",
+    "保留",
+    "保留",
+    "保留",
+    "保留",
+    "保留",
+    "保留",
+    "保留",
+    "保留",
+    "保留",
+    "保留",
+    "保留",
+    "保留",
+    "保留",
+    "保留",
+    "保留",
+    "保留",
+    "保留"
+  ],
+  "inputs": {
+    "doorSensor": {
+      "displayName": "安全门",
+      "index": 0,
+      "invertSignal": true
     },
-    "Y": {
-        "Type": 2,
-        "PulsePerMM": 1677721.6,
-        "OffsetMM": 0,
-        "HomingModel": 28,
-        "HighSpeed": 10.0,
-        "LowSpeed": 5.0
+    "emg": {
+      "displayName": "急停",
+      "index": 1,
+      "invertSignal": true
     },
-    "Z1": {
-        "Type": 3,
-        "PulsePerMM": 8388608,
-        "OffsetMM": 0,
-        "HomingModel": 28,
-        "HighSpeed": 4.0,
-        "LowSpeed": 1.0
+    "startButton": {
+      "displayName": "启动按钮",
+      "index": 2,
+      "invertSignal": false
     },
-    "Z2": {
-        "Type": 4,
-        "PulsePerMM": 1000,
-        "OffsetMM": 0,
-        "HomingModel": 28,
-        "HighSpeed": 10.0,
-        "LowSpeed": 1.0
-    },
-    "Theta": {
-        "Type": 5,
-        "PulsePerMM": 3019898880,
-        "OffsetMM": 0,
-        "HomingModel": 28,
-        "HighSpeed": 10.0,
-        "LowSpeed": 1.0
-    },
-
-
-    "AxisStatusDescription": [
-        "保留",
-        "驱动器报警标志",
-        "保留",
-        "保留",
-        "跟随误差越限标志",
-        "正限位触发标志",
-        "负限位触发标志",
-        "IO平滑停止触发标志",
-        "IO急停触发标志",
-        "电机使能标志",
-        "规划运动标志",
-        "电机到位标志",
-        "驱动器的电机到位信号",
-        "保留",
-        "保留",
-        "保留",
-        "保留",
-        "保留",
-        "保留",
-        "保留",
-        "保留",
-        "保留",
-        "保留",
-        "保留",
-        "保留",
-        "保留",
-        "保留",
-        "保留",
-        "保留",
-        "保留",
-        "保留",
-        "保留"
-    ],
-    "inputs": {
-        "doorSensor": {
-            "displayName": "安全门",
-            "index": 0,
-            "invertSignal": true
-        },
-        "emg": {
-            "displayName": "急停",
-            "index": 1,
-            "invertSignal": true
-        },
-        "startButton": {
-            "displayName": "启动按钮",
-            "index": 2,
-            "invertSignal": false
-        },
-        "stopButton": {
-            "displayName": "停止按钮",
-            "index": 3,
-            "invertSignal": false
-        }
-    },
-    "outputs": {
-        "greenLight": {
-            "displayName": "绿灯",
-            "index": 0,
-            "invertSignal": false
-        },
-        "redLight": {
-            "displayName": "红灯",
-            "index": 1,
-            "invertSignal": false
-        },
-        "buzzer": {
-            "displayName": "蜂鸣器",
-            "index": 2,
-            "invertSignal": false
-        }
+    "stopButton": {
+      "displayName": "停止按钮",
+      "index": 3,
+      "invertSignal": false
     }
+  },
+  "outputs": {
+    "greenLight": {
+      "displayName": "绿灯",
+      "index": 0,
+      "invertSignal": false
+    },
+    "redLight": {
+      "displayName": "红灯",
+      "index": 1,
+      "invertSignal": false
+    },
+    "buzzer": {
+      "displayName": "蜂鸣器",
+      "index": 2,
+      "invertSignal": false
+    }
+  }
 }

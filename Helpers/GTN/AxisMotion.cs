@@ -46,6 +46,7 @@ namespace 精密切割系统.Helpers.GTN
                 return (pSts & (int)bitsOff) == 0;
             });
         }
+
         /// <summary>
         /// 轴到位完成
         /// </summary>
@@ -60,6 +61,7 @@ namespace 精密切割系统.Helpers.GTN
                 return (pSts & bit11Mask) != 0;//按位与判断
             });
         }
+
         /// <summary>
         /// 等待轴准备好
         /// </summary>
@@ -67,7 +69,7 @@ namespace 精密切割系统.Helpers.GTN
         /// <returns></returns>
         public async Task WaitAxisReadyAsync(AxisType axis, CancellationToken token, params AxisStatusBits[] ignore)
         {
-            await TaskUtils.WaitExpectedResultAsync(() => IsReadyAsync(axis,ignore), default, token);
+            await TaskUtils.WaitExpectedResultAsync(() => IsReadyAsync(axis, ignore), default, token);
         }
 
         /// <summary>
@@ -87,7 +89,7 @@ namespace 精密切割系统.Helpers.GTN
         /// <returns></returns>
         public async Task AxisOnAsync(AxisType axis)
         {
-            var rtn = GTN_AxisOn(_core,(short)axis);
+            var rtn = GTN_AxisOn(_core, (short)axis);
         }
 
         /// <summary>
@@ -107,8 +109,6 @@ namespace 精密切割系统.Helpers.GTN
         //        rtn = GTN_SetEcatHomingPrm(_core, (short)axis, model, speed1, speed2, speed2, offset, probeFunc);
         //        rtn = GTN_SetHomingMode(_core, (short)axis, 6);
         //        rtn = GTN_StartEcatHoming(_core, (short)axis);
-
-
 
         //    });
         //    bool isHomingComplete = await IsCompleteHomingAsync((short)axis);
@@ -145,7 +145,7 @@ namespace 精密切割系统.Helpers.GTN
             await Task.Run(() =>
             {
                 short rtn = GTN_SetHomingMode(_core, (short)axis, 8);
-                GTN_ZeroPos(_core, (short)axis,(short)axis);
+                GTN_ZeroPos(_core, (short)axis, (short)axis);
             });
         }
 
@@ -176,17 +176,21 @@ namespace 精密切割系统.Helpers.GTN
         }
 
         /// <summary>
-        /// 设置软限位
+        /// 设置所有轴的软限位
         /// </summary>
         /// <param name="axis"></param>
         /// <param name="positive"></param>
         /// <param name="negative"></param>
         /// <returns></returns>
-        public async Task SetSoftLimit(AxisType axis, float positive, float negative)
+        public async Task SetAllAxisSoftLimit()
         {
             await Task.Run(() =>
             {
-                GTN_SetSoftLimit(_core, (short)axis, positive.MMToPulseF(axis), negative.MMToPulseF(axis));
+                GTN_SetSoftLimit(_core, (short)AxisType.X, GsneConfig.Instance.Axes[AxisType.X].PositiveSoftLimit.MMToPulse(AxisType.X), GsneConfig.Instance.Axes[AxisType.X].NegativeSoftLimit.MMToPulse(AxisType.X));
+                GTN_SetSoftLimit(_core, (short)AxisType.Y, GsneConfig.Instance.Axes[AxisType.Y].PositiveSoftLimit.MMToPulse(AxisType.Y), GsneConfig.Instance.Axes[AxisType.Y].NegativeSoftLimit.MMToPulse(AxisType.Y));
+                GTN_SetSoftLimit(_core, (short)AxisType.Z1, GsneConfig.Instance.Axes[AxisType.Z1].PositiveSoftLimit.MMToPulse(AxisType.Z1), GsneConfig.Instance.Axes[AxisType.Z1].NegativeSoftLimit.MMToPulse(AxisType.Z1));
+                GTN_SetSoftLimit(_core, (short)AxisType.Z2, GsneConfig.Instance.Axes[AxisType.Z2].PositiveSoftLimit.MMToPulse(AxisType.Z2), GsneConfig.Instance.Axes[AxisType.Z2].NegativeSoftLimit.MMToPulse(AxisType.Z2));
+                GTN_SetSoftLimit(_core, (short)AxisType.Theta, GsneConfig.Instance.Axes[AxisType.Theta].PositiveSoftLimit.MMToPulse(AxisType.Theta), GsneConfig.Instance.Axes[AxisType.Theta].NegativeSoftLimit.MMToPulse(AxisType.Theta));
             });
         }
 
