@@ -14,14 +14,11 @@ namespace 精密切割系统.Helpers.GTN
 
         public float OffsetMM { get; set; }
 
-        public short HomingModel { get; set; }
+        public short HomingModel {  get; set; }
 
         public double HighSpeed { get; set; }
 
         public double LowSpeed { get; set; }
 
-        public double PositiveSoftLimit { get; set; }
-
-        public double NegativeSoftLimit { get; set; }
     }
 }
